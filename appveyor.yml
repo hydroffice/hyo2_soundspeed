@@ -31,6 +31,7 @@ install:
   - "conda config --add channels SciTools"
   - "conda config --add channels IOOS"
   - "activate test-environment"
+  - "pip install wheel"
 
   # Check that we have the expected version of Python
   - "python --version"
@@ -45,3 +46,9 @@ build_script:
 test: off
 test_script:
   - python setup.py test
+
+after_test:
+  - "python setup.py bdist_wheel"
+
+artifacts:
+  - path: dist\*

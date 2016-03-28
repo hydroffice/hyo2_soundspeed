@@ -13,7 +13,7 @@ HydrOffice BAG
     :target: https://ci.appveyor.com/project/giumas/hyo-soundspeed
     :alt: AppVeyor Status
 
-.. image:: https://travis-ci.org/giumas/hyo_bag.svg?branch=master
+.. image:: https://travis-ci.org/hydroffice/hyo_soundspeed.svg?branch=master
     :target: https://travis-ci.org/hydroffice/hyo_soundspeed
     :alt: Travis-CI Status
 
