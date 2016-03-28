@@ -50,3 +50,6 @@ var/
 .installed.cfg
 *.egg
 docs/_build/*
+
+# Downloaded data
+data/downloaded/
