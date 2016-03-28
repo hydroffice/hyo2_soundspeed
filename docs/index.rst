@@ -1,7 +1,7 @@
 .. HydrOffice Sound Speed documentation master file.
 
 HydrOffice Sound Speed's documentation
-==============================
+======================================
 
 Contents
 --------
@@ -12,6 +12,8 @@ Contents
    in_brief
    license
    how_to_contribute
+   how_to_build_docs
+   how_to_distribute
 
 
 Indices and tables

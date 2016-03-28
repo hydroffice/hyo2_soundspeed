@@ -1,4 +1,4 @@
-version: 1.0.{build}-{branch}
+version: 0.1.{build}-{branch}
 
 branches:
   only:
@@ -36,12 +36,12 @@ install:
   - "python --version"
 
   # Install dependencies
-  # - conda install -q numpy matplotlib h5py lxml cython gdal==1.11.2
+  - conda install -q numpy  #  matplotlib h5py lxml cython gdal==1.11.2
 
 build: off
 build_script:
   - pip install --no-deps -e .
 
 test: off
-#test_script:
-  # - python setup.py test
+test_script:
+  - python setup.py test

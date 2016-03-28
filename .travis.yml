@@ -48,11 +48,11 @@ install:
   - conda config --add channels hydroffice
   - conda config --add channels SciTools
   - conda config --add channels IOOS
-  # - conda install -q numpy matplotlib h5py lxml gdal==1.11.2
+  - conda install -q numpy  #  matplotlib h5py lxml gdal==1.11.2
   - pip install --no-deps -e .
 
 script:
-  # - python setup.py test
+  - python setup.py test
 
 after_script:
   # If tests are successful, create a source distribution.
