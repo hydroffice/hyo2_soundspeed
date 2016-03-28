@@ -25,8 +25,8 @@ Here are a few hints and rules to get you started:
 Thank you for considering to contribute! If you have any question or concerns, feel free to reach out to us.
 
 .. _`Code of Conduct`: http://www.python.org/psf/codeofconduct/
-.. _AUTHORS.txt: https://bitbucket.org/ccomjhc/hyo_bag/raw/tip/AUTHORS.rst
-.. _changelog: https://bitbucket.org/ccomjhc/hyo_bag/raw/tip/HISTORY.rst
+.. _AUTHORS.txt: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/master/AUTHORS.rst
+.. _changelog: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/master/HISTORY.rst
 .. _`PEP 8`: http://www.python.org/dev/peps/pep-0008/
 .. _`PEP 257`: http://www.python.org/dev/peps/pep-0257/
 .. _collapse: https://www.mercurial-scm.org/wiki/RebaseExtension

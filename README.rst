@@ -9,12 +9,12 @@ HydrOffice BAG
     :target: http://giumas.github.io/hyo_soundspeed/latest
     :alt: Latest Documentation
 
-.. image:: https://ci.appveyor.com/api/projects/status/thng6eg4g05s8mi4?svg=true
+.. image:: https://ci.appveyor.com/api/projects/status/0le480nsvwjf86oj?svg=true
     :target: https://ci.appveyor.com/project/giumas/hyo-soundspeed
     :alt: AppVeyor Status
 
 .. image:: https://travis-ci.org/giumas/hyo_bag.svg?branch=master
-    :target: https://travis-ci.org/giumas/hyo_soundspeed
+    :target: https://travis-ci.org/hydroffice/hyo_soundspeed
     :alt: Travis-CI Status
 
 
@@ -22,7 +22,7 @@ HydrOffice BAG
 General Info
 ------------
 
-.. image:: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/tip/hydroffice/soundspeedmanager/media/favicon.png
+.. image:: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/master/hydroffice/soundspeedmanager/media/favicon.png
     :alt: logo
 
 HydrOffice is a research development environment for ocean mapping. Its aim is to provide a collection of
@@ -31,10 +31,12 @@ research-2-operation.
 
 This package provides functionalities to manage sound speed profiles.
 
+The package is jointly developed by NOAA OCS and UNH CCOM.
+
 
 Other info
 ----------
 
 * Bitbucket: `https://bitbucket.org/ccomjhc/hyo_soundspeed <https://bitbucket.org/ccomjhc/hyo_soundspeed>`_
-* Project page: `http://ccom.unh.edu/project/hydroffice <http://ccom.unh.edu/project/hydroffice>`_
-* License: `BSD license <https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/tip/LICENSE>`_
+* Project page: `http://www.hydroffice.org <http://www.hydroffice.org>`_
+* License: LGPLv3 license (See `LICENSE <https://bitbucket.org/ccomjhc/hyo_bag/raw/tip/LICENSE>`_)

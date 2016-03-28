@@ -43,5 +43,5 @@ build_script:
   - pip install --no-deps -e .
 
 test: off
-test_script:
-  - python setup.py test
+#test_script:
+  # - python setup.py test
