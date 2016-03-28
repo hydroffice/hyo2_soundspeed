@@ -9,7 +9,7 @@ HydrOffice BAG
     :target: http://giumas.github.io/hyo_soundspeed/latest
     :alt: Latest Documentation
 
-.. image:: https://ci.appveyor.com/api/projects/status/0le480nsvwjf86oj?svg=true
+.. image:: https://ci.appveyor.com/api/projects/status/6krhsxkcqo0jrvu6?svg=true
     :target: https://ci.appveyor.com/project/giumas/hyo-soundspeed
     :alt: AppVeyor Status
 
