@@ -1,0 +1,47 @@
+version: 1.0.{build}-{branch}
+
+branches:
+  only:
+  - default
+
+environment:
+  matrix:
+    - PYTHON_VERSION: 2.7
+      PYTHON_ARCH: x86
+      MINICONDA: C:\Miniconda
+    - PYTHON_VERSION: 3.4
+      PYTHON_ARCH: x64
+      MINICONDA: C:\Miniconda3-x64
+
+matrix:
+  allow_failures:
+    - PYTHON_VERSION: 3.4
+      PYTHON_ARCH: x64
+      MINICONDA: C:\Miniconda3-x64
+
+install:
+  - set PATH=%MINICONDA%;%MINICONDA%\Scripts;%PATH%
+
+  # Install the build and runtime dependencies of the project.
+  - "conda config --set always_yes yes --set changeps1 no"
+  - "conda update -q conda"
+  - "conda info -a"
+  - "conda create -q -n test-environment python=%PYTHON_VERSION%"
+  - "conda config --add channels hydroffice"
+  - "conda config --add channels SciTools"
+  - "conda config --add channels IOOS"
+  - "activate test-environment"
+
+  # Check that we have the expected version of Python
+  - "python --version"
+
+  # Install dependencies
+  # - conda install -q numpy matplotlib h5py lxml cython gdal==1.11.2
+
+build: off
+build_script:
+  - pip install --no-deps -e .
+
+test: off
+test_script:
+  - python setup.py test
