@@ -43,11 +43,13 @@ for fid in data_files:
         wget.download(uri, bar=wget.bar_thermometer)
         print("  - OK")
 
-# actually unzipping the archives
+# create an empty `downloaded` folder
 downloaded_folder = os.path.join(os.path.abspath(os.path.dirname(__file__)), "downloaded")
-if not os.path.exists(downloaded_folder):
-    os.makedirs(downloaded_folder)
-    print(downloaded_folder)
+if os.path.exists(downloaded_folder):
+    os.removedirs(downloaded_folder)
+os.makedirs(downloaded_folder)
+
+# actually unzipping the archives (then delete them)
 for fid in data_files:
     with zipfile.ZipFile(fid) as zf:
         zf.extractall(downloaded_folder)
