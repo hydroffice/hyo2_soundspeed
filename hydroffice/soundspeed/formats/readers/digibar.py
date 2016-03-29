@@ -14,3 +14,14 @@ class Digibar(AbstractReader):
 
     def __init__(self):
         super(Digibar, self).__init__()
+        self._ext.add('txt')
+        self._ext.add('csv')
+
+    def read(self, data_path):
+        pass
+
+    def _parse_header(self):
+        pass
+
+    def _parse_body(self):
+        pass

@@ -14,3 +14,13 @@ class Saiv(AbstractReader):
 
     def __init__(self):
         super(Saiv, self).__init__()
+        self._ext.add('txt')
+
+    def read(self, data_path):
+        pass
+
+    def _parse_header(self):
+        pass
+
+    def _parse_body(self):
+        pass

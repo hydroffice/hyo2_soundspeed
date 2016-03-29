@@ -14,3 +14,13 @@ class Sippican(AbstractReader):
 
     def __init__(self):
         super(Sippican, self).__init__()
+        self._ext.add('edf')
+
+    def read(self, data_path):
+        pass
+
+    def _parse_header(self):
+        pass
+
+    def _parse_body(self):
+        pass

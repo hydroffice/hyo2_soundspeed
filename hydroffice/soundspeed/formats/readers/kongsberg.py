@@ -15,9 +15,11 @@ class Kongsberg(AbstractReader):
     def __init__(self):
         super(Kongsberg, self).__init__()
 
+    def read(self, data_path):
+        pass
 
-class Kongsberg(AbstractWriter):
-    """Kongsberg writer"""
+    def _parse_header(self):
+        pass
 
-    def __init__(self):
-        super(Kongsberg, self).__init__()
+    def _parse_body(self):
+        pass

@@ -14,3 +14,13 @@ class Seabird(AbstractReader):
 
     def __init__(self):
         super(Seabird, self).__init__()
+        self._ext.add('cnv')
+
+    def read(self, data_path):
+        pass
+
+    def _parse_header(self):
+        pass
+
+    def _parse_body(self):
+        pass

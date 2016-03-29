@@ -14,3 +14,12 @@ class Mvp(AbstractReader):
 
     def __init__(self):
         super(Mvp, self).__init__()
+
+    def read(self, data_path):
+        pass
+
+    def _parse_header(self):
+        pass
+
+    def _parse_body(self):
+        pass
