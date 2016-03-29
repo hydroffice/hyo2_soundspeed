@@ -25,6 +25,10 @@ class AbstractFormat(object):
         return self._ssp
 
     @property
+    def ext(self):
+        return self._ext
+
+    @property
     def driver(self):
         return "%s.%s" % (self.name, self.version)
 
@@ -43,7 +47,7 @@ class AbstractReader(AbstractFormat):
         self.fid = None
 
     def __repr__(self):
-        return "<%s:reader:%s:%s>" % (self.name, self.version, ",".join(self._ext))
+        return "<%s:reader:%s:%s>" % (self.name, self.version, ",".join(self.ext))
 
     @abstractmethod
     def read(self, data_path):
@@ -68,8 +72,9 @@ class AbstractTextReader(AbstractReader):
         self.lines = []
         self.lines_offset = None
 
-    def _read(self, data_path):
-        self.fid = FileManager(data_path, 'r')
+    def _read(self, data_path, encoding='utf8'):
+        """Helper function to read the raw file"""
+        self.fid = FileManager(data_path, mode='r', encoding=encoding)
         self.lines = self.fid.io.readlines()
         self.samples_offset = 0
         self.field_index = dict()
@@ -85,7 +90,8 @@ class AbstractBinaryReader(AbstractReader):
         super(AbstractBinaryReader, self).__init__()
 
     def _read(self, data_path):
-        self.fid = FileManager(data_path, 'rb')
+        """Helper function to read the raw file"""
+        self.fid = FileManager(data_path, mode='rb')
 
 
 class AbstractWriter(AbstractFormat):
@@ -100,8 +106,6 @@ class AbstractWriter(AbstractFormat):
         super(AbstractWriter, self).__init__()
         self.fod = None
 
-    def _write_text(self, data_path):
-        self.fod = FileManager(data_path, 'w')
-
-    def _write_binary(self, data_path):
-        self.fod = FileManager(data_path, 'wb')
+    @abstractmethod
+    def write(self, data_path):
+        pass

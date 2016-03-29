@@ -4,6 +4,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import sys
 import os.path
+import shutil
 import zipfile
 try:
     import wget
@@ -19,11 +20,12 @@ except ImportError as e:
 
 # list of archives to download
 data_files = [
-    'data.asvp.zip',
     'data.castaway.zip',
-    'data.digibar.zip',
+    'data.digibarpro.zip',
+    'data.digibars.zip',
     'data.elac.zip',
     'data.idronaut.zip',
+    'data.kongsberg.zip',
     'data.saiv.zip',
     'data.seabird.zip',
     'data.sippican.zip',
@@ -46,7 +48,7 @@ for fid in data_files:
 # create an empty `downloaded` folder
 downloaded_folder = os.path.join(os.path.abspath(os.path.dirname(__file__)), "downloaded")
 if os.path.exists(downloaded_folder):
-    os.removedirs(downloaded_folder)
+    shutil.rmtree(downloaded_folder)
 os.makedirs(downloaded_folder)
 
 # actually unzipping the archives (then delete them)

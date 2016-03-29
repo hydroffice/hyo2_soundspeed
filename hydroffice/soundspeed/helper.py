@@ -2,6 +2,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import os
 import logging
+# To use a consistent encoding
+from codecs import open
 
 logger = logging.getLogger(__name__)
 
@@ -22,13 +24,13 @@ def get_testing_data_subfolders():
 
 class FileManager(object):
 
-    def __init__(self, data_path, mode):
+    def __init__(self, data_path, mode, encoding='utf-8'):
         """Open the passed file and store related info"""
 
         self._path = os.path.abspath(data_path)
         if not os.path.exists(self._path):
             raise RuntimeError('the passed file does not exist: %s' % self._path)
-        self._io = open(self._path, mode=mode)
+        self._io = open(self._path, mode=mode, encoding=encoding)
         self._basename = os.path.basename(self._path).split('.')[0]
         self._ext = os.path.basename(self._path).split('.')[-1]
 
@@ -47,10 +49,6 @@ class FileManager(object):
     @property
     def io(self):
         return self._io
-
-    @property
-    def lines(self):
-        return self._lines
 
     def __repr__(self):
         msg = "<%s:%s:%s>" % (self.__class__.__name__, self._basename, self._ext)

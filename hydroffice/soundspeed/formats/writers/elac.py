@@ -15,3 +15,6 @@ class Elac(AbstractWriter):
     def __init__(self):
         super(Elac, self).__init__()
         self._ext.add('sva')
+
+    def write(self, data_path):
+        pass

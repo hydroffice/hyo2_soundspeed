@@ -11,11 +11,14 @@ from ...profile.dicts import Dicts
 
 
 class Castaway(AbstractTextReader):
-    """Castaway reader"""
+    """Castaway reader -> CTD style
+
+    Info: http://www.sontek.com/productsdetail.php?CastAway-CTD-11
+    """
 
     def __init__(self):
         super(Castaway, self).__init__()
-        self._ext.add('csv')
+        self.ext.add('csv')
 
         # header tokens
         self.tk_filename = '% File name'
@@ -33,6 +36,7 @@ class Castaway(AbstractTextReader):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.init_data()  # create a new empty profile
+
         # initialize probe/sensor type
         self.ssp.meta.sensor_type = Dicts.sensor_types['CTD']
         self.ssp.meta.probe_type = Dicts.probe_types['Castaway']
@@ -45,14 +49,17 @@ class Castaway(AbstractTextReader):
         return True
 
     def _parse_header(self):
-        """"The Castaway header has field starting with '%'"""
+        """Parsing header: field header, filename, time, latitude, longitude
+
+        The Castaway header has field starting with '%'
+        """
         logger.debug('parsing header')
 
         # control flags
         has_depth = False
         has_speed = False
-        has_temperature = False
-        has_salinity = False
+        has_temp = False
+        has_sal = False
 
         for line in self.lines:
 
@@ -66,13 +73,13 @@ class Castaway(AbstractTextReader):
                     self.field_index[field_type] = col
                     if field_type == self.tk_depth:
                         has_depth = True
-                        self.more_fields.append(field_type)  # store the depth for additional fields
+                        self.more_fields.insert(0, field_type)  # prepend depth to additional fields
                     elif field_type == self.tk_speed:
                         has_speed = True
                     elif field_type == self.tk_temp:
-                        has_temperature = True
+                        has_temp = True
                     elif field_type == self.tk_sal:
-                        has_salinity = True
+                        has_sal = True
                     else:
                         self.more_fields.append(field_type)
                     col += 1
@@ -120,21 +127,20 @@ class Castaway(AbstractTextReader):
             raise RuntimeError("Missing depth field: %s" % self.tk_depth)
         if not has_speed:
             raise RuntimeError("Missing sound speed field: %s" % self.tk_speed)
-        if not has_temperature:
+        if not has_temp:
             raise RuntimeError("Missing temperature field: %s" % self.tk_temp)
-        if not has_salinity:
+        if not has_sal:
             raise RuntimeError("Missing salinity field: %s" % self.tk_sal)
+        if not self.ssp.meta.original_path:
+            self.ssp.meta.original_path = self.fid.path
 
         # initialize data sample structures
-        self.ssp.data.num_samples = len(self.lines) - self.samples_offset
-        self.ssp.data.init_depth()
-        self.ssp.data.init_speed()
-        self.ssp.data.init_temp()
-        self.ssp.data.init_sal()
-        # initiliaze additional fields
-        self.ssp.more.init_struct_array(self.ssp.data.num_samples, self.more_fields)
+        self.ssp.init_data(len(self.lines) - self.samples_offset)
+        # initialize additional fields
+        self.ssp.init_more(self.more_fields)
 
     def _parse_body(self):
+        """Parsing samples: depth, speed, temp, sal"""
         logger.debug('parsing body')
 
         count = 0
@@ -153,18 +159,18 @@ class Castaway(AbstractTextReader):
                 self.ssp.data.sal[count] = float(data[self.field_index[self.tk_sal]])
 
             except ValueError:
-                raise RuntimeError("invalid conversion parsing of line #%s" % (self.samples_offset + count))
+                logger.warning("invalid conversion parsing of line #%s" % (self.samples_offset + count))
+                continue
             except IndexError:
-                raise RuntimeError("invalid index parsing of line #%s" % (self.samples_offset + count))
+                logger.warning("invalid index parsing of line #%s" % (self.samples_offset + count))
+                continue
 
             # additional data field
             try:
                 for mf in self.more_fields:
-                    pass
-                    self.ssp.more.sa[mf] = float(data[self.field_index[mf]])
+                    self.ssp.more.sa[mf][count] = float(data[self.field_index[mf]])
             except Exception as e:
                 logger.debug("issue in reading additional data fields: %s -> skipping" % e)
-                pass
 
             count += 1
 

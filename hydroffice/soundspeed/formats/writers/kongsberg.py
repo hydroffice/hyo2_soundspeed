@@ -15,3 +15,6 @@ class Kongsberg(AbstractWriter):
     def __init__(self):
         super(Kongsberg, self).__init__()
         self._ext.add('asvp')
+
+    def write(self, data_path):
+        pass
