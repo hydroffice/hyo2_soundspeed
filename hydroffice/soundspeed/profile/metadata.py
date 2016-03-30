@@ -31,5 +31,6 @@ class Metadata(object):
         msg += "Probe: %s\n" % Dicts.first_match(Dicts.probe_types, self.probe_type)
         msg += "Location: %s, %s\n" % (self.latitude, self.longitude)
         msg += "Time: %s\n" % self.utc_time
-        msg += "Basename: %s\n" % os.path.basename(self.original_path)
+        if self.original_path:
+            msg += "Basename: %s\n" % os.path.basename(self.original_path)
         return msg

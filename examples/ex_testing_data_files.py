@@ -25,8 +25,8 @@ data_sub_folders = helper.get_testing_data_subfolders()
 for sub in data_sub_folders:  # retrieve the format-specific sub-folders
     for rdr in readers:
 
-        # if rdr.name.lower() != 'kongsberg':
-        #     continue
+        if rdr.name.lower() != 'valeport':
+            continue
 
         if rdr.name.lower() != sub.lower():  # skip not matching readers
             continue
@@ -53,4 +53,4 @@ for sub in data_sub_folders:  # retrieve the format-specific sub-folders
                 logger.info(rdr.ssp)
                 rdr.ssp.debug_plot(more=True)
 
-plt.show()
+            plt.show()

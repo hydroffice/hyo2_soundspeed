@@ -25,8 +25,9 @@ class More(object):
         if self.sa is not None:
             msg += "    <shape:(%s,%s)>\n" % self.sa.shape
             for fn in self.sa.dtype.names:
-                msg += "    <%s sz:%s min:%.3f max:%.3f>\n" \
-                       % (fn, self.sa[fn].shape[0], self.sa[fn].min(), self.sa[fn].max())
+                if len(self.sa[fn]) > 2:
+                    msg += "    <%s sz:%s min:%.3f max:%.3f>\n" \
+                           % (fn, self.sa[fn].shape[0], self.sa[fn].min(), self.sa[fn].max())
         return msg
 
     def resize(self, count):
@@ -52,7 +53,6 @@ class More(object):
 
         count = 0  # 0 is depth
         names = self.sa.dtype.names
-        print(names)
         for i in range(nr_figures):  # figure
 
             if count >= nr_fields:

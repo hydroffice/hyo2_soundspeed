@@ -49,10 +49,7 @@ class Castaway(AbstractTextReader):
         return True
 
     def _parse_header(self):
-        """Parsing header: field header, filename, time, latitude, longitude
-
-        The Castaway header has field starting with '%'
-        """
+        """Parsing header: field header, time, latitude, longitude"""
         logger.debug('parsing header')
 
         # control flags
@@ -64,6 +61,7 @@ class Castaway(AbstractTextReader):
         for line in self.lines:
 
             if not line:  # skip empty lines
+                self.samples_offset += 1
                 continue
 
             if line[0] != '%':  # field headers
@@ -86,9 +84,6 @@ class Castaway(AbstractTextReader):
                 self.samples_offset += 1
                 logger.debug("samples offset: %s" % self.samples_offset)
                 break
-
-            elif line[:len(self.tk_filename)] == self.tk_filename:  # original filename
-                self.ssp.meta.original_path = line.split(",")[-1].strip()
 
             elif line[:len(self.tk_cast_time)] == self.tk_cast_time:  # utc time
                 try:

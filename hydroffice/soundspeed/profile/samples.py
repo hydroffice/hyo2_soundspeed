@@ -45,12 +45,12 @@ class Samples(object):
     def __repr__(self):
         msg = "  <Samples>\n"
         msg += "    <nr:%s>\n" % self.num_samples
-        if self.depth is not None:
+        if (self.depth is not None) and (len(self.depth) > 2):
             msg += "    <depth sz:%s min:%.3f max:%.3f>\n" % (self.depth.shape[0], self.depth.min(), self.depth.max())
-        if self.speed is not None:
+        if (self.speed is not None) and (len(self.speed) > 2):
             msg += "    <speed sz:%s min:%.3f max:%.3f>\n" % (self.speed.shape[0], self.speed.min(), self.speed.max())
-        if self.temp is not None:
+        if (self.temp is not None) and (len(self.depth) > 2):
             msg += "    <temp sz:%s min:%.3f max:%.3f>\n" % (self.temp.shape[0], self.temp.min(), self.temp.max())
-        if self.sal is not None:
+        if (self.sal is not None) and (len(self.depth) > 2):
             msg += "    <sal sz:%s min:%.3f max:%.3f>\n" % (self.sal.shape[0], self.sal.min(), self.sal.max())
         return msg

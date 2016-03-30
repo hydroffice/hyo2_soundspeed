@@ -43,26 +43,32 @@ class Profile(object):
 
     def debug_plot(self, more=False):
         """Create a debug plot with the data, optionally with the extra data if available"""
+        if self.data.depth is None:
+            return
+
         import matplotlib.pyplot as plt
         plt.figure(self.meta.original_path, dpi=100)
 
-        plt.subplot(141)  # speed
-        plt.plot(self.data.speed, self.data.depth)
-        plt.gca().invert_yaxis()
-        plt.grid(True)
-        plt.title('speed')
+        if self.data.speed is not None:
+            plt.subplot(141)  # speed
+            plt.plot(self.data.speed, self.data.depth)
+            plt.gca().invert_yaxis()
+            plt.grid(True)
+            plt.title('speed')
 
-        plt.subplot(142)  # temp
-        plt.plot(self.data.temp, self.data.depth)
-        plt.gca().invert_yaxis()
-        plt.grid(True)
-        plt.title('temp')
+        if self.data.temp is not None:
+            plt.subplot(142)  # temp
+            plt.plot(self.data.temp, self.data.depth)
+            plt.gca().invert_yaxis()
+            plt.grid(True)
+            plt.title('temp')
 
-        plt.subplot(143)  # sal
-        plt.plot(self.data.sal, self.data.depth)
-        plt.gca().invert_yaxis()
-        plt.grid(True)
-        plt.title('sal')
+        if self.data.sal is not None:
+            plt.subplot(143)  # sal
+            plt.plot(self.data.sal, self.data.depth)
+            plt.gca().invert_yaxis()
+            plt.grid(True)
+            plt.title('sal')
 
         plt.subplot(144)  # meta
         fs = 9  # font size

@@ -75,7 +75,19 @@ class AbstractTextReader(AbstractReader):
     def _read(self, data_path, encoding='utf8'):
         """Helper function to read the raw file"""
         self.fid = FileManager(data_path, mode='r', encoding=encoding)
-        self.lines = self.fid.io.readlines()
+        try:
+            self.lines = self.fid.io.readlines()
+        except UnicodeDecodeError as e:
+            if encoding == 'utf8':
+                logger.info("changing encoding to latin: %s" % e)
+                self.fid = FileManager(data_path, mode='r', encoding='latin')
+                self.lines = self.fid.io.readlines()
+            elif encoding == 'latin':
+                logger.info("changing encoding to utf8: %s" % e)
+                self.fid = FileManager(data_path, mode='r', encoding='utf8')
+                self.lines = self.fid.io.readlines()
+            else:
+                raise e
         self.samples_offset = 0
         self.field_index = dict()
         self.more_fields = list()
