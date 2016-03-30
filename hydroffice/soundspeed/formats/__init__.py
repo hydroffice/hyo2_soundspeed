@@ -10,7 +10,7 @@ from .readers.castaway import Castaway
 from .readers.digibarpro import DigibarPro
 from .readers.digibars import DigibarS
 from .readers.idronaut import Idronaut
-from .readers.kongsberg import Kongsberg
+from .readers.asvp import Asvp
 from .readers.mvp import Mvp
 from .readers.saiv import Saiv
 from .readers.seabird import Seabird
@@ -24,7 +24,7 @@ readers.append(Castaway())
 readers.append(DigibarPro())
 readers.append(DigibarS())
 readers.append(Idronaut())
-readers.append(Kongsberg())
+readers.append(Asvp())
 readers.append(Mvp())
 readers.append(Saiv())
 readers.append(Seabird())
@@ -36,8 +36,8 @@ readers.append(Valeport())
 
 # writers
 from .writers.elac import Elac
-from .writers.kongsberg import Kongsberg
+from .writers.asvp import Asvp
 
 writers = list()
 writers.append(Elac())
-writers.append(Kongsberg())
+writers.append(Asvp())

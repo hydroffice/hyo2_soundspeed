@@ -20,12 +20,12 @@ except ImportError as e:
 
 # list of archives to download
 data_files = [
+    'data.asvp.zip',
     'data.castaway.zip',
     'data.digibarpro.zip',
     'data.digibars.zip',
     'data.elac.zip',
     'data.idronaut.zip',
-    'data.kongsberg.zip',
     'data.saiv.zip',
     'data.seabird.zip',
     'data.sippican.zip',

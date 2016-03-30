@@ -10,11 +10,11 @@ from ..abstract import AbstractTextReader
 from ...profile.dicts import Dicts
 
 
-class Kongsberg(AbstractTextReader):
-    """Kongsberg reader"""
+class Asvp(AbstractTextReader):
+    """Kongsberg asvp reader"""
 
     def __init__(self):
-        super(Kongsberg, self).__init__()
+        super(Asvp, self).__init__()
         self._ext.add('asvp')
 
         # header token

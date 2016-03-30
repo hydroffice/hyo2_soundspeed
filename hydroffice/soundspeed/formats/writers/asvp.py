@@ -9,11 +9,11 @@ logger = logging.getLogger(__name__)
 from ..abstract import AbstractWriter
 
 
-class Kongsberg(AbstractWriter):
-    """Kongsberg writer"""
+class Asvp(AbstractWriter):
+    """Kongsberg asvp writer"""
 
     def __init__(self):
-        super(Kongsberg, self).__init__()
+        super(Asvp, self).__init__()
         self._ext.add('asvp')
 
     def write(self, data_path):
