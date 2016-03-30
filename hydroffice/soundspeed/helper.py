@@ -10,23 +10,28 @@ logger = logging.getLogger(__name__)
 here = os.path.abspath(os.path.dirname(__file__))
 
 
-def get_testing_data_folder():
+def get_testing_input_folder():
     data_folder = os.path.abspath(os.path.join(here, os.pardir, os.pardir, "data", "downloaded"))
     if not os.path.exists(data_folder):
-        raise RuntimeError("The testing folder does not exist: %s" % data_folder)
+        raise RuntimeError("The testing input folder does not exist: %s" % data_folder)
     return data_folder
 
 
-def get_testing_data_subfolders():
-    df = get_testing_data_folder()
+def get_testing_input_subfolders():
+    df = get_testing_input_folder()
     return [o for o in os.listdir(df) if os.path.isdir(os.path.join(df, o))]
+
+
+def get_testing_output_folder():
+    data_folder = os.path.abspath(os.path.join(here, os.pardir, os.pardir, "data", "created"))
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+    return data_folder
 
 
 class FileInfo(object):
     def __init__(self, data_path):
         self._path = os.path.abspath(data_path)
-        if not os.path.exists(self._path):
-            raise RuntimeError('the passed file does not exist: %s' % self._path)
         self._basename = os.path.basename(self._path).split('.')[0]
         self._ext = os.path.basename(self._path).split('.')[-1]
         self._io = None
@@ -60,5 +65,7 @@ class FileInfo(object):
 class FileManager(FileInfo):
     def __init__(self, data_path, mode, encoding='utf-8'):
         """Open the passed file and store related info"""
+        if (not os.path.exists(data_path)) and ((mode == 'r') or (mode == 'rb')):
+            raise RuntimeError('the passed file does not exist: %s' % data_path)
         super(FileManager, self).__init__(data_path=data_path)
         self._io = open(self._path, mode=mode, encoding=encoding)

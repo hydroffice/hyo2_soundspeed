@@ -51,5 +51,6 @@ var/
 *.egg
 docs/_build/*
 
-# Downloaded data
+# Downloaded/Created data
 data/downloaded/
+data/created/

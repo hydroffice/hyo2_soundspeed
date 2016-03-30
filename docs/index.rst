@@ -11,6 +11,7 @@ Contents
 
    in_brief
    license
+   supported_formats
    how_to_contribute
    how_to_build_docs
    how_to_distribute

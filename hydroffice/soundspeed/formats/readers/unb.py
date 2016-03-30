@@ -37,6 +37,7 @@ class Unb(AbstractTextReader):
         return True
 
     def _parse_header(self):
+        logger.debug('parsing header')
         try:  # version
             self.version = int(self.lines[0].split()[0])
             logger.info("version: %s" % self.version)
@@ -55,8 +56,8 @@ class Unb(AbstractTextReader):
 
         try:  # latitude and longitude
             self.samples_offset = 3
-            latitude = float(self.lines[3].split()[0])
-            longitude = float(self.lines[3].split()[1])
+            self.ssp.meta.latitude = float(self.lines[3].split()[0])
+            self.ssp.meta.longitude = float(self.lines[3].split()[1])
         except ValueError:
             logger.warning("unable to parse the position from line #%s" % self.samples_offset)
 
@@ -68,6 +69,9 @@ class Unb(AbstractTextReader):
             logger.warning("unable to parse the number of samples from line #%s" % self.samples_offset)
 
         self.samples_offset = 16
+
+        if not self.ssp.meta.original_path:
+            self.ssp.meta.original_path = self.fid.path
 
         # initialize data sample structures
         self.ssp.init_data(num_samples)
