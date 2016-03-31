@@ -34,30 +34,30 @@ class Sonardyne(AbstractTextWriter):
         logger.debug('generating header')
         header = str()
         # row #0: title
-        if self.ssp.meta.project:
-            header += "%s\n" % self.ssp.meta.project
-        elif self.ssp.meta.survey:
-            header += "%s\n" % self.ssp.meta.survey
+        if self.ssp.cur.meta.project:
+            header += "%s\n" % self.ssp.cur.meta.project
+        elif self.ssp.cur.meta.survey:
+            header += "%s\n" % self.ssp.cur.meta.survey
         else:
             header += "Generated using HydrOffice %s v.%s\n" % (ssp_name, ssp_version)
         # row #1: date
-        if self.ssp.meta.utc_time:
-            header += "%s\n" % self.ssp.meta.utc_time.strftime("%d/%m/%Y").lstrip("0").replace("/0", "/")
+        if self.ssp.cur.meta.utc_time:
+            header += "%s\n" % self.ssp.cur.meta.utc_time.strftime("%d/%m/%Y").lstrip("0").replace("/0", "/")
         else:
             header += "0\n"
         # row #2: time
-        if self.ssp.meta.utc_time:
-            header += "%s\n" % self.ssp.meta.utc_time.strftime("%H:%M:%S").lstrip("0").replace(":0", ":")
+        if self.ssp.cur.meta.utc_time:
+            header += "%s\n" % self.ssp.cur.meta.utc_time.strftime("%H:%M:%S").lstrip("0").replace(":0", ":")
         else:
             header += "0\n"
         # row #3: probe
-        if self.ssp.meta.probe_type:
-            header += "Probe: %s\n" % Dicts.first_match(Dicts.probe_types, self.ssp.meta.probe_type)
+        if self.ssp.cur.meta.probe_type:
+            header += "Probe: %s\n" % Dicts.first_match(Dicts.probe_types, self.ssp.cur.meta.probe_type)
         else:
             header += "0\n"
         # row #4: comments
-        if self.ssp.meta.original_path:
-            header += "Source: %s\n" % self.ssp.meta.original_path
+        if self.ssp.cur.meta.original_path:
+            header += "Source: %s\n" % self.ssp.cur.meta.original_path
         else:
             header += "0\n"
 
@@ -65,7 +65,7 @@ class Sonardyne(AbstractTextWriter):
 
     def _write_body(self):
         logger.debug('generating body')
-        for idx in range(self.ssp.data.num_samples):
+        for idx in range(self.ssp.cur.data.num_samples):
             self.fod.io.write("%12.4f%12.4f%12.4f%12.4f\n"
-                              % (self.ssp.data.depth[idx], self.ssp.data.speed[idx],
-                                 self.ssp.data.sal[idx], self.ssp.data.temp[idx]))
+                              % (self.ssp.cur.data.depth[idx], self.ssp.cur.data.speed[idx],
+                                 self.ssp.cur.data.sal[idx], self.ssp.cur.data.temp[idx]))

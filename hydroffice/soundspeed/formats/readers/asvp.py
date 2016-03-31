@@ -23,11 +23,12 @@ class Asvp(AbstractTextReader):
     def read(self, data_path):
         logger.debug('*** %s ***: start' % self.driver)
 
-        self.init_data()  # create a new empty profile
+        self.init_data()  # create a new empty profile list
+        self.ssp.append()  # append a new profile
 
         # initialize probe/sensor type
-        self.ssp.meta.sensor_type = Dicts.sensor_types['SVP']
-        self.ssp.meta.probe_type = Dicts.probe_types['SVP']
+        self.ssp.cur.meta.sensor_type = Dicts.sensor_types['SVP']
+        self.ssp.cur.meta.probe_type = Dicts.probe_types['SVP']
 
         self._read(data_path=data_path)
         self._parse_header()
@@ -52,11 +53,11 @@ class Asvp(AbstractTextReader):
                     for idx, field in enumerate(line.split()):
                         # print(idx, field)
                         if idx == 4:  # time
-                            self.ssp.meta.utc_time = dt.strptime(field, "%Y%m%d%H%M")
+                            self.ssp.cur.meta.utc_time = dt.strptime(field, "%Y%m%d%H%M")
                         elif idx == 5:  # latitude
-                            self.ssp.meta.latitude = float(field)
+                            self.ssp.cur.meta.latitude = float(field)
                         elif idx == 6:  # longitude
-                            self.ssp.meta.longitude = float(field)
+                            self.ssp.cur.meta.longitude = float(field)
                     logger.debug("samples offset: %s" % self.samples_offset)
 
                 except Exception as e:
@@ -69,11 +70,11 @@ class Asvp(AbstractTextReader):
 
         if not has_header:
             raise RuntimeError("Missing header field: %s" % self.tk_header)
-        if not self.ssp.meta.original_path:
-            self.ssp.meta.original_path = self.fid.path
+        if not self.ssp.cur.meta.original_path:
+            self.ssp.cur.meta.original_path = self.fid.path
 
         # initialize data sample structures
-        self.ssp.init_data(len(self.lines) - self.samples_offset)
+        self.ssp.cur.init_data(len(self.lines) - self.samples_offset)
 
     def _parse_body(self):
         """Parsing samples: depth, speed"""
@@ -89,8 +90,8 @@ class Asvp(AbstractTextReader):
             data = line.split()
             # first required data fields
             try:
-                self.ssp.data.depth[count] = float(data[0])
-                self.ssp.data.speed[count] = float(data[1])
+                self.ssp.cur.data.depth[count] = float(data[0])
+                self.ssp.cur.data.speed[count] = float(data[1])
 
             except ValueError:
                 logger.warning("invalid conversion parsing of line #%s" % (self.samples_offset + count))
@@ -101,4 +102,4 @@ class Asvp(AbstractTextReader):
 
             count += 1
 
-        self.ssp.resize(count)
+        self.ssp.cur.resize(count)

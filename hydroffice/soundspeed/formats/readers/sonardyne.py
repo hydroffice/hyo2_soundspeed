@@ -23,11 +23,12 @@ class Sonardyne(AbstractTextReader):
     def read(self, data_path):
         logger.debug('*** %s ***: start' % self.driver)
 
-        self.init_data()  # create a new empty profile
+        self.init_data()  # create a new empty profile list
+        self.ssp.append()  # append a new profile
 
         # initialize probe/sensor type
-        self.ssp.meta.sensor_type = Dicts.sensor_types['XBT']
-        self.ssp.meta.probe_type = Dicts.probe_types['Sonardyne']
+        self.ssp.cur.meta.sensor_type = Dicts.sensor_types['XBT']
+        self.ssp.cur.meta.probe_type = Dicts.probe_types['Sonardyne']
 
         self._read(data_path=data_path)
         self._parse_header()
@@ -45,19 +46,20 @@ class Sonardyne(AbstractTextReader):
             date = dt.strptime(self.lines[self.samples_offset].strip(), "%d/%m/%Y")  # date
             self.samples_offset = 2
             time = dt.strptime(self.lines[self.samples_offset].strip(), "%H:%M:%S")  # time
-            self.ssp.meta.utc_time = dt(year=date.year, month=date.month, day=date.day, hour=time.hour, minute=time.minute, second=time.second)
+            self.ssp.cur.meta.utc_time = dt(year=date.year, month=date.month, day=date.day,
+                                            hour=time.hour, minute=time.minute, second=time.second)
         except ValueError as e:
             logger.info("unable to parse date and time from line #%s: %s" % (self.samples_offset, e))
 
         self.samples_offset = 5  # start of data samples
 
-        if not self.ssp.meta.original_path:
-            self.ssp.meta.original_path = self.fid.path
+        if not self.ssp.cur.meta.original_path:
+            self.ssp.cur.meta.original_path = self.fid.path
 
         # initialize data sample structures
-        self.ssp.init_data(len(self.lines) - self.samples_offset)
+        self.ssp.cur.init_data(len(self.lines) - self.samples_offset)
         # initialize additional fields
-        self.ssp.init_more(self.more_fields)
+        self.ssp.cur.init_more(self.more_fields)
 
     def _parse_body(self):
         """Parsing samples: depth, speed, temp, sal"""
@@ -73,14 +75,14 @@ class Sonardyne(AbstractTextReader):
             data = line.split()
             # first required data fields
             try:
-                self.ssp.data.depth[count] = float(data[0])
-                self.ssp.data.speed[count] = float(data[1])
+                self.ssp.cur.data.depth[count] = float(data[0])
+                self.ssp.cur.data.speed[count] = float(data[1])
                 try:
-                    self.ssp.data.sal[count] = float(data[2])
+                    self.ssp.cur.data.sal[count] = float(data[2])
                 except Exception:
                     pass
                 try:
-                    self.ssp.data.temp[count] = float(data[3])
+                    self.ssp.cur.data.temp[count] = float(data[3])
                 except Exception:
                     pass
 
@@ -93,4 +95,4 @@ class Sonardyne(AbstractTextReader):
 
             count += 1
 
-        self.ssp.resize(count)
+        self.ssp.cur.resize(count)

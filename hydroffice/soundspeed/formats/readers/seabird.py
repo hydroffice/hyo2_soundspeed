@@ -36,11 +36,12 @@ class Seabird(AbstractTextReader):
     def read(self, data_path):
         logger.debug('*** %s ***: start' % self.driver)
 
-        self.init_data()  # create a new empty profile
+        self.init_data()  # create a new empty profile list
+        self.ssp.append()  # append a new profile
 
         # initialize probe/sensor type
-        self.ssp.meta.sensor_type = Dicts.sensor_types['CTD']
-        self.ssp.meta.probe_type = Dicts.probe_types['SBE']
+        self.ssp.cur.meta.sensor_type = Dicts.sensor_types['CTD']
+        self.ssp.cur.meta.probe_type = Dicts.probe_types['SBE']
 
         self._read(data_path=data_path)
         self._parse_header()
@@ -88,7 +89,7 @@ class Seabird(AbstractTextReader):
                     has_sal = True
 
             elif line[:len(self.tk_time)] == self.tk_time:  # system time
-                if self.ssp.meta.utc_time:  # we prefer utc time
+                if self.ssp.cur.meta.utc_time:  # we prefer utc time
                     continue
                 try:
                     year = int(line.split()[-2])
@@ -109,7 +110,7 @@ class Seabird(AbstractTextReader):
                     month = dt.strptime(month_name, '%b').month
                     time_string = line.split()[-1]
                     hour, minute, second = [int(i) for i in time_string.split(':')]
-                    self.ssp.meta.utc_time = dt(year, month, day, hour, minute, second)
+                    self.ssp.cur.meta.utc_time = dt(year, month, day, hour, minute, second)
                 except ValueError:
                     logger.info("unable to parse UTC date and time from line #%s" % self.samples_offset)
 
@@ -146,15 +147,15 @@ class Seabird(AbstractTextReader):
             raise RuntimeError("Missing temperature field: %s" % self.tk_temp)
         if not has_sal:
             raise RuntimeError("Missing salinity field: %s" % self.tk_sal)
-        if not self.ssp.meta.original_path:
-            self.ssp.meta.original_path = self.fid.path
-        if (not self.ssp.meta.utc_time) and system_time:
-            self.ssp.meta.utc_time = system_time
+        if not self.ssp.cur.meta.original_path:
+            self.ssp.cur.meta.original_path = self.fid.path
+        if (not self.ssp.cur.meta.utc_time) and system_time:
+            self.ssp.cur.meta.utc_time = system_time
 
         # initialize data sample structures
-        self.ssp.init_data(len(self.lines) - self.samples_offset)
+        self.ssp.cur.init_data(len(self.lines) - self.samples_offset)
         # initialize additional fields
-        self.ssp.init_more(self.more_fields)
+        self.ssp.cur.init_more(self.more_fields)
 
     def _parse_body(self):
         """Parsing samples: depth, speed, temp, sal"""
@@ -170,10 +171,10 @@ class Seabird(AbstractTextReader):
             data = line.split()
             # first required data fields
             try:
-                self.ssp.data.depth[count] = float(data[self.field_index[self.tk_depth]])
-                self.ssp.data.speed[count] = float(data[self.field_index[self.tk_speed]])
-                self.ssp.data.temp[count] = float(data[self.field_index[self.tk_temp]])
-                self.ssp.data.sal[count] = float(data[self.field_index[self.tk_sal]])
+                self.ssp.cur.data.depth[count] = float(data[self.field_index[self.tk_depth]])
+                self.ssp.cur.data.speed[count] = float(data[self.field_index[self.tk_speed]])
+                self.ssp.cur.data.temp[count] = float(data[self.field_index[self.tk_temp]])
+                self.ssp.cur.data.sal[count] = float(data[self.field_index[self.tk_sal]])
 
             except ValueError:
                 logger.warning("invalid conversion parsing of line #%s" % (self.samples_offset + count))
@@ -185,10 +186,10 @@ class Seabird(AbstractTextReader):
             # additional data field
             try:
                 for mf in self.more_fields:
-                    self.ssp.more.sa[mf][count] = float(data[self.field_index[mf]])
+                    self.ssp.cur.more.sa[mf][count] = float(data[self.field_index[mf]])
             except Exception as e:
                 logger.debug("issue in reading additional data fields: %s -> skipping" % e)
 
             count += 1
 
-        self.ssp.resize(count)
+        self.ssp.cur.resize(count)

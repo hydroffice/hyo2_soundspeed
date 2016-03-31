@@ -14,7 +14,8 @@ from ...profile.dicts import Dicts
 class Idronaut(AbstractTextReader):
     """Idronaut reader -> CTD style
 
-    Info: http://www.idronaut.it/cms/view/products/multiparameter_probes/oceanographic_ctd_probes/ocean_seven_316_i_plus_i_/s310
+    Info: http://www.idronaut.it/cms/view/products/multiparameter_probes/oceanographic_ctd_probes
+        /ocean_seven_316_i_plus_i_/s310
     """
 
     def __init__(self):
@@ -37,11 +38,12 @@ class Idronaut(AbstractTextReader):
     def read(self, data_path):
         logger.debug('*** %s ***: start' % self.driver)
 
-        self.init_data()  # create a new empty profile
+        self.init_data()  # create a new empty profile list
+        self.ssp.append()  # append a new profile
 
         # initialize probe/sensor type
-        self.ssp.meta.sensor_type = Dicts.sensor_types['CTD']
-        self.ssp.meta.probe_type = Dicts.probe_types['Idronaut']
+        self.ssp.cur.meta.sensor_type = Dicts.sensor_types['CTD']
+        self.ssp.cur.meta.probe_type = Dicts.probe_types['Idronaut']
 
         self._read(data_path=data_path, encoding='latin')  # Idronaut seems to have a specific encoding
         self._parse_header()
@@ -108,7 +110,7 @@ class Idronaut(AbstractTextReader):
                     logger.warning("invalid cast time string at row #%s" % self.samples_offset)
                     continue
 
-                self.ssp.meta.utc_time = dt.datetime(year, month, day, hour, minute, second)
+                self.ssp.cur.meta.utc_time = dt.datetime(year, month, day, hour, minute, second)
 
             elif line[:len(self.tk_start_latitude)] == self.tk_start_latitude:
                 lat_token = line.split()[-1]
@@ -125,7 +127,7 @@ class Idronaut(AbstractTextReader):
                 else:
                     lat_sign = 1.0
 
-                self.ssp.meta.latitude = lat_sign * (lat_deg + lat_min / 60.0 + lat_sec / 3600.0)
+                self.ssp.cur.meta.latitude = lat_sign * (lat_deg + lat_min / 60.0 + lat_sec / 3600.0)
 
             elif line[:len(self.tk_start_longitude)] == self.tk_start_longitude:
                 lon_token = line.split()[-1]
@@ -141,7 +143,7 @@ class Idronaut(AbstractTextReader):
                     lon_deg = abs(lon_deg)
                 else:
                     lon_sign = 1.0
-                self.ssp.meta.longitude = lon_sign * (lon_deg + lon_min / 60.0 + lon_sec / 3600.0)
+                self.ssp.cur.meta.longitude = lon_sign * (lon_deg + lon_min / 60.0 + lon_sec / 3600.0)
 
             self.samples_offset += 1
 
@@ -154,13 +156,13 @@ class Idronaut(AbstractTextReader):
             raise RuntimeError("Missing temperature field: %s" % self.tk_temp)
         if not has_sal:
             raise RuntimeError("Missing salinity field: %s" % self.tk_sal)
-        if not self.ssp.meta.original_path:
-            self.ssp.meta.original_path = self.fid.path
+        if not self.ssp.cur.meta.original_path:
+            self.ssp.cur.meta.original_path = self.fid.path
 
         # initialize data sample structures
-        self.ssp.init_data(len(self.lines) - self.samples_offset)
+        self.ssp.cur.init_data(len(self.lines) - self.samples_offset)
         # initialize additional fields
-        self.ssp.init_more(self.more_fields)
+        self.ssp.cur.init_more(self.more_fields)
 
     def _parse_body(self):
         """Parsing samples: depth, speed, temp, sal"""
@@ -176,10 +178,10 @@ class Idronaut(AbstractTextReader):
             data = line.split('\t')
             # first required data fields
             try:
-                self.ssp.data.depth[count] = float(data[self.field_index[self.tk_depth]])
-                self.ssp.data.speed[count] = float(data[self.field_index[self.tk_speed]])
-                self.ssp.data.temp[count] = float(data[self.field_index[self.tk_temp]])
-                self.ssp.data.sal[count] = float(data[self.field_index[self.tk_sal]])
+                self.ssp.cur.data.depth[count] = float(data[self.field_index[self.tk_depth]])
+                self.ssp.cur.data.speed[count] = float(data[self.field_index[self.tk_speed]])
+                self.ssp.cur.data.temp[count] = float(data[self.field_index[self.tk_temp]])
+                self.ssp.cur.data.sal[count] = float(data[self.field_index[self.tk_sal]])
 
             except ValueError:
                 logger.warning("invalid conversion parsing of line #%s" % (self.samples_offset + count))
@@ -191,10 +193,10 @@ class Idronaut(AbstractTextReader):
             # additional data field
             try:
                 for mf in self.more_fields:
-                    self.ssp.more.sa[mf][count] = float(data[self.field_index[mf]])
+                    self.ssp.cur.more.sa[mf][count] = float(data[self.field_index[mf]])
             except Exception as e:
                 logger.debug("issue in reading additional data fields: %s -> skipping" % e)
 
             count += 1
 
-        self.ssp.resize(count)
+        self.ssp.cur.resize(count)

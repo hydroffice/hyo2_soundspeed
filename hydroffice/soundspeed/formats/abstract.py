@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..helper import FileManager
-from ..profile.profile import Profile
+from ..profile.profilelist import ProfileList
 
 
 class AbstractFormat(object):
@@ -18,7 +18,7 @@ class AbstractFormat(object):
     def __init__(self):
         self.name = self.__class__.__name__
         self.version = "0.1.0"
-        self._ssp = None
+        self._ssp = None  # profile list
         self._ext = set()
 
     @property
@@ -38,8 +38,8 @@ class AbstractFormat(object):
         return "%s.%s" % (self.name, self.version)
 
     def init_data(self):
-        """Create a new empty profile"""
-        self._ssp = Profile()
+        """Create a new empty profile list"""
+        self._ssp = ProfileList()
 
 
 class AbstractReader(AbstractFormat):
@@ -149,8 +149,8 @@ class AbstractTextWriter(AbstractWriter):
         if data_file:
             file_path = os.path.join(data_path, data_file)
         else:
-            if self.ssp.meta.original_path:
-                data_file = os.path.basename(self.ssp.meta.original_path) + '.' + list(self.ext)[0]
+            if self.ssp.cur.meta.original_path:
+                data_file = os.path.basename(self.ssp.cur.meta.original_path) + '.' + list(self.ext)[0]
             else:
                 data_file = 'output.' + list(self.ext)[0]
             data_path = os.path.join(data_path, self.name.lower())

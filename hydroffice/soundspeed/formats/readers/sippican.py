@@ -53,7 +53,9 @@ class Sippican(AbstractTextReader):
 
         self.is_var_alpha = False
         self.input_salinity = None
-        self.init_data()  # create a new empty profile
+
+        self.init_data()  # create a new empty profile list
+        self.ssp.append()  # append a new profile
 
         self._read(data_path=data_path)
         self._parse_header()
@@ -88,7 +90,7 @@ class Sippican(AbstractTextReader):
                 date_str = line.split()[-1]
                 try:
                     month, day, year = [int(i) for i in date_str.split('/')]
-                    self.ssp.meta.utc_time = dt.datetime(year=year, month=1, day=1)
+                    self.ssp.cur.meta.utc_time = dt.datetime(year=year, month=1, day=1)
                 except ValueError:
                     logger.warning("issue in casting the date format at line #%s" % self.samples_offset)
 
@@ -96,7 +98,7 @@ class Sippican(AbstractTextReader):
                 time_str = line.split()[-1]
                 try:
                     hour, minute, second = [int(i) for i in time_str.split(':')]
-                    self.ssp.meta.utc_time += dt.timedelta(seconds=second, minutes=minute, hours=hour)
+                    self.ssp.cur.meta.utc_time += dt.timedelta(seconds=second, minutes=minute, hours=hour)
                 except ValueError:
                     logger.warning("issue in casting the time format at line #%s" % self.samples_offset)
 
@@ -107,9 +109,9 @@ class Sippican(AbstractTextReader):
                         lat_deg = int(line.split()[-2])
                         lat_min = float(line.split()[-1][:-1])
                         lat_dir = line.split()[-1][-1]
-                        self.ssp.meta.latitude = lat_deg + lat_min / 60.
+                        self.ssp.cur.meta.latitude = lat_deg + lat_min / 60.
                         if lat_dir == 'S':
-                            self.ssp.meta.latitude *= -1
+                            self.ssp.cur.meta.latitude *= -1
                     except ValueError:
                         logger.warning("issue in casting the latitude at line #%s" % self.samples_offset)
 
@@ -120,9 +122,9 @@ class Sippican(AbstractTextReader):
                         lon_deg = int(line.split()[-2])
                         lon_min = float(line.split()[-1][:-1])
                         lon_dir = line.split()[-1][-1]
-                        self.ssp.meta.longitude = lon_deg + lon_min / 60.
+                        self.ssp.cur.meta.longitude = lon_deg + lon_min / 60.
                         if lon_dir == 'W':
-                            self.ssp.meta.longitude *= -1
+                            self.ssp.cur.meta.longitude *= -1
                     except ValueError:
                         logger.warning("issue in casting the longitude at line #%s" % self.samples_offset)
 
@@ -142,12 +144,12 @@ class Sippican(AbstractTextReader):
 
             elif line[:len(self.tk_probe)] == self.tk_probe:
                 try:
-                    self.ssp.meta.probe_type = Dicts.probe_types[line.split(':')[-1].lstrip().strip()]
-                    self.ssp.meta.sensor_type = self.sensor_dict[self.ssp.meta.probe_type]
+                    self.ssp.cur.meta.probe_type = Dicts.probe_types[line.split(':')[-1].lstrip().strip()]
+                    self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
 
                 except (IndexError, KeyError):
-                    self.ssp.meta.probe_type = Dicts.probe_types['Unknown']
-                    self.ssp.meta.sensor_type = Dicts.sensor_types['Unknown']
+                    self.ssp.cur.meta.probe_type = Dicts.probe_types['Unknown']
+                    self.ssp.cur.meta.sensor_type = Dicts.sensor_types['Unknown']
                     logger.warning("reverted to unknown probe type at line #%s" % self.samples_offset)
 
             elif line[:len(self.tk_field)] == self.tk_field:
@@ -159,30 +161,30 @@ class Sippican(AbstractTextReader):
 
             self.samples_offset += 1
 
-        if not self.ssp.meta.original_path:
-            self.ssp.meta.original_path = self.fid.path
+        if not self.ssp.cur.meta.original_path:
+            self.ssp.cur.meta.original_path = self.fid.path
 
         # initialize data sample structures
-        self.ssp.init_data(len(self.lines) - self.samples_offset)
+        self.ssp.cur.init_data(len(self.lines) - self.samples_offset)
         # initialize additional fields
         if self.is_var_alpha:
             pass
         else:
-            if self.ssp.meta.sensor_type == Dicts.sensor_types["XCTD"]:
+            if self.ssp.cur.meta.sensor_type == Dicts.sensor_types["XCTD"]:
                 self.more_fields.append('Depth')
                 self.more_fields.append('Conductivity')
                 self.more_fields.append('Density')
                 self.more_fields.append('Status')
-        self.ssp.init_more(self.more_fields)
+        self.ssp.cur.init_more(self.more_fields)
 
     def _parse_body(self):
         logger.debug('parsing body [alpha: %s]' % self.is_var_alpha)
 
-        if self.ssp.meta.sensor_type == Dicts.sensor_types["XBT"]:
+        if self.ssp.cur.meta.sensor_type == Dicts.sensor_types["XBT"]:
             # logger.info("%s" % self.input_salinity)
             # logger.info("%s" % self.ssp.data.sal)
             if self.input_salinity is not None:
-                self.ssp.data.sal[:] = self.input_salinity
+                self.ssp.cur.data.sal[:] = self.input_salinity
 
         count = 0
         for line in self.lines[self.samples_offset:len(self.lines)]:
@@ -207,14 +209,14 @@ class Sippican(AbstractTextReader):
 
             count += 1
 
-        self.ssp.resize(count)
+        self.ssp.cur.resize(count)
 
     def _body_default(self, line, count):
 
         field_count = 0
         fields = line.split()
 
-        if self.ssp.meta.sensor_type == Dicts.sensor_types["XBT"]:
+        if self.ssp.cur.meta.sensor_type == Dicts.sensor_types["XBT"]:
             if len(fields) < 3:
                 logger.warning("too few fields for line #%s" % (self.samples_offset + count))
                 return
@@ -226,16 +228,16 @@ class Sippican(AbstractTextReader):
 
             for field in fields:
                 if field_count == 0:
-                    self.ssp.data.depth[count] = field
+                    self.ssp.cur.data.depth[count] = field
                 elif field_count == 1:
-                    self.ssp.data.temp[count] = field
+                    self.ssp.cur.data.temp[count] = field
                 elif field_count == 2:
-                    self.ssp.data.speed[count] = field
+                    self.ssp.cur.data.speed[count] = field
                 field_count += 1
 
             return
 
-        elif self.ssp.meta.sensor_type == Dicts.sensor_types["XSV"]:
+        elif self.ssp.cur.meta.sensor_type == Dicts.sensor_types["XSV"]:
             if len(fields) < 2:
                 logger.warning("too few fields for line #%s" % (self.samples_offset + count))
                 return
@@ -247,14 +249,14 @@ class Sippican(AbstractTextReader):
 
             for field in fields:
                 if field_count == 0:
-                    self.ssp.data.depth[count] = field
+                    self.ssp.cur.data.depth[count] = field
                 elif field_count == 1:
-                    self.ssp.data.speed[count] = field
+                    self.ssp.cur.data.speed[count] = field
                 field_count += 1
 
             return
 
-        elif self.ssp.meta.sensor_type == Dicts.sensor_types["XCTD"]:
+        elif self.ssp.cur.meta.sensor_type == Dicts.sensor_types["XCTD"]:
             if len(fields) < 6:
                 logger.warning("too few fields for line #%s" % (self.samples_offset + count))
                 return
@@ -266,20 +268,20 @@ class Sippican(AbstractTextReader):
 
             for field in fields:
                 if field_count == 0:
-                    self.ssp.data.depth[count] = field
-                    self.ssp.more.sa['Depth'][count] = field
+                    self.ssp.cur.data.depth[count] = field
+                    self.ssp.cur.more.sa['Depth'][count] = field
                 elif field_count == 1:
-                    self.ssp.data.temp[count] = field
+                    self.ssp.cur.data.temp[count] = field
                 elif field_count == 2:
-                    self.ssp.more.sa['Conductivity'][count] = field
+                    self.ssp.cur.more.sa['Conductivity'][count] = field
                 elif field_count == 3:
-                    self.ssp.data.sal[count] = field
+                    self.ssp.cur.data.sal[count] = field
                 elif field_count == 4:
-                    self.ssp.data.speed[count] = field
+                    self.ssp.cur.data.speed[count] = field
                 elif field_count == 5:
-                    self.ssp.more.sa['Density'][count] = field
+                    self.ssp.cur.more.sa['Density'][count] = field
                 elif field_count == 6:
-                    self.ssp.more.sa['Status'][count] = field
+                    self.ssp.cur.more.sa['Status'][count] = field
                 field_count += 1
 
             return
@@ -289,35 +291,35 @@ class Sippican(AbstractTextReader):
         fields = line.split()
         # print(self.field_index)
 
-        if self.ssp.meta.sensor_type == Dicts.sensor_types["XBT"]:
+        if self.ssp.cur.meta.sensor_type == Dicts.sensor_types["XBT"]:
             # skip 0-speed value
             if float(fields[self.field_index["Sound"]]) == 0.0:
                 logger.info("skipping 0-speed row")
                 return
 
-            self.ssp.data.depth[count] = float(fields[self.field_index["Depth"]])
-            self.ssp.data.speed[count] = float(fields[self.field_index["Sound"]])
-            self.ssp.data.temp[count] = float(fields[self.field_index["Temperature"]])
+            self.ssp.cur.data.depth[count] = float(fields[self.field_index["Depth"]])
+            self.ssp.cur.data.speed[count] = float(fields[self.field_index["Sound"]])
+            self.ssp.cur.data.temp[count] = float(fields[self.field_index["Temperature"]])
             return
 
-        elif self.ssp.meta.sensor_type == Dicts.sensor_types["XSV"]:
+        elif self.ssp.cur.meta.sensor_type == Dicts.sensor_types["XSV"]:
             #  skip 0-speed value
             if float(fields[self.field_index["Sound"]]) == 0.0:
                 logger.info("skipping 0-speed row")
                 return
 
-            self.ssp.data.depth[count] = float(fields[self.field_index["Depth"]])
-            self.ssp.data.speed[count] = float(fields[self.field_index["Sound"]])
+            self.ssp.cur.data.depth[count] = float(fields[self.field_index["Depth"]])
+            self.ssp.cur.data.speed[count] = float(fields[self.field_index["Sound"]])
             return
 
-        elif self.ssp.meta.sensor_type == Dicts.sensor_types["XCTD"]:
+        elif self.ssp.cur.meta.sensor_type == Dicts.sensor_types["XCTD"]:
             # skip 0-speed value
             if float(fields[self.field_index["Sound"]]) == 0.0:
                 logger.info("skipping 0-speed row")
                 return
 
-            self.ssp.data.depth[count] = float(fields[self.field_index["Depth"]])
-            self.ssp.data.speed[count] = float(fields[self.field_index["Sound"]])
-            self.ssp.data.temp[count] = float(fields[self.field_index["Temperature"]])
-            self.ssp.data.sal[count] = float(fields[self.field_index["Salinity"]])
+            self.ssp.cur.data.depth[count] = float(fields[self.field_index["Depth"]])
+            self.ssp.cur.data.speed[count] = float(fields[self.field_index["Sound"]])
+            self.ssp.cur.data.temp[count] = float(fields[self.field_index["Temperature"]])
+            self.ssp.cur.data.sal[count] = float(fields[self.field_index["Salinity"]])
             return

@@ -32,11 +32,12 @@ class Saiv(AbstractTextReader):
     def read(self, data_path):
         logger.debug('*** %s ***: start' % self.driver)
 
-        self.init_data()  # create a new empty profile
+        self.init_data()  # create a new empty profile list
+        self.ssp.append()  # append a new profile
 
         # initialize probe/sensor type
-        self.ssp.meta.sensor_type = Dicts.sensor_types['CTD']
-        self.ssp.meta.probe_type = Dicts.probe_types['S2']
+        self.ssp.cur.meta.sensor_type = Dicts.sensor_types['CTD']
+        self.ssp.cur.meta.probe_type = Dicts.probe_types['S2']
 
         self._read(data_path=data_path)
         self._parse_header()
@@ -102,13 +103,13 @@ class Saiv(AbstractTextReader):
             raise RuntimeError("Missing temperature field: %s" % self.tk_temp)
         if not has_sal:
             raise RuntimeError("Missing salinity field: %s" % self.tk_sal)
-        if not self.ssp.meta.original_path:
-            self.ssp.meta.original_path = self.fid.path
+        if not self.ssp.cur.meta.original_path:
+            self.ssp.cur.meta.original_path = self.fid.path
 
         # initialize data sample structures
-        self.ssp.init_data(len(self.lines) - self.samples_offset)
+        self.ssp.cur.init_data(len(self.lines) - self.samples_offset)
         # initialize additional fields
-        self.ssp.init_more(self.more_fields)
+        self.ssp.cur.init_more(self.more_fields)
 
     def _parse_body(self):
         """Parsing samples: depth, speed, temp, sal"""
@@ -135,18 +136,18 @@ class Saiv(AbstractTextReader):
                     hour = int(time_string.split(':')[0])
                     minute = int(time_string.split(':')[1])
                     second = int(time_string.split(':')[2])
-                    self.ssp.meta.utc_time = dt.datetime(year=year, month=month, day=day,
-                                                         hour=hour, minute=minute, second=second)
+                    self.ssp.cur.meta.utc_time = dt.datetime(year=year, month=month, day=day,
+                                                             hour=hour, minute=minute, second=second)
                     has_valid_time = True
                 except Exception as e:
                     logger.warning('unable to retrieve date/time at line #%s' % (self.samples_offset + count))
 
             # first required data fields
             try:
-                self.ssp.data.depth[count] = float(data[self.field_index[self.tk_depth]])
-                self.ssp.data.speed[count] = float(data[self.field_index[self.tk_speed]])
-                self.ssp.data.temp[count] = float(data[self.field_index[self.tk_temp]])
-                self.ssp.data.sal[count] = float(data[self.field_index[self.tk_sal]])
+                self.ssp.cur.data.depth[count] = float(data[self.field_index[self.tk_depth]])
+                self.ssp.cur.data.speed[count] = float(data[self.field_index[self.tk_speed]])
+                self.ssp.cur.data.temp[count] = float(data[self.field_index[self.tk_temp]])
+                self.ssp.cur.data.sal[count] = float(data[self.field_index[self.tk_sal]])
 
             except ValueError:
                 logger.warning("invalid conversion parsing of line #%s" % (self.samples_offset + count))
@@ -158,10 +159,10 @@ class Saiv(AbstractTextReader):
             # additional data field
             try:
                 for mf in self.more_fields:
-                    self.ssp.more.sa[mf][count] = float(data[self.field_index[mf]])
+                    self.ssp.cur.more.sa[mf][count] = float(data[self.field_index[mf]])
             except Exception as e:
                 logger.debug("issue in reading additional data fields: %s -> skipping" % e)
 
             count += 1
 
-        self.ssp.resize(count)
+        self.ssp.cur.resize(count)

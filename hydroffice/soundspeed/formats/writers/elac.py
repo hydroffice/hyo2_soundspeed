@@ -41,7 +41,7 @@ class Elac(AbstractTextWriter):
 
     def _write_body(self):
         logger.debug('generating body')
-        for idx in range(self.ssp.data.num_samples):
+        for idx in range(self.ssp.cur.data.num_samples):
             self.fod.io.write("%8.2f%10.2f%10.2f%10.2f      0.00\n"
-                              % (self.ssp.data.depth[idx], self.ssp.data.speed[idx],
-                                 self.ssp.data.temp[idx], self.ssp.data.sal[idx]))
+                              % (self.ssp.cur.data.depth[idx], self.ssp.cur.data.speed[idx],
+                                 self.ssp.cur.data.temp[idx], self.ssp.cur.data.sal[idx]))

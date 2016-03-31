@@ -37,21 +37,22 @@ class Unb(AbstractTextWriter):
         # row #0: version
         header += "2  # Generated using HydrOffice %s v.%s\n" % (ssp_name, ssp_version)
         # row #1: date and time of observation
-        if self.ssp.meta.utc_time:
-            header += "%s # date and time of observation\n" % self.ssp.meta.utc_time.strftime("%Y %j %H:%M:%S")
+        if self.ssp.cur.meta.utc_time:
+            header += "%s # date and time of observation\n" % self.ssp.cur.meta.utc_time.strftime("%Y %j %H:%M:%S")
         else:
             header += "0000 000 00:00:00 # date and time of observation\n"
         # row #2: date and time of logging (when inserted into MB logging stream)
         header += "0000 000 00:00:00 # date and time of logging (when inserted into MB logging stream)\n"
         # row #3: lat and long of observation
-        if self.ssp.meta.latitude and self.ssp.meta.longitude:
-            header += "%.6f %.6f # lat and long of observation\n" % (self.ssp.meta.latitude, self.ssp.meta.longitude)
+        if self.ssp.cur.meta.latitude and self.ssp.cur.meta.longitude:
+            header += "%.6f %.6f # lat and long of observation\n" \
+                      % (self.ssp.cur.meta.latitude, self.ssp.cur.meta.longitude)
         else:
             header += "0.000000 0.000000 # lat and long of observation\n"
         # row #4: lat and long of ship when inserted
         header += "0.000000 0.000000 # lat and long of ship when inserted\n"
         # row #5: no. of raw observations
-        header += "%d # no. of raw observations\n" % self.ssp.data.num_samples
+        header += "%d # no. of raw observations\n" % self.ssp.cur.data.num_samples
         # rows #6-15: blanck
         header += "# blank line for future parameter 1 of 10\n" \
                   "# blank line for future parameter 2 of 10\n" \
@@ -68,7 +69,7 @@ class Unb(AbstractTextWriter):
 
     def _write_body(self):
         logger.debug('generating body')
-        for idx in range(self.ssp.data.num_samples):
+        for idx in range(self.ssp.cur.data.num_samples):
             self.fod.io.write("%d %.3f %.3f %.3f %.3f 0.000 0\n"
-                              % (idx+1, self.ssp.data.depth[idx], self.ssp.data.speed[idx],
-                                 self.ssp.data.temp[idx], self.ssp.data.sal[idx]))
+                              % (idx+1, self.ssp.cur.data.depth[idx], self.ssp.cur.data.speed[idx],
+                                 self.ssp.cur.data.temp[idx], self.ssp.cur.data.sal[idx]))

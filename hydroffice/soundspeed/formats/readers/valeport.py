@@ -34,7 +34,8 @@ class Valeport(AbstractTextReader):
     def read(self, data_path):
         logger.debug('*** %s ***: start' % self.driver)
 
-        self.init_data()  # create a new empty profile
+        self.init_data()  # create a new empty profile list
+        self.ssp.append()  # append a new profile
 
         self._read(data_path=data_path)
         self._parse_header()
@@ -72,32 +73,32 @@ class Valeport(AbstractTextReader):
                     minute = int(time_string.split(':')[1])
                     second = int(time_string.split(':')[2])
                     if (year is not None) and (hour is not None):
-                        self.ssp.meta.utc_time = dt.datetime(year, month, day, hour, minute, second)
+                        self.ssp.cur.meta.utc_time = dt.datetime(year, month, day, hour, minute, second)
                 except ValueError:
                     logger.warning("unable to parse date and time from line #%s" % self.samples_offset)
 
             elif line[:len(self.tk_latitude)] == self.tk_latitude:
                 try:
-                    self.ssp.meta.latitude = float(line.split(':')[-1])
+                    self.ssp.cur.meta.latitude = float(line.split(':')[-1])
                 except ValueError:
                     logger.warning("unable to parse latitude from line #%s" % self.samples_offset)
 
             elif line[:len(self.tk_probe_type)] == self.tk_probe_type:
-                self.ssp.meta.probe_type = Dicts.probe_types['MiniSVP']
+                self.ssp.cur.meta.probe_type = Dicts.probe_types['MiniSVP']
                 try:
-                    self.ssp.meta.sensor_type = self.sensor_dict[self.ssp.meta.probe_type]
+                    self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
                 except KeyError:
                     logger.warning("unable to recognize probe type from line #%s" % self.samples_offset)
-                    self.ssp.meta.sensor_type = Dicts.sensor_types['Unknown']
+                    self.ssp.cur.meta.sensor_type = Dicts.sensor_types['Unknown']
             self.samples_offset += 1
 
-        if not self.ssp.meta.original_path:
-            self.ssp.meta.original_path = self.fid.path
+        if not self.ssp.cur.meta.original_path:
+            self.ssp.cur.meta.original_path = self.fid.path
 
         # initialize data sample structures
-        self.ssp.init_data(len(self.lines) - self.samples_offset)
+        self.ssp.cur.init_data(len(self.lines) - self.samples_offset)
         # initialize additional fields
-        self.ssp.init_more(self.more_fields)
+        self.ssp.cur.init_more(self.more_fields)
 
     def _midas_header(self):
         self.tk_start_data = 'Date / Time'
@@ -116,31 +117,31 @@ class Valeport(AbstractTextReader):
                     time_string = line.split()[-1]
                     day, month, year = [int(i) for i in date_string.split('/')]
                     hour, minute, second = [int(i) for i in time_string.split(':')]
-                    self.ssp.meta.utc_time = dt.datetime(year, month, day, hour, minute, second)
+                    self.ssp.cur.meta.utc_time = dt.datetime(year, month, day, hour, minute, second)
                 except ValueError:
                     logger.warning("unable to parse time from line #%s" % self.samples_offset)
 
             elif line[:len(self.tk_probe_type)] == self.tk_probe_type:
                 try:
-                    self.ssp.meta.probe_type = Dicts.probe_types[line.split(':')[-1].strip()]
+                    self.ssp.cur.meta.probe_type = Dicts.probe_types[line.split(':')[-1].strip()]
                 except (ValueError, KeyError):
                     logger.warning("unable to parse probe type from line #%s" % self.samples_offset)
-                    self.ssp.meta.probe_type = Dicts.probe_types['Unknown']
+                    self.ssp.cur.meta.probe_type = Dicts.probe_types['Unknown']
                 try:
-                    self.ssp.meta.sensor_type = self.sensor_dict[self.ssp.meta.probe_type]
+                    self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
                 except KeyError:
                     logger.warning("unable to find sensor type from line #%s" % self.samples_offset)
-                    self.ssp.meta.sensor_type = Dicts.sensor_types['Unknown']
+                    self.ssp.cur.meta.sensor_type = Dicts.sensor_types['Unknown']
 
             self.samples_offset += 1
 
-        if not self.ssp.meta.original_path:
-            self.ssp.meta.original_path = self.fid.path
+        if not self.ssp.cur.meta.original_path:
+            self.ssp.cur.meta.original_path = self.fid.path
 
         # initialize data sample structures
-        self.ssp.init_data(len(self.lines) - self.samples_offset)
+        self.ssp.cur.init_data(len(self.lines) - self.samples_offset)
         # initialize additional fields
-        self.ssp.init_more(self.more_fields)
+        self.ssp.cur.init_more(self.more_fields)
 
     def _parse_body(self):
         logger.debug('parsing body')
@@ -159,16 +160,16 @@ class Valeport(AbstractTextReader):
                 if float(data[0]) < 0.0 or float(data[1]) < -2.0 or float(data[2]) < 1400.0 or float(data[2]) > 1650.0:
                     continue
 
-                self.ssp.data.depth[count] = float(data[0])
-                self.ssp.data.temp[count] = float(data[1])
-                self.ssp.data.speed[count] = float(data[2])
+                self.ssp.cur.data.depth[count] = float(data[0])
+                self.ssp.cur.data.temp[count] = float(data[1])
+                self.ssp.cur.data.speed[count] = float(data[2])
                 count += 1
 
             except ValueError:
                 logger.error("unable to parse from line #%s" % self.samples_offset)
                 continue
 
-        self.ssp.resize(count)
+        self.ssp.cur.resize(count)
 
     def _midas_body(self):
 
@@ -176,7 +177,7 @@ class Valeport(AbstractTextReader):
         for line in self.lines[self.samples_offset:len(self.lines)]:
             try:
                 # In case an incomplete file comes through
-                if self.ssp.meta.sensor_type == Dicts.sensor_types["SVPT"]:
+                if self.ssp.cur.meta.sensor_type == Dicts.sensor_types["SVPT"]:
                     data = line.split()
 
                     if data[2] == 0.0:  # sound speed
@@ -184,9 +185,9 @@ class Valeport(AbstractTextReader):
 
                     # s_date = data[0]
                     # s_time = data[1]
-                    self.ssp.data.speed[count] = data[2]
-                    self.ssp.data.depth[count] = data[3]
-                    self.ssp.data.temp[count] = data[4]
+                    self.ssp.cur.data.speed[count] = data[2]
+                    self.ssp.cur.data.depth[count] = data[3]
+                    self.ssp.cur.data.temp[count] = data[4]
 
             except ValueError:
                 logger.error("unable to parse from line #%s" % self.samples_offset)
@@ -194,5 +195,5 @@ class Valeport(AbstractTextReader):
 
             count += 1
 
-        self.ssp.resize(count)
+        self.ssp.cur.resize(count)
 

@@ -31,11 +31,13 @@ class Elac(AbstractTextReader):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.version = None
-        self.init_data()  # create a new empty profile
+
+        self.init_data()  # create a new empty profile list
+        self.ssp.append()  # append a new profile
 
         # initialize probe/sensor type
-        self.ssp.meta.sensor_type = Dicts.sensor_types['XBT']  # faking XBT
-        self.ssp.meta.probe_type = Dicts.probe_types['Elac']
+        self.ssp.cur.meta.sensor_type = Dicts.sensor_types['XBT']  # faking XBT
+        self.ssp.cur.meta.probe_type = Dicts.probe_types['Elac']
 
         self._read(data_path=data_path)
         self._parse_header()
@@ -94,13 +96,13 @@ class Elac(AbstractTextReader):
             raise RuntimeError("Missing temperature field: %s" % self.tk_temp)
         if not has_sal:
             raise RuntimeError("Missing salinity field: %s" % self.tk_sal)
-        if not self.ssp.meta.original_path:
-            self.ssp.meta.original_path = self.fid.path
+        if not self.ssp.cur.meta.original_path:
+            self.ssp.cur.meta.original_path = self.fid.path
 
         # initialize data sample structures
-        self.ssp.init_data(len(self.lines) - self.samples_offset)
+        self.ssp.cur.init_data(len(self.lines) - self.samples_offset)
         # initialize additional fields
-        self.ssp.init_more(self.more_fields)
+        self.ssp.cur.init_more(self.more_fields)
 
     def _parse_body(self):
         """Parsing samples: depth, speed, temp, sal"""
@@ -116,11 +118,11 @@ class Elac(AbstractTextReader):
             data = line.split()
             # first required data fields
             try:
-                self.ssp.data.depth[count] = float(data[0])
-                self.ssp.data.speed[count] = float(data[1])
+                self.ssp.cur.data.depth[count] = float(data[0])
+                self.ssp.cur.data.speed[count] = float(data[1])
 
-                self.ssp.data.temp[count] = float(data[2])
-                self.ssp.data.sal[count] = float(data[3])
+                self.ssp.cur.data.temp[count] = float(data[2])
+                self.ssp.cur.data.sal[count] = float(data[3])
 
             except ValueError:
                 logger.warning("invalid conversion parsing of line #%s" % (self.samples_offset + count))
@@ -132,10 +134,10 @@ class Elac(AbstractTextReader):
             # additional data field
             try:
                 for mf in self.more_fields:
-                    self.ssp.more.sa[mf][count] = float(data[self.field_index[mf]])
+                    self.ssp.cur.more.sa[mf][count] = float(data[self.field_index[mf]])
             except Exception as e:
                 logger.debug("issue in reading additional data fields: %s -> skipping" % e)
 
             count += 1
 
-        self.ssp.resize(count)
+        self.ssp.cur.resize(count)

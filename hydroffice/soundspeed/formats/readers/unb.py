@@ -23,11 +23,13 @@ class Unb(AbstractTextReader):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.version = None
-        self.init_data()  # create a new empty profile
+
+        self.init_data()  # create a new empty profile list
+        self.ssp.append()  # append a new profile
 
         # initialize probe/sensor type
-        self.ssp.meta.sensor_type = Dicts.sensor_types['XBT']  # faking XBT
-        self.ssp.meta.probe_type = Dicts.probe_types['XBT']
+        self.ssp.cur.meta.sensor_type = Dicts.sensor_types['XBT']  # faking XBT
+        self.ssp.cur.meta.probe_type = Dicts.probe_types['XBT']
 
         self._read(data_path=data_path)
         self._parse_header()
@@ -50,14 +52,14 @@ class Unb(AbstractTextReader):
             jday = int(self.lines[1].split()[1])
             time = self.lines[1].split()[2]
             hour, minute, second = [int(i) for i in time.split(':')]
-            self.ssp.meta.utc_time = dt.datetime(year, 1, 1, hour, minute, second) + dt.timedelta(days=jday-1)
+            self.ssp.cur.meta.utc_time = dt.datetime(year, 1, 1, hour, minute, second) + dt.timedelta(days=jday-1)
         except ValueError:
             logger.warning("unable to parse the time from line #%s" % self.samples_offset)
 
         try:  # latitude and longitude
             self.samples_offset = 3
-            self.ssp.meta.latitude = float(self.lines[3].split()[0])
-            self.ssp.meta.longitude = float(self.lines[3].split()[1])
+            self.ssp.cur.meta.latitude = float(self.lines[3].split()[0])
+            self.ssp.cur.meta.longitude = float(self.lines[3].split()[1])
         except ValueError:
             logger.warning("unable to parse the position from line #%s" % self.samples_offset)
 
@@ -70,15 +72,15 @@ class Unb(AbstractTextReader):
 
         self.samples_offset = 16
 
-        if not self.ssp.meta.original_path:
-            self.ssp.meta.original_path = self.fid.path
+        if not self.ssp.cur.meta.original_path:
+            self.ssp.cur.meta.original_path = self.fid.path
 
         # initialize data sample structures
-        self.ssp.init_data(num_samples)
+        self.ssp.cur.init_data(num_samples)
         # initialize additional fields
         self.more_fields.append('Depth')
         self.more_fields.append('Flag')
-        self.ssp.init_more(self.more_fields)
+        self.ssp.cur.init_more(self.more_fields)
 
     def _parse_body(self):
         """Parsing samples: depth, speed, temp, sal"""
@@ -94,15 +96,15 @@ class Unb(AbstractTextReader):
             data = line.split()
             # first required data fields
             try:
-                self.ssp.data.depth[count] = float(data[1])
-                self.ssp.data.speed[count] = float(data[2])
+                self.ssp.cur.data.depth[count] = float(data[1])
+                self.ssp.cur.data.speed[count] = float(data[2])
 
                 if self.version == 2:
-                    self.ssp.data.temp[count] = float(data[3])
-                    self.ssp.data.sal[count] = float(data[4])
+                    self.ssp.cur.data.temp[count] = float(data[3])
+                    self.ssp.cur.data.sal[count] = float(data[4])
                     # The fifth field is an extra (unused?) field
-                    self.ssp.more.sa['Depth'][count] = float(data[1])
-                    self.ssp.more.sa['Flag'][count] = float(data[6])
+                    self.ssp.cur.more.sa['Depth'][count] = float(data[1])
+                    self.ssp.cur.more.sa['Flag'][count] = float(data[6])
 
             except ValueError:
                 logger.warning("invalid conversion parsing of line #%s" % (self.samples_offset + count))
@@ -113,4 +115,4 @@ class Unb(AbstractTextReader):
 
             count += 1
 
-        self.ssp.resize(count)
+        self.ssp.cur.resize(count)

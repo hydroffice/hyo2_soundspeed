@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import os
+import sys
 import logging
 # To use a consistent encoding
 from codecs import open
@@ -27,6 +28,26 @@ def get_testing_output_folder():
     if not os.path.exists(data_folder):
         os.makedirs(data_folder)
     return data_folder
+
+
+def explore_folder(path):
+    """Open the passed path using OS-native commands"""
+    if not path:
+        return
+
+    import subprocess
+
+    if sys.platform == 'darwin':
+        subprocess.call(['open', '--', path])
+
+    elif sys.platform == 'linux':
+        subprocess.call(['xdg-open', path])
+
+    elif (sys.platform == 'win32') or (os.name is "nt"):
+        subprocess.call(['explorer', path])
+
+    else:
+        raise OSError("Unknown/unsupported OS")
 
 
 class FileInfo(object):
