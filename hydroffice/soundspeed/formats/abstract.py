@@ -20,6 +20,7 @@ class AbstractFormat(object):
         self.version = "0.1.0"
         self._ssp = None  # profile list
         self._ext = set()
+        self.multicast_support = False
 
     @property
     def ssp(self):

@@ -13,9 +13,11 @@ class Profile(object):
     """"A sound speed profile with 3 sections: metadata, data specific to the task, and additional data"""
 
     def __init__(self):
-        self.meta = Metadata()
-        self.data = Samples()
-        self.more = More()
+        self.meta = Metadata()  # metadata
+        self.data = Samples()   # raw data
+        self.proc = Samples()   # processed data
+        self.sis = Samples()    # sis data
+        self.more = More()      # additional fields
 
     def __repr__(self):
         msg = "<Profile>\n"
