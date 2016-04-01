@@ -6,7 +6,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from ..helper import FileManager
+from ..base.helper import FileManager
 from ..profile.profilelist import ProfileList
 
 

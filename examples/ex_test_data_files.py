@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import os
 from matplotlib import pyplot as plt
-from hydroffice.soundspeed import helper
+from hydroffice.soundspeed.base import helper
 from hydroffice.soundspeed.formats import readers, writers
 
 # logging settings
@@ -29,7 +29,7 @@ def process_test_file(tf, rdr, rdr_folder, data_output):
     ret = rdr.read(os.path.join(rdr_folder, tf))
     if ret:
         logger.info(rdr.ssp)
-        # rdr.ssp.debug_plot(more=True)
+        rdr.ssp.debug_plot(more=True)
         for wrt in writers:
             wrt.write(ssp=rdr.ssp, data_path=data_output)
 
@@ -52,7 +52,7 @@ def process_reader(sub, rdr, data_input, data_output):
     # use test files
     for tf in test_files:
         process_test_file(tf=tf, rdr=rdr, rdr_folder=rdr_folder, data_output=data_output)
-    # plt.show()
+    plt.show()
 
 
 def main():

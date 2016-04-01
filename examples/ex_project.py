@@ -15,8 +15,9 @@ from hydroffice.soundspeed.project import Project
 
 def main():
     prj = Project()
+    prj.activate_server_logger(True)
     logger.info(prj)
-    # prj.open_data_folder()
+    prj.open_data_folder()
 
 if __name__ == "__main__":
     main()

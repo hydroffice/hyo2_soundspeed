@@ -12,7 +12,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 
 def get_testing_input_folder():
-    data_folder = os.path.abspath(os.path.join(here, os.pardir, os.pardir, "data", "downloaded"))
+    data_folder = os.path.abspath(os.path.join(here, os.pardir, os.pardir, os.pardir, "data", "downloaded"))
     if not os.path.exists(data_folder):
         raise RuntimeError("The testing input folder does not exist: %s" % data_folder)
     return data_folder
@@ -24,7 +24,7 @@ def get_testing_input_subfolders():
 
 
 def get_testing_output_folder():
-    data_folder = os.path.abspath(os.path.join(here, os.pardir, os.pardir, "data", "created"))
+    data_folder = os.path.abspath(os.path.join(here, os.pardir, os.pardir, os.pardir, "data", "created"))
     if not os.path.exists(data_folder):
         os.makedirs(data_folder)
     return data_folder

@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 from ..abstract import AbstractBinaryReader
 from ...profile.dicts import Dicts
-from ...helper import FileInfo
+from ...base.helper import FileInfo
 
 
 class Turo(AbstractBinaryReader):
