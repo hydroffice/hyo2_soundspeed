@@ -6,6 +6,7 @@ logger = logging.getLogger(__name__)
 
 from .base.baseproject import BaseProject
 from .base.settings import Settings
+from .base.callbacks import Callbacks, AbstractCallbacks
 
 
 class Project(BaseProject):
@@ -15,6 +16,14 @@ class Project(BaseProject):
         """Initialization for the library"""
         super(Project, self).__init__(data_folder=data_folder)
         self.setup = Settings(data_folder=self.data_folder)
+        self.cb = Callbacks()
+
+    # --- callbacks
+
+    def set_callbacks(self, cb):
+        if not issubclass(type(cb), AbstractCallbacks):
+            raise RuntimeError("invalid callbacks object")
+        self.cb = cb
 
     # --- repr
 

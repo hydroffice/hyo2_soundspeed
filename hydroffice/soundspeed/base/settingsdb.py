@@ -26,7 +26,8 @@ class SettingsDb(BaseDb):
         try:
             with self.conn:
                 if self.conn.execute(""" PRAGMA foreign_keys """):
-                    logger.info("foreign keys active")
+                    # logger.info("foreign keys active")
+                    pass
                 else:
                     logger.error("foreign keys not active")
                     return False

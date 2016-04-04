@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 from .abstract import AbstractTextReader
 from ...profile.dicts import Dicts
+from ...base.callbacks import Callbacks
 
 
 class Sippican(AbstractTextReader):
@@ -48,10 +49,11 @@ class Sippican(AbstractTextReader):
         self.tk_probe = 'Probe Type'
         self.tk_field = 'Field'
 
-    def read(self, data_path, up_or_down=Dicts.ssp_directions['down']):
+    def read(self, data_path, settings, callbacks=Callbacks()):
         logger.debug('*** %s ***: start' % self.driver)
 
-        self.up_or_down = up_or_down
+        self.s = settings
+        self.cb = callbacks
 
         self.is_var_alpha = False
         self.input_salinity = None

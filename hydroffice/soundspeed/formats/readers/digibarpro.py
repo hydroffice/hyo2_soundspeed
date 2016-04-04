@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 from .abstract import AbstractTextReader
 from ...profile.dicts import Dicts
+from ...base.callbacks import Callbacks
 
 
 class DigibarPro(AbstractTextReader):
@@ -23,10 +24,11 @@ class DigibarPro(AbstractTextReader):
         self.tk_cast_time = "DATE:"
         self.tk_field_header = "DEPTH (M)"
 
-    def read(self, data_path, up_or_down=Dicts.ssp_directions['down']):
+    def read(self, data_path, settings, callbacks=Callbacks()):
         logger.debug('*** %s ***: start' % self.driver)
 
-        self.up_or_down = up_or_down
+        self.s = settings
+        self.cb = callbacks
 
         self.init_data()  # create a new empty profile list
         self.ssp.append()  # append a new profile

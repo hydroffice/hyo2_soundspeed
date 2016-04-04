@@ -95,7 +95,8 @@ class BaseDb(object):
     def reconnect_or_create(self):
         """ Reconnection to an existing database or create a new db """
         if self.conn:
-            logger.info("Already connected")
+            # logger.info("Already connected")
+            return
 
         if not os.path.exists(self.db_path):
             logger.info("New db")
@@ -103,7 +104,7 @@ class BaseDb(object):
         try:
             self.conn = sqlite3.connect(self.db_path,
                                         detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
-            logger.info("Connected")
+            # logger.info("Connected")
 
         except sqlite3.Error as e:
             raise RuntimeError("Unable to connect: %s" % e)

@@ -93,7 +93,7 @@ class Profile(object):
 
     def _plot(self, samples, more, kind):
         import matplotlib.pyplot as plt
-        plt.figure(self.meta.original_path, dpi=100)
+        plt.figure("[%s] %s" % (self.meta.original_path, kind), dpi=120)
 
         if samples.speed is not None:
             plt.subplot(231)  # speed

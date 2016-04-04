@@ -20,6 +20,9 @@ class AbstractFormat(object):
         self._ext = set()
         self.multicast_support = False
 
+        self.s = None  # settings
+        self.cb = None  # callbacks
+
     @property
     def ssp(self):
         return self._ssp

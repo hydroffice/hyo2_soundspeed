@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 from .abstract import AbstractBinaryReader
 from ...profile.dicts import Dicts
 from ...base.helper import FileInfo
+from ...base.callbacks import Callbacks
 
 
 class Turo(AbstractBinaryReader):
@@ -23,10 +24,11 @@ class Turo(AbstractBinaryReader):
         super(Turo, self).__init__()
         self._ext.add('nc')
 
-    def read(self, data_path, up_or_down=Dicts.ssp_directions['down']):
+    def read(self, data_path, settings, callbacks=Callbacks()):
         logger.debug('*** %s ***: start' % self.driver)
 
-        self.up_or_down = up_or_down
+        self.s = settings
+        self.cb = callbacks
 
         self.init_data()  # create a new empty profile list
         self.ssp.append()  # append a new profile

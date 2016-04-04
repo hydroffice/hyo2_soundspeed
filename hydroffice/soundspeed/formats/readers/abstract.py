@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 from ...base.helper import FileManager
 from ...profile.dicts import Dicts
 from ..abstract import AbstractFormat
+from ...base.callbacks import Callbacks
 
 
 class AbstractReader(AbstractFormat):
@@ -19,16 +20,16 @@ class AbstractReader(AbstractFormat):
     def __init__(self):
         super(AbstractReader, self).__init__()
         self.fid = None
-        self.up_or_down = None
 
     def __repr__(self):
         return "<%s:reader:%s:%s>" % (self.name, self.version, ",".join(self.ext))
 
     @abstractmethod
-    def read(self, data_path, up_or_down=Dicts.ssp_directions['down']):
+    def read(self, data_path, settings, callbacks=Callbacks()):
         """Common read function signature
 
-        The up_or_down is used to select the samples related to only the down- or up- cast.
+        The settings is a container with all the library settings.
+        The callback is a class that collects callback functions.
         """
         pass
 

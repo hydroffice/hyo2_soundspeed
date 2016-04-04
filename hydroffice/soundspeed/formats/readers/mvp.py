@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 
 from .abstract import AbstractReader
 from ...profile.dicts import Dicts
+from ...base.callbacks import Callbacks
 
 
 class Mvp(AbstractReader):
@@ -15,10 +16,12 @@ class Mvp(AbstractReader):
     def __init__(self):
         super(Mvp, self).__init__()
 
-    def read(self, data_path, up_or_down=Dicts.ssp_directions['down']):
+    def read(self, data_path, settings, callbacks=Callbacks()):
         logger.debug('*** %s ***: start' % self.driver)
 
-        self.up_or_down = up_or_down
+        self.s = settings
+        self.cb = callbacks
+
         self.finalize()
 
         logger.debug('*** %s ***: done' % self.driver)
