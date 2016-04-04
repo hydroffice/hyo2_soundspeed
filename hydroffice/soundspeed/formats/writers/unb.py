@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 from ... import __version__ as ssp_version
 from ... import __doc__ as ssp_name
-from ..abstract import AbstractTextWriter
+from .abstract import AbstractTextWriter
 from ...profile.dicts import Dicts
 
 

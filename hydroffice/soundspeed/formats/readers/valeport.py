@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-from ..abstract import AbstractTextReader
+from .abstract import AbstractTextReader
 from ...profile.dicts import Dicts
 
 
@@ -17,6 +17,7 @@ class Valeport(AbstractTextReader):
     sensor_dict = {
         Dicts.probe_types['MONITOR SVP 500']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVP 6000']: Dicts.sensor_types["SVPT"],
+        Dicts.probe_types['MIDAS SVX2 1000']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MiniSVP']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['Unknown']: Dicts.sensor_types["Unknown"]
     }
@@ -31,8 +32,10 @@ class Valeport(AbstractTextReader):
         self.tk_latitude = 'Latitude'
         self.tk_probe_type = ""
 
-    def read(self, data_path):
+    def read(self, data_path, up_or_down=Dicts.ssp_directions['down']):
         logger.debug('*** %s ***: start' % self.driver)
+
+        self.up_or_down = up_or_down
 
         self.init_data()  # create a new empty profile list
         self.ssp.append()  # append a new profile
@@ -40,6 +43,8 @@ class Valeport(AbstractTextReader):
         self._read(data_path=data_path)
         self._parse_header()
         self._parse_body()
+
+        self.finalize()
 
         logger.debug('*** %s ***: done' % self.driver)
         return True
@@ -135,6 +140,9 @@ class Valeport(AbstractTextReader):
 
             self.samples_offset += 1
 
+        if self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 1000']:
+            self.more_fields.append('Pressure')
+            self.more_fields.append('Conductivity')
         if not self.ssp.cur.meta.original_path:
             self.ssp.cur.meta.original_path = self.fid.path
 
@@ -169,7 +177,7 @@ class Valeport(AbstractTextReader):
                 logger.error("unable to parse from line #%s" % self.samples_offset)
                 continue
 
-        self.ssp.cur.resize(count)
+        self.ssp.cur.data_data_resize(count)
 
     def _midas_body(self):
 
@@ -189,11 +197,21 @@ class Valeport(AbstractTextReader):
                     self.ssp.cur.data.depth[count] = data[3]
                     self.ssp.cur.data.temp[count] = data[4]
 
+                    if self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 1000']:
+                        self.ssp.cur.data.sal[count] = data[6]
+
+                        # additional data field
+                        try:
+                            self.ssp.cur.more.sa['Pressure'][count] = float(data[3])  # pressure
+                            self.ssp.cur.more.sa['Conductivity'][count] = float(data[5])  # conductivity
+                        except Exception as e:
+                            logger.debug("issue in reading additional data fields: %s -> skipping" % e)
+
             except ValueError:
                 logger.error("unable to parse from line #%s" % self.samples_offset)
                 continue
 
             count += 1
 
-        self.ssp.cur.resize(count)
+        self.ssp.cur.data_resize(count)
 

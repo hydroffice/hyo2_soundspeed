@@ -38,10 +38,11 @@ class Dicts(object):
         'XCTD-2': 18,
         'MONITOR SVP 500': 20,
         'MIDAS SVP 6000': 21,
-        'MiniSVP': 22,
-        'MVP': 23,
-        'Sonardyne': 24,
-        'Elac': 25,
+        'MIDAS SVX2 1000': 22,
+        'MiniSVP': 23,
+        'MVP': 24,
+        'Sonardyne': 25,
+        'Elac': 26,
     }
 
     sensor_types = {
@@ -55,3 +56,9 @@ class Dicts(object):
         'SVPT': 7,
         'MVP': 8,
     }
+
+    ssp_directions = {
+        'up': 0,
+        'down': 1
+    }
+

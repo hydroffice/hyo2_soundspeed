@@ -36,8 +36,8 @@ def process_test_file(tf, rdr, rdr_folder, data_output):
 
 def process_reader(sub, rdr, data_input, data_output):
     """Process all the test files for a specific reader"""
-    # if rdr.name.lower() != 'elac':
-    #     return
+    if rdr.name.lower() != 'valeport':
+        return
 
     if rdr.name.lower() != sub.lower():  # skip not matching readers
         return

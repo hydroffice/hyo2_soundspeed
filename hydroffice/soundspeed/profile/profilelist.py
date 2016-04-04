@@ -49,4 +49,6 @@ class ProfileList(object):
     def debug_plot(self, more=False):
         """Create a debug plot with the data, optionally with the extra data if available"""
         for s in self.l:
-            s.debug_plot(more=more)
+            s.data_debug_plot(more=more)
+            s.proc_debug_plot(more=more)
+            s.sis_debug_plot(more=more)

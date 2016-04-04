@@ -60,22 +60,26 @@ class More(object):
 
             plt.figure(dpi=100)
 
-            for j in range(4):  # subplots for figure
+            for j in range(6):  # subplots for figure
 
                 if count >= nr_fields:
                     break
 
                 if j == 0:
-                    plt.subplot(141)
+                    plt.subplot(231)
                 elif j == 1:
-                    plt.subplot(142)
+                    plt.subplot(232)
                 elif j == 2:
-                    plt.subplot(143)
+                    plt.subplot(233)
                 elif j == 3:
-                    plt.subplot(144)
+                    plt.subplot(234)
+                elif j == 4:
+                    plt.subplot(235)
+                elif j == 5:
+                    plt.subplot(236)
 
-                plt.title("%s" % names[count+1])
-                plt.plot(self.sa[names[count+1]], self.sa[names[0]])
+                plt.title("%s" % names[count + 1])
+                plt.plot(self.sa[names[count + 1]], self.sa[names[0]])
                 plt.gca().invert_yaxis()
                 plt.grid(True)
                 count += 1

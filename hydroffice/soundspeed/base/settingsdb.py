@@ -232,6 +232,19 @@ class SettingsDb(BaseDb):
     def setup_name(self):
         return self._getter_str("setup_name")
 
+    @setup_name.setter
+    def setup_name(self, value):
+        self._setter_str("setup_name", value)
+
+    # --- ssp_up_or_down
+    @property
+    def ssp_up_or_down(self):
+        return self._getter_str("ssp_up_or_down")
+
+    @ssp_up_or_down.setter
+    def ssp_up_or_down(self, value):
+        self._setter_str("ssp_up_or_down", value)
+
    #  # --- rx_max_wait_time
    #  @property
    #  def rx_max_wait_time(self):
@@ -285,15 +298,6 @@ class SettingsDb(BaseDb):
    #  @woa_path.setter
    #  def woa_path(self, value):
    #      self._setter_str("woa_path", value)
-   #
-   #  # --- ssp_up_or_down
-   #  @property
-   #  def ssp_up_or_down(self):
-   #      return self._getter_str("ssp_up_or_down")
-   #
-   #  @ssp_up_or_down.setter
-   #  def ssp_up_or_down(self, value):
-   #      self._setter_str("ssp_up_or_down", value)
    #
    #  # --- user_append_caris_file
    #  @property

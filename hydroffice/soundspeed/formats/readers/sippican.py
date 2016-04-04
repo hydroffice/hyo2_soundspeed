@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-from ..abstract import AbstractTextReader
+from .abstract import AbstractTextReader
 from ...profile.dicts import Dicts
 
 
@@ -48,8 +48,10 @@ class Sippican(AbstractTextReader):
         self.tk_probe = 'Probe Type'
         self.tk_field = 'Field'
 
-    def read(self, data_path):
+    def read(self, data_path, up_or_down=Dicts.ssp_directions['down']):
         logger.debug('*** %s ***: start' % self.driver)
+
+        self.up_or_down = up_or_down
 
         self.is_var_alpha = False
         self.input_salinity = None
@@ -60,6 +62,8 @@ class Sippican(AbstractTextReader):
         self._read(data_path=data_path)
         self._parse_header()
         self._parse_body()
+
+        self.finalize()
 
         logger.debug('*** %s ***: done' % self.driver)
         return True
@@ -209,7 +213,7 @@ class Sippican(AbstractTextReader):
 
             count += 1
 
-        self.ssp.cur.resize(count)
+        self.ssp.cur.data_resize(count)
 
     def _body_default(self, line, count):
 

@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-from ..abstract import AbstractTextReader
+from .abstract import AbstractTextReader
 from ...profile.dicts import Dicts
 
 
@@ -29,8 +29,10 @@ class Saiv(AbstractTextReader):
         self.tk_time = 'Time'
         self.tk_probe_type = 'From file:'
 
-    def read(self, data_path):
+    def read(self, data_path, up_or_down=Dicts.ssp_directions['down']):
         logger.debug('*** %s ***: start' % self.driver)
+
+        self.up_or_down = up_or_down
 
         self.init_data()  # create a new empty profile list
         self.ssp.append()  # append a new profile
@@ -42,6 +44,8 @@ class Saiv(AbstractTextReader):
         self._read(data_path=data_path)
         self._parse_header()
         self._parse_body()
+
+        self.finalize()
 
         logger.debug('*** %s ***: done' % self.driver)
         return True
@@ -165,4 +169,4 @@ class Saiv(AbstractTextReader):
 
             count += 1
 
-        self.ssp.cur.resize(count)
+        self.ssp.cur.data_resize(count)
