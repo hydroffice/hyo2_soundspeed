@@ -19,6 +19,7 @@ class Castaway(AbstractTextReader):
 
     def __init__(self):
         super(Castaway, self).__init__()
+        self.desc = "Castaway"
         self.ext.add('csv')
 
         # header tokens

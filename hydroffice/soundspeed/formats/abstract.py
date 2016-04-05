@@ -15,6 +15,7 @@ class AbstractFormat(object):
 
     def __init__(self):
         self.name = self.__class__.__name__
+        self.desc = "Abstract Format"  # a human-readable description
         self.version = "0.1.0"
         self._ssp = None  # profile list
         self._ext = set()

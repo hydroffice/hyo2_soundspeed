@@ -14,6 +14,7 @@ class Elac(AbstractTextWriter):
 
     def __init__(self):
         super(Elac, self).__init__()
+        self.desc = "Elac"
         self._ext.add('sva')
 
     def write(self, ssp, data_path, data_file=None):

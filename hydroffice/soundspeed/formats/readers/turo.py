@@ -22,6 +22,7 @@ class Turo(AbstractBinaryReader):
 
     def __init__(self):
         super(Turo, self).__init__()
+        self.desc = "Turo"
         self._ext.add('nc')
 
     def read(self, data_path, settings, callbacks=Callbacks()):

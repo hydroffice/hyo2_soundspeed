@@ -16,6 +16,7 @@ class Elac(AbstractTextReader):
 
     def __init__(self):
         super(Elac, self).__init__()
+        self.desc = "Elac"
         self._ext.add('sva')
 
         # header tokens

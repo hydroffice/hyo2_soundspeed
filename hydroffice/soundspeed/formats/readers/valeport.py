@@ -25,6 +25,7 @@ class Valeport(AbstractTextReader):
 
     def __init__(self):
         super(Valeport, self).__init__()
+        self.desc = "Valeport Monitor/Midas/MiniSVP"
         self._ext.add('000')
         self._ext.add('txt')
 

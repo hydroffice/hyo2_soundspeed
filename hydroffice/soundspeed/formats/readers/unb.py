@@ -16,6 +16,7 @@ class Unb(AbstractTextReader):
 
     def __init__(self):
         super(Unb, self).__init__()
+        self.desc = "UNB"
         self._ext.add('unb')
 
         self.version = None  # Only version 2 and higher holds T/S and flags

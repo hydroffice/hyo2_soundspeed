@@ -19,6 +19,7 @@ class Seabird(AbstractTextReader):
 
     def __init__(self):
         super(Seabird, self).__init__()
+        self.desc = "Seabird"
         self._ext.add('cnv')
 
         self.tk_start_data = '*END*'

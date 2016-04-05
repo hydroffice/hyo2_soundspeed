@@ -19,6 +19,7 @@ class DigibarS(AbstractTextReader):
 
     def __init__(self):
         super(DigibarS, self).__init__()
+        self.desc = "Digibar S"
         self._ext.add('csv')
 
     def read(self, data_path, settings, callbacks=Callbacks()):

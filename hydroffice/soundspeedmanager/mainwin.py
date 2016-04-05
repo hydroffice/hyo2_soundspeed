@@ -12,6 +12,10 @@ logger = logging.getLogger(__name__)
 from . import __version__ as ssm_version
 from hydroffice.soundspeed.project import Project
 from .callbacks import Callbacks
+from .widgets.editor import Editor
+from .widgets.server import Server
+from .widgets.database import Database
+from .widgets.info import Info
 
 
 class MainWin(QtGui.QMainWindow):
@@ -31,10 +35,10 @@ class MainWin(QtGui.QMainWindow):
         self.setWindowTitle('%s v.%s' % (self.name, self.version))
         self.setMinimumSize(800, 600)
         _app = QtCore.QCoreApplication.instance()
-        _app.setApplicationName('Hush v.%s' % self.version)
+        _app.setApplicationName('%s v.%s' % (self.name, self.version))
         _app = QtCore.QCoreApplication.instance()
-        _app.setOrganizationName("CCOMJHC")
-        _app.setOrganizationDomain("ccom.unh.edu")
+        _app.setOrganizationName("HydrOffice")
+        _app.setOrganizationDomain("hydroffice.org")
 
         # set icons
         icon_info = QtCore.QFileInfo(os.path.join(self.here, 'media', 'favicon.png'))
@@ -53,3 +57,23 @@ class MainWin(QtGui.QMainWindow):
         style_content = open(style_info.filePath()).read()
         self.setStyleSheet(style_content)
 
+        # make tabs
+        self.tabs = QtGui.QTabWidget()
+        self.setCentralWidget(self.tabs)
+        self.tabs.setIconSize(QtCore.QSize(45, 45))
+        # editor
+        self.tabEditor = Editor(prj=self.prj, main_win=self)
+        idx = self.tabs.insertTab(0, self.tabEditor, QtGui.QIcon(os.path.join(self.here, 'media', 'editor.png')), "")
+        self.tabs.setTabToolTip(idx, "Editor")
+        # database
+        self.tabDatabase = Database(prj=self.prj, main_win=self)
+        idx = self.tabs.insertTab(1, self.tabDatabase, QtGui.QIcon(os.path.join(self.here, 'media', 'database.png')), "")
+        self.tabs.setTabToolTip(idx, "Database")
+        # server
+        self.tabServer = Server(prj=self.prj, main_win=self)
+        idx = self.tabs.insertTab(2, self.tabServer, QtGui.QIcon(os.path.join(self.here, 'media', 'server.png')), "")
+        self.tabs.setTabToolTip(idx, "Server")
+        # info
+        self.tabInfo = Info(default_url='http://www.hydroffice.org/soundspeed/')
+        idx = self.tabs.insertTab(3, self.tabInfo, QtGui.QIcon(os.path.join(self.here, 'media', 'info.png')), "")
+        self.tabs.setTabToolTip(idx, "Info")

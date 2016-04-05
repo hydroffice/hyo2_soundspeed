@@ -19,6 +19,7 @@ class Saiv(AbstractTextReader):
 
     def __init__(self):
         super(Saiv, self).__init__()
+        self.desc = "SAIV"
         self._ext.add('txt')
 
         self.tk_header = 'Ser\tMeas'

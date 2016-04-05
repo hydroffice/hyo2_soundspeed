@@ -15,6 +15,7 @@ class Sonardyne(AbstractTextWriter):
 
     def __init__(self):
         super(Sonardyne, self).__init__()
+        self.desc = "Sonardyne"
         self._ext.add('pro')
 
     def write(self, ssp, data_path, data_file=None):

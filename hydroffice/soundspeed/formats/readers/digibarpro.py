@@ -19,6 +19,7 @@ class DigibarPro(AbstractTextReader):
 
     def __init__(self):
         super(DigibarPro, self).__init__()
+        self.desc = "Digibar Pro"
         self._ext.add('txt')
 
         self.tk_cast_time = "DATE:"

@@ -31,6 +31,7 @@ class Sippican(AbstractTextReader):
 
     def __init__(self):
         super(Sippican, self).__init__()
+        self.desc = "Sippican"
         self._ext.add('edf')
 
         self.is_var_alpha = False

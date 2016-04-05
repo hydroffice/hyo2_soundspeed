@@ -15,6 +15,7 @@ class Unb(AbstractTextWriter):
 
     def __init__(self):
         super(Unb, self).__init__()
+        self.desc = "UNB"
         self._ext.add('unb')
 
     def write(self, ssp, data_path, data_file=None):

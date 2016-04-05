@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 from .base.baseproject import BaseProject
 from .base.settings import Settings
 from .base.callbacks import Callbacks, AbstractCallbacks
+from . import formats
 
 
 class Project(BaseProject):
@@ -24,6 +25,15 @@ class Project(BaseProject):
         if not issubclass(type(cb), AbstractCallbacks):
             raise RuntimeError("invalid callbacks object")
         self.cb = cb
+
+    # --- readers/writers
+    @property
+    def readers(self):
+        return formats.readers
+
+    @property
+    def writers(self):
+        return formats.writers
 
     # --- repr
 

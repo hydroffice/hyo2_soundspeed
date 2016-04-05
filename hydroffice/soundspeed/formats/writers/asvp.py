@@ -14,6 +14,7 @@ class Asvp(AbstractTextWriter):
 
     def __init__(self):
         super(Asvp, self).__init__()
+        self.desc = "Konsgberg asvp"
         self._ext.add('asvp')
 
     def write(self, ssp, data_path, data_file=None):

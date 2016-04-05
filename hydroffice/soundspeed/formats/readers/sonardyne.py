@@ -19,6 +19,7 @@ class Sonardyne(AbstractTextReader):
 
     def __init__(self):
         super(Sonardyne, self).__init__()
+        self.desc = "Sonardyne"
         self.ext.add('pro')
 
     def read(self, data_path, settings, callbacks=Callbacks()):

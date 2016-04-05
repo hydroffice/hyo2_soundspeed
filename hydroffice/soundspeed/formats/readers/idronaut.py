@@ -21,6 +21,7 @@ class Idronaut(AbstractTextReader):
 
     def __init__(self):
         super(Idronaut, self).__init__()
+        self.desc = "Idronaut"
         self._ext.add('txt')
 
         # header tokens
