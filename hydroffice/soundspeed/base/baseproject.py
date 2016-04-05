@@ -10,6 +10,7 @@ from .. import __doc__ as pkg_name
 from .helper import explore_folder
 from ..appdirs.appdirs import user_data_dir
 from ..logging.sqlitelogging import SqliteLogging
+from .. import formats
 
 
 class BaseProject(object):
@@ -29,6 +30,40 @@ class BaseProject(object):
             os.makedirs(self._data_folder)
 
         self.logs = SqliteLogging(self._data_folder)
+
+    # --- readers/writers
+
+    @property
+    def readers(self):
+        return formats.readers
+
+    @property
+    def name_readers(self):
+        return formats.name_readers
+
+    @property
+    def ext_readers(self):
+        return formats.ext_readers
+
+    @property
+    def desc_readers(self):
+        return formats.desc_readers
+
+    @property
+    def writers(self):
+        return formats.writers
+
+    @property
+    def name_writers(self):
+        return formats.name_writers
+
+    @property
+    def ext_writers(self):
+        return formats.ext_writers
+
+    @property
+    def desc_writers(self):
+        return formats.desc_writers
 
     # --- output data folder
 

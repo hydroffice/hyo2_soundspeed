@@ -70,6 +70,11 @@ class Profile(object):
         self.proc.source[:] = self.data.source
         self.proc.flag[:] = self.data.flag
 
+        self.update_proc_time()
+
+    def update_proc_time(self):
+        self.meta.update_proc_time()
+
     def data_debug_plot(self, more=False):
         """Create a debug plot with the data, optionally with the extra data if available"""
         if self.data.depth is None:

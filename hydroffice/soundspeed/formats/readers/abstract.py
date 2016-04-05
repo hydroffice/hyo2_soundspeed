@@ -43,6 +43,7 @@ class AbstractReader(AbstractFormat):
 
     def finalize(self):
         """Function called after the parsing is done, to finalize the reading"""
+
         self.ssp.cur.clone_data_to_proc()
 
 

@@ -46,6 +46,8 @@ class AbstractTextWriter(AbstractWriter):
     def _write(self, data_path, data_file, encoding='utf8'):
         """Helper function to write the raw file"""
         if data_file:
+            if len(data_file.split('.')) == 1:
+                data_file += (".%s" % list(self.ext)[0])
             file_path = os.path.join(data_path, data_file)
         else:
             if self.ssp.cur.meta.original_path:

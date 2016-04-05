@@ -39,3 +39,9 @@ class AbstractWidget(QtGui.QMainWindow):
         self.progress.setWindowTitle("Processing")
         self.progress.setCancelButtonText("Abort")
         self.progress.setWindowModality(QtCore.Qt.WindowModal)
+
+    def data_cleared(self):
+        pass
+
+    def data_imported(self):
+        pass

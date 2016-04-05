@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from abc import ABCMeta, abstractmethod, abstractproperty
 from datetime import datetime, timedelta
+import random
 import logging
 
 logger = logging.getLogger(__name__)
@@ -22,7 +23,17 @@ class AbstractCallbacks(object):
         pass
 
 
+class TestCallbacks(AbstractCallbacks):
+    """Used only for testing since the methods do not require user interaction"""
+    def ask_date(self):
+        return datetime.utcnow()
+
+    def ask_location(self):
+        return 43.13555 + random.random(), -70.9395 + random.random()
+
+
 class Callbacks(AbstractCallbacks):
+    """CLI-based callbacks"""
 
     def ask_date(self):
         """Ask user for date"""

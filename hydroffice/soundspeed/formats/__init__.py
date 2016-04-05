@@ -37,6 +37,13 @@ readers.append(Turo())
 readers.append(Unb())
 readers.append(Valeport())
 
+name_readers = list()
+ext_readers = list()
+desc_readers = list()
+for reader in readers:
+    name_readers.append(reader.name)
+    ext_readers.append(reader.ext)
+    desc_readers.append(reader.desc)
 
 # writers
 from .writers.asvp import Asvp
@@ -49,3 +56,12 @@ writers.append(Asvp())
 writers.append(Elac())
 writers.append(Sonardyne())
 writers.append(Unb())
+
+name_writers = list()
+ext_writers = list()
+desc_writers = list()
+for writer in writers:
+    if len(writer.ext):
+        name_writers.append(writer.name)
+        ext_writers.append(writer.ext)
+        desc_writers.append(writer.desc)

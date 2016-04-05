@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import os
+from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,16 +17,62 @@ class Metadata(object):
         self.longitude = None
         self.utc_time = None
         self.original_path = None
-        self.project = None
-        self.survey = None
-        self.vessel = None
-        self.sn = None  # serial number
+        self._project = None
+        self._survey = None
+        self._vessel = None
+        self._sn = None  # serial number
         self.proc_time = None  # last processing time
+
+    @property
+    def sensor(self):
+        return Dicts.first_match(Dicts.sensor_types, self.sensor_type)
+
+    @property
+    def probe(self):
+        return Dicts.first_match(Dicts.sensor_types, self.sensor_type)
+
+    @property
+    def project(self):
+        return self._project
+
+    @project.setter
+    def project(self, value):
+        self.update_proc_time()
+        self._project = value
+
+    @property
+    def survey(self):
+        return self._survey
+
+    @survey.setter
+    def survey(self, value):
+        self.update_proc_time()
+        self._survey = value
+
+    @property
+    def vessel(self):
+        return self._vessel
+
+    @vessel.setter
+    def vessel(self, value):
+        self.update_proc_time()
+        self._vessel = value
+
+    @property
+    def sn(self):
+        return self._sn
+
+    @sn.setter
+    def sn(self, value):
+        self.update_proc_time()
+        self._sn = value
+
+    def update_proc_time(self):
+        self.proc_time = datetime.utcnow()
 
     def __repr__(self):
         msg = "  <Meta>\n"
-        msg += "    <sensor:%s[%s]>\n" % (Dicts.first_match(Dicts.sensor_types, self.sensor_type),
-                                          Dicts.first_match(Dicts.probe_types, self.probe_type))
+        msg += "    <sensor:%s[%s]>\n" % (self.sensor, self.probe)
         msg += "    <time:%s,lat:%s,long:%s>\n" % (self.latitude, self.longitude, self.utc_time)
         msg += "    <path:%s>\n" % self.original_path
         msg += "    <project:%s,survey:%s,vessel:%s>\n" % (self.project, self.survey, self.vessel)
