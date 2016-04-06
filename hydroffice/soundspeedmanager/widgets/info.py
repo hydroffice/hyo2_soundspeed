@@ -22,25 +22,35 @@ class Info(QtGui.QMainWindow):
         self.toolbar = self.addToolBar('Shortcuts')
         self.toolbar.setIconSize(QtCore.QSize(65, 65))
         # default
-        homeAction = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'home.png')), 'Home page', self)
-        homeAction.setShortcut('Alt+H')
-        homeAction.triggered.connect(self.load_default)
-        self.toolbar.addAction(homeAction)
+        home_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'home.png')), 'Home page', self)
+        home_action.setShortcut('Alt+H')
+        home_action.triggered.connect(self.load_default)
+        self.toolbar.addAction(home_action)
+        # docs
+        docs_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'docs.png')), 'Documentation', self)
+        docs_action.setShortcut('Alt+D')
+        docs_action.triggered.connect(self.load_docs)
+        self.toolbar.addAction(docs_action)
+        # license
+        license_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'license.png')), 'License', self)
+        license_action.setShortcut('Alt+L')
+        license_action.triggered.connect(self.load_license)
+        self.toolbar.addAction(license_action)
         # HydrOffice.org
-        hyoAction = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'hyo.png')), 'HydrOffice.org', self)
-        hyoAction.setShortcut('Ctrl+H')
-        hyoAction.triggered.connect(self.load_hydroffice_org)
-        self.toolbar.addAction(hyoAction)
+        hyo_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'hyo.png')), 'HydrOffice.org', self)
+        hyo_action.setShortcut('Ctrl+H')
+        hyo_action.triggered.connect(self.load_hydroffice_org)
+        self.toolbar.addAction(hyo_action)
         # ccom.unh.edu
-        ccomAction = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'ccom.png')), 'ccom.unh.edu', self)
-        ccomAction.setShortcut('Alt+C')
-        ccomAction.triggered.connect(self.load_ccom_unh_edu)
-        self.toolbar.addAction(ccomAction)
+        ccom_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'ccom.png')), 'ccom.unh.edu', self)
+        ccom_action.setShortcut('Alt+C')
+        ccom_action.triggered.connect(self.load_ccom_unh_edu)
+        self.toolbar.addAction(ccom_action)
         # unh.edu
-        unhAction = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'unh.png')), 'unh.edu', self)
-        unhAction.setShortcut('Alt+U')
-        unhAction.triggered.connect(self.load_unh_edu)
-        self.toolbar.addAction(unhAction)
+        unh_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'unh.png')), 'unh.edu', self)
+        unh_action.setShortcut('Alt+U')
+        unh_action.triggered.connect(self.load_unh_edu)
+        self.toolbar.addAction(unh_action)
 
         # create the layout
         frame = QtGui.QFrame()
@@ -65,6 +75,16 @@ class Info(QtGui.QMainWindow):
         self.url_input.setText(self.default_url)
         self.web.load(QtCore.QUrl(self.default_url))
 
+    def load_docs(self):
+        url = 'https://giumas.github.io/hyo_ssp_manager/latest/index.html'
+        self.url_input.setText(url)
+        self.web.load(QtCore.QUrl(url))
+
+    def load_license(self):
+        url = 'http://www.hydroffice.org/license/'
+        self.url_input.setText(url)
+        self.web.load(QtCore.QUrl(url))
+
     def load_hydroffice_org(self):
         url = 'http://www.hydroffice.org'
         self.url_input.setText(url)
@@ -79,7 +99,6 @@ class Info(QtGui.QMainWindow):
         url = 'http://www.unh.edu'
         self.url_input.setText(url)
         self.web.load(QtCore.QUrl(url))
-
 
 
 class UrlInput(QtGui.QLineEdit):

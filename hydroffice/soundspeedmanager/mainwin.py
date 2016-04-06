@@ -34,7 +34,7 @@ class MainWin(QtGui.QMainWindow):
         self.name = "Sound Speed Manager"
         self.version = ssm_version
         self.setWindowTitle('%s v.%s' % (self.name, self.version))
-        self.setMinimumSize(800, 600)
+        self.setMinimumSize(700, 400)
         _app = QtCore.QCoreApplication.instance()
         _app.setApplicationName('%s v.%s' % (self.name, self.version))
         _app = QtCore.QCoreApplication.instance()

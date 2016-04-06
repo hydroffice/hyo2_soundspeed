@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 from .widget import AbstractWidget
 from ..dialogs.import_dialog import ImportDialog
+from ..dialogs.spreadsheet_dialog import SpreadSheetDialog
 from ..dialogs.metadata_dialog import MetadataDialog
 from ..dialogs.export_dialog import ExportDialog
 
@@ -28,16 +29,23 @@ class Editor(AbstractWidget):
         self.import_act.setShortcut('Alt+I')
         self.import_act.triggered.connect(self.on_import_data)
         self.file_bar.addAction(self.import_act)
-        # metadata
-        self.metadata_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata.png')), 'Metadata', self)
-        self.metadata_act.setShortcut('Alt+M')
-        self.metadata_act.triggered.connect(self.on_metadata)
-        self.file_bar.addAction(self.metadata_act)
         # clear
         self.clear_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'clear.png')), 'Clear data', self)
         self.clear_act.setShortcut('Alt+C')
         self.clear_act.triggered.connect(self.on_clear_data)
         self.file_bar.addAction(self.clear_act)
+        # separator
+        self.file_bar.addSeparator()
+        # spreadsheet
+        self.spreadsheet_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'grid.png')), 'Spreadsheet', self)
+        self.spreadsheet_act.setShortcut('Alt+S')
+        self.spreadsheet_act.triggered.connect(self.on_spreadsheet)
+        self.file_bar.addAction(self.spreadsheet_act)
+        # metadata
+        self.metadata_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata.png')), 'Metadata', self)
+        self.metadata_act.setShortcut('Alt+M')
+        self.metadata_act.triggered.connect(self.on_metadata)
+        self.file_bar.addAction(self.metadata_act)
         # separator
         self.file_bar.addSeparator()
         # export
@@ -63,6 +71,15 @@ class Editor(AbstractWidget):
         logger.debug('user wants to clear data')
         self.prj.clear_data()
         self.main_win.data_cleared()
+
+    def on_spreadsheet(self):
+        logger.debug('user wants to read/edit spreadsheet')
+        if not self.prj.has_ssp():
+            msg = "Import data before visualize them in a spreadsheet!"
+            QtGui.QMessageBox.warning(self, "Spreadsheet warning", msg, QtGui.QMessageBox.Ok)
+            return
+        dlg = SpreadSheetDialog(prj=self.prj, main_win=self.main_win, parent=self)
+        dlg.exec_()
 
     def on_metadata(self):
         logger.debug('user wants to read/edit metadata')
@@ -90,12 +107,14 @@ class Editor(AbstractWidget):
             return
 
     def data_cleared(self):
+        self.spreadsheet_act.setDisabled(True)
         self.metadata_act.setDisabled(True)
         self.clear_act.setDisabled(True)
         self.export_act.setDisabled(True)
         self.transmit_act.setDisabled(True)
 
     def data_imported(self):
+        self.spreadsheet_act.setDisabled(False)
         self.metadata_act.setDisabled(False)
         self.clear_act.setDisabled(False)
         self.export_act.setDisabled(False)
