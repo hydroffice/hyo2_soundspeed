@@ -12,6 +12,7 @@ from ..dialogs.import_dialog import ImportDialog
 from ..dialogs.spreadsheet_dialog import SpreadSheetDialog
 from ..dialogs.metadata_dialog import MetadataDialog
 from ..dialogs.export_dialog import ExportDialog
+from .dataplots import DataPlots
 
 
 class Editor(AbstractWidget):
@@ -58,6 +59,8 @@ class Editor(AbstractWidget):
         self.transmit_act.setShortcut('Alt+E')
         self.transmit_act.triggered.connect(self.on_transmit_data)
         self.file_bar.addAction(self.transmit_act)
+
+
 
     def on_import_data(self):
         """Import a data file"""

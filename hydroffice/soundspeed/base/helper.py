@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import os
 import sys
+import platform
 import logging
 # To use a consistent encoding
 from codecs import open
@@ -90,3 +91,59 @@ class FileManager(FileInfo):
             raise RuntimeError('the passed file does not exist: %s' % data_path)
         super(FileManager, self).__init__(data_path=data_path)
         self._io = open(self._path, mode=mode, encoding=encoding)
+
+
+def info_libs():
+    from .. import __version__ as ss_version
+    msg = "os: %s %s\n" % (os.name, "64" if is_64bit_os() else "32")
+    msg += "python: %s %s-bit\n" % (platform.python_version(), "64" if is_64bit_python() else "32")
+    msg += "hydroffice.soundspeed: %s\n" % ss_version
+
+    vers = None
+    try:
+        from hydroffice.soundspeedmanager import __version__ as ssm_version
+        vers = ssm_version
+    except ImportError:
+        vers = None
+    msg += "hydroffice.soundspeedmanager: %s\n" % vers
+
+    try:
+        from matplotlib import __version__ as mpl_version
+        vers = mpl_version
+    except ImportError:
+        vers = None
+    msg += "matplotlib: %s\n" % vers
+
+    try:
+        from PySide import __version__ as pyside_version
+        vers = pyside_version
+    except ImportError:
+        vers = None
+    msg += "pyside: %s\n" % vers
+
+    return msg
+
+
+def is_64bit_os():
+    """ Check if the current OS is at 64 bits """
+    return platform.machine().endswith('64')
+
+
+def is_64bit_python():
+    """ Check if the current Python is at 64 bits """
+    return platform.architecture()[0] == "64bit"
+
+
+def is_windows(cls):
+    """ Check if the current OS is Windows """
+    return (sys.platform == 'win32') or (os.name is "nt")
+
+
+def is_darwin(cls):
+    """ Check if the current OS is Mac OS """
+    return sys.platform == 'darwin'
+
+
+def is_linux(cls):
+    """ Check if the current OS is Linux """
+    return sys.platform == 'linux'
