@@ -60,7 +60,9 @@ class Editor(AbstractWidget):
         self.transmit_act.triggered.connect(self.on_transmit_data)
         self.file_bar.addAction(self.transmit_act)
 
-
+        # plots
+        self.dataplots = DataPlots(main_win=self.main_win, prj=self.prj)
+        self.setCentralWidget(self.dataplots)
 
     def on_import_data(self):
         """Import a data file"""
@@ -110,15 +112,23 @@ class Editor(AbstractWidget):
             return
 
     def data_cleared(self):
+        # dialogs
         self.spreadsheet_act.setDisabled(True)
         self.metadata_act.setDisabled(True)
         self.clear_act.setDisabled(True)
         self.export_act.setDisabled(True)
         self.transmit_act.setDisabled(True)
+        # data plots
+        self.dataplots.setHidden(True)
 
     def data_imported(self):
+        # dialogs
         self.spreadsheet_act.setDisabled(False)
         self.metadata_act.setDisabled(False)
         self.clear_act.setDisabled(False)
         self.export_act.setDisabled(False)
         self.transmit_act.setDisabled(False)
+        # data plots
+        self.dataplots.reset()
+        self.dataplots.on_draw()
+        self.dataplots.setVisible(True)

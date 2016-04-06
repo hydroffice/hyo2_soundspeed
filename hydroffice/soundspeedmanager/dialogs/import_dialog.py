@@ -34,7 +34,7 @@ class ImportDialog(AbstractDialog):
         self.buttonBox.clicked.connect(self.on_click_btn)
 
     def on_click_btn(self, btn):
-        print("clicked %s" % btn.text())
+        # print("clicked %s" % btn.text())
         idx = self.prj.desc_readers.index(btn.text())
         name = self.prj.name_readers[idx]
         desc = self.prj.desc_readers[idx]

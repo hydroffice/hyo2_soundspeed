@@ -81,7 +81,7 @@ class MatplotlibExample(QtGui.QMainWindow):
         self.main_frame = QtGui.QWidget()
 
         # Create Matplotlib figure and canvas
-        self.figure = Figure((6.0, 4.0), dpi=self.dpi)  # 5x4 inches, 100 dots-per-inch
+        self.figure = Figure((6.0, 4.0), dpi=self.dpi)  # inches, dots-per-inch
         self.canvas = FigureCanvas(self.figure)
         self.canvas.setParent(self.main_frame)
         self.canvas.setFocusPolicy(QtCore.Qt.ClickFocus)  # key for press events!!!

@@ -34,7 +34,8 @@ class MainWin(QtGui.QMainWindow):
         self.name = "Sound Speed Manager"
         self.version = ssm_version
         self.setWindowTitle('%s v.%s' % (self.name, self.version))
-        self.setMinimumSize(700, 400)
+        self.setMinimumSize(400, 250)
+        self.resize(800, 600)
         _app = QtCore.QCoreApplication.instance()
         _app.setApplicationName('%s v.%s' % (self.name, self.version))
         _app = QtCore.QCoreApplication.instance()
@@ -98,8 +99,6 @@ class MainWin(QtGui.QMainWindow):
         self.tabs.setTabToolTip(idx, "Info")
 
         self.data_cleared()
-
-        self.do()
 
     def data_cleared(self):
         self.tabEditor.data_cleared()

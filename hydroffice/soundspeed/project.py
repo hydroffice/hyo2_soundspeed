@@ -40,8 +40,16 @@ class Project(BaseProject):
             return "output"
         return os.path.basename(self.cur.meta.original_path).split('.')[0]
 
+    @property
+    def cur_file(self):
+        if self.cur is None:
+            return None
+        if self.cur.meta.original_path is None:
+            return None
+        return os.path.basename(self.cur.meta.original_path)
+
     def has_ssp(self):
-        if self.ssp is None:
+        if self.cur is None:
             return False
         return True
 
