@@ -220,6 +220,7 @@ class SpreadSheetDialog(AbstractDialog):
             msg = "Do you really want to manually edit the data?"
             ret = QtGui.QMessageBox.warning(self, "Spreadsheet", msg, QtGui.QMessageBox.Ok|QtGui.QMessageBox.No)
             if ret == QtGui.QMessageBox.No:
+                self.editable.setChecked(False)
                 return
             self.table.model().setEditable(True)
         else:

@@ -122,6 +122,15 @@ class Project(BaseProject):
         if show:
             plt.show()
 
+    # --- settings
+
+    def settings_db(self):
+        return self.setup.db
+
+    def reload_settings_from_db(self):
+        """Reload the current setup from the settings db"""
+        self.setup.load_settings_from_db()
+
     # --- repr
 
     def __repr__(self):

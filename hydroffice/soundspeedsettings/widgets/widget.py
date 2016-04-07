@@ -8,19 +8,19 @@ from PySide import QtCore
 import logging
 logger = logging.getLogger(__name__)
 
-from hydroffice.soundspeed.project import Project
+from hydroffice.soundspeed.base.settingsdb import SettingsDb
 
 
 class AbstractWidget(QtGui.QMainWindow):
 
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
 
-    def __init__(self, main_win, prj):
+    def __init__(self, main_win, db):
         QtGui.QMainWindow.__init__(self)
-        if type(prj) != Project:
-            raise RuntimeError("Passed invalid project object: %s" % type(prj))
+        if type(db) != SettingsDb:
+            raise RuntimeError("Passed invalid settings db object: %s" % type(db))
         self.main_win = main_win
-        self.prj = prj
+        self.db = db
 
         # set palette
         style_info = QtCore.QFileInfo(os.path.join(self.here, 'styles', 'widget.stylesheet'))
@@ -38,9 +38,3 @@ class AbstractWidget(QtGui.QMainWindow):
         self.progress.setWindowTitle("Processing")
         self.progress.setCancelButtonText("Abort")
         self.progress.setWindowModality(QtCore.Qt.WindowModal)
-
-    def data_cleared(self):
-        pass
-
-    def data_imported(self):
-        pass

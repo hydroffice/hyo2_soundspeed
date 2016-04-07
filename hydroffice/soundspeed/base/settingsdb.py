@@ -78,6 +78,8 @@ class SettingsDb(BaseDb):
                 # add default client list
                 self.conn.execute(""" INSERT INTO client_list (profile_id) VALUES(?) """, (ret[0], ))
                 # log.info("inserted %s settings values" % setup_name)
+
+                return True
    
             except sqlite3.Error as e:
                 logger.error("%s: %s" % (type(e), e))
@@ -173,7 +175,7 @@ class SettingsDb(BaseDb):
 
     @property
     def setup_list(self):
-        ret = self.conn.execute(""" SELECT id, setup_name, setup_status FROM general """).fetchall()
+        ret = self.conn.execute(""" SELECT id, setup_name, setup_status, library_version FROM general """).fetchall()
         logger.info("Profiles list: %s" % len(ret))
         return ret
 

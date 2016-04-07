@@ -39,10 +39,11 @@ class Dicts(object):
         'MONITOR SVP 500': 20,
         'MIDAS SVP 6000': 21,
         'MIDAS SVX2 1000': 22,
-        'MiniSVP': 23,
-        'MVP': 24,
-        'Sonardyne': 25,
-        'Elac': 26,
+        'MIDAS SVX2 3000': 23,
+        'MiniSVP': 24,
+        'MVP': 25,
+        'Sonardyne': 26,
+        'Elac': 27,
     }
 
     sensor_types = {

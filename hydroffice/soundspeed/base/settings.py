@@ -23,8 +23,12 @@ class Settings(object):
         self.data_folder = data_folder
         self.load_settings_from_db()
 
+    @property
+    def db(self):
+        return SettingsDb(self.data_folder)
+
     def load_settings_from_db(self):
-        db = SettingsDb(self.data_folder)
+        db = self.db
         self.library_version = db.library_version
         self.setup_id = db.active_setup_id
         self.setup_name = db.setup_name

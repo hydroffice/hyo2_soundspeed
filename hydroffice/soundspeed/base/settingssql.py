@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 CREATE_SETTINGS = """ CREATE TABLE IF NOT EXISTS general(
      id integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
-     library_version text NOT NULL UNIQUE DEFAULT "%s",
+     library_version text NOT NULL DEFAULT "%s",
      setup_name text NOT NULL UNIQUE DEFAULT "default",
      setup_status text NOT NULL DEFAULT "inactive",
      ssp_up_or_down text NOT NULL DEFAULT "down",

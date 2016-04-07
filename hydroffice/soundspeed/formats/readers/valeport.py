@@ -19,6 +19,7 @@ class Valeport(AbstractTextReader):
         Dicts.probe_types['MONITOR SVP 500']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVP 6000']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVX2 1000']: Dicts.sensor_types["SVPT"],
+        Dicts.probe_types['MIDAS SVX2 3000']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MiniSVP']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['Unknown']: Dicts.sensor_types["Unknown"]
     }
@@ -143,7 +144,8 @@ class Valeport(AbstractTextReader):
 
             self.samples_offset += 1
 
-        if self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 1000']:
+        if (self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 1000']) or \
+                (self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 3000']):
             self.more_fields.append('Pressure')
             self.more_fields.append('Conductivity')
         if not self.ssp.cur.meta.original_path:
@@ -200,7 +202,8 @@ class Valeport(AbstractTextReader):
                     self.ssp.cur.data.depth[count] = data[3]
                     self.ssp.cur.data.temp[count] = data[4]
 
-                    if self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 1000']:
+                    if (self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 1000']) or \
+                            (self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 3000']):
                         self.ssp.cur.data.sal[count] = data[6]
 
                         # additional data field
