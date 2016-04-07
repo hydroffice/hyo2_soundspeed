@@ -59,13 +59,14 @@ class DataPlots(AbstractWidget):
         # axes
         self.speed_ax = self.f.add_subplot(131)
         self.speed_ax.invert_yaxis()
-        self.speed_ax.set_visible(False)
         self.temp_ax = self.f.add_subplot(132, sharey=self.speed_ax)
         self.temp_ax.invert_yaxis()
-        self.temp_ax.set_visible(False)
         self.sal_ax = self.f.add_subplot(133, sharey=self.speed_ax)
         self.sal_ax.invert_yaxis()
-        self.sal_ax.set_visible(False)
+        # lines
+        self.speed_valid = None
+        self.temp_valid = None
+        self.sal_valid = None
         # events
 
         # toolbar
@@ -86,28 +87,25 @@ class DataPlots(AbstractWidget):
             a.grid(True)
 
     def _draw_speed(self):
-        if not self.speed_ax.get_visible():
-            self.speed_ax.set_visible(True)
         self.speed_ax.clear()
         self.speed_ax.set_ylabel('Depth [m]')
         self.speed_ax.set_xlabel('Sound Speed [m/s]')
-        self.speed_ax.plot(self.prj.cur.proc.speed, self.prj.cur.proc.depth, picker=3)
+        self.speed_valid, = self.speed_ax.plot(self.prj.cur.proc.speed, self.prj.cur.proc.depth, picker=3)
+        self.speed_ax.set_label("speed")
 
     def _draw_temp(self):
-        if not self.temp_ax.get_visible():
-            self.temp_ax.set_visible(True)
         self.temp_ax.clear()
         self.temp_ax.set_xlabel('Temperature [deg C]')
-        self.temp_ax.plot(self.prj.cur.proc.temp, self.prj.cur.proc.depth, picker=3)
+        self.temp_valid, = self.temp_ax.plot(self.prj.cur.proc.temp, self.prj.cur.proc.depth, picker=3)
+        self.temp_ax.set_label("temp")
         # hide y-labels
         [label.set_visible(False) for label in self.temp_ax.get_yticklabels()]
 
     def _draw_sal(self):
-        if not self.sal_ax.get_visible():
-            self.sal_ax.set_visible(True)
         self.sal_ax.clear()
         self.sal_ax.set_xlabel('Salinity [PSU]')
-        self.sal_ax.plot(self.prj.cur.proc.sal, self.prj.cur.proc.depth, picker=3)
+        self.sal_valid, = self.sal_ax.plot(self.prj.cur.proc.sal, self.prj.cur.proc.depth, picker=3)
+        self.sal_ax.set_label("sal")
         # hide y-labels
         [label.set_visible(False) for label in self.sal_ax.get_yticklabels()]
 
@@ -131,9 +129,11 @@ class DataPlots(AbstractWidget):
         self.c.draw()
 
     def reset(self):
+        pass
         if self.nav:
             self.hbox.removeWidget(self.nav)
             self.nav.deleteLater()
             del self.nav
-        self.nav = NavToolbar(self.c, self.top_widget)
+        self.nav = NavToolbar(canvas=self.c, parent=self.top_widget,
+                              plot_win=self, prj=self.prj)
         self.hbox.addWidget(self.nav)
