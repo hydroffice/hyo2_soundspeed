@@ -60,7 +60,7 @@ class AbstractReader(AbstractFormat):
                 profile.meta.utc_time = self.cb.ask_date()
                 if profile.meta.utc_time is None:
                     raise RuntimeError("missing date required for database lookup")
-                
+
             profile.clone_data_to_proc()
 
 

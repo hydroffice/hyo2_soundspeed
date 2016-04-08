@@ -10,7 +10,7 @@ from .metadata import Metadata
 from .samples import Samples
 from .more import More
 from .dicts import Dicts
-
+from .oceanography import Oceanography
 
 class Profile(object):
     """"A sound speed profile with 3 sections: metadata, data specific to the task, and additional data"""
