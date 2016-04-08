@@ -123,7 +123,7 @@ class MainWin(QtGui.QMainWindow):
             pairs = dict()
             for folder in folders:
                 for reader in readers:
-                    if reader.name.lower() != 'asvp':  # reader filter
+                    if reader.name.lower() != 'valeport':  # reader filter
                         continue
                     if reader.name.lower() != folder.lower():  # skip not matching readers
                         continue

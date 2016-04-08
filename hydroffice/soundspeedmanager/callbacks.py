@@ -31,7 +31,7 @@ class Callbacks(AbstractCallbacks):
             lon = None
 
         if (lat is None) or (lon is None):  # return None if one of the two is invalid
-            return None
+            return None, None
 
         return lat, lon
 

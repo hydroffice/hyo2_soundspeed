@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 from .metadata import Metadata
 from .samples import Samples
 from .more import More
+from .dicts import Dicts
 
 
 class Profile(object):
@@ -46,6 +47,40 @@ class Profile(object):
     def data_resize(self, count):
         self.data.resize(count)
         self.more.resize(count)
+
+    @property
+    def data_valid(self):
+        """Return indices of valid data"""
+        return np.equal(self.data.flag, Dicts.flags['valid'])
+
+    @property
+    def proc_valid(self):
+        """Return indices of valid data"""
+        return np.equal(self.proc.flag, Dicts.flags['valid'])
+
+    @property
+    def proc_invalid_direction(self):
+        """Return indices of invalid data for direction"""
+        return np.equal(self.proc.flag, Dicts.flags['direction'])
+
+    def reduce_up_down(self, ssp_direction):
+        """Reduce the raw data samples based on the passed direction"""
+        if self.data.num_samples == 0:  # skipping if there are no data
+            return
+
+        # identify max depth
+        max_depth = self.data.depth[self.data_valid].max()  # max depth
+        logger.debug("reduce up/down > max depth: %s" % max_depth)
+
+        # loop through the sample using max depth as turning point
+        max_depth_reached = False
+        for i in range(self.data.num_samples):
+            if self.data.depth[i] == max_depth:
+                max_depth_reached = True
+
+            if (ssp_direction == Dicts.ssp_directions['up'] and not max_depth_reached) \
+                    or (ssp_direction == Dicts.ssp_directions['down'] and max_depth_reached):
+                self.data.flag[i] = Dicts.flags['direction']  # set invalid for direction
 
     def init_proc(self, num_samples):
         if num_samples == 0:

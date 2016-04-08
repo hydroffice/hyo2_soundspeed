@@ -14,6 +14,8 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+from hydroffice.soundspeed.profile.dicts import Dicts
+
 
 class NavToolbar(NavigationToolbar2QT):
 
@@ -186,11 +188,11 @@ class NavToolbar(NavigationToolbar2QT):
         else:  # nothing and return for middle
             self._button_pressed = None
             return
-        logger.debug("FLAG > press > button #%s" % self._button_pressed)
+        # logger.debug("FLAG > press > button #%s" % self._button_pressed)
 
         x, y = event.x, event.y  # cursor position in pixel
         xd, yd = event.xdata, event.ydata  # cursor position in data coords
-        logger.debug("FLAG > press > loc (%.3f,%.3f)(%.3f,%.3f)" % (x, y, xd, yd))
+        # logger.debug("FLAG > press > loc (%.3f,%.3f)(%.3f,%.3f)" % (x, y, xd, yd))
 
         self._xypress = []  # clear past press
         self._flag_start = None  # clear past data
@@ -202,18 +204,143 @@ class NavToolbar(NavigationToolbar2QT):
                     ax.can_zoom()):  # if this axes supports the zoom box button functionality.
                 self._xypress.append((x, y, ax, i, ax._get_view()))
                 self._flag_start = (xd, yd, ax)
-                logger.debug("FLAG > press > axes %s" % ax.get_label())
+                # logger.debug("FLAG > press > axes %s" % ax.get_label())
 
         # connect drag/press/release events
-        id1 = self.canvas.mpl_connect('motion_notify_event', self.drag_flag)
+        id1 = self.canvas.mpl_connect('motion_notify_event', self._drag_flag)
         id2 = self.canvas.mpl_connect('key_press_event', self._switch_on_flag_mode)
         id3 = self.canvas.mpl_connect('key_release_event', self._switch_off_flag_mode)
         self._ids_flag = id1, id2, id3
         self._flag_mode = event.key
-        logger.debug("FLAG > press > key: %s" % self._flag_mode)
+        # logger.debug("FLAG > press > key: %s" % self._flag_mode)
 
         # pass the event
         self.press(event)
+
+    def release_flag(self, event):
+        """release mouse button callback in flagging mode"""
+        # disconnect callbacks
+        for flag_id in self._ids_flag:
+            self.canvas.mpl_disconnect(flag_id)
+        self._ids_flag = []
+        # remove flagging area
+        self.remove_rubberband()
+
+        if not self._xypress:
+            return
+
+        # retrieve valid initial and ending points
+        xd_start, yd_start, ax = self._flag_start
+        xd_end, yd_end = event.xdata, event.ydata
+        if (xd_end is None) or (yd_end is None):
+            if self._flag_end is None:  # nothing to do.. the drag was to small/invalid
+                return
+            xd_end, yd_end = self._flag_end
+        # calculate min/max
+        min_xd, max_xd = min(xd_start, xd_end), max(xd_start, xd_end)
+        min_yd, max_yd = min(yd_start, yd_end), max(yd_start, yd_end)
+        # logger.debug("FLAG > x: %.3f %.3f, y: %.3f %.3f" % (min_xd, max_xd, min_yd, max_yd))
+        yd2, yd1 = ax.get_ylim()  # bottom-to-top and the y-axis is reverted !!
+        xd1, xd2 = ax.get_xlim()  # left-to-right
+        min_xd, max_xd = max(min_xd, xd1), min(max_xd, xd2)
+        min_yd, max_yd = max(min_yd, yd1), min(max_yd, yd2)
+        # logger.debug("FLAG > x: %.3f %.3f, y: %.3f %.3f" % (min_xd, max_xd, min_yd, max_yd))
+
+        # actually do the flagging
+        selected = np.logical_and(self.prj.cur.proc.depth > min_yd, self.prj.cur.proc.depth < max_yd)
+        self.prj.cur.proc.flag[np.logical_and(self.plot_win.vi, selected)] = Dicts.flags['user']
+        self.plot_win.update_data()
+
+        self.draw()
+        self._xypress = None
+        self._flag_start = None
+        self._flag_end = None
+        self._button_pressed = None
+        self._flag_mode = None
+        self.release(event)
+
+    def press_unflag(self, event):
+        """Mouse press callback for flag"""
+
+        # store the pressed button
+        if event.button == 1:  # left
+            self._button_pressed = 1
+        elif event.button == 3:  # right
+            self._button_pressed = 3
+        else:  # nothing and return for middle
+            self._button_pressed = None
+            return
+        # logger.debug("UNFLAG > press > button #%s" % self._button_pressed)
+
+        x, y = event.x, event.y  # cursor position in pixel
+        xd, yd = event.xdata, event.ydata  # cursor position in data coords
+        # logger.debug("UNFLAG > press > loc (%.3f,%.3f)(%.3f,%.3f)" % (x, y, xd, yd))
+
+        self._xypress = []  # clear past press
+        self._flag_start = None  # clear past data
+        self._flag_end = None  # clear past data
+        for i, ax in enumerate(self.canvas.figure.get_axes()):
+            if ((x is not None) and (y is not None) and
+                    ax.in_axes(event) and  # if the given mouse event (in display coords) in axes
+                    ax.get_navigate() and  # whether the axes responds to navigation commands
+                    ax.can_zoom()):  # if this axes supports the zoom box button functionality.
+                self._xypress.append((x, y, ax, i, ax._get_view()))
+                self._flag_start = (xd, yd, ax)
+                # logger.debug("FLAG > press > axes %s" % ax.get_label())
+
+        # connect drag/press/release events
+        id1 = self.canvas.mpl_connect('motion_notify_event', self._drag_flag)
+        id2 = self.canvas.mpl_connect('key_press_event', self._switch_on_flag_mode)
+        id3 = self.canvas.mpl_connect('key_release_event', self._switch_off_flag_mode)
+        self._ids_flag = id1, id2, id3
+        self._flag_mode = event.key
+        # logger.debug("UNFLAG > press > key: %s" % self._flag_mode)
+
+        # pass the event
+        self.press(event)
+
+    def release_unflag(self, event):
+        """release mouse button callback in flagging mode"""
+        # disconnect callbacks
+        for flag_id in self._ids_flag:
+            self.canvas.mpl_disconnect(flag_id)
+        self._ids_flag = []
+        # remove flagging area
+        self.remove_rubberband()
+
+        if not self._xypress:
+            return
+
+        # retrieve valid initial and ending points
+        xd_start, yd_start, ax = self._flag_start
+        xd_end, yd_end = event.xdata, event.ydata
+        if (xd_end is None) or (yd_end is None):
+            if self._flag_end is None:  # nothing to do.. the drag was to small/invalid
+                return
+            xd_end, yd_end = self._flag_end
+        # calculate min/max
+        min_xd, max_xd = min(xd_start, xd_end), max(xd_start, xd_end)
+        min_yd, max_yd = min(yd_start, yd_end), max(yd_start, yd_end)
+        # logger.debug("UNFLAG > x: %.3f %.3f, y: %.3f %.3f" % (min_xd, max_xd, min_yd, max_yd))
+        yd2, yd1 = ax.get_ylim()  # bottom-to-top and the y-axis is reverted !!
+        xd1, xd2 = ax.get_xlim()  # left-to-right
+        min_xd, max_xd = max(min_xd, xd1), min(max_xd, xd2)
+        min_yd, max_yd = max(min_yd, yd1), min(max_yd, yd2)
+        # logger.debug("UNFLAG > x: %.3f %.3f, y: %.3f %.3f" % (min_xd, max_xd, min_yd, max_yd))
+
+        selected = np.logical_and(self.prj.cur.proc.depth > min_yd, self.prj.cur.proc.depth < max_yd)
+        self.prj.cur.proc.flag[np.logical_and(self.plot_win.ii, selected)] = Dicts.flags['valid']
+        self.plot_win.update_data()
+
+        self.draw()
+        self._xypress = None
+        self._flag_start = None
+        self._flag_end = None
+        self._button_pressed = None
+        self._flag_mode = None
+        self.release(event)
+
+    # helper methods
 
     def _switch_on_flag_mode(self, event):
         """optional key-press switch in flagging mode (used for x- and y- selections)"""
@@ -237,7 +364,7 @@ class NavToolbar(NavigationToolbar2QT):
 
         self.mouse_move(event)
 
-    def drag_flag(self, event):
+    def _drag_flag(self, event):
         """the mouse-motion dragging callback in flaggin mode"""
 
         if not self._xypress:  # return if missing valid initial click
@@ -264,71 +391,3 @@ class NavToolbar(NavigationToolbar2QT):
 
         # logger.debug("FLAG > drag > (%.3f, %.3f)(%.3f, %.3f)" % (x, y, last_x, last_y))
         self.draw_rubberband(event, x, y, last_x, last_y)
-
-    def release_flag(self, event):
-        """release mouse button callback in flagging mode"""
-        # disconnect callbacks
-        for flag_id in self._ids_flag:
-            self.canvas.mpl_disconnect(flag_id)
-        self._ids_flag = []
-        # remove flagging area
-        self.remove_rubberband()
-
-        if not self._xypress:
-            return
-
-        # retrieve valid initial and ending points
-        xd_start, yd_start, ax = self._flag_start
-        xd_end, yd_end = event.xdata, event.ydata
-        if (xd_end is None) or (yd_end is None):
-            if self._flag_end is None:  # nothing to do.. the drag was to small/invalid
-                return
-            xd_end, yd_end = self._flag_end
-        # calculate min/max
-        min_xd, max_xd = min(xd_start, xd_end), max(xd_start, xd_end)
-        min_yd, max_yd = min(yd_start, yd_end), max(yd_start, yd_end)
-        logger.debug("FLAG > x: %.3f %.3f, y: %.3f %.3f" % (min_xd, max_xd, min_yd, max_yd))
-        yd2, yd1 = ax.get_ylim()  # bottom-to-top and the y-axis is reverted !!
-        xd1, xd2 = ax.get_xlim()  # left-to-right
-        min_xd, max_xd = max(min_xd, xd1), min(max_xd, xd2)
-        min_yd, max_yd = max(min_yd, yd1), min(max_yd, yd2)
-        logger.debug("FLAG > x: %.3f %.3f, y: %.3f %.3f" % (min_xd, max_xd, min_yd, max_yd))
-
-        selected = np.where(np.logical_and(self.prj.cur.proc.depth > min_yd,
-                                           self.prj.cur.proc.depth < max_yd))
-        print(selected)
-        logger.debug(ax.get_label())
-        self.plot_win.speed_valid.set_xdata(self.prj.cur.proc.speed[selected])
-        self.plot_win.speed_valid.set_ydata(self.prj.cur.proc.depth[selected])
-
-        self.draw()
-        self._xypress = None
-        self._flag_start = None
-        self._flag_end = None
-        self._button_pressed = None
-        self._flag_mode = None
-        self.release(event)
-
-    def press_unflag(self, event):
-        if event.button == 1:
-            self._button_pressed = 1
-        elif event.button == 3:
-            self._button_pressed = 3
-        else:
-            self._button_pressed = None
-            return
-
-        x, y = event.x, event.y
-
-        # push the current view to define home if stack is empty
-        if self._views.empty():
-            self.push_current()
-
-        print(self._button_pressed, x, y)
-
-        self.press(event)
-
-    def release_unflag(self, event):
-        if self._button_pressed is None:
-            return
-        print("released")

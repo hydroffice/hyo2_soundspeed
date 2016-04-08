@@ -70,5 +70,4 @@ class Basic(AbstractWidget):
         # profile direction
         dir_str = self.db.ssp_up_or_down
         dir_idx = Dicts.ssp_directions[dir_str]
-        print(dir_str, dir_idx)
         self.profile_direction.setCurrentIndex(dir_idx)

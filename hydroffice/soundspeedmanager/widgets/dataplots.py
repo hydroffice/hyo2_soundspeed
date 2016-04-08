@@ -40,6 +40,10 @@ class DataPlots(AbstractWidget):
         # mpl figure settings
         self.f_dpi = 120  # dots-per-inch
         self.f_sz = (6.0, 3.0)  # inches
+        self.vi = None  # valid indices
+        self.ii = None  # invalid indices
+        self.valid_color = 'green'
+        self.invalid_color = '#cccccc'
 
         # outline ui
         self.top_widget = QtGui.QWidget()
@@ -67,6 +71,9 @@ class DataPlots(AbstractWidget):
         self.speed_valid = None
         self.temp_valid = None
         self.sal_valid = None
+        self.speed_invalid = None
+        self.temp_invalid = None
+        self.sal_invalid = None
         # events
 
         # toolbar
@@ -90,13 +97,27 @@ class DataPlots(AbstractWidget):
         self.speed_ax.clear()
         self.speed_ax.set_ylabel('Depth [m]')
         self.speed_ax.set_xlabel('Sound Speed [m/s]')
-        self.speed_valid, = self.speed_ax.plot(self.prj.cur.proc.speed, self.prj.cur.proc.depth, picker=3)
+        self.speed_invalid, = self.speed_ax.plot(self.prj.cur.proc.speed[self.ii],
+                                                 self.prj.cur.proc.depth[self.ii],
+                                                 color=self.invalid_color,
+                                                 picker=3)
+        self.speed_valid, = self.speed_ax.plot(self.prj.cur.proc.speed[self.vi],
+                                               self.prj.cur.proc.depth[self.vi],
+                                               color=self.valid_color,
+                                               picker=3)
         self.speed_ax.set_label("speed")
 
     def _draw_temp(self):
         self.temp_ax.clear()
         self.temp_ax.set_xlabel('Temperature [deg C]')
-        self.temp_valid, = self.temp_ax.plot(self.prj.cur.proc.temp, self.prj.cur.proc.depth, picker=3)
+        self.temp_invalid, = self.temp_ax.plot(self.prj.cur.proc.temp[self.ii],
+                                               self.prj.cur.proc.depth[self.ii],
+                                               color=self.invalid_color,
+                                               picker=3)
+        self.temp_valid, = self.temp_ax.plot(self.prj.cur.proc.temp[self.vi],
+                                             self.prj.cur.proc.depth[self.vi],
+                                             color=self.valid_color,
+                                             picker=3)
         self.temp_ax.set_label("temp")
         # hide y-labels
         [label.set_visible(False) for label in self.temp_ax.get_yticklabels()]
@@ -104,7 +125,14 @@ class DataPlots(AbstractWidget):
     def _draw_sal(self):
         self.sal_ax.clear()
         self.sal_ax.set_xlabel('Salinity [PSU]')
-        self.sal_valid, = self.sal_ax.plot(self.prj.cur.proc.sal, self.prj.cur.proc.depth, picker=3)
+        self.sal_invalid, = self.sal_ax.plot(self.prj.cur.proc.sal[self.ii],
+                                             self.prj.cur.proc.depth[self.ii],
+                                             color=self.invalid_color,
+                                             picker=3)
+        self.sal_valid, = self.sal_ax.plot(self.prj.cur.proc.sal[self.vi],
+                                           self.prj.cur.proc.depth[self.vi],
+                                           color=self.valid_color,
+                                           picker=3)
         self.sal_ax.set_label("sal")
         # hide y-labels
         [label.set_visible(False) for label in self.sal_ax.get_yticklabels()]
@@ -115,6 +143,7 @@ class DataPlots(AbstractWidget):
             self.f.suptitle(self.prj.cur_file)
 
         if self.prj.cur:
+            self.update_validity_indices()
             self._draw_speed()
             self._draw_temp()
             self._draw_sal()
@@ -122,11 +151,28 @@ class DataPlots(AbstractWidget):
         self._draw_grid()
         self.c.draw()
 
-    def on_update(self):
+    def update_data(self):
         """Update plot"""
-        self.on_draw()
+        self.update_validity_indices()
+        # speed
+        self.speed_valid.set_xdata(self.prj.cur.proc.speed[self.vi])
+        self.speed_valid.set_ydata(self.prj.cur.proc.depth[self.vi])
+        self.speed_invalid.set_xdata(self.prj.cur.proc.speed[self.ii])
+        self.speed_invalid.set_ydata(self.prj.cur.proc.depth[self.ii])
+        # temp
+        self.temp_valid.set_xdata(self.prj.cur.proc.temp[self.vi])
+        self.temp_valid.set_ydata(self.prj.cur.proc.depth[self.vi])
+        self.temp_invalid.set_xdata(self.prj.cur.proc.temp[self.ii])
+        self.temp_invalid.set_ydata(self.prj.cur.proc.depth[self.ii])
+        # sal
+        self.sal_valid.set_xdata(self.prj.cur.proc.sal[self.vi])
+        self.sal_valid.set_ydata(self.prj.cur.proc.depth[self.vi])
+        self.sal_invalid.set_xdata(self.prj.cur.proc.sal[self.ii])
+        self.sal_invalid.set_ydata(self.prj.cur.proc.depth[self.ii])
 
-        self.c.draw()
+    def update_validity_indices(self):
+        self.vi = self.prj.cur.proc_valid  # valid indices
+        self.ii = np.logical_and(~self.vi, ~self.prj.cur.proc_invalid_direction)  # selected invalid indices
 
     def reset(self):
         pass

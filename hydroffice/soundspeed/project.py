@@ -67,8 +67,7 @@ class Project(BaseProject):
         """Import data using a specific format name"""
         idx = self.name_readers.index(data_format)
         reader = self.readers[idx]
-        logger.debug("data reader: %s" % reader)
-        logger.debug("import path: %s" % data_path)
+        logger.debug("%s > path: %s" % (reader, data_path))
         success = reader.read(data_path=data_path, settings=self.setup, callbacks=self.cb)
         if not success:
             raise RuntimeError("Error using %s reader for file: %s"

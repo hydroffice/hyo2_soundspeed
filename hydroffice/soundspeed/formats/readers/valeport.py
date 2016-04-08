@@ -193,7 +193,7 @@ class Valeport(AbstractTextReader):
                 if self.ssp.cur.meta.sensor_type == Dicts.sensor_types["SVPT"]:
                     data = line.split()
 
-                    if data[2] == 0.0:  # sound speed
+                    if float(data[2]) == 0.0:  # sound speed
                         continue
 
                     # s_date = data[0]

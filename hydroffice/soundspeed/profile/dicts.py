@@ -64,3 +64,8 @@ class Dicts(object):
         ('down', 1)
     ])
 
+    flags = OrderedDict([
+        ('valid', 0),
+        ('direction', 1),
+        ('user', 2),
+    ])

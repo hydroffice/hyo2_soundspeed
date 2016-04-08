@@ -43,8 +43,25 @@ class AbstractReader(AbstractFormat):
 
     def finalize(self):
         """Function called after the parsing is done, to finalize the reading"""
+        # we may have multiple profiles
+        for profile in self.ssp.l:
 
-        self.ssp.cur.clone_data_to_proc()
+            # select samples by casting direction
+            profile.reduce_up_down(self.s.ssp_up_or_down)
+
+            # check if location is present
+            if (profile.meta.latitude is None) or (profile.meta.longitude is None):
+                profile.meta.latitude, profile.meta.longitude = self.cb.ask_location()
+                if (profile.meta.latitude is None) or (profile.meta.longitude is None):
+                    raise RuntimeError("missing geographic location required for database lookup")
+
+            # check if timestamp is present
+            if profile.meta.utc_time is None:
+                profile.meta.utc_time = self.cb.ask_date()
+                if profile.meta.utc_time is None:
+                    raise RuntimeError("missing date required for database lookup")
+                
+            profile.clone_data_to_proc()
 
 
 class AbstractTextReader(AbstractReader):
