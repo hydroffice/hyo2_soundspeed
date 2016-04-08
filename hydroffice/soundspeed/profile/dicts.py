@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from collections import OrderedDict
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,50 +17,50 @@ class Dicts(object):
         else:
             raise RuntimeError("unknown value %s in dict: %s" % (val, dct))
 
-    probe_types = {
-        'Unknown': 0,
-        'Synthetic': 1,
-        'SVP': 2,
-        'Castaway': 3,
-        'Idronaut': 4,
-        'S2': 5,
-        'SBE': 6,
-        'XBT': 7,
-        'Deep Blue': 8,
-        'T-10': 9,
-        'T-11 (Fine Structure)': 10,
-        'T-4': 11,
-        'T-5': 12,
-        'T-5/20': 13,
-        'T-7': 14,
-        'XSV-01': 15,
-        'XSV-02': 16,
-        'XCTD-1': 17,
-        'XCTD-2': 18,
-        'MONITOR SVP 500': 20,
-        'MIDAS SVP 6000': 21,
-        'MIDAS SVX2 1000': 22,
-        'MIDAS SVX2 3000': 23,
-        'MiniSVP': 24,
-        'MVP': 25,
-        'Sonardyne': 26,
-        'Elac': 27,
-    }
+    probe_types = OrderedDict([
+        ('Unknown', 0),
+        ('Synthetic', 1),
+        ('SVP', 2),
+        ('Castaway', 3),
+        ('Idronaut', 4),
+        ('S2', 5),
+        ('SBE', 6),
+        ('XBT', 7),
+        ('Deep Blue', 8),
+        ('T-10', 9),
+        ('T-11 (Fine Structure)', 10),
+        ('T-4', 11),
+        ('T-5', 12),
+        ('T-5/20', 13),
+        ('T-7', 14),
+        ('XSV-01', 15),
+        ('XSV-02', 16),
+        ('XCTD-1', 17),
+        ('XCTD-2', 18),
+        ('MONITOR SVP 500', 19),
+        ('MIDAS SVP 6000', 20),
+        ('MIDAS SVX2 1000', 21),
+        ('MIDAS SVX2 3000', 22),
+        ('MiniSVP', 23),
+        ('MVP', 24),
+        ('Sonardyne', 25),
+        ('Elac', 26),
+    ])
 
-    sensor_types = {
-        'Unknown': 0,
-        'Synthetic': 1,
-        'SVP': 2,
-        'CTD': 3,
-        'XBT': 4,
-        'XSV': 5,
-        'XCTD': 6,
-        'SVPT': 7,
-        'MVP': 8,
-    }
+    sensor_types = OrderedDict([
+        ('Unknown', 0),
+        ('Synthetic', 1),
+        ('SVP', 2),
+        ('CTD', 3),
+        ('XBT', 4),
+        ('XSV', 5),
+        ('XCTD', 6),
+        ('SVPT', 7),
+        ('MVP', 8),
+    ])
 
-    ssp_directions = {
-        'up': 0,
-        'down': 1
-    }
+    ssp_directions = OrderedDict([
+        ('up', 0),
+        ('down', 1)
+    ])
 

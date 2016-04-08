@@ -67,13 +67,11 @@ class Main(AbstractWidget):
         self.btn_activate_setup.clicked.connect(self.activate_setup)
         self.btn_box.addButton(self.btn_activate_setup, QtGui.QDialogButtonBox.ActionRole)
         # --- activate setup
-        self.btn_refresh_list = QtGui.QPushButton("Refresh list")
-        self.btn_refresh_list.clicked.connect(self.refresh_items)
+        self.btn_refresh_list = QtGui.QPushButton("Refresh")
+        self.btn_refresh_list.clicked.connect(self.refresh)
         self.btn_box.addButton(self.btn_refresh_list, QtGui.QDialogButtonBox.ActionRole)
 
         self.main_layout.addStretch()
-
-        self.refresh_items()
 
     def new_setup(self):
         logger.debug("new setup")
@@ -134,11 +132,15 @@ class Main(AbstractWidget):
             return
 
         self.db.activate_setup(setup_name)
-        self.refresh_items()
 
-    def refresh_items(self):
+        self.main_win.setup_changed()
+
+    def refresh(self):
+        self.main_win.setup_changed()
+
+    def setup_changed(self):
         """Refresh the setup list"""
-        # logger.debug("refresh setup list")
+        logger.debug("refresh main")
 
         # set the top label
         self.label.setText("<b>Current setup: %s [#%02d]</b>" % (self.db.setup_name, self.db.active_setup_id))

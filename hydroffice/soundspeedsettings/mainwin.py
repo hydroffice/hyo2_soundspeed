@@ -53,6 +53,8 @@ class MainWin(QtGui.QMainWindow):
         idx = self.tabs.insertTab(1, self.tab_basic, "Basic")
         self.tabs.setTabToolTip(idx, "Common processing settings")
 
+        self.setup_changed()  # trigger the first update of all the tabs
+
     def set_editable(self, value):
         if value:
             self.tab_main.setEnabled(True)
@@ -60,3 +62,9 @@ class MainWin(QtGui.QMainWindow):
         else:
             self.tab_main.setDisabled(True)
             self.tab_basic.setDisabled(True)
+
+    def setup_changed(self):
+        """Method used to update all the tabs (except the main)"""
+        tabs_nr = self.tabs.count()
+        for i in range(tabs_nr):
+            self.tabs.widget(i).setup_changed()

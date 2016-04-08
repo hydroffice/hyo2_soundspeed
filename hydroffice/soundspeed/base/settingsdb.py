@@ -176,7 +176,7 @@ class SettingsDb(BaseDb):
     @property
     def setup_list(self):
         ret = self.conn.execute(""" SELECT id, setup_name, setup_status, library_version FROM general """).fetchall()
-        logger.info("Profiles list: %s" % len(ret))
+        # logger.info("Profiles list: %s" % len(ret))
         return ret
 
     # --- templates
