@@ -69,7 +69,7 @@ class Editor(AbstractWidget):
         logger.debug('user wants to import a data file')
         dlg = ImportDialog(prj=self.prj, main_win=self.main_win, parent=self)
         dlg.exec_()
-        if self.prj.has_ssp:
+        if self.prj.has_ssp():
             self.main_win.data_imported()
 
     def on_clear_data(self):

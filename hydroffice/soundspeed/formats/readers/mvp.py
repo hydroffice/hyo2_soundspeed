@@ -22,6 +22,7 @@ class Mvp(AbstractReader):
         self.s = settings
         self.cb = callbacks
 
+        self.fix()
         self.finalize()
 
         logger.debug('*** %s ***: done' % self.driver)

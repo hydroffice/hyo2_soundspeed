@@ -39,6 +39,7 @@ class Sonardyne(AbstractTextReader):
         self._parse_header()
         self._parse_body()
 
+        self.fix()
         self.finalize()
 
         logger.debug('*** %s ***: done' % self.driver)

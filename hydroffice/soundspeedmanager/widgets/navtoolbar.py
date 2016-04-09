@@ -7,6 +7,7 @@ import os
 import logging
 
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT
+from matplotlib.backend_bases import cursors
 try:
     import matplotlib.backends.qt_editor.figureoptions as figureoptions
 except ImportError:
@@ -32,8 +33,20 @@ class NavToolbar(NavigationToolbar2QT):
         self._flag_mode = None
         self._flag_start = None
         self._flag_end = None
+
+        # custom  cursors
+        pan_px = QtGui.QPixmap(os.path.join(self.media, 'pan_cursor.png'))
+        pan_px.setMask(pan_px.mask())
+        self.pan_cursor = QtGui.QCursor(pan_px)
+        grab_px = QtGui.QPixmap(os.path.join(self.media, 'grab_cursor.png'))
+        grab_px.setMask(grab_px.mask())
+        self.grab_cursor = QtGui.QCursor(grab_px)
+
         NavigationToolbar2QT.__init__(self, canvas=canvas, parent=parent, coordinates=coordinates)
         self.setIconSize(QtCore.QSize(32, 32))
+
+        self.canvas.mpl_connect('button_press_event', self.press)
+        self.canvas.mpl_connect('button_release_event', self.release)
 
     def _icon(self, name):
         return QtGui.QIcon(os.path.join(self.media, name))
@@ -54,15 +67,24 @@ class NavToolbar(NavigationToolbar2QT):
                 forward_action.setToolTip('Next view')
                 self._actions['forward'] = forward_action
             elif text == 'Pan':
-                move_action = self.addAction(self._icon('move.png'), 'Move', self.pan)
-                move_action.setToolTip('Pan/scale (left/right button)')
-                move_action.setCheckable(True)
-                self._actions['pan'] = move_action
+                pan_action = self.addAction(self._icon('pan.png'), 'Pan', self.pan)
+                pan_action.setToolTip('Pan on plot')
+                pan_action.setCheckable(True)
+                self._actions['pan'] = pan_action
+                scale_action = self.addAction(self._icon('scale.png'), 'Scale', self.scale)
+                scale_action.setToolTip('Scale plot')
+                scale_action.setCheckable(True)
+                self._actions['scale'] = scale_action
             elif text == 'Zoom':
-                zoom_action = self.addAction(self._icon('zoom_to_rect.png'), 'Zoom', self.zoom)
-                zoom_action.setToolTip('Zoom in/out (left/right button)')
-                zoom_action.setCheckable(True)
-                self._actions['zoom'] = zoom_action
+                zoom_in_action = self.addAction(self._icon('zoomin.png'), 'Zoom in', self.zoom_in)
+                zoom_in_action.setToolTip('Zoom in area')
+                zoom_in_action.setCheckable(True)
+                self._actions['zoom_in'] = zoom_in_action
+                zoom_out_action = self.addAction(self._icon('zoomout.png'), 'Zoom out', self.zoom_out)
+                zoom_out_action.setToolTip('Zoom out area')
+                zoom_out_action.setCheckable(True)
+                self._actions['zoom_out'] = zoom_out_action
+                # flag/unflag actions
                 self.flag_action = self.addAction(self._icon("flag.png"), 'Flag', self.flag)
                 self.flag_action.setToolTip('Flag samples')
                 self.flag_action.setCheckable(True)
@@ -108,71 +130,485 @@ class NavToolbar(NavigationToolbar2QT):
         # reference holder for subplots_adjust window
         self.adj_window = None
 
-    def grid_plot(self):
-        grid_flag = self.grid_action.isChecked()
-        for a in self.canvas.figure.get_axes():
-            a.grid(grid_flag)
-        self.dynamic_update()
-
     def _update_buttons_checked(self):
         # sync button checkstates to match active mode
         self._actions['pan'].setChecked(self._active == 'PAN')
-        self._actions['zoom'].setChecked(self._active == 'ZOOM')
+        self._actions['scale'].setChecked(self._active == 'SCALE')
+        self._actions['zoom_in'].setChecked(self._active == 'ZOOM_IN')
+        self._actions['zoom_out'].setChecked(self._active == 'ZOOM_OUT')
         self._actions['flag'].setChecked(self._active == 'FLAG')
         self._actions['unflag'].setChecked(self._active == 'UNFLAG')
 
-    def flag(self):
-        if self._active == 'FLAG':
+    # ### actions ###
+
+    def press(self, event):
+        print("press", event.button)
+        if event.button == 3:
+            menu = QtGui.QMenu(self)
+            menu.addAction(self._actions['pan'])
+            menu.addAction(self._actions['scale'])
+            menu.addAction(self._actions['zoom_in'])
+            menu.addAction(self._actions['zoom_out'])
+            menu.addAction(self._actions['flag'])
+            menu.addAction(self._actions['unflag'])
+            menu.popup(QtGui.QCursor.pos())
+            menu.exec_()
+
+    def release(self, event):
+        print("release", event.button)
+
+    def canvas_menu(self):
+        print("menu")
+
+    # --- mouse movements ---
+
+    def mouse_move(self, event):
+        """Update message on the toolbar"""
+        self._set_cursor(event)
+
+        if event.inaxes and event.inaxes.get_navigate():
+
+            s = ""
+            try:
+                s = "x:%.2f, y:%.2f" % (event.xdata, event.ydata)
+                # s = event.inaxes.format_coord(event.xdata, event.ydata)
+            except (ValueError, OverflowError):
+                self.set_message('%s' % self.mode)
+                return
+
+            artists = [a for a in event.inaxes.mouseover_set if a.contains(event)]
+            if artists:
+                a = max(enumerate(artists), key=lambda x: x[1].zorder)[1]
+                if a is not event.inaxes.patch:
+                    data = a.get_cursor_data(event)
+                    if data is not None:
+                        s += '[%s]' % a.format_cursor_data(data)
+
+            if len(self.mode):
+                self.set_message('%s | %s' % (self.mode, s))
+            else:
+                self.set_message(s)
+
+        else:
+            if self.mode:
+                self.set_message('%s' % self.mode)
+            else:
+                self.set_message('')
+
+    def _set_cursor(self, event):
+        """Set cursor by mode"""
+
+        if not event.inaxes or not self._active:
+            if self._lastCursor != cursors.POINTER:
+                self.set_cursor(cursors.POINTER)
+                self._lastCursor = cursors.POINTER
+        else:
+            if (self._active == 'ZOOM_IN') or (self._active == 'ZOOM_OUT'):
+                if self._lastCursor != cursors.SELECT_REGION:
+                    self.set_cursor(cursors.SELECT_REGION)
+                    self._lastCursor = cursors.SELECT_REGION
+
+            elif (self._active == 'PAN') and (self._lastCursor != self.pan_cursor):
+                if self._lastCursor != self.pan_cursor:
+                    self.canvas.setCursor(self.pan_cursor)
+                    self._lastCursor = self.pan_cursor
+
+            elif (self._active == 'SCALE') and (self._lastCursor != cursors.MOVE):
+                self.set_cursor(cursors.MOVE)
+                self._lastCursor = cursors.MOVE
+
+    # --- pan ---
+
+    def pan(self, *args):
+        """Activate the pan tool"""
+
+        if self._active == 'PAN':
             self._active = None
-        else:
-            self._active = 'FLAG'
-
-        if self._idPress is not None:
-            self._idPress = self.canvas.mpl_disconnect(self._idPress)
             self.mode = ''
-
-        if self._idRelease is not None:
-            self._idRelease = self.canvas.mpl_disconnect(self._idRelease)
-            self.mode = ''
-
-        if self._active:
-            self._idPress = self.canvas.mpl_connect('button_press_event', self.press_flag)
-            self._idRelease = self.canvas.mpl_connect('button_release_event', self.release_flag)
-            self.mode = "flag"
-            self.canvas.widgetlock(self)
-        else:
+            if self._idPress:
+                self.canvas.mpl_disconnect(self._idPress)
+            if self._idRelease:
+                self.canvas.mpl_disconnect(self._idRelease)
             self.canvas.widgetlock.release(self)
 
-        for a in self.canvas.figure.get_axes():
-            a.set_navigate_mode(self._active)
+        else:
+            self._active = 'PAN'
+            if self._idPress:
+                self.canvas.mpl_disconnect(self._idPress)
+            self._idPress = self.canvas.mpl_connect('button_press_event', self.press_pan)
+            if self._idRelease:
+                self.canvas.mpl_disconnect(self._idRelease)
+            self._idRelease = self.canvas.mpl_connect('button_release_event', self.release_pan)
+            self.mode = 'pan'
+            self.canvas.widgetlock(self)
 
         self.set_message(self.mode)
         self._update_buttons_checked()
 
-    def unflag(self):
-        if self._active == 'UNFLAG':
+    def press_pan(self, event):
+        """the press mouse button in pan mode callback"""
+
+        if event.button == 1:
+            self._button_pressed = 1
+        else:
+            self._button_pressed = None
+            return
+
+        x, y = event.x, event.y
+
+        # push the current view to define home if stack is empty
+        if self._views.empty():
+            self.push_current()
+
+        self._xypress = []
+        for i, a in enumerate(self.canvas.figure.get_axes()):
+            if (x is not None) and (y is not None) and a.in_axes(event) and a.get_navigate() and a.can_pan():
+                a.start_pan(x, y, 1)  # 1 is pan
+                self._xypress.append((a, i))
+                self.canvas.mpl_disconnect(self._idDrag)
+                self._idDrag = self.canvas.mpl_connect('motion_notify_event', self.drag_pan)
+
+        self.canvas.setCursor(self.grab_cursor)  # change cursor to grab
+
+    def drag_pan(self, event):
+        """drag callback in pan mode"""
+        for a, ind in self._xypress:
+            # safer to use the recorded button at the press than current button
+            a.drag_pan(1, event.key, event.x, event.y)  # 1 is pan
+
+        self.dynamic_update()
+
+    def release_pan(self, event):
+        """the release mouse button callback in pan/scale mode"""
+
+        if self._button_pressed is None:
+            return
+
+        self.canvas.mpl_disconnect(self._idDrag)
+        self._idDrag = self.canvas.mpl_connect('motion_notify_event', self.mouse_move)
+        for a, ind in self._xypress:
+            a.end_pan()
+        if not self._xypress:
+            return
+
+        self._xypress = []
+        self._button_pressed = None
+        self.canvas.setCursor(self.pan_cursor)
+        self.push_current()
+        self.draw()
+
+    # --- scale ---
+
+    def scale(self, *args):
+        """Activate the scale tool"""
+
+        if self._active == 'SCALE':
             self._active = None
-        else:
-            self._active = 'UNFLAG'
-
-        if self._idPress is not None:
-            self._idPress = self.canvas.mpl_disconnect(self._idPress)
             self.mode = ''
-
-        if self._idRelease is not None:
-            self._idRelease = self.canvas.mpl_disconnect(self._idRelease)
-            self.mode = ''
-
-        if self._active:
-            self._idPress = self.canvas.mpl_connect('button_press_event', self.press_unflag)
-            self._idRelease = self.canvas.mpl_connect('button_release_event', self.release_unflag)
-            self.mode = "unflag"
-            self.canvas.widgetlock(self)
-        else:
+            if self._idPress:
+                self.canvas.mpl_disconnect(self._idPress)
+            if self._idRelease:
+                self.canvas.mpl_disconnect(self._idRelease)
             self.canvas.widgetlock.release(self)
 
-        for a in self.canvas.figure.get_axes():
-            a.set_navigate_mode(self._active)
+        else:
+            self._active = 'SCALE'
+            if self._idPress:
+                self.canvas.mpl_disconnect(self._idPress)
+            self._idPress = self.canvas.mpl_connect('button_press_event', self.press_scale)
+            if self._idRelease:
+                self.canvas.mpl_disconnect(self._idRelease)
+            self._idRelease = self.canvas.mpl_connect('button_release_event', self.release_scale)
+            self.mode = 'scale'
+            self.canvas.widgetlock(self)
+
+        self.set_message(self.mode)
+        self._update_buttons_checked()
+
+    def press_scale(self, event):
+        """the press mouse button in scale mode callback"""
+
+        if event.button == 1:
+            self._button_pressed = 1
+        else:
+            self._button_pressed = None
+            return
+
+        x, y = event.x, event.y
+
+        # push the current view to define home if stack is empty
+        if self._views.empty():
+            self.push_current()
+
+        self._xypress = []
+        for i, a in enumerate(self.canvas.figure.get_axes()):
+            if (x is not None and y is not None and a.in_axes(event) and a.get_navigate() and a.can_pan()):
+                a.start_pan(x, y, 3)  # 3 is scale
+                self._xypress.append((a, i))
+                self.canvas.mpl_disconnect(self._idDrag)
+                self._idDrag = self.canvas.mpl_connect('motion_notify_event', self.drag_scale)
+
+    def drag_scale(self, event):
+        """drag callback in scale mode"""
+        for a, ind in self._xypress:
+            # safer to use the recorded button at the press than current button
+            a.drag_pan(3, event.key, event.x, event.y)  # 3 is scale
+
+        self.dynamic_update()
+
+    def release_scale(self, event):
+        """the release mouse button callback in pan/scale mode"""
+
+        if self._button_pressed is None:
+            return
+
+        self.canvas.mpl_disconnect(self._idDrag)
+        self._idDrag = self.canvas.mpl_connect('motion_notify_event', self.mouse_move)
+        for a, ind in self._xypress:
+            a.end_pan()
+        if not self._xypress:
+            return
+
+        self._xypress = []
+        self._button_pressed = None
+        self.push_current()
+        self.draw()
+
+    # --- zoom in ---
+
+    def zoom_in(self, *args):
+        """Activate zoom in rect mode"""
+        if self._active == 'ZOOM_IN':
+            self._active = None
+            self.mode = ''
+            if self._idPress:
+                self.canvas.mpl_disconnect(self._idPress)
+            if self._idRelease:
+                self.canvas.mpl_disconnect(self._idRelease)
+            self.canvas.widgetlock.release(self)
+        else:
+            self._active = 'ZOOM_IN'
+            if self._idPress:
+                self.canvas.mpl_disconnect(self._idPress)
+            self._idPress = self.canvas.mpl_connect('button_press_event', self.press_zoom_in)
+            if self._idRelease:
+                self.canvas.mpl_disconnect(self._idRelease)
+            self._idRelease = self.canvas.mpl_connect('button_release_event', self.release_zoom_in)
+            self.mode = 'zoom in'
+            self.canvas.widgetlock(self)
+
+        self.set_message(self.mode)
+        self._update_buttons_checked()
+
+    def press_zoom_in(self, event):
+        """the press mouse button for zoom in mode"""
+        # If we're already in the middle of a zoom, pressing another button works to "cancel"
+        if self._ids_zoom != []:
+            for zoom_id in self._ids_zoom:
+                self.canvas.mpl_disconnect(zoom_id)
+            self.draw()
+            self._xypress = None
+            self._button_pressed = None
+            self._ids_zoom = []
+            return
+
+        if event.button == 1:
+            self._button_pressed = 1
+        else:
+            self._button_pressed = None
+            return
+
+        x, y = event.x, event.y
+
+        # push the current view to define home if stack is empty
+        if self._views.empty():
+            self.push_current()
+
+        self._xypress = []
+        for i, a in enumerate(self.canvas.figure.get_axes()):
+            if (x is not None and y is not None and a.in_axes(event) and
+                    a.get_navigate() and a.can_zoom()):
+                self._xypress.append((x, y, a, i, a._get_view()))
+
+        id1 = self.canvas.mpl_connect('motion_notify_event', self.drag_zoom)
+        id2 = self.canvas.mpl_connect('key_press_event', self._switch_on_zoom_mode)
+        id3 = self.canvas.mpl_connect('key_release_event', self._switch_off_zoom_mode)
+
+        self._ids_zoom = id1, id2, id3
+        self._zoom_mode = event.key
+
+    def release_zoom_in(self, event):
+        """the release mouse button callback for zoom in mode"""
+        for zoom_id in self._ids_zoom:
+            self.canvas.mpl_disconnect(zoom_id)
+        self._ids_zoom = []
+        self.remove_rubberband()
+        if not self._xypress:
+            return
+
+        last_a = []
+        for cur_xypress in self._xypress:
+            x, y = event.x, event.y
+            lastx, lasty, a, ind, view = cur_xypress
+            # ignore singular clicks - 5 pixels is a threshold
+            if ((abs(x - lastx) < 5 and self._zoom_mode != "y") or
+                    (abs(y - lasty) < 5 and self._zoom_mode != "x")):
+                self._xypress = None
+                self.draw()
+                return
+
+            # detect twinx,y axes and avoid double zooming
+            twinx, twiny = False, False
+            if last_a:
+                for la in last_a:
+                    if a.get_shared_x_axes().joined(a, la):
+                        twinx = True
+                    if a.get_shared_y_axes().joined(a, la):
+                        twiny = True
+            last_a.append(a)
+
+            if self._button_pressed == 1:
+                direction = 'in'
+            else:
+                continue
+
+            a._set_view_from_bbox((lastx, lasty, x, y), direction,
+                                  self._zoom_mode, twinx, twiny)
+
+        self.draw()
+        self._xypress = None
+        self._button_pressed = None
+        self._zoom_mode = None
+        self.push_current()
+
+    # --- zoom out ---
+
+    def zoom_out(self, *args):
+        """Activate zoom out rect mode"""
+        if self._active == 'ZOOM_OUT':
+            self._active = None
+            self.mode = ''
+            if self._idPress:
+                self.canvas.mpl_disconnect(self._idPress)
+            if self._idRelease:
+                self.canvas.mpl_disconnect(self._idRelease)
+            self.canvas.widgetlock.release(self)
+        else:
+            self._active = 'ZOOM_OUT'
+            if self._idPress:
+                self.canvas.mpl_disconnect(self._idPress)
+            self._idPress = self.canvas.mpl_connect('button_press_event', self.press_zoom_out)
+            if self._idRelease:
+                self.canvas.mpl_disconnect(self._idRelease)
+            self._idRelease = self.canvas.mpl_connect('button_release_event', self.release_zoom_out)
+            self.mode = 'zoom out'
+            self.canvas.widgetlock(self)
+
+        self.set_message(self.mode)
+        self._update_buttons_checked()
+
+    def press_zoom_out(self, event):
+        """the press mouse button for zoom out mode"""
+        # If we're already in the middle of a zoom, pressing another button works to "cancel"
+        if self._ids_zoom != []:
+            for zoom_id in self._ids_zoom:
+                self.canvas.mpl_disconnect(zoom_id)
+            self.draw()
+            self._xypress = None
+            self._button_pressed = None
+            self._ids_zoom = []
+            return
+
+        if event.button == 1:
+            self._button_pressed = 1
+        else:
+            self._button_pressed = None
+            return
+
+        x, y = event.x, event.y
+
+        # push the current view to define home if stack is empty
+        if self._views.empty():
+            self.push_current()
+
+        self._xypress = []
+        for i, a in enumerate(self.canvas.figure.get_axes()):
+            if (x is not None and y is not None and a.in_axes(event) and
+                    a.get_navigate() and a.can_zoom()):
+                self._xypress.append((x, y, a, i, a._get_view()))
+
+        id1 = self.canvas.mpl_connect('motion_notify_event', self.drag_zoom)
+        id2 = self.canvas.mpl_connect('key_press_event', self._switch_on_zoom_mode)
+        id3 = self.canvas.mpl_connect('key_release_event', self._switch_off_zoom_mode)
+
+        self._ids_zoom = id1, id2, id3
+        self._zoom_mode = event.key
+
+    def release_zoom_out(self, event):
+        """the release mouse button callback for zoom out mode"""
+        for zoom_id in self._ids_zoom:
+            self.canvas.mpl_disconnect(zoom_id)
+        self._ids_zoom = []
+        self.remove_rubberband()
+        if not self._xypress:
+            return
+
+        last_a = []
+        for cur_xypress in self._xypress:
+            x, y = event.x, event.y
+            lastx, lasty, a, ind, view = cur_xypress
+            # ignore singular clicks - 5 pixels is a threshold
+            if ((abs(x - lastx) < 5 and self._zoom_mode != "y") or
+                    (abs(y - lasty) < 5 and self._zoom_mode != "x")):
+                self._xypress = None
+                self.draw()
+                return
+
+            # detect twinx,y axes and avoid double zooming
+            twinx, twiny = False, False
+            if last_a:
+                for la in last_a:
+                    if a.get_shared_x_axes().joined(a, la):
+                        twinx = True
+                    if a.get_shared_y_axes().joined(a, la):
+                        twiny = True
+            last_a.append(a)
+
+            if self._button_pressed == 1:
+                direction = 'out'
+            else:
+                continue
+
+            a._set_view_from_bbox((lastx, lasty, x, y), direction,
+                                  self._zoom_mode, twinx, twiny)
+
+        self.draw()
+        self._xypress = None
+        self._button_pressed = None
+        self._zoom_mode = None
+        self.push_current()
+
+    # --- flag ---
+
+    def flag(self):
+        if self._active == 'FLAG':
+            self._active = None
+            self.mode = ''
+            if self._idPress:
+                self.canvas.mpl_disconnect(self._idPress)
+            if self._idRelease:
+                self.canvas.mpl_disconnect(self._idRelease)
+            self.canvas.widgetlock.release(self)
+        else:
+            self._active = 'FLAG'
+            if self._idPress:
+                self.canvas.mpl_disconnect(self._idPress)
+            self._idPress = self.canvas.mpl_connect('button_press_event', self.press_flag)
+            if self._idRelease:
+                self.canvas.mpl_disconnect(self._idRelease)
+            self._idRelease = self.canvas.mpl_connect('button_release_event', self.release_flag)
+            self.mode = "flag"
+            self.canvas.widgetlock(self)
 
         self.set_message(self.mode)
         self._update_buttons_checked()
@@ -183,8 +619,6 @@ class NavToolbar(NavigationToolbar2QT):
         # store the pressed button
         if event.button == 1:  # left
             self._button_pressed = 1
-        elif event.button == 3:  # right
-            self._button_pressed = 3
         else:  # nothing and return for middle
             self._button_pressed = None
             return
@@ -213,9 +647,6 @@ class NavToolbar(NavigationToolbar2QT):
         self._ids_flag = id1, id2, id3
         self._flag_mode = event.key
         # logger.debug("FLAG > press > key: %s" % self._flag_mode)
-
-        # pass the event
-        self.press(event)
 
     def release_flag(self, event):
         """release mouse button callback in flagging mode"""
@@ -257,7 +688,29 @@ class NavToolbar(NavigationToolbar2QT):
         self._flag_end = None
         self._button_pressed = None
         self._flag_mode = None
-        self.release(event)
+
+    def unflag(self):
+        if self._active == 'UNFLAG':
+            self._active = None
+            self.mode = ''
+            if self._idPress:
+                self.canvas.mpl_disconnect(self._idPress)
+            if self._idRelease:
+                self.canvas.mpl_disconnect(self._idRelease)
+            self.canvas.widgetlock.release(self)
+        else:
+            self._active = 'UNFLAG'
+            if self._idPress:
+                self.canvas.mpl_disconnect(self._idPress)
+            self._idPress = self.canvas.mpl_connect('button_press_event', self.press_unflag)
+            if self._idRelease:
+                self.canvas.mpl_disconnect(self._idRelease)
+            self._idRelease = self.canvas.mpl_connect('button_release_event', self.release_unflag)
+            self.mode = "unflag"
+            self.canvas.widgetlock(self)
+
+        self.set_message(self.mode)
+        self._update_buttons_checked()
 
     def press_unflag(self, event):
         """Mouse press callback for flag"""
@@ -265,8 +718,6 @@ class NavToolbar(NavigationToolbar2QT):
         # store the pressed button
         if event.button == 1:  # left
             self._button_pressed = 1
-        elif event.button == 3:  # right
-            self._button_pressed = 3
         else:  # nothing and return for middle
             self._button_pressed = None
             return
@@ -295,9 +746,6 @@ class NavToolbar(NavigationToolbar2QT):
         self._ids_flag = id1, id2, id3
         self._flag_mode = event.key
         # logger.debug("UNFLAG > press > key: %s" % self._flag_mode)
-
-        # pass the event
-        self.press(event)
 
     def release_unflag(self, event):
         """release mouse button callback in flagging mode"""
@@ -338,9 +786,8 @@ class NavToolbar(NavigationToolbar2QT):
         self._flag_end = None
         self._button_pressed = None
         self._flag_mode = None
-        self.release(event)
 
-    # helper methods
+    # flag/unflag helper methods
 
     def _switch_on_flag_mode(self, event):
         """optional key-press switch in flagging mode (used for x- and y- selections)"""
@@ -391,3 +838,11 @@ class NavToolbar(NavigationToolbar2QT):
 
         # logger.debug("FLAG > drag > (%.3f, %.3f)(%.3f, %.3f)" % (x, y, last_x, last_y))
         self.draw_rubberband(event, x, y, last_x, last_y)
+
+    # --- grid ---
+
+    def grid_plot(self):
+        grid_flag = self.grid_action.isChecked()
+        for a in self.canvas.figure.get_axes():
+            a.grid(grid_flag)
+        self.dynamic_update()

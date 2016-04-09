@@ -10,7 +10,8 @@ from .metadata import Metadata
 from .samples import Samples
 from .more import More
 from .dicts import Dicts
-from .oceanography import Oceanography
+from .oceanography import Oceanography as Oc
+
 
 class Profile(object):
     """"A sound speed profile with 3 sections: metadata, data specific to the task, and additional data"""
@@ -80,7 +81,21 @@ class Profile(object):
 
             if (ssp_direction == Dicts.ssp_directions['up'] and not max_depth_reached) \
                     or (ssp_direction == Dicts.ssp_directions['down'] and max_depth_reached):
+                print(i)
                 self.data.flag[i] = Dicts.flags['direction']  # set invalid for direction
+
+    def calc_salinity(self):
+        self.modify_proc_info('calc.salinity')
+
+    def modify_proc_info(self, info):
+        # if empty, add the info
+        if not self.meta.proc_info:
+            self.meta.proc_info = info
+            return
+        # check if it is already present
+        tokens = self.meta.proc_info.split(';')
+        if not info in tokens:
+            self.meta.proc_info += ';%s' % info
 
     def init_proc(self, num_samples):
         if num_samples == 0:

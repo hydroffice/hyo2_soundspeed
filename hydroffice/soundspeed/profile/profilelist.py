@@ -42,6 +42,11 @@ class ProfileList(object):
             raise RuntimeError("unable to set the current profile at index: %s (list sz: %s)" % (value, len(self.l)))
         self._current_index = value
 
+    def clear(self):
+        del self._list[:]
+        self._list = list()
+        self._current_index = None
+
     def append(self):
         self._list.append(Profile())
         self.current_index = len(self._list) - 1

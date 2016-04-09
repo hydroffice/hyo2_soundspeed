@@ -41,10 +41,10 @@ class AbstractReader(AbstractFormat):
     def _parse_body(self):
         pass
 
-    def finalize(self):
-        """Function called after the parsing is done, to finalize the reading"""
-        # we may have multiple profiles
-        for profile in self.ssp.l:
+    def fix(self):
+        """Function called after the parsing is done, to execute some common checks/integration"""
+
+        for profile in self.ssp.l:  # we may have multiple profiles
 
             # select samples by casting direction
             profile.reduce_up_down(self.s.ssp_up_or_down)
@@ -53,13 +53,20 @@ class AbstractReader(AbstractFormat):
             if (profile.meta.latitude is None) or (profile.meta.longitude is None):
                 profile.meta.latitude, profile.meta.longitude = self.cb.ask_location()
                 if (profile.meta.latitude is None) or (profile.meta.longitude is None):
+                    self.ssp.clear()
                     raise RuntimeError("missing geographic location required for database lookup")
 
             # check if timestamp is present
             if profile.meta.utc_time is None:
                 profile.meta.utc_time = self.cb.ask_date()
                 if profile.meta.utc_time is None:
+                    self.ssp.clear()
                     raise RuntimeError("missing date required for database lookup")
+
+    def finalize(self):
+        """Function called at the end, to finalize the reading (e.g., clone raw to proc)"""
+
+        for profile in self.ssp.l:  # we may have multiple profiles
 
             profile.clone_data_to_proc()
 

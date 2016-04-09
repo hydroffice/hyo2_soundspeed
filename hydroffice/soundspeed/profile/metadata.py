@@ -22,6 +22,7 @@ class Metadata(object):
         self._vessel = None
         self._sn = None  # serial number
         self.proc_time = None  # last processing time
+        self.proc_info = None  # info about processing
 
     @property
     def sensor(self):
@@ -78,6 +79,7 @@ class Metadata(object):
         msg += "    <project:%s,survey:%s,vessel:%s>\n" % (self.project, self.survey, self.vessel)
         msg += "    <sn:%s>\n" % self.sn
         msg += "    <proc_time:%s>\n" % self.proc_time
+        msg += "    <proc_info:%s>\n" % self.proc_info
         return msg
 
     def debug_info(self):
@@ -90,4 +92,5 @@ class Metadata(object):
         msg += "Project: %s, Survey: %s, Vessel: %s\n" % (self.project, self.survey, self.vessel)
         msg += "S/N: %s\n" % self.sn
         msg += "Last proc. time: %s\n" % self.proc_time
+        msg += "Last proc. info: %s\n" % self.proc_info
         return msg

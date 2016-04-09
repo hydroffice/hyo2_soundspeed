@@ -21,7 +21,8 @@ from .widgets.info import Info
 
 class MainWin(QtGui.QMainWindow):
 
-    here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
+    here = os.path.abspath(os.path.dirname(__file__))  # to be overloaded
+    media = os.path.join(here, "media")
 
     def __init__(self):
         QtGui.QMainWindow.__init__(self)
@@ -52,7 +53,7 @@ class MainWin(QtGui.QMainWindow):
             settings.setValue("import_folder", self.prj.data_folder)
 
         # set icons
-        icon_info = QtCore.QFileInfo(os.path.join(self.here, 'media', 'favicon.png'))
+        icon_info = QtCore.QFileInfo(os.path.join(self.media, 'favicon.png'))
         self.setWindowIcon(QtGui.QIcon(icon_info.absoluteFilePath()))
         if (sys.platform == 'win32') or (os.name is "nt"):  # is_windows()
             try:
@@ -112,6 +113,27 @@ class MainWin(QtGui.QMainWindow):
         self.tabServer.data_imported()
         self.tabSettings.data_imported()
 
+    # Quitting #
+
+    def do_you_really_want(self, title="Quit", text="quit"):
+        msg_box = QtGui.QMessageBox(self)
+        msg_box.setWindowTitle(title)
+        msg_box.setIconPixmap(QtGui.QPixmap(os.path.join(self.media, 'favicon.png')).scaled(QtCore.QSize(36, 36)))
+        msg_box.setText('Do you really want to %s?' % text)
+        msg_box.setStandardButtons(QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+        msg_box.setDefaultButton(QtGui.QMessageBox.No)
+        return msg_box.exec_()
+
+    def closeEvent(self, event):
+        """ actions to be done before close the app """
+        reply = self.do_you_really_want("Quit", "quit %s" % self.name)
+        # reply = QtGui.QMessageBox.Yes
+        if reply == QtGui.QMessageBox.Yes:
+            event.accept()
+            super(MainWin, self).closeEvent(event)
+        else:
+            event.ignore()
+
     def do(self):
         """DEBUGGING"""
         from hydroffice.soundspeed.base import helper
@@ -123,7 +145,7 @@ class MainWin(QtGui.QMainWindow):
             pairs = dict()
             for folder in folders:
                 for reader in readers:
-                    if reader.name.lower() != 'valeport':  # reader filter
+                    if reader.name.lower() != 'turo':  # reader filter
                         continue
                     if reader.name.lower() != folder.lower():  # skip not matching readers
                         continue

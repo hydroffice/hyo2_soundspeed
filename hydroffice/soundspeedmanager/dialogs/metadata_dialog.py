@@ -87,6 +87,17 @@ class MetadataDialog(AbstractDialog):
         self.proc_time.setText(self.prj.cur.meta.proc_time.strftime("%d/%m/%y %H:%M"))
         hbox.addWidget(self.proc_time)
 
+        # proc info
+        hbox = QtGui.QHBoxLayout()
+        self.mainLayout.addLayout(hbox)
+        label = QtGui.QLabel("Proc. info:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        self.proc_info = QtGui.QLineEdit()
+        self.proc_info.setDisabled(True)
+        self.proc_info.setText("%s" % self.prj.cur.meta.proc_info)
+        hbox.addWidget(self.proc_info)
+
         # project
         hbox = QtGui.QHBoxLayout()
         self.mainLayout.addLayout(hbox)

@@ -42,6 +42,8 @@ class Turo(AbstractBinaryReader):
         self._parse_header()
         self._parse_body()
 
+        self.fix()
+        self.ssp.cur.calc_salinity()
         self.finalize()
 
         logger.debug('*** %s ***: done' % self.driver)
@@ -71,10 +73,22 @@ class Turo(AbstractBinaryReader):
         """Parsing samples: depth, speed, temp, sal"""
         logger.debug('parsing body')
 
-        self.ssp.cur.data.depth = self.fid.io.variables['depth'][:]
-        self.ssp.cur.data.speed = self.fid.io.variables['soundSpeed'][0, :, 0, 0]
-        self.ssp.cur.data.temp = self.fid.io.variables['temperature'][0, :, 0, 0]
-        self.ssp.cur.data.num_samples = self.ssp.cur.data.depth.size
-        self.ssp.cur.data.sal = np.zeros(self.ssp.cur.data.num_samples)
+        depth = self.fid.io.variables['depth'][:]
+        speed = self.fid.io.variables['soundSpeed'][0, :, 0, 0]
+        temp = self.fid.io.variables['temperature'][0, :, 0, 0]
+        self.ssp.cur.init_data(depth.size)
 
         self.fid.io.close()
+
+        count = 0
+        for i in range(self.ssp.cur.data.num_samples):
+            # Skipping invalid data (crazy sound speed)
+            if isinstance(speed[i], np.ma.core.MaskedConstant):
+                continue
+
+            self.ssp.cur.data.depth[count] = depth[i]
+            self.ssp.cur.data.temp[count] = temp[i]
+            self.ssp.cur.data.speed[count] = speed[i]
+            count += 1
+
+        self.ssp.cur.data_resize(count)

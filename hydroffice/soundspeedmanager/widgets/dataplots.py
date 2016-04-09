@@ -43,7 +43,7 @@ class DataPlots(AbstractWidget):
         self.vi = None  # valid indices
         self.ii = None  # invalid indices
         self.valid_color = 'green'
-        self.invalid_color = '#cccccc'
+        self.invalid_color = '#dddddd'
 
         # outline ui
         self.top_widget = QtGui.QWidget()
@@ -100,6 +100,10 @@ class DataPlots(AbstractWidget):
         self.speed_invalid, = self.speed_ax.plot(self.prj.cur.proc.speed[self.ii],
                                                  self.prj.cur.proc.depth[self.ii],
                                                  color=self.invalid_color,
+                                                 linestyle='None',
+                                                 marker='o',
+                                                 alpha=0.5,
+                                                 ms=1,
                                                  picker=3)
         self.speed_valid, = self.speed_ax.plot(self.prj.cur.proc.speed[self.vi],
                                                self.prj.cur.proc.depth[self.vi],
@@ -113,6 +117,10 @@ class DataPlots(AbstractWidget):
         self.temp_invalid, = self.temp_ax.plot(self.prj.cur.proc.temp[self.ii],
                                                self.prj.cur.proc.depth[self.ii],
                                                color=self.invalid_color,
+                                               linestyle='None',
+                                               marker='o',
+                                               alpha=0.5,
+                                               ms=1,
                                                picker=3)
         self.temp_valid, = self.temp_ax.plot(self.prj.cur.proc.temp[self.vi],
                                              self.prj.cur.proc.depth[self.vi],
@@ -128,6 +136,10 @@ class DataPlots(AbstractWidget):
         self.sal_invalid, = self.sal_ax.plot(self.prj.cur.proc.sal[self.ii],
                                              self.prj.cur.proc.depth[self.ii],
                                              color=self.invalid_color,
+                                             linestyle='None',
+                                             marker='o',
+                                             alpha=0.5,
+                                             ms=1,
                                              picker=3)
         self.sal_valid, = self.sal_ax.plot(self.prj.cur.proc.sal[self.vi],
                                            self.prj.cur.proc.depth[self.vi],
