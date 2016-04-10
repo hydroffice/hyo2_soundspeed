@@ -248,6 +248,33 @@ class SettingsDb(BaseDb):
     def ssp_up_or_down(self, value):
         self._setter_str("ssp_up_or_down", value)
 
+    # --- use_woa09
+    @property
+    def use_woa09(self):
+        return self._getter_bool("use_woa09")
+
+    @use_woa09.setter
+    def use_woa09(self, value):
+        self._setter_bool("use_woa09", value)
+
+    # --- use_woa13
+    @property
+    def use_woa13(self):
+        return self._getter_bool("use_woa13")
+
+    @use_woa13.setter
+    def use_woa13(self, value):
+        self._setter_bool("use_woa13", value)
+
+    # --- use_rtofs
+    @property
+    def use_rtofs(self):
+        return self._getter_bool("use_rtofs")
+
+    @use_rtofs.setter
+    def use_rtofs(self, value):
+        self._setter_bool("use_rtofs", value)
+
    #  # --- rx_max_wait_time
    #  @property
    #  def rx_max_wait_time(self):

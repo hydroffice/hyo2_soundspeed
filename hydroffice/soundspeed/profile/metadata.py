@@ -30,7 +30,7 @@ class Metadata(object):
 
     @property
     def probe(self):
-        return Dicts.first_match(Dicts.sensor_types, self.sensor_type)
+        return Dicts.first_match(Dicts.probe_types, self.probe_type)
 
     @property
     def project(self):

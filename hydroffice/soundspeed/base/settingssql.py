@@ -12,6 +12,9 @@ CREATE_SETTINGS = """ CREATE TABLE IF NOT EXISTS general(
      setup_name text NOT NULL UNIQUE DEFAULT "default",
      setup_status text NOT NULL DEFAULT "inactive",
      ssp_up_or_down text NOT NULL DEFAULT "down",
+     use_woa09 text NOT NULL DEFAULT "True",
+     use_woa13 text NOT NULL DEFAULT "False",
+     use_rtofs text NOT NULL DEFAULT "True",
      /* rx_max_wait_time integer NOT NULL DEFAULT 30,
      ssp_extension_source text NOT NULL DEFAULT "WOA09",
      ssp_salinity_source text NOT NULL DEFAULT "WOA09",
@@ -43,7 +46,10 @@ CREATE_SETTINGS = """ CREATE TABLE IF NOT EXISTS general(
      mvp_instrument text NOT NULL DEFAULT "AML_uSVPT", */
      /* Checks */
      CHECK (setup_status IN ("active", "inactive")),
-     CHECK (ssp_up_or_down IN ("down", "up")) /*,
+     CHECK (ssp_up_or_down IN ("down", "up")),
+     CHECK (use_woa09 IN ("True", "False")),
+     CHECK (use_woa13 IN ("True", "False")),
+     CHECK (use_rtofs IN ("True", "False")) /*,
      CHECK (rx_max_wait_time > 0),
      CHECK (ssp_extension_source IN ("RTOFS", "WOA09", "WOA13")),
      CHECK (ssp_salinity_source IN ("RTOFS", "WOA09", "WOA13")),

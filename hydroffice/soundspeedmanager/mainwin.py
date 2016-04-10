@@ -27,10 +27,6 @@ class MainWin(QtGui.QMainWindow):
     def __init__(self):
         QtGui.QMainWindow.__init__(self)
 
-        # create the project
-        self.prj = Project()
-        self.prj.set_callbacks(Callbacks(self))  # set the PySide callbacks
-
         # set the application name
         self.name = "Sound Speed Manager"
         self.version = ssm_version
@@ -42,15 +38,6 @@ class MainWin(QtGui.QMainWindow):
         _app = QtCore.QCoreApplication.instance()
         _app.setOrganizationName("HydrOffice")
         _app.setOrganizationDomain("hydroffice.org")
-
-        # init default settings
-        settings = QtCore.QSettings()
-        export_folder = settings.value("export_folder")
-        if (export_folder is None) or (not os.path.exists(export_folder)):
-            settings.setValue("export_folder", self.prj.data_folder)
-        import_folder = settings.value("import_folder")
-        if (import_folder is None) or (not os.path.exists(import_folder)):
-            settings.setValue("import_folder", self.prj.data_folder)
 
         # set icons
         icon_info = QtCore.QFileInfo(os.path.join(self.media, 'favicon.png'))
@@ -68,6 +55,26 @@ class MainWin(QtGui.QMainWindow):
         style_info = QtCore.QFileInfo(os.path.join(self.here, 'styles', 'main.stylesheet'))
         style_content = open(style_info.filePath()).read()
         self.setStyleSheet(style_content)
+
+        self.progress = QtGui.QProgressDialog(self)
+        self.progress.setWindowTitle("Downloading")
+        self.progress.setCancelButtonText("Abort")
+        self.progress.setWindowModality(QtCore.Qt.WindowModal)
+
+        # create the project
+        self.prj = Project()
+        self.prj.set_callbacks(Callbacks(self))  # set the PySide callbacks
+        self.check_woa09()
+        self.check_woa13()
+
+        # init default settings
+        settings = QtCore.QSettings()
+        export_folder = settings.value("export_folder")
+        if (export_folder is None) or (not os.path.exists(export_folder)):
+            settings.setValue("export_folder", self.prj.data_folder)
+        import_folder = settings.value("import_folder")
+        if (import_folder is None) or (not os.path.exists(import_folder)):
+            settings.setValue("import_folder", self.prj.data_folder)
 
         # make tabs
         self.tabs = QtGui.QTabWidget()
@@ -100,6 +107,95 @@ class MainWin(QtGui.QMainWindow):
         self.tabs.setTabToolTip(idx, "Info")
 
         self.data_cleared()
+
+    def check_woa09(self):
+        if not self.prj.use_woa09():
+            return
+        if self.prj.has_woa09():
+            return
+
+        msg = 'The WOA09 atlas is required by some advanced application functions.\n\n' \
+              'The data set (~350MB) can be retrieved from:\n' \
+              '   ftp.ccom.unh.edu/fromccom/hydroffice/woa09.zip\n' \
+              'then unzipped it into:\n' \
+              '   %s\n\n' \
+              'Do you want that I perform this operation for you?\n' \
+              'Internet connection is required!\n' % self.prj.woa09_folder()
+        ret = QtGui.QMessageBox.information(self, "Sound Speed Manager - WOA09 Atlas", msg,
+                                            QtGui.QMessageBox.Ok | QtGui.QMessageBox.No)
+        if ret == QtGui.QMessageBox.No:
+            msg = 'You can also manually install it. The steps are:\n' \
+                  ' - download the archive from (anonymous ftp):\n' \
+                  '   ftp.ccom.unh.edu/fromccom/hydroffice/woa09.zip\n' \
+                  ' - unzip the archive into:\n' \
+                  '   %s\n' \
+                  ' - restart Sound Speed Manager\n' % self.prj.woa09_folder()
+            QtGui.QMessageBox.information(self, "Sound Speed Manager - WOA09 Atlas", msg,
+                                          QtGui.QMessageBox.Ok)
+            return
+
+        # progress dialog
+        self.progress.forceShow()
+        self.progress.setValue(0)
+        success = self.prj.download_woa09(qprogressbar=self.progress)
+        self.progress.setValue(100)
+
+        if not success:
+            msg = 'Unable to retrieve the WOA09 atlas.\n\n ' \
+                  'You may manually install it. The steps are:\n' \
+                  ' - download the archive from (anonymous ftp):\n' \
+                  '   ftp.ccom.unh.edu/fromccom/hydroffice/woa09.zip\n' \
+                  ' - unzip the archive into:\n' \
+                  '   %s\n' \
+                  ' - restart Sound Speed Manager\n' % self.prj.woa09_folder()
+            QtGui.QMessageBox.warning(self, "Sound Speed Manager - WOA09 Atlas", msg,
+                                      QtGui.QMessageBox.Ok)
+
+    def check_woa13(self):
+        if not self.prj.use_woa13():
+            return
+        if self.prj.has_woa13():
+            return
+
+        msg = 'The WOA13 atlas is required by some advanced application functions.\n\n' \
+              'The data set (~1.3GB) can be retrieved from:\n' \
+              '   ftp.ccom.unh.edu/fromccom/hydroffice/woa13_tmp.zip\n' \
+              '   ftp.ccom.unh.edu/fromccom/hydroffice/woa13_sal.zip\n' \
+              'then unzipped it into:\n' \
+              '   %s\n\n' \
+              'Do you want that I perform this operation for you?\n' \
+              'Internet connection is required!\n' % self.prj.woa13_folder()
+        ret = QtGui.QMessageBox.information(self, "Sound Speed Manager - WOA13 Atlas", msg,
+                                            QtGui.QMessageBox.Ok | QtGui.QMessageBox.No)
+        if ret == QtGui.QMessageBox.No:
+            msg = 'You can also manually install it. The steps are:\n' \
+                  ' - download the archive from (anonymous ftp):\n' \
+                  '   ftp.ccom.unh.edu/fromccom/hydroffice/woa13_tmp.zip\n' \
+                  '   ftp.ccom.unh.edu/fromccom/hydroffice/woa13_sal.zip\n' \
+                  ' - unzip the archive into:\n' \
+                  '   %s\n' \
+                  ' - restart Sound Speed Manager\n' % self.prj.woa13_folder()
+            QtGui.QMessageBox.information(self, "Sound Speed Manager - WOA13 Atlas", msg,
+                                          QtGui.QMessageBox.Ok)
+            return
+
+        # progress dialog
+        self.progress.forceShow()
+        self.progress.setValue(0)
+        success = self.prj.download_woa13(qprogressbar=self.progress)
+        self.progress.setValue(100)
+
+        if not success:
+            msg = 'Unable to retrieve the WOA13 atlas.\n\n ' \
+                  'You may manually install it. The steps are:\n' \
+                  ' - download the archive from (anonymous ftp):\n' \
+                  '   ftp.ccom.unh.edu/fromccom/hydroffice/woa13_tmp.zip\n' \
+                  '   ftp.ccom.unh.edu/fromccom/hydroffice/woa13_sal.zip\n' \
+                  ' - unzip the archive into:\n' \
+                  '   %s\n' \
+                  ' - restart Sound Speed Manager\n' % self.prj.woa13_folder()
+            QtGui.QMessageBox.warning(self, "Sound Speed Manager - WOA13 Atlas", msg,
+                                      QtGui.QMessageBox.Ok)
 
     def data_cleared(self):
         self.tabEditor.data_cleared()
@@ -145,7 +241,7 @@ class MainWin(QtGui.QMainWindow):
             pairs = dict()
             for folder in folders:
                 for reader in readers:
-                    if reader.name.lower() != 'turo':  # reader filter
+                    if reader.name.lower() != 'valeport':  # reader filter
                         continue
                     if reader.name.lower() != folder.lower():  # skip not matching readers
                         continue

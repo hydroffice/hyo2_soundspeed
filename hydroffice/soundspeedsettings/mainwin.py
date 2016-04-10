@@ -19,7 +19,7 @@ class MainWin(QtGui.QMainWindow):
 
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
 
-    def __init__(self, prj):
+    def __init__(self, prj, main_win=None):
         QtGui.QMainWindow.__init__(self)
 
         # check passed input parameters
@@ -27,6 +27,7 @@ class MainWin(QtGui.QMainWindow):
             raise RuntimeError("Invalid type (%s) in place of a Project instance" % type(prj))
         self.prj = prj
         self.db = prj.settings_db()
+        self.main_win = main_win
 
         # set the application name
         self.name = "Sound Speed Settings"

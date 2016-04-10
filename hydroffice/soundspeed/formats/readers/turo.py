@@ -43,7 +43,8 @@ class Turo(AbstractBinaryReader):
         self._parse_body()
 
         self.fix()
-        self.ssp.cur.calc_salinity()
+        if self.ssp.cur.data.sal.mean() == 0:  # future use
+            self.ssp.cur.calc_salinity()
         self.finalize()
 
         logger.debug('*** %s ***: done' % self.driver)

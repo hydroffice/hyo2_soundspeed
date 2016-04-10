@@ -40,6 +40,8 @@ class DigibarS(AbstractTextReader):
         self._parse_body()
 
         self.fix()
+        if self.ssp.cur.data.sal.mean() == 0:  # future use
+            self.ssp.cur.calc_salinity()
         self.finalize()
 
         logger.debug('*** %s ***: done' % self.driver)

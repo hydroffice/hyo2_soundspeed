@@ -16,6 +16,8 @@ rcParams['legend.fontsize'] = rcParams['font.size'] - 1
 rcParams['xtick.labelsize'] = rcParams['font.size'] - 2
 rcParams['ytick.labelsize'] = rcParams['font.size'] - 2
 rcParams['axes.linewidth'] = 0.5
+rcParams['axes.xmargin'] = 0.01
+rcParams['axes.ymargin'] = 0.01
 rcParams['backend.qt4'] = 'PySide'
 import matplotlib
 matplotlib.use('Qt4Agg')

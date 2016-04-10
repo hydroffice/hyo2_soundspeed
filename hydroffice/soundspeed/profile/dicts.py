@@ -69,3 +69,8 @@ class Dicts(object):
         ('direction', 1),
         ('user', 2),
     ])
+
+    booleans = OrderedDict([
+        (True, 0),
+        (False, 1)
+    ])

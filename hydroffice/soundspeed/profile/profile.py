@@ -81,11 +81,35 @@ class Profile(object):
 
             if (ssp_direction == Dicts.ssp_directions['up'] and not max_depth_reached) \
                     or (ssp_direction == Dicts.ssp_directions['down'] and max_depth_reached):
-                print(i)
                 self.data.flag[i] = Dicts.flags['direction']  # set invalid for direction
 
     def calc_salinity(self):
+        """Helper method to calculate salinity from depth, sound speed and temperature"""
+        logger.debug("calculate salinity")
+        if not self.meta.latitude:
+            latitude = 30.0
+            logger.warning("using default latitude: %s" % latitude)
+        else:
+            latitude = self.meta.latitude
+
+        for count in range(self.data.num_samples):
+            self.data.sal[count] = Oc.sal(d=self.data.depth[count], speed=self.data.speed[count],
+                                          t=self.data.temp[count], lat=latitude)
         self.modify_proc_info('calc.salinity')
+
+    def calc_depth(self):
+        """Helper method to calculate depth from pressure (in dBar)"""
+        logger.debug("calculate depth from pressure")
+        if not self.meta.latitude:
+            latitude = 30.0
+            logger.warning("using default latitude: %s" % latitude)
+        else:
+            latitude = self.meta.latitude
+
+        for count in range(self.data.num_samples):
+            self.data.depth[count] = Oc.p2d(p=self.data.depth[count], lat=latitude)
+
+        self.modify_proc_info('calc.depth')
 
     def modify_proc_info(self, info):
         # if empty, add the info

@@ -49,6 +49,11 @@ class Valeport(AbstractTextReader):
         self._parse_body()
 
         self.fix()
+        if self.ssp.cur.meta.probe_type not in [Dicts.probe_types['MiniSVP']]:
+            self.ssp.cur.calc_depth()
+        if self.ssp.cur.meta.probe_type not \
+                in [Dicts.probe_types['MIDAS SVX2 1000'], Dicts.probe_types['MIDAS SVX2 3000']]:
+            self.ssp.cur.calc_salinity()
         self.finalize()
 
         logger.debug('*** %s ***: done' % self.driver)
@@ -183,7 +188,7 @@ class Valeport(AbstractTextReader):
                 logger.error("unable to parse from line #%s" % self.samples_offset)
                 continue
 
-        self.ssp.cur.data_data_resize(count)
+        self.ssp.cur.data_resize(count)
 
     def _midas_body(self):
 

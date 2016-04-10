@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 from .base.baseproject import BaseProject
 from .base.settings import Settings
 from .base.callbacks import Callbacks, AbstractCallbacks
-
+from .atlas.atlases import Atlases
 
 class Project(BaseProject):
     """Sound Speed project"""
@@ -19,6 +19,7 @@ class Project(BaseProject):
         self.setup = Settings(data_folder=self.data_folder)
         self.cb = Callbacks()
         self.ssp = None
+        self.atlases = Atlases(prj=self)
 
     # --- ssp profile
 
@@ -129,6 +130,41 @@ class Project(BaseProject):
     def reload_settings_from_db(self):
         """Reload the current setup from the settings db"""
         self.setup.load_settings_from_db()
+
+    # --- atlases
+
+    def use_rtofs(self):
+        return self.setup.use_rtofs
+
+    def use_woa09(self):
+        return self.setup.use_woa09
+
+    def use_woa13(self):
+        return self.setup.use_woa13
+
+    def has_rtofs(self):
+        return self.atlases.rtofs.is_present()
+
+    def has_woa09(self):
+        return self.atlases.woa09.is_present()
+
+    def has_woa13(self):
+        return self.atlases.woa13.is_present()
+
+    def rtofs_folder(self):
+        return self.atlases.rtofs.folder
+
+    def woa09_folder(self):
+        return self.atlases.woa09.folder
+
+    def woa13_folder(self):
+        return self.atlases.woa13.folder
+
+    def download_woa09(self, qprogressbar=None):
+        return self.atlases.woa09.download_db(qprogressbar)
+
+    def download_woa13(self, qprogressbar=None):
+        return self.atlases.woa13.download_db(qprogressbar)
 
     # --- repr
 

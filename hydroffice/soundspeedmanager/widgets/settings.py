@@ -23,7 +23,7 @@ class Settings(AbstractWidget):
         self.mainLayout = QtGui.QVBoxLayout()
         self.frame.setLayout(self.mainLayout)
         # settings
-        self.settings_widget = MainWin(prj=prj)
+        self.settings_widget = MainWin(prj=prj, main_win=self.main_win)
         self.settings_widget.set_editable(False)
         self.mainLayout.addWidget(self.settings_widget)
         # lock/unlock

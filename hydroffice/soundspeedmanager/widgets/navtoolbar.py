@@ -185,7 +185,7 @@ class NavToolbar(NavigationToolbar2QT):
                         s += '[%s]' % a.format_cursor_data(data)
 
             if len(self.mode):
-                self.set_message('%s | %s' % (self.mode, s))
+                self.set_message('%s | %s' % (s, self.mode))
             else:
                 self.set_message(s)
 
