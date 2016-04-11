@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from datetime import datetime as dt, date, timedelta
-import netCDF4
+from netCDF4 import Dataset
 import numpy as np
 import httplib
 from urlparse import urlparse
@@ -138,26 +138,33 @@ class Rtofs(AbstractAtlas):
                 logger.info("cleaning data: %s %s" % (self.last_loaded_day, datestamp))
                 self.clear_data()
 
+        self.prj.progress.start("Download RTOFS")
+
         url_ck_temp, url_ck_sal = self.build_check_urls(datestamp)
         if not (self.check_url(url_ck_temp) and self.check_url(url_ck_sal)):
             datestamp -= timedelta(days=1)
         url_temp, url_sal = self.build_opendap_urls(datestamp)
 
+        self.prj.progress.update(30)
         logger.debug('downloading RTOFS data for %s' % datestamp)
 
         try:
             # Try out today's grids
-            self.file_temp = netCDF4.Dataset(url_temp)
-            self.file_sal = netCDF4.Dataset(url_sal)
+            self.file_temp = Dataset(url_temp)
+            self.prj.progress.update(60)
+            self.file_sal = Dataset(url_sal)
+            self.prj.progress.update(80)
             self.day_idx = 2  # usually 3 1-day steps
         except RuntimeError:
             logger.warning("unable to access data: %s" % datestamp.strftime("%Y%m%d"))
             self.clear_data()
+            self.prj.progress.end()
             return False
 
         self.has_data_loaded = True
         self.last_loaded_day = datestamp
         logger.info("loaded data for %s" % datestamp)
+        self.prj.progress.end()
         return True
 
     def query(self, lat, lon, datestamp=None):
@@ -189,6 +196,8 @@ class Rtofs(AbstractAtlas):
             logger.error("troubles in updating data set for timestamp: %s"
                          % datestamp.strftime("%Y%m%d"))
             return None
+
+        self.prj.progress.start("Retrieve RTOFS data")
 
         longitudes = np.zeros((self.search_window, self.search_window))
         if (lon_e_idx < self.lon.size) and (lon_w_idx >= 0):
@@ -263,6 +272,7 @@ class Rtofs(AbstractAtlas):
             s[:, :, lons_left.size:self.search_window] = s_right
 
         # logger.info("done data retrieval > calculating nodes distance")
+        self.prj.progress.update(40)
 
         # Calculate distances from requested position to each of the grid node locations
         distances = np.zeros((self.d.size, self.search_window, self.search_window))
@@ -277,12 +287,13 @@ class Rtofs(AbstractAtlas):
                 # logger.info("node %s, pos: %3.1f, %3.1f, dist: %3.1f"
                 #             % (i, latitudes[i, j], longitudes[i, j], distances[0, i, j]))
         # logger.info("distance array:\n%s" % distances[0])
-
         # Get mask of "no data" elements and replace these with NaNs in distance array
         t_mask = np.isnan(t)
         distances[t_mask] = np.nan
         s_mask = np.isnan(s)
         distances[s_mask] = np.nan
+
+        self.prj.progress.update(70)
 
         # Spin through all the depth levels
         temp_pot = np.zeros(self.d.size)
@@ -325,6 +336,7 @@ class Rtofs(AbstractAtlas):
 
         if num_values == 0:
             logger.info("no data from lookup!")
+            self.prj.progress.end()
             return None
 
         ind = np.nanargmin(distances[0])
@@ -333,6 +345,8 @@ class Rtofs(AbstractAtlas):
         lon_out = longitudes[ind2]
         while lon_out > 180.0:
             lon_out -= 360.0
+
+        self.prj.progress.update(90)
 
         # Make a new SV object to return our query in
         ssp = Profile()
@@ -347,6 +361,7 @@ class Rtofs(AbstractAtlas):
         ssp.data.sal = sal[0:num_values]
         ssp.calc_speed()
 
+        self.prj.progress.end()
         return ssp
 
     def clear_data(self):

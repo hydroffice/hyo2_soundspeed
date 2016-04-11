@@ -8,18 +8,21 @@ logger = logging.getLogger(__name__)
 from .base.baseproject import BaseProject
 from .base.settings import Settings
 from .base.callbacks import Callbacks, AbstractCallbacks
+from .base.progress import Progress
 from .atlas.atlases import Atlases
+
 
 class Project(BaseProject):
     """Sound Speed project"""
 
-    def __init__(self, data_folder=None):
+    def __init__(self, data_folder=None, qprogress=None):
         """Initialization for the library"""
         super(Project, self).__init__(data_folder=data_folder)
         self.setup = Settings(data_folder=self.data_folder)
         self.cb = Callbacks()
         self.ssp = None
         self.atlases = Atlases(prj=self)
+        self.progress = Progress(qprogress=qprogress)
 
     # --- ssp profile
 
@@ -160,14 +163,14 @@ class Project(BaseProject):
     def woa13_folder(self):
         return self.atlases.woa13.folder
 
-    def download_rtofs(self, qprogressbar=None):
-        return self.atlases.rtofs.download_db(qprogressbar)
+    def download_rtofs(self):
+        return self.atlases.rtofs.download_db()
 
-    def download_woa09(self, qprogressbar=None):
-        return self.atlases.woa09.download_db(qprogressbar)
+    def download_woa09(self):
+        return self.atlases.woa09.download_db()
 
-    def download_woa13(self, qprogressbar=None):
-        return self.atlases.woa13.download_db(qprogressbar)
+    def download_woa13(self):
+        return self.atlases.woa13.download_db()
 
     # --- repr
 

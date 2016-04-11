@@ -85,7 +85,7 @@ class Profile(object):
 
     def calc_salinity(self):
         """Helper method to calculate salinity from depth, sound speed and temperature"""
-        logger.debug("calculate salinity")
+        # logger.debug("calculate salinity")
         if not self.meta.latitude:
             latitude = 30.0
             logger.warning("using default latitude: %s" % latitude)
@@ -99,7 +99,7 @@ class Profile(object):
 
     def calc_depth(self):
         """Helper method to calculate depth from pressure (in dBar)"""
-        logger.debug("calculate depth from pressure")
+        # logger.debug("calculate depth from pressure")
         if not self.meta.latitude:
             latitude = 30.0
             logger.warning("using default latitude: %s" % latitude)
@@ -113,7 +113,7 @@ class Profile(object):
 
     def calc_speed(self):
         """Helper method to calculate sound speed"""
-        logger.debug("calculate sound speed")
+        # logger.debug("calculate sound speed")
         if not self.meta.latitude:
             latitude = 30.0
             logger.warning("using default latitude: %s" % latitude)

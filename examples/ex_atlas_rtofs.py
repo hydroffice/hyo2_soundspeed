@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from PySide import QtGui
 from datetime import datetime as dt, timedelta
 import os
 
@@ -17,41 +18,32 @@ from hydroffice.soundspeed.project import Project
 
 
 def main():
-    # create a project
-    prj = Project()
-    logger.info(prj)
-    logger.info(prj.atlases)
+    app = QtGui.QApplication([])  # PySide stuff (start)
+    mw = QtGui.QMainWindow()
+    mw.show()
 
-    lat = 43.026480
-    lon = -70.318824
-    # split case
-    # lat = -19.1
-    # lon = 74.16
-    timestamp = dt.utcnow()
+    prj = Project(qprogress=QtGui.QProgressDialog)
 
-    # woa13
-    if not prj.has_woa09():
-        prj.download_woa09()
-    logger.info("has woa09: %s" % prj.has_woa09())
+    tests = [
+        (43.026480, -70.318824, dt.utcnow()),  # offshore Portsmouth
+        (-19.1, 74.16, dt.utcnow())  # Indian Ocean
+    ]
 
-    # woa09
-    if not prj.has_woa13():
-        prj.download_woa13()
-    logger.info("has woa13: %s" % prj.has_woa13())
-
-    # rtofs
     if not prj.has_rtofs():
         prj.download_rtofs()
     logger.info("has rtofs: %s" % prj.has_rtofs())
 
     temp_url, sal_url = prj.atlases.rtofs.build_check_urls(dt.utcnow())
-    logger.info("urls:\n%s\n%s" % (temp_url, sal_url))
-    logger.info("valid:%s" % prj.atlases.rtofs.check_url(temp_url))
+    logger.info("urls:\n%s [%s]\n%s [%s]"
+                % (temp_url, prj.atlases.rtofs.check_url(temp_url), sal_url, prj.atlases.rtofs.check_url(sal_url)))
     temp_url, sal_url = prj.atlases.rtofs.build_check_urls(dt.utcnow() - timedelta(days=1))
-    logger.info("urls:\n%s\n%s" % (temp_url, sal_url))
-    logger.info("valid:%s" % prj.atlases.rtofs.check_url(temp_url))
+    logger.info("urls:\n%s [%s]\n%s [%s]"
+                % (temp_url, prj.atlases.rtofs.check_url(temp_url), sal_url, prj.atlases.rtofs.check_url(sal_url)))
 
-    logger.info("rtofs profile:\n%s" % prj.atlases.rtofs.query(lat=lat, lon=lon, datestamp=timestamp))
+    for test in tests:
+        logger.info("rtofs profile:\n%s" % prj.atlases.rtofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+
+    app.exec_()  # PySide stuff (end)
 
 if __name__ == "__main__":
     main()

@@ -83,7 +83,7 @@ class Ftp(object):
     """ This class manage a FTP connection, and may also unzip the downloaded file """
 
     def __init__(self, host, username="anonymous", password="anonymous@", show_progress=False, debug_mode=False,
-                 qprogressbar=None):
+                 progress=None):
         """ Initialize the FTP Connector
 
         Args:
@@ -105,7 +105,7 @@ class Ftp(object):
         self.filesize = None
         self.file_count = None
         self.file_nr = None
-        self.qprogressbar = qprogressbar
+        self.progress = progress
 
         self._connect()  # sets self.conn
 
@@ -140,10 +140,8 @@ class Ftp(object):
         file_dst = os.path.abspath(file_dst)
         self.filesize = self.conn.size(file_src)
         if self.show_progress:
-            if self.qprogressbar:
-                self.qprogressbar.setValue(0)
-                self.qprogressbar.setLabelText("Downloading")
-                self.qprogressbar.forceShow()
+            if self.progress:
+                self.progress.start(text="Downloading", abortion=True)
             else:
                 progress = ProgressBar(end_state=self.filesize, bar_width=50)
 
@@ -154,16 +152,17 @@ class Ftp(object):
                 f.write(chunk)
                 self.chunk_count += len(chunk)
                 if self.show_progress:
-                    if self.qprogressbar:
-                        if self.qprogressbar.wasCanceled():
+                    if self.progress:
+                        if self.progress.was_canceled():
                             raise RuntimeError("download stopped by user")
                         pt = int((self.chunk_count / self.filesize) * 100.0)
-                        self.qprogressbar.setValue(pt)
+                        self.progress.update(pt)
                     else:
                         progress + len(chunk)
                         progress.show_progress()
 
             self.conn.retrbinary('RETR %s' % file_src, callback)
+            self.progress.end()
 
         if unzip_it:
             import zipfile
@@ -179,10 +178,8 @@ class Ftp(object):
                 progress = None
                 self.file_nr = len(name_list)
                 if self.show_progress:
-                    if self.qprogressbar:
-                        self.qprogressbar.setValue(0)
-                        self.qprogressbar.setLabelText("Unzipping")
-                        self.qprogressbar.forceShow()
+                    if self.progress:
+                        self.progress.start(text="Unzipping", abortion=True)
                     else:
                         progress = ProgressBar(end_state=self.file_nr, bar_width=50)
 
@@ -192,16 +189,17 @@ class Ftp(object):
                     z.extract(item, unzip_path)
                     self.file_count += 1
                     if self.show_progress:
-                        if self.qprogressbar:
-                            if self.qprogressbar.wasCanceled():
+                        if self.progress:
+                            if self.progress.was_canceled():
                                 raise RuntimeError("unzip stopped by user")
                             pct = int((self.file_count / self.file_nr) * 100.0)
-                            self.qprogressbar.setValue(pct)
+                            self.progress.update(pct)
                         else:
                             progress + 1
                             progress.show_progress()
                 z.close()
                 os.remove(file_dst)
+                self.progress.end()
 
             except:
                 raise RuntimeError("unable to unzip the downloaded file: %s" % file_dst)
