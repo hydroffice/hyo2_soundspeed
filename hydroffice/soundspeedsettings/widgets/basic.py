@@ -196,3 +196,4 @@ class Basic(AbstractWidget):
             self.use_rtofs.setCurrentIndex(0)  # True
         else:
             self.use_rtofs.setCurrentIndex(1)  # False
+

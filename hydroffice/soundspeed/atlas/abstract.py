@@ -6,20 +6,32 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+from ..base.geodesy import Geodesy
+
 
 class AbstractAtlas(object):
     """Common abstract atlas"""
 
     __metaclass__ = ABCMeta
 
-    def __init__(self, data_folder):
+    def __init__(self, data_folder, prj):
         self.name = self.__class__.__name__
         self.desc = "Abstract atlas"  # a human-readable description
         self.data_folder = data_folder
         self._folder = None
+        self.prj = prj
+        self.g = Geodesy()
 
     @abstractmethod
     def is_present(self):
+        pass
+
+    @abstractmethod
+    def query(self, lat, lon, datestamp):
+        pass
+
+    @abstractmethod
+    def download_db(self):
         pass
 
     @property

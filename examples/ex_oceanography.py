@@ -34,3 +34,21 @@ vs_calc = Oc.speed(d=d_ck, t=t_ck, s=s_ck, lat=lat_ck)
 logger.info("Speed: %.3f <> %.3f" % (vs_calc, vs_check))
 s_calc = Oc.sal(d=d_ck, speed=vs_calc, t=t_ck, lat=lat_ck)
 logger.info("Salinity: %.3f <> %.3f" % (s_calc, s_ck))
+
+# check values from Fofonoff and Millard(1983)
+atg_ck = 3.255976e-4
+s_ck = 40.0
+t_ck = 40
+p_ck = 10000
+atg_calc = Oc.atg(s=s_ck, t=t_ck, p=p_ck)
+logger.info("Adiabatic Temperature Gradient: %g <> %g" % (atg_calc, atg_ck))
+
+theta_ck = 36.89073
+s_ck = 40
+t0_ck = 40
+p0_ck = 10000
+p_ref_ck = 0
+theta_calc = Oc.pot_temp(s=s_ck, t=t0_ck, p=p0_ck, pr=p_ref_ck)
+logger.info("Theta: %g <> %g" % (theta_calc, theta_ck))
+t0_calc = Oc.in_situ_temp(s=s_ck, t=theta_ck, p=p0_ck, pr=p_ref_ck)
+logger.info("Temp: %.3f <> %.3f" % (t0_calc, t0_ck))

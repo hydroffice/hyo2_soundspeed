@@ -111,6 +111,22 @@ class Profile(object):
 
         self.modify_proc_info('calc.depth')
 
+    def calc_speed(self):
+        """Helper method to calculate sound speed"""
+        logger.debug("calculate sound speed")
+        if not self.meta.latitude:
+            latitude = 30.0
+            logger.warning("using default latitude: %s" % latitude)
+        else:
+            latitude = self.meta.latitude
+
+        for count in range(self.data.num_samples):
+            self.data.speed[count] = Oc.speed(self.data.depth[count],
+                                              self.data.temp[count],
+                                              self.data.sal[count],
+                                              latitude)
+        self.modify_proc_info("calc.speed")
+
     def modify_proc_info(self, info):
         # if empty, add the info
         if not self.meta.proc_info:

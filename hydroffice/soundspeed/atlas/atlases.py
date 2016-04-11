@@ -21,9 +21,9 @@ class Atlases(object):
             os.makedirs(self.data_folder)
 
         # available atlases
-        self.rtofs = Rtofs(self.data_folder)
-        self.woa09 = Woa09(self.data_folder)
-        self.woa13 = Woa13(self.data_folder)
+        self.rtofs = Rtofs(data_folder=self.data_folder, prj=self.prj)
+        self.woa09 = Woa09(data_folder=self.data_folder, prj=self.prj)
+        self.woa13 = Woa13(data_folder=self.data_folder, prj=self.prj)
 
     @property
     def woa09_folder(self):

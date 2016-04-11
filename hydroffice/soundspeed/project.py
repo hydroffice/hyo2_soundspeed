@@ -160,6 +160,9 @@ class Project(BaseProject):
     def woa13_folder(self):
         return self.atlases.woa13.folder
 
+    def download_rtofs(self, qprogressbar=None):
+        return self.atlases.rtofs.download_db(qprogressbar)
+
     def download_woa09(self, qprogressbar=None):
         return self.atlases.woa09.download_db(qprogressbar)
 

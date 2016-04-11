@@ -200,3 +200,108 @@ class Oceanography(object):
             num_iterations += 1
 
         return salinity
+
+    @classmethod
+    def atg(cls, s, t, p):
+        """ Adiabatic temperature gradient
+
+        ref: Fofonoff and Millard(1983)
+
+        Args:
+            s: salinity in PSU ppt
+            t: temperature in deg Celsius
+            p: pressure in dBar
+
+        Returns: adiabatic temperature gradient in deg C/dBar
+
+        """
+        a0 = 3.5803E-5
+        a1 = 8.5258E-6
+        a2 = -6.836E-8
+        a3 = 6.6228E-10
+
+        b0 = 1.8932E-6
+        b1 = -4.2393E-8
+
+        c0 = 1.8741E-8
+        c1 = -6.7795E-10
+        c2 = 8.733E-12
+        c3 = -5.4481E-14
+
+        d0 = -1.1351E-10
+        d1 = 2.7759E-12
+
+        e0 = -4.6206E-13
+        e1 = 1.8676E-14
+        e2 = -2.1687E-16
+
+        return a0 + (a1 + (a2 + a3 * t) * t) * t + (b0 + b1 * t) * (s - 35) \
+               + ((c0 + (c1 + (c2 + c3 * t) * t) * t)
+               + (d0 + d1 * t) * (s - 35)) * p \
+               + (e0 + (e1 + e2 * t) * t) * p * p
+
+    @classmethod
+    def pot_temp(cls, s, t, p, pr):
+        """Compute local potential temperature at pressure
+
+        ref: Fofonoff and Millard(1983)
+
+        Args:
+            s: salinity in PSU ppt
+            t0: temperature
+            p0: pressure
+            pr: reference pressure
+
+        Returns: theta, potential temperature in deg C
+
+        """
+        h = pr - p
+        xk = h * cls.atg(s=s, t=t, p=p)
+
+        t += + 0.5 * xk
+        q = xk
+        p += 0.5 * h
+        xk = h * cls.atg(s=s, t=t, p=p)
+
+        t += 0.29289322 * (xk - q)
+        q = 0.58578644 * xk + 0.121320344 * q
+        xk = h * cls.atg(s=s, t=t, p=p)
+
+        t += 1.707106781 * (xk - q)
+        q = 3.414213562 * xk - 4.121320344 * q
+        p += 0.5 * h
+        xk = h * cls.atg(s=s, t=t, p=p)
+
+        return t + (xk - 2.0 * q) / 6.0
+
+    @classmethod
+    def in_situ_temp(cls, s, t, p, pr):
+        """Compute in-situ temperature at pressure
+
+        Args:
+            s: salinity in PSU ppt
+            t0: temperature
+            p0: pressure
+            pr: reference pressure
+
+        Returns: in-situ temperature in deg C
+        """
+
+        if p == pr:
+            return t
+
+        temp = t
+        new_pot_t = cls.pot_temp(s=s, t=t, p=p, pr=pr)
+        if new_pot_t < t:
+            sign = 1
+        else:
+            sign = -1
+
+        dt = new_pot_t - temp
+
+        while np.abs(dt) > 0.001:
+            temp += sign * 0.001
+            new_pot_t = cls.pot_temp(s=s, t=temp, p=p, pr=pr)
+            dt = new_pot_t - t
+
+        return temp

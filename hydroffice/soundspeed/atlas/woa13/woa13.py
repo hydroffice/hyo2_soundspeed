@@ -8,13 +8,14 @@ logger = logging.getLogger(__name__)
 
 from ..abstract import AbstractAtlas
 from ..ftp import Ftp
+from ...profile.profile import Profile
 
 
 class Woa13(AbstractAtlas):
     """WOA13 atlas"""
 
-    def __init__(self, data_folder):
-        super(Woa13, self).__init__(data_folder)
+    def __init__(self, data_folder, prj):
+        super(Woa13, self).__init__(data_folder=data_folder, prj=prj)
         self.name = self.__class__.__name__
         self.desc = "WOA13"
 
@@ -61,6 +62,10 @@ class Woa13(AbstractAtlas):
         except Exception as e:
             logger.error('during WOA13 download and unzip: %s' % e)
             return False
+
+    def query(self, lat, lon, datestamp):
+        ssp = Profile()
+        return ssp
 
     def __repr__(self):
         msg = "%s" % super(Woa13, self).__repr__()

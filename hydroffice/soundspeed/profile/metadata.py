@@ -74,7 +74,7 @@ class Metadata(object):
     def __repr__(self):
         msg = "  <Meta>\n"
         msg += "    <sensor:%s[%s]>\n" % (self.sensor, self.probe)
-        msg += "    <time:%s,lat:%s,long:%s>\n" % (self.latitude, self.longitude, self.utc_time)
+        msg += "    <time:%s,lat:%s,long:%s>\n" % (self.utc_time, self.latitude, self.longitude)
         msg += "    <path:%s>\n" % self.original_path
         msg += "    <project:%s,survey:%s,vessel:%s>\n" % (self.project, self.survey, self.vessel)
         msg += "    <sn:%s>\n" % self.sn
