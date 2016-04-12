@@ -44,3 +44,9 @@ class AbstractWidget(QtGui.QMainWindow):
 
     def data_imported(self):
         pass
+
+    def data_stored(self):
+        pass
+
+    def data_removed(self):
+        pass

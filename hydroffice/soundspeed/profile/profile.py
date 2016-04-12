@@ -162,20 +162,8 @@ class Profile(object):
             return
         # check if it is already present
         tokens = self.meta.proc_info.split(';')
-        if not info in tokens:
+        if info not in tokens:
             self.meta.proc_info += ';%s' % info
-
-    def init_proc(self, num_samples):
-        if num_samples == 0:
-            return
-
-        self.proc.num_samples = num_samples
-        self.proc.init_depth()
-        self.proc.init_speed()
-        self.proc.init_temp()
-        self.proc.init_sal()
-        self.proc.init_source()
-        self.proc.init_flag()
 
     def clone_data_to_proc(self):
         """Clone the raw data samples into proc samples"""

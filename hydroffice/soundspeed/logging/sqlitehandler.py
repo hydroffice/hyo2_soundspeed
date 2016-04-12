@@ -11,7 +11,6 @@ initial_sql = """CREATE TABLE IF NOT EXISTS log(
                     LogLevel INT,
                     LogLevelName TEXT,
                     Message TEXT,
-                    Args TEXT,
                     Module TEXT,
                     FuncName TEXT,
                     LineNo INT,
@@ -27,7 +26,6 @@ insertion_sql = """INSERT INTO log(
                     LogLevel,
                     LogLevelName,
                     Message,
-                    Args,
                     Module,
                     FuncName,
                     LineNo,
@@ -36,21 +34,7 @@ insertion_sql = """INSERT INTO log(
                     Thread,
                     ThreadName
                )
-               VALUES (
-                    '%(dbtime)s',
-                    '%(name)s',
-                    %(levelno)d,
-                    '%(levelname)s',
-                    '%(msg)s',
-                    '%(args)s',
-                    '%(module)s',
-                    '%(funcName)s',
-                    %(lineno)d,
-                    '%(exc_text)s',
-                    %(process)d,
-                    '%(thread)s',
-                    '%(threadName)s'
-               );
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
                """
 
 count_logs_sql = "SELECT COUNT(*) FROM log"
@@ -84,7 +68,11 @@ class SQLiteHandler(logging.Handler):
             record.exc_text = ""
 
         # Insert the log record
-        sql = insertion_sql % record.__dict__
+        rd = record.__dict__
+        tup = (rd['dbtime'], rd['name'], rd['levelno'], rd['levelname'],
+               rd['msg'], rd['module'], rd['funcName'],
+               rd['lineno'], rd['exc_text'], rd['process'],
+               rd['thread'], rd['threadName'],)
         conn = sqlite3.connect(self.db)
-        conn.execute(sql)
+        conn.execute(insertion_sql, tup)
         conn.commit()  # not efficient, but thread-safe

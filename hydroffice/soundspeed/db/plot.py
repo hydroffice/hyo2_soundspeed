@@ -13,6 +13,10 @@ rcParams.update(
         'font.size': 9
     }
 )
+rcParams['backend.qt4'] = 'PySide'
+import matplotlib
+matplotlib.use('Qt4Agg')
+
 from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes

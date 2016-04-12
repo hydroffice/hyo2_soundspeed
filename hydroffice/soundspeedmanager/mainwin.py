@@ -66,7 +66,7 @@ class MainWin(QtGui.QMainWindow):
         self.prj.set_callbacks(Callbacks(self))  # set the PySide callbacks
         self.check_woa09()
         self.check_woa13()
-        self.check_rtofs()
+        # self.check_rtofs()  # no need to wait for the download at the beginning
 
         # init default settings
         settings = QtCore.QSettings()

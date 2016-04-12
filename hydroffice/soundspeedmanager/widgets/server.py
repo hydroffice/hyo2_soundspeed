@@ -17,3 +17,17 @@ class Server(AbstractWidget):
 
     def __init__(self, main_win, prj):
         AbstractWidget.__init__(self, main_win=main_win, prj=prj)
+
+        # create the overall layout
+        self.main_layout = QtGui.QVBoxLayout()
+        self.frame.setLayout(self.main_layout)
+
+        # - label
+        hbox = QtGui.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        hbox.addStretch()
+        self.label = QtGui.QLabel("Server mode")
+        hbox.addWidget(self.label)
+        hbox.addStretch()
+
+        self.main_layout.addStretch()

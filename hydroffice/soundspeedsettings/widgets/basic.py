@@ -25,6 +25,14 @@ class Basic(AbstractWidget):
         self.main_layout = QtGui.QVBoxLayout()
         self.frame.setLayout(self.main_layout)
 
+        # - processing
+        hbox = QtGui.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        hbox.addStretch()
+        self.label = QtGui.QLabel("Processing")
+        hbox.addWidget(self.label)
+        hbox.addStretch()
+
         # - profile direction
         hbox = QtGui.QHBoxLayout()
         self.main_layout.addLayout(hbox)
@@ -53,6 +61,14 @@ class Basic(AbstractWidget):
         btn_apply.clicked.connect(self.apply_profile_direction)
         vbox.addWidget(btn_apply)
         vbox.addStretch()
+
+        # - atlases
+        hbox = QtGui.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        hbox.addStretch()
+        self.label = QtGui.QLabel("Atlases")
+        hbox.addWidget(self.label)
+        hbox.addStretch()
 
         # - use woa09
         hbox = QtGui.QHBoxLayout()
@@ -142,6 +158,72 @@ class Basic(AbstractWidget):
         vbox.addWidget(btn_apply)
         vbox.addStretch()
 
+        # - logging
+        hbox = QtGui.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        hbox.addStretch()
+        self.label = QtGui.QLabel("Logging")
+        hbox.addWidget(self.label)
+        hbox.addStretch()
+
+        # - log_user
+        hbox = QtGui.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtGui.QLabel("User logging:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.log_user = QtGui.QComboBox()
+        self.log_user.addItems(["True", "False"])
+        vbox.addWidget(self.log_user)
+        vbox.addStretch()
+        # -- buttons
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        btn_apply = QtGui.QPushButton("Apply")
+        btn_apply.setFixedWidth(lbl_width)
+        btn_apply.clicked.connect(self.apply_log_user)
+        vbox.addWidget(btn_apply)
+        vbox.addStretch()
+
+        # - log_server
+        hbox = QtGui.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtGui.QLabel("Server logging:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.log_server = QtGui.QComboBox()
+        self.log_server.addItems(["True", "False"])
+        vbox.addWidget(self.log_server)
+        vbox.addStretch()
+        # -- buttons
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        btn_apply = QtGui.QPushButton("Apply")
+        btn_apply.setFixedWidth(lbl_width)
+        btn_apply.clicked.connect(self.apply_log_server)
+        vbox.addWidget(btn_apply)
+        vbox.addStretch()
+
         self.main_layout.addStretch()
 
         self.setup_changed()  # to trigger the first data population
@@ -168,6 +250,18 @@ class Basic(AbstractWidget):
     def apply_use_rtofs(self):
         logger.debug("apply use rtofs")
         self.db.use_rtofs = self.use_rtofs.currentText()
+        self.setup_changed()
+
+    def apply_log_user(self):
+        logger.debug("apply log user")
+        self.db.log_user = self.log_user.currentText()
+        self.main_win.prj.logging()
+        self.setup_changed()
+
+    def apply_log_server(self):
+        logger.debug("apply log server")
+        self.db.log_server = self.log_server.currentText()
+        self.main_win.prj.logging()
         self.setup_changed()
 
     def setup_changed(self):
@@ -197,3 +291,14 @@ class Basic(AbstractWidget):
         else:
             self.use_rtofs.setCurrentIndex(1)  # False
 
+        # log_user
+        if self.db.log_user:
+            self.log_user.setCurrentIndex(0)  # True
+        else:
+            self.log_user.setCurrentIndex(1)  # False
+
+        # log_server
+        if self.db.log_server:
+            self.log_server.setCurrentIndex(0)  # True
+        else:
+            self.log_server.setCurrentIndex(1)  # False

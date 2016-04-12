@@ -275,6 +275,24 @@ class SettingsDb(BaseDb):
     def use_rtofs(self, value):
         self._setter_bool("use_rtofs", value)
 
+    # --- log_user
+    @property
+    def log_user(self):
+        return self._getter_bool("log_user")
+
+    @log_user.setter
+    def log_user(self, value):
+        self._setter_bool("log_user", value)
+
+    # --- log_server
+    @property
+    def log_server(self):
+        return self._getter_bool("log_server")
+
+    @log_server.setter
+    def log_server(self, value):
+        self._setter_bool("log_server", value)
+
    #  # --- rx_max_wait_time
    #  @property
    #  def rx_max_wait_time(self):

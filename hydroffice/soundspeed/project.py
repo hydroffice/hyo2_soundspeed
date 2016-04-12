@@ -26,6 +26,8 @@ class Project(BaseProject):
         self.atlases = Atlases(prj=self)
         self.progress = Progress(qprogress=qprogress, qparent=qparent)
 
+        self.logging()
+
     # --- ssp profile
 
     @property
@@ -309,6 +311,24 @@ class Project(BaseProject):
 
     def download_woa13(self):
         return self.atlases.woa13.download_db()
+
+    # --- logging
+
+    def logging(self):
+        """Set on/off logging for user and server"""
+        if self.setup.log_user:
+            if not self.logs.user_active:
+                self.logs.activate_user_db()
+        else:
+            if self.logs.user_active:
+                self.logs.deactivate_user_db()
+
+        if self.setup.log_server:
+            if not self.logs.server_active:
+                self.logs.activate_server_db()
+        else:
+            if self.logs.server_active:
+                self.logs.deactivate_server_db()
 
     # --- repr
 
