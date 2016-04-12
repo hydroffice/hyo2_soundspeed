@@ -8,7 +8,7 @@ import logging
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
-__version__ = '0.1.0'
+__version__ = '3.0.a1'
 __doc__ = "Sound Speed Manager"
 __author__ = 'barry.gallagher@noaa.gov; jack.riley@noaa.gov; chen.zang@noaa.gov; matthew.wilson@noaa.gov; brc@ccom.unh.edu; gmasetti@ccom.unh.edu'
 __license__ = 'LGPLv3 license'

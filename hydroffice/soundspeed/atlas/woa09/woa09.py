@@ -309,8 +309,8 @@ class Woa09(AbstractAtlas):
         if num_values > 0:
             ssp_min.init_data(num_values)
             ssp_min.data.depth = self.t_seasonal.variables['depth'][0:num_values]
-            ssp_min.data.temp = t_min[valid]
-            ssp_min.data.sal = s_min[valid]
+            ssp_min.data.temp = t_min[valid][0:num_values]
+            ssp_min.data.sal = s_min[valid][0:num_values]
             ssp_min.calc_speed()
             ssp_min.clone_data_to_proc()
         else:
@@ -325,8 +325,8 @@ class Woa09(AbstractAtlas):
         if num_values > 0:
             ssp_max.init_data(num_values)
             ssp_max.data.depth = self.t_seasonal.variables['depth'][0:num_values]
-            ssp_max.data.temp = t_max[valid]
-            ssp_max.data.sal = s_max[valid]
+            ssp_max.data.temp = t_max[valid][0:num_values]
+            ssp_max.data.sal = s_max[valid][0:num_values]
             ssp_max.calc_speed()
             ssp_max.clone_data_to_proc()
         else:

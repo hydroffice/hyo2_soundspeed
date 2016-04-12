@@ -17,7 +17,7 @@ class Metadata(object):
         self.longitude = None
         self.utc_time = None
         self.original_path = None
-        self._project = None
+        self._project = "default"
         self._survey = None
         self._vessel = None
         self._sn = None  # serial number

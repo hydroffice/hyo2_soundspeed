@@ -62,7 +62,7 @@ class MainWin(QtGui.QMainWindow):
         self.progress.setWindowModality(QtCore.Qt.WindowModal)
 
         # create the project
-        self.prj = Project(qprogress=QtGui.QProgressDialog)
+        self.prj = Project(qprogress=QtGui.QProgressDialog, qparent=self)
         self.prj.set_callbacks(Callbacks(self))  # set the PySide callbacks
         self.check_woa09()
         self.check_woa13()

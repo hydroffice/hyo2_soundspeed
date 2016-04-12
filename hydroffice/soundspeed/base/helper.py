@@ -108,6 +108,13 @@ def info_libs():
     msg += "hydroffice.soundspeedmanager: %s\n" % vers
 
     try:
+        from hydroffice.soundspeedsettings import __version__ as sss_version
+        vers = sss_version
+    except ImportError:
+        vers = None
+    msg += "hydroffice.soundspeedsettings: %s\n" % vers
+
+    try:
         from matplotlib import __version__ as mpl_version
         vers = mpl_version
     except ImportError:
@@ -120,6 +127,20 @@ def info_libs():
     except ImportError:
         vers = None
     msg += "pyside: %s\n" % vers
+
+    try:
+        from osgeo.gdal import __version__ as gdal_version
+        vers = gdal_version
+    except ImportError:
+        vers = None
+    msg += "gdal: %s\n" % vers
+
+    try:
+        from pyproj import __version__ as pyproj_version
+        vers = pyproj_version
+    except ImportError:
+        vers = None
+    msg += "pyproj: %s\n" % vers
 
     return msg
 

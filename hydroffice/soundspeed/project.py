@@ -10,19 +10,21 @@ from .base.settings import Settings
 from .base.callbacks import Callbacks, AbstractCallbacks
 from .base.progress import Progress
 from .atlas.atlases import Atlases
+from .db.db import SoundSpeedDb
+from .base.gdal_aux import GdalAux
 
 
 class Project(BaseProject):
     """Sound Speed project"""
 
-    def __init__(self, data_folder=None, qprogress=None):
+    def __init__(self, data_folder=None, qprogress=None, qparent=None):
         """Initialization for the library"""
         super(Project, self).__init__(data_folder=data_folder)
         self.setup = Settings(data_folder=self.data_folder)
         self.cb = Callbacks()
         self.ssp = None
         self.atlases = Atlases(prj=self)
-        self.progress = Progress(qprogress=qprogress)
+        self.progress = Progress(qprogress=qprogress, qparent=qparent)
 
     # --- ssp profile
 
@@ -177,6 +179,70 @@ class Project(BaseProject):
                 writer.write(ssp=self.ssp, data_path=data_path)
             else:
                 writer.write(ssp=self.ssp, data_path=data_path, data_file=data_files[i])
+
+    # --- db
+
+    def store_data(self):
+        """Export data using a list of formats name"""
+
+        # checks
+        if not self.has_ssp():
+            raise RuntimeError("Data not loaded")
+
+        db = SoundSpeedDb(data_folder=self.data_folder)
+        ret = db.add_casts(self.ssp)
+        db.disconnect()
+        return ret
+
+    def db_profiles(self, project=None):
+        """List the profile on the db"""
+        db = SoundSpeedDb(data_folder=self.data_folder)
+        lst = db.list_profiles(project=project)
+        db.disconnect()
+        return lst
+
+    def db_profile(self, pk):
+        """Retrieve a profile by primary key"""
+        db = SoundSpeedDb(data_folder=self.data_folder)
+        ssp = db.profile_by_pk(pk=pk)
+        db.disconnect()
+        return ssp
+
+    def delete_db_profile(self, pk):
+        """Retrieve a profile by primary key"""
+        db = SoundSpeedDb(data_folder=self.data_folder)
+        ssp = db.delete_profile_by_pk(pk=pk)
+        db.disconnect()
+        return ssp
+
+    def map_db_profiles(self, project=None):
+        """List the profile on the db"""
+        db = SoundSpeedDb(data_folder=self.data_folder)
+        lst = db.plot.map_profiles(project=project)
+        db.disconnect()
+        return lst
+
+    def plot_daily_db_profiles(self, project=None):
+        """Plot the profile on the db by day"""
+        db = SoundSpeedDb(data_folder=self.data_folder)
+        lst = db.plot.daily_plots(project=project)
+        db.disconnect()
+        return lst
+
+    def save_daily_db_profiles(self, project=None):
+        """Save figure with the profile on the db by day"""
+        db = SoundSpeedDb(data_folder=self.data_folder)
+        lst = db.plot.daily_plots(save_fig=True, project=project)
+        db.disconnect()
+        return lst
+
+    def export_db_profiles_metadata(self, ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile'],
+                                    project=None):
+        """Export the db profile metadata"""
+        db = SoundSpeedDb(data_folder=self.data_folder)
+        lst = db.export.export_profiles_metadata(ogr_format=ogr_format, project=project)
+        db.disconnect()
+        return lst
 
     # --- clear data
 

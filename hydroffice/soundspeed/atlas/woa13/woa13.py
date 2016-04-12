@@ -45,7 +45,7 @@ class Woa13(AbstractAtlas):
         check_woa13_file = os.path.join(self.folder, 'temp', 'woa13_decav_t00_04v2.nc')
         if not os.path.exists(check_woa13_file):
             return False
-        check_woa13_file = os.path.join(self.folder, 'sal', 'woa13_decav_s00_04v2.nc')
+        check_woa13_file = os.path.join(self.folder, 'sal', 'woa13_decav_s01_04v2.nc')  # s00 is not required
         if not os.path.exists(check_woa13_file):
             return False
         return True
@@ -90,6 +90,7 @@ class Woa13(AbstractAtlas):
             for i in range(17):
                 t_path = os.path.join(self.folder, "temp", "woa13_decav_t%02d_04v2.nc" % i)
                 self.t.append(Dataset(t_path))
+            for i in range(1, 17):
                 s_path = os.path.join(self.folder, "sal", "woa13_decav_s%02d_04v2.nc" % i)
                 self.s.append(Dataset(s_path))
 
@@ -312,8 +313,8 @@ class Woa13(AbstractAtlas):
         if num_values > 0:
             ssp_min.init_data(num_values)
             ssp_min.data.depth = self.t[self.season_idx].variables['depth'][0:num_values]
-            ssp_min.data.temp = t_min[valid]
-            ssp_min.data.sal = s_min[valid]
+            ssp_min.data.temp = t_min[valid][0:num_values]
+            ssp_min.data.sal = s_min[valid][0:num_values]
             ssp_min.calc_speed()
             ssp_min.clone_data_to_proc()
         else:
@@ -329,8 +330,8 @@ class Woa13(AbstractAtlas):
         if num_values > 0:
             ssp_max.init_data(num_values)
             ssp_max.data.depth = self.t[self.season_idx].variables['depth'][0:num_values]
-            ssp_max.data.temp = t_max[valid]
-            ssp_max.data.sal = s_max[valid]
+            ssp_max.data.temp = t_max[valid][0:num_values]
+            ssp_max.data.sal = s_max[valid][0:num_values]
             ssp_max.calc_speed()
             ssp_max.clone_data_to_proc()
         else:

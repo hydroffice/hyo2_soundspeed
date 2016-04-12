@@ -8,10 +8,13 @@ logger = logging.getLogger(__name__)
 
 class Progress(object):
 
-    def __init__(self, qprogress=None):
+    def __init__(self, qprogress=None, qparent=None):
         if qprogress:
+            from PySide import QtCore  # To avoid PySide as strict dependency
             self.qt = True
-            self._prog = qprogress()
+            self._prog = qprogress(qparent)
+            self._prog.setWindowTitle("Processing")
+            self._prog.setWindowModality(QtCore.Qt.WindowModal)
         else:
             self.qt = False
             self._prog = None

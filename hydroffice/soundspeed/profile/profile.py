@@ -46,6 +46,30 @@ class Profile(object):
         self.data.init_source()
         self.data.init_flag()
 
+    def init_proc(self, num_samples):
+        if num_samples == 0:
+            return
+
+        self.proc.num_samples = num_samples
+        self.proc.init_depth()
+        self.proc.init_speed()
+        self.proc.init_temp()
+        self.proc.init_sal()
+        self.proc.init_source()
+        self.proc.init_flag()
+
+    def init_sis(self, num_samples):
+        if num_samples == 0:
+            return
+
+        self.sis.num_samples = num_samples
+        self.sis.init_depth()
+        self.sis.init_speed()
+        self.sis.init_temp()
+        self.sis.init_sal()
+        self.sis.init_source()
+        self.sis.init_flag()
+
     def init_more(self, more_fields):
         self.more.init_struct_array(self.data.num_samples, more_fields)
 
@@ -156,6 +180,9 @@ class Profile(object):
     def clone_data_to_proc(self):
         """Clone the raw data samples into proc samples"""
         logger.info("cloning raw data to proc samples")
+
+        if self.data.num_samples == 0:
+            return
 
         self.init_proc(self.data.num_samples)
         self.proc.depth[:] = self.data.depth
