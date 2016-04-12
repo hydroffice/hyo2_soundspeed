@@ -62,7 +62,7 @@ class Profile(object):
     @property
     def proc_invalid_direction(self):
         """Return indices of invalid data for direction"""
-        return np.equal(self.proc.flag, Dicts.flags['direction'])
+        return np.equal(self.proc.flag, Dicts.flags['direction'])  # numpy 1.10.4 if a warning
 
     def reduce_up_down(self, ssp_direction):
         """Reduce the raw data samples based on the passed direction"""

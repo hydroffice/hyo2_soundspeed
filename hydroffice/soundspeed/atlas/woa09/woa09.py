@@ -28,7 +28,6 @@ class Woa09(AbstractAtlas):
         self.t_annual = None
         self.t_monthly = None
         self.t_seasonal = None
-        self.s_annual = None
         self.s_monthly = None
         self.s_seasonal = None
         self.landsea = None
@@ -68,8 +67,8 @@ class Woa09(AbstractAtlas):
         try:
             ftp = Ftp("ftp.ccom.unh.edu", show_progress=True, debug_mode=False,
                       progress=self.prj.progress)
-            data_zip_src = "fromccom/hydroffice/woa09.zip"
-            data_zip_dst = os.path.join(self.data_folder, "woa09.zip")
+            data_zip_src = "fromccom/hydroffice/woa09.red.zip"
+            data_zip_dst = os.path.join(self.data_folder, "woa09.red.zip")
             ftp.get_file(data_zip_src, data_zip_dst, unzip_it=True)
             return self.is_present()
 
@@ -83,7 +82,6 @@ class Woa09(AbstractAtlas):
             self.t_annual = Dataset(os.path.join(self.folder, "temperature_annual_1deg.nc"))
             self.t_monthly = Dataset(os.path.join(self.folder, "temperature_monthly_1deg.nc"))
             self.t_seasonal = Dataset(os.path.join(self.folder, "temperature_seasonal_1deg.nc"))
-            self.s_annual = Dataset(os.path.join(self.folder, "salinity_annual_1deg.nc"))
             self.s_monthly = Dataset(os.path.join(self.folder, "salinity_monthly_1deg.nc"))
             self.s_seasonal = Dataset(os.path.join(self.folder, "salinity_seasonal_1deg.nc"))
             landsea = np.genfromtxt((os.path.join(self.folder, "landsea.msk")))
@@ -155,14 +153,15 @@ class Woa09(AbstractAtlas):
         # check the inputs
         if (lat is None) or (lon is None) or (datestamp is None):
             logger.error("invalid query: %s @ (%.6f, %.6f)" % (datestamp.strftime("%Y%m%d"), lon, lat))
-            return None
+            return None, None, None
         if lon < 0:  # Make all longitudes positive
             lon += 360.0
 
         self.prj.progress.start("Retrieve WOA09 data")
 
         if not self.has_data_loaded:
-            self.load_grids()
+            if not self.load_grids():
+                return None, None, None
         self.prj.progress.update(20)
 
         # calculate month and season indices (based on julian day)
@@ -196,11 +195,8 @@ class Woa09(AbstractAtlas):
         # be used to populate lat/lon of the cast to be delivered
         lat_idx = -1
         lon_idx = -1
-        for lat_offset in lat_offsets:
-            for lon_offset in lon_offsets:
-
-                this_lat_index = lat_offset
-                this_lon_index = lon_offset
+        for this_lat_index in lat_offsets:
+            for this_lon_index in lon_offsets:
 
                 if this_lon_index >= self.t_monthly.variables['lon'].size:
                     this_lon_index -= self.t_monthly.variables['lon'].size
@@ -347,9 +343,6 @@ class Woa09(AbstractAtlas):
             if self.t_seasonal:
                 self.t_seasonal.close()
             self.t_seasonal = None
-            if self.s_annual:
-                self.s_annual.close()
-            self.s_annual = None
             if self.s_monthly:
                 self.s_monthly.close()
             self.s_monthly = None

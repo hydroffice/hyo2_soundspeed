@@ -38,9 +38,9 @@ def main():
 
     logger.info("load woa13: %s" % prj.atlases.woa13.load_grids())
 
-    # for test in tests:
-    #     # just the ssp (there are also ssp_min and ssp_max)
-    #     logger.info("woa09 profile:\n%s" % prj.atlases.woa09.query(lat=test[0], lon=test[1], datestamp=test[2])[0])
+    for test in tests:
+        # just the ssp (there are also ssp_min and ssp_max)
+        logger.info("woa13 profile:\n%s" % prj.atlases.woa13.query(lat=test[0], lon=test[1], datestamp=test[2])[0])
 
     app.exec_()  # PySide stuff (end)
 
