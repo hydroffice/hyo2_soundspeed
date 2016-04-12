@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 from .widget import AbstractWidget
 from ..dialogs.import_dialog import ImportDialog
+from ..dialogs.receive_dialog import ReceiveDialog
 from ..dialogs.spreadsheet_dialog import SpreadSheetDialog
 from ..dialogs.metadata_dialog import MetadataDialog
 from ..dialogs.export_dialog import ExportDialog
@@ -30,6 +31,11 @@ class Editor(AbstractWidget):
         self.import_act.setShortcut('Alt+I')
         self.import_act.triggered.connect(self.on_import_data)
         self.file_bar.addAction(self.import_act)
+        # receive
+        self.receive_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'receive.png')), 'Receive data', self)
+        self.receive_act.setShortcut('Alt+R')
+        self.receive_act.triggered.connect(self.on_receive_data)
+        self.file_bar.addAction(self.receive_act)
         # clear
         self.clear_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'clear.png')), 'Clear data', self)
         self.clear_act.setShortcut('Alt+C')
@@ -68,6 +74,14 @@ class Editor(AbstractWidget):
         """Import a data file"""
         logger.debug('user wants to import a data file')
         dlg = ImportDialog(prj=self.prj, main_win=self.main_win, parent=self)
+        dlg.exec_()
+        if self.prj.has_ssp():
+            self.main_win.data_imported()
+
+    def on_receive_data(self):
+        """Receive data"""
+        logger.debug('user wants to receive data')
+        dlg = ReceiveDialog(prj=self.prj, main_win=self.main_win, parent=self)
         dlg.exec_()
         if self.prj.has_ssp():
             self.main_win.data_imported()

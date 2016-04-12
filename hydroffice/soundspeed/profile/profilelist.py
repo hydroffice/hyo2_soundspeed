@@ -51,9 +51,19 @@ class ProfileList(object):
         self._list.append(Profile())
         self.current_index = len(self._list) - 1
 
+    def append_profile(self, profile):
+        self._list.append(profile)
+        self.current_index = len(self._list) - 1
+
     def debug_plot(self, more=False):
         """Create a debug plot with the data, optionally with the extra data if available"""
         for s in self.l:
             s.data_debug_plot(more=more)
             s.proc_debug_plot(more=more)
             s.sis_debug_plot(more=more)
+
+    def __repr__(self):
+        msg = "<ProfileList: %s>\n" % len(self.l)
+        for i, p in enumerate(self.l):
+            msg += "#%02d%s" % (i, p)
+        return msg

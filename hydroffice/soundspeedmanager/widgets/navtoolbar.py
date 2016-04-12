@@ -27,6 +27,7 @@ class NavToolbar(NavigationToolbar2QT):
         self.plot_win = plot_win
         self.prj = prj
         self.grid_action = None
+        self.flagged_action = None
         self.flag_action = None
         self.unflag_action = None
         self._ids_flag = None
@@ -94,6 +95,11 @@ class NavToolbar(NavigationToolbar2QT):
                 self.unflag_action.setCheckable(True)
                 self._actions['unflag'] = self.unflag_action
             elif text == 'Subplots':
+                self.flagged_action = self.addAction(self._icon("flagged.png"), 'Flagged', self.flagged_plot)
+                self.flagged_action.setToolTip('Hide flagged')
+                self.flagged_action.setCheckable(True)
+                self.flagged_action.setChecked(True)
+                self._actions['flagged'] = self.flagged_action
                 self.grid_action = self.addAction(self._icon("plot_grid.png"), 'Grid', self.grid_plot)
                 self.grid_action.setToolTip('Toggle grids')
                 self.grid_action.setCheckable(True)
@@ -145,10 +151,12 @@ class NavToolbar(NavigationToolbar2QT):
         print("press", event.button)
         if event.button == 3:
             menu = QtGui.QMenu(self)
+            menu.addAction(self._actions['home'])
             menu.addAction(self._actions['pan'])
             menu.addAction(self._actions['scale'])
             menu.addAction(self._actions['zoom_in'])
             menu.addAction(self._actions['zoom_out'])
+            menu.addSeparator()
             menu.addAction(self._actions['flag'])
             menu.addAction(self._actions['unflag'])
             menu.popup(QtGui.QCursor.pos())
@@ -845,4 +853,9 @@ class NavToolbar(NavigationToolbar2QT):
         grid_flag = self.grid_action.isChecked()
         for a in self.canvas.figure.get_axes():
             a.grid(grid_flag)
+        self.dynamic_update()
+
+    def flagged_plot(self):
+        flagged_flag = self.flagged_action.isChecked()
+        self.plot_win.set_invalid_visibility(flagged_flag)
         self.dynamic_update()

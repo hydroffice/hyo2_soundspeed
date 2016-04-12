@@ -155,7 +155,7 @@ class MainWin(QtGui.QMainWindow):
             return
 
         msg = 'The WOA13 atlas is required by some advanced application functions.\n\n' \
-              'The data set (~1.3GB) can be retrieved from:\n' \
+              'The data set (~4GB) can be retrieved from:\n' \
               '   ftp.ccom.unh.edu/fromccom/hydroffice/woa13_temp.red.zip\n' \
               '   ftp.ccom.unh.edu/fromccom/hydroffice/woa13_sal.red.zip\n' \
               'then unzipped it into:\n' \
@@ -199,7 +199,8 @@ class MainWin(QtGui.QMainWindow):
         success = self.prj.download_rtofs()
         if not success:
             msg = 'Unable to retrieve the RTOFS atlas.\n\n ' \
-                  'The application needs an internet connection to access this server::\n' \
+                  'The application needs an internet connection to access\n' \
+                  'this server (with port 9090 open):\n' \
                   ' - http://nomads.ncep.noaa.gov:9090\n\n' \
                   'You can disable the RTOFS support in Settings/Basic/Use RTOFS.\n'
             QtGui.QMessageBox.warning(self, "Sound Speed Manager - RTOFS Atlas", msg,

@@ -23,6 +23,10 @@ class Profile(object):
         self.sis = Samples()    # sis data
         self.more = More()      # additional fields
 
+        self.woa09 = None
+        self.woa13 = None
+        self.rtofs = None
+
     def __repr__(self):
         msg = "<Profile>\n"
         msg += "%s" % self.meta

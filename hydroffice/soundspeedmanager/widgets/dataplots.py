@@ -46,6 +46,7 @@ class DataPlots(AbstractWidget):
         self.ii = None  # invalid indices
         self.valid_color = 'green'
         self.invalid_color = '#dddddd'
+        self.atlas_color = '#ffaaaa'
 
         # outline ui
         self.top_widget = QtGui.QWidget()
@@ -70,6 +71,15 @@ class DataPlots(AbstractWidget):
         self.sal_ax = self.f.add_subplot(133, sharey=self.speed_ax)
         self.sal_ax.invert_yaxis()
         # lines
+        self.speed_atlas = None
+        self.temp_atlas = None
+        self.sal_atlas = None
+        self.speed_atlas_min = None
+        self.temp_atlas_min = None
+        self.sal_atlas_min = None
+        self.speed_atlas_max = None
+        self.temp_atlas_max = None
+        self.sal_atlas_max = None
         self.speed_valid = None
         self.temp_valid = None
         self.sal_valid = None
@@ -99,6 +109,24 @@ class DataPlots(AbstractWidget):
         self.speed_ax.clear()
         self.speed_ax.set_ylabel('Depth [m]')
         self.speed_ax.set_xlabel('Sound Speed [m/s]')
+        if self.prj.cur.woa09:
+            self.speed_atlas, = self.speed_ax.plot(self.prj.cur.woa09.l[0].proc.speed,
+                                                   self.prj.cur.woa09.l[0].proc.depth,
+                                                   color=self.atlas_color,
+                                                   linestyle='--'
+                                                   )
+            if self.prj.cur.woa09.l[1]:
+                self.speed_atlas_min, = self.speed_ax.plot(self.prj.cur.woa09.l[1].proc.speed,
+                                                           self.prj.cur.woa09.l[1].proc.depth,
+                                                           color=self.atlas_color,
+                                                           linestyle=':'
+                                                           )
+            if self.prj.cur.woa09.l[2]:
+                self.speed_atlas_max, = self.speed_ax.plot(self.prj.cur.woa09.l[2].proc.speed,
+                                                           self.prj.cur.woa09.l[2].proc.depth,
+                                                           color=self.atlas_color,
+                                                           linestyle=':'
+                                                           )
         self.speed_invalid, = self.speed_ax.plot(self.prj.cur.proc.speed[self.ii],
                                                  self.prj.cur.proc.depth[self.ii],
                                                  color=self.invalid_color,
@@ -116,6 +144,24 @@ class DataPlots(AbstractWidget):
     def _draw_temp(self):
         self.temp_ax.clear()
         self.temp_ax.set_xlabel('Temperature [deg C]')
+        if self.prj.cur.woa09:
+            self.temp_atlas, = self.temp_ax.plot(self.prj.cur.woa09.l[0].proc.temp,
+                                                 self.prj.cur.woa09.l[0].proc.depth,
+                                                 color=self.atlas_color,
+                                                 linestyle='--'
+                                                 )
+            if self.prj.cur.woa09.l[1]:
+                self.temp_atlas_min, = self.temp_ax.plot(self.prj.cur.woa09.l[1].proc.temp,
+                                                         self.prj.cur.woa09.l[1].proc.depth,
+                                                         color=self.atlas_color,
+                                                         linestyle=':'
+                                                         )
+            if self.prj.cur.woa09.l[2]:
+                self.temp_atlas_max, = self.temp_ax.plot(self.prj.cur.woa09.l[2].proc.temp,
+                                                         self.prj.cur.woa09.l[2].proc.depth,
+                                                         color=self.atlas_color,
+                                                         linestyle=':'
+                                                         )
         self.temp_invalid, = self.temp_ax.plot(self.prj.cur.proc.temp[self.ii],
                                                self.prj.cur.proc.depth[self.ii],
                                                color=self.invalid_color,
@@ -135,6 +181,24 @@ class DataPlots(AbstractWidget):
     def _draw_sal(self):
         self.sal_ax.clear()
         self.sal_ax.set_xlabel('Salinity [PSU]')
+        if self.prj.cur.woa09:
+            self.sal_atlas, = self.sal_ax.plot(self.prj.cur.woa09.l[0].proc.sal,
+                                               self.prj.cur.woa09.l[0].proc.depth,
+                                               color=self.atlas_color,
+                                               linestyle='--'
+                                               )
+            if self.prj.cur.woa09.l[1]:
+                self.sal_atlas_min, = self.sal_ax.plot(self.prj.cur.woa09.l[1].proc.sal,
+                                                       self.prj.cur.woa09.l[1].proc.depth,
+                                                       color=self.atlas_color,
+                                                       linestyle=':'
+                                                       )
+            if self.prj.cur.woa09.l[2]:
+                self.sal_atlas_max, = self.sal_ax.plot(self.prj.cur.woa09.l[2].proc.sal,
+                                                       self.prj.cur.woa09.l[2].proc.depth,
+                                                       color=self.atlas_color,
+                                                       linestyle=':'
+                                                       )
         self.sal_invalid, = self.sal_ax.plot(self.prj.cur.proc.sal[self.ii],
                                              self.prj.cur.proc.depth[self.ii],
                                              color=self.invalid_color,
@@ -187,6 +251,11 @@ class DataPlots(AbstractWidget):
     def update_validity_indices(self):
         self.vi = self.prj.cur.proc_valid  # valid indices
         self.ii = np.logical_and(~self.vi, ~self.prj.cur.proc_invalid_direction)  # selected invalid indices
+
+    def set_invalid_visibility(self, value):
+        self.speed_invalid.set_visible(value)
+        self.temp_invalid.set_visible(value)
+        self.sal_invalid.set_visible(value)
 
     def reset(self):
         pass

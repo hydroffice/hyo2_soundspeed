@@ -1,8 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from PySide import QtGui
-from datetime import datetime as dt, timedelta
-import os
+from datetime import datetime as dt
 
 # logging settings
 import logging
@@ -15,6 +14,7 @@ ch.setFormatter(ch_formatter)
 logger.addHandler(ch)
 
 from hydroffice.soundspeed.project import Project
+from hydroffice.soundspeedmanager.callbacks import Callbacks
 
 
 def main():
@@ -23,9 +23,10 @@ def main():
     mw.show()
 
     prj = Project(qprogress=QtGui.QProgressDialog)
+    prj.set_callbacks(Callbacks(mw))
 
     tests = [
-        (43.026480, -70.318824, dt.utcnow()),  # offshore Portsmouth
+        # (43.026480, -70.318824, dt.utcnow()),  # offshore Portsmouth
         (-19.1, 74.16, dt.utcnow()),  # Indian Ocean
         (18.2648113, 16.1761115, dt.utcnow()),  # in land -> middle of Africa
     ]
@@ -36,11 +37,14 @@ def main():
             raise RuntimeError("unable to download")
     logger.info("has woa09: %s" % prj.has_woa13())
 
-    logger.info("load woa13: %s" % prj.atlases.woa13.load_grids())
+    # logger.info("load woa13: %s" % prj.atlases.woa13.load_grids())
 
     for test in tests:
         # just the ssp (there are also ssp_min and ssp_max)
-        logger.info("woa13 profile:\n%s" % prj.atlases.woa13.query(lat=test[0], lon=test[1], datestamp=test[2])[0])
+        logger.info("woa13 profiles:\n%s" % prj.atlases.woa13.query(lat=test[0], lon=test[1], datestamp=test[2]))
+
+    prj.retrieve_woa13()
+    logger.info("prj retrieve rtofs: %s" % prj.ssp)
 
     app.exec_()  # PySide stuff (end)
 

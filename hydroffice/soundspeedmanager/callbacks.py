@@ -21,12 +21,12 @@ class Callbacks(AbstractCallbacks):
 
         # latitude
         lat, ok = QtGui.QInputDialog.getDouble(self.parent, "Location", "Enter latitude as dd.ddd:",
-                                               43.13555, -90.0, 90.0, 7)
+                                               37.540, -90.0, 90.0, 7)
         if not ok:
             lat = None
         # longitude
         lon, ok = QtGui.QInputDialog.getDouble(self.parent, "Location", "Enter longitude as dd.ddd:",
-                                               -70.9395, -180.0, 180.0, 7)
+                                               -42.910, -180.0, 180.0, 7)
         if not ok:
             lon = None
 

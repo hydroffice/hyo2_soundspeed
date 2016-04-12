@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 from ..abstract import AbstractAtlas
 from ..ftp import Ftp
 from ...profile.profile import Profile
+from ...profile.profilelist import ProfileList
 from ...profile.dicts import Dicts
 
 
@@ -67,13 +68,13 @@ class Woa13(AbstractAtlas):
         try:
             ftp = Ftp("ftp.ccom.unh.edu", show_progress=True, debug_mode=False,
                       progress=self.prj.progress)
-            data_zip_src = "fromccom/hydroffice/woa13_temp.zip"
+            data_zip_src = "fromccom/hydroffice/woa13_temp.red.zip"
             data_zip_dst = os.path.join(self.data_folder, "woa13_temp.red.zip")
             ftp.get_file(data_zip_src, data_zip_dst, unzip_it=True)
 
             ftp = Ftp("ftp.ccom.unh.edu", show_progress=True, debug_mode=False,
                       progress=self.prj.progress)
-            data_zip_src = "fromccom/hydroffice/woa13_sal.zip"
+            data_zip_src = "fromccom/hydroffice/woa13_sal.red.zip"
             data_zip_dst = os.path.join(self.data_folder, "woa13_sal.red.zip")
             ftp.get_file(data_zip_src, data_zip_dst, unzip_it=True)
 
@@ -164,7 +165,7 @@ class Woa13(AbstractAtlas):
 
         if not self.has_data_loaded:
             if not self.load_grids():
-                return None, None, None
+                return None
         self.prj.progress.update(20)
 
         self.calc_indices(month=datestamp.month)
@@ -274,7 +275,7 @@ class Woa13(AbstractAtlas):
         if (lat_idx == -1) and (lon_idx == -1):
             logger.info("possible request on land")
             self.prj.progress.end()
-            return None, None, None
+            return None
 
         lat_out = self.t[self.month_idx].variables['lat'][lat_idx]
         lon_out = self.t[self.month_idx].variables['lon'][lon_idx]
@@ -293,6 +294,7 @@ class Woa13(AbstractAtlas):
         ssp.data.temp = t[valid]
         ssp.data.sal = s[valid]
         ssp.calc_speed()
+        ssp.clone_data_to_proc()
 
         # - min/max
         # Isolate realistic values
@@ -313,6 +315,7 @@ class Woa13(AbstractAtlas):
             ssp_min.data.temp = t_min[valid]
             ssp_min.data.sal = s_min[valid]
             ssp_min.calc_speed()
+            ssp_min.clone_data_to_proc()
         else:
             ssp_min = None
         # -- max
@@ -322,17 +325,27 @@ class Woa13(AbstractAtlas):
         ssp_max.meta.latitude = lat_out
         ssp_max.meta.longitude = lon_out
         ssp_max.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
+        ssp.meta.original_path = "WOA13_%s" % datestamp.strftime("%Y%m%d")
         if num_values > 0:
             ssp_max.init_data(num_values)
             ssp_max.data.depth = self.t[self.season_idx].variables['depth'][0:num_values]
             ssp_max.data.temp = t_max[valid]
             ssp_max.data.sal = s_max[valid]
             ssp_max.calc_speed()
+            ssp_max.clone_data_to_proc()
         else:
             ssp_max = None
 
+        profiles = ProfileList()
+        profiles.append_profile(ssp)
+        if ssp_min:
+            profiles.append_profile(ssp_min)
+        if ssp_max:
+            profiles.append_profile(ssp_max)
+        profiles.current_index = 0
+
         self.prj.progress.end()
-        return ssp, ssp_min, ssp_max
+        return profiles
 
     def clear_data(self):
         """Delete the data and reset the last loaded day"""

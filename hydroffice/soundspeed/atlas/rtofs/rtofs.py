@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 from ..abstract import AbstractAtlas
 from ...profile.profile import Profile
+from ...profile.profilelist import ProfileList
 from ...profile.dicts import Dicts
 from ...profile.oceanography import Oceanography as Oc
 
@@ -355,14 +356,19 @@ class Rtofs(AbstractAtlas):
         ssp.meta.latitude = lat_out
         ssp.meta.longitude = lon_out
         ssp.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
+        ssp.meta.original_path = "RTOFS_%s" % datestamp.strftime("%Y%m%d")
         ssp.init_data(num_values)
         ssp.data.depth = d[0:num_values]
         ssp.data.temp = temp_in_situ[0:num_values]
         ssp.data.sal = sal[0:num_values]
         ssp.calc_speed()
+        ssp.clone_data_to_proc()
+
+        profiles = ProfileList()
+        profiles.append_profile(ssp)
 
         self.prj.progress.end()
-        return ssp
+        return profiles
 
     def clear_data(self):
         """Delete the data and reset the last loaded day"""

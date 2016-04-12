@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 from ..abstract import AbstractAtlas
 from ..ftp import Ftp
 from ...profile.profile import Profile
+from ...profile.profilelist import ProfileList
 from ...profile.dicts import Dicts
 
 
@@ -153,7 +154,7 @@ class Woa09(AbstractAtlas):
         # check the inputs
         if (lat is None) or (lon is None) or (datestamp is None):
             logger.error("invalid query: %s @ (%.6f, %.6f)" % (datestamp.strftime("%Y%m%d"), lon, lat))
-            return None, None, None
+            return None
         if lon < 0:  # Make all longitudes positive
             lon += 360.0
 
@@ -161,7 +162,7 @@ class Woa09(AbstractAtlas):
 
         if not self.has_data_loaded:
             if not self.load_grids():
-                return None, None, None
+                return None
         self.prj.progress.update(20)
 
         # calculate month and season indices (based on julian day)
@@ -270,7 +271,7 @@ class Woa09(AbstractAtlas):
         if (lat_idx == -1) and (lon_idx == -1):
             logger.info("possible request on land")
             self.prj.progress.end()
-            return None, None, None
+            return None
 
         lat_out = self.t_monthly.variables['lat'][lat_idx]
         lon_out = self.t_monthly.variables['lon'][lon_idx]
@@ -284,11 +285,13 @@ class Woa09(AbstractAtlas):
         ssp.meta.latitude = lat_out
         ssp.meta.longitude = lon_out
         ssp.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
+        ssp.meta.original_path = "WOA09_%s" % datestamp.strftime("%Y%m%d")
         ssp.init_data(num_values)
         ssp.data.depth = self.t_seasonal.variables['depth'][0:num_values]
         ssp.data.temp = t[valid]
         ssp.data.sal = s[valid]
         ssp.calc_speed()
+        ssp.clone_data_to_proc()
 
         # - min/max
         # Isolate realistic values
@@ -309,6 +312,7 @@ class Woa09(AbstractAtlas):
             ssp_min.data.temp = t_min[valid]
             ssp_min.data.sal = s_min[valid]
             ssp_min.calc_speed()
+            ssp_min.clone_data_to_proc()
         else:
             ssp_min = None
         # -- max
@@ -324,11 +328,20 @@ class Woa09(AbstractAtlas):
             ssp_max.data.temp = t_max[valid]
             ssp_max.data.sal = s_max[valid]
             ssp_max.calc_speed()
+            ssp_max.clone_data_to_proc()
         else:
             ssp_max = None
 
+        profiles = ProfileList()
+        profiles.append_profile(ssp)
+        if ssp_min:
+            profiles.append_profile(ssp_min)
+        if ssp_max:
+            profiles.append_profile(ssp_max)
+        profiles.current_index = 0
+
         self.prj.progress.end()
-        return ssp, ssp_min, ssp_max
+        return profiles
 
     def clear_data(self):
         """Delete the data and reset the last loaded day"""

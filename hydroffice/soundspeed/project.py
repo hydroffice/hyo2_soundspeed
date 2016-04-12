@@ -78,6 +78,78 @@ class Project(BaseProject):
                                % (reader.desc, data_path))
         self.ssp = reader.ssp
 
+        # retrieve atlases data
+        for pr in self.ssp.l:
+            if self.has_woa09():
+                pr.woa09 = self.atlases.woa09.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
+                                                    datestamp=pr.meta.utc_time)
+            if self.has_woa13():
+                pr.woa13 = self.atlases.woa13.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
+                                                    datestamp=pr.meta.utc_time)
+
+    # --- receive data
+
+    def retrieve_woa09(self):
+        """Retrieve data from WOA09 atlas"""
+
+        if not self.has_woa09():
+            logger.error("missing WOA09 atlas data set")
+            return
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return
+
+        utc_time = self.cb.ask_date()
+        if utc_time is None:
+            logger.error("missing date required for database lookup")
+            return
+
+        self.ssp = self.atlases.woa09.query(lat=lat, lon=lon, datestamp=utc_time)
+
+    def retrieve_woa13(self):
+        """Retrieve data from WOA13 atlas"""
+
+        if not self.has_woa13():
+            logger.error("missing WOA13 atlas data set")
+            return
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return
+
+        utc_time = self.cb.ask_date()
+        if utc_time is None:
+            logger.error("missing date required for database lookup")
+            return
+
+        self.ssp = self.atlases.woa13.query(lat=lat, lon=lon, datestamp=utc_time)
+
+    def retrieve_rtofs(self):
+        """Retrieve data from RTOFS atlas"""
+
+        utc_time = self.cb.ask_date()
+        if utc_time is None:
+            logger.error("missing date required for database lookup")
+            return None
+
+        if not self.download_rtofs(datestamp=utc_time):
+            logger.error("unable to download RTOFS atlas data set")
+            return None
+
+        if not self.has_rtofs():
+            logger.error("missing RTOFS atlas data set")
+            return None
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return None
+
+        self.ssp = self.atlases.rtofs.query(lat=lat, lon=lon, datestamp=utc_time)
+
     # --- export data
 
     def export_data(self, data_formats, data_path, data_files=None):
@@ -163,8 +235,8 @@ class Project(BaseProject):
     def woa13_folder(self):
         return self.atlases.woa13.folder
 
-    def download_rtofs(self):
-        return self.atlases.rtofs.download_db()
+    def download_rtofs(self, datestamp=None):
+        return self.atlases.rtofs.download_db(datestamp=datestamp)
 
     def download_woa09(self):
         return self.atlases.woa09.download_db()
