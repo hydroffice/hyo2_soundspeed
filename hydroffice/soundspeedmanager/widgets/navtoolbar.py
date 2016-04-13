@@ -18,6 +18,14 @@ logger = logging.getLogger(__name__)
 from hydroffice.soundspeed.profile.dicts import Dicts
 
 
+class Sample(object):
+    def __init__(self):
+        self.depth = None
+        self.speed = None
+        self.temp = None
+        self.sal = None
+
+
 class NavToolbar(NavigationToolbar2QT):
 
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
@@ -30,6 +38,10 @@ class NavToolbar(NavigationToolbar2QT):
         self.flagged_action = None
         self.flag_action = None
         self.unflag_action = None
+        self.insert_action = None
+        self.insert_sample = None
+        self.insLabel = None
+
         self._ids_flag = None
         self._flag_mode = None
         self._flag_start = None
@@ -48,6 +60,12 @@ class NavToolbar(NavigationToolbar2QT):
 
         self.canvas.mpl_connect('button_press_event', self.press)
         self.canvas.mpl_connect('button_release_event', self.release)
+
+    def reset(self):
+        self._ids_flag = None
+        self._flag_mode = None
+        self._flag_start = None
+        self._flag_end = None
 
     def _icon(self, name):
         return QtGui.QIcon(os.path.join(self.media, name))
@@ -94,6 +112,10 @@ class NavToolbar(NavigationToolbar2QT):
                 self.unflag_action.setToolTip('Unflag samples')
                 self.unflag_action.setCheckable(True)
                 self._actions['unflag'] = self.unflag_action
+                self.insert_action = self.addAction(self._icon("insert.png"), 'Insert', self.insert)
+                self.insert_action.setToolTip('Insert samples')
+                self.insert_action.setCheckable(True)
+                self._actions['insert'] = self.insert_action
             elif text == 'Subplots':
                 self.flagged_action = self.addAction(self._icon("flagged.png"), 'Flagged', self.flagged_plot)
                 self.flagged_action.setToolTip('Hide flagged')
@@ -126,13 +148,25 @@ class NavToolbar(NavigationToolbar2QT):
 
         # Add the x,y location widget at the right side of the toolbar
         if self.coordinates:
+            frame = QtGui.QFrame()
+            # policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Ignored)
+            # frame.setSizePolicy(policy)
+            self.addWidget(frame)
+            hbox = QtGui.QHBoxLayout()
+            frame.setLayout(hbox)
+            hbox.addStretch()
+            vbox = QtGui.QVBoxLayout()
+            hbox.addLayout(vbox)
+            # - location label
             self.locLabel = QtWidgets.QLabel("", self)
             self.locLabel.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
-            policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Ignored)
-            self.locLabel.setSizePolicy(policy)
-            label_action = self.addWidget(self.locLabel)
-            label_action.setVisible(True)
-
+            vbox.addWidget(self.locLabel)
+            # - insert label
+            self.insLabel = QtWidgets.QLabel("", self)
+            self.insLabel.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
+            self.insLabel.setStyleSheet("QLabel { color : red; }")
+            vbox.addWidget(self.insLabel)
+            # vbox.addStretch()
         # reference holder for subplots_adjust window
         self.adj_window = None
 
@@ -144,6 +178,7 @@ class NavToolbar(NavigationToolbar2QT):
         self._actions['zoom_out'].setChecked(self._active == 'ZOOM_OUT')
         self._actions['flag'].setChecked(self._active == 'FLAG')
         self._actions['unflag'].setChecked(self._active == 'UNFLAG')
+        self._actions['insert'].setChecked(self._active == 'INSERT')
 
     # ### actions ###
 
@@ -159,14 +194,13 @@ class NavToolbar(NavigationToolbar2QT):
             menu.addSeparator()
             menu.addAction(self._actions['flag'])
             menu.addAction(self._actions['unflag'])
+            menu.addAction(self._actions['insert'])
             menu.popup(QtGui.QCursor.pos())
             menu.exec_()
 
     def release(self, event):
-        print("release", event.button)
-
-    def canvas_menu(self):
-        print("menu")
+        # print("release", event.button)
+        pass
 
     # --- mouse movements ---
 
@@ -175,11 +209,16 @@ class NavToolbar(NavigationToolbar2QT):
         self._set_cursor(event)
 
         if event.inaxes and event.inaxes.get_navigate():
-
+            plt_label = event.inaxes.get_label()
             s = ""
             try:
-                s = "x:%.2f, y:%.2f" % (event.xdata, event.ydata)
-                # s = event.inaxes.format_coord(event.xdata, event.ydata)
+                s = "d:%.2f" % event.ydata
+                if plt_label == "speed":
+                    s += ", vs:%.2f" % event.xdata
+                elif plt_label == "temp":
+                    s += ", t:%.2f" % event.xdata
+                elif plt_label == "sal":
+                    s += ", s:%.2f" % event.xdata
             except (ValueError, OverflowError):
                 self.set_message('%s' % self.mode)
                 return
@@ -197,11 +236,58 @@ class NavToolbar(NavigationToolbar2QT):
             else:
                 self.set_message(s)
 
+            if self.mode == 'insert':
+                msg = str()
+                if self.insert_sample:
+                    if self.insert_sample.depth:
+                        msg += "+[d:%.2f," % self.insert_sample.depth
+                    else:
+                        msg += "+[d:%.2f," % event.ydata
+                    if self.insert_sample.speed:
+                        msg += " vs:%.2f," % self.insert_sample.speed
+                    else:
+                        if plt_label == "speed":
+                            msg += ", vs:%.2f" % event.xdata
+                        else:
+                            msg += ", vs:*"
+                    if self.insert_sample.temp:
+                        msg += " t:%.2f," % self.insert_sample.temp
+                    else:
+                        if plt_label == "temp":
+                            msg += ", t:%.2f" % event.xdata
+                        else:
+                            msg += ", t:*"
+                    if self.insert_sample.sal:
+                        msg += " s:%.2f]" % self.insert_sample.sal
+                    else:
+                        if plt_label == "sal":
+                            msg += ", s:%.2f]" % event.xdata
+                        else:
+                            msg += ", s:*]"
+                else:
+                    msg += "+[d:%.2f" % event.ydata
+                    if plt_label == "speed":
+                        msg += ", vs:%.2f" % event.xdata
+                    else:
+                        msg += ", vs:*"
+                    if plt_label == "temp":
+                        msg += ", t:%.2f" % event.xdata
+                    else:
+                        msg += ", t:*"
+                    if plt_label == "sal":
+                        msg += ", s:%.2f]" % event.xdata
+                    else:
+                        msg += ", s:*]"
+                self.insLabel.setText(msg)
+            else:
+                self.insLabel.setText('')
+
         else:
             if self.mode:
                 self.set_message('%s' % self.mode)
             else:
                 self.set_message('')
+            self.insLabel.setText('')
 
     def _set_cursor(self, event):
         """Set cursor by mode"""
@@ -211,7 +297,7 @@ class NavToolbar(NavigationToolbar2QT):
                 self.set_cursor(cursors.POINTER)
                 self._lastCursor = cursors.POINTER
         else:
-            if (self._active == 'ZOOM_IN') or (self._active == 'ZOOM_OUT'):
+            if (self._active == 'ZOOM_IN') or (self._active == 'ZOOM_OUT') or (self._active == 'INSERT'):
                 if self._lastCursor != cursors.SELECT_REGION:
                     self.set_cursor(cursors.SELECT_REGION)
                     self._lastCursor = cursors.SELECT_REGION
@@ -846,6 +932,87 @@ class NavToolbar(NavigationToolbar2QT):
 
         # logger.debug("FLAG > drag > (%.3f, %.3f)(%.3f, %.3f)" % (x, y, last_x, last_y))
         self.draw_rubberband(event, x, y, last_x, last_y)
+
+    # --- insert ---
+
+    def insert(self):
+        if self._active == 'INSERT':
+            self._active = None
+            self.mode = ''
+            if self._idPress:
+                self.canvas.mpl_disconnect(self._idPress)
+            if self._idRelease:
+                self.canvas.mpl_disconnect(self._idRelease)
+            self.canvas.widgetlock.release(self)
+        else:
+            self._active = 'INSERT'
+            if self._idPress:
+                self.canvas.mpl_disconnect(self._idPress)
+            self._idPress = self.canvas.mpl_connect('button_press_event', self.press_insert)
+            if self._idRelease:
+                self.canvas.mpl_disconnect(self._idRelease)
+            self._idRelease = self.canvas.mpl_connect('button_release_event', self.release_insert)
+            self.mode = "insert"
+            self.canvas.widgetlock(self)
+
+        self.set_message(self.mode)
+        self._update_buttons_checked()
+
+    def press_insert(self, event):
+        """Mouse press callback for flag"""
+
+        # store the pressed button
+        if event.button == 1:  # left
+            self._button_pressed = 1
+        else:  # nothing and return for middle
+            self._button_pressed = None
+            return
+        logger.debug("INSERT > press > button #%s" % self._button_pressed)
+
+        x, y = event.x, event.y  # cursor position in pixel
+        xd, yd = event.xdata, event.ydata  # cursor position in data coords
+        logger.debug("INSERT > press > loc (%.3f,%.3f)(%.3f,%.3f)" % (x, y, xd, yd))
+
+        if not self.insert_sample:
+            self.insert_sample = Sample()
+
+        plt_label = event.inaxes.get_label()
+        if plt_label == "speed":
+            if self.insert_sample.temp:
+                self.insert_sample.temp = None
+            if self.insert_sample.sal:
+                self.insert_sample.sal = None
+            if not self.insert_sample.depth:
+                self.insert_sample.depth = yd
+            self.insert_sample.speed = xd
+        elif plt_label == "temp":
+            if not self.insert_sample.depth:
+                self.insert_sample.depth = yd
+            self.insert_sample.temp = xd
+        elif plt_label == "sal":
+            if not self.insert_sample.depth:
+                self.insert_sample.depth = yd
+            self.insert_sample.sal = xd
+
+        if self.insert_sample.speed:
+            self.prj.cur.insert_proc_speed(depth=self.insert_sample.depth, speed=self.insert_sample.speed)
+            self.insert_sample = None
+            self.plot_win.update_data()
+
+        elif self.insert_sample.temp and self.insert_sample.sal:
+            self.prj.cur.insert_proc_temp_sal(depth=self.insert_sample.depth, temp=self.insert_sample.temp,
+                                              sal=self.insert_sample.sal)
+            self.insert_sample = None
+            self.plot_win.update_data()
+
+    def release_insert(self, event):
+        """the release mouse button callback in insert mode"""
+
+        if self._button_pressed is None:
+            return
+
+        self._button_pressed = None
+        self.draw()
 
     # --- grid ---
 

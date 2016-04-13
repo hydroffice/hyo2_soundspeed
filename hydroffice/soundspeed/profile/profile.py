@@ -155,6 +155,142 @@ class Profile(object):
                                               latitude)
         self.modify_proc_info("calc.speed")
 
+    def insert_proc_speed(self, depth, speed):
+        logger.debug("insert speed to proc data: d:%s, vs:%s" % (depth, speed))
+
+        # we need to take care of valid samples and user-invalidated samples (to avoid to brake in case un-flagged)
+        valid = self.proc.flag == Dicts.flags['valid']  # valid samples
+        iv = np.indices(self.proc.flag.shape)[0][valid]  # indices of valid samples
+        user_invalid = self.proc.flag == Dicts.flags['user']  # user-invalidate samples
+        possible = np.logical_or(valid, user_invalid)  # possible samples
+        ip = np.indices(self.proc.flag.shape)[0][possible]  # indices of possible samples
+
+        # find depth index both in the valid and in the possible samples
+        try:
+            v_i = np.argwhere(self.proc.depth[valid] > depth)[0][0]  # the index in the valid array
+            i = iv[v_i]  # the corresponding index of the masked index in the full array
+        except IndexError:  # in case that there are not
+            v_i = self.proc.depth[valid].size - 1
+            i = iv[v_i]
+        try:
+            p_i = np.argwhere(self.proc.depth[possible] > depth)[0][0]  # the index in the possible array
+            j = ip[p_i]
+        except IndexError:  # in case that there are not
+            p_i = self.proc.depth[possible].size - 1
+            j = ip[p_i]
+
+        # check if we already have this depth in the masked array
+        d_exists = self.proc.depth[valid][v_i] == depth
+
+        # manipulate profile (linear interpolation)
+        if d_exists:
+            # print('already present')
+            self.proc.speed[i] = speed
+            self.proc.source[i] = Dicts.sources['user']
+            self.proc.flag[i] = Dicts.flags['valid']
+        else:
+            # print('new depth')
+            if depth < self.proc.depth[valid][0]:
+                m_ids = [0, 1]
+                print('before beginning: %s' % j)
+
+            elif depth > self.proc.depth[valid][-1]:
+                j += 1
+                m_ids = [-2, -1]
+                print('after end')
+
+            else:
+                if self.proc.depth[valid][v_i] < depth:
+                    m_ids = [v_i, v_i + 1]
+                else:
+                    m_ids = [v_i - 1, v_i]
+                print('in the middle')
+
+            # interpolate for temp
+            di = np.array([self.proc.depth[valid][m_ids[0]], self.proc.depth[valid][m_ids[1]]])
+            a = np.array([[di[0], 1.], [di[1], 1.]])
+            ti = np.array([self.proc.temp[valid][m_ids[0]], self.proc.temp[valid][m_ids[1]]])
+            tm, tc = np.linalg.lstsq(a, ti)[0]
+            self.proc.temp = np.insert(self.proc.temp, j, tm * depth + tc)
+            # print(self.proc.temp[0], self.proc.temp.size)
+
+            # interpolate for sal
+            si = np.array([self.proc.sal[valid][m_ids[0]], self.proc.sal[valid][m_ids[1]]])
+            sm, sc = np.linalg.lstsq(a, si)[0]
+            self.proc.sal = np.insert(self.proc.sal, j, sm * depth + sc)
+            # print(self.proc.sal[0], self.proc.sal.size)
+
+            self.proc.depth = np.insert(self.proc.depth, j, depth)
+            self.proc.speed = np.insert(self.proc.speed, j, speed)
+            self.proc.source = np.insert(self.proc.source, j, Dicts.sources['user'])
+            self.proc.flag = np.insert(self.proc.flag, j, Dicts.flags['valid'])
+
+            self.proc.num_samples += 1
+
+    def insert_proc_temp_sal(self, depth, temp, sal):
+        logger.debug("insert temp, sal to proc data: d:%s, t:%s, s:%s" % (depth, temp, sal))
+
+        speed = Oc.speed(d=depth, t=temp, s=sal, lat=self.meta.latitude)
+
+        # we need to take care of valid samples and user-invalidated samples (to avoid to brake in case un-flagged)
+        valid = self.proc.flag == Dicts.flags['valid']  # valid samples
+        iv = np.indices(self.proc.flag.shape)[0][valid]  # indices of valid samples
+        user_invalid = self.proc.flag == Dicts.flags['user']  # user-invalidate samples
+        possible = np.logical_or(valid, user_invalid)  # possible samples
+        ip = np.indices(self.proc.flag.shape)[0][possible]  # indices of possible samples
+
+        # find depth index both in the valid and in the possible samples
+        try:
+            v_i = np.argwhere(self.proc.depth[valid] > depth)[0][0]  # the index in the valid array
+            i = iv[v_i]  # the corresponding index of the masked index in the full array
+        except IndexError:  # in case that there are not
+            v_i = self.proc.depth[valid].size - 1
+            i = iv[v_i]
+        try:
+            p_i = np.argwhere(self.proc.depth[possible] > depth)[0][0]  # the index in the possible array
+            j = ip[p_i]
+        except IndexError:  # in case that there are not
+            p_i = self.proc.depth[possible].size - 1
+            j = ip[p_i]
+
+        # check if we already have this depth in the masked array
+        d_exists = self.proc.depth[valid][v_i] == depth
+
+        # manipulate profile (linear interpolation)
+        if d_exists:
+            # print('already present')
+            self.proc.temp[i] = temp
+            self.proc.sal[i] = sal
+            self.proc.speed[i] = speed
+            self.proc.source[i] = Dicts.sources['user']
+            self.proc.flag[i] = Dicts.flags['valid']
+        else:
+            # print('new depth')
+            if depth < self.proc.depth[valid][0]:
+                m_ids = [0, 1]
+                print('before beginning: %s' % j)
+
+            elif depth > self.proc.depth[valid][-1]:
+                j += 1
+                m_ids = [-2, -1]
+                print('after end')
+
+            else:
+                if self.proc.depth[valid][v_i] < depth:
+                    m_ids = [v_i, v_i + 1]
+                else:
+                    m_ids = [v_i - 1, v_i]
+                print('in the middle')
+
+            self.proc.depth = np.insert(self.proc.depth, j, depth)
+            self.proc.speed = np.insert(self.proc.speed, j, speed)
+            self.proc.temp = np.insert(self.proc.temp, j, temp)
+            self.proc.sal = np.insert(self.proc.sal, j, sal)
+            self.proc.source = np.insert(self.proc.source, j, Dicts.sources['user'])
+            self.proc.flag = np.insert(self.proc.flag, j, Dicts.flags['valid'])
+
+            self.proc.num_samples += 1
+
     def modify_proc_info(self, info):
         # if empty, add the info
         if not self.meta.proc_info:
@@ -166,19 +302,24 @@ class Profile(object):
             self.meta.proc_info += ';%s' % info
 
     def clone_data_to_proc(self):
-        """Clone the raw data samples into proc samples"""
+        """Clone the raw data samples into proc samples
+
+        The operation eliminates the direction-flagged samples
+        """
         logger.info("cloning raw data to proc samples")
 
         if self.data.num_samples == 0:
             return
 
-        self.init_proc(self.data.num_samples)
-        self.proc.depth[:] = self.data.depth
-        self.proc.speed[:] = self.data.speed
-        self.proc.temp[:] = self.data.temp
-        self.proc.sal[:] = self.data.sal
-        self.proc.source[:] = self.data.source
-        self.proc.flag[:] = self.data.flag
+        vi = self.data.flag == Dicts.flags['valid']  # invalid samples (no direction-flagged)
+
+        self.init_proc(np.sum(vi))
+        self.proc.depth[:] = self.data.depth[vi]
+        self.proc.speed[:] = self.data.speed[vi]
+        self.proc.temp[:] = self.data.temp[vi]
+        self.proc.sal[:] = self.data.sal[vi]
+        self.proc.source[:] = self.data.source[vi]
+        self.proc.flag[:] = self.data.flag[vi]
 
         self.update_proc_time()
 

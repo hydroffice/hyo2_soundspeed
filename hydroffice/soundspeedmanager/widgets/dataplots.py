@@ -92,7 +92,8 @@ class DataPlots(AbstractWidget):
         self.hbox = QtGui.QHBoxLayout()
         self.vbox.addLayout(self.hbox)
         # navigation
-        self.nav = None
+        self.nav = NavToolbar(canvas=self.c, parent=self.top_widget, plot_win=self, prj=self.prj)
+        self.hbox.addWidget(self.nav)
 
         # # timer for updates
         # timer = QtCore.QTimer(self)
@@ -258,11 +259,4 @@ class DataPlots(AbstractWidget):
         self.sal_invalid.set_visible(value)
 
     def reset(self):
-        pass
-        if self.nav:
-            self.hbox.removeWidget(self.nav)
-            self.nav.deleteLater()
-            del self.nav
-        self.nav = NavToolbar(canvas=self.c, parent=self.top_widget,
-                              plot_win=self, prj=self.prj)
-        self.hbox.addWidget(self.nav)
+        self.nav.reset()

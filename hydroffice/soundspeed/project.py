@@ -84,11 +84,14 @@ class Project(BaseProject):
 
         # retrieve atlases data
         for pr in self.ssp.l:
-            if self.has_woa09():
+            if self.use_woa09() and self.has_woa09():
                 pr.woa09 = self.atlases.woa09.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
                                                     datestamp=pr.meta.utc_time)
-            if self.has_woa13():
+            if self.use_woa13() and self.has_woa13():
                 pr.woa13 = self.atlases.woa13.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
+                                                    datestamp=pr.meta.utc_time)
+            if self.use_rtofs():
+                pr.rtofs = self.atlases.rtofs.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
                                                     datestamp=pr.meta.utc_time)
 
     # --- receive data

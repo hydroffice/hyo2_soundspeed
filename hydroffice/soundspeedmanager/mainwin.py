@@ -32,7 +32,7 @@ class MainWin(QtGui.QMainWindow):
         self.version = ssm_version
         self.setWindowTitle('%s v.%s' % (self.name, self.version))
         self.setMinimumSize(400, 250)
-        self.resize(800, 600)
+        self.resize(900, 600)
         _app = QtCore.QCoreApplication.instance()
         _app.setApplicationName('%s v.%s' % (self.name, self.version))
         _app = QtCore.QCoreApplication.instance()
