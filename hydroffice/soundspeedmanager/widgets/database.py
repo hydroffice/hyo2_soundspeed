@@ -35,6 +35,11 @@ class Database(AbstractWidget):
         self.main_layout.addLayout(hbox)
         # -- list
         self.ssp_list = QtGui.QTableWidget()
+        # self.ssp_list.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        # quit_action = QtGui.QAction("Quit", None)
+        # quit_action.triggered.connect(QtGui.qApp.quit)
+        # self.ssp_list.addAction(quit_action)
+
         self.ssp_list.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.ssp_list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         hbox.addWidget(self.ssp_list)
