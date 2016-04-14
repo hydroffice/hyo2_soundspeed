@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 from .abstract import AbstractTextWriter
+from ...profile.oceanography import Oceanography as Oc
 
 
 class Elac(AbstractTextWriter):
@@ -43,6 +44,10 @@ class Elac(AbstractTextWriter):
     def _write_body(self):
         logger.debug('generating body')
         for idx in range(self.ssp.cur.data.num_samples):
-            self.fod.io.write("%8.2f%10.2f%10.2f%10.2f      0.00\n"
+            self.fod.io.write("%8.2f%10.2f%10.2f%10.2f%10.2f\n"
                               % (self.ssp.cur.data.depth[idx], self.ssp.cur.data.speed[idx],
-                                 self.ssp.cur.data.temp[idx], self.ssp.cur.data.sal[idx]))
+                                 self.ssp.cur.data.temp[idx], self.ssp.cur.data.sal[idx],
+                                 Oc.s2c(s=self.ssp.cur.data.sal[idx],
+                                        p=Oc.d2p(d=self.ssp.cur.data.depth[idx],
+                                                 lat=self.ssp.cur.meta.latitude),
+                                        t=self.ssp.cur.data.temp[idx])))

@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import math
 import numpy as np
 import logging
 import os
@@ -305,3 +306,159 @@ class Oceanography(object):
             dt = new_pot_t - t
 
         return temp
+
+    @classmethod
+    def c2s(cls, c, p, t):
+        """Covert conductivity to salinity
+
+        ref: Fofonoff and Millard(1983)
+
+        Args:
+            c: conductivity in mmho/cm
+            p: pressure in dBar
+            t: temperature in deg Celsius
+
+        Returns: Salinity
+
+        """
+
+        e1 = 2.07e-5
+        e2 = -6.37e-10
+        e3 = 3.989e-15
+
+        d1 = 3.426e-2
+        d2 = 4.464e-4
+        d3 = 4.215e-1
+        d4 = -3.107e-3
+
+        r = c / 42.914
+        r1 = p * (e1 + (e2 + e3 * p) * p)
+        r2 = 1 + (d1 + d2 * t) * t + (d3 + d4 * t) * r
+        rp = 1 + r1 / r2
+
+        c0 = 0.6766097
+        c1 = 2.00564e-2
+        c2 = 1.104259e-4
+        c3 = -6.9698e-7
+        c4 = 1.0031e-9
+
+        rt = c0 + (c1 + (c2 + (c3 + c4 * t) * t) * t) * t
+
+        cr = r / (rp * rt)
+
+        return cls.cr2s(cr, t)
+
+    @classmethod
+    def cr2s(cls, cr, t):
+        """Conductivity ratio to salinity
+
+        Args:
+            cr: conductivity ratio
+            t: temperature
+
+        Returns: salinity
+
+        """
+
+        a0 = 0.0080
+        a1 = -0.1692
+        a2 = 25.3851
+        a3 = 14.0941
+        a4 = -7.0261
+        a5 = 2.7081
+
+        b0 = 0.0005
+        b1 = -0.0056
+        b2 = -0.0066
+        b3 = -0.0375
+        b4 = 0.0636
+        b5 = -0.0144
+
+        k = 0.0162
+
+        rtx = np.sqrt(cr)
+        dt = t - 15
+        ds = (dt / (1 + k * dt) ) * ( b0 + (b1 + (b2+ (b3 + (b4 + b5 * rtx) * rtx) * rtx) * rtx) * rtx)
+
+        return a0 + (a1 + (a2 + (a3 + (a4 + a5 * rtx) * rtx) * rtx) * rtx) * rtx + ds
+
+    @classmethod
+    def s2c(cls, s, p, t):
+        """Calculate conductivity iteratively
+
+        Args:
+            s: salinity in psu
+            p: pressure in dBar
+            t: temperature in deg Celsisu
+
+        Returns: Conductivity
+        """
+
+        c = 0
+        c_step = 0.1
+        max_c = 100
+
+        calc_s = -1
+        last_c = c
+        last_s = calc_s
+
+        while c < max_c:
+            calc_s = cls.c2s(c, p, t)
+            # log.debug("%f %f %f %f" % (count, conductivity, calc_salinity, salinity))
+
+            if calc_s > s:
+                break
+
+            last_c = c
+            last_s = calc_s
+
+            c += c_step
+
+        delta_c = c - last_c
+        delta_s = calc_s - last_s
+
+        return last_c + delta_c / delta_s * (s - last_s)
+
+    @classmethod
+    def a(cls, f, t, s, d, ph):
+        """Calculate attenuation
+
+        ref: Francois and Garrison, J. Acoust. Soc. Am., Vol. 72, No. 6, December 1982
+
+        Args:
+            f: frequency in kHz
+            t: temperature in deg Celsius
+            s: salinity in ppt
+            d: depth in meter
+            ph: acidity
+
+        Returns: attenuation
+
+        """
+        abs_t = 273.0 + t
+        c = 1412.0 + 3.21 * t + 1.19 * s + 0.0167 * d  # sound speed calculation
+
+        # Boric Acid Contribution
+        a1 = (8.86 / c) * math.pow(10.0, (0.78 * ph - 5.0))
+        p1 = 1.0
+
+        f1 = 2.8 * math.pow((s / 35.0), 0.5) * math.pow(10.0, 4.0 - (1245.0 / abs_t))
+
+        # MgSO4 Contribution
+        a2 = (21.44 * s / c) * (1.0 + 0.025 * t)
+        p2 = (1.0 - 1.37E-4 * d) + (6.2E-9 * d * d)
+        f2 = (8.17 * math.pow(10.0, 8.0 - 1990.0 / abs_t)) / (1.0 + 0.0018 * (s - 35.0))
+
+        # Pure Water Contribution
+        if t <= 20.0:
+            a3 = 4.937E-4 - 2.59E-5 * t + 9.11E-7 * t * t - 1.50E-8 * t * t * t
+        else:
+            a3 = 3.964E-4 - 1.146E-5 * t + 1.45E-7 * t * t - 6.5E-10 * t * t * t
+
+        p3 = 1.0 - 3.83E-5 * d + 4.9E-10 * d * d
+
+        boric = (a1 * p1 * f1 * f * f) / (f * f + f1 * f1)
+        mgso4 = (a2 * p2 * f2 * f * f) / (f * f + f2 * f2)
+        h2o = a3 * p3 * f * f
+
+        return boric + mgso4 + h2o

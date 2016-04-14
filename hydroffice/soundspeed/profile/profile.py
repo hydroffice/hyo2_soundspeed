@@ -155,6 +155,32 @@ class Profile(object):
                                               latitude)
         self.modify_proc_info("calc.speed")
 
+    def calc_attenuation(self, frequency, ph):
+        """Helper method to calculation attenuation [unused]"""
+        depth = np.zeros(self.proc.num_samples)
+        attenuation = np.zeros(self.proc.num_samples)
+        for i in range(self.proc.num_samples):
+            depth[i] = self.proc.depth[i]
+            attenuation[i] = Oc.a(frequency, self.proc.temp[i], self.proc.sal[i],
+                                  self.proc.depth[i], ph)
+
+        return attenuation, depth
+
+    def calc_cumulative_attenuation(self, frequency, ph):
+        """Helper method to calculation cumulative attenuation [unused]"""
+        attenuation, depth = self.calc_attenuation(frequency, ph)
+        cumulative_attenuation = np.zeros(len(attenuation))
+
+        total_loss = 0
+        for count in range(len(attenuation) - 1):
+            layer_loss = attenuation[count] * (depth[count + 1] - depth[count]) / 1000.0
+            total_loss += layer_loss
+            cumulative_attenuation[count] = total_loss / (depth[count + 1] / 1000.0)
+
+        cumulative_attenuation[-1] = cumulative_attenuation[-2]
+
+        return cumulative_attenuation, depth
+
     def insert_proc_speed(self, depth, speed):
         logger.debug("insert speed to proc data: d:%s, vs:%s" % (depth, speed))
 
