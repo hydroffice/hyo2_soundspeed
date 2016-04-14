@@ -218,6 +218,18 @@ class MainWin(QtGui.QMainWindow):
         self.tabServer.data_imported()
         self.tabSettings.data_imported()
 
+    def data_stored(self):
+        self.tabEditor.data_stored()
+        self.tabDatabase.data_stored()
+        self.tabServer.data_stored()
+        self.tabSettings.data_stored()
+
+    def data_removed(self):
+        self.tabEditor.data_removed()
+        self.tabDatabase.data_removed()
+        self.tabServer.data_removed()
+        self.tabSettings.data_removed()
+
     # Quitting #
 
     def do_you_really_want(self, title="Quit", text="quit"):

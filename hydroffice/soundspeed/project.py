@@ -195,9 +195,9 @@ class Project(BaseProject):
             raise RuntimeError("Data not loaded")
 
         db = SoundSpeedDb(data_folder=self.data_folder)
-        ret = db.add_casts(self.ssp)
+        success = db.add_casts(self.ssp)
         db.disconnect()
-        return ret
+        return success
 
     def db_profiles(self, project=None):
         """List the profile on the db"""
@@ -213,33 +213,42 @@ class Project(BaseProject):
         db.disconnect()
         return ssp
 
+    def load_profile(self, pk):
+        ssp = self.db_profile(pk)
+        if not ssp:
+            return False
+
+        self.clear_data()
+        self.ssp = ssp
+        return True
+
     def delete_db_profile(self, pk):
         """Retrieve a profile by primary key"""
         db = SoundSpeedDb(data_folder=self.data_folder)
-        ssp = db.delete_profile_by_pk(pk=pk)
+        ret = db.delete_profile_by_pk(pk=pk)
         db.disconnect()
-        return ssp
+        return ret
 
     def map_db_profiles(self, project=None):
         """List the profile on the db"""
         db = SoundSpeedDb(data_folder=self.data_folder)
-        lst = db.plot.map_profiles(project=project)
+        ret = db.plot.map_profiles(project=project)
         db.disconnect()
-        return lst
+        return ret
 
     def plot_daily_db_profiles(self, project=None):
         """Plot the profile on the db by day"""
         db = SoundSpeedDb(data_folder=self.data_folder)
-        lst = db.plot.daily_plots(project=project)
+        success = db.plot.daily_plots(project=project)
         db.disconnect()
-        return lst
+        return success
 
     def save_daily_db_profiles(self, project=None):
         """Save figure with the profile on the db by day"""
         db = SoundSpeedDb(data_folder=self.data_folder)
-        lst = db.plot.daily_plots(save_fig=True, project=project)
+        success = db.plot.daily_plots(save_fig=True, project=project)
         db.disconnect()
-        return lst
+        return success
 
     def export_db_profiles_metadata(self, ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile'],
                                     project=None):

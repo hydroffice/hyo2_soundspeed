@@ -114,6 +114,7 @@ class PlotDb(object):
 
         # fig.tight_layout()
         plt.show()
+        return True
 
     @staticmethod
     def _inset_draw_map(llcrnrlon, llcrnrlat, urcrnrlon, urcrnrlat, ax_ins):
@@ -150,6 +151,8 @@ class PlotDb(object):
 
     def daily_plots(self, save_fig=False, project=None):
         """plot all the SSPs by day"""
+        if not save_fig:
+            plt.ion()
 
         rows = self.db.list_profiles(project=project)
         if rows is None:
@@ -237,5 +240,7 @@ class PlotDb(object):
 
         if save_fig:
             plt.savefig(os.path.join(self.plots_folder, 'day_%s.png' % day_count), bbox_inches='tight')
-        else:
-            plt.show()
+        # else:
+        #     plt.show()  # issue: QCoreApplication::exec: The event loop is already running
+
+        return True

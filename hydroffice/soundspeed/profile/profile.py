@@ -266,21 +266,13 @@ class Profile(object):
             self.proc.flag[i] = Dicts.flags['valid']
         else:
             # print('new depth')
-            if depth < self.proc.depth[valid][0]:
-                m_ids = [0, 1]
-                print('before beginning: %s' % j)
-
-            elif depth > self.proc.depth[valid][-1]:
+            if depth > self.proc.depth[valid][-1]:
                 j += 1
-                m_ids = [-2, -1]
-                print('after end')
-
-            else:
-                if self.proc.depth[valid][v_i] < depth:
-                    m_ids = [v_i, v_i + 1]
-                else:
-                    m_ids = [v_i - 1, v_i]
-                print('in the middle')
+            #     print('after end')
+            # elif depth < self.proc.depth[valid][0]:
+            #     print('before beginning: %s' % j)
+            # else:
+            #     print('in the middle')
 
             self.proc.depth = np.insert(self.proc.depth, j, depth)
             self.proc.speed = np.insert(self.proc.speed, j, speed)

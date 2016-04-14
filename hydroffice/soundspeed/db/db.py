@@ -533,7 +533,7 @@ class SoundSpeedDb(object):
             logger.error("missing db connection")
             return None
 
-        logger.info("retrieve profile with pk: %s" % pk)
+        # logger.info("retrieve profile with pk: %s" % pk)
 
         ssp = ProfileList()
         ssp.append()
@@ -572,7 +572,7 @@ class SoundSpeedDb(object):
                 ssp_samples = self.conn.execute("SELECT * FROM data WHERE ssp_pk=?", (pk, )).fetchall()
                 num_samples = len(ssp_samples)
                 ssp.cur.init_data(num_samples)
-                logger.debug("raw data samples: %s" % num_samples)
+                # logger.debug("raw data samples: %s" % num_samples)
                 for i in range(num_samples):
                     # print(ssp_samples[i])
                     ssp.cur.data.depth[i] = ssp_samples[i][b'depth']
@@ -591,7 +591,7 @@ class SoundSpeedDb(object):
                 ssp_samples = self.conn.execute("SELECT * FROM proc WHERE ssp_pk=?", (pk, )).fetchall()
                 num_samples = len(ssp_samples)
                 ssp.cur.init_proc(num_samples)
-                logger.debug("proc data samples: %s" % num_samples)
+                # logger.debug("proc data samples: %s" % num_samples)
                 for i in range(num_samples):
                     # print(ssp_samples[i])
                     ssp.cur.proc.depth[i] = ssp_samples[i][b'depth']
@@ -610,7 +610,7 @@ class SoundSpeedDb(object):
                 ssp_samples = self.conn.execute("SELECT * FROM sis WHERE ssp_pk=?", (pk, )).fetchall()
                 num_samples = len(ssp_samples)
                 ssp.cur.init_sis(num_samples)
-                logger.debug("sis data samples: %s" % num_samples)
+                # logger.debug("sis data samples: %s" % num_samples)
                 for i in range(num_samples):
                     # print(ssp_samples[i])
                     ssp.cur.sis.depth[i] = ssp_samples[i][b'depth']
@@ -635,3 +635,4 @@ class SoundSpeedDb(object):
                 raise RuntimeError("unable to delete ssp with pk: %s" % pk)
 
         self.tmp_ssp_pk = None
+        return  True

@@ -36,6 +36,11 @@ class Editor(AbstractWidget):
         self.receive_act.setShortcut('Alt+R')
         self.receive_act.triggered.connect(self.on_receive_data)
         self.file_bar.addAction(self.receive_act)
+        # load db
+        self.load_db_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'db_load.png')), 'Load from database', self)
+        self.load_db_act.setShortcut('Alt+L')
+        self.load_db_act.triggered.connect(self.on_load_db)
+        self.file_bar.addAction(self.load_db_act)
         # clear
         self.clear_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'clear.png')), 'Clear data', self)
         self.clear_act.setShortcut('Alt+C')
@@ -65,6 +70,11 @@ class Editor(AbstractWidget):
         self.transmit_act.setShortcut('Alt+E')
         self.transmit_act.triggered.connect(self.on_transmit_data)
         self.file_bar.addAction(self.transmit_act)
+        # save db
+        self.save_db_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'db_save.png')), 'Save to database', self)
+        self.save_db_act.setShortcut('Alt+D')
+        self.save_db_act.triggered.connect(self.on_save_db)
+        self.file_bar.addAction(self.save_db_act)
 
         # plots
         self.dataplots = DataPlots(main_win=self.main_win, prj=self.prj)
@@ -83,6 +93,30 @@ class Editor(AbstractWidget):
         logger.debug('user wants to receive data')
         dlg = ReceiveDialog(prj=self.prj, main_win=self.main_win, parent=self)
         dlg.exec_()
+        if self.prj.has_ssp():
+            self.main_win.data_imported()
+
+    def on_load_db(self):
+        """Load data from database"""
+        logger.debug('user wants to load data from db')
+
+        profiles = self.prj.db_profiles()
+        lst = ["#%03d: %s" % (p[0], p[1]) for p in profiles]
+        if len(lst) == 0:
+            msg = "Store data before import!"
+            QtGui.QMessageBox.warning(self, "Database", msg, QtGui.QMessageBox.Ok)
+            return
+
+        sel, ok = QtGui.QInputDialog.getItem(self, 'Database', 'Select profile to load:', lst, 0, False)
+        if not ok:
+            return
+
+        success = self.prj.load_profile(profiles[lst.index(sel)][0])
+        if not success:
+            msg = "Unable to load profile!"
+            QtGui.QMessageBox.warning(self, "Database", msg, QtGui.QMessageBox.Ok)
+            return
+
         if self.prj.has_ssp():
             self.main_win.data_imported()
 
@@ -125,6 +159,20 @@ class Editor(AbstractWidget):
             QtGui.QMessageBox.warning(self, "Transmit warning", msg, QtGui.QMessageBox.Ok)
             return
 
+    def on_save_db(self):
+        logger.debug('user wants to save data to db')
+        if not self.prj.has_ssp():
+            msg = "Import data before save to db!"
+            QtGui.QMessageBox.warning(self, "Database warning", msg, QtGui.QMessageBox.Ok)
+            return
+
+        if not self.prj.store_data():
+            msg = "Unable to save to db!"
+            QtGui.QMessageBox.warning(self, "Database warning", msg, QtGui.QMessageBox.Ok)
+            return
+        else:
+            self.main_win.data_stored()
+
     def data_cleared(self):
         # dialogs
         self.spreadsheet_act.setDisabled(True)
@@ -132,6 +180,7 @@ class Editor(AbstractWidget):
         self.clear_act.setDisabled(True)
         self.export_act.setDisabled(True)
         self.transmit_act.setDisabled(True)
+        self.save_db_act.setDisabled(True)
         # data plots
         self.dataplots.setHidden(True)
 
@@ -142,6 +191,7 @@ class Editor(AbstractWidget):
         self.clear_act.setDisabled(False)
         self.export_act.setDisabled(False)
         self.transmit_act.setDisabled(False)
+        self.save_db_act.setDisabled(False)
         # data plots
         self.dataplots.reset()
         self.dataplots.on_draw()
