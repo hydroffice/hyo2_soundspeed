@@ -182,7 +182,18 @@ class Rtofs(AbstractAtlas):
         if (lat is None) or (lon is None) or (datestamp is None):
             logger.error("invalid query: %s @ (%.6f, %.6f)" % (datestamp.strftime("%Y%m%d"), lon, lat))
             return None
-        lat_idx, lon_idx = self.grid_coords(lat, lon)
+
+        # check if we need to update the data set (new day!)
+        if not self.download_db(datestamp):
+            logger.error("troubles in updating data set for timestamp: %s"
+                         % datestamp.strftime("%Y%m%d"))
+            return None
+
+        try:
+            lat_idx, lon_idx = self.grid_coords(lat, lon)
+        except TypeError as e:
+            logger.critical("while converting location to grid coords, %s" % e)
+            return None
         # logger.debug("idx > lat: %s, lon: %s" % (lat_idx, lon_idx))
         lat_s_idx = lat_idx - self.search_half_window
         lat_n_idx = lat_idx + self.search_half_window
@@ -191,12 +202,6 @@ class Rtofs(AbstractAtlas):
         # logger.info("indices -> %s %s %s %s" % (lat_s_idx, lat_n_idx, lon_w_idx, lon_e_idx))
         if lon < self.lon_0:  # Make all longitudes safe
             lon += 360.0
-
-        # check if we need to update the data set (new day!)
-        if not self.download_db(datestamp):
-            logger.error("troubles in updating data set for timestamp: %s"
-                         % datestamp.strftime("%Y%m%d"))
-            return None
 
         self.prj.progress.start("Retrieve RTOFS data")
 

@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 from .widget import AbstractWidget
 
 
-class Basic(AbstractWidget):
+class Input(AbstractWidget):
 
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
@@ -24,43 +24,6 @@ class Basic(AbstractWidget):
         # outline ui
         self.main_layout = QtGui.QVBoxLayout()
         self.frame.setLayout(self.main_layout)
-
-        # - processing
-        hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
-        hbox.addStretch()
-        self.label = QtGui.QLabel("Processing")
-        hbox.addWidget(self.label)
-        hbox.addStretch()
-
-        # - profile direction
-        hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
-        # -- label
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        label = QtGui.QLabel("Profile direction:")
-        label.setFixedWidth(lbl_width)
-        vbox.addWidget(label)
-        vbox.addStretch()
-        # -- label
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        self.profile_direction = QtGui.QComboBox()
-        self.profile_direction.addItems(Dicts.ssp_directions.keys())
-        vbox.addWidget(self.profile_direction)
-        vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_profile_direction)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
         # - atlases
         hbox = QtGui.QHBoxLayout()
@@ -158,22 +121,14 @@ class Basic(AbstractWidget):
         vbox.addWidget(btn_apply)
         vbox.addStretch()
 
-        # - logging
-        hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
-        hbox.addStretch()
-        self.label = QtGui.QLabel("Logging")
-        hbox.addWidget(self.label)
-        hbox.addStretch()
-
-        # - log_user
+        # - ssp_extension_source
         hbox = QtGui.QHBoxLayout()
         self.main_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
-        label = QtGui.QLabel("User logging:")
+        label = QtGui.QLabel("Extend with:")
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
@@ -181,9 +136,9 @@ class Basic(AbstractWidget):
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
-        self.log_user = QtGui.QComboBox()
-        self.log_user.addItems(["True", "False"])
-        vbox.addWidget(self.log_user)
+        self.extension_source = QtGui.QComboBox()
+        self.extension_source.addItems(Dicts.atlases.keys())
+        vbox.addWidget(self.extension_source)
         vbox.addStretch()
         # -- buttons
         vbox = QtGui.QVBoxLayout()
@@ -191,18 +146,18 @@ class Basic(AbstractWidget):
         vbox.addStretch()
         btn_apply = QtGui.QPushButton("Apply")
         btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_log_user)
+        btn_apply.clicked.connect(self.apply_extension_source)
         vbox.addWidget(btn_apply)
         vbox.addStretch()
 
-        # - log_server
+        # - ssp_salinity_source
         hbox = QtGui.QHBoxLayout()
         self.main_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
-        label = QtGui.QLabel("Server logging:")
+        label = QtGui.QLabel("Salinity from:")
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
@@ -210,9 +165,9 @@ class Basic(AbstractWidget):
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
-        self.log_server = QtGui.QComboBox()
-        self.log_server.addItems(["True", "False"])
-        vbox.addWidget(self.log_server)
+        self.salinity_source = QtGui.QComboBox()
+        self.salinity_source.addItems(Dicts.atlases.keys())
+        vbox.addWidget(self.salinity_source)
         vbox.addStretch()
         # -- buttons
         vbox = QtGui.QVBoxLayout()
@@ -220,7 +175,105 @@ class Basic(AbstractWidget):
         vbox.addStretch()
         btn_apply = QtGui.QPushButton("Apply")
         btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_log_server)
+        btn_apply.clicked.connect(self.apply_salinity_source)
+        vbox.addWidget(btn_apply)
+        vbox.addStretch()
+
+        # - ssp_temp_sal_source
+        hbox = QtGui.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtGui.QLabel("Temp/sal from:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.temp_sal_source = QtGui.QComboBox()
+        self.temp_sal_source.addItems(Dicts.atlases.keys())
+        vbox.addWidget(self.temp_sal_source)
+        vbox.addStretch()
+        # -- buttons
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        btn_apply = QtGui.QPushButton("Apply")
+        btn_apply.setFixedWidth(lbl_width)
+        btn_apply.clicked.connect(self.apply_temp_sal_source)
+        vbox.addWidget(btn_apply)
+        vbox.addStretch()
+
+        self.main_layout.addStretch()
+
+        # - processing
+        hbox = QtGui.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        hbox.addStretch()
+        self.label = QtGui.QLabel("Other settings")
+        hbox.addWidget(self.label)
+        hbox.addStretch()
+
+        # - profile direction
+        hbox = QtGui.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtGui.QLabel("Profile direction:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.profile_direction = QtGui.QComboBox()
+        self.profile_direction.addItems(Dicts.ssp_directions.keys())
+        vbox.addWidget(self.profile_direction)
+        vbox.addStretch()
+        # -- buttons
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        btn_apply = QtGui.QPushButton("Apply")
+        btn_apply.setFixedWidth(lbl_width)
+        btn_apply.clicked.connect(self.apply_profile_direction)
+        vbox.addWidget(btn_apply)
+        vbox.addStretch()
+
+        # - rx max waiting time
+        hbox = QtGui.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtGui.QLabel("RX timeout:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.rx_max_wait_time = QtGui.QLineEdit()
+        validator = QtGui.QIntValidator(0, 99999)
+        self.rx_max_wait_time.setValidator(validator)
+        vbox.addWidget(self.rx_max_wait_time)
+        vbox.addStretch()
+        # -- buttons
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        btn_apply = QtGui.QPushButton("Apply")
+        btn_apply.setFixedWidth(lbl_width)
+        btn_apply.clicked.connect(self.apply_rx_max_wait_time)
         vbox.addWidget(btn_apply)
         vbox.addStretch()
 
@@ -252,26 +305,29 @@ class Basic(AbstractWidget):
         self.db.use_rtofs = self.use_rtofs.currentText()
         self.setup_changed()
 
-    def apply_log_user(self):
-        logger.debug("apply log user")
-        self.db.log_user = self.log_user.currentText()
-        self.main_win.prj.logging()
+    def apply_extension_source(self):
+        logger.debug("apply extension source")
+        self.db.ssp_extension_source = self.extension_source.currentText()
         self.setup_changed()
 
-    def apply_log_server(self):
-        logger.debug("apply log server")
-        self.db.log_server = self.log_server.currentText()
-        self.main_win.prj.logging()
+    def apply_salinity_source(self):
+        logger.debug("apply salinity source")
+        self.db.ssp_salinity_source = self.salinity_source.currentText()
+        self.setup_changed()
+
+    def apply_temp_sal_source(self):
+        logger.debug("apply temp/sal source")
+        self.db.ssp_temp_sal_source = self.temp_sal_source.currentText()
+        self.setup_changed()
+
+    def apply_rx_max_wait_time(self):
+        logger.debug("apply rx timeout")
+        self.db.rx_max_wait_time = int(self.rx_max_wait_time.text())
         self.setup_changed()
 
     def setup_changed(self):
         """Refresh items"""
-        logger.debug("refresh basic")
-
-        # profile direction
-        dir_str = self.db.ssp_up_or_down
-        dir_idx = Dicts.ssp_directions[dir_str]
-        self.profile_direction.setCurrentIndex(dir_idx)
+        # logger.debug("refresh input settings")
 
         # use woa09
         if self.db.use_woa09:
@@ -291,14 +347,25 @@ class Basic(AbstractWidget):
         else:
             self.use_rtofs.setCurrentIndex(1)  # False
 
-        # log_user
-        if self.db.log_user:
-            self.log_user.setCurrentIndex(0)  # True
-        else:
-            self.log_user.setCurrentIndex(1)  # False
+        # extension source
+        _str = self.db.ssp_extension_source
+        _idx = Dicts.atlases[_str]
+        self.extension_source.setCurrentIndex(_idx)
 
-        # log_server
-        if self.db.log_server:
-            self.log_server.setCurrentIndex(0)  # True
-        else:
-            self.log_server.setCurrentIndex(1)  # False
+        # salinity source
+        _str = self.db.ssp_salinity_source
+        _idx = Dicts.atlases[_str]
+        self.salinity_source.setCurrentIndex(_idx)
+
+        # temperature/salinity source
+        _str = self.db.ssp_temp_sal_source
+        _idx = Dicts.atlases[_str]
+        self.temp_sal_source.setCurrentIndex(_idx)
+
+        # profile direction
+        _str = self.db.ssp_up_or_down
+        _idx = Dicts.ssp_directions[_str]
+        self.profile_direction.setCurrentIndex(_idx)
+
+        # rx_max_wait_time
+        self.rx_max_wait_time.setText("%d" % self.db.rx_max_wait_time)

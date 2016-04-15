@@ -40,6 +40,7 @@ class SettingsDb(BaseDb):
             logger.error("during building tables, %s: %s" % (type(e), e))
             return False
 
+
     # --- setup stuff
     
     def check_default_setup(self):
@@ -239,15 +240,6 @@ class SettingsDb(BaseDb):
     def setup_name(self, value):
         self._setter_str("setup_name", value)
 
-    # --- ssp_up_or_down
-    @property
-    def ssp_up_or_down(self):
-        return self._getter_str("ssp_up_or_down")
-
-    @ssp_up_or_down.setter
-    def ssp_up_or_down(self, value):
-        self._setter_str("ssp_up_or_down", value)
-
     # --- use_woa09
     @property
     def use_woa09(self):
@@ -275,6 +267,60 @@ class SettingsDb(BaseDb):
     def use_rtofs(self, value):
         self._setter_bool("use_rtofs", value)
 
+    # --- ssp_extension_source
+    @property
+    def ssp_extension_source(self):
+        return self._getter_str("ssp_extension_source")
+
+    @ssp_extension_source.setter
+    def ssp_extension_source(self, value):
+        self._setter_str("ssp_extension_source", value)
+
+    # --- ssp_salinity_source
+    @property
+    def ssp_salinity_source(self):
+        return self._getter_str("ssp_salinity_source")
+
+    @ssp_salinity_source.setter
+    def ssp_salinity_source(self, value):
+        self._setter_str("ssp_salinity_source", value)
+
+    # --- ssp_temp_sal_source
+    @property
+    def ssp_temp_sal_source(self):
+        return self._getter_str("ssp_temp_sal_source")
+
+    @ssp_temp_sal_source.setter
+    def ssp_temp_sal_source(self, value):
+        self._setter_str("ssp_temp_sal_source", value)
+
+    # --- ssp_up_or_down
+    @property
+    def ssp_up_or_down(self):
+        return self._getter_str("ssp_up_or_down")
+
+    @ssp_up_or_down.setter
+    def ssp_up_or_down(self, value):
+        self._setter_str("ssp_up_or_down", value)
+
+    # --- rx_max_wait_time
+    @property
+    def rx_max_wait_time(self):
+        return self._getter_int("rx_max_wait_time")
+
+    @rx_max_wait_time.setter
+    def rx_max_wait_time(self, value):
+        self._setter_int("rx_max_wait_time", value)
+
+    # --- append_caris_file
+    @property
+    def append_caris_file(self):
+        return self._getter_bool("append_caris_file")
+
+    @append_caris_file.setter
+    def append_caris_file(self, value):
+        self._setter_str("append_caris_file", value)
+
     # --- log_user
     @property
     def log_user(self):
@@ -293,263 +339,191 @@ class SettingsDb(BaseDb):
     def log_server(self, value):
         self._setter_bool("log_server", value)
 
-   #  # --- rx_max_wait_time
-   #  @property
-   #  def rx_max_wait_time(self):
-   #      return self._getter_int("rx_max_wait_time")
-   #
-   #  @rx_max_wait_time.setter
-   #  def rx_max_wait_time(self, value):
-   #      self._setter_int("rx_max_wait_time", value)
-   #
-   #  # --- ssp_extension_source
-   #  @property
-   #  def ssp_extension_source(self):
-   #      return self._getter_str("ssp_extension_source")
-   #
-   #  @ssp_extension_source.setter
-   #  def ssp_extension_source(self, value):
-   #      self._setter_str("ssp_extension_source", value)
-   #
-   #  # --- ssp_salinity_source
-   #  @property
-   #  def ssp_salinity_source(self):
-   #      return self._getter_str("ssp_salinity_source")
-   #
-   #  @ssp_salinity_source.setter
-   #  def ssp_salinity_source(self, value):
-   #      self._setter_str("ssp_salinity_source", value)
-   #
-   #  # --- ssp_temp_sal_source
-   #  @property
-   #  def ssp_temp_sal_source(self):
-   #      return self._getter_str("ssp_temp_sal_source")
-   #
-   #  @ssp_temp_sal_source.setter
-   #  def ssp_temp_sal_source(self, value):
-   #      self._setter_str("ssp_temp_sal_source", value)
-   #
-   #  # --- ssp_temp_sal_source
-   #  @property
-   #  def sis_server_source(self):
-   #      return self._getter_str("sis_server_source")
-   #
-   #  @sis_server_source.setter
-   #  def sis_server_source(self, value):
-   #      self._setter_str("sis_server_source", value)
-   #
-   #  # --- woa_path
-   #  @property
-   #  def woa_path(self):
-   #      return self._getter_str("woa_path")
-   #
-   #  @woa_path.setter
-   #  def woa_path(self, value):
-   #      self._setter_str("woa_path", value)
-   #
-   #  # --- user_append_caris_file
-   #  @property
-   #  def user_append_caris_file(self):
-   #      return self._getter_bool("user_append_caris_file")
-   #
-   #  @user_append_caris_file.setter
-   #  def user_append_caris_file(self, value):
-   #      self._setter_str("user_append_caris_file", value)
-   #
-   #  # --- user_export_prompt_filename
-   #  @property
-   #  def user_export_prompt_filename(self):
-   #      return self._getter_bool("user_export_prompt_filename")
-   #
-   #  @user_export_prompt_filename.setter
-   #  def user_export_prompt_filename(self, value):
-   #      self._setter_str("user_export_prompt_filename", value)
-   #
-   #  # --- auto_export_on_send
-   #  @property
-   #  def auto_export_on_send(self):
-   #      return self._getter_bool("auto_export_on_send")
-   #
-   #  @auto_export_on_send.setter
-   #  def auto_export_on_send(self, value):
-   #      self._setter_str("auto_export_on_send", value)
-   #
-   #  # --- server_append_caris_file
-   #  @property
-   #  def server_append_caris_file(self):
-   #      return self._getter_bool("server_append_caris_file")
-   #
-   #  @server_append_caris_file.setter
-   #  def server_append_caris_file(self, value):
-   #      self._setter_str("server_append_caris_file", value)
-   #
-   #  # --- auto_export_on_server_send
-   #  @property
-   #  def auto_export_on_server_send(self):
-   #      return self._getter_bool("auto_export_on_server_send")
-   #
-   #  @auto_export_on_server_send.setter
-   #  def auto_export_on_server_send(self, value):
-   #      self._setter_str("auto_export_on_server_send", value)
-   #
-   #  # --- server_apply_surface_sound_speed
-   #  @property
-   #  def server_apply_surface_sound_speed(self):
-   #      return self._getter_bool("server_apply_surface_sound_speed")
-   #
-   #  @server_apply_surface_sound_speed.setter
-   #  def server_apply_surface_sound_speed(self, value):
-   #      self._setter_str("server_apply_surface_sound_speed", value)
-   #
-   #  # --- km_listen_port
-   #  @property
-   #  def km_listen_port(self):
-   #      return self._getter_int("km_listen_port")
-   #
-   #  @km_listen_port.setter
-   #  def km_listen_port(self, value):
-   #      self._setter_int("km_listen_port", value)
-   #
-   #  # --- km_listen_timeout
-   #  @property
-   #  def km_listen_timeout(self):
-   #      return self._getter_int("km_listen_timeout")
-   #
-   #  @km_listen_timeout.setter
-   #  def km_listen_timeout(self, value):
-   #      self._setter_int("km_listen_timeout", value)
-   #
-   #  # --- sis_auto_apply_manual_casts
-   #  @property
-   #  def sis_auto_apply_manual_casts(self):
-   #      return self._getter_bool("sis_auto_apply_manual_casts")
-   #
-   #  @sis_auto_apply_manual_casts.setter
-   #  def sis_auto_apply_manual_casts(self, value):
-   #      self._setter_bool("sis_auto_apply_manual_casts", value)
-   #
-   #  # --- sippican_listen_port
-   #  @property
-   #  def sippican_listen_port(self):
-   #      return self._getter_int("sippican_listen_port")
-   #
-   #  @sippican_listen_port.setter
-   #  def sippican_listen_port(self, value):
-   #      self._setter_int("sippican_listen_port", value)
-   #
-   #  # --- sippican_listen_timeout
-   #  @property
-   #  def sippican_listen_timeout(self):
-   #      return self._getter_int("sippican_listen_timeout")
-   #
-   #  @sippican_listen_timeout.setter
-   #  def sippican_listen_timeout(self, value):
-   #      self._setter_int("sippican_listen_timeout", value)
-   #
-   #  # --- mvp_ip_address
-   #  @property
-   #  def mvp_ip_address(self):
-   #      return self._getter_str("mvp_ip_address")
-   #
-   #  @mvp_ip_address.setter
-   #  def mvp_ip_address(self, value):
-   #      self._setter_str("mvp_ip_address", value)
-   #
-   #  # --- mvp_listen_port
-   #  @property
-   #  def mvp_listen_port(self):
-   #      return self._getter_int("mvp_listen_port")
-   #
-   #  @mvp_listen_port.setter
-   #  def mvp_listen_port(self, value):
-   #      self._setter_int("mvp_listen_port", value)
-   #
-   #  # --- mvp_listen_timeout
-   #  @property
-   #  def mvp_listen_timeout(self):
-   #      return self._getter_int("mvp_listen_timeout")
-   #
-   #  @mvp_listen_timeout.setter
-   #  def mvp_listen_timeout(self, value):
-   #      self._setter_int("mvp_listen_timeout", value)
-   #
-   #  # --- mvp_transmission_protocol
-   #  @property
-   #  def mvp_transmission_protocol(self):
-   #      return self._getter_str("mvp_transmission_protocol")
-   #
-   #  @mvp_transmission_protocol.setter
-   #  def mvp_transmission_protocol(self, value):
-   #      self._setter_str("mvp_transmission_protocol", value)
-   #
-   #  # --- mvp_format
-   #  @property
-   #  def mvp_format(self):
-   #      return self._getter_str("mvp_format")
-   #
-   #  @mvp_format.setter
-   #  def mvp_format(self, value):
-   #      self._setter_str("mvp_format", value)
-   #
-   #  # --- mvp_winch_port
-   #  @property
-   #  def mvp_winch_port(self):
-   #      return self._getter_int("mvp_winch_port")
-   #
-   #  @mvp_winch_port.setter
-   #  def mvp_winch_port(self, value):
-   #      self._setter_int("mvp_winch_port", value)
-   #
-   #  # --- mvp_fish_port
-   #  @property
-   #  def mvp_fish_port(self):
-   #      return self._getter_int("mvp_fish_port")
-   #
-   #  @mvp_fish_port.setter
-   #  def mvp_fish_port(self, value):
-   #      self._setter_int("mvp_fish_port", value)
-   #
-   #  # --- mvp_nav_port
-   #  @property
-   #  def mvp_nav_port(self):
-   #      return self._getter_int("mvp_nav_port")
-   #
-   #  @mvp_nav_port.setter
-   #  def mvp_nav_port(self, value):
-   #      self._setter_int("mvp_nav_port", value)
-   #
-   #  # --- mvp_system_port
-   #  @property
-   #  def mvp_system_port(self):
-   #      return self._getter_int("mvp_system_port")
-   #
-   #  @mvp_system_port.setter
-   #  def mvp_system_port(self, value):
-   #      self._setter_int("mvp_system_port", value)
-   #
-   #  # --- mvp_sw_version
-   #  @property
-   #  def mvp_sw_version(self):
-   #      return self._getter_str("mvp_sw_version")
-   #
-   #  @mvp_sw_version.setter
-   #  def mvp_sw_version(self, value):
-   #      self._setter_str("mvp_sw_version", value)
-   #
-   #  # --- mvp_instrument
-   #  @property
-   #  def mvp_instrument(self):
-   #      return self._getter_str("mvp_instrument")
-   #
-   #  @mvp_instrument.setter
-   #  def mvp_instrument(self, value):
-   #      self._setter_str("mvp_instrument", value)
-   #
-   #  # --- mvp_instrument_id
-   #  @property
-   #  def mvp_instrument_id(self):
-   #      return self._getter_str("mvp_instrument_id")
-   #
-   #  @mvp_instrument_id.setter
-   #  def mvp_instrument_id(self, value):
-   #      self._setter_str("mvp_instrument_id", value)
+    # --- sis_listen_port
+    @property
+    def sis_listen_port(self):
+        return self._getter_int("sis_listen_port")
+
+    @sis_listen_port.setter
+    def sis_listen_port(self, value):
+        self._setter_int("sis_listen_port", value)
+
+    # --- sis_listen_timeout
+    @property
+    def sis_listen_timeout(self):
+        return self._getter_int("sis_listen_timeout")
+
+    @sis_listen_timeout.setter
+    def sis_listen_timeout(self, value):
+        self._setter_int("sis_listen_timeout", value)
+
+    # --- sis_auto_apply_manual_casts
+    @property
+    def sis_auto_apply_manual_casts(self):
+        return self._getter_bool("sis_auto_apply_manual_casts")
+
+    @sis_auto_apply_manual_casts.setter
+    def sis_auto_apply_manual_casts(self, value):
+        self._setter_bool("sis_auto_apply_manual_casts", value)
+
+    # --- sippican_listen_port
+    @property
+    def sippican_listen_port(self):
+        return self._getter_int("sippican_listen_port")
+
+    @sippican_listen_port.setter
+    def sippican_listen_port(self, value):
+        self._setter_int("sippican_listen_port", value)
+
+    # --- sippican_listen_timeout
+    @property
+    def sippican_listen_timeout(self):
+        return self._getter_int("sippican_listen_timeout")
+
+    @sippican_listen_timeout.setter
+    def sippican_listen_timeout(self, value):
+        self._setter_int("sippican_listen_timeout", value)
+
+    # --- mvp_ip_address
+    @property
+    def mvp_ip_address(self):
+        return self._getter_str("mvp_ip_address")
+
+    @mvp_ip_address.setter
+    def mvp_ip_address(self, value):
+        self._setter_str("mvp_ip_address", value)
+
+    # --- mvp_listen_port
+    @property
+    def mvp_listen_port(self):
+        return self._getter_int("mvp_listen_port")
+
+    @mvp_listen_port.setter
+    def mvp_listen_port(self, value):
+        self._setter_int("mvp_listen_port", value)
+
+    # --- mvp_listen_timeout
+    @property
+    def mvp_listen_timeout(self):
+        return self._getter_int("mvp_listen_timeout")
+
+    @mvp_listen_timeout.setter
+    def mvp_listen_timeout(self, value):
+        self._setter_int("mvp_listen_timeout", value)
+
+    # --- mvp_transmission_protocol
+    @property
+    def mvp_transmission_protocol(self):
+        return self._getter_str("mvp_transmission_protocol")
+
+    @mvp_transmission_protocol.setter
+    def mvp_transmission_protocol(self, value):
+        self._setter_str("mvp_transmission_protocol", value)
+
+    # --- mvp_format
+    @property
+    def mvp_format(self):
+        return self._getter_str("mvp_format")
+
+    @mvp_format.setter
+    def mvp_format(self, value):
+        self._setter_str("mvp_format", value)
+
+    # --- mvp_winch_port
+    @property
+    def mvp_winch_port(self):
+        return self._getter_int("mvp_winch_port")
+
+    @mvp_winch_port.setter
+    def mvp_winch_port(self, value):
+        self._setter_int("mvp_winch_port", value)
+
+    # --- mvp_fish_port
+    @property
+    def mvp_fish_port(self):
+        return self._getter_int("mvp_fish_port")
+
+    @mvp_fish_port.setter
+    def mvp_fish_port(self, value):
+        self._setter_int("mvp_fish_port", value)
+
+    # --- mvp_nav_port
+    @property
+    def mvp_nav_port(self):
+        return self._getter_int("mvp_nav_port")
+
+    @mvp_nav_port.setter
+    def mvp_nav_port(self, value):
+        self._setter_int("mvp_nav_port", value)
+
+    # --- mvp_system_port
+    @property
+    def mvp_system_port(self):
+        return self._getter_int("mvp_system_port")
+
+    @mvp_system_port.setter
+    def mvp_system_port(self, value):
+        self._setter_int("mvp_system_port", value)
+
+    # --- mvp_sw_version
+    @property
+    def mvp_sw_version(self):
+        return self._getter_str("mvp_sw_version")
+
+    @mvp_sw_version.setter
+    def mvp_sw_version(self, value):
+        self._setter_str("mvp_sw_version", value)
+
+    # --- mvp_instrument
+    @property
+    def mvp_instrument(self):
+        return self._getter_str("mvp_instrument")
+
+    @mvp_instrument.setter
+    def mvp_instrument(self, value):
+        self._setter_str("mvp_instrument", value)
+
+    # --- mvp_instrument_id
+    @property
+    def mvp_instrument_id(self):
+        return self._getter_str("mvp_instrument_id")
+
+    @mvp_instrument_id.setter
+    def mvp_instrument_id(self, value):
+        self._setter_str("mvp_instrument_id", value)
+
+    # --- server_source
+    @property
+    def server_source(self):
+        return self._getter_str("server_source")
+
+    @server_source.setter
+    def server_source(self, value):
+        self._setter_str("server_source", value)
+
+    # --- server_append_caris_file
+    @property
+    def server_append_caris_file(self):
+        return self._getter_bool("server_append_caris_file")
+
+    @server_append_caris_file.setter
+    def server_append_caris_file(self, value):
+        self._setter_str("server_append_caris_file", value)
+
+    # --- server_apply_surface_sound_speed
+    @property
+    def server_apply_surface_sound_speed(self):
+        return self._getter_bool("server_apply_surface_sound_speed")
+
+    @server_apply_surface_sound_speed.setter
+    def server_apply_surface_sound_speed(self, value):
+        self._setter_str("server_apply_surface_sound_speed", value)
+
+    # --- server_auto_export_on_send
+    @property
+    def server_auto_export_on_send(self):
+        return self._getter_bool("server_auto_export_on_send")
+
+    @server_auto_export_on_send.setter
+    def server_auto_export_on_send(self, value):
+        self._setter_str("server_auto_export_on_send", value)

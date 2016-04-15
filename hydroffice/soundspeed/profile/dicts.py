@@ -95,3 +95,32 @@ class Dicts(object):
         ("PDS2000", 2),
         ("QINSY", 3)
     ])
+
+    atlases = OrderedDict([
+        ("WOA09", 0),
+        ("WOA13", 1),
+        ("RTOFS", 2)
+    ])
+
+    mvp_protocols = OrderedDict([
+        ("NAVO_ISS60", 0),
+        ("UNDEFINED", 1),
+    ])
+
+    mvp_formats = OrderedDict([
+        ("S12", 0),
+        ("CALC", 1),
+        ("ASVP", 2)
+    ])
+
+    mvp_instruments = OrderedDict([
+        ("AML_uSVP", 0),
+        ("AML_uSVPT", 1),
+        ("AML_Smart_SVP", 2),
+        ("AML_uCTD", 3),
+        ("AML_uCTD+", 4),
+        ("Valeport_SVPT", 5),
+        ("SBE_911+", 6),
+        ("SBE_49", 7),
+    ])
+

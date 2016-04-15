@@ -11,7 +11,7 @@ from .widget import AbstractWidget
 from hydroffice.soundspeed.profile.dicts import Dicts
 
 
-class Clients(AbstractWidget):
+class Output(AbstractWidget):
 
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
@@ -59,6 +59,103 @@ class Clients(AbstractWidget):
         self.btn_refresh_list = QtGui.QPushButton("Refresh")
         self.btn_refresh_list.clicked.connect(self.refresh)
         self.btn_box.addButton(self.btn_refresh_list, QtGui.QDialogButtonBox.ActionRole)
+
+        self.main_layout.addStretch()
+
+        # - other
+        hbox = QtGui.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        hbox.addStretch()
+        self.label = QtGui.QLabel("Other settings:")
+        hbox.addWidget(self.label)
+        hbox.addStretch()
+
+        # - append_caris_file
+        hbox = QtGui.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtGui.QLabel("Append Caris file:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.append_caris_file = QtGui.QComboBox()
+        self.append_caris_file.addItems(["True", "False"])
+        vbox.addWidget(self.append_caris_file)
+        vbox.addStretch()
+        # -- buttons
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        btn_apply = QtGui.QPushButton("Apply")
+        btn_apply.setFixedWidth(lbl_width)
+        btn_apply.clicked.connect(self.apply_append_caris_file)
+        vbox.addWidget(btn_apply)
+        vbox.addStretch()
+
+        # - log_user
+        hbox = QtGui.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtGui.QLabel("User logging:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.log_user = QtGui.QComboBox()
+        self.log_user.addItems(["True", "False"])
+        vbox.addWidget(self.log_user)
+        vbox.addStretch()
+        # -- buttons
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        btn_apply = QtGui.QPushButton("Apply")
+        btn_apply.setFixedWidth(lbl_width)
+        btn_apply.clicked.connect(self.apply_log_user)
+        vbox.addWidget(btn_apply)
+        vbox.addStretch()
+
+        # - log_server
+        hbox = QtGui.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtGui.QLabel("Server logging:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.log_server = QtGui.QComboBox()
+        self.log_server.addItems(["True", "False"])
+        vbox.addWidget(self.log_server)
+        vbox.addStretch()
+        # -- buttons
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        btn_apply = QtGui.QPushButton("Apply")
+        btn_apply.setFixedWidth(lbl_width)
+        btn_apply.clicked.connect(self.apply_log_server)
+        vbox.addWidget(btn_apply)
+        vbox.addStretch()
 
         self.main_layout.addStretch()
 
@@ -158,12 +255,29 @@ class Clients(AbstractWidget):
         self.db.delete_client(client_name)
         self.refresh()
 
+    def apply_append_caris_file(self):
+        logger.debug("apply append caris file")
+        self.db.append_caris_file = self.append_caris_file.currentText()
+        self.setup_changed()
+
+    def apply_log_user(self):
+        logger.debug("apply log user")
+        self.db.log_user = self.log_user.currentText()
+        self.main_win.prj.logging()
+        self.setup_changed()
+
+    def apply_log_server(self):
+        logger.debug("apply log server")
+        self.db.log_server = self.log_server.currentText()
+        self.main_win.prj.logging()
+        self.setup_changed()
+
     def refresh(self):
         self.main_win.setup_changed()
 
     def setup_changed(self):
         """Refresh the setup list"""
-        logger.debug("refresh clients")
+        # logger.debug("refresh clients")
 
         # prepare the table
         self.client_list.clear()
@@ -184,3 +298,21 @@ class Clients(AbstractWidget):
                 self.client_list.setItem(i, j, item)
 
         self.client_list.resizeColumnsToContents()
+
+        # append_caris_file
+        if self.db.append_caris_file:
+            self.append_caris_file.setCurrentIndex(0)  # True
+        else:
+            self.append_caris_file.setCurrentIndex(1)  # False
+
+        # log_user
+        if self.db.log_user:
+            self.log_user.setCurrentIndex(0)  # True
+        else:
+            self.log_user.setCurrentIndex(1)  # False
+
+        # log_server
+        if self.db.log_server:
+            self.log_server.setCurrentIndex(0)  # True
+        else:
+            self.log_server.setCurrentIndex(1)  # False

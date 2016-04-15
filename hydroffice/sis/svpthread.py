@@ -51,7 +51,7 @@ class SvpThread(threading.Thread):
         """Initialize UDP sockets"""
 
         self.sock_in = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock_in.settimeout(1)
+        self.sock_in.settimeout(10)
         self.sock_in.bind(("0.0.0.0", self.port_in))
 
         self.sock_out = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

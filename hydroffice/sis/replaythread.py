@@ -65,7 +65,7 @@ class ReplayThread(threading.Thread):
         logger.debug("sock_out > buffer %sKB" % (self.sock_out.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF) / 1024))
 
     def interaction(self):
-        logger.debug("reading files")
+        # logger.debug("reading files")
 
         self.dg_counter = 0
 
