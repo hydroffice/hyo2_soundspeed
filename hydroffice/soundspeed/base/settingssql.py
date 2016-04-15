@@ -30,7 +30,7 @@ CREATE_SETTINGS = """ CREATE TABLE IF NOT EXISTS general(
      user_export_prompt_filename text NOT NULL DEFAULT "False",
      user_append_caris_file text NOT NULL DEFAULT "False",
      server_append_caris_file text NOT NULL DEFAULT "False",
-     km_listen_port integer NOT NULL DEFAULT 26103,
+     km_listen_port integer NOT NULL DEFAULT 16103,
      km_listen_timeout integer NOT NULL DEFAULT 1,
      sis_auto_apply_manual_casts text NOT NULL DEFAULT "True",
      server_apply_surface_sound_speed text NOT NULL DEFAULT "True",
