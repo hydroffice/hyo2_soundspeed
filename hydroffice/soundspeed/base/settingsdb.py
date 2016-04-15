@@ -303,6 +303,33 @@ class SettingsDb(BaseDb):
     def ssp_up_or_down(self, value):
         self._setter_str("ssp_up_or_down", value)
 
+    # --- use_sis
+    @property
+    def use_sis(self):
+        return self._getter_bool("use_sis")
+
+    @use_sis.setter
+    def use_sis(self, value):
+        self._setter_bool("use_sis", value)
+
+    # --- use_sippican
+    @property
+    def use_sippican(self):
+        return self._getter_bool("use_sippican")
+
+    @use_sippican.setter
+    def use_sippican(self, value):
+        self._setter_bool("use_sippican", value)
+
+    # --- use_mvp
+    @property
+    def use_mvp(self):
+        return self._getter_bool("use_mvp")
+
+    @use_mvp.setter
+    def use_mvp(self, value):
+        self._setter_bool("use_mvp", value)
+
     # --- rx_max_wait_time
     @property
     def rx_max_wait_time(self):

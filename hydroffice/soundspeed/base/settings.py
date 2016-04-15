@@ -26,6 +26,9 @@ class Settings(object):
         self.ssp_temp_sal_source = None
         self.ssp_up_or_down = None
         self.rx_max_wait_time = None
+        self.use_sis = None
+        self.use_sippican = None
+        self.use_mvp = None
 
         # output
         self.append_caris_file = None
@@ -83,6 +86,9 @@ class Settings(object):
         self.ssp_temp_sal_source = Dicts.atlases[db.ssp_temp_sal_source]
         self.ssp_up_or_down = Dicts.ssp_directions[db.ssp_up_or_down]
         self.rx_max_wait_time = db.rx_max_wait_time
+        self.use_sis = db.use_sis
+        self.use_sippican = db.use_sippican
+        self.use_mvp = db.use_mvp
 
         # output
         self.append_caris_file = db.append_caris_file
@@ -136,6 +142,9 @@ class Settings(object):
         msg += "      <ssp_temp_sal_source: %s>\n" % self.ssp_temp_sal_source
         msg += "      <up_or_down: %s>\n" % self.ssp_up_or_down
         msg += "      <rx_max_wait_time: %s>\n" % self.rx_max_wait_time
+        msg += "      <use_sis: %s>\n" % self.use_sis
+        msg += "      <use_sippican: %s>\n" % self.use_sippican
+        msg += "      <use_mvp: %s>\n" % self.use_mvp
         msg += "    <output>\n"
         msg += "      <append_caris_file: %s>\n" % self.append_caris_file
         msg += "      <log_user: %s>\n" % self.log_user

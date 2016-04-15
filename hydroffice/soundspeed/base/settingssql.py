@@ -20,6 +20,9 @@ CREATE_SETTINGS = """ CREATE TABLE IF NOT EXISTS general(
      ssp_temp_sal_source text NOT NULL DEFAULT "WOA09",
      ssp_up_or_down text NOT NULL DEFAULT "down",
      rx_max_wait_time integer NOT NULL DEFAULT 10,
+     use_sis text NOT NULL DEFAULT "True",
+     use_sippican text NOT NULL DEFAULT "False",
+     use_mvp text NOT NULL DEFAULT "False",
      /* output */
      append_caris_file text NOT NULL DEFAULT "False",
      log_user text NOT NULL DEFAULT "False",
@@ -61,6 +64,9 @@ CREATE_SETTINGS = """ CREATE TABLE IF NOT EXISTS general(
      CHECK (ssp_temp_sal_source IN ("RTOFS", "WOA09", "WOA13")),
      CHECK (ssp_up_or_down IN ("down", "up")),
      CHECK (rx_max_wait_time > 0),
+     CHECK (use_sis IN ("True", "False")),
+     CHECK (use_sippican IN ("True", "False")),
+     CHECK (use_mvp IN ("True", "False")),
      /* output */
      CHECK (append_caris_file IN ("True", "False")),
      CHECK (log_user IN ("True", "False")),
