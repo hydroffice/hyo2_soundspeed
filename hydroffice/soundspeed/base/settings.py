@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 
 from .settingsdb import SettingsDb
 from ..profile.dicts import Dicts
+from .clientlist import ClientList
 
 
 class Settings(object):
@@ -27,6 +28,9 @@ class Settings(object):
         # logging
         self.log_user = None
         self.log_server = None
+
+        # client list
+        self.client_list = ClientList()
 
         # loading settings
         self.data_folder = data_folder
@@ -49,6 +53,12 @@ class Settings(object):
         # logging
         self.log_user = db.log_user
         self.log_server = db.log_server
+        # client list
+        self.client_list = ClientList()  # to reset the list
+        for client in db.client_list:
+            client_string = "\"%s\":%s:%s:%s" % (client[1], client[2], client[3], client[4])
+            self.client_list.add_client(client_string)
+        db.close()
 
     def __repr__(self):
         msg = "  <setup:%s:%s>\n" % (self.setup_id, self.setup_name)
@@ -62,4 +72,7 @@ class Settings(object):
         msg += "    <logging>\n"
         msg += "      <log_user: %s>\n" % self.log_user
         msg += "      <log_server: %s>\n" % self.log_server
+        msg += "    <clients>\n"
+        for c in self.client_list:
+            msg += "      <%s>\n" % c
         return msg

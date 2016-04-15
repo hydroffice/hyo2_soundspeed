@@ -88,3 +88,10 @@ class Dicts(object):
         (True, 0),
         (False, 1)
     ])
+
+    clients = OrderedDict([
+        ("SIS", 0),
+        ("HYPACK", 1),
+        ("PDS2000", 2),
+        ("QINSY", 3)
+    ])

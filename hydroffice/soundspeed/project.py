@@ -10,6 +10,7 @@ from .base.settings import Settings
 from .base.callbacks import Callbacks, AbstractCallbacks
 from .base.progress import Progress
 from .atlas.atlases import Atlases
+from .listener.listeners import Listeners
 from .db.db import SoundSpeedDb
 from .base.gdal_aux import GdalAux
 
@@ -24,6 +25,7 @@ class Project(BaseProject):
         self.cb = Callbacks()
         self.ssp = None
         self.atlases = Atlases(prj=self)
+        self.listeners = Listeners(prj=self)
         self.progress = Progress(qprogress=qprogress, qparent=qparent)
 
         self.logging()
@@ -156,6 +158,30 @@ class Project(BaseProject):
             return None
 
         self.ssp = self.atlases.rtofs.query(lat=lat, lon=lon, datestamp=utc_time)
+
+    def retrieve_sis(self):
+        """Retrieve data from SIS"""
+
+        # utc_time = self.cb.ask_date()
+        # if utc_time is None:
+        #     logger.error("missing date required for database lookup")
+        #     return None
+        #
+        # if not self.download_rtofs(datestamp=utc_time):
+        #     logger.error("unable to download RTOFS atlas data set")
+        #     return None
+        #
+        # if not self.has_rtofs():
+        #     logger.error("missing RTOFS atlas data set")
+        #     return None
+        #
+        # lat, lon = self.cb.ask_location()
+        # if (lat is None) or (lon is None):
+        #     logger.error("missing geographic location required for database lookup")
+        #     return None
+        #
+        # self.ssp = self.atlases.rtofs.query(lat=lat, lon=lon, datestamp=utc_time)
+        return
 
     # --- export data
 

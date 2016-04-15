@@ -66,7 +66,7 @@ class Main(AbstractWidget):
         self.btn_activate_setup = QtGui.QPushButton("Activate setup")
         self.btn_activate_setup.clicked.connect(self.activate_setup)
         self.btn_box.addButton(self.btn_activate_setup, QtGui.QDialogButtonBox.ActionRole)
-        # --- activate setup
+        # --- refresh
         self.btn_refresh_list = QtGui.QPushButton("Refresh")
         self.btn_refresh_list.clicked.connect(self.refresh)
         self.btn_box.addButton(self.btn_refresh_list, QtGui.QDialogButtonBox.ActionRole)
@@ -87,7 +87,7 @@ class Main(AbstractWidget):
                 continue
 
             self.db.add_setup(name)
-            self.refresh_items()
+            self.refresh()
             break
 
     def delete_setup(self):
@@ -111,7 +111,7 @@ class Main(AbstractWidget):
             return
 
         self.db.delete_setup(setup_name)
-        self.refresh_items()
+        self.refresh()
 
     def activate_setup(self):
         logger.debug("activate setup")

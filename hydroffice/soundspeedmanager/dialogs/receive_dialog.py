@@ -39,6 +39,11 @@ class ReceiveDialog(AbstractDialog):
         self.buttonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
         btn.setToolTip("Retrieve synthetic data from RTOFS Atlas")
         btn.clicked.connect(self.on_click_rtofs)
+        # -- SIS
+        btn = QtGui.QPushButton("Retrieve from SIS")
+        self.buttonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve current profile from SIS")
+        btn.clicked.connect(self.on_click_sis)
 
     def on_click_woa09(self):
         """Retrieve WOA09 data"""
@@ -71,6 +76,18 @@ class ReceiveDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = "Issue in importing the data:\n\n> %s" % e
+            QtGui.QMessageBox.critical(self, "Import error", msg, QtGui.QMessageBox.Ok)
+            return
+
+        self.accept()
+
+    def on_click_sis(self):
+        """Retrieve SIS data"""
+        try:
+            self.prj.retrieve_sis()
+
+        except RuntimeError as e:
+            msg = "Issue in retrieving data from SIS:\n\n> %s" % e
             QtGui.QMessageBox.critical(self, "Import error", msg, QtGui.QMessageBox.Ok)
             return
 
