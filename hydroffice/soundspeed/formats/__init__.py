@@ -47,13 +47,21 @@ for reader in readers:
 
 # writers
 from .writers.asvp import Asvp
+from .writers.caris import Caris
+from .writers.csv import Csv
 from .writers.elac import Elac
+from .writers.hypack import Hypack
+from .writers.ixblue import Ixblue
 from .writers.sonardyne import Sonardyne
 from .writers.unb import Unb
 
 writers = list()
 writers.append(Asvp())
+writers.append(Caris())
+writers.append(Csv())
 writers.append(Elac())
+writers.append(Hypack())
+writers.append(Ixblue())
 writers.append(Sonardyne())
 writers.append(Unb())
 

@@ -84,8 +84,13 @@ class Profile(object):
 
     @property
     def proc_valid(self):
-        """Return indices of valid data"""
+        """Return indices of valid proc samples"""
         return np.equal(self.proc.flag, Dicts.flags['valid'])
+
+    @property
+    def sis_valid(self):
+        """Return indices of valid sis samples"""
+        return np.equal(self.sis.flag, Dicts.flags['valid'])
 
     @property
     def proc_invalid_direction(self):
@@ -329,7 +334,7 @@ class Profile(object):
         if self.data.num_samples == 0:
             return
 
-        vi = self.data.flag == Dicts.flags['valid']  # invalid samples (no direction-flagged)
+        vi = self.data_valid  # invalid samples (no direction-flagged)
 
         self.init_proc(np.sum(vi))
         self.proc.depth[:] = self.data.depth[vi]
@@ -340,6 +345,21 @@ class Profile(object):
         self.proc.flag[:] = self.data.flag[vi]
 
         self.update_proc_time()
+
+    def clone_proc_to_sis(self):
+        """Clone the processed data samples into sis samples"""
+        logger.info("cloning proc data to sis samples")
+
+        if self.proc.num_samples == 0:
+            return
+
+        self.init_sis(self.proc.depth.size)
+        self.sis.depth[:] = self.proc.depth
+        self.sis.speed[:] = self.proc.speed
+        self.sis.temp[:] = self.proc.temp
+        self.sis.sal[:] = self.proc.sal
+        self.sis.source[:] = self.proc.source
+        self.sis.flag[:] = self.proc.flag
 
     def update_proc_time(self):
         self.meta.update_proc_time()

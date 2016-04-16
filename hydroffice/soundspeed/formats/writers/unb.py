@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import numpy as np
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,7 +19,7 @@ class Unb(AbstractTextWriter):
         self.desc = "UNB"
         self._ext.add('unb')
 
-    def write(self, ssp, data_path, data_file=None):
+    def write(self, ssp, data_path, data_file=None, data_append=False):
         """Writing version 2 since it holds T/S and flags"""
         logger.debug('*** %s ***: start' % self.driver)
 
@@ -27,6 +28,8 @@ class Unb(AbstractTextWriter):
 
         self._write_header()
         self._write_body()
+
+        self.finalize()
 
         logger.debug('*** %s ***: done' % self.driver)
         return True
@@ -70,7 +73,8 @@ class Unb(AbstractTextWriter):
 
     def _write_body(self):
         logger.debug('generating body')
-        for idx in range(self.ssp.cur.data.num_samples):
+        vi = self.ssp.cur.proc_valid
+        for idx in range(np.sum(vi)):
             self.fod.io.write("%d %.3f %.3f %.3f %.3f 0.000 0\n"
-                              % (idx+1, self.ssp.cur.data.depth[idx], self.ssp.cur.data.speed[idx],
-                                 self.ssp.cur.data.temp[idx], self.ssp.cur.data.sal[idx]))
+                              % (idx + 1, self.ssp.cur.proc.depth[vi][idx], self.ssp.cur.proc.speed[vi][idx],
+                                 self.ssp.cur.proc.temp[vi][idx], self.ssp.cur.proc.sal[vi][idx]))

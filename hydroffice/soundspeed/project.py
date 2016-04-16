@@ -228,7 +228,7 @@ class Project(BaseProject):
 
     # --- export data
 
-    def export_data(self, data_formats, data_path, data_files=None):
+    def export_data(self, data_formats, data_path, data_files=None, server_mode=False):
         """Export data using a list of formats name"""
 
         # checks
@@ -249,10 +249,16 @@ class Project(BaseProject):
         for i, name in enumerate(data_formats):
             idx = self.name_writers.index(name)
             writer = self.writers[idx]
+            data_append = False
+            if writer.name == 'caris':
+                if server_mode:
+                    data_append = self.setup.server_append_caris_file
+                else:
+                    data_append = self.setup.append_caris_file
             if not has_data_files:  # we don't have the output file names
-                writer.write(ssp=self.ssp, data_path=data_path)
+                writer.write(ssp=self.ssp, data_path=data_path, data_append=data_append)
             else:
-                writer.write(ssp=self.ssp, data_path=data_path, data_file=data_files[i])
+                writer.write(ssp=self.ssp, data_path=data_path, data_file=data_files[i], data_append=data_append)
 
     # --- db
 

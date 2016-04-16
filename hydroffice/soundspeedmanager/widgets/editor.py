@@ -58,6 +58,33 @@ class Editor(AbstractWidget):
         self.metadata_act.setShortcut('Alt+M')
         self.metadata_act.triggered.connect(self.on_metadata)
         self.file_bar.addAction(self.metadata_act)
+        # retrieve sal
+        self.sal_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'sal.png')), 'Retrieve salinity', self)
+        self.sal_act.setShortcut('Alt+A')
+        self.sal_act.triggered.connect(self.on_retrieve_sal)
+        self.file_bar.addAction(self.sal_act)
+        # retrieve temp/sal
+        self.temp_sal_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'temp_sal.png')),
+                                          'Retrieve temperature/salinity', self)
+        self.temp_sal_act.setShortcut('Alt+T')
+        self.temp_sal_act.triggered.connect(self.on_retrieve_temp_sal)
+        self.file_bar.addAction(self.temp_sal_act)
+        # retrieve transducer sound speed
+        self.tss_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'tss.png')),
+                                     'Retrieve transducer sound speed', self)
+        self.tss_act.setShortcut('Alt+W')
+        self.tss_act.triggered.connect(self.on_retrieve_tss)
+        self.file_bar.addAction(self.tss_act)
+        # extend profile
+        self.extend_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'extend.png')), 'Extend profile', self)
+        self.extend_act.setShortcut('Alt+E')
+        self.extend_act.triggered.connect(self.on_extend_profile)
+        self.file_bar.addAction(self.extend_act)
+        # preview thinning
+        self.thin_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'thinning.png')), 'Preview thinning', self)
+        self.thin_act.setShortcut('Alt+H')
+        self.thin_act.triggered.connect(self.on_preview_thinning)
+        self.file_bar.addAction(self.thin_act)
         # separator
         self.file_bar.addSeparator()
         # export
@@ -125,6 +152,21 @@ class Editor(AbstractWidget):
         self.prj.clear_data()
         self.main_win.data_cleared()
 
+    def on_retrieve_sal(self):
+        logger.debug('user wants to retrieve salinity')
+
+    def on_retrieve_temp_sal(self):
+        logger.debug('user wants to retrieve temp/sal')
+
+    def on_retrieve_tss(self):
+        logger.debug('user wants to retrieve transducer sound speed')
+
+    def on_extend_profile(self):
+        logger.debug('user wants to extend the profile')
+
+    def on_preview_thinning(self):
+        logger.debug('user wants to preview thinning')
+
     def on_spreadsheet(self):
         logger.debug('user wants to read/edit spreadsheet')
         if not self.prj.has_ssp():
@@ -175,9 +217,14 @@ class Editor(AbstractWidget):
 
     def data_cleared(self):
         # dialogs
-        self.spreadsheet_act.setDisabled(True)
-        self.metadata_act.setDisabled(True)
         self.clear_act.setDisabled(True)
+        self.spreadsheet_act.setDisabled(True)
+        self.sal_act.setDisabled(True)
+        self.temp_sal_act.setDisabled(True)
+        self.tss_act.setDisabled(True)
+        self.extend_act.setDisabled(True)
+        self.thin_act.setDisabled(True)
+        self.metadata_act.setDisabled(True)
         self.export_act.setDisabled(True)
         self.transmit_act.setDisabled(True)
         self.save_db_act.setDisabled(True)
@@ -186,9 +233,14 @@ class Editor(AbstractWidget):
 
     def data_imported(self):
         # dialogs
+        self.clear_act.setDisabled(False)
         self.spreadsheet_act.setDisabled(False)
         self.metadata_act.setDisabled(False)
-        self.clear_act.setDisabled(False)
+        self.sal_act.setDisabled(False)
+        self.temp_sal_act.setDisabled(False)
+        self.tss_act.setDisabled(False)
+        self.extend_act.setDisabled(False)
+        self.thin_act.setDisabled(False)
         self.export_act.setDisabled(False)
         self.transmit_act.setDisabled(False)
         self.save_db_act.setDisabled(False)

@@ -23,7 +23,7 @@ class AbstractWriter(AbstractFormat):
         self.fod = None
 
     @abstractmethod
-    def write(self, ssp, data_path, data_file=None):
+    def write(self, ssp, data_path, data_file=None, data_append=False):
         pass
 
     @abstractmethod
@@ -34,6 +34,11 @@ class AbstractWriter(AbstractFormat):
     def _write_body(self):
         pass
 
+    def finalize(self):
+        if self.fod:
+            if not self.fod.io.closed:
+                self.fod.io.close()
+
 
 class AbstractTextWriter(AbstractWriter):
     """ Abstract text data writer """
@@ -43,7 +48,7 @@ class AbstractTextWriter(AbstractWriter):
     def __init__(self):
         super(AbstractTextWriter, self).__init__()
 
-    def _write(self, data_path, data_file, encoding='utf8'):
+    def _write(self, data_path, data_file, encoding='utf8', append=False):
         """Helper function to write the raw file"""
         if data_file:
             if len(data_file.split('.')) == 1:
@@ -59,4 +64,7 @@ class AbstractTextWriter(AbstractWriter):
                 os.makedirs(data_path)
             file_path = os.path.join(data_path, data_file)
         logger.info("output file: %s" % file_path)
-        self.fod = FileManager(file_path, mode='w', encoding=encoding)
+        if append:
+            self.fod = FileManager(file_path, mode='a', encoding=encoding)
+        else:
+            self.fod = FileManager(file_path, mode='w', encoding=encoding)

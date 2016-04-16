@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import numpy as np
 import os
 import logging
 
@@ -18,7 +19,7 @@ class Elac(AbstractTextWriter):
         self.desc = "Elac"
         self._ext.add('sva')
 
-    def write(self, ssp, data_path, data_file=None):
+    def write(self, ssp, data_path, data_file=None, data_append=False):
         """Writing version 2 since it holds T/S and flags"""
         logger.debug('*** %s ***: start' % self.driver)
 
@@ -27,6 +28,8 @@ class Elac(AbstractTextWriter):
 
         self._write_header()
         self._write_body()
+
+        self.finalize()
 
         logger.debug('*** %s ***: done' % self.driver)
         return True
@@ -43,11 +46,12 @@ class Elac(AbstractTextWriter):
 
     def _write_body(self):
         logger.debug('generating body')
-        for idx in range(self.ssp.cur.data.num_samples):
+        vi = self.ssp.cur.proc_valid
+        for idx in range(np.sum(vi)):
             self.fod.io.write("%8.2f%10.2f%10.2f%10.2f%10.2f\n"
-                              % (self.ssp.cur.data.depth[idx], self.ssp.cur.data.speed[idx],
-                                 self.ssp.cur.data.temp[idx], self.ssp.cur.data.sal[idx],
-                                 Oc.s2c(s=self.ssp.cur.data.sal[idx],
-                                        p=Oc.d2p(d=self.ssp.cur.data.depth[idx],
+                              % (self.ssp.cur.proc.depth[vi][idx], self.ssp.cur.proc.speed[vi][idx],
+                                 self.ssp.cur.proc.temp[vi][idx], self.ssp.cur.proc.sal[vi][idx],
+                                 Oc.s2c(s=self.ssp.cur.proc.sal[vi][idx],
+                                        p=Oc.d2p(d=self.ssp.cur.proc.depth[vi][idx],
                                                  lat=self.ssp.cur.meta.latitude),
-                                        t=self.ssp.cur.data.temp[idx])))
+                                        t=self.ssp.cur.proc.temp[vi][idx])))

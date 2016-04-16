@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import numpy as np
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,7 +19,7 @@ class Sonardyne(AbstractTextWriter):
         self.desc = "Sonardyne"
         self._ext.add('pro')
 
-    def write(self, ssp, data_path, data_file=None):
+    def write(self, ssp, data_path, data_file=None, data_append=False):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.ssp = ssp
@@ -26,6 +27,8 @@ class Sonardyne(AbstractTextWriter):
 
         self._write_header()
         self._write_body()
+
+        self.finalize()
 
         logger.debug('*** %s ***: done' % self.driver)
         return True
@@ -66,7 +69,8 @@ class Sonardyne(AbstractTextWriter):
 
     def _write_body(self):
         logger.debug('generating body')
-        for idx in range(self.ssp.cur.data.num_samples):
+        vi = self.ssp.cur.proc_valid
+        for idx in range(np.sum(vi)):
             self.fod.io.write("%12.4f%12.4f%12.4f%12.4f\n"
-                              % (self.ssp.cur.data.depth[idx], self.ssp.cur.data.speed[idx],
-                                 self.ssp.cur.data.sal[idx], self.ssp.cur.data.temp[idx]))
+                              % (self.ssp.cur.proc.depth[vi][idx], self.ssp.cur.proc.speed[vi][idx],
+                                 self.ssp.cur.proc.sal[vi][idx], self.ssp.cur.proc.temp[vi][idx]))

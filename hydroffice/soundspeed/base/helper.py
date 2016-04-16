@@ -90,7 +90,15 @@ class FileManager(FileInfo):
         if (not os.path.exists(data_path)) and ((mode == 'r') or (mode == 'rb')):
             raise RuntimeError('the passed file does not exist: %s' % data_path)
         super(FileManager, self).__init__(data_path=data_path)
-        self._io = open(self._path, mode=mode, encoding=encoding)
+        self._append_exists = False
+        if mode == 'a':
+            self._append_exists = os.path.exists(data_path)
+        self._io = open(self.path, mode=mode, encoding=encoding)
+
+    @property
+    def append_exists(self):
+        """Return if the file was existing before the appending operation"""
+        return self._append_exists
 
 
 def info_libs():

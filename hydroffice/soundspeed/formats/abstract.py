@@ -14,7 +14,7 @@ class AbstractFormat(object):
     __metaclass__ = ABCMeta
 
     def __init__(self):
-        self.name = self.__class__.__name__
+        self.name = self.__class__.__name__.lower()
         self.desc = "Abstract Format"  # a human-readable description
         self.version = "0.1.0"
         self._ssp = None  # profile list
