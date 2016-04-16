@@ -91,13 +91,15 @@ class SvpThread(threading.Thread):
             if len(self.ssp) == 0:
                 # If we're running but haven't received an SVP yet, then we build a fake one to send back.
                 # Useful in testing the Server mode since the library establishes comm's before starting to serve
-                num_entries = 2
+                num_entries = 3
                 depths = np.zeros(num_entries)
                 speeds = np.zeros(num_entries)
                 depths[0] = 0.0
-                speeds[0] = 1500.0
-                depths[1] = 12000.0
-                speeds[1] = 1500.0
+                speeds[0] = 1510.0
+                depths[1] = 500.0
+                speeds[1] = 1490.0
+                depths[2] = 12000.0
+                speeds[2] = 1500.0
                 logger.debug("making up a fake profile")
             else:
                 logger.debug("sending svp")

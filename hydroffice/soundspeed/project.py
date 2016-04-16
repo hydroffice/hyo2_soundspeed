@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import time
 import os
 import logging
 
@@ -13,6 +14,7 @@ from .atlas.atlases import Atlases
 from .listener.listeners import Listeners
 from .db.db import SoundSpeedDb
 from .base.gdal_aux import GdalAux
+from .profile.profilelist import ProfileList
 
 
 class Project(BaseProject):
@@ -29,6 +31,11 @@ class Project(BaseProject):
         self.progress = Progress(qprogress=qprogress, qparent=qparent)
 
         self.logging()
+
+    def close(self):
+        """Destructor"""
+        logger.debug("destroy project")
+        self.listeners.stop()
 
     # --- ssp profile
 
@@ -161,27 +168,63 @@ class Project(BaseProject):
 
     def retrieve_sis(self):
         """Retrieve data from SIS"""
+        if not self.use_sis():
+            logger.warning("use SIS option is disabled")
+            return
 
-        # utc_time = self.cb.ask_date()
-        # if utc_time is None:
-        #     logger.error("missing date required for database lookup")
-        #     return None
-        #
-        # if not self.download_rtofs(datestamp=utc_time):
-        #     logger.error("unable to download RTOFS atlas data set")
-        #     return None
-        #
-        # if not self.has_rtofs():
-        #     logger.error("missing RTOFS atlas data set")
-        #     return None
-        #
-        # lat, lon = self.cb.ask_location()
-        # if (lat is None) or (lon is None):
-        #     logger.error("missing geographic location required for database lookup")
-        #     return None
-        #
-        # self.ssp = self.atlases.rtofs.query(lat=lat, lon=lon, datestamp=utc_time)
-        return
+        self.progress.start("Retrieve from SIS")
+
+        self.listen_sis()
+
+        prog_value = 0
+        prog_quantum = 50 / len(self.setup.client_list.clients)
+
+        for client in self.setup.client_list.clients:
+            if client.protocol != "SIS":
+                continue
+
+            self.listeners.sis.request_iur(ip=client.ip, port=client.port)
+            wait = self.setup.rx_max_wait_time
+            count = 0
+            quantum = 2
+            logger.info("Waiting ..")
+            while (count < wait) and (not self.listeners.sis.ssp):
+                time.sleep(quantum)
+                count += quantum
+                logger.info(".. %s sec" % count)
+
+            self.progress.add(prog_quantum)
+
+        if not self.listeners.sis.ssp:
+            self.progress.end()
+            raise RuntimeError("Unable to get SIS cast from any clients")
+
+        # logger.info("got SSP from SIS: %s" % self.listeners.sis.ssp)
+        self.progress.update(80)
+
+        # try to retrieve the location from SIS
+        lat = None
+        lon = None
+        if self.listeners.sis.nav:
+            from_sis = self.cb.ask_location_from_sis()
+            if from_sis:
+                lat, lon = self.listeners.sis.nav.latitude, self.listeners.sis.nav.longitude
+        # if we don't have a location, ask user
+        if (lat is None) or (lon is None):
+            lat, lon = self.cb.ask_location()
+            if (lat is None) or (lon is None):
+                logger.error("missing geographic location required for database lookup")
+                self.progress.end()
+                return None
+
+        ssp = self.listeners.sis.ssp.convert_ssp()
+        ssp.meta.latitude = lat
+        ssp.meta.longitude = lon
+        ssp.clone_data_to_proc()
+        ssp_list = ProfileList()
+        ssp_list.append_profile(ssp)
+        self.ssp = ssp_list
+        self.progress.end()
 
     # --- export data
 
@@ -349,6 +392,35 @@ class Project(BaseProject):
 
     def download_woa13(self):
         return self.atlases.woa13.download_db()
+
+    # --- listeners
+
+    def use_sis(self):
+        return self.setup.use_sis
+
+    def use_sippican(self):
+        return self.setup.use_sippican
+
+    def use_mvp(self):
+        return self.setup.use_mvp
+
+    def listen_sis(self):
+        return self.listeners.listen_sis()
+
+    def listen_sippican(self):
+        return self.listeners.listen_sippican()
+
+    def listen_mvp(self):
+        return self.listeners.listen_mvp()
+
+    def stop_listen_sis(self):
+        return self.listeners.stop_listen_sis()
+
+    def stop_listen_sippican(self):
+        return self.listeners.stop_listen_sippican()
+
+    def stop_listen_mvp(self):
+        return self.listeners.stop_listen_mvp()
 
     # --- logging
 

@@ -44,7 +44,10 @@ class DataPlots(AbstractWidget):
         self.f_sz = (6.0, 3.0)  # inches
         self.vi = None  # valid indices
         self.ii = None  # invalid indices
-        self.valid_color = 'green'
+        self.draft_color = '#00cc66'
+        self.seafloor_color = '#cc6600'
+        self.sensor_color = '#00cc66'
+        self.valid_color = '#3385ff'
         self.invalid_color = '#dddddd'
         self.atlas_color = '#ffaaaa'
 
@@ -71,6 +74,9 @@ class DataPlots(AbstractWidget):
         self.sal_ax = self.f.add_subplot(133, sharey=self.speed_ax)
         self.sal_ax.invert_yaxis()
         # lines
+        self.speed_draft = None
+        self.speed_sensor = None
+        self.speed_seafloor = None
         self.speed_atlas = None
         self.temp_atlas = None
         self.sal_atlas = None
@@ -140,6 +146,9 @@ class DataPlots(AbstractWidget):
                                                self.prj.cur.proc.depth[self.vi],
                                                color=self.valid_color,
                                                picker=3)
+        self.speed_draft = self.speed_ax.axhline(y=None, linewidth=1.5, color=self.draft_color, linestyle=':')
+        self.speed_sensor = self.speed_ax.axvline(x=None, linewidth=1.5, color=self.sensor_color, linestyle=':')
+        self.speed_seafloor = self.speed_ax.axhline(y=None, linewidth=1.5, color=self.seafloor_color, linestyle=':')
         self.speed_ax.set_label("speed")
 
     def _draw_temp(self):
@@ -228,6 +237,27 @@ class DataPlots(AbstractWidget):
             self._draw_sal()
 
         self._draw_grid()
+
+        # limits
+        if self.prj.use_sis():  # in case of SIS enabled
+            if self.prj.listeners.sis.xyz88:
+                y_limits = self.speed_ax.get_ylim()
+                x_limits = self.speed_ax.get_xlim()
+                print(y_limits, x_limits)
+                # y-limits
+                mean_depth = self.prj.listeners.sis.xyz88.mean_depth
+                if mean_depth:
+                    mean_depth *= 0.1
+                else:
+                    mean_depth = 0
+                if mean_depth > y_limits[0]:
+                    max_depth = mean_depth
+                else:
+                    max_depth = y_limits[0]
+                self.speed_ax.set_ylim([max_depth, -30])
+                # x-limits
+                # TODO
+
         self.c.draw()
 
     def update_data(self):
@@ -248,6 +278,49 @@ class DataPlots(AbstractWidget):
         self.sal_valid.set_ydata(self.prj.cur.proc.depth[self.vi])
         self.sal_invalid.set_xdata(self.prj.cur.proc.sal[self.ii])
         self.sal_invalid.set_ydata(self.prj.cur.proc.depth[self.ii])
+
+        if not self.prj.use_sis():  # in case that SIS was disabled
+            self.speed_draft.set_ydata(None)
+            self.speed_sensor.set_xdata(None)
+            return
+
+        if self.prj.listeners.sis.xyz88 is None:
+            self.speed_draft.set_ydata(None)
+            self.speed_sensor.set_xdata(None)
+        else:
+            # sensor speed
+            if self.prj.listeners.sis.xyz88.sound_speed is None:
+                self.speed_sensor.set_xdata(None)
+            else:
+                self.speed_sensor.set_xdata([self.prj.listeners.sis.xyz88.sound_speed, ])
+            # draft
+            if self.prj.listeners.sis.xyz88.transducer_draft is None:
+                self.speed_draft.set_ydata(None)
+            else:
+                self.speed_draft.set_ydata([self.prj.listeners.sis.xyz88.transducer_draft, ])
+            # seafloor
+            mean_depth = self.prj.listeners.sis.xyz88.mean_depth
+            if mean_depth:
+                self.speed_seafloor.set_ydata([mean_depth, ])
+            else:
+                self.speed_seafloor.set_ydata(None)
+
+    def redraw(self):
+        """Redraw the canvases, update the locators"""
+        for a in self.c.figure.get_axes():
+            xaxis = getattr(a, 'xaxis', None)
+            yaxis = getattr(a, 'yaxis', None)
+            locators = []
+            if xaxis is not None:
+                locators.append(xaxis.get_major_locator())
+                locators.append(xaxis.get_minor_locator())
+            if yaxis is not None:
+                locators.append(yaxis.get_major_locator())
+                locators.append(yaxis.get_minor_locator())
+
+            for loc in locators:
+                loc.refresh()
+        self.c.draw_idle()
 
     def update_validity_indices(self):
         self.vi = self.prj.cur.proc_valid  # valid indices

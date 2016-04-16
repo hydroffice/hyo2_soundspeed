@@ -218,19 +218,19 @@ class Profile(object):
             # print('new depth')
             if depth < self.proc.depth[valid][0]:
                 m_ids = [0, 1]
-                print('before beginning: %s' % j)
+                # print('before beginning: %s' % j)
 
             elif depth > self.proc.depth[valid][-1]:
                 j += 1
                 m_ids = [-2, -1]
-                print('after end')
+                # print('after end')
 
             else:
                 if self.proc.depth[valid][v_i] < depth:
                     m_ids = [v_i, v_i + 1]
                 else:
                     m_ids = [v_i - 1, v_i]
-                print('in the middle')
+                # print('in the middle')
 
             # interpolate for temp
             di = np.array([self.proc.depth[valid][m_ids[0]], self.proc.depth[valid][m_ids[1]]])

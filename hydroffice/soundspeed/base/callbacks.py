@@ -22,6 +22,11 @@ class AbstractCallbacks(object):
         """Ask user for location"""
         pass
 
+    @abstractmethod
+    def ask_location_from_sis(self):
+        """Ask user for location"""
+        pass
+
 
 class TestCallbacks(AbstractCallbacks):
     """Used only for testing since the methods do not require user interaction"""
@@ -30,6 +35,9 @@ class TestCallbacks(AbstractCallbacks):
 
     def ask_location(self):
         return 43.13555 + random.random(), -70.9395 + random.random()
+
+    def ask_location_from_sis(self):
+        return True
 
 
 class Callbacks(AbstractCallbacks):
@@ -118,3 +126,14 @@ class Callbacks(AbstractCallbacks):
                 continue
 
         return lat, lon
+
+    def ask_location_from_sis(self):
+        """Ask user whether retrieving location from SIS"""
+        bool_msg = "Geographic location required for pressure/depth conversion and atlas lookup.\n" \
+                   "Use geographic position from SIS?\'y' for yes, other inputs to enter position manually."
+
+        raw = raw_input(bool_msg)
+        # print(raw)
+        if (raw == "Y") or (raw == "y"):
+            return True
+        return False

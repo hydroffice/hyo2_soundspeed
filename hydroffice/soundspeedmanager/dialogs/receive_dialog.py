@@ -52,7 +52,7 @@ class ReceiveDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = "Issue in importing the data:\n\n> %s" % e
-            QtGui.QMessageBox.critical(self, "Import error", msg, QtGui.QMessageBox.Ok)
+            QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
             return
 
         self.accept()
@@ -64,7 +64,7 @@ class ReceiveDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = "Issue in importing the data:\n\n> %s" % e
-            QtGui.QMessageBox.critical(self, "Import error", msg, QtGui.QMessageBox.Ok)
+            QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
             return
 
         self.accept()
@@ -76,19 +76,24 @@ class ReceiveDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = "Issue in importing the data:\n\n> %s" % e
-            QtGui.QMessageBox.critical(self, "Import error", msg, QtGui.QMessageBox.Ok)
+            QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
             return
 
         self.accept()
 
     def on_click_sis(self):
         """Retrieve SIS data"""
+        if not self.prj.use_sis():
+            msg = "The SIS listening is not activated!\n\nGo to Settings/Input/Listen SIS"
+            QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
+            return
+
         try:
             self.prj.retrieve_sis()
 
         except RuntimeError as e:
-            msg = "Issue in retrieving data from SIS:\n\n> %s" % e
-            QtGui.QMessageBox.critical(self, "Import error", msg, QtGui.QMessageBox.Ok)
+            msg = "Issue in retrieving data from SIS:\n\n%s" % e
+            QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
             return
 
         self.accept()

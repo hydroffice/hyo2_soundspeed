@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import math
 import os
 import sys
 
@@ -67,6 +68,9 @@ class MainWin(QtGui.QMainWindow):
         self.check_woa09()
         self.check_woa13()
         # self.check_rtofs()  # no need to wait for the download at the beginning
+        self.check_sis()
+        self.check_sippican()
+        self.check_mvp()
 
         # init default settings
         settings = QtCore.QSettings()
@@ -82,30 +86,36 @@ class MainWin(QtGui.QMainWindow):
         self.setCentralWidget(self.tabs)
         self.tabs.setIconSize(QtCore.QSize(45, 45))
         # editor
-        self.tabEditor = Editor(prj=self.prj, main_win=self)
-        idx = self.tabs.insertTab(0, self.tabEditor,
+        self.tab_editor = Editor(prj=self.prj, main_win=self)
+        idx = self.tabs.insertTab(0, self.tab_editor,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'editor.png')), "")
         self.tabs.setTabToolTip(idx, "Editor")
         # database
-        self.tabDatabase = Database(prj=self.prj, main_win=self)
-        idx = self.tabs.insertTab(1, self.tabDatabase,
+        self.tab_database = Database(prj=self.prj, main_win=self)
+        idx = self.tabs.insertTab(1, self.tab_database,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'database.png')), "")
         self.tabs.setTabToolTip(idx, "Database")
         # server
-        self.tabServer = Server(prj=self.prj, main_win=self)
-        idx = self.tabs.insertTab(2, self.tabServer,
+        self.tab_server = Server(prj=self.prj, main_win=self)
+        idx = self.tabs.insertTab(2, self.tab_server,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'server.png')), "")
         self.tabs.setTabToolTip(idx, "Server")
         # server
-        self.tabSettings = Settings(prj=self.prj, main_win=self)
-        idx = self.tabs.insertTab(3, self.tabSettings,
+        self.tab_settings = Settings(prj=self.prj, main_win=self)
+        idx = self.tabs.insertTab(3, self.tab_settings,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'settings.png')), "")
         self.tabs.setTabToolTip(idx, "Settings")
         # info
-        self.tabInfo = Info(default_url='http://www.hydroffice.org/soundspeed/')
-        idx = self.tabs.insertTab(4, self.tabInfo,
+        self.tab_info = Info(default_url='http://www.hydroffice.org/soundspeed/')
+        idx = self.tabs.insertTab(4, self.tab_info,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'info.png')), "")
         self.tabs.setTabToolTip(idx, "Info")
+
+        self.statusBar().setStyleSheet("QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;}")
+        self.statusBar().showMessage("%s" % ssm_version, 2000)
+        timer = QtCore.QTimer(self)
+        timer.timeout.connect(self.update_gui)
+        timer.start(1500)
 
         self.data_cleared()
 
@@ -206,29 +216,146 @@ class MainWin(QtGui.QMainWindow):
             QtGui.QMessageBox.warning(self, "Sound Speed Manager - RTOFS Atlas", msg,
                                       QtGui.QMessageBox.Ok)
 
+    def check_sis(self):
+        if self.prj.use_sis():
+            if not self.prj.listen_sis():
+                msg = 'Unable to listening SIS.'
+                QtGui.QMessageBox.warning(self, "Sound Speed Manager - SIS", msg,
+                                          QtGui.QMessageBox.Ok)
+        else:
+            if not self.prj.stop_listen_sis():
+                msg = 'Unable to stop listening SIS.'
+                QtGui.QMessageBox.warning(self, "Sound Speed Manager - SIS", msg,
+                                          QtGui.QMessageBox.Ok)
+
+    def check_sippican(self):
+        if self.prj.use_sippican():
+            if not self.prj.listen_sippican():
+                msg = 'Unable to listening Sippican.'
+                QtGui.QMessageBox.warning(self, "Sound Speed Manager - Sippican", msg,
+                                          QtGui.QMessageBox.Ok)
+        else:
+            if not self.prj.stop_listen_sippican():
+                msg = 'Unable to stop listening Sippican.'
+                QtGui.QMessageBox.warning(self, "Sound Speed Manager - Sippican", msg,
+                                          QtGui.QMessageBox.Ok)
+
+    def check_mvp(self):
+        if self.prj.use_mvp():
+            if not self.prj.listen_mvp():
+                msg = 'Unable to listening MVP.'
+                QtGui.QMessageBox.warning(self, "Sound Speed Manager - MVP", msg,
+                                          QtGui.QMessageBox.Ok)
+        else:
+            if not self.prj.stop_listen_mvp():
+                msg = 'Unable to stop listening MVP.'
+                QtGui.QMessageBox.warning(self, "Sound Speed Manager - MVP", msg,
+                                          QtGui.QMessageBox.Ok)
+
     def data_cleared(self):
-        self.tabEditor.data_cleared()
-        self.tabDatabase.data_cleared()
-        self.tabServer.data_cleared()
-        self.tabSettings.data_cleared()
+        self.tab_editor.data_cleared()
+        self.tab_database.data_cleared()
+        self.tab_server.data_cleared()
+        self.tab_settings.data_cleared()
 
     def data_imported(self):
-        self.tabEditor.data_imported()
-        self.tabDatabase.data_imported()
-        self.tabServer.data_imported()
-        self.tabSettings.data_imported()
+        self.tab_editor.data_imported()
+        self.tab_database.data_imported()
+        self.tab_server.data_imported()
+        self.tab_settings.data_imported()
 
     def data_stored(self):
-        self.tabEditor.data_stored()
-        self.tabDatabase.data_stored()
-        self.tabServer.data_stored()
-        self.tabSettings.data_stored()
+        self.tab_editor.data_stored()
+        self.tab_database.data_stored()
+        self.tab_server.data_stored()
+        self.tab_settings.data_stored()
 
     def data_removed(self):
-        self.tabEditor.data_removed()
-        self.tabDatabase.data_removed()
-        self.tabServer.data_removed()
-        self.tabSettings.data_removed()
+        self.tab_editor.data_removed()
+        self.tab_database.data_removed()
+        self.tab_server.data_removed()
+        self.tab_settings.data_removed()
+
+    def update_gui(self):
+        msg = str()
+
+        tokens = list()
+        if self.prj.use_rtofs():
+            tokens.append("RTF")
+        if self.prj.use_woa09():
+            tokens.append("W09")
+        if self.prj.use_woa13():
+            tokens.append("W13")
+        if self.prj.use_sippican():
+            tokens.append("SIP")
+        if self.prj.use_mvp():
+            tokens.append("MVP")
+        if self.prj.use_sis():
+            tokens.append("SIS")
+        msg += "|".join(tokens)
+
+        if not self.prj.use_sis():  # in case that SIS was disabled
+            self.statusBar().showMessage(msg, 1000)
+            return
+
+        msg += "  -  "  # add some spacing
+
+        if self.prj.listeners.sis.nav is not None:
+            # time stamp
+            msg += "time:"
+            if self.prj.listeners.sis.nav.dg_time is not None:
+                msg += "%s, " % (self.prj.listeners.sis.nav.dg_time.strftime("%H:%M:%S"))
+
+            else:
+                msg += "NA, "
+
+            # position
+            msg += "pos:"
+            if (self.prj.listeners.sis.nav.latitude is not None) and (self.prj.listeners.sis.nav.longitude is not None):
+
+                latitude = self.prj.listeners.sis.nav.latitude
+                if latitude >= 0:
+                    letter = "N"
+                else:
+                    letter = "S"
+                lat_min = float(60 * math.fabs(latitude - int(latitude)))
+                lat_str = "%02d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(latitude)), lat_min, letter)
+
+                longitude = self.prj.listeners.sis.nav.longitude
+                if longitude < 0:
+                    letter = "W"
+                else:
+                    letter = "E"
+                lon_min = float(60 * math.fabs(longitude - int(longitude)))
+                lon_str = "%03d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(longitude)), lon_min, letter)
+
+                msg += "(%s, %s),  " % (lat_str, lon_str)
+
+            else:
+                msg += "(NA, NA),  "
+
+        if self.prj.listeners.sis.xyz88 is not None:
+            msg += 'tss:'
+            if self.prj.listeners.sis.xyz88.sound_speed is not None:
+                msg += '%.1f m/s,  ' % self.prj.listeners.sis.xyz88.sound_speed
+
+            else:
+                msg += 'NA m/s,  '
+
+            msg += 'avg.depth:'
+            mean_depth = self.prj.listeners.sis.xyz88.mean_depth
+            if mean_depth:
+                msg += '%.1f m' % mean_depth
+            else:
+                msg += 'NA m'
+
+        else:
+            msg += 'XYZ88 NA [pinging?]'
+
+        self.statusBar().showMessage(msg, 2000)
+        if self.prj.has_ssp():
+            self.tab_editor.dataplots.update_data()
+            self.tab_editor.dataplots.redraw()
 
     # Quitting #
 
@@ -247,6 +374,7 @@ class MainWin(QtGui.QMainWindow):
         # reply = QtGui.QMessageBox.Yes
         if reply == QtGui.QMessageBox.Yes:
             event.accept()
+            self.prj.close()
             super(MainWin, self).closeEvent(event)
         else:
             event.ignore()

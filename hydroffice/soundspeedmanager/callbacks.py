@@ -16,9 +16,6 @@ class Callbacks(AbstractCallbacks):
         self.parent = parent
 
     def ask_location(self):
-        lat = None
-        lon = None
-
         # latitude
         lat, ok = QtGui.QInputDialog.getDouble(self.parent, "Location", "Enter latitude as dd.ddd:",
                                                37.540, -90.0, 90.0, 7)
@@ -34,6 +31,15 @@ class Callbacks(AbstractCallbacks):
             return None, None
 
         return lat, lon
+
+    def ask_location_from_sis(self):
+        msg = "Geographic location required for pressure/depth conversion and atlas lookup.\n" \
+              "Use geographic position from SIS?\nChoose 'no' to enter position manually."
+        ret = QtGui.QMessageBox.information(self.parent, "Location", msg,
+                                            QtGui.QMessageBox.Ok | QtGui.QMessageBox.No)
+        if ret == QtGui.QMessageBox.No:
+            return False
+        return True
 
     def ask_date(self):
         """Ask user for date"""

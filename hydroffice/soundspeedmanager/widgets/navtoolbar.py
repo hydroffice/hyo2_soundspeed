@@ -40,7 +40,7 @@ class NavToolbar(NavigationToolbar2QT):
         self.unflag_action = None
         self.insert_action = None
         self.insert_sample = None
-        self.insLabel = None
+        self.mon_label = None
 
         self._ids_flag = None
         self._flag_mode = None
@@ -74,7 +74,7 @@ class NavToolbar(NavigationToolbar2QT):
 
         for text, tooltip_text, image_file, callback in self.toolitems:
             if text == 'Home':
-                home_action = self.addAction(self._icon('home.png'), 'Home', self.home)
+                home_action = self.addAction(self._icon('home.png'), 'Reset view', self.home)
                 home_action.setToolTip('Reset view')
                 self._actions['home'] = home_action
             elif text == 'Back':
@@ -162,10 +162,10 @@ class NavToolbar(NavigationToolbar2QT):
             self.locLabel.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
             vbox.addWidget(self.locLabel)
             # - insert label
-            self.insLabel = QtWidgets.QLabel("", self)
-            self.insLabel.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
-            self.insLabel.setStyleSheet("QLabel { color : red; }")
-            vbox.addWidget(self.insLabel)
+            self.mon_label = QtWidgets.QLabel("", self)
+            self.mon_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
+            self.mon_label.setStyleSheet("QLabel { color : red; }")
+            vbox.addWidget(self.mon_label)
             # vbox.addStretch()
         # reference holder for subplots_adjust window
         self.adj_window = None
@@ -183,10 +183,11 @@ class NavToolbar(NavigationToolbar2QT):
     # ### actions ###
 
     def press(self, event):
-        print("press", event.button)
+        # print("press", event.button)
         if event.button == 3:
             menu = QtGui.QMenu(self)
             menu.addAction(self._actions['home'])
+            menu.addSeparator()
             menu.addAction(self._actions['pan'])
             menu.addAction(self._actions['scale'])
             menu.addAction(self._actions['zoom_in'])
@@ -278,16 +279,16 @@ class NavToolbar(NavigationToolbar2QT):
                         msg += ", s:%.2f]" % event.xdata
                     else:
                         msg += ", s:*]"
-                self.insLabel.setText(msg)
+                self.mon_label.setText(msg)
             else:
-                self.insLabel.setText('')
+                self.mon_label.setText('')
 
         else:
             if self.mode:
                 self.set_message('%s' % self.mode)
             else:
                 self.set_message('')
-            self.insLabel.setText('')
+            self.mon_label.setText('')
 
     def _set_cursor(self, event):
         """Set cursor by mode"""
@@ -772,7 +773,15 @@ class NavToolbar(NavigationToolbar2QT):
         # logger.debug("FLAG > x: %.3f %.3f, y: %.3f %.3f" % (min_xd, max_xd, min_yd, max_yd))
 
         # actually do the flagging
-        selected = np.logical_and(self.prj.cur.proc.depth > min_yd, self.prj.cur.proc.depth < max_yd)
+        plt_label = event.inaxes.get_label()
+        y_selected = np.logical_and(self.prj.cur.proc.depth > min_yd, self.prj.cur.proc.depth < max_yd)
+        if plt_label == 'speed':
+            x_selected = np.logical_and(self.prj.cur.proc.speed > min_xd, self.prj.cur.proc.speed < max_xd)
+        elif plt_label == 'temp':
+            x_selected = np.logical_and(self.prj.cur.proc.temp > min_xd, self.prj.cur.proc.temp < max_xd)
+        else:  # sal
+            x_selected = np.logical_and(self.prj.cur.proc.sal > min_xd, self.prj.cur.proc.sal < max_xd)
+        selected = np.logical_and(y_selected, x_selected)
         self.prj.cur.proc.flag[np.logical_and(self.plot_win.vi, selected)] = Dicts.flags['user']
         self.plot_win.update_data()
 
@@ -870,7 +879,15 @@ class NavToolbar(NavigationToolbar2QT):
         min_yd, max_yd = max(min_yd, yd1), min(max_yd, yd2)
         # logger.debug("UNFLAG > x: %.3f %.3f, y: %.3f %.3f" % (min_xd, max_xd, min_yd, max_yd))
 
-        selected = np.logical_and(self.prj.cur.proc.depth > min_yd, self.prj.cur.proc.depth < max_yd)
+        plt_label = event.inaxes.get_label()
+        y_selected = np.logical_and(self.prj.cur.proc.depth > min_yd, self.prj.cur.proc.depth < max_yd)
+        if plt_label == 'speed':
+            x_selected = np.logical_and(self.prj.cur.proc.speed > min_xd, self.prj.cur.proc.speed < max_xd)
+        elif plt_label == 'temp':
+            x_selected = np.logical_and(self.prj.cur.proc.temp > min_xd, self.prj.cur.proc.temp < max_xd)
+        else:  # sal
+            x_selected = np.logical_and(self.prj.cur.proc.sal > min_xd, self.prj.cur.proc.sal < max_xd)
+        selected = np.logical_and(y_selected, x_selected)
         self.prj.cur.proc.flag[np.logical_and(self.plot_win.ii, selected)] = Dicts.flags['valid']
         self.plot_win.update_data()
 

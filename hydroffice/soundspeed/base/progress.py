@@ -35,6 +35,12 @@ class Progress(object):
             if text:
                 self._prog.setLabelText(text)
 
+    def add(self, value, text=None):
+        if self.qt:
+            self._prog.setValue(self._prog.value() + value)
+            if text:
+                self._prog.setLabelText(text)
+
     def end(self):
         if self.qt:
             self._prog.setValue(100)
