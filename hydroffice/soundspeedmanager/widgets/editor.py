@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import os
+import copy
 import logging
 
 from PySide import QtGui, QtCore
@@ -104,6 +105,11 @@ class Editor(AbstractWidget):
         self.save_db_act.setShortcut('Alt+D')
         self.save_db_act.triggered.connect(self.on_save_db)
         self.file_bar.addAction(self.save_db_act)
+        # set ref
+        self.set_ref_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'ref.png')), 'Set as reference', self)
+        self.set_ref_act.setShortcut('Alt+R')
+        self.set_ref_act.triggered.connect(self.on_set_ref)
+        self.file_bar.addAction(self.set_ref_act)
 
         # plots
         self.dataplots = DataPlots(main_win=self.main_win, prj=self.prj)
@@ -156,6 +162,13 @@ class Editor(AbstractWidget):
 
     def on_retrieve_sal(self):
         logger.debug('user wants to retrieve salinity')
+
+        if self.prj.cur.meta.sensor_type != Dicts.sensor_types['XBT']:
+            msg = "This is a XBT-specific function!"
+            QtGui.QMessageBox.warning(self, "Salinity", msg, QtGui.QMessageBox.Ok)
+            return
+
+
 
     def on_retrieve_temp_sal(self):
         logger.debug('user wants to retrieve temp/sal')
@@ -216,6 +229,15 @@ class Editor(AbstractWidget):
             return
         else:
             self.main_win.data_stored()
+
+    def on_set_ref(self):
+        logger.debug('user wants to set as a reference')
+        if not self.prj.has_ssp():
+            logger.debug('cleaning reference')
+            self.prj.ref = None
+        else:
+            logger.debug('cloning current profile')
+            self.prj.ref = copy.deepcopy(self.prj.ssp)
 
     def data_cleared(self):
         # dialogs

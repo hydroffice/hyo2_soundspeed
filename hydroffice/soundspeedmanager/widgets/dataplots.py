@@ -176,9 +176,9 @@ class DataPlots(AbstractWidget):
                                                    color=self.rtofs_color,
                                                    linestyle='--'
                                                    )
-        if self.prj.cur.ref:
-            self.speed_ref, = self.speed_ax.plot(self.prj.cur.ref.l[0].proc.speed,
-                                                 self.prj.cur.ref.l[0].proc.depth,
+        if self.prj.has_ref():
+            self.speed_ref, = self.speed_ax.plot(self.prj.ref.l[0].proc.speed,
+                                                 self.prj.ref.l[0].proc.depth,
                                                  color=self.ref_color,
                                                  linestyle='--'
                                                  )
@@ -244,9 +244,9 @@ class DataPlots(AbstractWidget):
                                                  color=self.rtofs_color,
                                                  linestyle='--'
                                                  )
-        if self.prj.cur.ref:
-            self.temp_ref, = self.temp_ax.plot(self.prj.cur.ref.l[0].proc.temp,
-                                               self.prj.cur.ref.l[0].proc.depth,
+        if self.prj.has_ref():
+            self.temp_ref, = self.temp_ax.plot(self.prj.ref.l[0].proc.temp,
+                                               self.prj.ref.l[0].proc.depth,
                                                color=self.ref_color,
                                                linestyle='--'
                                                )
@@ -311,9 +311,9 @@ class DataPlots(AbstractWidget):
                                                color=self.rtofs_color,
                                                linestyle='--'
                                                )
-        if self.prj.cur.ref:
-            self.sal_ref, = self.sal_ax.plot(self.prj.cur.ref.l[0].proc.sal,
-                                             self.prj.cur.ref.l[0].proc.depth,
+        if self.prj.has_ref():
+            self.sal_ref, = self.sal_ax.plot(self.prj.ref.l[0].proc.sal,
+                                             self.prj.ref.l[0].proc.depth,
                                              color=self.ref_color,
                                              linestyle='--'
                                              )

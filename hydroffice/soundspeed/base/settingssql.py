@@ -59,9 +59,9 @@ CREATE_SETTINGS = """ CREATE TABLE IF NOT EXISTS general(
      CHECK (use_woa09 IN ("True", "False")),
      CHECK (use_woa13 IN ("True", "False")),
      CHECK (use_rtofs IN ("True", "False")),
-     CHECK (ssp_extension_source IN ("RTOFS", "WOA09", "WOA13")),
-     CHECK (ssp_salinity_source IN ("RTOFS", "WOA09", "WOA13")),
-     CHECK (ssp_temp_sal_source IN ("RTOFS", "WOA09", "WOA13")),
+     CHECK (ssp_extension_source IN ("RTOFS", "WOA09", "WOA13", "ref")),
+     CHECK (ssp_salinity_source IN ("RTOFS", "WOA09", "WOA13", "ref")),
+     CHECK (ssp_temp_sal_source IN ("RTOFS", "WOA09", "WOA13", "ref")),
      CHECK (ssp_up_or_down IN ("down", "up")),
      CHECK (rx_max_wait_time > 0),
      CHECK (use_sis IN ("True", "False")),
@@ -87,7 +87,7 @@ CREATE_SETTINGS = """ CREATE TABLE IF NOT EXISTS general(
      CHECK (mvp_format IN ("S12", "CALC", "ASVP")),
      CHECK (mvp_instrument IN ("AML_uSVP", "AML_uSVPT", "AML_Smart_SVP", "AML_uCTD", "AML_uCTD+", "Valeport_SVPT", "SBE_911+", "SBE_49")),
      /* server */
-     CHECK (server_source IN ("RTOFS", "WOA09", "WOA13")),
+     CHECK (server_source IN ("RTOFS", "WOA09", "WOA13", "ref")),
      CHECK (server_append_caris_file IN ("True", "False")),
      CHECK (server_apply_surface_sound_speed IN ("True", "False")),
      CHECK (server_auto_export_on_send IN ("True", "False"))

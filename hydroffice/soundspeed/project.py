@@ -26,6 +26,7 @@ class Project(BaseProject):
         self.setup = Settings(data_folder=self.data_folder)
         self.cb = Callbacks()
         self.ssp = None
+        self.ref = None  # reference profile
         self.atlases = Atlases(prj=self)
         self.listeners = Listeners(prj=self)
         self.progress = Progress(qprogress=qprogress, qparent=qparent)
@@ -67,6 +68,11 @@ class Project(BaseProject):
 
     def has_ssp(self):
         if self.cur is None:
+            return False
+        return True
+
+    def has_ref(self):
+        if self.ref is None:
             return False
         return True
 

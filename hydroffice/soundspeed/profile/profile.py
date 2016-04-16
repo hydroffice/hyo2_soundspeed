@@ -26,7 +26,6 @@ class Profile(object):
         self.woa09 = None
         self.woa13 = None
         self.rtofs = None
-        self.ref = None
 
     def __repr__(self):
         msg = "<Profile>\n"

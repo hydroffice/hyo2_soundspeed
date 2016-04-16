@@ -100,7 +100,8 @@ class Dicts(object):
     atlases = OrderedDict([
         ("WOA09", 0),
         ("WOA13", 1),
-        ("RTOFS", 2)
+        ("RTOFS", 2),
+        ("ref", 3),
     ])
 
     mvp_protocols = OrderedDict([
