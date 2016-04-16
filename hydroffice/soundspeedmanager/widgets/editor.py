@@ -15,6 +15,8 @@ from ..dialogs.metadata_dialog import MetadataDialog
 from ..dialogs.export_dialog import ExportDialog
 from .dataplots import DataPlots
 
+from hydroffice.soundspeed.profile.dicts import Dicts
+
 
 class Editor(AbstractWidget):
 
@@ -236,9 +238,19 @@ class Editor(AbstractWidget):
         self.clear_act.setDisabled(False)
         self.spreadsheet_act.setDisabled(False)
         self.metadata_act.setDisabled(False)
-        self.sal_act.setDisabled(False)
-        self.temp_sal_act.setDisabled(False)
-        self.tss_act.setDisabled(False)
+        if self.prj.cur.meta.sensor_type == Dicts.sensor_types['XBT']:
+            self.sal_act.setDisabled(False)
+        else:
+            self.sal_act.setDisabled(True)
+        if (self.prj.cur.meta.sensor_type == Dicts.sensor_types['XSV']) or \
+            (self.prj.cur.meta.sensor_type == Dicts.sensor_types['SVP']):
+            self.temp_sal_act.setDisabled(False)
+        else:
+            self.temp_sal_act.setDisabled(True)
+        if self.prj.use_sis():
+            self.tss_act.setDisabled(False)
+        else:
+            self.tss_act.setDisabled(True)
         self.extend_act.setDisabled(False)
         self.thin_act.setDisabled(False)
         self.export_act.setDisabled(False)

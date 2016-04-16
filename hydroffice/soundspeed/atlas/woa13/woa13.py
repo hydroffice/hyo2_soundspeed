@@ -95,14 +95,16 @@ class Woa13(AbstractAtlas):
                 self.s.append(Dataset(s_path))
 
             self.lat = self.t[0].variables['lat'][:]
-            lon = self.t[0].variables['lon'][:]
-            self.lon = np.vstack((lon[lon.size // 2:], lon[:lon.size // 2]))
+            self.lon = self.t[0].variables['lon'][:]
+            # self.lon = np.hstack((lon[lon.size // 2:], lon[:lon.size // 2]))
             csv_iter = csv.reader(open((os.path.join(self.folder, "landsea_04.msk"))))
             next(csv_iter)  # skip firs header row
             next(csv_iter)   # skip another header row
             landsea = np.asarray([float(data[2]) for data in csv_iter])
             # print(landsea.shape, lons.size, lats.size)
-            self.landsea = landsea.reshape((self.lat.size, self.lon.size))
+            landsea = landsea.reshape((self.lat.size, self.lon.size))
+            splitted = np.vsplit(landsea, 2)
+            self.landsea = np.vstack((splitted[1], splitted[0]))
             # from matplotlib import pyplot
             # pyplot.imshow(self.landsea, origin='lower')
             # pyplot.show()
@@ -118,8 +120,8 @@ class Woa13(AbstractAtlas):
 
     def grid_coords(self, lat, lon):
         """This does a nearest neighbour lookup"""
-        lat_idx = (np.abs(self.lat - lat)).argmin()
-        lon_idx = (np.abs(self.lon - lon)).argmin()
+        lat_idx = np.abs((self.lat - lat)).argmin()
+        lon_idx = np.abs((self.lon - lon)).argmin()
         logger.debug("grid coords: %s %s" % (lat_idx, lon_idx))
         return lat_idx, lon_idx
 
@@ -200,8 +202,9 @@ class Woa13(AbstractAtlas):
         for this_lat_index in lat_offsets:
             for this_lon_index in lon_offsets:
 
-                if this_lon_index >= self.t[self.month_idx].variables['lon'].size:
-                    this_lon_index -= self.t[self.month_idx].variables['lon'].size
+                if this_lon_index >= self.lon.size:
+                    # logger.debug("[%s] >= [%s]" % (this_lon_index, self.t[self.month_idx].variables['lon'].size))
+                    this_lon_index -= self.lat.size
 
                 # Check to see if we're at sea or on land
                 if self.landsea[this_lat_index][this_lon_index] == 1:
@@ -213,8 +216,9 @@ class Woa13(AbstractAtlas):
                     continue
 
                 # calculate the distance to the grid node
-                dist = self.g.distance(lon, lat, self.t[self.month_idx].variables['lon'][this_lon_index],
-                                       self.t[self.month_idx].variables['lat'][this_lat_index])
+                dist = self.g.distance(lon, lat, self.lon[this_lon_index], self.lat[this_lat_index])
+                # logger.debug("[%s %s] [%s %s]" % (self.lon.shape, self.lat.shape, this_lon_index, this_lat_index))
+                # logger.debug("dist: %s" % dist)
 
                 # Keep track of the closest valid grid node to report the pseudo-cast position
                 if dist < min_dist:
@@ -243,16 +247,20 @@ class Woa13(AbstractAtlas):
 
                 # For each element in the profile, only keep those whose distance is closer than values
                 # found from previous iterations (maintain the closest value at each depth level)
+                # logger.debug("profile sz: %d\n%s" % (t_profile2.size, t_profile2))
                 for i in range(t_profile2.size):
-                    if (dist < dist_arr[i]) and (t_profile2[i] < 50.0) and \
-                            (s_profile2[i] < 500.0) and (s_profile2[i] >= 0):
+                    if dist >= dist_arr[i]:
+                        continue
+                    if (t_profile2[i] < 50.0) and (s_profile2[i] < 500.0) and (s_profile2[i] >= 0):
                         t[i] = t_profile2[i]
                         s[i] = s_profile2[i]
                         dist_arr[i] = dist
 
                 # Now do the same thing for the temperature standard deviations
                 for i in range(t_sd_profile2.size):
-                    if (dist < dist_t_sd[i]) and (t_sd_profile2[i] < 50.0) and (t_sd_profile2[i] > -2):
+                    if dist >= dist_t_sd[i]:
+                        continue
+                    if (t_sd_profile2[i] < 50.0) and (t_sd_profile2[i] > -2):
                         t_min[i] = t_profile2[i] - t_sd_profile2[i]
                         if t_min[i] < -2.0:  # can't have overly cold water
                             t_min[i] = -2.0
@@ -261,7 +269,9 @@ class Woa13(AbstractAtlas):
 
                 # Now do the same thing for the salinity standard deviations
                 for i in range(s_sd_profile2.size):
-                    if (dist < dist_s_sd[i]) and (s_sd_profile2[i] < 500.0) and (s_sd_profile2[i] >= 0):
+                    if dist >= dist_s_sd[i]:
+                        continue
+                    if (s_sd_profile2[i] < 500.0) and (s_sd_profile2[i] >= 0):
                         s_min[i] = s_profile2[i] - s_sd_profile2[i]
                         if s_min[i] < 0:  # Can't have a negative salinity
                             s_min[i] = 0
@@ -278,10 +288,11 @@ class Woa13(AbstractAtlas):
             self.prj.progress.end()
             return None
 
-        lat_out = self.t[self.month_idx].variables['lat'][lat_idx]
-        lon_out = self.t[self.month_idx].variables['lon'][lon_idx]
+        lat_out = self.lat[lat_idx]
+        lon_out = self.lon[lon_idx]
         valid = dist_arr != 99999999
         num_values = t[valid].size
+        logger.debug("valid: %s" % num_values)
 
         # populate output profiles
         ssp = Profile()
@@ -344,6 +355,8 @@ class Woa13(AbstractAtlas):
         if ssp_max:
             profiles.append_profile(ssp_max)
         profiles.current_index = 0
+
+        # logger.debug("retrieved: %s" % profiles)
 
         self.prj.progress.end()
         return profiles

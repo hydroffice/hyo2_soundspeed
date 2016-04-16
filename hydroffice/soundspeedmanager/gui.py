@@ -17,6 +17,6 @@ def gui():
 
     main = mainwin.MainWin()
     main.show()
-    # main.do()
+    main.do()
 
     sys.exit(app.exec_())
