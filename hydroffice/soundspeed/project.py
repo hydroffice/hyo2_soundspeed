@@ -32,6 +32,8 @@ class Project(BaseProject):
         self.listeners = Listeners(prj=self)
         self.progress = Progress(qprogress=qprogress, qparent=qparent)
 
+        self.time_of_last_tx = None
+
         self.logging()
 
     def close(self):
@@ -616,6 +618,26 @@ class Project(BaseProject):
 
     def stop_listen_mvp(self):
         return self.listeners.stop_listen_mvp()
+
+    # --- senders
+
+    def transmit_ssp(self):
+        """Add the transducer sound speed to the current profile"""
+        if not self.has_ssp():
+            logger.warning("no profile!")
+            return False
+
+        # loop through the client list
+        success = False
+        for client in self.setup.client_list.clients:
+            success = self.send_cast(client)
+
+        return True
+
+    def send_cast(self, client):
+        logger.info("Transmitting cast to %s (port: %d)" % (client.ip, client.port))
+
+        return True
 
     # --- logging
 

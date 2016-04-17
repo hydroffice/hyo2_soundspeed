@@ -255,6 +255,13 @@ class Editor(AbstractWidget):
             QtGui.QMessageBox.warning(self, "Transmit warning", msg, QtGui.QMessageBox.Ok)
             return
 
+        if not self.prj.transmit_ssp():
+            msg = "Issue in profile transmission"
+            QtGui.QMessageBox.warning(self, "Profile transmission", msg, QtGui.QMessageBox.Ok)
+            return
+
+        self.dataplots.update_data()
+
     def on_save_db(self):
         logger.debug('user wants to save data to db')
         if not self.prj.has_ssp():

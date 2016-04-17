@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import logging
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 from ..profile.dicts import Dicts
 
@@ -15,22 +15,21 @@ class Client(object):
         self.port = int(client.split(":")[2])
         self.protocol = client.split(":")[3]
         self.alive = True
-        log.info("new client: %s(%s:%s) %s" % (self.name, self.ip, self.port, self.protocol))
+        logger.info("new client: %s(%s:%s) %s" % (self.name, self.ip, self.port, self.protocol))
 
     def send_cast(self, ssp_data, fmt):
 
-        # if (self.protocol == "QINSY") or (self.protocol == "PDS2000"):
-        #     fmt = Dicts.kng_formats['S12']
-        #     log.info("forcing S12 format")
-        #
-        # if (self.protocol == "QINSY") or (self.protocol == "SIS") or (self.protocol == "PDS2000"):
-        #     log.info("sending by km function")
-        #     ssp_data.send_km(self.IP, self.port, fmt)
-        #
-        # elif self.protocol == "HYPACK":
-        #     log.info("sending by hypack function")
-        #     ssp_data.send_hypack(self.IP, self.port)
-        pass
+        if (self.protocol == "QINSY") or (self.protocol == "PDS2000"):
+            fmt = Dicts.kng_formats['S12']
+            logger.info("forcing S12 format")
+
+        if (self.protocol == "QINSY") or (self.protocol == "SIS") or (self.protocol == "PDS2000"):
+            logger.info("sending by km function")
+            # ssp_data.send_km(self.IP, self.port, fmt)
+
+        elif self.protocol == "HYPACK":
+            logger.info("sending by hypack function")
+            # ssp_data.send_hypack(self.IP, self.port)
 
 
 class ClientList(object):
