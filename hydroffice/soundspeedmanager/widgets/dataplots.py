@@ -361,7 +361,7 @@ class DataPlots(AbstractWidget):
             if self.prj.listeners.sis.xyz88:
                 y_limits = self.speed_ax.get_ylim()
                 x_limits = self.speed_ax.get_xlim()
-                print(y_limits, x_limits)
+                # print(y_limits, x_limits)
                 # y-limits
                 mean_depth = self.prj.listeners.sis.xyz88.mean_depth
                 if mean_depth:

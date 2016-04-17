@@ -28,22 +28,31 @@ class Editor(AbstractWidget):
         AbstractWidget.__init__(self, main_win=main_win, prj=prj)
 
         self.file_bar = self.addToolBar('File')
-        self.file_bar.setIconSize(QtCore.QSize(45, 45))
+        self.file_bar.setIconSize(QtCore.QSize(36, 36))
         # import
-        self.import_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'import.png')), 'Import data', self)
+        self.import_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'import.png')),
+                                        'Import data', self)
         self.import_act.setShortcut('Alt+I')
         self.import_act.triggered.connect(self.on_import_data)
         self.file_bar.addAction(self.import_act)
         # receive
-        self.receive_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'receive.png')), 'Receive data', self)
+        self.receive_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'receive.png')),
+                                         'Receive data', self)
         self.receive_act.setShortcut('Alt+R')
         self.receive_act.triggered.connect(self.on_receive_data)
         self.file_bar.addAction(self.receive_act)
         # load db
-        self.load_db_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'db_load.png')), 'Load from database', self)
+        self.load_db_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'db_load.png')),
+                                         'Load from database', self)
         self.load_db_act.setShortcut('Alt+L')
         self.load_db_act.triggered.connect(self.on_load_db)
         self.file_bar.addAction(self.load_db_act)
+        # restart processing
+        self.restart_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'restart.png')),
+                                         'Restart processing', self)
+        self.restart_act.setShortcut('Alt+N')
+        self.restart_act.triggered.connect(self.on_restart_proc)
+        self.file_bar.addAction(self.restart_act)
         # clear
         self.clear_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'clear.png')), 'Clear data', self)
         self.clear_act.setShortcut('Alt+C')
@@ -159,6 +168,11 @@ class Editor(AbstractWidget):
         logger.debug('user wants to clear data')
         self.prj.clear_data()
         self.main_win.data_cleared()
+
+    def on_restart_proc(self):
+        logger.debug('user wants to restart processing')
+        self.prj.restart_proc()
+        self.main_win.data_imported()
 
     def on_retrieve_sal(self):
         logger.debug('user wants to retrieve salinity')

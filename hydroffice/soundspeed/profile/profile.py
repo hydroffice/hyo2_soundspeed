@@ -276,6 +276,78 @@ class Profile(object):
 
             self.proc.num_samples += 1
 
+    def insert_sis_speed(self, depth, speed, src=Dicts.sources['user']):
+        logger.debug("insert speed to sis data: d:%s, vs:%s" % (depth, speed))
+
+        # we need to take care of valid samples and user-invalidated samples (to avoid to brake in case un-flagged)
+        valid = self.sis_thinned # valid samples
+        iv = np.indices(self.sis.flag.shape)[0][valid]  # indices of valid samples
+        user_invalid = self.sis.flag == Dicts.flags['user']  # user-invalidate samples
+        possible = np.logical_or(valid, user_invalid)  # possible samples
+        ip = np.indices(self.sis.flag.shape)[0][possible]  # indices of possible samples
+
+        # find depth index both in the valid and in the possible samples
+        try:
+            v_i = np.argwhere(self.sis.depth[valid] > depth)[0][0]  # the index in the valid array
+            i = iv[v_i]  # the corresponding index of the masked index in the full array
+        except IndexError:  # in case that there are not
+            v_i = self.sis.depth[valid].size - 1
+            i = iv[v_i]
+        try:
+            p_i = np.argwhere(self.sis.depth[possible] > depth)[0][0]  # the index in the possible array
+            j = ip[p_i]
+        except IndexError:  # in case that there are not
+            p_i = self.sis.depth[possible].size - 1
+            j = ip[p_i]
+
+        # check if we already have this depth in the masked array
+        d_exists = self.sis.depth[valid][v_i] == depth
+
+        # manipulate profile (linear interpolation)
+        if d_exists:
+            # print('already present')
+            self.sis.speed[i] = speed
+            self.sis.source[i] = src
+            self.sis.flag[i] = Dicts.flags['thin']
+        else:
+            # print('new depth')
+            if depth < self.sis.depth[valid][0]:
+                m_ids = [0, 1]
+                # print('before beginning: %s' % j)
+
+            elif depth > self.sis.depth[valid][-1]:
+                j += 1
+                m_ids = [-2, -1]
+                # print('after end')
+
+            else:
+                if self.sis.depth[valid][v_i] < depth:
+                    m_ids = [v_i, v_i + 1]
+                else:
+                    m_ids = [v_i - 1, v_i]
+                # print('in the middle')
+
+            # interpolate for temp
+            di = np.array([self.sis.depth[valid][m_ids[0]], self.sis.depth[valid][m_ids[1]]])
+            a = np.array([[di[0], 1.], [di[1], 1.]])
+            ti = np.array([self.sis.temp[valid][m_ids[0]], self.sis.temp[valid][m_ids[1]]])
+            tm, tc = np.linalg.lstsq(a, ti)[0]
+            self.sis.temp = np.insert(self.sis.temp, j, tm * depth + tc)
+            # print(self.sis.temp[0], self.sis.temp.size)
+
+            # interpolate for sal
+            si = np.array([self.sis.sal[valid][m_ids[0]], self.sis.sal[valid][m_ids[1]]])
+            sm, sc = np.linalg.lstsq(a, si)[0]
+            self.sis.sal = np.insert(self.sis.sal, j, sm * depth + sc)
+            # print(self.proc.sal[0], self.proc.sal.size)
+
+            self.sis.depth = np.insert(self.sis.depth, j, depth)
+            self.sis.speed = np.insert(self.sis.speed, j, speed)
+            self.sis.source = np.insert(self.sis.source, j, src)
+            self.sis.flag = np.insert(self.sis.flag, j, Dicts.flags['thin'])
+
+            self.sis.num_samples += 1
+
     def insert_proc_temp_sal(self, depth, temp, sal):
         logger.debug("insert temp, sal to proc data: d:%s, t:%s, s:%s" % (depth, temp, sal))
 
@@ -445,7 +517,13 @@ class Profile(object):
         # - 570 points for: EM3000, EM3002, EM1002, EM300, EM120
         # TODO: the resulting profile must be less than 30kB
         flagged = self.sis.flag[self.sis_valid][:]
-        self.douglas_peucker_1d(0, self.sis.depth[self.sis_valid].size - 1, tolerance=tolerance, data=flagged)
+        idx_start = 0
+        idx_end = self.sis.depth[self.sis_valid].size - 1
+        # logger.debug('first: %s, last: %s[%s]'
+        #              % (self.sis.depth[self.sis_valid][idx_start],
+        #                 self.sis.depth[self.sis_valid][idx_end],
+        #                 self.sis.flag[self.sis_valid][idx_end]))
+        self.douglas_peucker_1d(idx_start, idx_end, tolerance=tolerance, data=flagged)
         self.sis.flag[self.sis_valid] = flagged[:]
 
         # logger.info("thinned: %s" % self.sis.flag[self.sis_thinned].size)
@@ -478,7 +556,7 @@ class Profile(object):
 
         else:
             data[max_ind] = Dicts.flags['thin']
-            print(max_ind, max_dist, data[max_ind])
+            # print(max_ind, max_dist, data[max_ind])
             self.douglas_peucker_1d(start, max_ind, tolerance, data=data)
             self.douglas_peucker_1d(max_ind, end, tolerance, data=data)
             return

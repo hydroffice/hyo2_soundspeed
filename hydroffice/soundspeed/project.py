@@ -264,6 +264,8 @@ class Project(BaseProject):
                     data_append = self.setup.server_append_caris_file
                 else:
                     data_append = self.setup.append_caris_file
+            if writer.name == 'asvp':
+                self.prepare_sis(thin=True)
             if not has_data_files:  # we don't have the output file names
                 writer.write(ssp=self.ssp, data_path=data_path, data_append=data_append)
             else:
@@ -517,10 +519,56 @@ class Project(BaseProject):
             return False
 
         self.cur.clone_proc_to_sis()
-        if thin:
-            if not self.cur.thin(tolerance=0.1):
-                logger.warning("thinning issue")
-                return False
+
+        if not thin:
+            return True
+
+        if not self.cur.thin(tolerance=0.1):
+            logger.warning("thinning issue")
+            return False
+
+        # filter the data for depth
+        si = self.cur.sis_thinned
+        valid = self.cur.sis.flag[si][:]
+        last_depth = -1.0
+        # logger.debug('valid size: %s' % valid.size)
+        for i in range(self.cur.sis.flag[si].size):
+            depth = self.cur.sis.depth[si][i]
+            if abs(depth - last_depth) < 0.02:  # ignore sample with small separation
+                valid[i] = Dicts.flags['sis']
+                # logger.debug('small change: %s %s %s' % (i, last_depth, depth))
+            elif (depth < 0.0) or (depth > 12000.0):
+                valid[i] = Dicts.flags['sis']
+                # logger.debug('out of range: %s %s' % (i, depth))
+            last_depth = depth
+        self.cur.sis.flag[si] = valid[:]
+
+        # check depth 0.0
+        si = self.cur.sis_thinned
+        if self.cur.sis.flag[si].size == 0:
+            logger.warning("no valid samples after depth filters")
+            return False
+        depth_0 = self.cur.sis.depth[si][0]
+        if depth_0 > 0:
+            self.cur.insert_sis_speed(depth=0.0, speed=self.cur.sis.speed[si][0], src=Dicts.sources['sis'])
+
+        # check last depth
+        # Add a final value at 12000m, from: Taira, K., Yanagimoto, D. and Kitagawa, S. (2005).,
+        #  "Deep CTD Casts in the Challenger Deep, Mariana Trench", Journal of Oceanography, Vol. 61, pp. 447 t 454
+        # TODO: add T/S at location of max depth in the current basin in between last observation and 12000m sample
+        si = self.cur.sis_thinned
+        if self.cur.sis.flag[si].size == 0:
+            logger.warning("no valid samples after depth filters")
+            return False
+        depth_end = self.cur.sis.depth[si][-1]
+        if depth_end < 12000:
+            self.cur.insert_sis_speed(depth=12000.0, speed=1675.8, src=Dicts.sources['sis'])
+            si = self.cur.sis_thinned
+            self.cur.sis.temp[si][-1] = 2.46
+            self.cur.sis.sal[si][-1] = 34.70
+        # logger.debug('last sample: %s %s %s %s'
+        #              % (self.cur.sis.depth[-1], self.cur.sis.speed[-1],
+        #                 self.cur.sis.source[-1], self.cur.sis.flag[-1]))
 
         return True
 
@@ -531,6 +579,13 @@ class Project(BaseProject):
         if self.has_ssp():
             logger.debug("Clear data")
             self.ssp = None
+
+    def restart_proc(self):
+        """Clear current data"""
+        if self.has_ssp():
+            for profile in self.ssp.l:  # we may have multiple profiles
+                profile.clone_data_to_proc()
+                profile.init_sis()  # initialize to zero
 
     # --- plot data
 
@@ -619,7 +674,7 @@ class Project(BaseProject):
     def stop_listen_mvp(self):
         return self.listeners.stop_listen_mvp()
 
-    # --- senders
+    # --- clients
 
     def transmit_ssp(self):
         """Add the transducer sound speed to the current profile"""
@@ -627,15 +682,9 @@ class Project(BaseProject):
             logger.warning("no profile!")
             return False
 
-        # loop through the client list
-        success = False
-        for client in self.setup.client_list.clients:
-            success = self.send_cast(client)
-
-        return True
-
-    def send_cast(self, client):
-        logger.info("Transmitting cast to %s (port: %d)" % (client.ip, client.port))
+        if not self.setup.client_list.transmit_ssp(prj=self):
+            logger.warning("issue in transmitting the profile")
+            return False
 
         return True
 

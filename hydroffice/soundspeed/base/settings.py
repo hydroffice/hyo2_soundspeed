@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 from .settingsdb import SettingsDb
 from ..profile.dicts import Dicts
-from .clientlist import ClientList
+from ..client.clientlist import ClientList
 
 
 class Settings(object):
