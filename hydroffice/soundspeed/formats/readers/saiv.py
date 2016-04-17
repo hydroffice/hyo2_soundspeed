@@ -49,7 +49,7 @@ class Saiv(AbstractTextReader):
         self._parse_body()
 
         self.fix()
-        self.ssp.cur.calc_depth()
+        self.ssp.cur.calc_data_depth()
         self.finalize()
 
         logger.debug('*** %s ***: done' % self.driver)

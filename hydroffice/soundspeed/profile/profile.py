@@ -130,7 +130,7 @@ class Profile(object):
                                           t=self.data.temp[count], lat=latitude)
         self.modify_proc_info('calc.salinity')
 
-    def calc_depth(self):
+    def calc_data_depth(self):
         """Helper method to calculate depth from pressure (in dBar)"""
         # logger.debug("calculate depth from pressure")
         if not self.meta.latitude:
@@ -144,7 +144,7 @@ class Profile(object):
 
         self.modify_proc_info('calc.depth')
 
-    def calc_speed(self):
+    def calc_data_speed(self):
         """Helper method to calculate sound speed"""
         # logger.debug("calculate sound speed")
         if not self.meta.latitude:
@@ -157,6 +157,22 @@ class Profile(object):
             self.data.speed[count] = Oc.speed(self.data.depth[count],
                                               self.data.temp[count],
                                               self.data.sal[count],
+                                              latitude)
+        self.modify_proc_info("calc.speed")
+
+    def calc_proc_speed(self):
+        """Helper method to calculate processed sound speed"""
+        # logger.debug("calculate sound speed")
+        if not self.meta.latitude:
+            latitude = 30.0
+            logger.warning("using default latitude: %s" % latitude)
+        else:
+            latitude = self.meta.latitude
+
+        for count in range(self.proc.num_samples):
+            self.proc.speed[count] = Oc.speed(self.proc.depth[count],
+                                              self.proc.temp[count],
+                                              self.proc.sal[count],
                                               latitude)
         self.modify_proc_info("calc.speed")
 
@@ -186,7 +202,7 @@ class Profile(object):
 
         return cumulative_attenuation, depth
 
-    def insert_proc_speed(self, depth, speed):
+    def insert_proc_speed(self, depth, speed, src=Dicts.sources['user']):
         logger.debug("insert speed to proc data: d:%s, vs:%s" % (depth, speed))
 
         # we need to take care of valid samples and user-invalidated samples (to avoid to brake in case un-flagged)
@@ -217,7 +233,7 @@ class Profile(object):
         if d_exists:
             # print('already present')
             self.proc.speed[i] = speed
-            self.proc.source[i] = Dicts.sources['user']
+            self.proc.source[i] = src
             self.proc.flag[i] = Dicts.flags['valid']
         else:
             # print('new depth')
@@ -253,7 +269,7 @@ class Profile(object):
 
             self.proc.depth = np.insert(self.proc.depth, j, depth)
             self.proc.speed = np.insert(self.proc.speed, j, speed)
-            self.proc.source = np.insert(self.proc.source, j, Dicts.sources['user'])
+            self.proc.source = np.insert(self.proc.source, j, src)
             self.proc.flag = np.insert(self.proc.flag, j, Dicts.flags['valid'])
 
             self.proc.num_samples += 1
@@ -363,6 +379,25 @@ class Profile(object):
 
     def update_proc_time(self):
         self.meta.update_proc_time()
+
+    def replace_proc_sal(self, source):
+        try:
+            self.proc.sal = np.interp(self.proc.depth[:], source.cur.proc.depth[:], source.cur.proc.sal[:])
+        except Exception as e:
+            logger.warning("in replace salinity, %s" % e)
+            return False
+        return True
+
+    def replace_proc_temp_sal(self, source):
+        try:
+            self.proc.temp = np.interp(self.proc.depth[:], source.cur.proc.depth[:], source.cur.proc.temp[:])
+            self.proc.sal = np.interp(self.proc.depth[:], source.cur.proc.depth[:], source.cur.proc.sal[:])
+        except Exception as e:
+            logger.warning("in replace temp/sal, %s" % e)
+            return False
+        return True
+
+    # - debugging
 
     def data_debug_plot(self, more=False):
         """Create a debug plot with the data, optionally with the extra data if available"""

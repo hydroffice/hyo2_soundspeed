@@ -280,6 +280,8 @@ class MainWin(QtGui.QMainWindow):
         msg = str()
 
         tokens = list()
+        if self.prj.has_ref():
+            tokens.append("REF")
         if self.prj.use_rtofs():
             tokens.append("RTF")
         if self.prj.use_woa09():

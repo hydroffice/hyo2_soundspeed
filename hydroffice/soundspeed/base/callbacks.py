@@ -27,6 +27,16 @@ class AbstractCallbacks(object):
         """Ask user for location"""
         pass
 
+    @abstractmethod
+    def ask_tss(self):
+        """Ask user for transducer sound speed"""
+        pass
+
+    @abstractmethod
+    def ask_draft(self):
+        """Ask user for draft"""
+        pass
+
 
 class TestCallbacks(AbstractCallbacks):
     """Used only for testing since the methods do not require user interaction"""
@@ -38,6 +48,13 @@ class TestCallbacks(AbstractCallbacks):
 
     def ask_location_from_sis(self):
         return True
+
+    def ask_tss(self):
+        return 1500.0
+
+    @abstractmethod
+    def ask_draft(self):
+        return 8.0
 
 
 class Callbacks(AbstractCallbacks):
@@ -137,3 +154,49 @@ class Callbacks(AbstractCallbacks):
         if (raw == "Y") or (raw == "y"):
             return True
         return False
+
+    def ask_tss(self):
+        """Ask user for transducer sound speed"""
+        tss = 1500.0
+        tss_msg = "Enter transducer sound speed in m/sec [default: %s]:" % tss
+
+        # lat
+        while True:
+            raw = raw_input(tss_msg)
+            # print(raw)
+            if raw == "":
+                break
+            try:
+                tss = float(raw)
+                if (tss > 2000) or (tss < 1000):
+                    logger.info("invalid sound speed value: %s" % tss)
+                    continue
+                break
+            except ValueError as e:
+                logger.info("invalid input: %s\n" % e)
+                continue
+
+        return tss
+
+    def ask_draft(self):
+        """Ask user for draft"""
+        draft = 8.0
+        draft_msg = "Enter transducer draft in m [default: %s]:" % draft
+
+        # lat
+        while True:
+            raw = raw_input(draft_msg)
+            # print(raw)
+            if raw == "":
+                break
+            try:
+                draft = float(raw)
+                if (draft > 1000) or (draft < -1000):
+                    logger.info("invalid draft value: %s" % draft)
+                    continue
+                break
+            except ValueError as e:
+                logger.info("invalid input: %s\n" % e)
+                continue
+
+        return draft

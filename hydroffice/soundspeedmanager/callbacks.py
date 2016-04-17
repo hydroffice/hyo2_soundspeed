@@ -91,3 +91,19 @@ class Callbacks(AbstractCallbacks):
                 continue
 
         return dt
+
+    def ask_tss(self):
+        # transducer sound speed
+        tss, ok = QtGui.QInputDialog.getDouble(self.parent, "TSS", "Enter transducer sound speed:",
+                                               1500.0, 1000.0, 20000.0, 2)
+        if not ok:
+            tss = None
+        return tss
+
+    def ask_draft(self):
+        # transducer draft
+        draft, ok = QtGui.QInputDialog.getDouble(self.parent, "Draft", "Enter transducer draft:",
+                                                 8.0, -1000.0, 1000.0, 3)
+        if not ok:
+            draft = None
+        return draft

@@ -15,6 +15,7 @@ from .listener.listeners import Listeners
 from .db.db import SoundSpeedDb
 from .base.gdal_aux import GdalAux
 from .profile.profilelist import ProfileList
+from .profile.dicts import Dicts
 
 
 class Project(BaseProject):
@@ -338,6 +339,120 @@ class Project(BaseProject):
         lst = db.export.export_profiles_metadata(ogr_format=ogr_format, project=project)
         db.disconnect()
         return lst
+
+    # --- replace
+
+    def replace_cur_salinity(self):
+        """Replace salinity using atlases for the current profile"""
+        if self.setup.ssp_salinity_source == Dicts.atlases['ref']:
+            if not self.has_ref():
+                logger.warning("missing reference profile")
+                return False
+            if not self.cur.replace_proc_sal(self.ref):
+                return False
+            self.cur.modify_proc_info('sal.from ref')
+
+        elif self.setup.ssp_salinity_source == Dicts.atlases['RTOFS']:
+            if not self.has_rtofs():
+                logger.warning("missing RTOFS profile")
+                return False
+            if not self.cur.replace_proc_sal(self.cur.rtofs):
+                return False
+            self.cur.modify_proc_info('sal.from RTOFS')
+
+        elif self.setup.ssp_salinity_source == Dicts.atlases['WOA09']:
+            if not self.has_woa09():
+                logger.warning("missing WOA09 profile")
+                return False
+            if not self.cur.replace_proc_sal(self.cur.woa09):
+                return False
+            self.cur.modify_proc_info('sal.from WOA09')
+
+        elif self.setup.ssp_salinity_source == Dicts.atlases['WOA13']:
+            if not self.has_woa13():
+                logger.warning("missing WOA13 profile")
+                return False
+            if not self.cur.replace_proc_sal(self.cur.woa13):
+                return False
+            self.cur.modify_proc_info('sal.from WOA13')
+
+        else:
+            logger.warning("unknown atlases: %s" % self.setup.ssp_salinity_source)
+            return False
+
+        self.cur.calc_proc_speed()
+
+        return True
+
+    def replace_cur_temp_sal(self):
+        """Replace temperature/salinity using atlases for the current profile"""
+        if self.setup.ssp_temp_sal_source == Dicts.atlases['ref']:
+            if not self.has_ref():
+                logger.warning("missing reference profile")
+                return False
+            if not self.cur.replace_proc_temp_sal(self.ref):
+                return False
+            self.cur.modify_proc_info('temp./sal.from ref')
+
+        elif self.setup.ssp_temp_sal_source == Dicts.atlases['RTOFS']:
+            if not self.has_rtofs():
+                logger.warning("missing RTOFS profile")
+                return False
+            if not self.cur.replace_proc_temp_sal(self.cur.rtofs):
+                return False
+            self.cur.modify_proc_info('temp./sal.from RTOFS')
+
+        elif self.setup.ssp_temp_sal_source == Dicts.atlases['WOA09']:
+            if not self.has_woa09():
+                logger.warning("missing WOA09 profile")
+                return False
+            if not self.cur.replace_proc_temp_sal(self.cur.woa09):
+                return False
+            self.cur.modify_proc_info('temp./sal.from WOA09')
+
+        elif self.setup.ssp_temp_sal_source == Dicts.atlases['WOA13']:
+            if not self.has_woa13():
+                logger.warning("missing WOA13 profile")
+                return False
+            if not self.cur.replace_proc_temp_sal(self.cur.woa13):
+                return False
+            self.cur.modify_proc_info('temp./sal.from WOA13')
+
+        else:
+            logger.warning("unknown atlases: %s" % self.setup.ssp_temp_sal_source)
+            return False
+
+        # We don't recalculate speed, of course.  T/S is simply for absorption coefficient calculation
+
+        return True
+
+    def add_cur_tss(self):
+        """Add the transducer sound speed to the current profile"""
+        if not self.setup.use_sis:
+            logger.warning("the SIS listening is off")
+            return False
+
+        tss_depth = None
+        tss_value = None
+        if self.listeners.sis.xyz88:
+            try:
+                tss_depth = self.listeners.sis.xyz88.transducer_draft
+                tss_value = self.listeners.sis.xyz88.sound_speed
+            except Exception as e:
+                logger.warning("unable to retrieve tss values: %s" % e)
+
+        if not tss_depth:
+            tss_depth = self.cb.ask_draft()
+        if not tss_value:
+            tss_value = self.cb.ask_tss()
+
+        if (not tss_depth) or (not tss_value):
+            logger.warning("unable to retrieve tss values")
+            return False
+
+        self.cur.insert_proc_speed(depth=tss_depth, speed=tss_value, src=Dicts.sources['tss'])
+        self.cur.modify_proc_info('added tss')
+        return True
 
     # --- clear data
 

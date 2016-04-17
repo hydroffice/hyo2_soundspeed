@@ -366,7 +366,7 @@ class Rtofs(AbstractAtlas):
         ssp.data.depth = d[0:num_values]
         ssp.data.temp = temp_in_situ[0:num_values]
         ssp.data.sal = sal[0:num_values]
-        ssp.calc_speed()
+        ssp.calc_data_speed()
         ssp.clone_data_to_proc()
 
         profiles = ProfileList()

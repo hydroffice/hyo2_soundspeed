@@ -50,7 +50,7 @@ class Valeport(AbstractTextReader):
 
         self.fix()
         if self.ssp.cur.meta.probe_type not in [Dicts.probe_types['MiniSVP']]:
-            self.ssp.cur.calc_depth()
+            self.ssp.cur.calc_data_depth()
         if self.ssp.cur.meta.probe_type not \
                 in [Dicts.probe_types['MIDAS SVX2 1000'], Dicts.probe_types['MIDAS SVX2 3000']]:
             self.ssp.cur.calc_salinity()

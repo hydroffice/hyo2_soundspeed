@@ -76,9 +76,10 @@ class Dicts(object):
     sources = OrderedDict([
         ('raw', 0),
         ('user', 1),
+        ('tss', 2),
         # 'Atlas': 2,
         # 'Interp': 3,
-        # 'SurfaceSensor': 4,
+        #
         # 'Woa09Extend': 5,
         # 'Woa13Extend': 6,
         # 'RtofsExtend': 7,

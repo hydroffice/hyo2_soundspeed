@@ -168,13 +168,38 @@ class Editor(AbstractWidget):
             QtGui.QMessageBox.warning(self, "Salinity", msg, QtGui.QMessageBox.Ok)
             return
 
+        if not self.prj.replace_cur_salinity():
+            msg = "Issue in replacing the salinity"
+            QtGui.QMessageBox.warning(self, "Salinity", msg, QtGui.QMessageBox.Ok)
+            return
 
+        self.dataplots.update_data()
 
     def on_retrieve_temp_sal(self):
         logger.debug('user wants to retrieve temp/sal')
 
+        if (self.prj.cur.meta.sensor_type != Dicts.sensor_types['XSV']) \
+                and (self.prj.cur.meta.sensor_type != Dicts.sensor_types['SVP']):
+            msg = "This is a XSV- and SVP-specific function!"
+            QtGui.QMessageBox.warning(self, "Temperature/Salinity", msg, QtGui.QMessageBox.Ok)
+            return
+
+        if not self.prj.replace_cur_temp_sal():
+            msg = "Issue in replacing temperature and salinity"
+            QtGui.QMessageBox.warning(self, "Temperature/Salinity", msg, QtGui.QMessageBox.Ok)
+            return
+
+        self.dataplots.update_data()
+
     def on_retrieve_tss(self):
         logger.debug('user wants to retrieve transducer sound speed')
+
+        if not self.prj.add_cur_tss():
+            msg = "Issue in retrieving transducer sound speed"
+            QtGui.QMessageBox.warning(self, "Sound speed", msg, QtGui.QMessageBox.Ok)
+            return
+
+        self.dataplots.update_data()
 
     def on_extend_profile(self):
         logger.debug('user wants to extend the profile')
