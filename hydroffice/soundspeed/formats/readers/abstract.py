@@ -69,6 +69,7 @@ class AbstractReader(AbstractFormat):
         for profile in self.ssp.l:  # we may have multiple profiles
 
             profile.clone_data_to_proc()
+            profile.init_sis()  # initialize to zero
 
 
 class AbstractTextReader(AbstractReader):

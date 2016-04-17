@@ -42,17 +42,19 @@ class DataPlots(AbstractWidget):
         # mpl figure settings
         self.f_dpi = 120  # dots-per-inch
         self.f_sz = (6.0, 3.0)  # inches
-        self.vi = None  # valid indices
-        self.ii = None  # invalid indices
+        self.svi = None  # sis valid indices
+        self.vi = None  # proc valid indices
+        self.ii = None  # proc invalid indices
         self.draft_color = '#00cc66'
         self.seafloor_color = '#cc6600'
         self.sensor_color = '#00cc66'
         self.valid_color = '#3385ff'
-        self.invalid_color = '#dddddd'
+        self.invalid_color = '#999966'
         self.woa09_color = '#ffaaaa'
         self.woa13_color = '#ffcc66'
         self.rtofs_color = '#99cc00'
         self.ref_color = '#ff6600'
+        self.sis_color = '#0000e6'
 
         # outline ui
         self.top_widget = QtGui.QWidget()
@@ -80,6 +82,7 @@ class DataPlots(AbstractWidget):
         self.speed_draft = None
         self.speed_sensor = None
         self.speed_seafloor = None
+        self.speed_sis = None
         self.speed_woa09 = None
         self.temp_woa09 = None
         self.sal_woa09 = None
@@ -118,11 +121,6 @@ class DataPlots(AbstractWidget):
         # navigation
         self.nav = NavToolbar(canvas=self.c, parent=self.top_widget, plot_win=self, prj=self.prj)
         self.hbox.addWidget(self.nav)
-
-        # # timer for updates
-        # timer = QtCore.QTimer(self)
-        # timer.timeout.connect(self.on_draw)
-        # timer.start(500)
 
         self.on_draw()
 
@@ -184,16 +182,26 @@ class DataPlots(AbstractWidget):
                                                  )
         self.speed_invalid, = self.speed_ax.plot(self.prj.cur.proc.speed[self.ii],
                                                  self.prj.cur.proc.depth[self.ii],
-                                                 color=self.invalid_color,
+                                                 markerfacecolor=self.invalid_color,
+                                                 markeredgecolor=self.invalid_color,
                                                  linestyle='None',
-                                                 marker='o',
-                                                 alpha=0.5,
-                                                 ms=1,
+                                                 marker='.',
+                                                 alpha=0.8,
+                                                 ms=4,
                                                  picker=3)
         self.speed_valid, = self.speed_ax.plot(self.prj.cur.proc.speed[self.vi],
                                                self.prj.cur.proc.depth[self.vi],
                                                color=self.valid_color,
                                                picker=3)
+        self.speed_sis, = self.speed_ax.plot(self.prj.cur.sis.speed[self.svi],
+                                             self.prj.cur.sis.depth[self.svi],
+                                             markerfacecolor=self.sis_color,
+                                             markeredgecolor=self.sis_color,
+                                             marker='.',
+                                             linestyle='None',
+                                             alpha=0.8,
+                                             ms=4,
+                                             picker=3)
         self.speed_draft = self.speed_ax.axhline(y=None, linewidth=1.5, color=self.draft_color, linestyle=':')
         self.speed_sensor = self.speed_ax.axvline(x=None, linewidth=1.5, color=self.sensor_color, linestyle=':')
         self.speed_seafloor = self.speed_ax.axhline(y=None, linewidth=1.5, color=self.seafloor_color, linestyle=':')
@@ -252,11 +260,12 @@ class DataPlots(AbstractWidget):
                                                )
         self.temp_invalid, = self.temp_ax.plot(self.prj.cur.proc.temp[self.ii],
                                                self.prj.cur.proc.depth[self.ii],
-                                               color=self.invalid_color,
+                                               markerfacecolor=self.invalid_color,
+                                               markeredgecolor=self.invalid_color,
                                                linestyle='None',
-                                               marker='o',
-                                               alpha=0.5,
-                                               ms=1,
+                                               marker='.',
+                                               alpha=0.8,
+                                               ms=4,
                                                picker=3)
         self.temp_valid, = self.temp_ax.plot(self.prj.cur.proc.temp[self.vi],
                                              self.prj.cur.proc.depth[self.vi],
@@ -319,11 +328,12 @@ class DataPlots(AbstractWidget):
                                              )
         self.sal_invalid, = self.sal_ax.plot(self.prj.cur.proc.sal[self.ii],
                                              self.prj.cur.proc.depth[self.ii],
-                                             color=self.invalid_color,
+                                             markerfacecolor=self.invalid_color,
+                                             markeredgecolor=self.invalid_color,
                                              linestyle='None',
-                                             marker='o',
-                                             alpha=0.5,
-                                             ms=1,
+                                             marker='.',
+                                             alpha=0.8,
+                                             ms=4,
                                              picker=3)
         self.sal_valid, = self.sal_ax.plot(self.prj.cur.proc.sal[self.vi],
                                            self.prj.cur.proc.depth[self.vi],
@@ -372,6 +382,9 @@ class DataPlots(AbstractWidget):
         """Update plot"""
         self.update_validity_indices()
         # speed
+        if self.speed_sis:
+            self.speed_sis.set_xdata(self.prj.cur.sis.speed[self.svi])
+            self.speed_sis.set_ydata(self.prj.cur.sis.depth[self.svi])
         if self.speed_valid:
             self.speed_valid.set_xdata(self.prj.cur.proc.speed[self.vi])
             self.speed_valid.set_ydata(self.prj.cur.proc.depth[self.vi])
@@ -443,7 +456,8 @@ class DataPlots(AbstractWidget):
         self.c.draw_idle()
 
     def update_validity_indices(self):
-        self.vi = self.prj.cur.proc_valid  # valid indices
+        self.svi = self.prj.cur.sis_thinned  # sis valid indices (thinned!)
+        self.vi = self.prj.cur.proc_valid  # proc valid indices
         self.ii = np.logical_and(~self.vi, ~self.prj.cur.proc_invalid_direction)  # selected invalid indices
 
     def set_invalid_visibility(self, value):

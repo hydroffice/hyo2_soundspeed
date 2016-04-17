@@ -344,6 +344,10 @@ class Project(BaseProject):
 
     def replace_cur_salinity(self):
         """Replace salinity using atlases for the current profile"""
+        if not self.has_ssp():
+            logger.warning("no profile!")
+            return False
+
         if self.setup.ssp_salinity_source == Dicts.atlases['ref']:
             if not self.has_ref():
                 logger.warning("missing reference profile")
@@ -386,6 +390,10 @@ class Project(BaseProject):
 
     def replace_cur_temp_sal(self):
         """Replace temperature/salinity using atlases for the current profile"""
+        if not self.has_ssp():
+            logger.warning("no profile!")
+            return False
+
         if self.setup.ssp_temp_sal_source == Dicts.atlases['ref']:
             if not self.has_ref():
                 logger.warning("missing reference profile")
@@ -428,6 +436,10 @@ class Project(BaseProject):
 
     def add_cur_tss(self):
         """Add the transducer sound speed to the current profile"""
+        if not self.has_ssp():
+            logger.warning("no profile!")
+            return False
+
         if not self.setup.use_sis:
             logger.warning("the SIS listening is off")
             return False
@@ -452,6 +464,62 @@ class Project(BaseProject):
 
         self.cur.insert_proc_speed(depth=tss_depth, speed=tss_value, src=Dicts.sources['tss'])
         self.cur.modify_proc_info('added tss')
+        return True
+
+    def extend_profile(self):
+        if not self.has_ssp():
+            logger.warning("no profile!")
+            return False
+
+        if self.setup.ssp_extension_source == Dicts.atlases['ref']:
+            if not self.has_ref():
+                logger.warning("missing reference profile")
+                return False
+            if not self.cur.extend(self.ref, ext_type=Dicts.sources['ref_ext']):
+                return False
+            self.cur.modify_proc_info('ext.from ref')
+
+        elif self.setup.ssp_extension_source == Dicts.atlases['RTOFS']:
+            if not self.has_rtofs():
+                logger.warning("missing RTOFS profile")
+                return False
+            if not self.cur.extend(self.cur.rtofs, ext_type=Dicts.sources['rtofs_ext']):
+                return False
+            self.cur.modify_proc_info('ext.from RTOFS')
+
+        elif self.setup.ssp_extension_source == Dicts.atlases['WOA09']:
+            if not self.has_woa09():
+                logger.warning("missing WOA09 profile")
+                return False
+            if not self.cur.extend(self.cur.woa09, ext_type=Dicts.sources['woa09_ext']):
+                return False
+            self.cur.modify_proc_info('ext.from WOA09')
+
+        elif self.setup.ssp_extension_source == Dicts.atlases['WOA13']:
+            if not self.has_woa13():
+                logger.warning("missing WOA13 profile")
+                return False
+            if not self.cur.extend(self.cur.woa13, ext_type=Dicts.sources['woa13_ext']):
+                return False
+            self.cur.modify_proc_info('ext.from WOA13')
+
+        else:
+            logger.warning("unknown atlases: %s" % self.setup.ssp_extension_source)
+            return False
+
+        return True
+
+    def prepare_sis(self, thin=True):
+        if not self.has_ssp():
+            logger.warning("no profile!")
+            return False
+
+        self.cur.clone_proc_to_sis()
+        if thin:
+            if not self.cur.thin(tolerance=0.1):
+                logger.warning("thinning issue")
+                return False
+
         return True
 
     # --- clear data

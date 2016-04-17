@@ -71,19 +71,18 @@ class Dicts(object):
         ('valid', 0),
         ('direction', 1),
         ('user', 2),
+        ('thin', 3),
     ])
 
     sources = OrderedDict([
         ('raw', 0),
         ('user', 1),
         ('tss', 2),
-        # 'Atlas': 2,
-        # 'Interp': 3,
-        #
-        # 'Woa09Extend': 5,
-        # 'Woa13Extend': 6,
-        # 'RtofsExtend': 7,
-        # 'UserRefExtend': 8,
+        ('woa09_ext', 3),
+        ('woa13_ext', 4),
+        ('rtofs_ext', 5),
+        ('ref_ext', 6),
+        ('interp', 7),
     ])
 
     booleans = OrderedDict([

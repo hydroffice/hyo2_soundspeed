@@ -58,10 +58,7 @@ class Profile(object):
         self.proc.init_source()
         self.proc.init_flag()
 
-    def init_sis(self, num_samples):
-        if num_samples == 0:
-            return
-
+    def init_sis(self, num_samples=0):
         self.sis.num_samples = num_samples
         self.sis.init_depth()
         self.sis.init_speed()
@@ -91,6 +88,11 @@ class Profile(object):
     def sis_valid(self):
         """Return indices of valid sis samples"""
         return np.equal(self.sis.flag, Dicts.flags['valid'])
+
+    @property
+    def sis_thinned(self):
+        """Return indices of thinned sis samples"""
+        return np.equal(self.sis.flag, Dicts.flags['thin'])
 
     @property
     def proc_invalid_direction(self):
@@ -330,6 +332,42 @@ class Profile(object):
 
             self.proc.num_samples += 1
 
+    def extend(self, extender, ext_type):
+        """ Use the extender samples to extend the profile """
+        logger.debug("extension source type: %s" % ext_type)
+        extender.cur.proc.source[:] = ext_type
+
+        # find the max valid depth in the current profile
+        if self.proc.num_samples > 0:
+            vi = self.proc_valid
+            ivs = np.indices(self.proc.flag.shape)[0][vi]  # indices of valid samples
+            max_depth = self.proc.depth[vi].max()  # this is the max of the valid samples
+            vi_idx = np.argwhere(self.proc.depth[vi] >= max_depth)[0][0]  # index of the max depth
+            max_idx = ivs[vi_idx]  # index of the max depth in the original array
+        else:
+            max_depth = 0
+            max_idx = 0
+        # logger.debug("orig.max depth: %s[%s]" % (max_depth, max_idx))
+
+        # find the depth values in the extender that are deeper than the current (valid) max depth
+        ext_vi = extender.cur.proc_valid
+        ind2 = np.argwhere(extender.cur.proc.depth[ext_vi][:] > max_depth)[0][0]
+        if ind2 <= 0:
+            logger.info("nothing to extend with")
+            return True
+        # logger.debug("ext.max depth: [%s]" % ind2)
+
+        # stack the extending samples after the last valid (max depth) index
+        self.proc.depth = np.hstack([self.proc.depth[:max_idx], extender.cur.proc.depth[ext_vi][ind2:]])
+        self.proc.speed = np.hstack([self.proc.speed[:max_idx], extender.cur.proc.speed[ext_vi][ind2:]])
+        self.proc.temp = np.hstack([self.proc.temp[:max_idx], extender.cur.proc.temp[ext_vi][ind2:]])
+        self.proc.sal = np.hstack([self.proc.sal[:max_idx], extender.cur.proc.sal[ext_vi][ind2:]])
+        self.proc.source = np.hstack([self.proc.source[:max_idx], extender.cur.proc.source[ext_vi][ind2:]])
+        self.proc.flag = np.hstack([self.proc.flag[:max_idx], extender.cur.proc.flag[ext_vi][ind2:]])
+        self.proc.num_samples = self.proc.depth.size
+
+        return True
+
     def modify_proc_info(self, info):
         # if empty, add the info
         if not self.meta.proc_info:
@@ -396,6 +434,54 @@ class Profile(object):
             logger.warning("in replace temp/sal, %s" % e)
             return False
         return True
+
+    # - thinning
+
+    def thin(self, tolerance):
+        """Thin the sis data"""
+        logger.info("thinning the sis samples")
+
+        # - 1000 points for: EM2040, EM710, EM302 and EM122;
+        # - 570 points for: EM3000, EM3002, EM1002, EM300, EM120
+        # TODO: the resulting profile must be less than 30kB
+        flagged = self.sis.flag[self.sis_valid][:]
+        self.douglas_peucker_1d(0, self.sis.depth[self.sis_valid].size - 1, tolerance=tolerance, data=flagged)
+        self.sis.flag[self.sis_valid] = flagged[:]
+
+        # logger.info("thinned: %s" % self.sis.flag[self.sis_thinned].size)
+        return True
+
+    def douglas_peucker_1d(self, start, end, tolerance, data):
+        """ Recursive implementation """
+        # logger.debug("dp: %s, %s" % (start, end))
+
+        # We always keep end points
+        data[start] = Dicts.flags['thin']
+        data[end] = Dicts.flags['thin']
+
+        slope = (self.sis.speed[self.sis_valid][end] - self.sis.speed[self.sis_valid][start]) / \
+                (self.sis.depth[self.sis_valid][end] - self.sis.depth[self.sis_valid][start])
+
+        max_dist = 0
+        max_ind = 0
+        for ind in range(start + 1, end):
+            dist = abs(self.sis.speed[self.sis_valid][start] +
+                       slope * (self.sis.depth[self.sis_valid][ind] - self.sis.depth[self.sis_valid][start]) -
+                       self.sis.speed[self.sis_valid][ind])
+
+            if dist > max_dist:
+                max_dist = dist
+                max_ind = ind
+
+        if max_dist <= tolerance:
+            return
+
+        else:
+            data[max_ind] = Dicts.flags['thin']
+            print(max_ind, max_dist, data[max_ind])
+            self.douglas_peucker_1d(start, max_ind, tolerance, data=data)
+            self.douglas_peucker_1d(max_ind, end, tolerance, data=data)
+            return
 
     # - debugging
 

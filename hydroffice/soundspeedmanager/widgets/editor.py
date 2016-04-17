@@ -204,8 +204,22 @@ class Editor(AbstractWidget):
     def on_extend_profile(self):
         logger.debug('user wants to extend the profile')
 
+        if not self.prj.extend_profile():
+            msg = "Issue in extending the profile"
+            QtGui.QMessageBox.warning(self, "Profile extension", msg, QtGui.QMessageBox.Ok)
+            return
+
+        self.dataplots.update_data()
+
     def on_preview_thinning(self):
         logger.debug('user wants to preview thinning')
+
+        if not self.prj.prepare_sis():
+            msg = "Issue in preview the thinning"
+            QtGui.QMessageBox.warning(self, "Thinning preview", msg, QtGui.QMessageBox.Ok)
+            return
+
+        self.dataplots.update_data()
 
     def on_spreadsheet(self):
         logger.debug('user wants to read/edit spreadsheet')
