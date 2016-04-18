@@ -81,18 +81,6 @@ class Rtofs(AbstractAtlas):
         # logger.debug("0(%.3f, %.3f); step(%.3f, %.3f)" % (self.lat_0, self.lon_0, self.lat_step, self.lon_step))
         return True
 
-    def grid_coords(self, lat, lon):
-        """Convert the passed position in RTOFS grid coords"""
-        # make longitude "safe" since RTOFS grid starts at east longitude 70-ish degrees
-        if lon < self.lon_0:
-            lon += 360.0
-
-        # This does a nearest neighbour lookup
-        lat_idx = int(round((lat - self.lat_0) / self.lat_step, 0))
-        lon_idx = int(round((lon - self.lon_0) / self.lon_step, 0))
-
-        return lat_idx, lon_idx
-
     @staticmethod
     def check_url(url):
         p = urlparse(url)
@@ -168,6 +156,25 @@ class Rtofs(AbstractAtlas):
         self.prj.progress.end()
         return True
 
+    def grid_coords(self, lat, lon, datestamp, server_mode=False):
+        """Convert the passed position in RTOFS grid coords"""
+
+        # check if we need to update the data set (new day!)
+        if not self.download_db(datestamp, server_mode=server_mode):
+            logger.error("troubles in updating data set for timestamp: %s"
+                         % datestamp.strftime("%Y%m%d"))
+            raise RuntimeError('troubles in db download')
+
+        # make longitude "safe" since RTOFS grid starts at east longitude 70-ish degrees
+        if lon < self.lon_0:
+            lon += 360.0
+
+        # This does a nearest neighbour lookup
+        lat_idx = int(round((lat - self.lat_0) / self.lat_step, 0))
+        lon_idx = int(round((lon - self.lon_0) / self.lon_step, 0))
+
+        return lat_idx, lon_idx
+
     def query(self, lat, lon, datestamp=None, server_mode=False):
         """Query RTOFS for passed location and timestamp"""
         if datestamp is None:
@@ -183,17 +190,12 @@ class Rtofs(AbstractAtlas):
             logger.error("invalid query: %s @ (%.6f, %.6f)" % (datestamp.strftime("%Y%m%d"), lon, lat))
             return None
 
-        # check if we need to update the data set (new day!)
-        if not self.download_db(datestamp, server_mode=server_mode):
-            logger.error("troubles in updating data set for timestamp: %s"
-                         % datestamp.strftime("%Y%m%d"))
-            return None
-
         try:
-            lat_idx, lon_idx = self.grid_coords(lat, lon)
+            lat_idx, lon_idx = self.grid_coords(lat, lon, datestamp=datestamp, server_mode=server_mode)
         except TypeError as e:
             logger.critical("while converting location to grid coords, %s" % e)
             return None
+
         # logger.debug("idx > lat: %s, lon: %s" % (lat_idx, lon_idx))
         lat_s_idx = lat_idx - self.search_half_window
         lat_n_idx = lat_idx + self.search_half_window

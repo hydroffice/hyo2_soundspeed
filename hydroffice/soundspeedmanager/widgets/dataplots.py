@@ -363,7 +363,7 @@ class DataPlots(AbstractWidget):
     def on_draw(self):
         """Redraws the figure"""
         self._set_title()
-        print("cur: %s" % self.prj.cur)
+        # print("cur: %s" % self.prj.cur)
         # if self.prj.cur:
         if self.prj.has_ssp():
             self.update_validity_indices()

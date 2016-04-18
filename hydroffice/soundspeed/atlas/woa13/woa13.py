@@ -118,13 +118,6 @@ class Woa13(AbstractAtlas):
 
         return True
 
-    def grid_coords(self, lat, lon):
-        """This does a nearest neighbour lookup"""
-        lat_idx = np.abs((self.lat - lat)).argmin()
-        lon_idx = np.abs((self.lon - lon)).argmin()
-        logger.debug("grid coords: %s %s" % (lat_idx, lon_idx))
-        return lat_idx, lon_idx
-
     def get_depth(self, lat, lon):
         """This helper method retrieve the max valid depth based on location"""
         lat_idx, lon_idx = self.grid_coords(lat, lon)
@@ -148,6 +141,18 @@ class Woa13(AbstractAtlas):
             self.season_idx = 16
 
         # logger.debug("indices: %s, %s" % (self.month_idx, self.season_idx))
+
+    def grid_coords(self, lat, lon, server_mode=False):
+        """This does a nearest neighbour lookup"""
+
+        if not self.has_data_loaded:
+            if not self.load_grids():
+                raise RuntimeError('troubles in db load')
+
+        lat_idx = np.abs((self.lat - lat)).argmin()
+        lon_idx = np.abs((self.lon - lon)).argmin()
+        logger.debug("grid coords: %s %s" % (lat_idx, lon_idx))
+        return lat_idx, lon_idx
 
     def query(self, lat, lon, datestamp=None, server_mode=False):
         """Query WOA13 for passed location and timestamp"""
@@ -174,7 +179,7 @@ class Woa13(AbstractAtlas):
         self.calc_indices(month=datestamp.month)
 
         # Find the nearest grid node
-        lat_base_idx, lon_base_idx = self.grid_coords(lat=lat, lon=lon)
+        lat_base_idx, lon_base_idx = self.grid_coords(lat=lat, lon=lon, server_mode=server_mode)
         lat_offsets = range(lat_base_idx - self.search_radius, lat_base_idx + self.search_radius + 1)
         lon_offsets = range(lon_base_idx - self.search_radius, lon_base_idx + self.search_radius + 1)
 

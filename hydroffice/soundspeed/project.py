@@ -430,7 +430,7 @@ class Project(BaseProject):
 
         return True
 
-    def add_cur_tss(self):
+    def add_cur_tss(self, server_mode=False):
         """Add the transducer sound speed to the current profile"""
         if not self.has_ssp():
             logger.warning("no profile!")
@@ -450,9 +450,11 @@ class Project(BaseProject):
                 logger.warning("unable to retrieve tss values: %s" % e)
 
         if not tss_depth:
-            tss_depth = self.cb.ask_draft()
+            if not server_mode:
+                tss_depth = self.cb.ask_draft()
         if not tss_value:
-            tss_value = self.cb.ask_tss()
+            if not server_mode:
+                tss_value = self.cb.ask_tss()
 
         if (not tss_depth) or (not tss_value):
             logger.warning("unable to retrieve tss values")

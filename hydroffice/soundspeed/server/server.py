@@ -21,6 +21,10 @@ class Server(Thread):
         self.shutdown = Event()
         self.wait_time = 5
 
+        self.tss_last = None
+        self.lat_idx_last = None
+        self.lon_idx_last = None
+
     def stop(self):
         self.shutdown.set()
 
@@ -149,6 +153,41 @@ class Server(Thread):
             return
         logger.debug('loc/timestamp: (%s %s)/%s' % (lat, lon, tm.strftime('%Y/%m/%d %H:%M')))
 
+        # retrieve grid index
+        if self.prj.setup.server_source == 'RTOFS':  # RTOFS case
+            lat_idx, lon_idx = self.prj.atlases.rtofs.grid_coords(lat=lat, lon=lon, datestamp=tm, server_mode=True)
+        elif self.prj.setup.server_source == 'WOA09':  # WOA09 case
+            lat_idx, lon_idx = self.prj.atlases.woa09.grid_coords(lat=lat, lon=lon, server_mode=True)
+        elif self.prj.setup.server_source == 'WOA13':  # WOA09 case
+            lat_idx, lon_idx = self.prj.atlases.woa13.grid_coords(lat=lat, lon=lon, server_mode=True)
+        else:
+            raise RuntimeError('unable to understand server source: %s' % self.prj.setup.server_source)
+        logger.debug('lat idx: %s [last: %s]' % (lat_idx, self.lat_idx_last))
+        logger.debug('lon idx: %s [last: %s]' % (lon_idx, self.lon_idx_last))
+
+        # retrieve surface sound speed
+        tss = None
+        draft = None
+        tss_diff = 0.0
+        if self.prj.setup.server_apply_surface_sound_speed:
+            if self.prj.listeners.sis.xyz88.sound_speed:
+                tss = self.prj.listeners.sis.xyz88.sound_speed
+                if self.tss_last:
+                    tss_diff = abs(tss - self.tss_last)
+            if self.prj.listeners.sis.xyz88.transducer_draft:
+                draft = self.prj.listeners.sis.xyz88.transducer_draft
+
+        logger.debug('tss delta: %s' % tss_diff)
+
+        # check if we need a new cast
+        if (tss_diff < 1.0) and (lat_idx == self.lat_idx_last) and (lon_idx == self.lon_idx_last):
+            if self.force_send.is_set():
+                logger.debug('forcing send')
+                self.force_send.clear()
+            else:
+                logger.debug('new profile not required')
+                return
+
         # retrieve profile
         if self.prj.setup.server_source == 'RTOFS':  # RTOFS case
             self.prj.ssp = self.prj.atlases.rtofs.query(lat=lat, lon=lon, datestamp=tm, server_mode=True)
@@ -164,50 +203,47 @@ class Server(Thread):
             return
         logger.debug('Retrieve new synthetic profile')
 
+        # apply tss (if required)
+        if self.prj.setup.server_apply_surface_sound_speed and tss and draft:
+            self.prj.add_cur_tss(server_mode=True)
 
         # after the first tx, a cast from SIS is always required
         num_live_clients = 0
         if self.prj.setup.client_list.last_tx_time:
-            # log.info("Requesting cast from SIS (prior to transmission)")
-            #
-            # for client in range(self.prj.s.client_list.num_clients):
-            #
-            #     # skipping dead clients
-            #     if not self.prj.s.client_list.clients[client].alive:
-            #         log.info("Dead client: %s > Skipping"
-            #                  % self.prj.s.client_list.clients[client].IP)
-            #         continue
-            #
-            #     # actually requiring the SSP
-            #     self.prj.ssp_recipient_ip = self.prj.s.client_list.clients[client].IP
-            #     log.info("Testing client: %s" % self.prj.ssp_recipient_ip)
-            #     self.prj.get_cast_from_sis()
-            #     log.info("Tested client and got %s" % self.prj.km_listener.ssp)
-            #     if not self.prj.km_listener.ssp:
-            #         log.info("Client went dead since last transmission %s" % self.prj.ssp_recipient_ip)
-            #         self.prj.s.client_list.clients[client].alive = False
-            #         continue
-            #
-            #     # test by comparing the times
-            #     if self.last_sent_ssp_time != self.prj.km_listener.ssp.acquisition_time:
-            #         log.warning("Times mismatch > %s != %s"
-            #                     % (self.prj.time_of_last_tx, self.last_sent_ssp_time))
-            #         self.stopped_on_error = True
-            #         self.prj.server.error_message = "Times mismatch > Another agent uploaded SSP on SIS"
-            #         log.error(self.prj.server.error_message)
-            #         self.prj.s.client_list.clients[client].alive = False
-            #         continue
-            #
-            #     log.info("Live client")
-            #
-            #     num_live_clients += 1
-            #
-            # if num_live_clients == 0:
-            #     self.stopped_on_error = True
-            #     self.prj.server.error_message = "No more live clients"
-            #     log.error("Found no live clients during pre-transmission test")
-            #     continue
-            pass
+            logger.info("Requesting cast from SIS (prior to transmission)")
+
+            for client in self.prj.setup.client_list.clients:
+
+                # skipping dead clients
+                if not client.alive:
+                    logger.info("Dead client: %s > Skipping" % client.ip)
+                    continue
+
+                client.request_profile_from_sis(prj=self.prj)
+                if not self.prj.listeners.sis.ssp:
+                    logger.info("client %s dead since last tx" % client.name)
+                    client.alive = False
+                    continue
+
+                logger.info("Live client: %s" % client.name)
+                num_live_clients += 1
+
+                # test by comparing the times
+                if self.prj.setup.client_list.last_tx_time != self.prj.listeners.sis.ssp.acquisition_time:
+                    logger.error("Times mismatch > %s != %s"
+                                 % (self.prj.setup.client_list.last_tx_time,
+                                    self.prj.listeners.sis.ssp.acquisition_time))
+                    self.shutdown.set()
+                    return
+
+            if num_live_clients == 0:
+                self.shutdown.set()
+                logger.error("no live clients")
+                return
 
         self.prj.setup.client_list.transmit_ssp(prj=self.prj, server_mode=True)
+        if self.prj.setup.server_apply_surface_sound_speed:
+            self.tss_last = tss  # store the tss for the next iteration
+        self.lat_idx_last = lat_idx
+        self.lon_idx_last = lon_idx
 
