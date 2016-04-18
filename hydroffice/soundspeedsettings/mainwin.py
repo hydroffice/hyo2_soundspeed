@@ -17,6 +17,7 @@ from .widgets.sis import Sis
 from .widgets.sippican import Sippican
 from .widgets.mvp import Mvp
 from .widgets.server import Server
+
 from hydroffice.soundspeed.project import Project
 
 

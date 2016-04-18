@@ -47,7 +47,7 @@ class Rtofs(AbstractAtlas):
         """check the availability"""
         return self.has_data_loaded
 
-    def download_db(self, datestamp=None):
+    def download_db(self, datestamp=None, server_mode=False):
         """try to connect and load info from the data set"""
         if datestamp is None:
             datestamp = dt.utcnow()
@@ -56,7 +56,7 @@ class Rtofs(AbstractAtlas):
         if not isinstance(datestamp, date):
             raise RuntimeError("invalid date passed: %s" % type(datestamp))
 
-        if not self.download_files(datestamp=datestamp):
+        if not self.download_files(datestamp=datestamp, server_mode=server_mode):
             return False
 
         try:
@@ -121,7 +121,7 @@ class Rtofs(AbstractAtlas):
                   % input_date.strftime("%Y%m%d")
         return url_temp, url_sal
 
-    def download_files(self, datestamp):
+    def download_files(self, datestamp, server_mode=False):
         """Actually, just try to connect with the remote files
 
         For a given queried date, we may have to use the forecast from the previous
@@ -139,7 +139,7 @@ class Rtofs(AbstractAtlas):
                 logger.info("cleaning data: %s %s" % (self.last_loaded_day, datestamp))
                 self.clear_data()
 
-        self.prj.progress.start("Download RTOFS")
+        self.prj.progress.start("Download RTOFS", server_mode=server_mode)
 
         url_ck_temp, url_ck_sal = self.build_check_urls(datestamp)
         if not (self.check_url(url_ck_temp) and self.check_url(url_ck_sal)):
@@ -168,7 +168,7 @@ class Rtofs(AbstractAtlas):
         self.prj.progress.end()
         return True
 
-    def query(self, lat, lon, datestamp=None):
+    def query(self, lat, lon, datestamp=None, server_mode=False):
         """Query RTOFS for passed location and timestamp"""
         if datestamp is None:
             datestamp = dt.utcnow()
@@ -184,7 +184,7 @@ class Rtofs(AbstractAtlas):
             return None
 
         # check if we need to update the data set (new day!)
-        if not self.download_db(datestamp):
+        if not self.download_db(datestamp, server_mode=server_mode):
             logger.error("troubles in updating data set for timestamp: %s"
                          % datestamp.strftime("%Y%m%d"))
             return None
@@ -203,7 +203,7 @@ class Rtofs(AbstractAtlas):
         if lon < self.lon_0:  # Make all longitudes safe
             lon += 360.0
 
-        self.prj.progress.start("Retrieve RTOFS data")
+        self.prj.progress.start("Retrieve RTOFS data", server_mode=server_mode)
 
         longitudes = np.zeros((self.search_window, self.search_window))
         if (lon_e_idx < self.lon.size) and (lon_w_idx >= 0):

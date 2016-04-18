@@ -338,7 +338,14 @@ class Editor(AbstractWidget):
         self.export_act.setDisabled(False)
         self.transmit_act.setDisabled(False)
         self.save_db_act.setDisabled(False)
+
         # data plots
         self.dataplots.reset()
         self.dataplots.on_draw()
         self.dataplots.setVisible(True)
+
+    def server_started(self):
+        self.setDisabled(True)
+
+    def server_stopped(self):
+        self.setEnabled(True)

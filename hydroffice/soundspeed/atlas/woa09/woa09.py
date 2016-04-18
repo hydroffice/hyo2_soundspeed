@@ -141,7 +141,7 @@ class Woa09(AbstractAtlas):
                 self.season_idx = int(i)
             i += 1
 
-    def query(self, lat, lon, datestamp=None):
+    def query(self, lat, lon, datestamp=None, server_mode=False):
         """Query WOA09 for passed location and timestamp"""
         if datestamp is None:
             datestamp = dt.utcnow()
@@ -158,10 +158,11 @@ class Woa09(AbstractAtlas):
         if lon < 0:  # Make all longitudes positive
             lon += 360.0
 
-        self.prj.progress.start("Retrieve WOA09 data")
+        self.prj.progress.start("Retrieve WOA09 data", server_mode=server_mode)
 
         if not self.has_data_loaded:
             if not self.load_grids():
+                self.prj.progress.end()
                 return None
         self.prj.progress.update(20)
 

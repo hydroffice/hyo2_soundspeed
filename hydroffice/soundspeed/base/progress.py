@@ -19,8 +19,11 @@ class Progress(object):
             self.qt = False
             self._prog = None
 
-    def start(self, text="Processing", abortion=False):
-        if self.qt:
+        self.server_mode = False
+
+    def start(self, text="Processing", abortion=False, server_mode=False):
+        self.server_mode = server_mode
+        if self.qt and not self.server_mode:
             self._prog.reset()
             if not abortion:
                 self._prog.setCancelButton(None)
@@ -30,22 +33,22 @@ class Progress(object):
             self._prog.setValue(10)
 
     def update(self, value, text=None):
-        if self.qt:
+        if self.qt and not self.server_mode:
             self._prog.setValue(value)
             if text:
                 self._prog.setLabelText(text)
 
     def add(self, value, text=None):
-        if self.qt:
+        if self.qt and not self.server_mode:
             self._prog.setValue(self._prog.value() + value)
             if text:
                 self._prog.setLabelText(text)
 
     def end(self):
-        if self.qt:
+        if self.qt and not self.server_mode:
             self._prog.setValue(100)
 
     def was_canceled(self):
-        if self.qt:
+        if self.qt and not self.server_mode:
             return self._prog.wasCanceled()
         return False

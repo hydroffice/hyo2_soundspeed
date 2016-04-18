@@ -16,6 +16,7 @@ from .db.db import SoundSpeedDb
 from .base.gdal_aux import GdalAux
 from .profile.profilelist import ProfileList
 from .profile.dicts import Dicts
+from .server.server import Server
 
 
 class Project(BaseProject):
@@ -30,9 +31,8 @@ class Project(BaseProject):
         self.ref = None  # reference profile
         self.atlases = Atlases(prj=self)
         self.listeners = Listeners(prj=self)
+        self.server = Server(prj=self)
         self.progress = Progress(qprogress=qprogress, qparent=qparent)
-
-        self.time_of_last_tx = None
 
         self.logging()
 
@@ -40,6 +40,9 @@ class Project(BaseProject):
         """Destructor"""
         logger.debug("destroy project")
         self.listeners.stop()
+        if self.server.is_alive():
+            self.server.stop()
+            self.server.join(2)
 
     # --- ssp profile
 
@@ -189,19 +192,7 @@ class Project(BaseProject):
         prog_quantum = 50 / len(self.setup.client_list.clients)
 
         for client in self.setup.client_list.clients:
-            if client.protocol != "SIS":
-                continue
-
-            self.listeners.sis.request_iur(ip=client.ip, port=client.port)
-            wait = self.setup.rx_max_wait_time
-            count = 0
-            quantum = 2
-            logger.info("Waiting ..")
-            while (count < wait) and (not self.listeners.sis.ssp):
-                time.sleep(quantum)
-                count += quantum
-                logger.info(".. %s sec" % count)
-
+            client.request_profile_from_sis(prj=self)
             self.progress.add(prog_quantum)
 
         if not self.listeners.sis.ssp:
@@ -688,6 +679,22 @@ class Project(BaseProject):
             return False
 
         return True
+
+    # --- server
+
+    def start_server(self):
+        if not self.server.is_alive():
+            self.server = Server(prj=self)
+            self.server.start()
+            time.sleep(0.1)
+        return self.server.is_alive()
+
+    def stop_server(self):
+        logger.debug("stop server")
+        if self.server.is_alive():
+            self.server.stop()
+            self.server.join(2)
+        return not self.server.is_alive()
 
     # --- logging
 

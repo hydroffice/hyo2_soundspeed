@@ -125,9 +125,7 @@ class Settings(object):
 
         # server
         self.server_source = db.server_source
-        self.server_append_caris_file = db.server_append_caris_file
         self.server_apply_surface_sound_speed = db.server_apply_surface_sound_speed
-        self.server_auto_export_on_send = db.server_auto_export_on_send
         db.close()
 
     def __repr__(self):

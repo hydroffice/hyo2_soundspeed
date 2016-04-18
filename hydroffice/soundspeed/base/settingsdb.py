@@ -528,15 +528,6 @@ class SettingsDb(BaseDb):
     def server_source(self, value):
         self._setter_str("server_source", value)
 
-    # --- server_append_caris_file
-    @property
-    def server_append_caris_file(self):
-        return self._getter_bool("server_append_caris_file")
-
-    @server_append_caris_file.setter
-    def server_append_caris_file(self, value):
-        self._setter_str("server_append_caris_file", value)
-
     # --- server_apply_surface_sound_speed
     @property
     def server_apply_surface_sound_speed(self):
@@ -545,12 +536,3 @@ class SettingsDb(BaseDb):
     @server_apply_surface_sound_speed.setter
     def server_apply_surface_sound_speed(self, value):
         self._setter_str("server_apply_surface_sound_speed", value)
-
-    # --- server_auto_export_on_send
-    @property
-    def server_auto_export_on_send(self):
-        return self._getter_bool("server_auto_export_on_send")
-
-    @server_auto_export_on_send.setter
-    def server_auto_export_on_send(self, value):
-        self._setter_str("server_auto_export_on_send", value)

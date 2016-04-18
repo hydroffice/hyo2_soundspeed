@@ -49,9 +49,7 @@ CREATE_SETTINGS = """ CREATE TABLE IF NOT EXISTS general(
      mvp_instrument text NOT NULL DEFAULT "AML_uSVPT",
      /* server */
      server_source text NOT NULL DEFAULT "WOA09",
-     server_append_caris_file text NOT NULL DEFAULT "False",
      server_apply_surface_sound_speed text NOT NULL DEFAULT "True",
-     server_auto_export_on_send text NOT NULL DEFAULT "True",
 
      /* Checks */
      CHECK (setup_status IN ("active", "inactive")),
@@ -87,10 +85,8 @@ CREATE_SETTINGS = """ CREATE TABLE IF NOT EXISTS general(
      CHECK (mvp_format IN ("S12", "CALC", "ASVP")),
      CHECK (mvp_instrument IN ("AML_uSVP", "AML_uSVPT", "AML_Smart_SVP", "AML_uCTD", "AML_uCTD+", "Valeport_SVPT", "SBE_911+", "SBE_49")),
      /* server */
-     CHECK (server_source IN ("RTOFS", "WOA09", "WOA13", "ref")),
-     CHECK (server_append_caris_file IN ("True", "False")),
-     CHECK (server_apply_surface_sound_speed IN ("True", "False")),
-     CHECK (server_auto_export_on_send IN ("True", "False"))
+     CHECK (server_source IN ("RTOFS", "WOA09", "WOA13")),
+     CHECK (server_apply_surface_sound_speed IN ("True", "False"))
      ) """ % lib_version
 
 CREATE_CLIENT_LIST = """ CREATE TABLE IF NOT EXISTS client_list(

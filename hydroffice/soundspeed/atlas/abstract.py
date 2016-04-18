@@ -27,7 +27,7 @@ class AbstractAtlas(object):
         pass
 
     @abstractmethod
-    def query(self, lat, lon, datestamp):
+    def query(self, lat, lon, datestamp, server_mode):
         pass
 
     @abstractmethod

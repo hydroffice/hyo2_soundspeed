@@ -149,7 +149,7 @@ class Woa13(AbstractAtlas):
 
         # logger.debug("indices: %s, %s" % (self.month_idx, self.season_idx))
 
-    def query(self, lat, lon, datestamp=None):
+    def query(self, lat, lon, datestamp=None, server_mode=False):
         """Query WOA13 for passed location and timestamp"""
         if datestamp is None:
             datestamp = dt.utcnow()
@@ -164,7 +164,7 @@ class Woa13(AbstractAtlas):
             logger.error("invalid query: %s @ (%.6f, %.6f)" % (datestamp.strftime("%Y%m%d"), lon, lat))
             return None
 
-        self.prj.progress.start("Retrieve WOA13 data")
+        self.prj.progress.start("Retrieve WOA13 data", server_mode=server_mode)
 
         if not self.has_data_loaded:
             if not self.load_grids():

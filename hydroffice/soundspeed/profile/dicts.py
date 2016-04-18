@@ -106,6 +106,12 @@ class Dicts(object):
         ("ref", 3),
     ])
 
+    server_sources = OrderedDict([
+        ("WOA09", 0),
+        ("WOA13", 1),
+        ("RTOFS", 2),
+    ])
+
     mvp_protocols = OrderedDict([
         ("NAVO_ISS60", 0),
         ("UNDEFINED", 1),

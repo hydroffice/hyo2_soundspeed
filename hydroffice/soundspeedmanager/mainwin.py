@@ -17,6 +17,7 @@ from .widgets.editor import Editor
 from .widgets.database import Database
 from .widgets.server import Server
 from .widgets.settings import Settings
+from .widgets.refraction import Refraction
 from .widgets.info import Info
 
 
@@ -100,18 +101,24 @@ class MainWin(QtGui.QMainWindow):
         idx = self.tabs.insertTab(2, self.tab_server,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'server.png')), "")
         self.tabs.setTabToolTip(idx, "Server")
+        # refraction
+        self.tab_refraction = Refraction(prj=self.prj, main_win=self)
+        idx = self.tabs.insertTab(3, self.tab_refraction,
+                                  QtGui.QIcon(os.path.join(self.here, 'media', 'refraction.png')), "")
+        self.tabs.setTabToolTip(idx, "Refraction Monitor")
         # server
         self.tab_settings = Settings(prj=self.prj, main_win=self)
-        idx = self.tabs.insertTab(3, self.tab_settings,
+        idx = self.tabs.insertTab(4, self.tab_settings,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'settings.png')), "")
         self.tabs.setTabToolTip(idx, "Settings")
         # info
         self.tab_info = Info(default_url='http://www.hydroffice.org/soundspeed/')
-        idx = self.tabs.insertTab(4, self.tab_info,
+        idx = self.tabs.insertTab(5, self.tab_info,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'info.png')), "")
         self.tabs.setTabToolTip(idx, "Info")
 
         self.statusBar().setStyleSheet("QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;}")
+        self.status_bar_normal_style = self.statusBar().styleSheet()
         self.statusBar().showMessage("%s" % ssm_version, 2000)
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.update_gui)
@@ -256,30 +263,55 @@ class MainWin(QtGui.QMainWindow):
         self.tab_editor.data_cleared()
         self.tab_database.data_cleared()
         self.tab_server.data_cleared()
+        self.tab_refraction.data_cleared()
         self.tab_settings.data_cleared()
 
     def data_imported(self):
         self.tab_editor.data_imported()
         self.tab_database.data_imported()
         self.tab_server.data_imported()
+        self.tab_refraction.data_imported()
         self.tab_settings.data_imported()
 
     def data_stored(self):
         self.tab_editor.data_stored()
         self.tab_database.data_stored()
         self.tab_server.data_stored()
+        self.tab_refraction.data_stored()
         self.tab_settings.data_stored()
 
     def data_removed(self):
         self.tab_editor.data_removed()
         self.tab_database.data_removed()
         self.tab_server.data_removed()
+        self.tab_refraction.data_removed()
         self.tab_settings.data_removed()
+
+    def server_started(self):
+        # clear widgets as for data clear
+        self.data_cleared()
+
+        self.tab_editor.server_started()
+        self.tab_database.server_started()
+        self.tab_server.server_started()
+        self.tab_refraction.server_started()
+        self.tab_settings.server_started()
+        self.statusBar().setStyleSheet("QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;background-color:rgba(51,204,255,128);}")
+
+    def server_stopped(self):
+        self.tab_editor.server_stopped()
+        self.tab_database.server_stopped()
+        self.tab_server.server_stopped()
+        self.tab_refraction.server_stopped()
+        self.tab_settings.server_stopped()
+        self.statusBar().setStyleSheet(self.status_bar_normal_style)
 
     def update_gui(self):
         msg = str()
 
         tokens = list()
+        if self.prj.server.is_alive():
+            tokens.append("SRV")
         if self.prj.has_ref():
             tokens.append("REF")
         if self.prj.use_rtofs():
@@ -356,8 +388,16 @@ class MainWin(QtGui.QMainWindow):
 
         self.statusBar().showMessage(msg, 2000)
         if self.prj.has_ssp():
-            self.tab_editor.dataplots.update_data()
-            self.tab_editor.dataplots.redraw()
+            if self.prj.server.is_alive():
+                if not self.tab_server.is_drawn:
+                    self.tab_server.dataplots.reset()
+                    self.tab_server.dataplots.on_draw()
+                    self.tab_server.is_drawn = True
+                self.tab_server.dataplots.update_data()
+                self.tab_server.dataplots.redraw()
+            else:
+                self.tab_editor.dataplots.update_data()
+                self.tab_editor.dataplots.redraw()
 
     # Quitting #
 

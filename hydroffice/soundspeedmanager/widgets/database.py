@@ -185,3 +185,9 @@ class Database(AbstractWidget):
 
     def data_removed(self):
         self.update_table()
+
+    def server_started(self):
+        self.setDisabled(True)
+
+    def server_stopped(self):
+        self.setEnabled(True)

@@ -37,8 +37,10 @@ class DataPlots(AbstractWidget):
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
 
-    def __init__(self, main_win, prj):
+    def __init__(self, main_win, prj, server_mode=False):
         AbstractWidget.__init__(self, main_win=main_win, prj=prj)
+
+        self.server_mode = server_mode
 
         # mpl figure settings
         self.f_dpi = 120  # dots-per-inch
@@ -116,12 +118,13 @@ class DataPlots(AbstractWidget):
         self.sal_invalid = None
         # events
 
-        # toolbar
-        self.hbox = QtGui.QHBoxLayout()
-        self.vbox.addLayout(self.hbox)
-        # navigation
-        self.nav = NavToolbar(canvas=self.c, parent=self.top_widget, plot_win=self, prj=self.prj)
-        self.hbox.addWidget(self.nav)
+        if not self.server_mode:
+            # toolbar
+            self.hbox = QtGui.QHBoxLayout()
+            self.vbox.addLayout(self.hbox)
+            # navigation
+            self.nav = NavToolbar(canvas=self.c, parent=self.top_widget, plot_win=self, prj=self.prj)
+            self.hbox.addWidget(self.nav)
 
         self.on_draw()
 
@@ -360,8 +363,9 @@ class DataPlots(AbstractWidget):
     def on_draw(self):
         """Redraws the figure"""
         self._set_title()
-
-        if self.prj.cur:
+        print("cur: %s" % self.prj.cur)
+        # if self.prj.cur:
+        if self.prj.has_ssp():
             self.update_validity_indices()
             self._draw_speed()
             self._draw_temp()
@@ -482,4 +486,5 @@ class DataPlots(AbstractWidget):
         self.sal_invalid.set_visible(value)
 
     def reset(self):
-        self.nav.reset()
+        if not self.server_mode:
+         self.nav.reset()

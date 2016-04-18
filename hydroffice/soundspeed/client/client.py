@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import time
 import socket
 import logging
 
@@ -20,7 +21,7 @@ class Client(object):
         self.alive = True
         logger.info("new client: %s(%s:%s) %s" % (self.name, self.ip, self.port, self.protocol))
 
-    def send_cast(self, prj):
+    def send_cast(self, prj, server_mode=False):
         """Send a cast to the """
         if not self.alive:
             logger.debug("%s[%s:%s:%s] is NOT alive" % (self.name, self.ip, self.port, self.protocol))
@@ -32,15 +33,15 @@ class Client(object):
         if self.protocol == "HYPACK":
             success = self.send_hyp_format(prj=prj)
         else:
-            success = self.send_kng_format(prj=prj)
+            success = self.send_kng_format(prj=prj, server_mode=server_mode)
 
         return success
 
-    def send_kng_format(self, prj):
+    def send_kng_format(self, prj, server_mode=False):
         logger.info("using kng format")
         kng_fmt = None
         if self.protocol == "SIS":
-            if prj.setup.sis_auto_apply_manual_casts:
+            if prj.setup.sis_auto_apply_manual_casts or server_mode:
                 kng_fmt = Dicts.kng_formats['S01']
             else:
                 kng_fmt = Dicts.kng_formats['S12']
@@ -77,3 +78,17 @@ class Client(object):
 
         sock_out.close()
         return True
+
+    def request_profile_from_sis(self, prj):
+        if self.protocol != "SIS":
+            return
+
+        prj.listeners.sis.request_iur(ip=self.ip, port=self.port)
+        wait = prj.setup.rx_max_wait_time
+        count = 0
+        quantum = 2
+        logger.info("Waiting ..")
+        while (count < wait) and (not prj.listeners.sis.ssp):
+            time.sleep(quantum)
+            count += quantum
+            logger.info(".. %s sec" % count)

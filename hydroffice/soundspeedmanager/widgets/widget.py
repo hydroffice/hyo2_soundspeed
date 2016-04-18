@@ -50,3 +50,9 @@ class AbstractWidget(QtGui.QMainWindow):
 
     def data_removed(self):
         pass
+
+    def server_started(self):
+        pass
+
+    def server_stopped(self):
+        pass

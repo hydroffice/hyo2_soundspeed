@@ -14,7 +14,7 @@ from .client import Client
 class ClientList(object):
     def __init__(self):
         self.num_clients = 0
-        self.clients = []
+        self.clients = list()
         self.last_tx_time = None
 
     def add_client(self, client):
@@ -22,9 +22,9 @@ class ClientList(object):
         self.clients.append(client)
         self.num_clients += 1
 
-    def transmit_ssp(self, prj):
+    def transmit_ssp(self, prj, server_mode=False):
 
-        prj.progress.start('Transmitting')
+        prj.progress.start('Transmitting', server_mode=server_mode)
 
         # loop through the client list
         success = True  # false if one tx has troubles
@@ -32,12 +32,12 @@ class ClientList(object):
         for client in self.clients:
 
             # clean previously received profile from SIS
-            if client.protocol != "SIS":
+            if client.protocol == "SIS":
                 prj.listeners.sis.ssp = None
 
             prj.progress.add(prog_quantum)
 
-            if not client.send_cast(prj=prj):
+            if not client.send_cast(prj=prj, server_mode=server_mode):
                 logger.warning('unable to send profile to %s' % client.name)
                 success = False
                 continue
@@ -46,12 +46,14 @@ class ClientList(object):
                 logger.info("transmitted cast, protocol %s does not allow verification"
                             % client.protocol)
                 time.sleep(1)
-                prj.cb.msg_tx_no_verification(name=client.name, protocol=client.protocol)
+                if not server_mode:
+                    prj.cb.msg_tx_no_verification(name=client.name, protocol=client.protocol)
                 continue
 
             if not prj.setup.sis_auto_apply_manual_casts:
                 logger.info("transmitted cast, SIS is waiting for operator confirmation")
-                prj.cb.msg_tx_sis_wait(name=client.name)
+                if not server_mode:
+                    prj.cb.msg_tx_sis_wait(name=client.name)
                 continue
 
             logger.debug("waiting for receipt confirmation...")
@@ -74,16 +76,19 @@ class ClientList(object):
                 if max_diff < 0.2:
                     self.last_tx_time = prj.listeners.sis.ssp.acquisition_time
                     logger.debug("reception confirmed: %s" % self.last_tx_time.strftime("%d/%m/%Y, %H:%M:%S"))
-                    prj.cb.msg_tx_sis_confirmed(name=client.name)
+                    if not server_mode:
+                        prj.cb.msg_tx_sis_confirmed(name=client.name)
                     continue
                 else:
                     logger.info("casts differ by %.2f m/s" % max_diff)
-                    prj.cb.msg_tx_sis_not_confirmed(name=client.name, ip=prj.setup.sis_listen_port)
+                    if not server_mode:
+                        prj.cb.msg_tx_sis_not_confirmed(name=client.name, ip=prj.setup.sis_listen_port)
                     success = False
                     continue
             else:
                 logger.warning("reception NOT confirmed: unable to catch the back datagram")
-                prj.cb.msg_tx_sis_not_confirmed(name=client.name, ip=prj.setup.sis_listen_port)
+                if not server_mode:
+                    prj.cb.msg_tx_sis_not_confirmed(name=client.name, ip=prj.setup.sis_listen_port)
                 success = False
 
         prj.progress.end()

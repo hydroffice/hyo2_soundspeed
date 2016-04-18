@@ -74,3 +74,9 @@ class Settings(AbstractWidget):
 
         msg = "New settings have been applied!"
         QtGui.QMessageBox.information(self, "Settings", msg, QtGui.QMessageBox.Ok)
+
+    def server_started(self):
+        self.setDisabled(True)
+
+    def server_stopped(self):
+        self.setEnabled(True)
