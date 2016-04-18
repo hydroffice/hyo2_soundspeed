@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from datetime import datetime
 import os
 import logging
 
@@ -343,10 +344,22 @@ class DataPlots(AbstractWidget):
         # hide y-labels
         [label.set_visible(False) for label in self.sal_ax.get_yticklabels()]
 
+    def _set_title(self):
+        # plot title
+        msg = str()
+        if self.prj.cur_file:
+            msg += self.prj.cur_file
+        if self.prj.setup.client_list.last_tx_time and self.prj.use_sis():
+            if len(msg) > 0:
+                msg += " "
+            delta = datetime.utcnow() - self.prj.setup.client_list.last_tx_time
+            msg += "[%dh %dm since last tx]" % (delta.days * 24 + delta.seconds // 3600,
+                                                (delta.seconds // 60) % 60)
+        self.f.suptitle(msg)
+
     def on_draw(self):
         """Redraws the figure"""
-        if self.prj.cur_file:
-            self.f.suptitle(self.prj.cur_file)
+        self._set_title()
 
         if self.prj.cur:
             self.update_validity_indices()
@@ -412,6 +425,9 @@ class DataPlots(AbstractWidget):
             if self.speed_sensor:
                 self.speed_sensor.set_xdata(None)
             return
+
+        # plot title
+        self._set_title()
 
         # it means that data have not been plotted
         if (not self.speed_draft) or (not self.speed_sensor) or (not self.speed_seafloor):

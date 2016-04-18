@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import datetime
 import time
 import threading
 import socket
@@ -70,6 +71,9 @@ class SvpThread(threading.Thread):
 
         logger.debug("msg from %s [sz: %sB]" % (address, len(data)))
 
+        date = None
+        secs = None
+
         if data[0] == '$' and data[3:6] == "R20":
             logger.debug("got IUR request!")
 
@@ -112,20 +116,32 @@ class SvpThread(threading.Thread):
             if isinstance(data, bytes):
                 data = data.decode("utf-8")
 
-            print(data)
+            # logger.debug(data)
 
             depths = None
             speeds = None
             count = 0
             header = False
+
             for l in data.splitlines():
+
+                if count == 0:  # first line
+                    if "CALC" in l:
+                        logger.warning("HYPACK profile")
+                        return
+
                 num_fields = len(l.split(","))
                 if num_fields == 12:  # header
-                    num_entries = int(l.split(",")[2])
+                    fields = l.split(",")
+                    num_entries = int(fields[2])
+                    timestamp = datetime.datetime.strptime(fields[3], "%H%M%S")
+                    secs = (timestamp - timestamp.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()
+                    datestamp = datetime.datetime(day=int(fields[4]), month=int(fields[5]), year=int(fields[6]))
+                    date = int(datestamp.strftime("%Y%m%d"))
                     depths = np.zeros(num_entries)
                     speeds = np.zeros(num_entries)
-                    depths[count] = l.split(",")[7]
-                    speeds[count] = l.split(",")[8]
+                    depths[count] = fields[7]
+                    speeds[count] = fields[8]
                     header = True
                 elif num_fields == 5:
                     if not header:
@@ -135,7 +151,7 @@ class SvpThread(threading.Thread):
                     speeds[count] = l.split(",")[1]
                 count += 1
 
-        ssp = self.create_binary_ssp(depths=depths, speeds=speeds)
+        ssp = self.create_binary_ssp(depths=depths, speeds=speeds, date=date, secs=secs)
 
         logger.debug("sending data: %s" % repr(ssp))
         time.sleep(1.5)
@@ -143,12 +159,17 @@ class SvpThread(threading.Thread):
         self.ssp.append(ssp)
         logger.debug("data sent")
 
-    def create_binary_ssp(self, depths, speeds, d_res=1):
+    def create_binary_ssp(self, depths, speeds, d_res=1, date=None, secs=None):
         logger.debug('creating a binary ssp')
         d_res = 1  # depth resolution
         # TODO: improve it with the received metadata
+        now = datetime.datetime.utcnow()
+        if not date:
+            date = int(now.strftime("%Y%m%d"))
+        if not secs:
+            secs = (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()
         # -- header
-        svp = struct.pack("<BBHIIHHIIHH", 2, 0x55, 122, 20120403, 0, 0, 0, 20120403, 0, depths.size, d_res)
+        svp = struct.pack("<BBHIIHHIIHH", 2, 0x55, 122, date, secs * 1000, 1, 123, date, secs, depths.size, d_res)
         # -- body
         for count in range(depths.size):
             depth = int(depths[count] * d_res / 0.01)

@@ -307,6 +307,7 @@ class Woa13(AbstractAtlas):
         ssp.data.sal = s[valid]
         ssp.calc_data_speed()
         ssp.clone_data_to_proc()
+        ssp.init_sis()
 
         # - min/max
         # Isolate realistic values
@@ -328,6 +329,7 @@ class Woa13(AbstractAtlas):
             ssp_min.data.sal = s_min[valid][0:num_values]
             ssp_min.calc_data_speed()
             ssp_min.clone_data_to_proc()
+            ssp_min.init_sis()
         else:
             ssp_min = None
         # -- max
@@ -345,6 +347,7 @@ class Woa13(AbstractAtlas):
             ssp_max.data.sal = s_max[valid][0:num_values]
             ssp_max.calc_data_speed()
             ssp_max.clone_data_to_proc()
+            ssp_max.init_sis()
         else:
             ssp_max = None
 

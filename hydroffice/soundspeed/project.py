@@ -230,6 +230,7 @@ class Project(BaseProject):
         ssp.meta.latitude = lat
         ssp.meta.longitude = lon
         ssp.clone_data_to_proc()
+        ssp.init_sis()  # initialize to zero
         ssp_list = ProfileList()
         ssp_list.append_profile(ssp)
         self.ssp = ssp_list

@@ -37,6 +37,26 @@ class AbstractCallbacks(object):
         """Ask user for draft"""
         pass
 
+    @abstractmethod
+    def msg_tx_no_verification(self, name, protocol):
+        """Profile transmitted but not verification available"""
+        pass
+
+    @abstractmethod
+    def msg_tx_sis_wait(self, name):
+        """Profile transmitted, SIS is waiting for confirmation"""
+        pass
+
+    @abstractmethod
+    def msg_tx_sis_confirmed(self, name):
+        """Profile transmitted, SIS confirmed"""
+        pass
+
+    @abstractmethod
+    def msg_tx_sis_not_confirmed(self, name, ip):
+        """Profile transmitted, SIS not confirmed"""
+        pass
+
 
 class TestCallbacks(AbstractCallbacks):
     """Used only for testing since the methods do not require user interaction"""
@@ -52,9 +72,24 @@ class TestCallbacks(AbstractCallbacks):
     def ask_tss(self):
         return 1500.0
 
-    @abstractmethod
     def ask_draft(self):
         return 8.0
+
+    def msg_tx_no_verification(self, name, protocol):
+        """Profile transmitted but not verification available"""
+        pass
+
+    def msg_tx_sis_wait(self, name):
+        """Profile transmitted, SIS is waiting for confirmation"""
+        pass
+
+    def msg_tx_sis_confirmed(self, name):
+        """Profile transmitted, SIS confirmed"""
+        pass
+
+    def msg_tx_sis_not_confirmed(self, name, ip):
+        """Profile transmitted, SIS not confirmed"""
+        pass
 
 
 class Callbacks(AbstractCallbacks):
@@ -200,3 +235,19 @@ class Callbacks(AbstractCallbacks):
                 continue
 
         return draft
+
+    def msg_tx_no_verification(self, name, protocol):
+        """Profile transmitted but not verification available"""
+        pass
+
+    def msg_tx_sis_wait(self, name):
+        """Profile transmitted, SIS is waiting for confirmation"""
+        pass
+
+    def msg_tx_sis_confirmed(self, name):
+        """Profile transmitted, SIS confirmed"""
+        pass
+
+    def msg_tx_sis_not_confirmed(self, name, ip):
+        """Profile transmitted, SIS not confirmed"""
+        pass

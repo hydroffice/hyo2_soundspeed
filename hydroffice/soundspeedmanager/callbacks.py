@@ -107,3 +107,32 @@ class Callbacks(AbstractCallbacks):
         if not ok:
             draft = None
         return draft
+
+    def msg_tx_no_verification(self, name, protocol):
+        """Ask user for draft"""
+        QtGui.QMessageBox.information(self.parent, "Profile transmitted",
+                                      "Profile transmitted to \'%s\'.\n\n"
+                                      "The %s protocol does not allow verification." %
+                                      (name, protocol))
+
+    def msg_tx_sis_wait(self, name):
+        """Profile transmitted, SIS is waiting for confirmation"""
+        QtGui.QMessageBox.information(self.parent, "Profile Transmitted",
+                                      "Profile transmitted to \'%s\'.\n\n"
+                                      "SIS is waiting for operator confirmation." % name)
+
+    def msg_tx_sis_confirmed(self, name):
+        """Profile transmitted, SIS confirmed"""
+        QtGui.QMessageBox.information(self.parent, "Transmitted",
+                                      "Reception confirmed from \'%s\'!" % name)
+
+    def msg_tx_sis_not_confirmed(self, name, ip):
+        """Profile transmitted, SIS not confirmed"""
+        QtGui.QMessageBox.warning(self.parent, "Transmitted",
+                                  "Profile transmitted, but \'%s\' did not confirm the recption\n\n"
+                                  "Please do the following checks on SIS:\n"
+                                  "1) Check sound speed file name in SIS run-time parameters "
+                                  "and match date/time in SIS .asvp filename with cast date/time to ensure receipt\n"
+                                  "2) Ensure SVP datagram is being distributed to this IP "
+                                  "on port %d to enable future confirmations"
+                                  % (name, ip))
