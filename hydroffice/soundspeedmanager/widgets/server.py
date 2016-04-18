@@ -19,8 +19,6 @@ class Server(AbstractWidget):
     def __init__(self, main_win, prj):
         AbstractWidget.__init__(self, main_win=main_win, prj=prj)
 
-        self.is_drawn = False
-
         # create the overall layout
         self.main_layout = QtGui.QVBoxLayout()
         self.frame.setLayout(self.main_layout)

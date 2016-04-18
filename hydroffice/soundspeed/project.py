@@ -82,6 +82,20 @@ class Project(BaseProject):
             return False
         return True
 
+    # --- listeners
+
+    def has_mvp_to_process(self):
+        if not self.use_mvp():
+            return False
+
+        return self.listeners.mvp_to_process
+
+    def has_sippican_to_process(self):
+        if not self.use_sippican():
+            return False
+
+        return self.listeners.sippican_to_process
+
     # --- callbacks
 
     def set_callbacks(self, cb):
@@ -263,6 +277,12 @@ class Project(BaseProject):
             else:
                 writer.write(ssp=self.ssp, data_path=data_path, data_file=data_files[i], data_append=data_append)
 
+        # take care of listeners
+        if self.has_sippican_to_process():
+            self.listeners.sippican_to_process = False
+        if self.has_mvp_to_process():
+            self.listeners.mvp_to_process = False
+
     # --- db
 
     def store_data(self):
@@ -275,6 +295,14 @@ class Project(BaseProject):
         db = SoundSpeedDb(data_folder=self.data_folder)
         success = db.add_casts(self.ssp)
         db.disconnect()
+
+        # take care of listeners
+        if success:
+            if self.has_sippican_to_process():
+                self.listeners.sippican_to_process = False
+            if self.has_mvp_to_process():
+                self.listeners.mvp_to_process = False
+
         return success
 
     def db_profiles(self, project=None):
@@ -680,6 +708,11 @@ class Project(BaseProject):
             logger.warning("issue in transmitting the profile")
             return False
 
+        # take care of listeners
+        if self.has_sippican_to_process():
+            self.listeners.sippican_to_process = False
+        if self.has_mvp_to_process():
+            self.listeners.mvp_to_process = False
         return True
 
     # --- server

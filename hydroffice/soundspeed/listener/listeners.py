@@ -23,8 +23,26 @@ class Listeners(object):
         # available listeners
         self.sis = Sis(port=self.prj.setup.sis_listen_port, datagrams=[0x50, 0x52, 0x55, 0x58],
                        timeout=self.prj.setup.sis_listen_timeout)
-        self.sippican = Sippican(port=self.prj.setup.sippican_listen_port)
-        self.mvp = Mvp(port=self.prj.setup.mvp_listen_port)
+        self.sippican = Sippican(port=self.prj.setup.sippican_listen_port, prj=prj)
+        self.mvp = Mvp(port=self.prj.setup.mvp_listen_port, prj=prj)
+
+    @property
+    def sippican_to_process(self):
+        return self.sippican.new_ssp.is_set()
+
+    @sippican_to_process.setter
+    def sippican_to_process(self, to_process):
+        if not to_process:
+            self.sippican.new_ssp.clear()
+
+    @property
+    def mvp_to_process(self):
+        return self.mvp.new_ssp.is_set()
+
+    @mvp_to_process.setter
+    def mvp_to_process(self, to_process):
+        if not to_process:
+            self.mvp.new_ssp.clear()
 
     def listen_sis(self):
         if not self.sis.is_alive():

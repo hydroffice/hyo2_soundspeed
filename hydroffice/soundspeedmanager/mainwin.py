@@ -388,16 +388,27 @@ class MainWin(QtGui.QMainWindow):
 
         self.statusBar().showMessage(msg, 2000)
         if self.prj.has_ssp():
-            if self.prj.server.is_alive():
-                if not self.tab_server.is_drawn:
+
+            if self.prj.server.is_alive():  # server mode
+                if not self.tab_server.dataplots.is_drawn:
                     self.tab_server.dataplots.reset()
                     self.tab_server.dataplots.on_draw()
-                    self.tab_server.is_drawn = True
                 self.tab_server.dataplots.update_data()
                 self.tab_server.dataplots.redraw()
-            else:
+            else:  # user mode
+                if self.prj.has_mvp_to_process() or self.prj.has_sippican_to_process():
+                    # logger.debug("plot drawn: %s" % self.tab_editor.dataplots.is_drawn)
+                    if not self.tab_editor.dataplots.is_drawn:
+                        self.tab_editor.dataplots.reset()
+                        self.tab_editor.dataplots.on_draw()
                 self.tab_editor.dataplots.update_data()
                 self.tab_editor.dataplots.redraw()
+
+        if not self.prj.server.is_alive():  # user mode - listeners
+            if self.prj.has_mvp_to_process() or self.prj.has_sippican_to_process():
+                self.statusBar().setStyleSheet("QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;background-color:rgba(255,163,102,128);}")
+            else:
+                self.statusBar().setStyleSheet(self.status_bar_normal_style)
 
     # Quitting #
 

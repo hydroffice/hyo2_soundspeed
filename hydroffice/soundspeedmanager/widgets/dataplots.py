@@ -41,6 +41,7 @@ class DataPlots(AbstractWidget):
         AbstractWidget.__init__(self, main_win=main_win, prj=prj)
 
         self.server_mode = server_mode
+        self.is_drawn = False
 
         # mpl figure settings
         self.f_dpi = 120  # dots-per-inch
@@ -370,6 +371,7 @@ class DataPlots(AbstractWidget):
             self._draw_speed()
             self._draw_temp()
             self._draw_sal()
+            self.is_drawn = True
 
         self._draw_grid()
 
