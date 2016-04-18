@@ -1,0 +1,10 @@
+{
+  "title": "Sound Speed Manager",
+   "background": "dmg.png",
+   "icon-size": 80,
+   "contents": [
+    { "x": 128, "y": 110, "type": "file", "path": "dist/SoundSpeedManager.app" },
+    { "x": 370, "y": 110, "type": "link", "path": "/Applications" }
+  ]
+   
+}

@@ -399,8 +399,7 @@ class MainWin(QtGui.QMainWindow):
                 if self.prj.has_mvp_to_process() or self.prj.has_sippican_to_process():
                     # logger.debug("plot drawn: %s" % self.tab_editor.dataplots.is_drawn)
                     if not self.tab_editor.dataplots.is_drawn:
-                        self.tab_editor.dataplots.reset()
-                        self.tab_editor.dataplots.on_draw()
+                        self.data_imported()
                 self.tab_editor.dataplots.update_data()
                 self.tab_editor.dataplots.redraw()
 
