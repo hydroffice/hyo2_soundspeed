@@ -5,18 +5,24 @@ Todolist
 Sound Speed
 -----------
 
-* Add Caris svp reader/writer
-* Add sqlite reader/writer (pk: time + location + filename?)
+* Add Caris svp reader
 * Add NODC archive output
-* Add sqlite settings
-* Add sqlite logging (user/server)
-* Release: 1.0.0
+* Fix too many point in DP algorithm
 
 Manager
 -------
 
-* Metadata widget
-* Read-only spreadsheet
+* Spreadsheets for proc and sis data
 * Plot x-y for additional fields
-* Profile editing: pan + toolbar
-* Release: 3.0.0
+* Combobox editing list of vessel, projects
+* Display - close to tss, draft and bottom
+* Remember last export
+* Retrieve past version of atlases
+
+Research
+--------
+
+* Evaluate when server mode is appropriate
+* Planning tool: how many xbt?
+* Real-time estimation of variability
+
