@@ -1,5 +1,5 @@
-HydrOffice BAG
-==============
+HydrOffice Sound Speed
+======================
 
 .. image:: https://img.shields.io/pypi/v/hydroffice.soundspeed.svg
     :target: https://pypi.python.org/pypi/hydroffice.soundspeed

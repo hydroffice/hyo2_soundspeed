@@ -162,7 +162,9 @@ class Ftp(object):
                         progress.show_progress()
 
             self.conn.retrbinary('RETR %s' % file_src, callback)
-            self.progress.end()
+            if self.show_progress:
+                if self.progress:
+                    self.progress.end()
 
         if unzip_it:
             import zipfile
@@ -199,7 +201,9 @@ class Ftp(object):
                             progress.show_progress()
                 z.close()
                 os.remove(file_dst)
-                self.progress.end()
+                if self.show_progress:
+                    if self.progress:
+                        self.progress.end()
 
             except:
                 raise RuntimeError("unable to unzip the downloaded file: %s" % file_dst)
