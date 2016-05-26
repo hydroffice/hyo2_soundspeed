@@ -75,7 +75,10 @@ class Turo(AbstractBinaryReader):
         logger.debug('parsing body')
 
         depth = self.fid.io.variables['depth'][:]
-        speed = self.fid.io.variables['soundSpeed'][0, :, 0, 0]
+        try:
+            speed = self.fid.io.variables['soundSpeed'][0, :, 0, 0]
+        except KeyError:
+            speed = self.fid.io.variables['derivedSoundSpeed'][0, :, 0, 0]
         temp = self.fid.io.variables['temperature'][0, :, 0, 0]
         self.ssp.cur.init_data(depth.size)
 

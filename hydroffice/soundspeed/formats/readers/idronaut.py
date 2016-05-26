@@ -167,7 +167,7 @@ class Idronaut(AbstractTextReader):
         if not self.ssp.cur.meta.original_path:
             self.ssp.cur.meta.original_path = self.fid.path
 
-        # initialize data sample structures
+        # initialize data sample fields
         self.ssp.cur.init_data(len(self.lines) - self.samples_offset)
         # initialize additional fields
         self.ssp.cur.init_more(self.more_fields)

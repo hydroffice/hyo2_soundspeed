@@ -83,7 +83,7 @@ class Unb(AbstractTextReader):
         if not self.ssp.cur.meta.original_path:
             self.ssp.cur.meta.original_path = self.fid.path
 
-        # initialize data sample structures
+        # initialize data sample fields
         self.ssp.cur.init_data(num_samples)
         # initialize additional fields
         self.more_fields.append('Depth')

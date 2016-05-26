@@ -160,7 +160,7 @@ class Seabird(AbstractTextReader):
         if (not self.ssp.cur.meta.utc_time) and system_time:
             self.ssp.cur.meta.utc_time = system_time
 
-        # initialize data sample structures
+        # initialize data sample fields
         self.ssp.cur.init_data(len(self.lines) - self.samples_offset)
         # initialize additional fields
         self.ssp.cur.init_more(self.more_fields)

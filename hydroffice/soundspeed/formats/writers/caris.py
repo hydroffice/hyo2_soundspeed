@@ -60,13 +60,13 @@ class Caris(AbstractTextWriter):
         while longitude > 180.0:
             longitude -= 360.0
         lat_min = int(60 * math.fabs(latitude - int(latitude)))
-        lat_sec = int(60 * int(100 * (60 * math.fabs(latitude - int(latitude)) - lat_min)))
+        lat_sec = 60 * int(100 * (60 * math.fabs(latitude - int(latitude)) - lat_min))
         lon_min = int(60 * math.fabs(longitude - int(longitude)))
-        lon_sec = int(60 * int(100 * (60 * math.fabs(longitude - int(longitude)) - lon_min)))
-        position_string = "{0:02d}:{1:02d}:{2:02d} {3:02d}:{4:02d}:{5:02d}".format(int(latitude),
-                                                                                   lat_min, lat_sec,
-                                                                                   int(longitude),
-                                                                                   lon_min, lon_sec)
+        lon_sec = 60 * int(100 * (60 * math.fabs(longitude - int(longitude)) - lon_min))
+        position_string = "{0:02d}:{1:02d}:{2:05.2f} {3:02d}:{4:02d}:{2:05.2f}".format(int(latitude),
+                                                                                       lat_min, lat_sec,
+                                                                                       int(longitude),
+                                                                                       lon_min, lon_sec)
         header += "Section " + date_string + " " + position_string + " Created by hydroffice.soundspeed\n"
         self.fod.io.write(header)
 

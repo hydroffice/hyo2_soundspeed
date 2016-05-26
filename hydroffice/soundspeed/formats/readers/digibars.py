@@ -54,7 +54,7 @@ class DigibarS(AbstractTextReader):
         if not self.ssp.cur.meta.original_path:
             self.ssp.cur.meta.original_path = self.fid.path
 
-        # initialize data sample structures
+        # initialize data sample fields
         self.ssp.cur.init_data(len(self.lines))
 
     def _parse_body(self):
