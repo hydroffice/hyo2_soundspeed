@@ -5,6 +5,7 @@ Todolist
 Sound Speed
 -----------
 
+* Improve Seabird reader after Fugro example file
 * Add Caris svp reader
 * Add NODC archive output
 * Fix too many point in DP algorithm
