@@ -168,7 +168,7 @@ class Database(AbstractWidget):
 
         # populate the table
         if len(lst) == 0:
-            self.setup_list.resizeColumnsToContents()
+            self.ssp_list.resizeColumnsToContents()
             return
         self.ssp_list.setRowCount(len(lst))
         for i, ssp in enumerate(lst):
