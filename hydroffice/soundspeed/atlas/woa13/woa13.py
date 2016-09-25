@@ -41,14 +41,34 @@ class Woa13(AbstractAtlas):
         self.season_idx = 0
 
     def is_present(self):
-        """check the presence of one of the dataset file"""
-        check_woa13_file = os.path.join(self.folder, 'temp', 'woa13_decav_t00_04v2.nc')
-        if not os.path.exists(check_woa13_file):
-            return False
-        check_woa13_file = os.path.join(self.folder, 'sal', 'woa13_decav_s01_04v2.nc')  # s00 is not required
-        if not os.path.exists(check_woa13_file):
-            return False
-        return True
+        """Check the presence of one of the db file
+
+        The default location is first checked. If not present, the search is enlarged to past installations"""
+
+        # first check the location based on the current version
+        check_woa13_temp = os.path.join(self.folder, 'temp', 'woa13_decav_t00_04v2.nc')
+        check_woa13_sal = os.path.join(self.folder, 'sal', 'woa13_decav_s01_04v2.nc')  # s00 is not required
+        if os.path.exists(check_woa13_temp) and os.path.exists(check_woa13_sal):
+            logger.info('unable to locate the WOA13 db at the default location: %s' % self.folder)
+            return True
+        logger.info('unable to locate the WOA13 db at the default location: %s' % self.folder)
+
+        # continue the search based on possible old installations
+        parent_folder = os.path.abspath(os.path.join(self.folder, os.pardir, os.pardir, os.pardir))
+        for folder in os.listdir(parent_folder):
+            candidate_path = os.path.join(parent_folder, folder)
+            if os.path.isdir(candidate_path) and "Sound Speed" in candidate_path:
+                candidate_folder = os.path.join(candidate_path, "atlases", "woa13")
+                check_woa13_temp = os.path.join(candidate_folder, 'temp', 'woa13_decav_t00_04v2.nc')
+                check_woa13_sal = os.path.join(candidate_folder, 'sal', 'woa13_decav_s01_04v2.nc')
+                if os.path.exists(check_woa13_temp) and os.path.exists(check_woa13_sal):
+                    self.folder = candidate_folder
+                    logger.info("identified WOA13 db at: %s" % self.folder)
+                    return True
+
+        # no way to find the database
+        logger.warning("unable to location the WOA13 db")
+        return False
 
     def download_db(self):
         """try to download the data set"""

@@ -388,14 +388,16 @@ class Input(AbstractWidget):
         logger.debug("apply use woa09")
         self.db.use_woa09 = self.use_woa09.currentText()
         if self.db.use_woa09:
-            self.main_win.main_win.check_woa09()
+            if self.main_win.main_win:
+                self.main_win.main_win.check_woa09()
         self.setup_changed()
 
     def apply_use_woa13(self):
         logger.debug("apply use woa13")
         self.db.use_woa13 = self.use_woa13.currentText()
         if self.db.use_woa13:
-            self.main_win.main_win.check_woa13()
+            if self.main_win.main_win:
+                self.main_win.main_win.check_woa13()
         self.setup_changed()
 
     def apply_use_rtofs(self):

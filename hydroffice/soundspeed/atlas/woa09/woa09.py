@@ -44,11 +44,31 @@ class Woa09(AbstractAtlas):
         self.season_idx = 0
 
     def is_present(self):
-        """check the presence of one of the dataset file"""
+        """Check the presence of one of the db file
+
+        The default location is first checked. If not present, the search is enlarged to past installations"""
+
+        # first check the location based on the current version
         check_woa09_file = os.path.join(self.folder, 'landsea.msk')
-        if not os.path.exists(check_woa09_file):
-            return False
-        return True
+        if os.path.exists(check_woa09_file):
+            return True
+        logger.info('unable to locate the WOA09 db at the default location: %s' % self.folder)
+
+        # continue the search based on possible old installations
+        parent_folder = os.path.abspath(os.path.join(self.folder, os.pardir, os.pardir, os.pardir))
+        for folder in os.listdir(parent_folder):
+            candidate_path = os.path.join(parent_folder, folder)
+            if os.path.isdir(candidate_path) and "Sound Speed" in candidate_path:
+                candidate_folder = os.path.join(candidate_path, "atlases", "woa09")
+                check_woa09_file = os.path.join(candidate_folder, 'landsea.msk')
+                if os.path.exists(check_woa09_file):
+                    self.folder = candidate_folder
+                    logger.info("identified WOA09 db at: %s" % self.folder)
+                    return True
+
+        # no way to find the database
+        logger.warning("unable to location the WOA09 db")
+        return False
 
     def download_db(self):
         """try to download the data set"""

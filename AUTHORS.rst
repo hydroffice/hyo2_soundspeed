@@ -6,17 +6,18 @@ Authors
 
 HydrOffice Sound Speed is written and maintained by:
 
+- `Giuseppe Masetti <mailto:gmasetti@ccom.unh.edu>`_
+
 - `Barry Gallagher <mailto:barry.gallagher@noaa.gov>`_
 
-- `Jack Riley <mailto:jack.riley@noaa.gov>`_
+- `Brian R. Calder <mailto:brc@ccom.unh.edu>`_
 
 - `Chen Zang <mailto:chen.zang@noaa.gov>`_
 
 - `Matthew J. Wilson <mailto:matthew.wilson@noaa.gov>`_
 
-- `Brian R. Calder <mailto:brc@ccom.unh.edu>`_
+- `Jack Riley <mailto:jack.riley@noaa.gov>`_
 
-- `Giuseppe Masetti <mailto:gmasetti@ccom.unh.edu>`_
 
 Contributors
 ~~~~~~~~~~~~

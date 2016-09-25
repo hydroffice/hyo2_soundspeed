@@ -11,6 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from . import __version__ as ssm_version
+from . import __doc__ as ssm_name
 from hydroffice.soundspeed.project import Project
 from .callbacks import Callbacks
 from .widgets.editor import Editor
@@ -29,17 +30,18 @@ class MainWin(QtGui.QMainWindow):
     def __init__(self):
         QtGui.QMainWindow.__init__(self)
 
-        # set the application name
-        self.name = "Sound Speed Manager"
+        # set the application name and the version
+        self.name = ssm_name
         self.version = ssm_version
         self.setWindowTitle('%s v.%s' % (self.name, self.version))
-        self.setMinimumSize(400, 250)
-        self.resize(900, 600)
         _app = QtCore.QCoreApplication.instance()
         _app.setApplicationName('%s v.%s' % (self.name, self.version))
-        _app = QtCore.QCoreApplication.instance()
         _app.setOrganizationName("HydrOffice")
         _app.setOrganizationDomain("hydroffice.org")
+
+        # set the minimum and the initial size
+        self.setMinimumSize(400, 250)
+        self.resize(900, 600)
 
         # set icons
         icon_info = QtCore.QFileInfo(os.path.join(self.media, 'favicon.png'))
@@ -53,11 +55,12 @@ class MainWin(QtGui.QMainWindow):
             except AttributeError as e:
                 logger.debug("Unable to change app icon: %s" % e)
 
-        # set palette
+        # set palette/stylesheet
         style_info = QtCore.QFileInfo(os.path.join(self.here, 'styles', 'main.stylesheet'))
         style_content = open(style_info.filePath()).read()
         self.setStyleSheet(style_content)
 
+        # TODO: check if progress is actually called somewhere
         self.progress = QtGui.QProgressDialog(self)
         self.progress.setWindowTitle("Downloading")
         self.progress.setCancelButtonText("Abort")
@@ -65,7 +68,7 @@ class MainWin(QtGui.QMainWindow):
 
         # create the project
         self.prj = Project(qprogress=QtGui.QProgressDialog, qparent=self)
-        self.prj.set_callbacks(Callbacks(self))  # set the PySide callbacks
+        self.prj.set_callbacks(Callbacks(parent=self))  # set the PySide callbacks
         self.check_woa09()
         self.check_woa13()
         # self.check_rtofs()  # no need to wait for the download at the beginning
@@ -112,7 +115,7 @@ class MainWin(QtGui.QMainWindow):
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'settings.png')), "")
         self.tabs.setTabToolTip(idx, "Settings")
         # info
-        self.tab_info = Info(default_url='http://www.hydroffice.org/soundspeed/')
+        self.tab_info = Info(default_url='https://www.hydroffice.org/soundspeed/')
         idx = self.tabs.insertTab(5, self.tab_info,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'info.png')), "")
         self.tabs.setTabToolTip(idx, "Info")
@@ -127,8 +130,11 @@ class MainWin(QtGui.QMainWindow):
         self.data_cleared()
 
     def check_woa09(self):
+        """ helper function that looks after WOA09 database"""
         if not self.prj.use_woa09():
+            logger.debug('woa09: disabled by settings')
             return
+
         if self.prj.has_woa09():
             return
 
@@ -166,8 +172,11 @@ class MainWin(QtGui.QMainWindow):
                                       QtGui.QMessageBox.Ok)
 
     def check_woa13(self):
+        """ helper function that looks after WOA13 database"""
         if not self.prj.use_woa13():
+            logger.debug('woa13: disabled by settings')
             return
+
         if self.prj.has_woa13():
             return
 
@@ -208,8 +217,11 @@ class MainWin(QtGui.QMainWindow):
                                       QtGui.QMessageBox.Ok)
 
     def check_rtofs(self):
+        """ helper function that looks after RTOFS connection"""
         if not self.prj.use_rtofs():
+            logger.debug('rtofs: disabled by settings')
             return
+
         if self.prj.has_rtofs():
             return
 
@@ -411,7 +423,8 @@ class MainWin(QtGui.QMainWindow):
 
     # Quitting #
 
-    def do_you_really_want(self, title="Quit", text="quit"):
+    def _do_you_really_want(self, title="Quit", text="quit"):
+        """helper function that show to the user a message windows asking to confirm an action"""
         msg_box = QtGui.QMessageBox(self)
         msg_box.setWindowTitle(title)
         msg_box.setIconPixmap(QtGui.QPixmap(os.path.join(self.media, 'favicon.png')).scaled(QtCore.QSize(36, 36)))
@@ -422,7 +435,7 @@ class MainWin(QtGui.QMainWindow):
 
     def closeEvent(self, event):
         """ actions to be done before close the app """
-        reply = self.do_you_really_want("Quit", "quit %s" % self.name)
+        reply = self._do_you_really_want("Quit", "quit %s" % self.name)
         # reply = QtGui.QMessageBox.Yes
         if reply == QtGui.QMessageBox.Yes:
             event.accept()
@@ -431,14 +444,16 @@ class MainWin(QtGui.QMainWindow):
         else:
             event.ignore()
 
+    # -------------------------- development-only --------------------------
+
     def do(self):
-        """DEBUGGING"""
+        """ development-mode only helper function """
         from hydroffice.soundspeed.base import helper
         data_input = helper.get_testing_input_folder()
         data_sub_folders = helper.get_testing_input_subfolders()
 
         def pair_reader_and_folder(folders, readers):
-            """Create pair of folder and reader"""
+            """ create pairs of folder and reader"""
             pairs = dict()
             for folder in folders:
                 for reader in readers:
@@ -451,7 +466,7 @@ class MainWin(QtGui.QMainWindow):
             return pairs
 
         def list_test_files(data_input, pairs):
-            """Create a dictionary of test file and reader to use with"""
+            """ create a dictionary of test file and reader to use with """
             tests = dict()
             for folder in pairs.keys():
                 reader = pairs[folder]

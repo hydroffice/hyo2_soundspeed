@@ -6,4 +6,4 @@ In brief
 
 HydrOffice is a research development environment for ocean mapping. It provides a collection of hydro-packages, each of them dealing with a specific issue of the field. The main goal is to speed up both algorithms testing and research-2-operation.
 
-This package provides functionalities to manage sound speed profiles.
+This package provides both a library and an application with functionalities to manage sound speed profiles.

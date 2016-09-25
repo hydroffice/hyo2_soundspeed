@@ -8,9 +8,10 @@ import logging
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
-__version__ = '3.0.a1'
+__version__ = '3.0.a2'
 __doc__ = "Sound Speed Manager"
-__author__ = 'barry.gallagher@noaa.gov; jack.riley@noaa.gov; chen.zang@noaa.gov; matthew.wilson@noaa.gov; brc@ccom.unh.edu; gmasetti@ccom.unh.edu'
+__author__ = 'gmasetti@ccom.unh.edu; barry.gallagher@noaa.gov; brc@ccom.unh.edu; chen.zang@noaa.gov; ' \
+             'matthew.wilson@noaa.gov; jack.riley@noaa.gov'
 __license__ = 'LGPLv3 license'
 __copyright__ = 'Copyright 2016 University of New Hampshire, Center for Coastal and Ocean Mapping'
 

@@ -10,6 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from . import __version__ as sss_version
+from . import __doc__ as sss_name
 from .widgets.main import Main
 from .widgets.input import Input
 from .widgets.output import Output
@@ -24,6 +25,7 @@ from hydroffice.soundspeed.project import Project
 class MainWin(QtGui.QMainWindow):
 
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
+    media = os.path.join(here, "media")
 
     def __init__(self, prj, main_win=None):
         QtGui.QMainWindow.__init__(self)
@@ -35,10 +37,30 @@ class MainWin(QtGui.QMainWindow):
         self.db = prj.settings_db()
         self.main_win = main_win
 
-        # set the application name
-        self.name = "Sound Speed Settings"
+        # set the application name and the version
+        self.name = sss_name
         self.version = sss_version
         self.setWindowTitle('%s v.%s' % (self.name, self.version))
+
+        # only called when stand-alone (without Sound Speed Manager)
+        _app = QtCore.QCoreApplication.instance()
+        if _app.applicationName() == 'python':
+            _app.setApplicationName('%s v.%s' % (self.name, self.version))
+            _app.setOrganizationName("HydrOffice")
+            _app.setOrganizationDomain("hydroffice.org")
+            logger.debug("set application name: %s" % _app.applicationName())
+
+            # set icons
+            icon_info = QtCore.QFileInfo(os.path.join(self.media, 'settings.png'))
+            self.setWindowIcon(QtGui.QIcon(icon_info.absoluteFilePath()))
+            if (sys.platform == 'win32') or (os.name is "nt"):  # is_windows()
+                try:
+                    # This is needed to display the app icon on the taskbar on Windows 7
+                    import ctypes
+                    app_id = '%s v.%s' % (self.name, self.version)
+                    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_id)
+                except AttributeError as e:
+                    logger.debug("Unable to change app icon: %s" % e)
 
         # set style
         style_info = QtCore.QFileInfo(os.path.join(self.here, 'styles', 'main.stylesheet'))
@@ -82,8 +104,9 @@ class MainWin(QtGui.QMainWindow):
 
         self.setup_changed()  # trigger the first update of all the tabs
 
-    def set_editable(self, value):
-        if value:
+    def set_editable(self, editable):
+        """Helper function to disable/enable all the tabs"""
+        if editable:
             self.tab_main.setEnabled(True)
             self.tab_input.setEnabled(True)
             self.tab_output.setEnabled(True)

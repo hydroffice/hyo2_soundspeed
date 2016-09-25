@@ -36,16 +36,30 @@ class AbstractAtlas(object):
 
     @property
     def folder(self):
+        """Return the db folder
+
+        If not stored, the folder path is retrieved. It is also created in the case that does not exist"""
         if self._folder:
             return self._folder
+        self._folder = os.path.join(self.data_folder, self.__class__.__name__.lower())
 
-        default = os.path.join(self.data_folder, self.__class__.__name__.lower())
-        if not os.path.exists(default):
-            os.makedirs(default)
-        return default
+        if not os.path.exists(self._folder):
+            os.makedirs(self._folder)
+
+        return self._folder
+
+    @folder.setter
+    def folder(self, path):
+        """Set the db folder
+
+        If the passed path does not exists, it is created."""
+        self._folder = path
+
+        if not os.path.exists(self._folder):
+            os.makedirs(self._folder)
 
     def __repr__(self):
         msg = "<%s>\n" % self.__class__.__name__
         msg += "  <desc: %s>\n" % self.desc
-        msg += "  <data folder: %s>\n" % self.folder
+        msg += "  <db folder: %s>\n" % self.folder
         return msg
