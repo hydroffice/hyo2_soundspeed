@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 from ...base.helper import FileManager
 from ...profile.dicts import Dicts
 from ..abstract import AbstractFormat
-from ...base.callbacks import Callbacks
+from ...base.callbacks import CliCallbacks
 
 
 class AbstractReader(AbstractFormat):
@@ -25,7 +25,7 @@ class AbstractReader(AbstractFormat):
         return "<%s:reader:%s:%s>" % (self.name, self.version, ",".join(self.ext))
 
     @abstractmethod
-    def read(self, data_path, settings, callbacks=Callbacks()):
+    def read(self, data_path, settings, callbacks=CliCallbacks()):
         """Common read function signature
 
         The settings is a container with all the library settings.

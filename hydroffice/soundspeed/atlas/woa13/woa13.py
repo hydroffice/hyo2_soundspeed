@@ -51,7 +51,7 @@ class Woa13(AbstractAtlas):
         if os.path.exists(check_woa13_temp) and os.path.exists(check_woa13_sal):
             logger.info('unable to locate the WOA13 db at the default location: %s' % self.folder)
             return True
-        logger.info('unable to locate the WOA13 db at the default location: %s' % self.folder)
+        # logger.info('unable to locate the WOA13 db at the default location: %s' % self.folder)
 
         # continue the search based on possible old installations
         parent_folder = os.path.abspath(os.path.join(self.folder, os.pardir, os.pardir, os.pardir))

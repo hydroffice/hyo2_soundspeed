@@ -6,33 +6,49 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from .base.baseproject import BaseProject
-from .base.settings import Settings
-from .base.callbacks import Callbacks, AbstractCallbacks
-from .base.progress import Progress
+from . import __version__ as soundspeed_version
+from . import __doc__ as soundspeed_name
+from . import formats
+from .appdirs.appdirs import user_data_dir
 from .atlas.atlases import Atlases
-from .listener.listeners import Listeners
-from .db.db import SoundSpeedDb
+from .base.callbacks import CliCallbacks, AbstractCallbacks
 from .base.gdal_aux import GdalAux
+from .base.helper import explore_folder
+from .base.progress import Progress
+from .base.settings import Settings
+from .db.db import SoundSpeedDb
+from .listener.listeners import Listeners
+from .logging.sqlitelogging import SqliteLogging
 from .profile.profilelist import ProfileList
 from .profile.dicts import Dicts
 from .server.server import Server
 
 
-class Project(BaseProject):
+class Project(object):
     """Sound Speed project"""
 
-    def __init__(self, data_folder=None, qprogress=None, qparent=None):
+    def __init__(self, data_folder=None, qt_progress=None, qt_parent=None):
         """Initialization for the library"""
-        super(Project, self).__init__(data_folder=data_folder)
+
+        # output data folder: where all the library data are written
+        self._data_folder = data_folder
+        if self._data_folder is None:
+            self._data_folder = user_data_dir("%s %s" % (soundspeed_name, soundspeed_version), "HydrOffice")
+        if not os.path.exists(self._data_folder):  # create it if it does not exist
+            os.makedirs(self._data_folder)
+        logger.debug("data folder: %s" % self._data_folder)
+
+        # create loggers
+        self.logs = SqliteLogging(self._data_folder)
+
         self.setup = Settings(data_folder=self.data_folder)
-        self.cb = Callbacks()
+        self.cb = CliCallbacks()
         self.ssp = None
         self.ref = None  # reference profile
         self.atlases = Atlases(prj=self)
         self.listeners = Listeners(prj=self)
         self.server = Server(prj=self)
-        self.progress = Progress(qprogress=qprogress, qparent=qparent)
+        self.progress = Progress(qprogress=qt_progress, qparent=qt_parent)
 
         self.logging()
 
@@ -43,6 +59,75 @@ class Project(BaseProject):
         if self.server.is_alive():
             self.server.stop()
             self.server.join(2)
+
+    # --- output data folder
+
+    @property
+    def data_folder(self):
+        """Get the library's output data folder"""
+        return self._data_folder
+
+    @data_folder.setter
+    def data_folder(self, value):
+        """ Set the library's output data folder"""
+        self._data_folder = value
+
+    def open_data_folder(self):
+        explore_folder(self.data_folder)
+
+    # --- readers/writers
+
+    @property
+    def readers(self):
+        return formats.readers
+
+    @property
+    def name_readers(self):
+        return formats.name_readers
+
+    @property
+    def ext_readers(self):
+        return formats.ext_readers
+
+    @property
+    def desc_readers(self):
+        return formats.desc_readers
+
+    @property
+    def writers(self):
+        return formats.writers
+
+    @property
+    def name_writers(self):
+        return formats.name_writers
+
+    @property
+    def ext_writers(self):
+        return formats.ext_writers
+
+    @property
+    def desc_writers(self):
+        return formats.desc_writers
+
+    # --- sqlite logging
+
+    def has_active_user_logger(self):
+        return self.logs.user_active
+
+    def activate_user_logger(self, flag):
+        if flag:
+            self.logs.activate_user_db()
+        else:
+            self.logs.deactivate_user_db()
+
+    def has_active_server_logger(self):
+        return self.logs.server_active
+
+    def activate_server_logger(self, flag):
+        if flag:
+            self.logs.activate_server_db()
+        else:
+            self.logs.deactivate_server_db()
 
     # --- ssp profile
 
@@ -108,26 +193,38 @@ class Project(BaseProject):
 
     def import_data(self, data_path, data_format):
         """Import data using a specific format name"""
+
+        # identify reader to use
         idx = self.name_readers.index(data_format)
         reader = self.readers[idx]
-        logger.debug("%s > path: %s" % (reader, data_path))
+        logger.debug("%s > path: %s" % (data_format, data_path))
+
+        # call the reader to process the data file
         success = reader.read(data_path=data_path, settings=self.setup, callbacks=self.cb)
         if not success:
             raise RuntimeError("Error using %s reader for file: %s"
                                % (reader.desc, data_path))
         self.ssp = reader.ssp
+        logger.debug("data file successfully parsed!")
 
-        # retrieve atlases data
+        # retrieve atlases data for each retrieved profile
         for pr in self.ssp.l:
+
             if self.use_woa09() and self.has_woa09():
                 pr.woa09 = self.atlases.woa09.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
                                                     datestamp=pr.meta.utc_time)
+
             if self.use_woa13() and self.has_woa13():
                 pr.woa13 = self.atlases.woa13.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
                                                     datestamp=pr.meta.utc_time)
+
             if self.use_rtofs():
-                pr.rtofs = self.atlases.rtofs.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
-                                                    datestamp=pr.meta.utc_time)
+                try:
+                    pr.rtofs = self.atlases.rtofs.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
+                                                        datestamp=pr.meta.utc_time)
+                except RuntimeError:
+                    pr.rtofs = None
+                    logger.warning("unable to retrieve RTOFS data")
 
     # --- receive data
 
@@ -752,6 +849,9 @@ class Project(BaseProject):
     # --- repr
 
     def __repr__(self):
-        msg = "%s" % super(Project, self).__repr__()
+        msg = "<%s>\n" % self.__class__.__name__
+        msg += "  <data_folder:%s>\n" % self.data_folder
+        msg += "  <sqlite_loggers: user %s; server %s>\n" \
+               % (self.has_active_user_logger(), self.has_active_server_logger())
         msg += "%s" % self.setup
         return msg

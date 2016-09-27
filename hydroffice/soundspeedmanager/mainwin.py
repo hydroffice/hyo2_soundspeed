@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 from . import __version__ as ssm_version
 from . import __doc__ as ssm_name
 from hydroffice.soundspeed.project import Project
-from .callbacks import Callbacks
+from .qtcallbacks import QtCallbacks
 from .widgets.editor import Editor
 from .widgets.database import Database
 from .widgets.server import Server
@@ -67,8 +67,8 @@ class MainWin(QtGui.QMainWindow):
         self.progress.setWindowModality(QtCore.Qt.WindowModal)
 
         # create the project
-        self.prj = Project(qprogress=QtGui.QProgressDialog, qparent=self)
-        self.prj.set_callbacks(Callbacks(parent=self))  # set the PySide callbacks
+        self.prj = Project(qt_progress=QtGui.QProgressDialog, qt_parent=self)
+        self.prj.set_callbacks(QtCallbacks(parent=self))  # set the PySide callbacks
         self.check_woa09()
         self.check_woa13()
         # self.check_rtofs()  # no need to wait for the download at the beginning

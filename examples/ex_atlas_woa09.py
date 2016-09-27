@@ -14,7 +14,7 @@ ch.setFormatter(ch_formatter)
 logger.addHandler(ch)
 
 from hydroffice.soundspeed.project import Project
-from hydroffice.soundspeedmanager.callbacks import Callbacks
+from hydroffice.soundspeedmanager.qtcallbacks import QtCallbacks
 
 
 def main():
@@ -22,8 +22,8 @@ def main():
     mw = QtGui.QMainWindow()
     mw.show()
 
-    prj = Project(qprogress=QtGui.QProgressDialog)
-    prj.set_callbacks(Callbacks(mw))
+    prj = Project(qt_progress=QtGui.QProgressDialog)
+    prj.set_callbacks(QtCallbacks(mw))
 
     tests = [
         (43.026480, -70.318824, dt.utcnow()),  # offshore Portsmouth

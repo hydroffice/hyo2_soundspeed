@@ -10,36 +10,11 @@ logger = logging.getLogger(__name__)
 from hydroffice.soundspeed.base.callbacks import AbstractCallbacks
 
 
-class Callbacks(AbstractCallbacks):
+class QtCallbacks(AbstractCallbacks):
+    """Qt-based callbacks"""
 
     def __init__(self, parent):
         self.parent = parent
-
-    def ask_location(self):
-        # latitude
-        lat, ok = QtGui.QInputDialog.getDouble(self.parent, "Location", "Enter latitude as dd.ddd:",
-                                               37.540, -90.0, 90.0, 7)
-        if not ok:
-            lat = None
-        # longitude
-        lon, ok = QtGui.QInputDialog.getDouble(self.parent, "Location", "Enter longitude as dd.ddd:",
-                                               -42.910, -180.0, 180.0, 7)
-        if not ok:
-            lon = None
-
-        if (lat is None) or (lon is None):  # return None if one of the two is invalid
-            return None, None
-
-        return lat, lon
-
-    def ask_location_from_sis(self):
-        msg = "Geographic location required for pressure/depth conversion and atlas lookup.\n" \
-              "Use geographic position from SIS?\nChoose 'no' to enter position manually."
-        ret = QtGui.QMessageBox.information(self.parent, "Location", msg,
-                                            QtGui.QMessageBox.Ok | QtGui.QMessageBox.No)
-        if ret == QtGui.QMessageBox.No:
-            return False
-        return True
 
     def ask_date(self):
         """Ask user for date"""
@@ -92,8 +67,37 @@ class Callbacks(AbstractCallbacks):
 
         return dt
 
+    def ask_location(self):
+        """Ask user for location"""
+
+        # latitude
+        lat, ok = QtGui.QInputDialog.getDouble(self.parent, "Location", "Enter latitude as dd.ddd:",
+                                               37.540, -90.0, 90.0, 7)
+        if not ok:
+            lat = None
+        # longitude
+        lon, ok = QtGui.QInputDialog.getDouble(self.parent, "Location", "Enter longitude as dd.ddd:",
+                                               -42.910, -180.0, 180.0, 7)
+        if not ok:
+            lon = None
+
+        if (lat is None) or (lon is None):  # return None if one of the two is invalid
+            return None, None
+
+        return lat, lon
+
+    def ask_location_from_sis(self):
+        """Ask user whether retrieving location from SIS"""
+        msg = "Geographic location required for pressure/depth conversion and atlas lookup.\n" \
+              "Use geographic position from SIS?\nChoose 'no' to enter position manually."
+        ret = QtGui.QMessageBox.information(self.parent, "Location", msg,
+                                            QtGui.QMessageBox.Ok | QtGui.QMessageBox.No)
+        if ret == QtGui.QMessageBox.No:
+            return False
+        return True
+
     def ask_tss(self):
-        # transducer sound speed
+        """Ask user for transducer sound speed"""
         tss, ok = QtGui.QInputDialog.getDouble(self.parent, "TSS", "Enter transducer sound speed:",
                                                1500.0, 1000.0, 20000.0, 2)
         if not ok:
@@ -101,7 +105,7 @@ class Callbacks(AbstractCallbacks):
         return tss
 
     def ask_draft(self):
-        # transducer draft
+        """Ask user for draft"""
         draft, ok = QtGui.QInputDialog.getDouble(self.parent, "Draft", "Enter transducer draft:",
                                                  8.0, -1000.0, 1000.0, 3)
         if not ok:
@@ -109,7 +113,7 @@ class Callbacks(AbstractCallbacks):
         return draft
 
     def msg_tx_no_verification(self, name, protocol):
-        """Ask user for draft"""
+        """Profile transmitted but not verification available"""
         QtGui.QMessageBox.information(self.parent, "Profile transmitted",
                                       "Profile transmitted to \'%s\'.\n\n"
                                       "The %s protocol does not allow verification." %

@@ -52,7 +52,7 @@ class Woa09(AbstractAtlas):
         check_woa09_file = os.path.join(self.folder, 'landsea.msk')
         if os.path.exists(check_woa09_file):
             return True
-        logger.info('unable to locate the WOA09 db at the default location: %s' % self.folder)
+        # logger.info('unable to locate the WOA09 db at the default location: %s' % self.folder)
 
         # continue the search based on possible old installations
         parent_folder = os.path.abspath(os.path.join(self.folder, os.pardir, os.pardir, os.pardir))

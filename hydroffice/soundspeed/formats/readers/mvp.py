@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 from .abstract import AbstractReader
 from ...profile.dicts import Dicts
-from ...base.callbacks import Callbacks
+from ...base.callbacks import CliCallbacks
 from ...profile.profilelist import ProfileList
 
 
@@ -58,7 +58,7 @@ class Mvp(AbstractReader):  # TODO: ATYPICAL READER!!!
         self.ssp.cur.clone_data_to_proc()
         self.ssp.cur.init_sis()
 
-    def read(self, data_path, settings, callbacks=Callbacks()):  # UNUSED
+    def read(self, data_path, settings, callbacks=CliCallbacks()):  # UNUSED
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings

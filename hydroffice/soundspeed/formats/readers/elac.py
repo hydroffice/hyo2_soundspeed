@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 from .abstract import AbstractTextReader
 from ...profile.dicts import Dicts
-from ...base.callbacks import Callbacks
+from ...base.callbacks import CliCallbacks
 
 
 class Elac(AbstractTextReader):
@@ -29,7 +29,7 @@ class Elac(AbstractTextReader):
         self.tk_temp = 'temp.'
         self.tk_speed = 'veloc.'
 
-    def read(self, data_path, settings, callbacks=Callbacks()):
+    def read(self, data_path, settings, callbacks=CliCallbacks()):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings

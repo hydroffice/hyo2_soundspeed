@@ -18,7 +18,7 @@ from hydroffice.soundspeed.project import Project
 
 def main():
     app = QtGui.QApplication([])
-    prj = Project(qprogress=QtGui.QProgressDialog)
+    prj = Project(qt_progress=QtGui.QProgressDialog)
     prj.progress.start("TEST")
     sleep(2)
     prj.progress.update(30)

@@ -144,7 +144,7 @@ class Rtofs(AbstractAtlas):
             self.file_sal = Dataset(url_sal)
             self.prj.progress.update(80)
             self.day_idx = 2  # usually 3 1-day steps
-        except RuntimeError:
+        except (RuntimeError, IOError):
             logger.warning("unable to access data: %s" % datestamp.strftime("%Y%m%d"))
             self.clear_data()
             self.prj.progress.end()

@@ -12,6 +12,7 @@ from .readers.digibarpro import DigibarPro
 from .readers.digibars import DigibarS
 from .readers.elac import Elac
 from .readers.idronaut import Idronaut
+from .readers.iss import Iss
 # from .readers.mvp import Mvp
 from .readers.saiv import Saiv
 from .readers.seabird import Seabird
@@ -28,6 +29,7 @@ readers.append(DigibarPro())
 readers.append(DigibarS())
 readers.append(Elac())
 readers.append(Idronaut())
+readers.append(Iss())
 # readers.append(Mvp())
 readers.append(Saiv())
 readers.append(Seabird())
@@ -52,6 +54,7 @@ from .writers.csv import Csv
 from .writers.elac import Elac
 from .writers.hypack import Hypack
 from .writers.ixblue import Ixblue
+from .writers.ncei import Ncei
 from .writers.sonardyne import Sonardyne
 from .writers.unb import Unb
 
@@ -62,6 +65,7 @@ writers.append(Csv())
 writers.append(Elac())
 writers.append(Hypack())
 writers.append(Ixblue())
+writers.append(Ncei())
 writers.append(Sonardyne())
 writers.append(Unb())
 

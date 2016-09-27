@@ -1,6 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from matplotlib import pyplot as plt
 import os
 
 # logging settings
@@ -21,35 +20,44 @@ from hydroffice.soundspeed.base.gdal_aux import GdalAux
 
 def pair_reader_and_folder(folders, readers):
     """Create pair of folder and reader"""
+
     pairs = dict()
+
     for folder in folders:
+
         for reader in readers:
+
             if reader.name.lower() != 'valeport':  # reader filter
                 continue
             if reader.name.lower() != folder.lower():  # skip not matching readers
                 continue
             pairs[folder] = reader
-    logger.info('pairs: %s' % pairs.keys())
+
+    logger.info('pairs: %s' % pairs)
     return pairs
 
 
 def list_test_files(data_input, pairs):
     """Create a dictionary of test file and reader to use with"""
     tests = dict()
+
     for folder in pairs.keys():
+
         reader = pairs[folder]
         reader_folder = os.path.join(data_input, folder)
 
         for root, dirs, files in os.walk(reader_folder):
-            for file in files:
+
+            for filename in files:
 
                 # check the extension
-                ext = file.split('.')[-1].lower()
+                ext = filename.split('.')[-1].lower()
                 if ext not in reader.ext:
                     continue
 
-                tests[os.path.join(root, file)] = reader
-    # logger.info("tests: %s" % tests)
+                tests[os.path.join(root, filename)] = reader
+
+    logger.info("tests (%d): %s" % (len(tests), tests))
     return tests
 
 
@@ -57,13 +65,13 @@ def main():
     # create a project
     prj = Project()
     # prj.activate_server_logger(True)
-    logger.info(prj)
+    # logger.info(prj)
     # prj.open_data_folder()
 
     # set callbacks
     prj.set_callbacks(TestCallbacks())
-    logger.info("test ask date: %s" % prj.cb.ask_date())
-    logger.info("test ask location: %s, %s" % prj.cb.ask_location())
+    # logger.info("test ask date: %s" % prj.cb.ask_date())
+    # logger.info("test ask location: %s, %s" % prj.cb.ask_location())
 
     # retrieve data input/output folders
     data_input = helper.get_testing_input_folder()
@@ -76,16 +84,14 @@ def main():
     data_sub_folders = helper.get_testing_input_subfolders()
     pairs = pair_reader_and_folder(folders=data_sub_folders, readers=prj.readers)
     tests = list_test_files(data_input=data_input, pairs=pairs)
-    for idx, test in enumerate(tests.keys()):
-        if idx != 0:
+    for idx, testfile in enumerate(tests.keys()):
+        if idx > 0:
             break
-        logger.info("test: * NEW #%02d *" % idx)
+        logger.info("test: * New profile: #%03d *" % idx)
 
         # import
-        prj.import_data(data_path=test, data_format=tests[test].name)
+        prj.import_data(data_path=testfile, data_format=tests[testfile].name)
         # print(prj.cur)
-
-        # plot
         # prj.plot_ssp(more=True, show=False)
 
         # store
@@ -95,29 +101,35 @@ def main():
         success = prj.store_data()
         logger.info("stored: %s" % success)
 
+    # from matplotlib import pyplot as plt
     # plt.show()
 
+    # retrieve all the id profiles from db
     lst = prj.db_profiles()
     logger.info("Profiles: %s" % len(lst))
     for p in lst:
         logger.info(p)
 
+    # retrieve id profiles of a specific project from the db
     lst = prj.db_profiles(project='test')
     logger.info("Profiles of 'test' project: %s" % len(lst))
     for p in lst:
-        logger.info(p)
+       logger.info(p)
 
+    # retrieve a specific profile and delete it
     ssp_pk = lst[0][0]
     ssp = prj.db_profile(pk=ssp_pk)
     logger.info("Retrieved profile:\n%s" % ssp)
-    # prj.delete_db_profile(pk=ssp_pk)
+    ret = prj.delete_db_profile(pk=ssp_pk)
+    logger.info("Deleted profile: %s" % ret)
 
-    prj.map_db_profiles()
-    prj.plot_daily_db_profiles()
-    prj.save_daily_db_profiles()
-    prj.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats['KML'])
-    prj.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats['CSV'])
-    prj.export_db_profiles_metadata()
+    # plots/maps/exports
+    # prj.map_db_profiles()
+    # prj.plot_daily_db_profiles()
+    # prj.save_daily_db_profiles()
+    # prj.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'KML'])
+    # prj.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'CSV'])
+    # prj.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile'])
 
     logger.info('test: *** END ***')
 

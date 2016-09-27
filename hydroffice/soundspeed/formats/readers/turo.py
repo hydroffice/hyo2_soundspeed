@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 from .abstract import AbstractBinaryReader
 from ...profile.dicts import Dicts
 from ...base.helper import FileInfo
-from ...base.callbacks import Callbacks
+from ...base.callbacks import CliCallbacks
 
 
 class Turo(AbstractBinaryReader):
@@ -25,7 +25,7 @@ class Turo(AbstractBinaryReader):
         self.desc = "Turo"
         self._ext.add('nc')
 
-    def read(self, data_path, settings, callbacks=Callbacks()):
+    def read(self, data_path, settings, callbacks=CliCallbacks()):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings
@@ -78,7 +78,12 @@ class Turo(AbstractBinaryReader):
         try:
             speed = self.fid.io.variables['soundSpeed'][0, :, 0, 0]
         except KeyError:
-            speed = self.fid.io.variables['derivedSoundSpeed'][0, :, 0, 0]
+            try:
+                speed = self.fid.io.variables['derivedSoundSpeed'][0, :, 0, 0]
+            except KeyError:
+                logger.info("missing sound speed")
+                self.missing_sound_speed = True
+                speed = np.zeros(depth.size)
         temp = self.fid.io.variables['temperature'][0, :, 0, 0]
         self.ssp.cur.init_data(depth.size)
 

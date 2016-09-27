@@ -9,57 +9,59 @@ logger = logging.getLogger(__name__)
 
 
 class AbstractCallbacks(object):
+    """Abstract class with several callbacks that has to be implemented for a new backend"""
 
     __metaclass__ = ABCMeta
 
     @abstractmethod
     def ask_date(self):
         """Ask user for date"""
-        pass
+        logger.warning("to be implemented")
 
     @abstractmethod
     def ask_location(self):
         """Ask user for location"""
-        pass
+        logger.warning("to be implemented")
 
     @abstractmethod
     def ask_location_from_sis(self):
         """Ask user for location"""
-        pass
+        logger.warning("to be implemented")
 
     @abstractmethod
     def ask_tss(self):
         """Ask user for transducer sound speed"""
-        pass
+        logger.warning("to be implemented")
 
     @abstractmethod
     def ask_draft(self):
         """Ask user for draft"""
-        pass
+        logger.warning("to be implemented")
 
     @abstractmethod
     def msg_tx_no_verification(self, name, protocol):
         """Profile transmitted but not verification available"""
-        pass
+        logger.warning("to be implemented")
 
     @abstractmethod
     def msg_tx_sis_wait(self, name):
         """Profile transmitted, SIS is waiting for confirmation"""
-        pass
+        logger.warning("to be implemented")
 
     @abstractmethod
     def msg_tx_sis_confirmed(self, name):
         """Profile transmitted, SIS confirmed"""
-        pass
+        logger.warning("to be implemented")
 
     @abstractmethod
     def msg_tx_sis_not_confirmed(self, name, ip):
         """Profile transmitted, SIS not confirmed"""
-        pass
+        logger.warning("to be implemented")
 
 
 class TestCallbacks(AbstractCallbacks):
     """Used only for testing since the methods do not require user interaction"""
+
     def ask_date(self):
         return datetime.utcnow()
 
@@ -92,7 +94,7 @@ class TestCallbacks(AbstractCallbacks):
         pass
 
 
-class Callbacks(AbstractCallbacks):
+class CliCallbacks(AbstractCallbacks):
     """CLI-based callbacks"""
 
     def ask_date(self):

@@ -44,10 +44,13 @@ class Dicts(object):
         ('MIDAS SVP 6000', 23),
         ('MIDAS SVX2 1000', 24),
         ('MIDAS SVX2 3000', 25),
-        ('MiniSVP', 26),
-        ('MVP', 27),
-        ('Sonardyne', 28),
-        ('Elac', 29),
+        ('MIDAS SVX2 6000', 26),
+        ('MiniSVP', 27),
+        ('RapidSVT', 28),
+        ('MVP', 29),
+        ('Sonardyne', 30),
+        ('Elac', 31),
+        ('ISS', 32),
     ])
 
     sensor_types = OrderedDict([

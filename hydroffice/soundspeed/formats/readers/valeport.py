@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 from .abstract import AbstractTextReader
 from ...profile.dicts import Dicts
-from ...base.callbacks import Callbacks
+from ...base.callbacks import CliCallbacks
 
 
 class Valeport(AbstractTextReader):
@@ -20,6 +20,7 @@ class Valeport(AbstractTextReader):
         Dicts.probe_types['MIDAS SVP 6000']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVX2 1000']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVX2 3000']: Dicts.sensor_types["SVPT"],
+        Dicts.probe_types['MIDAS SVX2 6000']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MiniSVP']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['Unknown']: Dicts.sensor_types["Unknown"]
     }
@@ -35,7 +36,7 @@ class Valeport(AbstractTextReader):
         self.tk_latitude = 'Latitude'
         self.tk_probe_type = ""
 
-    def read(self, data_path, settings, callbacks=Callbacks()):
+    def read(self, data_path, settings, callbacks=CliCallbacks()):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings
