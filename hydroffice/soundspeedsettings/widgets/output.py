@@ -32,7 +32,7 @@ class Output(AbstractWidget):
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
-        label = QtGui.QLabel("Client lists:")
+        label = QtGui.QLabel("Client list:")
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()

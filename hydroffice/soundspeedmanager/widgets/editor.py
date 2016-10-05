@@ -37,7 +37,7 @@ class Editor(AbstractWidget):
         self.file_bar.addAction(self.import_act)
         # receive
         self.receive_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'receive.png')),
-                                         'Receive data', self)
+                                         'Retrieve data', self)
         self.receive_act.setShortcut('Alt+R')
         self.receive_act.triggered.connect(self.on_receive_data)
         self.file_bar.addAction(self.receive_act)
@@ -115,7 +115,7 @@ class Editor(AbstractWidget):
         self.save_db_act.triggered.connect(self.on_save_db)
         self.file_bar.addAction(self.save_db_act)
         # set ref
-        self.set_ref_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'ref.png')), 'Set as reference', self)
+        self.set_ref_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'ref.png')), 'Reference cast', self)
         self.set_ref_act.setShortcut('Alt+R')
         self.set_ref_act.triggered.connect(self.on_set_ref)
         self.file_bar.addAction(self.set_ref_act)

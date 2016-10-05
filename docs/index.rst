@@ -1,26 +1,23 @@
 .. HydrOffice Sound Speed documentation master file.
 
+######################################
 HydrOffice Sound Speed's documentation
-======================================
-
-Contents
---------
+######################################
 
 .. toctree::
-   :maxdepth: 2
+	:maxdepth: 1
+	:numbered:
 
-   in_brief
-   license
-   supported_formats
-   how_to_contribute
-   how_to_build_docs
-   how_to_distribute
-
-
-Indices and tables
-==================
+	in_brief
+	user_manual
+	developer_guide
+	license
+	credits
+   
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
 
+
+.. note::
+    © University of New Hampshire, Center for Coastal and Ocean Mapping, 2016.  All rights reserved.  Portions of this project were developed under a cooperative agreement with NOAA Coast Survey Development Laboratory, and contain NOAA-developed code in the public domain.

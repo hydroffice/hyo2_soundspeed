@@ -4,7 +4,7 @@ Credits
 Authors
 ~~~~~~~
 
-HydrOffice Sound Speed is written and maintained by:
+HydrOffice Sound Speed is developed and maintained by:
 
 - `Giuseppe Masetti <mailto:gmasetti@ccom.unh.edu>`_
 

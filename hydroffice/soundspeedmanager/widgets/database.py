@@ -51,6 +51,11 @@ class Database(AbstractWidget):
         self.btn_profile_map.clicked.connect(self.profile_map)
         self.btn_profile_map.setToolTip("Create a map with all the profiles")
         self.btn_box.addButton(self.btn_profile_map, QtGui.QDialogButtonBox.ActionRole)
+        # --- aggregate plot
+        self.btn_aggregate_plot = QtGui.QPushButton("Aggregate plot")
+        self.btn_aggregate_plot.clicked.connect(self.aggregate_plot)
+        self.btn_aggregate_plot.setToolTip("Create a plot aggregating multiple profiles")
+        self.btn_box.addButton(self.btn_aggregate_plot, QtGui.QDialogButtonBox.ActionRole)
         # --- create daily plots
         self.btn_plot_daily = QtGui.QPushButton("Plot daily")
         self.btn_plot_daily.clicked.connect(self.plot_daily_profiles)
@@ -116,6 +121,77 @@ class Database(AbstractWidget):
         success = self.prj.map_db_profiles()
         if not success:
             QtGui.QMessageBox.critical(self, "Database", "Unable to create a profile map!")
+
+    def aggregate_plot(self):
+        logger.debug("user want to create an aggregate plot")
+
+        ssp_times = self.prj.db_timestamp_list()
+        # print(ssp_times[0][0], ssp_times[-1][0])
+
+        if len(ssp_times) == 0:
+            QtGui.QMessageBox.information(self, "Database",
+                                          "Missing SSPs in the database. Import and store them first!")
+
+        class DateDialog(QtGui.QDialog):
+
+            def __init__(self, date_start, date_end, *args, **kwargs):
+                super(DateDialog, self).__init__(*args, **kwargs)
+
+                self.setMinimumSize(300, 500)
+                self.setWindowTitle('SSP date range to plot')
+
+                self.start_date = QtGui.QLabel()
+                self.start_date.setText("Start date:")
+                self.cal_start_date = QtGui.QCalendarWidget()
+                self.cal_start_date.setSelectedDate(date_start)
+
+                self.end_date = QtGui.QLabel()
+                self.end_date.setText("End date:")
+                self.cal_end_date = QtGui.QCalendarWidget()
+                self.cal_end_date.setSelectedDate(date_end)
+
+                self.ok = QtGui.QPushButton("OK")
+                self.ok.clicked.connect(self.on_click_ok)
+                self.cancel = QtGui.QPushButton("Cancel")
+                self.cancel.clicked.connect(self.on_click_cancel)
+
+                vbox = QtGui.QVBoxLayout()
+                self.setLayout(vbox)
+                vbox.addWidget(self.start_date)
+                vbox.addWidget(self.cal_start_date)
+                vbox.addWidget(self.end_date)
+                vbox.addWidget(self.cal_end_date)
+                vbox.addWidget(self.ok)
+                vbox.addWidget(self.cancel)
+
+            def on_click_ok(self):
+                logger.debug("button: ok")
+                self.accept()
+
+            def on_click_cancel(self):
+                logger.debug("button: cancel")
+                self.reject()
+
+        dialog = DateDialog(date_start=ssp_times[0][0], date_end=ssp_times[-1][0], parent=self)
+        ret = dialog.exec_()
+        if ret == QtGui.QDialog.Accepted:
+            dates = dialog.cal_start_date.selectedDate().toPython(), \
+                    dialog.cal_end_date.selectedDate().toPython()
+            dialog.destroy()
+        else:
+            dialog.destroy()
+            return
+        # print(dates)
+
+        # check the user selection
+        if dates[0] > dates[1]:
+            QtGui.QMessageBox.critical(self, 'The start date (%s) comes after the end data (%s)' % (dates[0], dates[1]),
+                                       'Invalid selection')
+            return
+
+        success = self.prj.aggregate_plot(dates=dates)
+        if not success:
+            QtGui.QMessageBox.critical(self, "Database", "Unable to create an aggregate plot!")
 
     def plot_daily_profiles(self):
         logger.debug("user want to plot daily profiles")

@@ -416,6 +416,13 @@ class Project(object):
         db.disconnect()
         return ssp
 
+    def db_timestamp_list(self):
+        """Retrieve a list with the timestamp of all the profiles"""
+        db = SoundSpeedDb(data_folder=self.data_folder)
+        lst = db.timestamp_list()
+        db.disconnect()
+        return lst
+
     def load_profile(self, pk):
         ssp = self.db_profile(pk)
         if not ssp:
@@ -438,6 +445,13 @@ class Project(object):
         ret = db.plot.map_profiles(project=project)
         db.disconnect()
         return ret
+
+    def aggregate_plot(self, dates, project=None):
+        """Create an aggregate plot"""
+        db = SoundSpeedDb(data_folder=self.data_folder)
+        success = db.plot.aggregate_plot(dates=dates, project=project)
+        db.disconnect()
+        return success
 
     def plot_daily_db_profiles(self, project=None):
         """Plot the profile on the db by day"""

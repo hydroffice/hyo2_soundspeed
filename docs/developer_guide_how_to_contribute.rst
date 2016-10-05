@@ -1,5 +1,17 @@
+.. _how-to-contribute-label:
+
 How to contribute
-=================
+-----------------
+
+.. index::
+    single: open source
+    single: contribution
+    single: code of conduct
+    single: PEP; 8
+    single: PEP; 257
+    single: documentation
+    single: compatibility
+    single: history
 
 Every open source project lives from the generous help by contributors that sacrifice their time and this is no different.
 
@@ -22,7 +34,7 @@ Here are a few hints and rules to get you started:
    In the best case, we can mold it into something, in the worst case the pull request gets politely closed.
    There's absolutely nothing to fear.
 
-Thank you for considering to contribute! If you have any question or concerns, feel free to reach out to us.
+Thank you for considering to contribute! If you have any question or concerns, feel free to reach out to us (see :ref:`credits-label`).
 
 .. _`Code of Conduct`: http://www.python.org/psf/codeofconduct/
 .. _AUTHORS.txt: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/master/AUTHORS.rst

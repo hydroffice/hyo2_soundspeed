@@ -149,6 +149,122 @@ class PlotDb(object):
             for t in x[m][1]:
                 t.set_color(color)
 
+    class AvgSsp(object):
+        def __init__(self):
+            # create and populate list used in the calculations
+            self.limits = list()  # bin limits
+            self.depths = list()  # avg depth for each bin
+            self.bins = list()  # a list of list with all the value within a bin
+
+            # populating
+            for i, z in enumerate(range(10, 781, 10)):
+                self.limits.append(z)
+                # self.depths.append(z + 5.)
+                self.bins.append(list())
+
+            # output lists
+            self.min_2std = list()
+            self.max_2std = list()
+            self.mean = list()
+
+        def add_samples(self, depths, values):
+
+            for i, d in enumerate(depths):
+
+                for j, lim in enumerate(self.limits):
+
+                    if d < lim:
+                        self.bins[j].append(values[i])
+                        break
+
+        def calc_avg(self):
+
+            for i, bin in enumerate(self.bins):
+
+                # to avoid unstable statistics
+                if len(bin) < 3:
+                    continue
+
+                if i == 0:
+                    self.depths.append(0.)
+                elif i == (len(self.bins) - 1):
+                    self.depths.append(780.)
+                else:
+                    self.depths.append(self.limits[i] - 5.)
+
+                avg = np.mean(bin)
+                std = np.std(bin)
+                self.mean.append(avg)
+                self.min_2std.append(avg - 2 * std)
+                self.max_2std.append(avg + 2 * std)
+
+    def aggregate_plot(self, dates, save_fig=False, project=None):
+        """aggregate plot with all the SSPs between the passed dates"""
+
+        if not save_fig:
+            plt.ion()
+
+        ts_list = self.db.list_profiles(project=project)
+
+        if ts_list is None:
+            raise RuntimeError("Unable to retrieve the day list > Empty database?")
+        if len(ts_list) == 0:
+            raise RuntimeError("Unable to retrieve the day list > Empty database?")
+
+        # start a new figure
+        fig = plt.figure()
+        plt.title("Aggregate SSP plot [from: %s to: %s]" % (dates[0], dates[1]))
+        ax = fig.add_subplot(111)
+        ax.invert_yaxis()
+        ax.set_xlim(1460, 1580)
+        ax.set_ylim(780, 0)
+        plt.xlabel('Sound Speed [m/s]', fontsize=10)
+        plt.ylabel('Depth [m]', fontsize=10)
+        ax.grid(linewidth=0.8,  color=(0.3, 0.3, 0.3))
+
+        avg_ssp = PlotDb.AvgSsp()
+
+        ssp_count = 0
+        for ts_pk in ts_list:
+
+            tmp_date = ts_pk[1].date()
+
+            if (tmp_date < dates[0]) or (tmp_date > dates[1]):
+                continue
+
+            ssp_count += 1
+            # print(ts_pk[1], ts_pk[0])
+            tmp_ssp = self.db.profile_by_pk(ts_pk[0])
+            # print(tmp_ssp)
+            ax.plot(tmp_ssp.cur.data.speed[tmp_ssp.cur.data_valid], tmp_ssp.cur.data.depth[tmp_ssp.cur.data_valid], '.',
+                    color=(0.85, 0.85, 0.85),  markersize=2
+                    # label='%s [%04d] ' % (ts_pk[0].time(), ts_pk[1])
+                    )
+            ax.hold(True)
+
+            avg_ssp.add_samples(tmp_ssp.cur.data.depth[tmp_ssp.cur.data_valid],
+                                tmp_ssp.cur.data.speed[tmp_ssp.cur.data_valid])
+
+        avg_ssp.calc_avg()
+        ax.plot(avg_ssp.mean, avg_ssp.depths, '-b', linewidth=2)
+        ax.hold(True)
+        ax.plot(avg_ssp.min_2std, avg_ssp.depths, '--b', linewidth=1)
+        ax.hold(True)
+        ax.plot(avg_ssp.max_2std, avg_ssp.depths, '--b', linewidth=1)
+        ax.hold(True)
+        # fill between std-curves
+        # ax.fill_betweenx(avg_ssp.depths, avg_ssp.min_2std, avg_ssp.max_2std, color='b', alpha='0.1')
+        # ax.hold(True)
+
+        if save_fig:
+            plt.savefig(os.path.join(self.plots_folder, 'aggregate_%s_%s.png' % (dates[0], dates[1])),
+                        bbox_inches='tight')
+        else:
+            plt.show()
+
+        logger.debug("plotted SSPs: %d" % ssp_count)
+        return True
+
     def daily_plots(self, save_fig=False, project=None):
         """plot all the SSPs by day"""
         if not save_fig:

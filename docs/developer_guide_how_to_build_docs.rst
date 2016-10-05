@@ -1,9 +1,9 @@
 How to build the documentation
-==============================
+------------------------------
 
 
 Requirements
-------------
+^^^^^^^^^^^^
 
 The documentation is built using ``sphinx``, so you neeed to have it:
 
@@ -11,7 +11,7 @@ The documentation is built using ``sphinx``, so you neeed to have it:
 
 
 First-time creation of documentation template
----------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Just once for each project, you can create the documentation template as follows:
 
@@ -21,11 +21,11 @@ Just once for each project, you can create the documentation template as follows
 
 
 Generate the documentation
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To update the API documentation:
 
-* ``sphinx-apidoc -f -o docs/api hydroffice hydroffice/soundspeed/scripts``
+* ``sphinx-apidoc -f -o docs/api hydroffice``
 
 To create the html
 

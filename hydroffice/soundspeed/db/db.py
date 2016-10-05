@@ -495,6 +495,26 @@ class SoundSpeedDb(object):
         # logger.info("added %s sis samples" % added_samples)
         return True
 
+    def timestamp_list(self):
+        """Create and return the timestamp list (and the pk)"""
+
+        if not self.conn:
+            logger.error("missing db connection")
+            return None
+
+        with self.conn:
+            try:
+                # ssp spatial timestamp
+                ts_list = self.conn.execute("""
+                                             SELECT cast_datetime, pk FROM ssp_view ORDER BY cast_datetime
+                                             """).fetchall()
+                logger.info("retrieved %s timestamps from ssp view" % len(ts_list))
+                return ts_list
+
+            except sqlite3.Error as e:
+                logger.error("retrieving the time stamp list, %s: %s" % (type(e), e))
+                return None
+
     def list_profiles(self, project=None):
         if not self.conn:
             logger.error("missing db connection")

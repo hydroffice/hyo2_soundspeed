@@ -1,17 +1,17 @@
 How to distribute
-=================
+-----------------
 
 
 Requirements
-------------
+^^^^^^^^^^^^
 
 To bump the version, you need ``bumpversion``:
 
-* ``pip install sphinx sphinx-autobuild``
+* ``pip install bumpversion``
 
 
 Update the version
-------------------
+^^^^^^^^^^^^^^^^^^
 
 Once installed, you can run something like:
 
