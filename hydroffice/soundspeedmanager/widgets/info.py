@@ -76,12 +76,12 @@ class Info(QtGui.QMainWindow):
         self.web.load(QtCore.QUrl(self.default_url))
 
     def load_docs(self):
-        url = 'https://giumas.github.io/hyo_ssp_manager/latest/index.html'
+        url = 'https://hydroffice.github.io/hyo_soundspeed/latest/index.html'
         self.url_input.setText(url)
         self.web.load(QtCore.QUrl(url))
 
     def load_license(self):
-        url = 'http://www.hydroffice.org/license/'
+        url = 'http://www.hydroffice.org/license_lgpl21/'
         self.url_input.setText(url)
         self.web.load(QtCore.QUrl(url))
 
