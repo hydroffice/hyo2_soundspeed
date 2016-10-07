@@ -29,16 +29,16 @@ class BaseDb(object):
         x, y = map(float, s.split(";"))
         return BaseDb.Point(x, y)
 
+    @staticmethod
+    def clean_name(some_var):
+        return ''.join(char for char in some_var if char.isalnum())
+
     def __init__(self, db_path):
         super(BaseDb, self).__init__()
 
         self.name = "_DB"
         self.db_path = db_path
         self.conn = None
-
-    @staticmethod
-    def clean_name(some_var):
-        return ''.join(char for char in some_var if char.isalnum())
 
     def check_table_total_rows(self, table_name, print_out=False):
         """ Returns the total number of rows in the database """
@@ -141,12 +141,13 @@ class BaseDb(object):
 
     def disconnect(self):
         """ Disconnect from the current database """
-        if not self.conn:
+        if self.conn is None:
             logger.info("Already disconnected")
             return True
 
         try:
             self.conn.close()
+            self.conn = None
             logger.info("Disconnected")
             return True
 

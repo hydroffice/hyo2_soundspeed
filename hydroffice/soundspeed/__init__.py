@@ -12,7 +12,7 @@ __version__ = '3.0.a2'
 __doc__ = "Sound Speed"
 __author__ = 'gmasetti@ccom.unh.edu; barry.gallagher@noaa.gov; brc@ccom.unh.edu; chen.zang@noaa.gov; ' \
              'matthew.wilson@noaa.gov; jack.riley@noaa.gov'
-__license__ = 'LGPLv3 license'
+__license__ = 'LGPLv2.1 or CCOM-UNH Industrial Associate license'
 __copyright__ = 'Copyright 2016 University of New Hampshire, Center for Coastal and Ocean Mapping'
 
 
