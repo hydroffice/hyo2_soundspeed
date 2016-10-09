@@ -157,3 +157,10 @@ class BaseDb(object):
 
     def close(self):
         self.disconnect()
+
+    def commit(self):
+        if self.conn is None:
+            return False
+
+        self.conn.commit()
+        return True

@@ -16,7 +16,7 @@ class SettingsDb(BaseDb):
         db_path = os.path.join(data_folder, db_file)
         super(SettingsDb, self).__init__(db_path=db_path)
         self.reconnect_or_create()
-        self.check_default_setup()
+        self._check_default_setup()
 
     def build_tables(self):
         if not self.conn:
@@ -40,10 +40,9 @@ class SettingsDb(BaseDb):
             logger.error("during building tables, %s: %s" % (type(e), e))
             return False
 
-
     # --- setup stuff
     
-    def check_default_setup(self):
+    def _check_default_setup(self):
         """Check for the presence of default settings, creating them if missing. """
         default_setup = "default"
         if not self.setup_exists(default_setup):
@@ -55,7 +54,7 @@ class SettingsDb(BaseDb):
         try:
             ret = self.conn.execute(""" SELECT COUNT(id) FROM general WHERE setup_name=? """,
                                     (setup_name,)).fetchone()
-            # log.info("found %s settings named %s" % (ret[0], setup_name))
+            # logger.info("found %d settings named %s" % (ret[0], setup_name))
             if ret[0] == 0:
                 return False
             else:
@@ -69,16 +68,16 @@ class SettingsDb(BaseDb):
             try:
                 # create a default settings record
                 self.conn.execute(""" INSERT INTO general (setup_name) VALUES(?) """, (setup_name,))
-                # log.info("inserted %s settings with default values" % setup_name)
+                # logger.info("inserted %s settings with default values" % setup_name)
    
                 # retrieve settings id
                 ret = self.conn.execute(""" SELECT id FROM general WHERE setup_name=? """,
                                         (setup_name,)).fetchone()
-                # log.info("%s settings id: %s" % (setup_name, ret[0]))
+                # logger.info("%s settings id: %s" % (setup_name, ret[0]))
    
                 # add default client list
                 self.conn.execute(""" INSERT INTO client_list (profile_id) VALUES(?) """, (ret[0], ))
-                # log.info("inserted %s settings values" % setup_name)
+                # logger.info("inserted %s settings values" % setup_name)
 
                 return True
    
@@ -92,13 +91,13 @@ class SettingsDb(BaseDb):
             try:
                 # check if active
                 ret = self.conn.execute(""" SELECT setup_status FROM general WHERE setup_name=? """, (setup_name,)).fetchone()
-                # log.info("%s settings status: %s" % (setup_name, ret))
+                # logger.info("%s settings status: %s" % (setup_name, ret))
                 if ret == "active":
                     raise RuntimeError("Attempt to delete active profile (%s)" % setup_name)
    
                 # create a default settings record
                 self.conn.execute(""" DELETE FROM general WHERE setup_name=? """, (setup_name,))
-                # log.info("deleted profile: %s" % setup_name)
+                # logger.info("deleted profile: %s" % setup_name)
    
             except sqlite3.Error as e:
                 logger.error("%s: %s" % (type(e), e))
@@ -115,7 +114,7 @@ class SettingsDb(BaseDb):
                 self.conn.execute(""" UPDATE general SET setup_status="inactive" """)
                 # set active just the passed profile
                 self.conn.execute(""" UPDATE general SET setup_status="active" WHERE setup_name=? """, (setup_name, ))
-                # log.info("activated profile: %s" % setup_name)
+                # logger.info("activated profile: %s" % setup_name)
             except sqlite3.Error as e:
                 logger.error("%s: %s" % (type(e), e))
                 return False
@@ -140,7 +139,7 @@ class SettingsDb(BaseDb):
         try:
             ret = self.conn.execute(""" SELECT COUNT(id) FROM client_list WHERE name=? """,
                                     (client_name,)).fetchone()
-            # log.info("found %s clients named %s" % (ret[0], client_name))
+            # logger.info("found %s clients named %s" % (ret[0], client_name))
             if ret[0] == 0:
                 return False
             else:
@@ -155,7 +154,7 @@ class SettingsDb(BaseDb):
                 self.conn.execute(""" INSERT INTO client_list (profile_id, name, ip, port, protocol)
                                                   VALUES(?, ?, ?, ?, ?) """,
                                   (self.active_setup_id, client_name, client_ip, client_port, client_protocol))
-                # log.info("inserted %s client values" % client_name, client_ip, client_port, client_protocol)
+                # logger.info("inserted %s client values" % client_name, client_ip, client_port, client_protocol)
 
             except sqlite3.Error as e:
                 logger.error("%s: %s" % (type(e), e))
@@ -166,7 +165,7 @@ class SettingsDb(BaseDb):
         with self.conn:
             try:
                 self.conn.execute(""" DELETE FROM client_list WHERE name=? """, (client_name,))
-                # log.info("deleted client: %s" % client_name)
+                # logger.info("deleted client: %s" % client_name)
 
             except sqlite3.Error as e:
                 logger.error("%s: %s" % (type(e), e))
@@ -214,7 +213,7 @@ class SettingsDb(BaseDb):
     def _getter_bool(self, attrib):
         r = self.conn.execute(""" SELECT """ + attrib + """ FROM general WHERE id=? """,
                               (self.active_setup_id,)).fetchone()
-        # logger.info("%s = %s" % (attrib, r[0]))
+        logger.info("%s = %s" % (attrib, r[0]))
         return r[0] == "True"
 
     def _setter_bool(self, attrib, value):
@@ -224,7 +223,7 @@ class SettingsDb(BaseDb):
                                   (value, self.active_setup_id,))
             except sqlite3.Error as e:
                 logger.error("%s: %s" % (type(e), e))
-        # logger.info("%s = %s" % (attrib, value))
+        logger.info("%s = %s" % (attrib, value))
 
     # --- active library version
     @property
