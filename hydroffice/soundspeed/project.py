@@ -38,18 +38,19 @@ class Project(object):
             os.makedirs(self._data_folder)
         logger.debug("data folder: %s" % self._data_folder)
 
-        # create loggers
+        # create (user and server) loggers
         self.logs = SqliteLogging(self._data_folder)
 
         self.setup = Settings(data_folder=self.data_folder)
-        self.cb = CliCallbacks()
-        self.ssp = None
+        self.cb = CliCallbacks()  # default callbacks use command line inputs
+        self.ssp = None  # current profile
         self.ref = None  # reference profile
         self.atlases = Atlases(prj=self)
         self.listeners = Listeners(prj=self)
         self.server = Server(prj=self)
         self.progress = Progress(qprogress=qt_progress, qparent=qt_parent)
 
+        # Set on/off logging for user and server based on loaded settings
         self.logging()
 
     def close(self):

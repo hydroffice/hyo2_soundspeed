@@ -9,49 +9,10 @@ from codecs import open
 
 logger = logging.getLogger(__name__)
 
-here = os.path.abspath(os.path.dirname(__file__))
-
-
-def get_testing_input_folder():
-    data_folder = os.path.abspath(os.path.join(here, os.pardir, os.pardir, os.pardir, "data", "downloaded"))
-    if not os.path.exists(data_folder):
-        raise RuntimeError("The testing input folder does not exist: %s" % data_folder)
-    return data_folder
-
-
-def get_testing_input_subfolders():
-    df = get_testing_input_folder()
-    return [o for o in os.listdir(df) if os.path.isdir(os.path.join(df, o))]
-
-
-def get_testing_output_folder():
-    data_folder = os.path.abspath(os.path.join(here, os.pardir, os.pardir, os.pardir, "data", "created"))
-    if not os.path.exists(data_folder):
-        os.makedirs(data_folder)
-    return data_folder
-
-
-def explore_folder(path):
-    """Open the passed path using OS-native commands"""
-    if not path:
-        return
-
-    import subprocess
-
-    if sys.platform == 'darwin':
-        subprocess.call(['open', '--', path])
-
-    elif sys.platform == 'linux':
-        subprocess.call(['xdg-open', path])
-
-    elif (sys.platform == 'win32') or (os.name is "nt"):
-        subprocess.call(['explorer', path])
-
-    else:
-        raise OSError("Unknown/unsupported OS")
-
 
 class FileInfo(object):
+    """A class that collects information on a passed file"""
+
     def __init__(self, data_path):
         self._path = os.path.abspath(data_path)
         self._basename = os.path.basename(self._path).split('.')[0]
@@ -107,48 +68,54 @@ def info_libs():
     msg += "python: %s %s-bit\n" % (platform.python_version(), "64" if is_64bit_python() else "32")
     msg += "hydroffice.soundspeed: %s\n" % ss_version
 
-    vers = None
     try:
         from hydroffice.soundspeedmanager import __version__ as ssm_version
-        vers = ssm_version
+        vrs = ssm_version
     except ImportError:
-        vers = None
-    msg += "hydroffice.soundspeedmanager: %s\n" % vers
+        vrs = None
+    msg += "hydroffice.soundspeedmanager: %s\n" % vrs
 
     try:
         from hydroffice.soundspeedsettings import __version__ as sss_version
-        vers = sss_version
+        vrs = sss_version
     except ImportError:
-        vers = None
-    msg += "hydroffice.soundspeedsettings: %s\n" % vers
+        vrs = None
+    msg += "hydroffice.soundspeedsettings: %s\n" % vrs
 
     try:
         from matplotlib import __version__ as mpl_version
-        vers = mpl_version
+        vrs = mpl_version
     except ImportError:
-        vers = None
-    msg += "matplotlib: %s\n" % vers
+        vrs = None
+    msg += "matplotlib: %s\n" % vrs
 
     try:
         from PySide import __version__ as pyside_version
-        vers = pyside_version
+        vrs = pyside_version
     except ImportError:
-        vers = None
-    msg += "pyside: %s\n" % vers
+        vrs = None
+    msg += "pyside: %s\n" % vrs
 
     try:
         from osgeo.gdal import __version__ as gdal_version
-        vers = gdal_version
+        vrs = gdal_version
     except ImportError:
-        vers = None
-    msg += "gdal: %s\n" % vers
+        vrs = None
+    msg += "gdal: %s\n" % vrs
 
     try:
         from pyproj import __version__ as pyproj_version
-        vers = pyproj_version
+        vrs = pyproj_version
     except ImportError:
-        vers = None
-    msg += "pyproj: %s\n" % vers
+        vrs = None
+    msg += "pyproj: %s\n" % vrs
+
+    try:
+        from netCDF4 import __version__ as netcdf4_version
+        vrs = netcdf4_version
+    except ImportError:
+        vrs = None
+    msg += "netCDF4: %s\n" % vrs
 
     return msg
 
@@ -163,16 +130,65 @@ def is_64bit_python():
     return platform.architecture()[0] == "64bit"
 
 
-def is_windows(cls):
+def is_windows():
     """ Check if the current OS is Windows """
     return (sys.platform == 'win32') or (os.name is "nt")
 
 
-def is_darwin(cls):
+def is_darwin():
     """ Check if the current OS is Mac OS """
     return sys.platform == 'darwin'
 
 
-def is_linux(cls):
+def is_linux():
     """ Check if the current OS is Linux """
     return sys.platform == 'linux'
+
+
+def explore_folder(path):
+    """Open the passed path using OS-native commands"""
+    if not os.path.exists(path):
+        logger.warning('the passed path to open does not exist: %s' % path)
+        return False
+
+    import subprocess
+
+    if is_darwin():
+        subprocess.call(['open', '--', path])
+        return True
+
+    elif is_linux():
+        subprocess.call(['xdg-open', path])
+        return True
+
+    elif is_windows():
+        subprocess.call(['explorer', path])
+        return True
+
+    else:
+        logger.warning("Unknown/unsupported OS")
+        return False
+
+
+# testing stuff
+
+here = os.path.abspath(os.path.dirname(__file__))
+
+
+def get_testing_input_folder():
+    data_folder = os.path.abspath(os.path.join(here, os.pardir, os.pardir, os.pardir, "data", "downloaded"))
+    if not os.path.exists(data_folder):
+        raise RuntimeError("The testing input folder does not exist: %s" % data_folder)
+    return data_folder
+
+
+def get_testing_input_subfolders():
+    df = get_testing_input_folder()
+    return [o for o in os.listdir(df) if os.path.isdir(os.path.join(df, o))]
+
+
+def get_testing_output_folder():
+    data_folder = os.path.abspath(os.path.join(here, os.pardir, os.pardir, os.pardir, "data", "created"))
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+    return data_folder

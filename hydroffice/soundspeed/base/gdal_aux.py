@@ -4,7 +4,7 @@ import os
 import sys
 import logging
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 try:
     from osgeo import gdal
@@ -22,40 +22,43 @@ except ImportError as e:
     raise ImportError("Unable to load `osgeo.osr` module: %s" % e)
 
 
-def python_path(cls):
-    """
-    Return the python site-specific directory prefix (the temporary folder for PyInstaller)
-    """
-    if hasattr(sys, '_MEIPASS'):  # required by PyInstaller single-file mode
+def python_path():
+    """ Return the python site-specific directory prefix (the temporary folder for PyInstaller) """
+
+    # required by PyInstaller single-file mode
+    if hasattr(sys, '_MEIPASS'):
         return sys._MEIPASS
-    else:
-        if hasattr(sys, 'real_prefix'):  # check if in a virtual environment
-            return sys.real_prefix
-        else:
-            return sys.prefix
+
+    # check if in a virtual environment
+    if hasattr(sys, 'real_prefix'):
+        return sys.real_prefix
+
+    return sys.prefix
 
 
 def check_gdal_data():
     """ Check the correctness of os env GDAL_DATA """
 
     # if 'GDAL_DATA' in os.environ:
-    #     log.debug("original GDAL_DATA = %s" % os.environ['GDAL_DATA'])
+    #     logger.debug("original GDAL_DATA = %s" % os.environ['GDAL_DATA'])
 
-    gdal_data_path = os.path.join(os.path.dirname(gdal.__file__), 'data', 'gdal')
-    # log.debug("checking GDAL_DATA as %s" % gdal_data_path)
+    gdal_data_path1 = os.path.join(os.path.dirname(gdal.__file__), 'data', 'gdal')
+    # logger.debug("checking GDAL_DATA as %s" % gdal_data_path)
+    if os.path.exists(gdal_data_path1):
+        os.environ['GDAL_DATA'] = gdal_data_path1
+        logger.debug("resulting GDAL_DATA = %s" % os.environ['GDAL_DATA'])
+        return
 
-    if os.path.exists(gdal_data_path):
-        os.environ['GDAL_DATA'] = gdal_data_path
+    # conda specific
+    gdal_data_path2 = os.path.join(python_path(), 'Library', 'data')
+    if os.path.exists(gdal_data_path2):
+        os.environ['GDAL_DATA'] = gdal_data_path2
+        logger.debug("resulting GDAL_DATA = %s" % os.environ['GDAL_DATA'])
+        return
 
-    else:
-        # conda specific
-        gdal_data_path = os.path.join(python_path(), 'Library', 'data')
-        if os.path.exists(gdal_data_path):
-            os.environ['GDAL_DATA'] = gdal_data_path
-        else:
-            raise RuntimeError("Unable to locate GDAL data at %s" % gdal_data_path)
+    # TODO: add mmore cases to find GDAL_DATA
 
-    # log.debug("resulting GDAL_DATA = %s" % os.environ['GDAL_DATA'])
+    raise RuntimeError("Unable to locate GDAL data at %s or %s" % (gdal_data_path1, gdal_data_path2))
 
 
 class GdalAux(object):
@@ -73,11 +76,7 @@ class GdalAux(object):
     }
 
     def __init__(self):
-        super(GdalAux, self).__init__()
-
-        self.name = "GDL"
-        log.debug("gdal version: %s" % gdal.VersionInfo(b'VERSION_NUM'))
-
+        logger.debug("gdal version: %s" % gdal.VersionInfo(b'VERSION_NUM'))
         self.push_gdal_error_handler()
 
     @classmethod

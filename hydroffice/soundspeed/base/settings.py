@@ -69,9 +69,11 @@ class Settings(object):
 
     @property
     def db(self):
+        """Usually the data_folder is set when the project is instantiated, so this is safe"""
         return SettingsDb(self.data_folder)
 
     def load_settings_from_db(self):
+        """Loar/reload the setting from the db"""
         db = self.db
         self.library_version = db.library_version
         self.setup_id = db.active_setup_id

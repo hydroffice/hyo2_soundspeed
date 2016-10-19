@@ -35,12 +35,12 @@ def main():
         prj.download_rtofs()
     logger.info("has rtofs: %s" % prj.has_rtofs())
 
-    temp_url, sal_url = prj.atlases.rtofs.build_check_urls(dt.utcnow())
+    temp_url, sal_url = prj.atlases.rtofs._build_check_urls(dt.utcnow())
     logger.info("urls:\n%s [%s]\n%s [%s]"
-                % (temp_url, prj.atlases.rtofs.check_url(temp_url), sal_url, prj.atlases.rtofs.check_url(sal_url)))
-    temp_url, sal_url = prj.atlases.rtofs.build_check_urls(dt.utcnow() - timedelta(days=1))
+                % (temp_url, prj.atlases.rtofs._check_url(temp_url), sal_url, prj.atlases.rtofs._check_url(sal_url)))
+    temp_url, sal_url = prj.atlases.rtofs._build_check_urls(dt.utcnow() - timedelta(days=1))
     logger.info("urls:\n%s [%s]\n%s [%s]"
-                % (temp_url, prj.atlases.rtofs.check_url(temp_url), sal_url, prj.atlases.rtofs.check_url(sal_url)))
+                % (temp_url, prj.atlases.rtofs._check_url(temp_url), sal_url, prj.atlases.rtofs._check_url(sal_url)))
 
     for test in tests:
         logger.info("rtofs profile:\n%s" % prj.atlases.rtofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
