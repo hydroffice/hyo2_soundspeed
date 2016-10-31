@@ -20,19 +20,7 @@ except ImportError as e:
 
 # list of archives to download
 data_files = [
-    'data.asvp.zip',
-    'data.castaway.zip',
-    'data.digibarpro.zip',
-    'data.digibars.zip',
-    'data.elac.zip',
-    'data.idronaut.zip',
-    'data.saiv.zip',
-    'data.seabird.zip',
-    'data.sippican.zip',
-    'data.sonardyne.zip',
-    'data.turo.zip',
-    'data.unb.zip',
-    'data.valeport.zip',
+    
 ]
 
 # actually downloading the file with wget
@@ -46,7 +34,7 @@ for fid in data_files:
         print("  - OK")
 
 # create an empty `downloaded` folder
-downloaded_folder = os.path.join(os.path.abspath(os.path.dirname(__file__)), "downloaded")
+downloaded_folder = os.path.join(os.path.abspath(os.path.dirname(__file__)), "download")
 if os.path.exists(downloaded_folder):
     shutil.rmtree(downloaded_folder)
 os.makedirs(downloaded_folder)
