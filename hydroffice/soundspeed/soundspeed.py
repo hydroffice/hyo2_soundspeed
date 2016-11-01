@@ -24,57 +24,187 @@ from .profile.dicts import Dicts
 from .server.server import Server
 
 
-class Project(object):
-    """Sound Speed project"""
+class SoundSpeedLibrary(object):
+    """Sound Speed library"""
 
     def __init__(self, data_folder=None, qt_progress=None, qt_parent=None):
         """Initialization for the library"""
+        logger.info("** > LIB: initializing ...")
 
-        # output data folder: where all the library data are written
-        self._data_folder = data_folder
-        if self._data_folder is None:
-            self._data_folder = user_data_dir("%s %s" % (soundspeed_name, soundspeed_version), "HydrOffice")
-        if not os.path.exists(self._data_folder):  # create it if it does not exist
-            os.makedirs(self._data_folder)
-        logger.debug("data folder: %s" % self._data_folder)
-
-        # create (user and server) loggers
-        self.logs = SqliteLogging(self._data_folder)
-
-        self.setup = Settings(data_folder=self.data_folder)
-        self.cb = CliCallbacks()  # default callbacks use command line inputs
         self.ssp = None  # current profile
         self.ref = None  # reference profile
+
+        # take care of all the required folders
+        self._data_folder = None
+        self._releases_folder = None
+        self._release_folder = None
+        self._projects_folder = None
+        self._outputs_folder = None
+        self.set_folders(data_folder=data_folder)
+
+        # load settings and other functionalities
+        self.setup = Settings(data_folder=self.release_folder)
         self.atlases = Atlases(prj=self)
         self.listeners = Listeners(prj=self)
         self.server = Server(prj=self)
+        self.logs = SqliteLogging(self._release_folder)  # (user and server) loggers
+        self.cb = CliCallbacks()  # default callbacks use command line inputs
         self.progress = Progress(qprogress=qt_progress, qparent=qt_parent)
 
-        # Set on/off logging for user and server based on loaded settings
-        self.logging()
+        self.logging()  # Set on/off logging for user and server based on loaded settings
+
+        logger.info("** > LIB: initialized!")
 
     def close(self):
         """Destructor"""
-        logger.debug("destroy project")
+        logger.info("CLOSING LIBRARY ...")
+
         self.listeners.stop()
+
         if self.server.is_alive():
             self.server.stop()
             self.server.join(2)
 
-    # --- output data folder
+        logger.info("LIBRARY CLOSED!")
+
+    # --- library, release, atlases, and projects folders
+
+    def set_folders(self, data_folder):
+        """manage library folders creation"""
+
+        # output data folder: where all the library data are written
+        self._data_folder = data_folder
+        if self._data_folder is None:
+            self._data_folder = user_data_dir(soundspeed_name, "HydrOffice")
+        if not os.path.exists(self._data_folder):  # create it if it does not exist
+            os.makedirs(self._data_folder)
+        logger.debug("library folder: %s" % self.data_folder)
+
+        # releases data folder
+        self._releases_folder = os.path.join(self.data_folder, "releases")
+        if not os.path.exists(self._releases_folder):  # create it if it does not exist
+            os.makedirs(self._releases_folder)
+        # logger.debug("releases folder: %s" % self.releases_folder)
+
+        # release data folder: release-specific data (as settings)
+        self._release_folder = os.path.join(self.releases_folder, soundspeed_version[:soundspeed_version.rindex('.')])
+        if not os.path.exists(self._release_folder):  # create it if it does not exist
+            os.makedirs(self._release_folder)
+        # logger.debug("release folder: %s" % self.release_folder)
+
+        # projects folder
+        self._projects_folder = os.path.join(self.data_folder, "projects")
+        if not os.path.exists(self._projects_folder):  # create it if it does not exist
+            os.makedirs(self._projects_folder)
+        # logger.debug("projects folder: %s" % self.projects_folder)
+
+        # outputs folder
+        self._outputs_folder = os.path.join(self.data_folder, "outputs")
+        if not os.path.exists(self._outputs_folder):  # create it if it does not exist
+            os.makedirs(self._outputs_folder)
+        # logger.debug("outputs folder: %s" % self.projects_folder)
+
+    # library data folder
 
     @property
     def data_folder(self):
-        """Get the library's output data folder"""
+        """Get the library data folder"""
         return self._data_folder
 
     @data_folder.setter
     def data_folder(self, value):
-        """ Set the library's output data folder"""
+        """ Set the library data folder"""
         self._data_folder = value
 
     def open_data_folder(self):
         explore_folder(self.data_folder)
+
+    # releases folder
+
+    @property
+    def releases_folder(self):
+        """Get the releases data folder"""
+        return self._releases_folder
+
+    @releases_folder.setter
+    def releases_folder(self, value):
+        """ Set the releases data folder"""
+        self._releases_folder = value
+
+    def open_releases_folder(self):
+        explore_folder(self.releases_folder)
+
+    # release folder
+
+    @property
+    def release_folder(self):
+        """Get the release data folder"""
+        return self._release_folder
+
+    @release_folder.setter
+    def release_folder(self, value):
+        """ Set the release data folder"""
+        self._release_folder = value
+
+    # atlases
+
+    @property
+    def atlases_folder(self):
+        """Get the atlases folder"""
+        return self.atlases.atlases_folder
+
+    @atlases_folder.setter
+    def atlases_folder(self, value):
+        """ Set the atlases folder"""
+        self.atlases.atlases_folder = value
+
+    def open_atlases_folder(self):
+        explore_folder(self.atlases_folder)
+
+    @property
+    def woa09_folder(self):
+        """Get the woa09 atlas folder"""
+        return self.atlases.woa09_folder
+
+    @woa09_folder.setter
+    def woa09_folder(self, value):
+        """ Set the woa09 atlas folder"""
+        self.atlases.woa09_folder = value
+
+    @property
+    def woa13_folder(self):
+        """Get the woa13 atlas folder"""
+        return self.atlases.woa13_folder
+
+    @woa13_folder.setter
+    def woa13_folder(self, value):
+        """ Set the woa13 atlas folder"""
+        self.atlases.woa13_folder = value
+
+    @property
+    def rtofs_folder(self):
+        """Get the rtofs atlas folder"""
+        return self.atlases.rtofs_folder
+
+    @rtofs_folder.setter
+    def rtofs_folder(self, value):
+        """ Set the rtofs atlas folder"""
+        self.atlases.rtofs_folder = value
+
+    # projects
+
+    @property
+    def projects_folder(self):
+        """Get the projects folder"""
+        return self._projects_folder
+
+    @projects_folder.setter
+    def projects_folder(self, value):
+        """ Set the projects folder"""
+        self._projects_folder = value
+
+    def open_projects_folder(self):
+        explore_folder(self.projects_folder)
 
     # --- readers/writers
 
@@ -300,7 +430,6 @@ class Project(object):
 
         self.listen_sis()
 
-        prog_value = 0
         prog_quantum = 50 / len(self.setup.client_list.clients)
 
         for client in self.setup.client_list.clients:
@@ -390,7 +519,7 @@ class Project(object):
         if not self.has_ssp():
             raise RuntimeError("Data not loaded")
 
-        db = SoundSpeedDb(data_folder=self.data_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder)
         success = db.add_casts(self.ssp)
         db.disconnect()
 
@@ -405,21 +534,21 @@ class Project(object):
 
     def db_profiles(self, project=None):
         """List the profile on the db"""
-        db = SoundSpeedDb(data_folder=self.data_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder)
         lst = db.list_profiles(project=project)
         db.disconnect()
         return lst
 
     def db_profile(self, pk):
         """Retrieve a profile by primary key"""
-        db = SoundSpeedDb(data_folder=self.data_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder)
         ssp = db.profile_by_pk(pk=pk)
         db.disconnect()
         return ssp
 
     def db_timestamp_list(self):
         """Retrieve a list with the timestamp of all the profiles"""
-        db = SoundSpeedDb(data_folder=self.data_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder)
         lst = db.timestamp_list()
         db.disconnect()
         return lst
@@ -435,35 +564,35 @@ class Project(object):
 
     def delete_db_profile(self, pk):
         """Retrieve a profile by primary key"""
-        db = SoundSpeedDb(data_folder=self.data_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder)
         ret = db.delete_profile_by_pk(pk=pk)
         db.disconnect()
         return ret
 
     def map_db_profiles(self, project=None):
         """List the profile on the db"""
-        db = SoundSpeedDb(data_folder=self.data_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder)
         ret = db.plot.map_profiles(project=project)
         db.disconnect()
         return ret
 
     def aggregate_plot(self, dates, project=None):
         """Create an aggregate plot"""
-        db = SoundSpeedDb(data_folder=self.data_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder)
         success = db.plot.aggregate_plot(dates=dates, project=project)
         db.disconnect()
         return success
 
     def plot_daily_db_profiles(self, project=None):
         """Plot the profile on the db by day"""
-        db = SoundSpeedDb(data_folder=self.data_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder)
         success = db.plot.daily_plots(project=project)
         db.disconnect()
         return success
 
     def save_daily_db_profiles(self, project=None):
         """Save figure with the profile on the db by day"""
-        db = SoundSpeedDb(data_folder=self.data_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder)
         success = db.plot.daily_plots(save_fig=True, project=project)
         db.disconnect()
         return success
@@ -471,7 +600,7 @@ class Project(object):
     def export_db_profiles_metadata(self, ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile'],
                                     project=None):
         """Export the db profile metadata"""
-        db = SoundSpeedDb(data_folder=self.data_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder)
         lst = db.export.export_profiles_metadata(ogr_format=ogr_format, project=project)
         db.disconnect()
         return lst
@@ -711,7 +840,7 @@ class Project(object):
     def clear_data(self):
         """Clear current data"""
         if self.has_ssp():
-            logger.debug("Clear data")
+            logger.debug("Clear SSP data")
             self.ssp = None
 
     def restart_proc(self):
@@ -760,15 +889,6 @@ class Project(object):
 
     def has_woa13(self):
         return self.atlases.woa13.is_present()
-
-    def rtofs_folder(self):
-        return self.atlases.rtofs.folder
-
-    def woa09_folder(self):
-        return self.atlases.woa09.folder
-
-    def woa13_folder(self):
-        return self.atlases.woa13.folder
 
     def download_rtofs(self, datestamp=None):
         return self.atlases.rtofs.download_db(datestamp=datestamp)
@@ -865,8 +985,13 @@ class Project(object):
 
     def __repr__(self):
         msg = "<%s>\n" % self.__class__.__name__
-        msg += "  <data_folder:%s>\n" % self.data_folder
-        msg += "  <sqlite_loggers: user %s; server %s>\n" \
+        msg += "\n  <library data folder: %s>\n" % self.data_folder
+        msg += "  <projects folder: %s>\n" % self.projects_folder
+        msg += "  <release folder: %s>\n" % self.release_folder
+
+        msg += "\n%s" % self.atlases
+
+        msg += "\n  <sqlite_loggers: user %s; server %s>\n" \
                % (self.has_active_user_logger(), self.has_active_server_logger())
-        msg += "%s" % self.setup
+        msg += "\n%s" % self.setup
         return msg

@@ -17,7 +17,7 @@ def gui():
     app = QtGui.QApplication(sys.argv)
 
     prj = Project()
-    main = mainwin.MainWin(prj=prj)
+    main = mainwin.MainWin(lib=prj)
     main.show()
 
     sys.exit(app.exec_())

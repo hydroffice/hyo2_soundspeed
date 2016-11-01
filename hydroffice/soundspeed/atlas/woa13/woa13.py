@@ -49,7 +49,6 @@ class Woa13(AbstractAtlas):
         check_woa13_temp = os.path.join(self.folder, 'temp', 'woa13_decav_t00_04v2.nc')
         check_woa13_sal = os.path.join(self.folder, 'sal', 'woa13_decav_s01_04v2.nc')  # s00 is not required
         if os.path.exists(check_woa13_temp) and os.path.exists(check_woa13_sal):
-            logger.info('unable to locate the WOA13 db at the default location: %s' % self.folder)
             return True
         # logger.info('unable to locate the WOA13 db at the default location: %s' % self.folder)
 

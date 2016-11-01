@@ -132,7 +132,7 @@ class Settings(object):
 
     def __repr__(self):
         msg = "  <setup:%s:%s>\n" % (self.setup_id, self.setup_name)
-        msg += "    <library version: %s>" % self.library_version
+        msg += "    <library version: %s>\n" % self.library_version
         msg += "    <input>\n"
         msg += "      <use_woa09: %s>\n" % self.use_woa09
         msg += "      <use_woa13: %s>\n" % self.use_woa13

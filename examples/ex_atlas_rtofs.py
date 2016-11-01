@@ -46,7 +46,7 @@ def main():
         logger.info("rtofs profile:\n%s" % prj.atlases.rtofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
 
     prj.retrieve_rtofs()
-    logger.info("prj retrieve rtofs: %s" % prj.ssp)
+    logger.info("lib retrieve rtofs: %s" % prj.ssp)
 
     app.exec_()  # PySide stuff (end)
 

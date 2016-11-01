@@ -37,8 +37,8 @@ class DataPlots(AbstractWidget):
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
 
-    def __init__(self, main_win, prj, server_mode=False):
-        AbstractWidget.__init__(self, main_win=main_win, prj=prj)
+    def __init__(self, main_win, lib, server_mode=False):
+        AbstractWidget.__init__(self, main_win=main_win, lib=lib)
 
         self.server_mode = server_mode
         self.is_drawn = False
@@ -124,7 +124,7 @@ class DataPlots(AbstractWidget):
             self.hbox = QtGui.QHBoxLayout()
             self.vbox.addLayout(self.hbox)
             # navigation
-            self.nav = NavToolbar(canvas=self.c, parent=self.top_widget, plot_win=self, prj=self.prj)
+            self.nav = NavToolbar(canvas=self.c, parent=self.top_widget, plot_win=self, prj=self.lib)
             self.hbox.addWidget(self.nav)
 
         self.on_draw()
@@ -137,56 +137,56 @@ class DataPlots(AbstractWidget):
         self.speed_ax.clear()
         self.speed_ax.set_ylabel('Depth [m]')
         self.speed_ax.set_xlabel('Sound Speed [m/s]')
-        if self.prj.cur.woa09:
-            self.speed_woa09, = self.speed_ax.plot(self.prj.cur.woa09.l[0].proc.speed,
-                                                   self.prj.cur.woa09.l[0].proc.depth,
+        if self.lib.cur.woa09:
+            self.speed_woa09, = self.speed_ax.plot(self.lib.cur.woa09.l[0].proc.speed,
+                                                   self.lib.cur.woa09.l[0].proc.depth,
                                                    color=self.woa09_color,
                                                    linestyle='--'
                                                    )
-            if self.prj.cur.woa09.l[1]:
-                self.speed_woa09_min, = self.speed_ax.plot(self.prj.cur.woa09.l[1].proc.speed,
-                                                           self.prj.cur.woa09.l[1].proc.depth,
+            if self.lib.cur.woa09.l[1]:
+                self.speed_woa09_min, = self.speed_ax.plot(self.lib.cur.woa09.l[1].proc.speed,
+                                                           self.lib.cur.woa09.l[1].proc.depth,
                                                            color=self.woa09_color,
                                                            linestyle=':'
                                                            )
-            if self.prj.cur.woa09.l[2]:
-                self.speed_woa09_max, = self.speed_ax.plot(self.prj.cur.woa09.l[2].proc.speed,
-                                                           self.prj.cur.woa09.l[2].proc.depth,
+            if self.lib.cur.woa09.l[2]:
+                self.speed_woa09_max, = self.speed_ax.plot(self.lib.cur.woa09.l[2].proc.speed,
+                                                           self.lib.cur.woa09.l[2].proc.depth,
                                                            color=self.woa09_color,
                                                            linestyle=':'
                                                            )
-        if self.prj.cur.woa13:
-            self.speed_woa13, = self.speed_ax.plot(self.prj.cur.woa13.l[0].proc.speed,
-                                                   self.prj.cur.woa13.l[0].proc.depth,
+        if self.lib.cur.woa13:
+            self.speed_woa13, = self.speed_ax.plot(self.lib.cur.woa13.l[0].proc.speed,
+                                                   self.lib.cur.woa13.l[0].proc.depth,
                                                    color=self.woa13_color,
                                                    linestyle='--'
                                                    )
-            if self.prj.cur.woa13.l[1]:
-                self.speed_woa13_min, = self.speed_ax.plot(self.prj.cur.woa13.l[1].proc.speed,
-                                                           self.prj.cur.woa13.l[1].proc.depth,
+            if self.lib.cur.woa13.l[1]:
+                self.speed_woa13_min, = self.speed_ax.plot(self.lib.cur.woa13.l[1].proc.speed,
+                                                           self.lib.cur.woa13.l[1].proc.depth,
                                                            color=self.woa13_color,
                                                            linestyle=':'
                                                            )
-            if self.prj.cur.woa13.l[2]:
-                self.speed_woa13_max, = self.speed_ax.plot(self.prj.cur.woa13.l[2].proc.speed,
-                                                           self.prj.cur.woa13.l[2].proc.depth,
+            if self.lib.cur.woa13.l[2]:
+                self.speed_woa13_max, = self.speed_ax.plot(self.lib.cur.woa13.l[2].proc.speed,
+                                                           self.lib.cur.woa13.l[2].proc.depth,
                                                            color=self.woa13_color,
                                                            linestyle=':'
                                                            )
-        if self.prj.cur.rtofs:
-            self.speed_rtofs, = self.speed_ax.plot(self.prj.cur.rtofs.l[0].proc.speed,
-                                                   self.prj.cur.rtofs.l[0].proc.depth,
+        if self.lib.cur.rtofs:
+            self.speed_rtofs, = self.speed_ax.plot(self.lib.cur.rtofs.l[0].proc.speed,
+                                                   self.lib.cur.rtofs.l[0].proc.depth,
                                                    color=self.rtofs_color,
                                                    linestyle='--'
                                                    )
-        if self.prj.has_ref():
-            self.speed_ref, = self.speed_ax.plot(self.prj.ref.l[0].proc.speed,
-                                                 self.prj.ref.l[0].proc.depth,
+        if self.lib.has_ref():
+            self.speed_ref, = self.speed_ax.plot(self.lib.ref.l[0].proc.speed,
+                                                 self.lib.ref.l[0].proc.depth,
                                                  color=self.ref_color,
                                                  linestyle='--'
                                                  )
-        self.speed_invalid, = self.speed_ax.plot(self.prj.cur.proc.speed[self.ii],
-                                                 self.prj.cur.proc.depth[self.ii],
+        self.speed_invalid, = self.speed_ax.plot(self.lib.cur.proc.speed[self.ii],
+                                                 self.lib.cur.proc.depth[self.ii],
                                                  markerfacecolor=self.invalid_color,
                                                  markeredgecolor=self.invalid_color,
                                                  linestyle='None',
@@ -194,12 +194,12 @@ class DataPlots(AbstractWidget):
                                                  alpha=0.8,
                                                  ms=4,
                                                  picker=3)
-        self.speed_valid, = self.speed_ax.plot(self.prj.cur.proc.speed[self.vi],
-                                               self.prj.cur.proc.depth[self.vi],
+        self.speed_valid, = self.speed_ax.plot(self.lib.cur.proc.speed[self.vi],
+                                               self.lib.cur.proc.depth[self.vi],
                                                color=self.valid_color,
                                                picker=3)
-        self.speed_sis, = self.speed_ax.plot(self.prj.cur.sis.speed[self.svi],
-                                             self.prj.cur.sis.depth[self.svi],
+        self.speed_sis, = self.speed_ax.plot(self.lib.cur.sis.speed[self.svi],
+                                             self.lib.cur.sis.depth[self.svi],
                                              markerfacecolor=self.sis_color,
                                              markeredgecolor=self.sis_color,
                                              marker='.',
@@ -215,56 +215,56 @@ class DataPlots(AbstractWidget):
     def _draw_temp(self):
         self.temp_ax.clear()
         self.temp_ax.set_xlabel('Temperature [deg C]')
-        if self.prj.cur.woa09:
-            self.temp_woa09, = self.temp_ax.plot(self.prj.cur.woa09.l[0].proc.temp,
-                                                 self.prj.cur.woa09.l[0].proc.depth,
+        if self.lib.cur.woa09:
+            self.temp_woa09, = self.temp_ax.plot(self.lib.cur.woa09.l[0].proc.temp,
+                                                 self.lib.cur.woa09.l[0].proc.depth,
                                                  color=self.woa09_color,
                                                  linestyle='--'
                                                  )
-            if self.prj.cur.woa09.l[1]:
-                self.temp_woa09_min, = self.temp_ax.plot(self.prj.cur.woa09.l[1].proc.temp,
-                                                         self.prj.cur.woa09.l[1].proc.depth,
+            if self.lib.cur.woa09.l[1]:
+                self.temp_woa09_min, = self.temp_ax.plot(self.lib.cur.woa09.l[1].proc.temp,
+                                                         self.lib.cur.woa09.l[1].proc.depth,
                                                          color=self.woa09_color,
                                                          linestyle=':'
                                                          )
-            if self.prj.cur.woa09.l[2]:
-                self.temp_woa09_max, = self.temp_ax.plot(self.prj.cur.woa09.l[2].proc.temp,
-                                                         self.prj.cur.woa09.l[2].proc.depth,
+            if self.lib.cur.woa09.l[2]:
+                self.temp_woa09_max, = self.temp_ax.plot(self.lib.cur.woa09.l[2].proc.temp,
+                                                         self.lib.cur.woa09.l[2].proc.depth,
                                                          color=self.woa09_color,
                                                          linestyle=':'
                                                          )
-        if self.prj.cur.woa13:
-            self.temp_woa13, = self.temp_ax.plot(self.prj.cur.woa13.l[0].proc.temp,
-                                                 self.prj.cur.woa13.l[0].proc.depth,
+        if self.lib.cur.woa13:
+            self.temp_woa13, = self.temp_ax.plot(self.lib.cur.woa13.l[0].proc.temp,
+                                                 self.lib.cur.woa13.l[0].proc.depth,
                                                  color=self.woa13_color,
                                                  linestyle='--'
                                                  )
-            if self.prj.cur.woa13.l[1]:
-                self.temp_woa13_min, = self.temp_ax.plot(self.prj.cur.woa13.l[1].proc.temp,
-                                                          self.prj.cur.woa13.l[1].proc.depth,
-                                                          color=self.woa13_color,
-                                                          linestyle=':'
-                                                          )
-            if self.prj.cur.woa13.l[2]:
-                self.temp_woa13_max, = self.temp_ax.plot(self.prj.cur.woa13.l[2].proc.temp,
-                                                         self.prj.cur.woa13.l[2].proc.depth,
+            if self.lib.cur.woa13.l[1]:
+                self.temp_woa13_min, = self.temp_ax.plot(self.lib.cur.woa13.l[1].proc.temp,
+                                                         self.lib.cur.woa13.l[1].proc.depth,
                                                          color=self.woa13_color,
                                                          linestyle=':'
                                                          )
-        if self.prj.cur.rtofs:
-            self.temp_rtofs, = self.temp_ax.plot(self.prj.cur.rtofs.l[0].proc.temp,
-                                                 self.prj.cur.rtofs.l[0].proc.depth,
+            if self.lib.cur.woa13.l[2]:
+                self.temp_woa13_max, = self.temp_ax.plot(self.lib.cur.woa13.l[2].proc.temp,
+                                                         self.lib.cur.woa13.l[2].proc.depth,
+                                                         color=self.woa13_color,
+                                                         linestyle=':'
+                                                         )
+        if self.lib.cur.rtofs:
+            self.temp_rtofs, = self.temp_ax.plot(self.lib.cur.rtofs.l[0].proc.temp,
+                                                 self.lib.cur.rtofs.l[0].proc.depth,
                                                  color=self.rtofs_color,
                                                  linestyle='--'
                                                  )
-        if self.prj.has_ref():
-            self.temp_ref, = self.temp_ax.plot(self.prj.ref.l[0].proc.temp,
-                                               self.prj.ref.l[0].proc.depth,
+        if self.lib.has_ref():
+            self.temp_ref, = self.temp_ax.plot(self.lib.ref.l[0].proc.temp,
+                                               self.lib.ref.l[0].proc.depth,
                                                color=self.ref_color,
                                                linestyle='--'
                                                )
-        self.temp_invalid, = self.temp_ax.plot(self.prj.cur.proc.temp[self.ii],
-                                               self.prj.cur.proc.depth[self.ii],
+        self.temp_invalid, = self.temp_ax.plot(self.lib.cur.proc.temp[self.ii],
+                                               self.lib.cur.proc.depth[self.ii],
                                                markerfacecolor=self.invalid_color,
                                                markeredgecolor=self.invalid_color,
                                                linestyle='None',
@@ -272,8 +272,8 @@ class DataPlots(AbstractWidget):
                                                alpha=0.8,
                                                ms=4,
                                                picker=3)
-        self.temp_valid, = self.temp_ax.plot(self.prj.cur.proc.temp[self.vi],
-                                             self.prj.cur.proc.depth[self.vi],
+        self.temp_valid, = self.temp_ax.plot(self.lib.cur.proc.temp[self.vi],
+                                             self.lib.cur.proc.depth[self.vi],
                                              color=self.valid_color,
                                              picker=3)
         self.temp_ax.set_label("temp")
@@ -283,56 +283,56 @@ class DataPlots(AbstractWidget):
     def _draw_sal(self):
         self.sal_ax.clear()
         self.sal_ax.set_xlabel('Salinity [PSU]')
-        if self.prj.cur.woa09:
-            self.sal_woa09, = self.sal_ax.plot(self.prj.cur.woa09.l[0].proc.sal,
-                                               self.prj.cur.woa09.l[0].proc.depth,
+        if self.lib.cur.woa09:
+            self.sal_woa09, = self.sal_ax.plot(self.lib.cur.woa09.l[0].proc.sal,
+                                               self.lib.cur.woa09.l[0].proc.depth,
                                                color=self.woa09_color,
                                                linestyle='--'
                                                )
-            if self.prj.cur.woa09.l[1]:
-                self.sal_woa09_min, = self.sal_ax.plot(self.prj.cur.woa09.l[1].proc.sal,
-                                                       self.prj.cur.woa09.l[1].proc.depth,
+            if self.lib.cur.woa09.l[1]:
+                self.sal_woa09_min, = self.sal_ax.plot(self.lib.cur.woa09.l[1].proc.sal,
+                                                       self.lib.cur.woa09.l[1].proc.depth,
                                                        color=self.woa09_color,
                                                        linestyle=':'
                                                        )
-            if self.prj.cur.woa09.l[2]:
-                self.sal_woa09_max, = self.sal_ax.plot(self.prj.cur.woa09.l[2].proc.sal,
-                                                       self.prj.cur.woa09.l[2].proc.depth,
+            if self.lib.cur.woa09.l[2]:
+                self.sal_woa09_max, = self.sal_ax.plot(self.lib.cur.woa09.l[2].proc.sal,
+                                                       self.lib.cur.woa09.l[2].proc.depth,
                                                        color=self.woa09_color,
                                                        linestyle=':'
                                                        )
-        if self.prj.cur.woa13:
-            self.sal_woa13, = self.sal_ax.plot(self.prj.cur.woa13.l[0].proc.sal,
-                                               self.prj.cur.woa13.l[0].proc.depth,
+        if self.lib.cur.woa13:
+            self.sal_woa13, = self.sal_ax.plot(self.lib.cur.woa13.l[0].proc.sal,
+                                               self.lib.cur.woa13.l[0].proc.depth,
                                                color=self.woa13_color,
                                                linestyle='--'
                                                )
-            if self.prj.cur.woa13.l[1]:
-                self.sal_woa13_min, = self.sal_ax.plot(self.prj.cur.woa13.l[1].proc.sal,
-                                                       self.prj.cur.woa13.l[1].proc.depth,
+            if self.lib.cur.woa13.l[1]:
+                self.sal_woa13_min, = self.sal_ax.plot(self.lib.cur.woa13.l[1].proc.sal,
+                                                       self.lib.cur.woa13.l[1].proc.depth,
                                                        color=self.woa13_color,
                                                        linestyle=':'
                                                        )
-            if self.prj.cur.woa13.l[2]:
-                self.sal_woa13_max, = self.sal_ax.plot(self.prj.cur.woa13.l[2].proc.sal,
-                                                       self.prj.cur.woa13.l[2].proc.depth,
+            if self.lib.cur.woa13.l[2]:
+                self.sal_woa13_max, = self.sal_ax.plot(self.lib.cur.woa13.l[2].proc.sal,
+                                                       self.lib.cur.woa13.l[2].proc.depth,
                                                        color=self.woa13_color,
                                                        linestyle=':'
                                                        )
-        if self.prj.cur.rtofs:
-            self.sal_rtofs, = self.sal_ax.plot(self.prj.cur.rtofs.l[0].proc.sal,
-                                               self.prj.cur.rtofs.l[0].proc.depth,
+        if self.lib.cur.rtofs:
+            self.sal_rtofs, = self.sal_ax.plot(self.lib.cur.rtofs.l[0].proc.sal,
+                                               self.lib.cur.rtofs.l[0].proc.depth,
                                                color=self.rtofs_color,
                                                linestyle='--'
                                                )
-        if self.prj.has_ref():
-            self.sal_ref, = self.sal_ax.plot(self.prj.ref.l[0].proc.sal,
-                                             self.prj.ref.l[0].proc.depth,
+        if self.lib.has_ref():
+            self.sal_ref, = self.sal_ax.plot(self.lib.ref.l[0].proc.sal,
+                                             self.lib.ref.l[0].proc.depth,
                                              color=self.ref_color,
                                              linestyle='--'
                                              )
-        self.sal_invalid, = self.sal_ax.plot(self.prj.cur.proc.sal[self.ii],
-                                             self.prj.cur.proc.depth[self.ii],
+        self.sal_invalid, = self.sal_ax.plot(self.lib.cur.proc.sal[self.ii],
+                                             self.lib.cur.proc.depth[self.ii],
                                              markerfacecolor=self.invalid_color,
                                              markeredgecolor=self.invalid_color,
                                              linestyle='None',
@@ -340,8 +340,8 @@ class DataPlots(AbstractWidget):
                                              alpha=0.8,
                                              ms=4,
                                              picker=3)
-        self.sal_valid, = self.sal_ax.plot(self.prj.cur.proc.sal[self.vi],
-                                           self.prj.cur.proc.depth[self.vi],
+        self.sal_valid, = self.sal_ax.plot(self.lib.cur.proc.sal[self.vi],
+                                           self.lib.cur.proc.depth[self.vi],
                                            color=self.valid_color,
                                            picker=3)
         self.sal_ax.set_label("sal")
@@ -351,12 +351,12 @@ class DataPlots(AbstractWidget):
     def _set_title(self):
         # plot title
         msg = str()
-        if self.prj.cur_file:
-            msg += self.prj.cur_file
-        if self.prj.setup.client_list.last_tx_time and self.prj.use_sis():
+        if self.lib.cur_file:
+            msg += self.lib.cur_file
+        if self.lib.setup.client_list.last_tx_time and self.lib.use_sis():
             if len(msg) > 0:
                 msg += " "
-            delta = datetime.utcnow() - self.prj.setup.client_list.last_tx_time
+            delta = datetime.utcnow() - self.lib.setup.client_list.last_tx_time
             msg += "[%dh %dm since last tx]" % (delta.days * 24 + delta.seconds // 3600,
                                                 (delta.seconds // 60) % 60)
         self.f.suptitle(msg)
@@ -364,9 +364,9 @@ class DataPlots(AbstractWidget):
     def on_draw(self):
         """Redraws the figure"""
         self._set_title()
-        # print("cur: %s" % self.prj.cur)
-        # if self.prj.cur:
-        if self.prj.has_ssp():
+        # print("cur: %s" % self.lib.cur)
+        # if self.lib.cur:
+        if self.lib.has_ssp():
             self.update_validity_indices()
             self._draw_speed()
             self._draw_temp()
@@ -376,13 +376,13 @@ class DataPlots(AbstractWidget):
         self._draw_grid()
 
         # limits
-        if self.prj.use_sis():  # in case of SIS enabled
-            if self.prj.listeners.sis.xyz88:
+        if self.lib.use_sis():  # in case of SIS enabled
+            if self.lib.listeners.sis.xyz88:
                 y_limits = self.speed_ax.get_ylim()
                 x_limits = self.speed_ax.get_xlim()
                 # print(y_limits, x_limits)
                 # y-limits
-                mean_depth = self.prj.listeners.sis.xyz88.mean_depth
+                mean_depth = self.lib.listeners.sis.xyz88.mean_depth
                 if mean_depth:
                     mean_depth *= 0.1
                 else:
@@ -402,30 +402,30 @@ class DataPlots(AbstractWidget):
         self.update_validity_indices()
         # speed
         if self.speed_sis:
-            self.speed_sis.set_xdata(self.prj.cur.sis.speed[self.svi])
-            self.speed_sis.set_ydata(self.prj.cur.sis.depth[self.svi])
+            self.speed_sis.set_xdata(self.lib.cur.sis.speed[self.svi])
+            self.speed_sis.set_ydata(self.lib.cur.sis.depth[self.svi])
         if self.speed_valid:
-            self.speed_valid.set_xdata(self.prj.cur.proc.speed[self.vi])
-            self.speed_valid.set_ydata(self.prj.cur.proc.depth[self.vi])
+            self.speed_valid.set_xdata(self.lib.cur.proc.speed[self.vi])
+            self.speed_valid.set_ydata(self.lib.cur.proc.depth[self.vi])
         if self.speed_invalid:
-            self.speed_invalid.set_xdata(self.prj.cur.proc.speed[self.ii])
-            self.speed_invalid.set_ydata(self.prj.cur.proc.depth[self.ii])
+            self.speed_invalid.set_xdata(self.lib.cur.proc.speed[self.ii])
+            self.speed_invalid.set_ydata(self.lib.cur.proc.depth[self.ii])
         # temp
         if self.temp_valid:
-            self.temp_valid.set_xdata(self.prj.cur.proc.temp[self.vi])
-            self.temp_valid.set_ydata(self.prj.cur.proc.depth[self.vi])
+            self.temp_valid.set_xdata(self.lib.cur.proc.temp[self.vi])
+            self.temp_valid.set_ydata(self.lib.cur.proc.depth[self.vi])
         if self.temp_invalid:
-            self.temp_invalid.set_xdata(self.prj.cur.proc.temp[self.ii])
-            self.temp_invalid.set_ydata(self.prj.cur.proc.depth[self.ii])
+            self.temp_invalid.set_xdata(self.lib.cur.proc.temp[self.ii])
+            self.temp_invalid.set_ydata(self.lib.cur.proc.depth[self.ii])
         # sal
         if self.sal_valid:
-            self.sal_valid.set_xdata(self.prj.cur.proc.sal[self.vi])
-            self.sal_valid.set_ydata(self.prj.cur.proc.depth[self.vi])
+            self.sal_valid.set_xdata(self.lib.cur.proc.sal[self.vi])
+            self.sal_valid.set_ydata(self.lib.cur.proc.depth[self.vi])
         if self.sal_invalid:
-            self.sal_invalid.set_xdata(self.prj.cur.proc.sal[self.ii])
-            self.sal_invalid.set_ydata(self.prj.cur.proc.depth[self.ii])
+            self.sal_invalid.set_xdata(self.lib.cur.proc.sal[self.ii])
+            self.sal_invalid.set_ydata(self.lib.cur.proc.depth[self.ii])
 
-        if not self.prj.use_sis():  # in case that SIS was disabled
+        if not self.lib.use_sis():  # in case that SIS was disabled
             if self.speed_draft:
                 self.speed_draft.set_ydata(None)
             if self.speed_sensor:
@@ -439,22 +439,22 @@ class DataPlots(AbstractWidget):
         if (not self.speed_draft) or (not self.speed_sensor) or (not self.speed_seafloor):
             return
 
-        if self.prj.listeners.sis.xyz88 is None:
+        if self.lib.listeners.sis.xyz88 is None:
             self.speed_draft.set_ydata(None)
             self.speed_sensor.set_xdata(None)
         else:
             # sensor speed
-            if self.prj.listeners.sis.xyz88.sound_speed is None:
+            if self.lib.listeners.sis.xyz88.sound_speed is None:
                 self.speed_sensor.set_xdata(None)
             else:
-                self.speed_sensor.set_xdata([self.prj.listeners.sis.xyz88.sound_speed, ])
+                self.speed_sensor.set_xdata([self.lib.listeners.sis.xyz88.sound_speed, ])
             # draft
-            if self.prj.listeners.sis.xyz88.transducer_draft is None:
+            if self.lib.listeners.sis.xyz88.transducer_draft is None:
                 self.speed_draft.set_ydata(None)
             else:
-                self.speed_draft.set_ydata([self.prj.listeners.sis.xyz88.transducer_draft, ])
+                self.speed_draft.set_ydata([self.lib.listeners.sis.xyz88.transducer_draft, ])
             # seafloor
-            mean_depth = self.prj.listeners.sis.xyz88.mean_depth
+            mean_depth = self.lib.listeners.sis.xyz88.mean_depth
             if mean_depth:
                 self.speed_seafloor.set_ydata([mean_depth, ])
             else:
@@ -478,9 +478,9 @@ class DataPlots(AbstractWidget):
         self.c.draw_idle()
 
     def update_validity_indices(self):
-        self.svi = self.prj.cur.sis_thinned  # sis valid indices (thinned!)
-        self.vi = self.prj.cur.proc_valid  # proc valid indices
-        self.ii = np.logical_and(~self.vi, ~self.prj.cur.proc_invalid_direction)  # selected invalid indices
+        self.svi = self.lib.cur.sis_thinned  # sis valid indices (thinned!)
+        self.vi = self.lib.cur.proc_valid  # proc valid indices
+        self.ii = np.logical_and(~self.vi, ~self.lib.cur.proc_invalid_direction)  # selected invalid indices
 
     def set_invalid_visibility(self, value):
         self.speed_invalid.set_visible(value)

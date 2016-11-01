@@ -142,13 +142,13 @@ class BaseDb(object):
     def disconnect(self):
         """ Disconnect from the current database """
         if self.conn is None:
-            logger.info("Already disconnected")
+            # logger.info("Already disconnected")
             return True
 
         try:
             self.conn.close()
             self.conn = None
-            logger.info("Disconnected")
+            # logger.info("Disconnected")
             return True
 
         except sqlite3.Error as e:

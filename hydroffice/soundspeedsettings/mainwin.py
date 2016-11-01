@@ -19,7 +19,7 @@ from .widgets.sippican import Sippican
 from .widgets.mvp import Mvp
 from .widgets.server import Server
 
-from hydroffice.soundspeed.project import Project
+from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
 
 
 class MainWin(QtGui.QMainWindow):
@@ -27,14 +27,14 @@ class MainWin(QtGui.QMainWindow):
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, "media")
 
-    def __init__(self, prj, main_win=None):
-        QtGui.QMainWindow.__init__(self)
+    def __init__(self, lib, main_win=None):
+        super(MainWin, self).__init__()
 
         # check passed input parameters
-        if type(prj) != Project:
-            raise RuntimeError("Invalid type (%s) in place of a Project instance" % type(prj))
-        self.prj = prj
-        self.db = prj.settings_db()
+        if type(lib) != SoundSpeedLibrary:
+            raise RuntimeError("Invalid type (%s) in place of a Project instance" % type(lib))
+        self.lib = lib
+        self.db = lib.settings_db()
         self.main_win = main_win
 
         # set the application name and the version

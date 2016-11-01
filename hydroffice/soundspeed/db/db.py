@@ -3,7 +3,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import sqlite3
 import os
 from datetime import datetime as dt
-import numpy as np
 import logging
 
 logger = logging.getLogger(__name__)
@@ -17,13 +16,22 @@ from ..profile.profilelist import ProfileList
 class SoundSpeedDb(object):
     """Class that provides an interface to a SQLite db with Sound Speed data"""
 
-    def __init__(self, data_folder=None):
-        if not data_folder:
-            data_folder = os.path.abspath(os.path.curdir)
-        self.data_folder = data_folder
-        self.db_path = os.path.join(data_folder, "soundspeed.db")
+    def __init__(self, projects_folder=None, project_name="default"):
+
+        # in case that no data folder is passed
+        if projects_folder is None:
+            projects_folder = os.path.abspath(os.path.curdir)
+        self.data_folder = projects_folder
+
+        # the passed project name (lower case) is used to identify the project database to open
+        self.db_path = os.path.join(projects_folder, self.clean_name(project_name.lower()) + ".db")
+        logger.debug('current project db: %s' % self.db_path)
+
+        # add plotting and exporting capabilities
         self.plot = PlotDb(db=self)
         self.export = ExportDb(db=self)
+
+        # add variable used to store the connection to the database
         self.conn = None
 
         self.tmp_data = None
@@ -38,15 +46,15 @@ class SoundSpeedDb(object):
     def reconnect_or_create(self):
         """ Reconnection to an existing database or create a new db """
         if self.conn:
-            logger.info("Already connected")
+            logger.info("already connected")
 
         if not os.path.exists(self.db_path):
-            logger.info("New db")
+            logger.info("created a new project db")
 
         try:
             self.conn = sqlite3.connect(self.db_path,
                                         detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
-            logger.info("Connected")
+            # logger.info("Connected")
 
         except sqlite3.Error as e:
             raise RuntimeError("Unable to connect: %s" % e)
@@ -79,12 +87,12 @@ class SoundSpeedDb(object):
     def disconnect(self):
         """ Disconnect from the current database """
         if not self.conn:
-            logger.info("Already disconnected")
+            # logger.info("Already disconnected")
             return True
 
         try:
             self.conn.close()
-            logger.info("Disconnected")
+            # logger.info("Disconnected")
             return True
 
         except sqlite3.Error as e:

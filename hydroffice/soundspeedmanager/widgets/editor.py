@@ -24,8 +24,8 @@ class Editor(AbstractWidget):
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
 
-    def __init__(self, main_win, prj):
-        AbstractWidget.__init__(self, main_win=main_win, prj=prj)
+    def __init__(self, main_win, lib):
+        AbstractWidget.__init__(self, main_win=main_win, lib=lib)
 
         self.file_bar = self.addToolBar('File')
         self.file_bar.setIconSize(QtCore.QSize(36, 36))
@@ -121,30 +121,30 @@ class Editor(AbstractWidget):
         self.file_bar.addAction(self.set_ref_act)
 
         # plots
-        self.dataplots = DataPlots(main_win=self.main_win, prj=self.prj)
+        self.dataplots = DataPlots(main_win=self.main_win, lib=self.lib)
         self.setCentralWidget(self.dataplots)
 
     def on_import_data(self):
         """Import a data file"""
         logger.debug('user wants to import a data file')
-        dlg = ImportDialog(prj=self.prj, main_win=self.main_win, parent=self)
+        dlg = ImportDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
-        if self.prj.has_ssp():
+        if self.lib.has_ssp():
             self.main_win.data_imported()
 
     def on_receive_data(self):
         """Receive data"""
         logger.debug('user wants to receive data')
-        dlg = ReceiveDialog(prj=self.prj, main_win=self.main_win, parent=self)
+        dlg = ReceiveDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
-        if self.prj.has_ssp():
+        if self.lib.has_ssp():
             self.main_win.data_imported()
 
     def on_load_db(self):
         """Load data from database"""
         logger.debug('user wants to load data from db')
 
-        profiles = self.prj.db_profiles()
+        profiles = self.lib.db_profiles()
         lst = ["#%03d: %s" % (p[0], p[1]) for p in profiles]
         if len(lst) == 0:
             msg = "Store data before import!"
@@ -155,34 +155,34 @@ class Editor(AbstractWidget):
         if not ok:
             return
 
-        success = self.prj.load_profile(profiles[lst.index(sel)][0])
+        success = self.lib.load_profile(profiles[lst.index(sel)][0])
         if not success:
             msg = "Unable to load profile!"
             QtGui.QMessageBox.warning(self, "Database", msg, QtGui.QMessageBox.Ok)
             return
 
-        if self.prj.has_ssp():
+        if self.lib.has_ssp():
             self.main_win.data_imported()
 
     def on_clear_data(self):
         logger.debug('user wants to clear data')
-        self.prj.clear_data()
+        self.lib.clear_data()
         self.main_win.data_cleared()
 
     def on_restart_proc(self):
         logger.debug('user wants to restart processing')
-        self.prj.restart_proc()
+        self.lib.restart_proc()
         self.main_win.data_imported()
 
     def on_retrieve_sal(self):
         logger.debug('user wants to retrieve salinity')
 
-        if self.prj.cur.meta.sensor_type != Dicts.sensor_types['XBT']:
+        if self.lib.cur.meta.sensor_type != Dicts.sensor_types['XBT']:
             msg = "This is a XBT-specific function!"
             QtGui.QMessageBox.warning(self, "Salinity", msg, QtGui.QMessageBox.Ok)
             return
 
-        if not self.prj.replace_cur_salinity():
+        if not self.lib.replace_cur_salinity():
             msg = "Issue in replacing the salinity"
             QtGui.QMessageBox.warning(self, "Salinity", msg, QtGui.QMessageBox.Ok)
             return
@@ -192,13 +192,13 @@ class Editor(AbstractWidget):
     def on_retrieve_temp_sal(self):
         logger.debug('user wants to retrieve temp/sal')
 
-        if (self.prj.cur.meta.sensor_type != Dicts.sensor_types['XSV']) \
-                and (self.prj.cur.meta.sensor_type != Dicts.sensor_types['SVP']):
+        if (self.lib.cur.meta.sensor_type != Dicts.sensor_types['XSV']) \
+                and (self.lib.cur.meta.sensor_type != Dicts.sensor_types['SVP']):
             msg = "This is a XSV- and SVP-specific function!"
             QtGui.QMessageBox.warning(self, "Temperature/Salinity", msg, QtGui.QMessageBox.Ok)
             return
 
-        if not self.prj.replace_cur_temp_sal():
+        if not self.lib.replace_cur_temp_sal():
             msg = "Issue in replacing temperature and salinity"
             QtGui.QMessageBox.warning(self, "Temperature/Salinity", msg, QtGui.QMessageBox.Ok)
             return
@@ -208,7 +208,7 @@ class Editor(AbstractWidget):
     def on_retrieve_tss(self):
         logger.debug('user wants to retrieve transducer sound speed')
 
-        if not self.prj.add_cur_tss():
+        if not self.lib.add_cur_tss():
             msg = "Issue in retrieving transducer sound speed"
             QtGui.QMessageBox.warning(self, "Sound speed", msg, QtGui.QMessageBox.Ok)
             return
@@ -218,7 +218,7 @@ class Editor(AbstractWidget):
     def on_extend_profile(self):
         logger.debug('user wants to extend the profile')
 
-        if not self.prj.extend_profile():
+        if not self.lib.extend_profile():
             msg = "Issue in extending the profile"
             QtGui.QMessageBox.warning(self, "Profile extension", msg, QtGui.QMessageBox.Ok)
             return
@@ -228,7 +228,7 @@ class Editor(AbstractWidget):
     def on_preview_thinning(self):
         logger.debug('user wants to preview thinning')
 
-        if not self.prj.prepare_sis():
+        if not self.lib.prepare_sis():
             msg = "Issue in preview the thinning"
             QtGui.QMessageBox.warning(self, "Thinning preview", msg, QtGui.QMessageBox.Ok)
             return
@@ -237,39 +237,39 @@ class Editor(AbstractWidget):
 
     def on_spreadsheet(self):
         logger.debug('user wants to read/edit spreadsheet')
-        if not self.prj.has_ssp():
+        if not self.lib.has_ssp():
             msg = "Import data before visualize them in a spreadsheet!"
             QtGui.QMessageBox.warning(self, "Spreadsheet warning", msg, QtGui.QMessageBox.Ok)
             return
-        dlg = SpreadSheetDialog(prj=self.prj, main_win=self.main_win, parent=self)
+        dlg = SpreadSheetDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
 
     def on_metadata(self):
         logger.debug('user wants to read/edit metadata')
-        if not self.prj.has_ssp():
+        if not self.lib.has_ssp():
             msg = "Import data before visualize metadata!"
             QtGui.QMessageBox.warning(self, "Metadata warning", msg, QtGui.QMessageBox.Ok)
             return
-        dlg = MetadataDialog(prj=self.prj, main_win=self.main_win, parent=self)
+        dlg = MetadataDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
 
     def on_export_data(self):
         logger.debug('user wants to export the data')
-        if not self.prj.has_ssp():
+        if not self.lib.has_ssp():
             msg = "Import data before export!"
             QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
             return
-        dlg = ExportDialog(prj=self.prj, main_win=self.main_win, parent=self)
+        dlg = ExportDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
 
     def on_transmit_data(self):
         logger.debug('user wants to transmit the data')
-        if not self.prj.has_ssp():
+        if not self.lib.has_ssp():
             msg = "Import data before transmit!"
             QtGui.QMessageBox.warning(self, "Transmit warning", msg, QtGui.QMessageBox.Ok)
             return
 
-        if not self.prj.transmit_ssp():
+        if not self.lib.transmit_ssp():
             msg = "Issue in profile transmission"
             QtGui.QMessageBox.warning(self, "Profile transmission", msg, QtGui.QMessageBox.Ok)
             return
@@ -278,12 +278,12 @@ class Editor(AbstractWidget):
 
     def on_save_db(self):
         logger.debug('user wants to save data to db')
-        if not self.prj.has_ssp():
+        if not self.lib.has_ssp():
             msg = "Import data before save to db!"
             QtGui.QMessageBox.warning(self, "Database warning", msg, QtGui.QMessageBox.Ok)
             return
 
-        if not self.prj.store_data():
+        if not self.lib.store_data():
             msg = "Unable to save to db!"
             QtGui.QMessageBox.warning(self, "Database warning", msg, QtGui.QMessageBox.Ok)
             return
@@ -292,12 +292,12 @@ class Editor(AbstractWidget):
 
     def on_set_ref(self):
         logger.debug('user wants to set as a reference')
-        if not self.prj.has_ssp():
+        if not self.lib.has_ssp():
             logger.debug('cleaning reference')
-            self.prj.ref = None
+            self.lib.ref = None
         else:
             logger.debug('cloning current profile')
-            self.prj.ref = copy.deepcopy(self.prj.ssp)
+            self.lib.ref = copy.deepcopy(self.lib.ssp)
 
     def data_cleared(self):
         # dialogs
@@ -320,16 +320,16 @@ class Editor(AbstractWidget):
         self.clear_act.setDisabled(False)
         self.spreadsheet_act.setDisabled(False)
         self.metadata_act.setDisabled(False)
-        if self.prj.cur.meta.sensor_type == Dicts.sensor_types['XBT']:
+        if self.lib.cur.meta.sensor_type == Dicts.sensor_types['XBT']:
             self.sal_act.setDisabled(False)
         else:
             self.sal_act.setDisabled(True)
-        if (self.prj.cur.meta.sensor_type == Dicts.sensor_types['XSV']) or \
-            (self.prj.cur.meta.sensor_type == Dicts.sensor_types['SVP']):
+        if (self.lib.cur.meta.sensor_type == Dicts.sensor_types['XSV']) or \
+            (self.lib.cur.meta.sensor_type == Dicts.sensor_types['SVP']):
             self.temp_sal_act.setDisabled(False)
         else:
             self.temp_sal_act.setDisabled(True)
-        if self.prj.use_sis():
+        if self.lib.use_sis():
             self.tss_act.setDisabled(False)
         else:
             self.tss_act.setDisabled(True)

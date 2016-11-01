@@ -20,7 +20,7 @@ except ImportError as e:
 
 # list of archives to download
 data_files = [
-    
+
 ]
 
 # actually downloading the file with wget

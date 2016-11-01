@@ -16,8 +16,8 @@ class Database(AbstractWidget):
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
 
-    def __init__(self, main_win, prj):
-        AbstractWidget.__init__(self, main_win=main_win, prj=prj)
+    def __init__(self, main_win, lib):
+        AbstractWidget.__init__(self, main_win=main_win, lib=lib)
 
         # create the overall layout
         self.main_layout = QtGui.QVBoxLayout()
@@ -110,7 +110,7 @@ class Database(AbstractWidget):
         if ret == QtGui.QMessageBox.No:
             return
 
-        success = self.prj.delete_db_profile(pk)
+        success = self.lib.delete_db_profile(pk)
         if success:
             self.main_win.data_removed()
         else:
@@ -118,14 +118,14 @@ class Database(AbstractWidget):
 
     def profile_map(self):
         logger.debug("user want to map the profiles")
-        success = self.prj.map_db_profiles()
+        success = self.lib.map_db_profiles()
         if not success:
             QtGui.QMessageBox.critical(self, "Database", "Unable to create a profile map!")
 
     def aggregate_plot(self):
         logger.debug("user want to create an aggregate plot")
 
-        ssp_times = self.prj.db_timestamp_list()
+        ssp_times = self.lib.db_timestamp_list()
         # print(ssp_times[0][0], ssp_times[-1][0])
 
         if len(ssp_times) == 0:
@@ -189,50 +189,50 @@ class Database(AbstractWidget):
                                        'Invalid selection')
             return
 
-        success = self.prj.aggregate_plot(dates=dates)
+        success = self.lib.aggregate_plot(dates=dates)
         if not success:
             QtGui.QMessageBox.critical(self, "Database", "Unable to create an aggregate plot!")
 
     def plot_daily_profiles(self):
         logger.debug("user want to plot daily profiles")
-        success = self.prj.plot_daily_db_profiles()
+        success = self.lib.plot_daily_db_profiles()
         if not success:
             QtGui.QMessageBox.critical(self, "Database", "Unable to create daily plots!")
 
     def save_daily_profiles(self):
         logger.debug("user want to save daily profiles")
-        success = self.prj.save_daily_db_profiles()
+        success = self.lib.save_daily_db_profiles()
         if not success:
             QtGui.QMessageBox.critical(self, "Database", "Unable to save daily plots!")
         else:
-            self.prj.open_data_folder()
+            self.lib.open_data_folder()
 
     def export_as_shp(self):
         logger.debug("user want to export profiles as shp")
-        success = self.prj.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile'])
+        success = self.lib.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile'])
         if not success:
             QtGui.QMessageBox.critical(self, "Database", "Unable to export as shp!")
         else:
-            self.prj.open_data_folder()
+            self.lib.open_data_folder()
 
     def export_as_kml(self):
         logger.debug("user want to export profiles as kml")
-        success = self.prj.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'KML'])
+        success = self.lib.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'KML'])
         if not success:
             QtGui.QMessageBox.critical(self, "Database", "Unable to export as kml!")
         else:
-            self.prj.open_data_folder()
+            self.lib.open_data_folder()
 
     def export_as_csv(self):
         logger.debug("user want to export profiles as csv")
-        success = self.prj.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'CSV'])
+        success = self.lib.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'CSV'])
         if not success:
             QtGui.QMessageBox.critical(self, "Database", "Unable to export as csv!")
         else:
-            self.prj.open_data_folder()
+            self.lib.open_data_folder()
 
     def update_table(self):
-        lst = self.prj.db_profiles()
+        lst = self.lib.db_profiles()
 
         # prepare the table
         self.ssp_list.clear()

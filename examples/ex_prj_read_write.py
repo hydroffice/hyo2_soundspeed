@@ -63,14 +63,14 @@ def list_test_files(data_input, pairs):
 def main():
     # create a project
     prj = Project()
-    # prj.activate_server_logger(True)
-    # logger.info(prj)
-    # prj.open_data_folder()
+    # lib.activate_server_logger(True)
+    # logger.info(lib)
+    # lib.open_data_folder()
 
     # set callbacks
     prj.set_callbacks(TestCallbacks())
-    # logger.info("test ask date: %s" % prj.cb.ask_date())
-    # logger.info("test ask location: %s, %s" % prj.cb.ask_location())
+    # logger.info("test ask date: %s" % lib.cb.ask_date())
+    # logger.info("test ask location: %s, %s" % lib.cb.ask_location())
 
     # retrieve data input/output folders
     data_input = helper.get_testing_input_folder()
@@ -90,11 +90,11 @@ def main():
 
         # import
         prj.import_data(data_path=test, data_format=tests[test].name)
-        # print(prj.cur)
-        # prj.plot_ssp(more=True, show=False)
+        # print(lib.cur)
+        # lib.plot_ssp(more=True, show=False)
 
         # export
-        # prj.export_data(data_path=data_output, data_formats=prj.name_writers)
+        # lib.export_data(data_path=data_output, data_formats=lib.name_writers)
         prj.export_data(data_path=data_output, data_formats=["ncei", ])
 
     from matplotlib import pyplot as plt

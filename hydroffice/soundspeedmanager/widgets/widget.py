@@ -8,19 +8,19 @@ from PySide import QtCore
 import logging
 logger = logging.getLogger(__name__)
 
-from hydroffice.soundspeed.project import Project
+from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
 
 
 class AbstractWidget(QtGui.QMainWindow):
 
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
 
-    def __init__(self, main_win, prj):
+    def __init__(self, main_win, lib):
         QtGui.QMainWindow.__init__(self)
-        if type(prj) != Project:
-            raise RuntimeError("Passed invalid project object: %s" % type(prj))
+        if type(lib) != SoundSpeedLibrary:
+            raise RuntimeError("Passed invalid project object: %s" % type(lib))
         self.main_win = main_win
-        self.prj = prj
+        self.lib = lib
 
         # set palette
         style_info = QtCore.QFileInfo(os.path.join(self.here, 'styles', 'widget.stylesheet'))

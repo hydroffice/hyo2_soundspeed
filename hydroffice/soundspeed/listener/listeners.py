@@ -48,39 +48,42 @@ class Listeners(object):
         if not self.sis.is_alive():
             self.sis.start()
             time.sleep(0.1)
+            logger.debug("start")
         return self.sis.is_alive()
 
     def stop_listen_sis(self):
-        logger.debug("stop")
         if self.sis.is_alive():
             self.sis.stop()
             self.sis.join(2)
+            logger.debug("stop")
         return not self.sis.is_alive()
 
     def listen_sippican(self):
         if not self.sippican.is_alive():
             self.sippican.start()
             time.sleep(0.1)
+            logger.debug("start")
         return self.sippican.is_alive()
 
     def stop_listen_sippican(self):
-        logger.debug("stop")
         if self.sippican.is_alive():
             self.sippican.stop()
             self.sippican.join(2)
+            logger.debug("stop")
         return not self.sippican.is_alive()
 
     def listen_mvp(self):
         if not self.mvp.is_alive():
             self.mvp.start()
             time.sleep(0.1)
+            logger.debug("start")
         return self.mvp.is_alive()
 
     def stop_listen_mvp(self):
-        logger.debug("stop")
         if self.mvp.is_alive():
             self.mvp.stop()
             self.mvp.join(2)
+            logger.debug("stop")
         return not self.mvp.is_alive()
 
     def stop(self):

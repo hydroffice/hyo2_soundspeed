@@ -16,14 +16,14 @@ class Settings(AbstractWidget):
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
 
-    def __init__(self, main_win, prj):
-        AbstractWidget.__init__(self, main_win=main_win, prj=prj)
+    def __init__(self, main_win, lib):
+        AbstractWidget.__init__(self, main_win=main_win, lib=lib)
 
         # create the overall layout
         self.mainLayout = QtGui.QVBoxLayout()
         self.frame.setLayout(self.mainLayout)
         # settings
-        self.settings_widget = MainWin(prj=prj, main_win=self.main_win)
+        self.settings_widget = MainWin(lib=lib, main_win=self.main_win)
         self.settings_widget.set_editable(False)
         self.mainLayout.addWidget(self.settings_widget)
         # lock/unlock
@@ -66,7 +66,7 @@ class Settings(AbstractWidget):
     def on_reload(self):
         logger.debug("reload settings")
         try:
-            self.prj.reload_settings_from_db()
+            self.lib.reload_settings_from_db()
         except RuntimeError as e:
             msg = "Issue in reloading settings\n%s" % e
             QtGui.QMessageBox.critical(self, "Settings error", msg, QtGui.QMessageBox.Ok)

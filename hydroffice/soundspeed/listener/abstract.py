@@ -81,18 +81,18 @@ class AbstractListener(Thread):
 
     def run(self):
         """Start the simulation"""
-        # self.init_logger()
-        logger.debug("%s start" % self.name)
+
+        # logger.debug("%s start" % self.name)
         if not self.init_sockets():
             return
 
         count = 0
         while True:
             if self.shutdown.is_set():
-                logger.debug("shutdown")
+                # logger.debug("shutdown")
                 break
-            if (count % 100) == 0:
-                logger.debug("#%05d: running" % count)
+            # if (count % 20) == 0:
+            #     logger.debug("%s: listening" % self.__class__.__name__)
             count += 1
 
             try:

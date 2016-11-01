@@ -16,8 +16,8 @@ class Refraction(AbstractWidget):
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
 
-    def __init__(self, main_win, prj):
-        AbstractWidget.__init__(self, main_win=main_win, prj=prj)
+    def __init__(self, main_win, lib):
+        AbstractWidget.__init__(self, main_win=main_win, lib=lib)
 
         # create the overall layout
         self.main_layout = QtGui.QVBoxLayout()

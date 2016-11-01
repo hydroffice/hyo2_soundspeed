@@ -16,8 +16,8 @@ class Server(AbstractWidget):
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
 
-    def __init__(self, main_win, prj):
-        AbstractWidget.__init__(self, main_win=main_win, prj=prj)
+    def __init__(self, main_win, lib):
+        AbstractWidget.__init__(self, main_win=main_win, lib=lib)
 
         # create the overall layout
         self.main_layout = QtGui.QVBoxLayout()
@@ -40,7 +40,7 @@ class Server(AbstractWidget):
         hbox.addStretch()
 
         # - plots
-        self.dataplots = DataPlots(main_win=self.main_win, prj=self.prj, server_mode=True)
+        self.dataplots = DataPlots(main_win=self.main_win, lib=self.lib, server_mode=True)
         self.main_layout.addWidget(self.dataplots)
         self.dataplots.setHidden(True)
         self.hidden = QtGui.QFrame()
@@ -57,13 +57,13 @@ class Server(AbstractWidget):
         if ret == QtGui.QMessageBox.No:
             return
 
-        if not self.prj.server.check_settings():
+        if not self.lib.server.check_settings():
             msg = "Unable to start the server mode.\n\n" \
                   "Double-check the server settings and be sure that SIS is properly configured."
             QtGui.QMessageBox.critical(self, "Server mode", msg, QtGui.QMessageBox.Ok)
             return
 
-        self.prj.start_server()
+        self.lib.start_server()
 
         self.dataplots.setVisible(True)
         self.hidden.setHidden(True)
@@ -72,7 +72,7 @@ class Server(AbstractWidget):
     def on_stop_server(self):
         logger.debug('stop server')
 
-        self.prj.stop_server()
+        self.lib.stop_server()
 
         self.dataplots.setHidden(True)
         self.hidden.setVisible(True)

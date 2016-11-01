@@ -13,8 +13,8 @@ from hydroffice.soundspeed.base.helper import explore_folder
 
 class ExportDialog(AbstractDialog):
 
-    def __init__(self, main_win, prj, parent=None):
-        AbstractDialog.__init__(self, main_win=main_win, prj=prj, parent=parent)
+    def __init__(self, main_win, lib, parent=None):
+        AbstractDialog.__init__(self, main_win=main_win, lib=lib, parent=parent)
 
         self.name_outputs = list()
 

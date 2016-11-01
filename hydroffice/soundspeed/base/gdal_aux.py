@@ -108,12 +108,12 @@ class GdalAux(object):
 
     @classmethod
     def create_prj_file(cls, output_path, epsg=4326):
-        """Create an ESRI prj file (geographic WGS84 by default)"""
+        """Create an ESRI lib file (geographic WGS84 by default)"""
         spatial_ref = osr.SpatialReference()
         spatial_ref.ImportFromEPSG(epsg)
 
         spatial_ref.MorphToESRI()
-        fid = open(output_path + '.prj', 'w')
+        fid = open(output_path + '.lib', 'w')
         fid.write(spatial_ref.ExportToWkt())
         fid.close()
 

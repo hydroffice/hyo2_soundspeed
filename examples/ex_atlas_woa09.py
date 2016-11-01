@@ -37,14 +37,14 @@ def main():
             raise RuntimeError("unable to download")
     logger.info("has woa09: %s" % prj.has_woa09())
 
-    # logger.info("load woa09: %s" % prj.atlases.woa09.load_grids())
+    # logger.info("load woa09: %s" % lib.atlases.woa09.load_grids())
 
     for test in tests:
         # just the ssp (there are also ssp_min and ssp_max)
         logger.info("woa09 profiles:\n%s" % prj.atlases.woa09.query(lat=test[0], lon=test[1], datestamp=test[2]))
 
     prj.retrieve_woa09()
-    logger.info("prj retrieve rtofs: %s" % prj.ssp)
+    logger.info("lib retrieve rtofs: %s" % prj.ssp)
 
     app.exec_()  # PySide stuff (end)
 

@@ -131,7 +131,7 @@ class SettingsDb(BaseDb):
     def client_list(self):
         ret = self.conn.execute(""" SELECT id, name, ip, port, protocol FROM client_list WHERE profile_id=? """,
                                 (self.active_setup_id,)).fetchall()
-        logger.info("SSP clients: %s" % len(ret))
+        # logger.info("SSP clients: %s" % len(ret))
         return ret
 
     def client_exists(self, client_name):
@@ -213,7 +213,7 @@ class SettingsDb(BaseDb):
     def _getter_bool(self, attrib):
         r = self.conn.execute(""" SELECT """ + attrib + """ FROM general WHERE id=? """,
                               (self.active_setup_id,)).fetchone()
-        logger.info("%s = %s" % (attrib, r[0]))
+        # logger.info("%s = %s" % (attrib, r[0]))
         return r[0] == "True"
 
     def _setter_bool(self, attrib, value):

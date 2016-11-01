@@ -64,14 +64,14 @@ def list_test_files(data_input, pairs):
 def main():
     # create a project
     prj = Project()
-    # prj.activate_server_logger(True)
-    # logger.info(prj)
-    # prj.open_data_folder()
+    # lib.activate_server_logger(True)
+    # logger.info(lib)
+    # lib.open_data_folder()
 
     # set callbacks
     prj.set_callbacks(TestCallbacks())
-    # logger.info("test ask date: %s" % prj.cb.ask_date())
-    # logger.info("test ask location: %s, %s" % prj.cb.ask_location())
+    # logger.info("test ask date: %s" % lib.cb.ask_date())
+    # logger.info("test ask location: %s, %s" % lib.cb.ask_location())
 
     # retrieve data input/output folders
     data_input = helper.get_testing_input_folder()
@@ -91,13 +91,13 @@ def main():
 
         # import
         prj.import_data(data_path=testfile, data_format=tests[testfile].name)
-        # print(prj.cur)
-        # prj.plot_ssp(more=True, show=False)
+        # print(lib.cur)
+        # lib.plot_ssp(more=True, show=False)
 
         # store
         prj.ssp.cur.meta.project = "test"
-        # prj.ssp.cur.meta.latitude += 2.
-        # prj.ssp.cur.meta.longitude += 3.
+        # lib.ssp.cur.meta.latitude += 2.
+        # lib.ssp.cur.meta.longitude += 3.
         success = prj.store_data()
         logger.info("stored: %s" % success)
 
@@ -124,12 +124,12 @@ def main():
     logger.info("Deleted profile: %s" % ret)
 
     # plots/maps/exports
-    # prj.map_db_profiles()
-    # prj.plot_daily_db_profiles()
-    # prj.save_daily_db_profiles()
-    # prj.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'KML'])
-    # prj.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'CSV'])
-    # prj.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile'])
+    # lib.map_db_profiles()
+    # lib.plot_daily_db_profiles()
+    # lib.save_daily_db_profiles()
+    # lib.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'KML'])
+    # lib.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'CSV'])
+    # lib.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile'])
 
     logger.info('test: *** END ***')
 

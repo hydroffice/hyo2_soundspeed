@@ -104,10 +104,10 @@ class Server(Thread):
             logger.info("Interaction verified with %s client/clients" % num_live_clients)
 
         # # test vessel draft
-        # if self.prj.vessel_draft is None:
+        # if self.lib.vessel_draft is None:
         #     log.info("Vessel draft: %s (server)" % self.server_vessel_draft)
         # else:
-        #     log.error("Vessel draft: %s" % self.prj.vessel_draft)
+        #     log.error("Vessel draft: %s" % self.lib.vessel_draft)
         #
         # # reset server flags
         # self.update_plot = False

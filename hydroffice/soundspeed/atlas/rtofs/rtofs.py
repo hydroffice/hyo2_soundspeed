@@ -306,8 +306,8 @@ class Rtofs(AbstractAtlas):
 
     def __repr__(self):
         msg = "%s" % super(Rtofs, self).__repr__()
-        msg += "  <has data loaded: %s>\n" % self._has_data_loaded
-        msg += "  <last loaded day: %s>\n" % self._last_loaded_day.strftime("%d\%m\%Y")
+        msg += "      <has data loaded: %s>\n" % self._has_data_loaded
+        msg += "      <last loaded day: %s>\n" % self._last_loaded_day.strftime("%d\%m\%Y")
         return msg
 
     # ### private methods ###
@@ -382,7 +382,7 @@ class Rtofs(AbstractAtlas):
 
         # Try to download the data grid grids
         url_temp, url_sal = self._build_opendap_urls(datestamp)
-        logger.debug('downloading RTOFS data for %s' % datestamp)
+        # logger.debug('downloading RTOFS data for %s' % datestamp)
         try:
             self._file_temp = Dataset(url_temp)
             self.prj.progress.update(60)
@@ -399,7 +399,7 @@ class Rtofs(AbstractAtlas):
         # success!
         self._has_data_loaded = True
         self._last_loaded_day = datestamp
-        logger.info("loaded data for %s" % datestamp)
+        # logger.info("loaded data for %s" % datestamp)
         self.prj.progress.end()
         return True
 

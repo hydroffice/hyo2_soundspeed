@@ -1,7 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from PySide import QtGui
-
 # logging settings
 import logging
 logger = logging.getLogger()
@@ -12,17 +10,24 @@ ch_formatter = logging.Formatter('%(levelname)-9s %(name)s.%(funcName)s:%(lineno
 ch.setFormatter(ch_formatter)
 logger.addHandler(ch)
 
-from hydroffice.soundspeedmanager.mainwin import MainWin
+from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
 
 
 def main():
-    app = QtGui.QApplication([])
-    mw = MainWin()
-    mw.show()
-    logger.info(mw.lib)
-    print(mw.lib.cb.ask_location())
-    print(mw.lib.cb.ask_date())
-    app.exec_()
+    # initialize the library
+    lib = SoundSpeedLibrary()
+
+
+
+    # print(lib)
+
+    # # exploring folders
+    # lib.open_data_folder()
+    # lib.open_release_folder()
+    # lib.open_projects_folder()
+    # lib.open_atlases_folder()
+
+    lib.close()
 
 if __name__ == "__main__":
     main()

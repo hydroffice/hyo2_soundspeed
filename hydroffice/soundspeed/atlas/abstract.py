@@ -59,7 +59,7 @@ class AbstractAtlas(object):
             os.makedirs(self._folder)
 
     def __repr__(self):
-        msg = "<%s>\n" % self.__class__.__name__
-        msg += "  <desc: %s>\n" % self.desc
-        msg += "  <db folder: %s>\n" % self.folder
+        msg = "  <%s>\n" % self.__class__.__name__
+        msg += "      <desc: %s>\n" % self.desc
+        msg += "      <db folder: %s>\n" % self.folder
         return msg
