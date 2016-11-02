@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from PySide import QtGui
-from datetime import datetime as dt, timedelta
+from datetime import datetime as dt
 
 # logging settings
 import logging
@@ -13,7 +13,7 @@ ch_formatter = logging.Formatter('%(levelname)-9s %(name)s.%(funcName)s:%(lineno
 ch.setFormatter(ch_formatter)
 logger.addHandler(ch)
 
-from hydroffice.soundspeed.project import Project
+from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
 from hydroffice.soundspeedmanager.qtcallbacks import QtCallbacks
 
 
@@ -22,8 +22,8 @@ def main():
     mw = QtGui.QMainWindow()
     mw.show()
 
-    prj = Project(qt_progress=QtGui.QProgressDialog)
-    prj.set_callbacks(QtCallbacks(mw))
+    lib = SoundSpeedLibrary(qt_progress=QtGui.QProgressDialog)
+    lib.set_callbacks(QtCallbacks(mw))
 
     tests = [
         (43.026480, -70.318824, dt.utcnow()),  # offshore Portsmouth
@@ -31,22 +31,23 @@ def main():
         (18.2648113, 16.1761115, dt.utcnow()),  # in land -> middle of Africa
     ]
 
-    if not prj.has_rtofs():
-        prj.download_rtofs()
-    logger.info("has rtofs: %s" % prj.has_rtofs())
+    # download the woa09 if not present
+    if not lib.has_woa09():
+        success = lib.download_woa09()
+        if not success:
+            raise RuntimeError("unable to download")
+    logger.info("has woa09: %s" % lib.has_woa09())
 
-    temp_url, sal_url = prj.atlases.rtofs._build_check_urls(dt.utcnow())
-    logger.info("urls:\n%s [%s]\n%s [%s]"
-                % (temp_url, prj.atlases.rtofs._check_url(temp_url), sal_url, prj.atlases.rtofs._check_url(sal_url)))
-    temp_url, sal_url = prj.atlases.rtofs._build_check_urls(dt.utcnow() - timedelta(days=1))
-    logger.info("urls:\n%s [%s]\n%s [%s]"
-                % (temp_url, prj.atlases.rtofs._check_url(temp_url), sal_url, prj.atlases.rtofs._check_url(sal_url)))
+    # logger.info("load woa09: %s" % lib.atlases.woa09.load_grids())
 
+    # test for a few locations
     for test in tests:
-        logger.info("rtofs profile:\n%s" % prj.atlases.rtofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        # just the ssp (there are also ssp_min and ssp_max)
+        logger.info("woa09 profiles:\n%s" % lib.atlases.woa09.query(lat=test[0], lon=test[1], datestamp=test[2]))
 
-    prj.retrieve_rtofs()
-    logger.info("lib retrieve rtofs: %s" % prj.ssp)
+    # test user interaction: 3 profiles (avg, min, max)
+    lib.retrieve_woa09()
+    logger.info("lib retrieve rtofs: %s" % lib.ssp)
 
     app.exec_()  # PySide stuff (end)
 

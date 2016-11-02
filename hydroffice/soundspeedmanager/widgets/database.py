@@ -205,7 +205,7 @@ class Database(AbstractWidget):
         if not success:
             QtGui.QMessageBox.critical(self, "Database", "Unable to save daily plots!")
         else:
-            self.lib.open_data_folder()
+            self.lib.open_outputs_folder()
 
     def export_as_shp(self):
         logger.debug("user want to export profiles as shp")
@@ -213,7 +213,7 @@ class Database(AbstractWidget):
         if not success:
             QtGui.QMessageBox.critical(self, "Database", "Unable to export as shp!")
         else:
-            self.lib.open_data_folder()
+            self.lib.open_outputs_folder()
 
     def export_as_kml(self):
         logger.debug("user want to export profiles as kml")
@@ -221,7 +221,7 @@ class Database(AbstractWidget):
         if not success:
             QtGui.QMessageBox.critical(self, "Database", "Unable to export as kml!")
         else:
-            self.lib.open_data_folder()
+            self.lib.open_outputs_folder()
 
     def export_as_csv(self):
         logger.debug("user want to export profiles as csv")
@@ -229,7 +229,7 @@ class Database(AbstractWidget):
         if not success:
             QtGui.QMessageBox.critical(self, "Database", "Unable to export as csv!")
         else:
-            self.lib.open_data_folder()
+            self.lib.open_outputs_folder()
 
     def update_table(self):
         lst = self.lib.db_list_profiles()

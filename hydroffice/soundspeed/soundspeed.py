@@ -16,7 +16,7 @@ from .base.gdal_aux import GdalAux
 from .base.helper import explore_folder
 from .base.progress import Progress
 from .base.setup import Setup
-from .db.db import SoundSpeedDb
+from .db.db import ProjectDb
 from .listener.listeners import Listeners
 from .logging.sqlitelogging import SqliteLogging
 from .profile.profilelist import ProfileList
@@ -205,6 +205,21 @@ class SoundSpeedLibrary(object):
 
     def open_projects_folder(self):
         explore_folder(self.projects_folder)
+
+    # outputs
+
+    @property
+    def outputs_folder(self):
+        """Get the outputs folder"""
+        return self._outputs_folder
+
+    @outputs_folder.setter
+    def outputs_folder(self, value):
+        """ Set the outputs folder"""
+        self._outputs_folder = value
+
+    def open_outputs_folder(self):
+        explore_folder(self.outputs_folder)
 
     # --- readers/writers
 
@@ -510,16 +525,28 @@ class SoundSpeedLibrary(object):
         if self.has_mvp_to_process():
             self.listeners.mvp_to_process = False
 
-    # --- db
+    # --- project db
+
+    @property
+    def current_project(self):
+        return self.setup.current_project
+
+    @current_project.setter
+    def current_project(self, value):
+        self.setup.current_project = value
+
+    def list_projects(self):
+        """Return a list with all the available projects"""
+        pass
 
     def store_data(self):
-        """Export data using a list of formats name"""
+        """Store the current profile in the project db"""
 
         # checks
         if not self.has_ssp():
             raise RuntimeError("Data not loaded")
 
-        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
+        db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         success = db.add_casts(self.ssp)
         db.disconnect()
 
@@ -534,21 +561,24 @@ class SoundSpeedLibrary(object):
 
     def db_list_profiles(self, project=None):
         """List the profile on the db"""
-        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
-        lst = db.list_profiles(project=project)
+        if project is None:
+            project = self.current_project
+
+        db = ProjectDb(projects_folder=self.projects_folder, project_name=project)
+        lst = db.list_profiles()
         db.disconnect()
         return lst
 
     def db_retrieve_profile(self, pk):
         """Retrieve a profile by primary key"""
-        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
+        db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         ssp = db.profile_by_pk(pk=pk)
         db.disconnect()
         return ssp
 
     def db_timestamp_list(self):
         """Retrieve a list with the timestamp of all the profiles"""
-        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
+        db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         lst = db.timestamp_list()
         db.disconnect()
         return lst
@@ -564,44 +594,61 @@ class SoundSpeedLibrary(object):
 
     def delete_db_profile(self, pk):
         """Retrieve a profile by primary key"""
-        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
+        db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         ret = db.delete_profile_by_pk(pk=pk)
         db.disconnect()
         return ret
 
-    def map_db_profiles(self, project=None):
+    # plotting
+
+    def map_db_profiles(self):
         """List the profile on the db"""
-        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
-        ret = db.plot.map_profiles(project=project)
+        db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
+        ret = db.plot.map_profiles(output_folder=self.outputs_folder, save_fig=False)
         db.disconnect()
         return ret
 
-    def aggregate_plot(self, dates, project=None):
+    def save_map_db_profiles(self):
+        """List the profile on the db"""
+        db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
+        ret = db.plot.map_profiles(output_folder=self.outputs_folder, save_fig=True)
+        db.disconnect()
+        return ret
+
+    def aggregate_plot(self, dates):
         """Create an aggregate plot"""
-        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
-        success = db.plot.aggregate_plot(dates=dates, project=project)
+        db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
+        success = db.plot.aggregate_plot(dates=dates, output_folder=self.outputs_folder, save_fig=False)
         db.disconnect()
         return success
 
-    def plot_daily_db_profiles(self, project=None):
+    def save_aggregate_plot(self, dates):
+        """Create an aggregate plot"""
+        db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
+        success = db.plot.aggregate_plot(dates=dates, output_folder=self.outputs_folder, save_fig=True)
+        db.disconnect()
+        return success
+
+    def plot_daily_db_profiles(self):
         """Plot the profile on the db by day"""
-        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
-        success = db.plot.daily_plots(project=project)
+        db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
+        success = db.plot.daily_plots(output_folder=self.outputs_folder, save_fig=False)
         db.disconnect()
         return success
 
-    def save_daily_db_profiles(self, project=None):
+    def save_daily_db_profiles(self):
         """Save figure with the profile on the db by day"""
-        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
-        success = db.plot.daily_plots(save_fig=True, project=project)
+        db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
+        success = db.plot.daily_plots(output_folder=self.outputs_folder, save_fig=True)
         db.disconnect()
         return success
 
-    def export_db_profiles_metadata(self, ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile'],
-                                    project=None):
+    # exporting
+
+    def export_db_profiles_metadata(self, ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile']):
         """Export the db profile metadata"""
-        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
-        lst = db.export.export_profiles_metadata(ogr_format=ogr_format, project=project)
+        db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
+        lst = db.export.export_profiles_metadata(output_folder=self.outputs_folder, ogr_format=ogr_format)
         db.disconnect()
         return lst
 

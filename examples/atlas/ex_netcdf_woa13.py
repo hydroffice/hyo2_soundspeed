@@ -18,6 +18,8 @@ output_path = "C:\\Users\\gmasetti\\AppData\\Local\\HydrOffice\\Sound Speed 0.1.
 
 
 def main():
+    """USED TO REDUCE THE SIZE OF THE FULL WOA13 DATABASE"""
+
     # temp annual
     file = "woa13_decav_t00_04v2.nc"
     i_path = os.path.join(input_path, "temp", file)

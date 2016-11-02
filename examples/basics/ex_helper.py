@@ -10,6 +10,7 @@ ch_formatter = logging.Formatter('%(levelname)-9s %(name)s.%(funcName)s:%(lineno
 ch.setFormatter(ch_formatter)
 logger.addHandler(ch)
 
-from hydroffice.soundspeed.base.helper import info_libs
+from hydroffice.soundspeed.base import helper
 
-print(info_libs())
+print("> info libs:\n%s" % helper.info_libs())
+

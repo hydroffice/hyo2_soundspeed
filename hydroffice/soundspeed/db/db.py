@@ -13,7 +13,7 @@ from .export import ExportDb
 from ..profile.profilelist import ProfileList
 
 
-class SoundSpeedDb(object):
+class ProjectDb(object):
     """Class that provides an interface to a SQLite db with Sound Speed data"""
 
     def __init__(self, projects_folder=None, project_name=None):
@@ -137,6 +137,7 @@ class SoundSpeedDb(object):
                                      cast_position point NOT NULL)
                                   """)
 
+                # noinspection SqlResolve
                 self.conn.execute("""
                                   CREATE TABLE IF NOT EXISTS ssp(
                                      pk integer NOT NULL,
@@ -154,6 +155,7 @@ class SoundSpeedDb(object):
                                      FOREIGN KEY(pk) REFERENCES ssp_pk(id))
                                   """)
 
+                # noinspection SqlResolve
                 self.conn.execute("""
                                   CREATE TABLE IF NOT EXISTS data(
                                      ssp_pk integer NOT NULL,
@@ -167,6 +169,7 @@ class SoundSpeedDb(object):
                                         REFERENCES ssp(pk))
                                   """)
 
+                # noinspection SqlResolve
                 self.conn.execute("""
                                   CREATE TABLE IF NOT EXISTS proc(
                                      ssp_pk integer NOT NULL,
@@ -180,6 +183,7 @@ class SoundSpeedDb(object):
                                         REFERENCES ssp(pk))
                                   """)
 
+                # noinspection SqlResolve
                 self.conn.execute("""
                                   CREATE TABLE IF NOT EXISTS sis(
                                      ssp_pk integer NOT NULL,
@@ -193,6 +197,7 @@ class SoundSpeedDb(object):
                                         REFERENCES ssp(pk))
                                   """)
 
+                # noinspection SqlResolve
                 self.conn.execute("""
                                   CREATE VIEW IF NOT EXISTS ssp_view AS
                                      SELECT pk, cast_datetime, cast_position,
@@ -263,6 +268,7 @@ class SoundSpeedDb(object):
         version = ssp_version
 
         try:
+            # noinspection SqlResolve
             ret = self.conn.execute("""
                                     SELECT COUNT(version) FROM library WHERE version=?
                                     """, (version, )).fetchone()
@@ -272,6 +278,7 @@ class SoundSpeedDb(object):
                 new_row = (version, dt.now())
                 # logger.info("inserting: %s" % ", ".join(map(str, new_row)))
 
+                # noinspection SqlResolve
                 self.conn.execute("INSERT INTO library VALUES (?, ?)", new_row)
 
         except sqlite3.Error as e:
@@ -286,6 +293,7 @@ class SoundSpeedDb(object):
         project = self.tmp_data.meta.project
 
         try:
+            # noinspection SqlResolve
             ret = self.conn.execute("""
                                     SELECT COUNT(project_name) FROM project WHERE project_name=?
                                     """, (project, )).fetchone()
@@ -295,6 +303,7 @@ class SoundSpeedDb(object):
                 new_row = (project, dt.now())
                 logger.info("inserting: %s" % ", ".join(map(str, new_row)))
 
+                # noinspection SqlResolve
                 self.conn.execute("INSERT INTO project VALUES (?, ?)", new_row)
 
         except sqlite3.Error as e:
@@ -314,12 +323,14 @@ class SoundSpeedDb(object):
 
         try:
             # check if the ssp key is present
+            # noinspection SqlResolve
             ret = self.conn.execute("""
                                     SELECT COUNT(*) FROM ssp_pk WHERE cast_datetime=? AND cast_position=?
                                     """, (datetime, point,)).fetchone()
             # if not present, add it
             if ret[0] == 0:
                 # logger.info("add new spp pk for %s @ %s" % (datetime, point))
+                # noinspection SqlResolve
                 self.conn.execute("""
                                   INSERT INTO ssp_pk VALUES (NULL, ?, ?)
                                   """, (datetime, point,))
@@ -329,6 +340,7 @@ class SoundSpeedDb(object):
 
         try:
             # return the ssp pk
+            # noinspection SqlResolve
             ret = self.conn.execute("""
                                     SELECT rowid FROM ssp_pk WHERE cast_datetime=? AND cast_position=?
                                     """, (datetime, point,)).fetchone()
@@ -345,6 +357,7 @@ class SoundSpeedDb(object):
         """Delete all the entries with the selected pk, with 'full' also the pk from ssp_pk"""
 
         try:
+            # noinspection SqlResolve
             self.conn.execute("""DELETE FROM data WHERE ssp_pk=?""", (self.tmp_ssp_pk, ))
             # logger.info("deleted %s pk entries from data" % self.tmp_ssp_pk)
 
@@ -353,6 +366,7 @@ class SoundSpeedDb(object):
             return False
 
         try:
+            # noinspection SqlResolve
             self.conn.execute("""DELETE FROM proc WHERE ssp_pk=?""", (self.tmp_ssp_pk, ))
             # logger.info("deleted %s pk entries from proc" % self.tmp_ssp_pk)
 
@@ -361,6 +375,7 @@ class SoundSpeedDb(object):
             return False
 
         try:
+            # noinspection SqlResolve
             self.conn.execute("""DELETE FROM sis WHERE ssp_pk=?""", (self.tmp_ssp_pk, ))
             # logger.info("deleted %s pk entries from sis" % self.tmp_ssp_pk)
 
@@ -369,6 +384,7 @@ class SoundSpeedDb(object):
             return False
 
         try:
+            # noinspection SqlResolve
             self.conn.execute("""DELETE FROM ssp WHERE pk=?""", (self.tmp_ssp_pk, ))
             # logger.info("deleted %s pk entry from ssp" % self.tmp_ssp_pk)
 
@@ -378,6 +394,7 @@ class SoundSpeedDb(object):
 
         if full:
             try:
+                # noinspection SqlResolve
                 self.conn.execute("""DELETE FROM ssp_pk WHERE id=?""", (self.tmp_ssp_pk, ))
                 # logger.info("deleted %s id entry from ssp_pk" % self.tmp_ssp_pk)
 
@@ -390,6 +407,7 @@ class SoundSpeedDb(object):
     def _add_ssp(self):
 
         try:
+            # noinspection SqlResolve
             self.conn.execute("""
                               INSERT INTO ssp VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                               """, (self.tmp_ssp_pk,
@@ -421,6 +439,7 @@ class SoundSpeedDb(object):
 
             try:
                 # first check if the sample is already present with exactly the same values
+                # noinspection SqlResolve
                 self.conn.execute("""
                                   INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?)
                                   """, (self.tmp_ssp_pk,
@@ -452,6 +471,7 @@ class SoundSpeedDb(object):
 
             try:
                 # first check if the sample is already present with exactly the same values
+                # noinspection SqlResolve
                 self.conn.execute("""
                                   INSERT INTO proc VALUES (?, ?, ?, ?, ?, ?, ?)
                                   """, (self.tmp_ssp_pk,
@@ -484,6 +504,7 @@ class SoundSpeedDb(object):
 
             try:
                 # first check if the sample is already present with exactly the same values
+                # noinspection SqlResolve
                 self.conn.execute("""
                                   INSERT INTO sis VALUES (?, ?, ?, ?, ?, ?, ?)
                                   """, (self.tmp_ssp_pk,
@@ -517,6 +538,7 @@ class SoundSpeedDb(object):
         with self.conn:
             try:
                 # ssp spatial timestamp
+                # noinspection SqlResolve
                 ts_list = self.conn.execute("""
                                              SELECT cast_datetime, pk FROM ssp_view ORDER BY cast_datetime
                                              """).fetchall()
@@ -527,16 +549,14 @@ class SoundSpeedDb(object):
                 logger.error("retrieving the time stamp list, %s: %s" % (type(e), e))
                 return None
 
-    def list_profiles(self, project=None):
+    def list_profiles(self):
         if not self.conn:
             logger.error("missing db connection")
             return None
 
         ssp_list = list()
-        if project:
-            sql = self.conn.execute("SELECT * FROM ssp_view WHERE project=?", (project, ))
-        else:
-            sql = self.conn.execute("SELECT * FROM ssp_view")
+        # noinspection SqlResolve
+        sql = self.conn.execute("SELECT * FROM ssp_view")
 
         try:
             with self.conn:
@@ -573,6 +593,7 @@ class SoundSpeedDb(object):
         with self.conn:
             try:
                 # ssp spatial timestamp
+                # noinspection SqlResolve
                 ssp_idx = self.conn.execute("SELECT * FROM ssp_pk WHERE id=?", (pk, )).fetchone()
                 ssp.cur.meta.utc_time = ssp_idx[b'cast_datetime']
                 ssp.cur.meta.longitude = ssp_idx[b'cast_position'].x
@@ -584,6 +605,7 @@ class SoundSpeedDb(object):
 
             try:
                 # ssp metadata
+                # noinspection SqlResolve
                 ssp_meta = self.conn.execute("SELECT * FROM ssp WHERE pk=?", (pk, )).fetchone()
                 ssp.cur.meta.project = ssp_meta[b'project']
                 ssp.cur.meta.sensor_type = ssp_meta[b'sensor_type']
@@ -601,6 +623,7 @@ class SoundSpeedDb(object):
 
             # raw data
             try:
+                # noinspection SqlResolve
                 ssp_samples = self.conn.execute("SELECT * FROM data WHERE ssp_pk=?", (pk, )).fetchall()
                 num_samples = len(ssp_samples)
                 ssp.cur.init_data(num_samples)
@@ -620,6 +643,7 @@ class SoundSpeedDb(object):
 
             # proc data
             try:
+                # noinspection SqlResolve
                 ssp_samples = self.conn.execute("SELECT * FROM proc WHERE ssp_pk=?", (pk, )).fetchall()
                 num_samples = len(ssp_samples)
                 ssp.cur.init_proc(num_samples)
@@ -639,6 +663,7 @@ class SoundSpeedDb(object):
 
             # sis data
             try:
+                # noinspection SqlResolve
                 ssp_samples = self.conn.execute("SELECT * FROM sis WHERE ssp_pk=?", (pk, )).fetchall()
                 num_samples = len(ssp_samples)
                 ssp.cur.init_sis(num_samples)
@@ -667,4 +692,4 @@ class SoundSpeedDb(object):
                 raise RuntimeError("unable to delete ssp with pk: %s" % pk)
 
         self.tmp_ssp_pk = None
-        return  True
+        return True

@@ -29,17 +29,17 @@ class PlotDb(object):
     def __init__(self, db):
         self.db = db
 
-    @property
-    def plots_folder(self):
-        folder = os.path.join(self.db.data_folder, "plots")
+    @classmethod
+    def plots_folder(cls, output_folder):
+        folder = os.path.join(output_folder, "plots")
         if not os.path.exists(folder):
             os.makedirs(folder)
         return folder
 
-    def map_profiles(self, project=None):
+    def map_profiles(self, output_folder, save_fig=False):
         """plot all the ssp in the database"""
 
-        rows = self.db.list_profiles(project=project)
+        rows = self.db.list_profiles()
         if rows is None:
             raise RuntimeError("Unable to retrieve ssp view rows > Empty database?")
         if len(rows) == 0:
@@ -56,11 +56,11 @@ class PlotDb(object):
         ssp_x_min = min(ssp_x)
         ssp_x_max = max(ssp_x)
         ssp_x_mean = (ssp_x_min + ssp_x_max) / 2
-        ssp_x_delta = max(0.05, abs(ssp_x_max - ssp_x_min)/5)
+        ssp_x_delta = max(0.05, abs(ssp_x_max - ssp_x_min) / 5)
         ssp_y_min = min(ssp_y)
         ssp_y_max = max(ssp_y)
-        ssp_y_mean = (ssp_y_min + ssp_y_max) / 2
-        ssp_y_delta = max(0.05, abs(ssp_y_max - ssp_y_min)/5)
+        # ssp_y_mean = (ssp_y_min + ssp_y_max) / 2
+        ssp_y_delta = max(0.05, abs(ssp_y_max - ssp_y_min) / 5)
         logger.info("data boundary: %.4f, %.4f (%.4f) / %.4f, %.4f (%.4f)"
                     % (ssp_x_min, ssp_x_max, ssp_x_delta, ssp_y_min, ssp_y_max, ssp_y_delta))
 
@@ -79,7 +79,7 @@ class PlotDb(object):
         else:
             ssp_loc = 1
 
-        max_delta_range = max(abs(ssp_x_min-ssp_x_max),abs(ssp_y_min-ssp_y_max))
+        max_delta_range = max(abs(ssp_x_min - ssp_x_max), abs(ssp_y_min - ssp_y_max))
         logger.info("maximum delta range: %s" % max_delta_range)
         if max_delta_range > 15:
             ins_scale = 6
@@ -89,8 +89,21 @@ class PlotDb(object):
             ins_scale = 12
         elif max_delta_range > 3:
             ins_scale = 15
-        else:
+            ssp_x_delta *= 2
+            ssp_y_delta *= 2
+        elif max_delta_range > 1:
             ins_scale = 18
+            ssp_x_delta *= 5
+            ssp_y_delta *= 5
+        elif max_delta_range > 0.1:
+            ins_scale = 21
+            ssp_x_delta *= 10
+            ssp_y_delta *= 10
+        else:
+            ins_scale = 24
+            ssp_x_delta *= 40
+            ssp_y_delta *= 40
+
         ax_ins = zoomed_inset_axes(ax, ins_scale, loc=ssp_loc)
         ax_ins.set_xlim((ssp_x_min - ssp_x_delta), (ssp_x_max + ssp_x_delta))
         ax_ins.set_ylim((ssp_y_min - ssp_y_delta), (ssp_y_max + ssp_y_delta))
@@ -112,15 +125,19 @@ class PlotDb(object):
         for spine in ax_ins.spines.values():
             spine.set_edgecolor('y')
 
-        # fig.tight_layout()
-        plt.show()
+        if save_fig:
+            plt.savefig(os.path.join(self.plots_folder(output_folder), 'ssp_map.png'),
+                        bbox_inches='tight')
+        else:
+            plt.show()
+
         return True
 
     @staticmethod
     def _inset_draw_map(llcrnrlon, llcrnrlat, urcrnrlon, urcrnrlat, ax_ins):
 
         m = Basemap(llcrnrlon=llcrnrlon, llcrnrlat=llcrnrlat, urcrnrlon=urcrnrlon, urcrnrlat=urcrnrlat,
-                    resolution='i', ax=ax_ins)
+                    resolution='l', ax=ax_ins)
         # resolution c, l, i, h, f in that order
 
         m.drawmapboundary(fill_color='aqua', zorder=2)
@@ -179,10 +196,10 @@ class PlotDb(object):
 
         def calc_avg(self):
 
-            for i, bin in enumerate(self.bins):
+            for i, i_bin in enumerate(self.bins):
 
                 # to avoid unstable statistics
-                if len(bin) < 3:
+                if len(i_bin) < 3:
                     continue
 
                 if i == 0:
@@ -192,19 +209,19 @@ class PlotDb(object):
                 else:
                     self.depths.append(self.limits[i] - 5.)
 
-                avg = np.mean(bin)
-                std = np.std(bin)
+                avg = np.mean(i_bin)
+                std = np.std(i_bin)
                 self.mean.append(avg)
                 self.min_2std.append(avg - 2 * std)
                 self.max_2std.append(avg + 2 * std)
 
-    def aggregate_plot(self, dates, save_fig=False, project=None):
+    def aggregate_plot(self, dates, output_folder, save_fig=False):
         """aggregate plot with all the SSPs between the passed dates"""
 
         if not save_fig:
             plt.ion()
 
-        ts_list = self.db.list_profiles(project=project)
+        ts_list = self.db.list_profiles()
 
         if ts_list is None:
             raise RuntimeError("Unable to retrieve the day list > Empty database?")
@@ -220,7 +237,7 @@ class PlotDb(object):
         ax.set_ylim(780, 0)
         plt.xlabel('Sound Speed [m/s]', fontsize=10)
         plt.ylabel('Depth [m]', fontsize=10)
-        ax.grid(linewidth=0.8,  color=(0.3, 0.3, 0.3))
+        ax.grid(linewidth=0.8, color=(0.3, 0.3, 0.3))
 
         avg_ssp = PlotDb.AvgSsp()
 
@@ -237,7 +254,7 @@ class PlotDb(object):
             tmp_ssp = self.db.profile_by_pk(ts_pk[0])
             # print(tmp_ssp)
             ax.plot(tmp_ssp.cur.data.speed[tmp_ssp.cur.data_valid], tmp_ssp.cur.data.depth[tmp_ssp.cur.data_valid], '.',
-                    color=(0.85, 0.85, 0.85),  markersize=2
+                    color=(0.85, 0.85, 0.85), markersize=2
                     # label='%s [%04d] ' % (ts_pk[0].time(), ts_pk[1])
                     )
             ax.hold(True)
@@ -257,106 +274,102 @@ class PlotDb(object):
         # ax.hold(True)
 
         if save_fig:
-            plt.savefig(os.path.join(self.plots_folder, 'aggregate_%s_%s.png' % (dates[0], dates[1])),
+            plt.savefig(os.path.join(self.plots_folder(output_folder), 'aggregate_%s_%s.png' % (dates[0], dates[1])),
                         bbox_inches='tight')
         else:
             plt.show()
 
+        # if not save_fig:
+        #     plt.show()  # issue: QCoreApplication::exec: The event loop is already running
+
         logger.debug("plotted SSPs: %d" % ssp_count)
         return True
 
-    def daily_plots(self, save_fig=False, project=None):
+    def daily_plots(self, output_folder, save_fig=False):
         """plot all the SSPs by day"""
+
         if not save_fig:
             plt.ion()
 
-        rows = self.db.list_profiles(project=project)
+        rows = self.db.list_profiles()
         if rows is None:
-            raise RuntimeError("Unable to retrieve ssp view rows > Empty database?")
+            logger.warning("Unable to retrieve ssp view rows > Empty database?")
+            return False
         if len(rows) == 0:
-            raise RuntimeError("Unable to retrieve ssp view rows > Empty database?")
+            logger.warning("Unable to retrieve ssp view rows > Empty database?")
+            return False
 
-        day_count = 0
-        ssp_count = 0
-        current_date = None
-        fig = None
-        first_fig = True
+        # retrieve the timestamps
+        ts_list = self.db.timestamp_list()
+        # print(ts_list)
+
+        # find the days
+        date_list = list()
+        for ts in ts_list:
+            date = ts[0].date()
+            if date not in date_list:
+                date_list.append(date)
+        # print(date_list)
+
+        # create the required figures and prepare the dict to count the plots
+        date_plots = dict()
+        for date in date_list:
+            date_plots[date] = 0
+            fig = plt.figure(date_list.index(date))
+            ax = fig.add_subplot(111)
+            ax.invert_yaxis()
+
+        # plot each profile
         for row in rows:
+            row_date = row[1].date()  # 1 is the cast_datetime
+            date_plots[row_date] += 1
 
-            if first_fig:
-                first_fig = False
+            fig = plt.figure(date_list.index(row_date))
+            row_ssp = self.db.profile_by_pk(row[0])
+            fig.get_axes()[0].plot(row_ssp.cur.data.speed[row_ssp.cur.data_valid],
+                                   row_ssp.cur.data.depth[row_ssp.cur.data_valid],
+                                   label='%s [%04d]' % (row[1].time(), row[0]))
+            fig.get_axes()[0].hold(True)
+
+        # print(date_plots)
+
+        # finishing up the plots
+        for date in date_list:
+            fig = plt.figure(date_list.index(date))
+
+            plt.title("Day #%s: %s (profiles: %s)" % (date_list.index(date) + 1, date, date_plots[date]))
+            fig.get_axes()[0].set_xlim(1460, 1580)
+            fig.get_axes()[0].set_ylim(780, 0)
+            plt.xlabel('Sound Speed [m/s]', fontsize=10)
+            plt.ylabel('Depth [m]', fontsize=10)
+            plt.grid()
+
+            # Now add the legend with some customizations.
+            legend = fig.get_axes()[0].legend(loc='lower right', shadow=True)
+            # The frame is matplotlib.patches.Rectangle instance surrounding the legend.
+            frame = legend.get_frame()
+            frame.set_facecolor('0.90')
+            # Set the fontsize
+            for label in legend.get_texts():
+                label.set_fontsize('large')
+
+            for label in legend.get_lines():
+                label.set_linewidth(1.5)  # the legend line width
+
+        # end
+        for date in date_list:
+            fig = plt.figure(date_list.index(date))
+
+            if save_fig:
+                fig.savefig(os.path.join(self.plots_folder(output_folder), 'day_%2d.png' % (date_list.index(date) + 1)),
+                            bbox_inches='tight')
             else:
-                ssp_count += 1
-            tmp_date = row[1].date()  # 1 is the cast_datetime
+                fig.show()
 
-            if (current_date is None) or (tmp_date > current_date):
-                # end the previous figure
-                if fig is not None:
-                    plt.title("Day #%s: %s (profiles: %s)" % (day_count, current_date, ssp_count))
-                    ax.set_xlim(1460, 1580)
-                    ax.set_ylim(780, 0)
-                    plt.xlabel('Sound Speed [m/s]', fontsize=10)
-                    plt.ylabel('Depth [m]', fontsize=10)
-                    plt.grid()
-                    # Now add the legend with some customizations.
-                    legend = ax.legend(loc='lower right', shadow=True)
-                    # The frame is matplotlib.patches.Rectangle instance surrounding the legend.
-                    frame = legend.get_frame()
-                    frame.set_facecolor('0.90')
-
-                    # Set the fontsize
-                    for label in legend.get_texts():
-                        label.set_fontsize('large')
-
-                    for label in legend.get_lines():
-                        label.set_linewidth(1.5)  # the legend line width
-
-                    if save_fig:
-                        plt.savefig(os.path.join(self.plots_folder, 'day_%s.png' % day_count), bbox_inches='tight')
-                    else:
-                        plt.show()
-                    ssp_count = 0
-
-                # start a new figure
-                fig = plt.figure(day_count)
-                ax = fig.add_subplot(111)
-                ax.invert_yaxis()
-                current_date = tmp_date
-                logger.info("day: %s" % day_count)
-                day_count += 1
-
-            tmp_ssp = self.db.profile_by_pk(row[0])
-            ax.plot(tmp_ssp.cur.data.speed[tmp_ssp.cur.data_valid],
-                    tmp_ssp.cur.data.depth[tmp_ssp.cur.data_valid],
-                    label='%s [%04d]' % (row[1].time(), row[0]))
-            ax.hold(True)
-
-            # print(ts_pk[1], ts_pk[0])
-
-        # last figure
-        ssp_count += 1
-        plt.title("Day #%s: %s (profiles: %s)" % (day_count, current_date, ssp_count))
-        ax.set_xlim(1460, 1580)
-        ax.set_ylim(780, 0)
-        plt.xlabel('Sound Speed [m/s]', fontsize=10)
-        plt.ylabel('Depth [m]', fontsize=10)
-        plt.grid()
-        # Now add the legend with some customizations.
-        legend = ax.legend(loc='lower right', shadow=True)
-        # The frame is matplotlib.patches.Rectangle instance surrounding the legend.
-        frame = legend.get_frame()
-        frame.set_facecolor('0.90')
-
-        # Set the fontsize
-        for label in legend.get_texts():
-            label.set_fontsize('large')
-
-        for label in legend.get_lines():
-            label.set_linewidth(1.5)  # the legend line width
-
-        if save_fig:
-            plt.savefig(os.path.join(self.plots_folder, 'day_%s.png' % day_count), bbox_inches='tight')
-        # else:
+        # if not save_fig:
         #     plt.show()  # issue: QCoreApplication::exec: The event loop is already running
+
+        # for date in date_list:
+        #     plt.close(plt.figure(date_list.index(date)))
 
         return True

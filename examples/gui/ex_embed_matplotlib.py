@@ -15,6 +15,7 @@ from matplotlib.figure import Figure
 
 
 class MatplotlibExample(QtGui.QMainWindow):
+    """HOW TO EMBED MATPLOTLIB WITH PYSIDE"""
 
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.abspath(os.path.join(here, "media"))

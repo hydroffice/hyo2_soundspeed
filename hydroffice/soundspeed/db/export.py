@@ -17,9 +17,9 @@ class ExportDb(object):
     def __init__(self, db):
         self.db = db
 
-    @property
-    def export_folder(self):
-        folder = os.path.join(self.db.data_folder, "db_export")
+    @classmethod
+    def export_folder(cls, output_folder):
+        folder = os.path.join(output_folder, "export")
         if not os.path.exists(folder):
             os.makedirs(folder)
         return folder
@@ -86,10 +86,10 @@ class ExportDb(object):
 
         return lyr
 
-    def export_profiles_metadata(self, ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile'], project=None):
+    def export_profiles_metadata(self, output_folder, ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile']):
 
         GdalAux()
-        output = os.path.join(self.export_folder, "profiles")
+        output = os.path.join(self.export_folder(output_folder=output_folder), "ssp")
 
         # create the data source
         try:
@@ -100,7 +100,7 @@ class ExportDb(object):
             logger.error("%s" % e)
             return
 
-        rows = self.db.list_profiles(project=project)
+        rows = self.db.list_profiles()
         if rows is None:
             raise RuntimeError("Unable to retrieve ssp view rows > Empty database?")
         if len(rows) == 0:

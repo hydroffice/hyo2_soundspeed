@@ -13,7 +13,7 @@ ch_formatter = logging.Formatter('%(levelname)-9s %(name)s.%(funcName)s:%(lineno
 ch.setFormatter(ch_formatter)
 logger.addHandler(ch)
 
-from hydroffice.soundspeed.project import Project
+from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
 from hydroffice.soundspeedmanager.qtcallbacks import QtCallbacks
 
 
@@ -22,8 +22,8 @@ def main():
     mw = QtGui.QMainWindow()
     mw.show()
 
-    prj = Project(qt_progress=QtGui.QProgressDialog)
-    prj.set_callbacks(QtCallbacks(mw))
+    lib = SoundSpeedLibrary(qt_progress=QtGui.QProgressDialog)
+    lib.set_callbacks(QtCallbacks(mw))
 
     tests = [
         (43.026480, -70.318824, dt.utcnow()),  # offshore Portsmouth
@@ -31,20 +31,23 @@ def main():
         (18.2648113, 16.1761115, dt.utcnow()),  # in land -> middle of Africa
     ]
 
-    if not prj.has_woa09():
-        success = prj.download_woa09()
+    # download the woa13 if not present
+    if not lib.has_woa13():
+        success = lib.download_woa13()
         if not success:
             raise RuntimeError("unable to download")
-    logger.info("has woa09: %s" % prj.has_woa09())
+    logger.info("has woa09: %s" % lib.has_woa13())
 
-    # logger.info("load woa09: %s" % lib.atlases.woa09.load_grids())
+    # logger.info("load woa13: %s" % lib.atlases.woa13.load_grids())
 
+    # test for a few locations
     for test in tests:
         # just the ssp (there are also ssp_min and ssp_max)
-        logger.info("woa09 profiles:\n%s" % prj.atlases.woa09.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        logger.info("woa13 profiles:\n%s" % lib.atlases.woa13.query(lat=test[0], lon=test[1], datestamp=test[2]))
 
-    prj.retrieve_woa09()
-    logger.info("lib retrieve rtofs: %s" % prj.ssp)
+    # test user interaction: 3 profiles (avg, min, max)
+    lib.retrieve_woa13()
+    logger.info("lib retrieve rtofs: %s" % lib.ssp)
 
     app.exec_()  # PySide stuff (end)
 

@@ -70,51 +70,65 @@ def info_libs():
 
     try:
         from hydroffice.soundspeedmanager import __version__ as ssm_version
-        vrs = ssm_version
+
     except ImportError:
-        vrs = None
+        ssm_version = None
+
+    vrs = ssm_version
     msg += "hydroffice.soundspeedmanager: %s\n" % vrs
 
     try:
         from hydroffice.soundspeedsettings import __version__ as sss_version
-        vrs = sss_version
+
     except ImportError:
-        vrs = None
+        sss_version = None
+
+    vrs = sss_version
     msg += "hydroffice.soundspeedsettings: %s\n" % vrs
 
     try:
         from matplotlib import __version__ as mpl_version
-        vrs = mpl_version
+
     except ImportError:
-        vrs = None
+        mpl_version = None
+
+    vrs = mpl_version
     msg += "matplotlib: %s\n" % vrs
 
     try:
         from PySide import __version__ as pyside_version
-        vrs = pyside_version
+
     except ImportError:
-        vrs = None
+        pyside_version = None
+
+    vrs = pyside_version
     msg += "pyside: %s\n" % vrs
 
     try:
         from osgeo.gdal import __version__ as gdal_version
-        vrs = gdal_version
+
     except ImportError:
-        vrs = None
+        gdal_version = None
+
+    vrs = gdal_version
     msg += "gdal: %s\n" % vrs
 
     try:
         from pyproj import __version__ as pyproj_version
-        vrs = pyproj_version
+
     except ImportError:
-        vrs = None
+        pyproj_version = None
+
+    vrs = pyproj_version
     msg += "pyproj: %s\n" % vrs
 
     try:
         from netCDF4 import __version__ as netcdf4_version
-        vrs = netcdf4_version
+
     except ImportError:
-        vrs = None
+        netcdf4_version = None
+
+    vrs = netcdf4_version
     msg += "netCDF4: %s\n" % vrs
 
     return msg
@@ -179,26 +193,3 @@ def first_match(dct, val):
         return values[0]
     else:
         raise RuntimeError("unknown value %s in dict: %s" % (val, dct))
-
-# testing stuff
-
-here = os.path.abspath(os.path.dirname(__file__))
-
-
-def get_testing_input_folder():
-    data_folder = os.path.abspath(os.path.join(here, os.pardir, os.pardir, os.pardir, "data", "downloaded"))
-    if not os.path.exists(data_folder):
-        raise RuntimeError("The testing input folder does not exist: %s" % data_folder)
-    return data_folder
-
-
-def get_testing_input_subfolders():
-    df = get_testing_input_folder()
-    return [o for o in os.listdir(df) if os.path.isdir(os.path.join(df, o))]
-
-
-def get_testing_output_folder():
-    data_folder = os.path.abspath(os.path.join(here, os.pardir, os.pardir, os.pardir, "data", "created"))
-    if not os.path.exists(data_folder):
-        os.makedirs(data_folder)
-    return data_folder
