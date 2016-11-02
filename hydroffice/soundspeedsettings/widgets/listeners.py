@@ -11,7 +11,7 @@ from .widget import AbstractWidget
 from hydroffice.soundspeed.profile.dicts import Dicts
 
 
-class Mvp(AbstractWidget):
+class Listeners(AbstractWidget):
 
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
@@ -19,15 +19,135 @@ class Mvp(AbstractWidget):
     def __init__(self, main_win, db):
         AbstractWidget.__init__(self, main_win=main_win, db=db)
 
-        lbl_width = 100
+        lbl_width = 120
 
         # outline ui
         self.main_layout = QtGui.QVBoxLayout()
         self.frame.setLayout(self.main_layout)
 
-        # - mvp_ip_address
+        # - active setup
         hbox = QtGui.QHBoxLayout()
         self.main_layout.addLayout(hbox)
+        hbox.addStretch()
+        self.active_label = QtGui.QLabel()
+        hbox.addWidget(self.active_label)
+        hbox.addStretch()
+
+        # - left and right sub-frames
+        hbox = QtGui.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        # -- left
+        self.left_frame = QtGui.QFrame()
+        self.left_layout = QtGui.QVBoxLayout()
+        self.left_frame.setLayout(self.left_layout)
+        hbox.addWidget(self.left_frame, stretch=1)
+        # -- stretch
+        hbox.addStretch()
+        # -- right
+        self.right_frame = QtGui.QFrame()
+        self.right_layout = QtGui.QVBoxLayout()
+        self.right_frame.setLayout(self.right_layout)
+        hbox.addWidget(self.right_frame, stretch=1)
+
+        # LEFT
+
+        # - Editor settings
+        hbox = QtGui.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        hbox.addStretch()
+        self.label = QtGui.QLabel("SIS:")
+        hbox.addWidget(self.label)
+        hbox.addStretch()
+
+        # - sis_listen_port
+        hbox = QtGui.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        label = QtGui.QLabel("Listen port:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.sis_listen_port = QtGui.QLineEdit()
+        validator = QtGui.QIntValidator(0, 65535)
+        self.sis_listen_port.setValidator(validator)
+        hbox.addWidget(self.sis_listen_port)
+
+        # - sis_listen_timeout
+        hbox = QtGui.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        label = QtGui.QLabel("Listen timeout:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.sis_listen_timeout = QtGui.QLineEdit()
+        validator = QtGui.QIntValidator(0, 9999)
+        self.sis_listen_timeout.setValidator(validator)
+        hbox.addWidget(self.sis_listen_timeout)
+
+        # - sis_auto_apply_manual_casts
+        hbox = QtGui.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        label = QtGui.QLabel("Auto apply profile:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.sis_auto_apply_manual_casts = QtGui.QComboBox()
+        self.sis_auto_apply_manual_casts.addItems(["True", "False"])
+        hbox.addWidget(self.sis_auto_apply_manual_casts)
+
+        self.left_layout.addSpacing(12)
+
+        # - Editor settings
+        hbox = QtGui.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        hbox.addStretch()
+        self.label = QtGui.QLabel("Sippican:")
+        hbox.addWidget(self.label)
+        hbox.addStretch()
+
+        # - sippican_listen_port
+        hbox = QtGui.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        label = QtGui.QLabel("Listen port:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.sippican_listen_port = QtGui.QLineEdit()
+        validator = QtGui.QIntValidator(0, 99999)
+        self.sippican_listen_port.setValidator(validator)
+        hbox.addWidget(self.sippican_listen_port)
+
+        # - sippican_listen_timeout
+        hbox = QtGui.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        label = QtGui.QLabel("Listen timeout:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.sippican_listen_timeout = QtGui.QLineEdit()
+        validator = QtGui.QIntValidator(0, 99999)
+        self.sippican_listen_timeout.setValidator(validator)
+        hbox.addWidget(self.sippican_listen_timeout)
+
+        self.left_layout.addStretch()
+
+        # RIGHT
+
+        # - Editor settings
+        hbox = QtGui.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        hbox.addStretch()
+        self.label = QtGui.QLabel("MVP:")
+        hbox.addWidget(self.label)
+        hbox.addStretch()
+
+        # - mvp_ip_address
+        hbox = QtGui.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -36,7 +156,7 @@ class Mvp(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
@@ -47,19 +167,10 @@ class Mvp(AbstractWidget):
         self.mvp_ip_address.setValidator(validator)
         vbox.addWidget(self.mvp_ip_address)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_mvp_ip_address)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
         # - mvp_listen_port
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -68,7 +179,7 @@ class Mvp(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
@@ -77,19 +188,10 @@ class Mvp(AbstractWidget):
         self.mvp_listen_port.setValidator(validator)
         vbox.addWidget(self.mvp_listen_port)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_mvp_listen_port)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
         # - mvp_listen_timeout
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -98,7 +200,7 @@ class Mvp(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
@@ -107,19 +209,10 @@ class Mvp(AbstractWidget):
         self.mvp_listen_timeout.setValidator(validator)
         vbox.addWidget(self.mvp_listen_timeout)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_mvp_listen_timeout)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
         # - mvp_transmission_protocol
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -128,7 +221,7 @@ class Mvp(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
@@ -136,19 +229,10 @@ class Mvp(AbstractWidget):
         self.mvp_transmission_protocol.addItems(Dicts.mvp_protocols.keys())
         vbox.addWidget(self.mvp_transmission_protocol)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_mvp_transmission_protocol)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
         # - mvp_format
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -157,7 +241,7 @@ class Mvp(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
@@ -165,19 +249,10 @@ class Mvp(AbstractWidget):
         self.mvp_format.addItems(Dicts.mvp_formats.keys())
         vbox.addWidget(self.mvp_format)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_mvp_format)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
         # - mvp_winch_port
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -186,7 +261,7 @@ class Mvp(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
@@ -195,19 +270,10 @@ class Mvp(AbstractWidget):
         self.mvp_winch_port.setValidator(validator)
         vbox.addWidget(self.mvp_winch_port)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_mvp_winch_port)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
         # - mvp_fish_port
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -216,7 +282,7 @@ class Mvp(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
@@ -225,19 +291,10 @@ class Mvp(AbstractWidget):
         self.mvp_fish_port.setValidator(validator)
         vbox.addWidget(self.mvp_fish_port)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_mvp_fish_port)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
         # - mvp_nav_port
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -246,7 +303,7 @@ class Mvp(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
@@ -255,19 +312,10 @@ class Mvp(AbstractWidget):
         self.mvp_nav_port.setValidator(validator)
         vbox.addWidget(self.mvp_nav_port)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_mvp_nav_port)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
         # - mvp_system_port
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -276,7 +324,7 @@ class Mvp(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
@@ -285,19 +333,10 @@ class Mvp(AbstractWidget):
         self.mvp_system_port.setValidator(validator)
         vbox.addWidget(self.mvp_system_port)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_mvp_system_port)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
         # - mvp_sw_version
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -306,26 +345,17 @@ class Mvp(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
         self.mvp_sw_version = QtGui.QLineEdit()
         vbox.addWidget(self.mvp_sw_version)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_mvp_sw_version)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
         # - mvp_instrument_id
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -334,26 +364,17 @@ class Mvp(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
         self.mvp_instrument_id = QtGui.QLineEdit()
         vbox.addWidget(self.mvp_instrument_id)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_mvp_instrument_id)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
         # - mvp_instrument
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -370,83 +391,182 @@ class Mvp(AbstractWidget):
         self.mvp_instrument.addItems(Dicts.mvp_instruments.keys())
         vbox.addWidget(self.mvp_instrument)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_mvp_instrument)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
+
+        self.right_layout.addStretch()
 
         self.main_layout.addStretch()
 
         self.setup_changed()  # to trigger the first data population
 
+        # -- functions
+        # --- left
+        # noinspection PyUnresolvedReferences
+        self.sis_listen_port.textChanged.connect(self.apply_sis_listen_port)
+        # noinspection PyUnresolvedReferences
+        self.sis_listen_timeout.textChanged.connect(self.apply_sis_listen_timeout)
+        # noinspection PyUnresolvedReferences
+        self.sis_auto_apply_manual_casts.currentIndexChanged.connect(self.apply_sis_auto_apply_manual_casts)
+        # noinspection PyUnresolvedReferences
+        self.sippican_listen_port.textChanged.connect(self.apply_sippican_listen_port)
+        # noinspection PyUnresolvedReferences
+        self.sippican_listen_timeout.textChanged.connect(self.apply_sippican_listen_timeout)
+        # --- right
+        # noinspection PyUnresolvedReferences
+        self.mvp_ip_address.textChanged.connect(self.apply_mvp_ip_address)
+        # noinspection PyUnresolvedReferences
+        self.mvp_listen_port.textChanged.connect(self.apply_mvp_listen_port)
+        # noinspection PyUnresolvedReferences
+        self.mvp_listen_timeout.textChanged.connect(self.apply_mvp_listen_timeout)
+        # noinspection PyUnresolvedReferences
+        self.mvp_transmission_protocol.currentIndexChanged.connect(self.apply_mvp_transmission_protocol)
+        # noinspection PyUnresolvedReferences
+        self.mvp_format.currentIndexChanged.connect(self.apply_mvp_format)
+        # noinspection PyUnresolvedReferences
+        self.mvp_winch_port.textChanged.connect(self.apply_mvp_winch_port)
+        # noinspection PyUnresolvedReferences
+        self.mvp_fish_port.textChanged.connect(self.apply_mvp_fish_port)
+        # noinspection PyUnresolvedReferences
+        self.mvp_nav_port.textChanged.connect(self.apply_mvp_nav_port)
+        # noinspection PyUnresolvedReferences
+        self.mvp_system_port.textChanged.connect(self.apply_mvp_system_port)
+        # noinspection PyUnresolvedReferences
+        self.mvp_sw_version.textChanged.connect(self.apply_mvp_sw_version)
+        # noinspection PyUnresolvedReferences
+        self.mvp_instrument_id.textChanged.connect(self.apply_mvp_instrument_id)
+        # noinspection PyUnresolvedReferences
+        self.mvp_instrument.currentIndexChanged.connect(self.apply_mvp_instrument)
+
+    def apply_sis_listen_port(self):
+        # logger.debug("listen SIS port")
+        self.db.sis_listen_port = int(self.sis_listen_port.text())
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+    def apply_sis_listen_timeout(self):
+        # logger.debug("listen SIS timeout")
+        self.db.sis_listen_timeout = int(self.sis_listen_timeout.text())
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+    def apply_sis_auto_apply_manual_casts(self):
+        # logger.debug("auto-apply cast")
+        self.db.sis_auto_apply_manual_casts = self.sis_auto_apply_manual_casts.currentText() == "True"
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+    def apply_sippican_listen_timeout(self):
+        # logger.debug("apply listen timeout")
+        self.db.sippican_listen_timeout = int(self.sippican_listen_timeout.text())
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+    def apply_sippican_listen_port(self):
+        # logger.debug("apply listen port")
+        self.db.sippican_listen_port = int(self.sippican_listen_port.text())
+        self.setup_changed()
+        self.main_win.reload_settings()
+
     def apply_mvp_listen_port(self):
-        logger.debug("apply listen port")
+        # logger.debug("apply listen port")
         self.db.mvp_listen_port = int(self.mvp_listen_port.text())
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_mvp_listen_timeout(self):
-        logger.debug("apply listen timeout")
+        # logger.debug("apply listen timeout")
         self.db.mvp_listen_timeout = int(self.mvp_listen_timeout.text())
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_mvp_ip_address(self):
-        logger.debug("apply listen IP")
+        # logger.debug("apply listen IP")
         self.db.mvp_ip_address = self.mvp_ip_address.text()
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_mvp_transmission_protocol(self):
-        logger.debug("apply tx protocol")
+        # logger.debug("apply tx protocol")
         self.db.mvp_transmission_protocol = self.mvp_transmission_protocol.currentText()
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_mvp_format(self):
-        logger.debug("apply format")
+        # logger.debug("apply format")
         self.db.mvp_format = self.mvp_format.currentText()
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_mvp_winch_port(self):
-        logger.debug("apply winch port")
+        # logger.debug("apply winch port")
         self.db.mvp_winch_port = int(self.mvp_winch_port.text())
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_mvp_fish_port(self):
-        logger.debug("apply fish port")
+        # logger.debug("apply fish port")
         self.db.mvp_fish_port = int(self.mvp_fish_port.text())
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_mvp_nav_port(self):
-        logger.debug("apply nav port")
+        # logger.debug("apply nav port")
         self.db.mvp_nav_port = int(self.mvp_nav_port.text())
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_mvp_system_port(self):
-        logger.debug("apply system port")
+        # logger.debug("apply system port")
         self.db.mvp_system_port = int(self.mvp_system_port.text())
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_mvp_sw_version(self):
-        logger.debug("apply software version")
-        self.db.mvp_sw_version = int(self.mvp_sw_version.text())
+        # logger.debug("apply software version")
+        self.db.mvp_sw_version = self.mvp_sw_version.text()
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_mvp_instrument_id(self):
-        logger.debug("apply instrument ID")
-        self.db.mvp_instrument_id = int(self.mvp_instrument_id.text())
+        # logger.debug("apply instrument ID")
+        self.db.mvp_instrument_id = self.mvp_instrument_id.text()
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_mvp_instrument(self):
-        logger.debug("apply instrument type")
+        # logger.debug("apply instrument type")
         self.db.mvp_instrument = self.mvp_instrument.currentText()
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def setup_changed(self):
         """Refresh items"""
         # logger.debug("refresh input settings")
+
+        # set the top label
+        self.active_label.setText("<b>Current setup: %s [#%02d]</b>" % (self.db.setup_name, self.db.active_setup_id))
+
+        # - SIS
+
+        # sis_listen_port
+        self.sis_listen_port.setText("%d" % self.db.sis_listen_port)
+        # sis_listen_timeout
+        self.sis_listen_timeout.setText("%d" % self.db.sis_listen_timeout)
+
+        # sis_auto_apply_manual_casts
+        if self.db.sis_auto_apply_manual_casts:
+            self.sis_auto_apply_manual_casts.setCurrentIndex(0)  # True
+        else:
+            self.sis_auto_apply_manual_casts.setCurrentIndex(1)  # False
+
+        # - SIPPICAN
+
+        # sippican_listen_port
+        self.sippican_listen_port.setText("%d" % self.db.sippican_listen_port)
+
+        # sippican_listen_timeout
+        self.sippican_listen_timeout.setText("%d" % self.db.sippican_listen_timeout)
+
+        # - MVP
 
         # mvp_ip_address
         self.mvp_ip_address.setText(self.db.mvp_ip_address)

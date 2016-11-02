@@ -44,7 +44,7 @@ class MainWin(QtGui.QMainWindow):
         _app.setOrganizationDomain("hydroffice.org")
 
         # set the minimum and the initial size
-        self.setMinimumSize(600, 400)
+        self.setMinimumSize(640, 480)
         self.resize(900, 600)
 
         # set icons
@@ -107,11 +107,11 @@ class MainWin(QtGui.QMainWindow):
         idx = self.tabs.insertTab(3, self.tab_refraction,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'refraction.png')), "")
         self.tabs.setTabToolTip(idx, "Refraction Monitor")
-        # server
-        self.tab_settings = Settings(lib=self.lib, main_win=self)
-        idx = self.tabs.insertTab(4, self.tab_settings,
+        # setup
+        self.tab_setup = Settings(lib=self.lib, main_win=self)
+        idx = self.tabs.insertTab(4, self.tab_setup,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'settings.png')), "")
-        self.tabs.setTabToolTip(idx, "Settings")
+        self.tabs.setTabToolTip(idx, "Setup")
         # info
         self.tab_info = Info(default_url='https://www.hydroffice.org/soundspeed/3_0_0')
         idx = self.tabs.insertTab(5, self.tab_info,
@@ -145,7 +145,7 @@ class MainWin(QtGui.QMainWindow):
               'then unzipped it into:\n' \
               '   %s\n\n' \
               'Do you want that I perform this operation for you?\n' \
-              'Internet connection is required!\n' % self.lib.woa09_folder()
+              'Internet connection is required!\n' % self.lib.woa09_folder
         # noinspection PyCallByClass
         ret = QtGui.QMessageBox.information(self, "Sound Speed Manager - WOA09 Atlas", msg,
                                             QtGui.QMessageBox.Ok | QtGui.QMessageBox.No)
@@ -155,7 +155,7 @@ class MainWin(QtGui.QMainWindow):
                   '   ftp.ccom.unh.edu/fromccom/hydroffice/woa09.red.zip\n' \
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
-                  ' - restart Sound Speed Manager\n' % self.lib.woa09_folder()
+                  ' - restart Sound Speed Manager\n' % self.lib.woa09_folder
             # noinspection PyCallByClass
             QtGui.QMessageBox.information(self, "Sound Speed Manager - WOA09 Atlas", msg,
                                           QtGui.QMessageBox.Ok)
@@ -170,7 +170,7 @@ class MainWin(QtGui.QMainWindow):
                   '   ftp.ccom.unh.edu/fromccom/hydroffice/woa09.red.zip\n' \
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
-                  ' - restart Sound Speed Manager\n' % self.lib.woa09_folder()
+                  ' - restart Sound Speed Manager\n' % self.lib.woa09_folder
             # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Sound Speed Manager - WOA09 Atlas", msg,
                                       QtGui.QMessageBox.Ok)
@@ -196,7 +196,7 @@ class MainWin(QtGui.QMainWindow):
               'then unzipped it into:\n' \
               '   %s\n\n' \
               'Do you want that I perform this operation for you?\n' \
-              'Internet connection is required!\n' % self.lib.woa13_folder()
+              'Internet connection is required!\n' % self.lib.woa13_folder
         # noinspection PyCallByClass
         ret = QtGui.QMessageBox.information(self, "Sound Speed Manager - WOA13 Atlas", msg,
                                             QtGui.QMessageBox.Ok | QtGui.QMessageBox.No)
@@ -207,7 +207,7 @@ class MainWin(QtGui.QMainWindow):
                   '   ftp.ccom.unh.edu/fromccom/hydroffice/woa13_sal.red.zip\n' \
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
-                  ' - restart Sound Speed Manager\n' % self.lib.woa13_folder()
+                  ' - restart Sound Speed Manager\n' % self.lib.woa13_folder
             # noinspection PyCallByClass
             QtGui.QMessageBox.information(self, "Sound Speed Manager - WOA13 Atlas", msg,
                                           QtGui.QMessageBox.Ok)
@@ -223,7 +223,7 @@ class MainWin(QtGui.QMainWindow):
                   '   ftp.ccom.unh.edu/fromccom/hydroffice/woa13_sal.red.zip\n' \
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
-                  ' - restart Sound Speed Manager\n' % self.lib.woa13_folder()
+                  ' - restart Sound Speed Manager\n' % self.lib.woa13_folder
             # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Sound Speed Manager - WOA13 Atlas", msg,
                                       QtGui.QMessageBox.Ok)
@@ -304,28 +304,28 @@ class MainWin(QtGui.QMainWindow):
         self.tab_database.data_cleared()
         self.tab_server.data_cleared()
         self.tab_refraction.data_cleared()
-        self.tab_settings.data_cleared()
+        self.tab_setup.data_cleared()
 
     def data_imported(self):
         self.tab_editor.data_imported()
         self.tab_database.data_imported()
         self.tab_server.data_imported()
         self.tab_refraction.data_imported()
-        self.tab_settings.data_imported()
+        self.tab_setup.data_imported()
 
     def data_stored(self):
         self.tab_editor.data_stored()
         self.tab_database.data_stored()
         self.tab_server.data_stored()
         self.tab_refraction.data_stored()
-        self.tab_settings.data_stored()
+        self.tab_setup.data_stored()
 
     def data_removed(self):
         self.tab_editor.data_removed()
         self.tab_database.data_removed()
         self.tab_server.data_removed()
         self.tab_refraction.data_removed()
-        self.tab_settings.data_removed()
+        self.tab_setup.data_removed()
 
     def server_started(self):
         # clear widgets as for data clear
@@ -335,7 +335,7 @@ class MainWin(QtGui.QMainWindow):
         self.tab_database.server_started()
         self.tab_server.server_started()
         self.tab_refraction.server_started()
-        self.tab_settings.server_started()
+        self.tab_setup.server_started()
         self.statusBar().setStyleSheet("QStatusBar{color:rgba(0,0,0,128);"
                                        "font-size: 8pt;background-color:rgba(51,204,255,128);}")
 
@@ -344,7 +344,7 @@ class MainWin(QtGui.QMainWindow):
         self.tab_database.server_stopped()
         self.tab_server.server_stopped()
         self.tab_refraction.server_stopped()
-        self.tab_settings.server_stopped()
+        self.tab_setup.server_stopped()
         self.statusBar().setStyleSheet(self.status_bar_normal_style)
 
     def update_gui(self):

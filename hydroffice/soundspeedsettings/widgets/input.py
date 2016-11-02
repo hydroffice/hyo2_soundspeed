@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import os
 import logging
 
-from PySide import QtGui, QtCore
+from PySide import QtGui
 from hydroffice.soundspeed.profile.dicts import Dicts
 
 logger = logging.getLogger(__name__)
@@ -19,15 +19,41 @@ class Input(AbstractWidget):
     def __init__(self, main_win, db):
         AbstractWidget.__init__(self, main_win=main_win, db=db)
 
-        lbl_width = 100
+        lbl_width = 120
 
         # outline ui
         self.main_layout = QtGui.QVBoxLayout()
         self.frame.setLayout(self.main_layout)
 
-        # - atlases
+        # - active setup
         hbox = QtGui.QHBoxLayout()
         self.main_layout.addLayout(hbox)
+        hbox.addStretch()
+        self.active_label = QtGui.QLabel()
+        hbox.addWidget(self.active_label)
+        hbox.addStretch()
+
+        # - left and right sub-frames
+        hbox = QtGui.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        # -- left
+        self.left_frame = QtGui.QFrame()
+        self.left_layout = QtGui.QVBoxLayout()
+        self.left_frame.setLayout(self.left_layout)
+        hbox.addWidget(self.left_frame, stretch=1)
+        # -- stretch
+        hbox.addStretch()
+        # -- right
+        self.right_frame = QtGui.QFrame()
+        self.right_layout = QtGui.QVBoxLayout()
+        self.right_frame.setLayout(self.right_layout)
+        hbox.addWidget(self.right_frame, stretch=1)
+
+        # LEFT
+
+        # - atlases
+        hbox = QtGui.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
         hbox.addStretch()
         self.label = QtGui.QLabel("Atlases")
         hbox.addWidget(self.label)
@@ -35,7 +61,7 @@ class Input(AbstractWidget):
 
         # - use woa09
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.left_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -52,19 +78,10 @@ class Input(AbstractWidget):
         self.use_woa09.addItems(["True", "False"])
         vbox.addWidget(self.use_woa09)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_use_woa09)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
         # - use woa13
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.left_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -73,28 +90,18 @@ class Input(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
         self.use_woa13 = QtGui.QComboBox()
         self.use_woa13.addItems(["True", "False"])
-        # self.use_woa13.setDisabled(True)
         vbox.addWidget(self.use_woa13)
-        vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_use_woa13)
-        vbox.addWidget(btn_apply)
         vbox.addStretch()
 
         # - use rtofs
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.left_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -103,7 +110,7 @@ class Input(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
@@ -111,19 +118,10 @@ class Input(AbstractWidget):
         self.use_rtofs.addItems(["True", "False"])
         vbox.addWidget(self.use_rtofs)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_use_rtofs)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
         # - ssp_extension_source
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.left_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -132,7 +130,7 @@ class Input(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
@@ -140,19 +138,10 @@ class Input(AbstractWidget):
         self.extension_source.addItems(Dicts.atlases.keys())
         vbox.addWidget(self.extension_source)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_extension_source)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
         # - ssp_salinity_source
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.left_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -161,7 +150,7 @@ class Input(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
@@ -169,19 +158,10 @@ class Input(AbstractWidget):
         self.salinity_source.addItems(Dicts.atlases.keys())
         vbox.addWidget(self.salinity_source)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_salinity_source)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
         # - ssp_temp_sal_source
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.left_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -190,7 +170,7 @@ class Input(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
@@ -198,21 +178,14 @@ class Input(AbstractWidget):
         self.temp_sal_source.addItems(Dicts.atlases.keys())
         vbox.addWidget(self.temp_sal_source)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_temp_sal_source)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
-        self.main_layout.addStretch()
+        self.left_layout.addStretch()
+
+        # RIGHT FRAME
 
         # - listeners
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         hbox.addStretch()
         self.label = QtGui.QLabel("Listeners")
         hbox.addWidget(self.label)
@@ -220,7 +193,7 @@ class Input(AbstractWidget):
 
         # - use sis
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -229,7 +202,7 @@ class Input(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
@@ -237,19 +210,10 @@ class Input(AbstractWidget):
         self.use_sis.addItems(["True", "False"])
         vbox.addWidget(self.use_sis)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_use_sis)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
         # - use sippican
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -258,28 +222,18 @@ class Input(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
         self.use_sippican = QtGui.QComboBox()
         self.use_sippican.addItems(["True", "False"])
-        # self.use_woa13.setDisabled(True)
         vbox.addWidget(self.use_sippican)
-        vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_use_sippican)
-        vbox.addWidget(btn_apply)
         vbox.addStretch()
 
         # - use mvp
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -288,7 +242,7 @@ class Input(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
@@ -296,19 +250,10 @@ class Input(AbstractWidget):
         self.use_mvp.addItems(["True", "False"])
         vbox.addWidget(self.use_mvp)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_use_mvp)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
         # - rx max waiting time
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -317,7 +262,7 @@ class Input(AbstractWidget):
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
-        # -- label
+        # -- value
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
@@ -326,29 +271,20 @@ class Input(AbstractWidget):
         self.rx_max_wait_time.setValidator(validator)
         vbox.addWidget(self.rx_max_wait_time)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_rx_max_wait_time)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
 
-        self.main_layout.addStretch()
+        self.right_layout.addSpacing(12)
 
         # - processing
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         hbox.addStretch()
-        self.label = QtGui.QLabel("Other settings")
-        hbox.addWidget(self.label)
+        label = QtGui.QLabel("Other settings")
+        hbox.addWidget(label)
         hbox.addStretch()
 
         # - profile direction
         hbox = QtGui.QHBoxLayout()
-        self.main_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -365,90 +301,115 @@ class Input(AbstractWidget):
         self.profile_direction.addItems(Dicts.ssp_directions.keys())
         vbox.addWidget(self.profile_direction)
         vbox.addStretch()
-        # -- buttons
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        btn_apply = QtGui.QPushButton("Apply")
-        btn_apply.setFixedWidth(lbl_width)
-        btn_apply.clicked.connect(self.apply_profile_direction)
-        vbox.addWidget(btn_apply)
-        vbox.addStretch()
+
+        self.right_layout.addStretch()
 
         self.main_layout.addStretch()
 
         self.setup_changed()  # to trigger the first data population
 
+        # -- connect functions:
+        # noinspection PyUnresolvedReferences
+        self.use_woa09.currentIndexChanged.connect(self.apply_use_woa09)
+        # noinspection PyUnresolvedReferences
+        self.use_woa13.currentIndexChanged.connect(self.apply_use_woa13)
+        # noinspection PyUnresolvedReferences
+        self.use_rtofs.currentIndexChanged.connect(self.apply_use_rtofs)
+        # noinspection PyUnresolvedReferences
+        self.extension_source.currentIndexChanged.connect(self.apply_extension_source)
+        # noinspection PyUnresolvedReferences
+        self.salinity_source.currentIndexChanged.connect(self.apply_salinity_source)
+        # noinspection PyUnresolvedReferences
+        self.temp_sal_source.currentIndexChanged.connect(self.apply_temp_sal_source)
+        # noinspection PyUnresolvedReferences
+        self.use_sis.currentIndexChanged.connect(self.apply_use_sis)
+        # noinspection PyUnresolvedReferences
+        self.use_sippican.currentIndexChanged.connect(self.apply_use_sippican)
+        # noinspection PyUnresolvedReferences
+        self.use_mvp.currentIndexChanged.connect(self.apply_use_mvp)
+        # noinspection PyUnresolvedReferences
+        self.rx_max_wait_time.textChanged.connect(self.apply_rx_max_wait_time)
+        # noinspection PyUnresolvedReferences
+        self.profile_direction.currentIndexChanged.connect(self.apply_profile_direction)
+
     def apply_profile_direction(self):
         logger.debug("apply profile direction")
         self.db.ssp_up_or_down = self.profile_direction.currentText()
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_use_woa09(self):
-        logger.debug("apply use woa09")
-        self.db.use_woa09 = self.use_woa09.currentText()
-        if self.db.use_woa09:
-            if self.main_win.main_win:
-                self.main_win.main_win.check_woa09()
+        # logger.debug("apply use woa09: %s" % self.use_woa09.currentText())
+        self.db.use_woa09 = self.use_woa09.currentText() == "True"
         self.setup_changed()
+        self.main_win.reload_settings()
+
+        if self.main_win.main_win:
+            self.main_win.main_win.check_woa09()
 
     def apply_use_woa13(self):
-        logger.debug("apply use woa13")
-        self.db.use_woa13 = self.use_woa13.currentText()
-        if self.db.use_woa13:
-            if self.main_win.main_win:
-                self.main_win.main_win.check_woa13()
+        # logger.debug("apply use woa13: %s" % self.use_woa13.currentText())
+        self.db.use_woa13 = self.use_woa13.currentText() == "True"
         self.setup_changed()
+        self.main_win.reload_settings()
+
+        if self.main_win.main_win:
+            self.main_win.main_win.check_woa13()
 
     def apply_use_rtofs(self):
-        logger.debug("apply use rtofs")
-        self.db.use_rtofs = self.use_rtofs.currentText()
+        # logger.debug("apply use rtofs: %s" % self.use_rtofs.currentText())
+        self.db.use_rtofs = self.use_rtofs.currentText() == "True"
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_extension_source(self):
-        logger.debug("apply extension source")
+        # logger.debug("apply extension source")
         self.db.ssp_extension_source = self.extension_source.currentText()
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_salinity_source(self):
-        logger.debug("apply salinity source")
+        # logger.debug("apply salinity source")
         self.db.ssp_salinity_source = self.salinity_source.currentText()
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_temp_sal_source(self):
-        logger.debug("apply temp/sal source")
+        # logger.debug("apply temp/sal source")
         self.db.ssp_temp_sal_source = self.temp_sal_source.currentText()
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_use_sis(self):
-        logger.debug("apply use SIS")
-        self.db.use_sis = self.use_sis.currentText()
-        # if self.db.use_woa09:
-        #     self.main_win.main_win.check_woa09()
+        # logger.debug("apply use SIS")
+        self.db.use_sis = self.use_sis.currentText() == "True"
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_use_sippican(self):
-        logger.debug("apply use Sippican")
-        self.db.use_sippican = self.use_sippican.currentText()
-        # if self.db.use_woa13:
-        #     self.main_win.main_win.check_woa13()
+        # logger.debug("apply use Sippican")
+        self.db.use_sippican = self.use_sippican.currentText() == "True"
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_use_mvp(self):
-        logger.debug("apply use MVP")
-        self.db.use_mvp = self.use_mvp.currentText()
-        # if self.db.use_woa13:
-        #     self.main_win.main_win.check_woa13()
+        # logger.debug("apply use MVP")
+        self.db.use_mvp = self.use_mvp.currentText() == "True"
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def apply_rx_max_wait_time(self):
-        logger.debug("apply rx timeout")
+        # logger.debug("apply rx timeout")
         self.db.rx_max_wait_time = int(self.rx_max_wait_time.text())
         self.setup_changed()
+        self.main_win.reload_settings()
 
     def setup_changed(self):
         """Refresh items"""
         # logger.debug("refresh input settings")
+
+        # set the top label
+        self.active_label.setText("<b>Current setup: %s [#%02d]</b>" % (self.db.setup_name, self.db.active_setup_id))
 
         # use woa09
         if self.db.use_woa09:

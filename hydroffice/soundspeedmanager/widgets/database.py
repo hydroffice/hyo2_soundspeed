@@ -232,7 +232,7 @@ class Database(AbstractWidget):
             self.lib.open_data_folder()
 
     def update_table(self):
-        lst = self.lib.db_profiles()
+        lst = self.lib.db_list_profiles()
 
         # prepare the table
         self.ssp_list.clear()

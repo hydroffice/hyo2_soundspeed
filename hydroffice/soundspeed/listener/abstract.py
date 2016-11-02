@@ -1,6 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import os
 import logging
 import time
 import socket
@@ -113,7 +112,7 @@ class AbstractListener(Thread):
         self.data = None
         self.sender = None
         self.sock_in.close()
-        logger.debug("%s end" % self.name)
+        # logger.debug("%s end" % self.name)
 
     def parse(self):
         raise Exception("Unimplemented function")

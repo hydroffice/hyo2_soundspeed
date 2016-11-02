@@ -170,6 +170,16 @@ def explore_folder(path):
         return False
 
 
+def first_match(dct, val):
+    if not isinstance(dct, dict):
+        raise RuntimeError("invalid first input: it is %s instead of a dict" % type(dct))
+    # print(dct, val)
+    values = [key for key, value in dct.items() if value == val]
+    if len(values) != 0:
+        return values[0]
+    else:
+        raise RuntimeError("unknown value %s in dict: %s" % (val, dct))
+
 # testing stuff
 
 here = os.path.abspath(os.path.dirname(__file__))

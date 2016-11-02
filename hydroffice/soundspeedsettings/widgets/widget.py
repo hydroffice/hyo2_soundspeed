@@ -8,7 +8,7 @@ from PySide import QtCore
 import logging
 logger = logging.getLogger(__name__)
 
-from hydroffice.soundspeed.base.settingsdb import SettingsDb
+from hydroffice.soundspeed.base.setup_db import SetupDb
 
 
 class AbstractWidget(QtGui.QMainWindow):
@@ -16,8 +16,8 @@ class AbstractWidget(QtGui.QMainWindow):
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
 
     def __init__(self, main_win, db):
-        QtGui.QMainWindow.__init__(self)
-        if type(db) != SettingsDb:
+        super(AbstractWidget, self).__init__()
+        if type(db) != SetupDb:
             raise RuntimeError("Passed invalid settings db object: %s" % type(db))
         self.main_win = main_win
         self.db = db

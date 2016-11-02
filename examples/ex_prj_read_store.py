@@ -105,20 +105,20 @@ def main():
     # plt.show()
 
     # retrieve all the id profiles from db
-    lst = prj.db_profiles()
+    lst = prj.db_list_profiles()
     logger.info("Profiles: %s" % len(lst))
     for p in lst:
         logger.info(p)
 
     # retrieve id profiles of a specific project from the db
-    lst = prj.db_profiles(project='test')
+    lst = prj.db_list_profiles(project='test')
     logger.info("Profiles of 'test' project: %s" % len(lst))
     for p in lst:
        logger.info(p)
 
     # retrieve a specific profile and delete it
     ssp_pk = lst[0][0]
-    ssp = prj.db_profile(pk=ssp_pk)
+    ssp = prj.db_retrieve_profile(pk=ssp_pk)
     logger.info("Retrieved profile:\n%s" % ssp)
     ret = prj.delete_db_profile(pk=ssp_pk)
     logger.info("Deleted profile: %s" % ret)

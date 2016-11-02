@@ -37,15 +37,10 @@ class Settings(AbstractWidget):
         edit_icon.addFile(os.path.join(self.media, 'unlock.png'), state=QtGui.QIcon.On)
         self.editable.setIcon(edit_icon)
         self.editable.setCheckable(True)
+        # noinspection PyUnresolvedReferences
         self.editable.clicked.connect(self.on_editable)
         self.editable.setToolTip("Unlock settings editing")
         hbox.addWidget(self.editable)
-        self.reload = QtGui.QPushButton("Reload")
-        self.reload.setFixedHeight(self.editable.height())
-        self.reload.setDisabled(True)
-        self.reload.clicked.connect(self.on_reload)
-        self.reload.setToolTip("Reload settings")
-        hbox.addWidget(self.reload)
         hbox.addStretch()
         self.mainLayout.addLayout(hbox)
 
@@ -53,27 +48,14 @@ class Settings(AbstractWidget):
         logger.debug("editable: %s" % self.editable.isChecked())
         if self.editable.isChecked():
             msg = "Do you really want to change the settings?"
-            ret = QtGui.QMessageBox.warning(self, "Settings", msg, QtGui.QMessageBox.Ok|QtGui.QMessageBox.No)
+            # noinspection PyCallByClass
+            ret = QtGui.QMessageBox.warning(self, "Settings", msg, QtGui.QMessageBox.Ok | QtGui.QMessageBox.No)
             if ret == QtGui.QMessageBox.No:
                 self.editable.setChecked(False)
                 return
-            self.reload.setEnabled(True)
             self.settings_widget.set_editable(True)
         else:
-            self.reload.setDisabled(True)
             self.settings_widget.set_editable(False)
-
-    def on_reload(self):
-        logger.debug("reload settings")
-        try:
-            self.lib.reload_settings_from_db()
-        except RuntimeError as e:
-            msg = "Issue in reloading settings\n%s" % e
-            QtGui.QMessageBox.critical(self, "Settings error", msg, QtGui.QMessageBox.Ok)
-            return
-
-        msg = "New settings have been applied!"
-        QtGui.QMessageBox.information(self, "Settings", msg, QtGui.QMessageBox.Ok)
 
     def server_started(self):
         self.setDisabled(True)

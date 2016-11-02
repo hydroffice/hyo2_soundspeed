@@ -17,8 +17,6 @@ def main():
     # initialize the library
     lib = SoundSpeedLibrary()
 
-
-
     # print(lib)
 
     # # exploring folders
@@ -26,6 +24,13 @@ def main():
     # lib.open_release_folder()
     # lib.open_projects_folder()
     # lib.open_atlases_folder()
+
+    ssp_list = lib.db_list_profiles()
+    print('profiles in db: %d' % len(ssp_list))
+
+    print('setup version: %s' % lib.setup.setup_version)
+    # lib.setup.setup_version = 2
+    # lib.setup.save_to_db()
 
     lib.close()
 

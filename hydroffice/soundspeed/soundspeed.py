@@ -15,7 +15,7 @@ from .base.callbacks import CliCallbacks, AbstractCallbacks
 from .base.gdal_aux import GdalAux
 from .base.helper import explore_folder
 from .base.progress import Progress
-from .base.settings import Settings
+from .base.setup import Setup
 from .db.db import SoundSpeedDb
 from .listener.listeners import Listeners
 from .logging.sqlitelogging import SqliteLogging
@@ -43,7 +43,7 @@ class SoundSpeedLibrary(object):
         self.set_folders(data_folder=data_folder)
 
         # load settings and other functionalities
-        self.setup = Settings(data_folder=self.release_folder)
+        self.setup = Setup(data_folder=self.release_folder)
         self.atlases = Atlases(prj=self)
         self.listeners = Listeners(prj=self)
         self.server = Server(prj=self)
@@ -57,7 +57,7 @@ class SoundSpeedLibrary(object):
 
     def close(self):
         """Destructor"""
-        logger.info("CLOSING LIBRARY ...")
+        logger.info("** > LIB: closing ...")
 
         self.listeners.stop()
 
@@ -65,7 +65,7 @@ class SoundSpeedLibrary(object):
             self.server.stop()
             self.server.join(2)
 
-        logger.info("LIBRARY CLOSED!")
+        logger.info("** > LIB: closed!")
 
     # --- library, release, atlases, and projects folders
 
@@ -519,7 +519,7 @@ class SoundSpeedLibrary(object):
         if not self.has_ssp():
             raise RuntimeError("Data not loaded")
 
-        db = SoundSpeedDb(projects_folder=self.projects_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
         success = db.add_casts(self.ssp)
         db.disconnect()
 
@@ -532,29 +532,29 @@ class SoundSpeedLibrary(object):
 
         return success
 
-    def db_profiles(self, project=None):
+    def db_list_profiles(self, project=None):
         """List the profile on the db"""
-        db = SoundSpeedDb(projects_folder=self.projects_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
         lst = db.list_profiles(project=project)
         db.disconnect()
         return lst
 
-    def db_profile(self, pk):
+    def db_retrieve_profile(self, pk):
         """Retrieve a profile by primary key"""
-        db = SoundSpeedDb(projects_folder=self.projects_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
         ssp = db.profile_by_pk(pk=pk)
         db.disconnect()
         return ssp
 
     def db_timestamp_list(self):
         """Retrieve a list with the timestamp of all the profiles"""
-        db = SoundSpeedDb(projects_folder=self.projects_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
         lst = db.timestamp_list()
         db.disconnect()
         return lst
 
     def load_profile(self, pk):
-        ssp = self.db_profile(pk)
+        ssp = self.db_retrieve_profile(pk)
         if not ssp:
             return False
 
@@ -564,35 +564,35 @@ class SoundSpeedLibrary(object):
 
     def delete_db_profile(self, pk):
         """Retrieve a profile by primary key"""
-        db = SoundSpeedDb(projects_folder=self.projects_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
         ret = db.delete_profile_by_pk(pk=pk)
         db.disconnect()
         return ret
 
     def map_db_profiles(self, project=None):
         """List the profile on the db"""
-        db = SoundSpeedDb(projects_folder=self.projects_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
         ret = db.plot.map_profiles(project=project)
         db.disconnect()
         return ret
 
     def aggregate_plot(self, dates, project=None):
         """Create an aggregate plot"""
-        db = SoundSpeedDb(projects_folder=self.projects_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
         success = db.plot.aggregate_plot(dates=dates, project=project)
         db.disconnect()
         return success
 
     def plot_daily_db_profiles(self, project=None):
         """Plot the profile on the db by day"""
-        db = SoundSpeedDb(projects_folder=self.projects_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
         success = db.plot.daily_plots(project=project)
         db.disconnect()
         return success
 
     def save_daily_db_profiles(self, project=None):
         """Save figure with the profile on the db by day"""
-        db = SoundSpeedDb(projects_folder=self.projects_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
         success = db.plot.daily_plots(save_fig=True, project=project)
         db.disconnect()
         return success
@@ -600,7 +600,7 @@ class SoundSpeedLibrary(object):
     def export_db_profiles_metadata(self, ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile'],
                                     project=None):
         """Export the db profile metadata"""
-        db = SoundSpeedDb(projects_folder=self.projects_folder)
+        db = SoundSpeedDb(projects_folder=self.projects_folder, project_name=self.setup.current_project)
         lst = db.export.export_profiles_metadata(ogr_format=ogr_format, project=project)
         db.disconnect()
         return lst
@@ -868,7 +868,7 @@ class SoundSpeedLibrary(object):
 
     def reload_settings_from_db(self):
         """Reload the current setup from the settings db"""
-        self.setup.load_settings_from_db()
+        self.setup.load_from_db()
 
     # --- atlases
 

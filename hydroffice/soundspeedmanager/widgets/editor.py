@@ -144,7 +144,7 @@ class Editor(AbstractWidget):
         """Load data from database"""
         logger.debug('user wants to load data from db')
 
-        profiles = self.lib.db_profiles()
+        profiles = self.lib.db_list_profiles()
         lst = ["#%03d: %s" % (p[0], p[1]) for p in profiles]
         if len(lst) == 0:
             msg = "Store data before import!"

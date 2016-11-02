@@ -7,14 +7,14 @@ import sqlite3
 logger = logging.getLogger(__name__)
 
 from .basedb import BaseDb
-from .settingssql import CREATE_SETTINGS, CREATE_SETTINGS_VIEW, CREATE_CLIENT_LIST
+from .setup_sql import CREATE_SETTINGS, CREATE_SETTINGS_VIEW, CREATE_CLIENT_LIST
 
 
-class SettingsDb(BaseDb):
+class SetupDb(BaseDb):
 
-    def __init__(self, data_folder, db_file="settings.db"):
+    def __init__(self, data_folder, db_file="setup.db"):
         db_path = os.path.join(data_folder, db_file)
-        super(SettingsDb, self).__init__(db_path=db_path)
+        super(SetupDb, self).__init__(db_path=db_path)
         self.reconnect_or_create()
         self._check_default_setup()
 
@@ -48,7 +48,8 @@ class SettingsDb(BaseDb):
         if not self.setup_exists(default_setup):
             self.add_setup(setup_name=default_setup)
             self.activate_setup(setup_name=default_setup)
-   
+
+    # noinspection SqlResolve
     def setup_exists(self, setup_name):
         """Check if the passed profile exists"""
         try:
@@ -61,7 +62,8 @@ class SettingsDb(BaseDb):
                 return True
         except sqlite3.Error as e:
             raise RuntimeError("%s: %s" % (type(e), e))
-   
+
+    # noinspection SqlResolve
     def add_setup(self, setup_name):
         """ Add setting with passed name and default values."""
         with self.conn:
@@ -76,7 +78,7 @@ class SettingsDb(BaseDb):
                 # logger.info("%s settings id: %s" % (setup_name, ret[0]))
    
                 # add default client list
-                self.conn.execute(""" INSERT INTO client_list (profile_id) VALUES(?) """, (ret[0], ))
+                self.conn.execute(""" INSERT INTO client_list (setup_id) VALUES(?) """, (ret[0], ))
                 # logger.info("inserted %s settings values" % setup_name)
 
                 return True
@@ -84,13 +86,15 @@ class SettingsDb(BaseDb):
             except sqlite3.Error as e:
                 logger.error("%s: %s" % (type(e), e))
                 return False
-   
+
+    # noinspection SqlResolve
     def delete_setup(self, setup_name):
         """ Delete a profile (if not active)."""
         with self.conn:
             try:
                 # check if active
-                ret = self.conn.execute(""" SELECT setup_status FROM general WHERE setup_name=? """, (setup_name,)).fetchone()
+                ret = self.conn.execute(""" SELECT setup_status FROM general WHERE setup_name=? """,
+                                        (setup_name,)).fetchone()
                 # logger.info("%s settings status: %s" % (setup_name, ret))
                 if ret == "active":
                     raise RuntimeError("Attempt to delete active profile (%s)" % setup_name)
@@ -102,7 +106,8 @@ class SettingsDb(BaseDb):
             except sqlite3.Error as e:
                 logger.error("%s: %s" % (type(e), e))
                 return False
-   
+
+    # noinspection SqlResolve
     def activate_setup(self, setup_name):
         """Activate a profile, if it exists"""
         if not self.setup_exists(setup_name):
@@ -119,6 +124,7 @@ class SettingsDb(BaseDb):
                 logger.error("%s: %s" % (type(e), e))
                 return False
 
+    # noinspection SqlResolve
     @property
     def active_setup_id(self):
         """ Retrieve the active settings id """
@@ -127,13 +133,15 @@ class SettingsDb(BaseDb):
 
     # --- clients list
 
+    # noinspection SqlResolve
     @property
     def client_list(self):
-        ret = self.conn.execute(""" SELECT id, name, ip, port, protocol FROM client_list WHERE profile_id=? """,
+        ret = self.conn.execute(""" SELECT id, name, ip, port, protocol FROM client_list WHERE setup_id=? """,
                                 (self.active_setup_id,)).fetchall()
         # logger.info("SSP clients: %s" % len(ret))
         return ret
 
+    # noinspection SqlResolve
     def client_exists(self, client_name):
         """Check if the passed profile exists"""
         try:
@@ -147,11 +155,12 @@ class SettingsDb(BaseDb):
         except sqlite3.Error as e:
             raise RuntimeError("%s: %s" % (type(e), e))
 
+    # noinspection SqlResolve
     def add_client(self, client_name, client_ip="127.0.0.1", client_port=4001, client_protocol="SIS"):
         """Add client with passed name and default values."""
         with self.conn:
             try:
-                self.conn.execute(""" INSERT INTO client_list (profile_id, name, ip, port, protocol)
+                self.conn.execute(""" INSERT INTO client_list (setup_id, name, ip, port, protocol)
                                                   VALUES(?, ?, ?, ?, ?) """,
                                   (self.active_setup_id, client_name, client_ip, client_port, client_protocol))
                 # logger.info("inserted %s client values" % client_name, client_ip, client_port, client_protocol)
@@ -160,6 +169,7 @@ class SettingsDb(BaseDb):
                 logger.error("%s: %s" % (type(e), e))
                 return False
 
+    # noinspection SqlResolve
     def delete_client(self, client_name):
         """Delete a client."""
         with self.conn:
@@ -171,11 +181,24 @@ class SettingsDb(BaseDb):
                 logger.error("%s: %s" % (type(e), e))
                 return False
 
+    # noinspection SqlResolve
+    def delete_clients(self):
+        """Delete all clients."""
+        with self.conn:
+            try:
+                self.conn.execute(""" DELETE FROM client_list""")
+                # logger.info("deleted clients")
+
+            except sqlite3.Error as e:
+                logger.error("%s: %s" % (type(e), e))
+                return False
+
     # --- setup list
 
+    # noinspection SqlResolve
     @property
     def setup_list(self):
-        ret = self.conn.execute(""" SELECT id, setup_name, setup_status, library_version FROM general """).fetchall()
+        ret = self.conn.execute(""" SELECT id, setup_name, setup_status, setup_version FROM general """).fetchall()
         # logger.info("Profiles list: %s" % len(ret))
         return ret
 
@@ -192,7 +215,7 @@ class SettingsDb(BaseDb):
                 self.conn.execute(""" UPDATE general SET """ + attrib + """=? WHERE id=? """,
                                   (value, self.active_setup_id,))
             except sqlite3.Error as e:
-                logger.error("%s: %s" % (type(e), e))
+                logger.error("while setting %s, %s: %s" % (attrib, type(e), e))
         # logger.info("%s = %d" % (attrib, value))
 
     def _getter_str(self, attrib):
@@ -207,7 +230,7 @@ class SettingsDb(BaseDb):
                 self.conn.execute(""" UPDATE general SET """ + attrib + """=? WHERE id=? """,
                                   (value, self.active_setup_id,))
             except sqlite3.Error as e:
-                logger.error("%s: %s" % (type(e), e))
+                logger.error("while setting %s, %s: %s" % (attrib, type(e), e))
         # logger.info("%s = %s" % (attrib, value))
 
     def _getter_bool(self, attrib):
@@ -217,18 +240,32 @@ class SettingsDb(BaseDb):
         return r[0] == "True"
 
     def _setter_bool(self, attrib, value):
+
+        if type(value) is not bool:
+            logger.error("passed a %s in place of a boolean" % type(value))
+            return
+
         with self.conn:
+            if value:
+                value = "True"
+            else:
+                value = "False"
+
             try:
                 self.conn.execute(""" UPDATE general SET """ + attrib + """=? WHERE id=? """,
                                   (value, self.active_setup_id,))
             except sqlite3.Error as e:
-                logger.error("%s: %s" % (type(e), e))
-        logger.info("%s = %s" % (attrib, value))
+                logger.error("while setting %s, %s: %s" % (attrib, type(e), e))
+        # logger.info("%s = %s" % (attrib, value))
 
     # --- active library version
     @property
-    def library_version(self):
-        return self._getter_str("library_version")
+    def setup_version(self):
+        return self._getter_int("setup_version")
+
+    @setup_version.setter
+    def setup_version(self, value):
+        self._setter_int("setup_version", value)
 
     # --- active setup name
     @property
@@ -238,6 +275,11 @@ class SettingsDb(BaseDb):
     @setup_name.setter
     def setup_name(self, value):
         self._setter_str("setup_name", value)
+
+    # --- active setup status
+    @property
+    def setup_status(self):
+        return self._getter_str("setup_status")
 
     # --- use_woa09
     @property
@@ -345,7 +387,7 @@ class SettingsDb(BaseDb):
 
     @append_caris_file.setter
     def append_caris_file(self, value):
-        self._setter_str("append_caris_file", value)
+        self._setter_bool("append_caris_file", value)
 
     # --- log_user
     @property
@@ -534,4 +576,13 @@ class SettingsDb(BaseDb):
 
     @server_apply_surface_sound_speed.setter
     def server_apply_surface_sound_speed(self, value):
-        self._setter_str("server_apply_surface_sound_speed", value)
+        self._setter_bool("server_apply_surface_sound_speed", value)
+
+    # --- current_project
+    @property
+    def current_project(self):
+        return self._getter_str("current_project")
+
+    @current_project.setter
+    def current_project(self, value):
+        self._setter_str("current_project", value)

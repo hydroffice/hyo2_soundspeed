@@ -16,12 +16,16 @@ from ..profile.profilelist import ProfileList
 class SoundSpeedDb(object):
     """Class that provides an interface to a SQLite db with Sound Speed data"""
 
-    def __init__(self, projects_folder=None, project_name="default"):
+    def __init__(self, projects_folder=None, project_name=None):
 
         # in case that no data folder is passed
         if projects_folder is None:
             projects_folder = os.path.abspath(os.path.curdir)
         self.data_folder = projects_folder
+
+        # in case that none is passed as project name
+        if project_name is None:
+            project_name = "default"
 
         # the passed project name (lower case) is used to identify the project database to open
         self.db_path = os.path.join(projects_folder, self.clean_name(project_name.lower()) + ".db")

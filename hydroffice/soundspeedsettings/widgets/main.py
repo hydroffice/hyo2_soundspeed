@@ -18,7 +18,7 @@ class Main(AbstractWidget):
     def __init__(self, main_win, db):
         AbstractWidget.__init__(self, main_win=main_win, db=db)
 
-        lbl_width = 100
+        lbl_width = 120
 
         # outline ui
         self.main_layout = QtGui.QVBoxLayout()
@@ -28,26 +28,29 @@ class Main(AbstractWidget):
         hbox = QtGui.QHBoxLayout()
         self.main_layout.addLayout(hbox)
         hbox.addStretch()
-        self.label = QtGui.QLabel()
-        hbox.addWidget(self.label)
+        self.active_label = QtGui.QLabel()
+        hbox.addWidget(self.active_label)
         hbox.addStretch()
 
         # - list of setups
         hbox = QtGui.QHBoxLayout()
         self.main_layout.addLayout(hbox)
+
         # -- label
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
-        label = QtGui.QLabel("Available settings:")
+        label = QtGui.QLabel("Available setups:")
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
+
         # -- list
         self.setup_list = QtGui.QTableWidget()
         self.setup_list.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.setup_list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         hbox.addWidget(self.setup_list)
+
         # -- button box
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -56,19 +59,23 @@ class Main(AbstractWidget):
         vbox.addStretch()
         # --- new setup
         self.btn_new_setup = QtGui.QPushButton("New setup")
+        # noinspection PyUnresolvedReferences
         self.btn_new_setup.clicked.connect(self.new_setup)
         self.btn_box.addButton(self.btn_new_setup, QtGui.QDialogButtonBox.ActionRole)
         # --- delete setup
         self.btn_delete_setup = QtGui.QPushButton("Delete setup")
+        # noinspection PyUnresolvedReferences
         self.btn_delete_setup.clicked.connect(self.delete_setup)
         self.btn_box.addButton(self.btn_delete_setup, QtGui.QDialogButtonBox.ActionRole)
         # --- activate setup
         self.btn_activate_setup = QtGui.QPushButton("Activate setup")
+        # noinspection PyUnresolvedReferences
         self.btn_activate_setup.clicked.connect(self.activate_setup)
         self.btn_box.addButton(self.btn_activate_setup, QtGui.QDialogButtonBox.ActionRole)
         # --- refresh
         self.btn_refresh_list = QtGui.QPushButton("Refresh")
-        self.btn_refresh_list.clicked.connect(self.refresh)
+        # noinspection PyUnresolvedReferences
+        self.btn_refresh_list.clicked.connect(self.setup_changed)
         self.btn_box.addButton(self.btn_refresh_list, QtGui.QDialogButtonBox.ActionRole)
 
         self.main_layout.addStretch()
@@ -76,18 +83,20 @@ class Main(AbstractWidget):
     def new_setup(self):
         logger.debug("new setup")
         while True:
+            # noinspection PyCallByClass
             name, ok = QtGui.QInputDialog.getText(self, "New setup", "Input a name for the new setup")
             if not ok:
                 return
 
             if self.db.setup_exists(name):
+                # noinspection PyCallByClass
                 QtGui.QMessageBox.information(self, "Invalid setup name",
                                               "The input setup name already exists.\n"
                                               "You entered: %s" % name)
                 continue
 
             self.db.add_setup(name)
-            self.refresh()
+            self.setup_changed()
             break
 
     def delete_setup(self):
@@ -97,6 +106,7 @@ class Main(AbstractWidget):
         # check if any selection
         sel = self.setup_list.selectedItems()
         if len(sel) == 0:
+            # noinspection PyCallByClass
             QtGui.QMessageBox.information(self, "Setup deletion",
                                           "You need to first select the setup to delete!")
             return
@@ -105,13 +115,15 @@ class Main(AbstractWidget):
         setup_id = int(sel[0].text())
         setup_name = sel[1].text()
         if setup_id == self.db.active_setup_id:
+            # noinspection PyCallByClass
             QtGui.QMessageBox.information(self, "Setup deletion",
                                           "The setup \'%s\' is active!\n"
                                           "You need to first activate another setup." % setup_name)
             return
 
         self.db.delete_setup(setup_name)
-        self.refresh()
+        self.setup_changed()
+        self.main_win.setup_changed()
 
     def activate_setup(self):
         logger.debug("activate setup")
@@ -119,6 +131,7 @@ class Main(AbstractWidget):
         # check if any selection
         sel = self.setup_list.selectedItems()
         if len(sel) == 0:
+            # noinspection PyCallByClass
             QtGui.QMessageBox.information(self, "Setup activation",
                                           "You need to first select the setup to activate!")
             return
@@ -127,15 +140,12 @@ class Main(AbstractWidget):
         setup_id = int(sel[0].text())
         setup_name = sel[1].text()
         if setup_id == self.db.active_setup_id:
+            # noinspection PyCallByClass
             QtGui.QMessageBox.information(self, "Setup activation",
                                           "The setup \'%s\' is already active!" % setup_name)
             return
 
         self.db.activate_setup(setup_name)
-
-        self.main_win.setup_changed()
-
-    def refresh(self):
         self.main_win.setup_changed()
 
     def setup_changed(self):
@@ -143,18 +153,19 @@ class Main(AbstractWidget):
         logger.debug("refresh main")
 
         # set the top label
-        self.label.setText("<b>Current setup: %s [#%02d]</b>" % (self.db.setup_name, self.db.active_setup_id))
+        self.active_label.setText("<b>Current setup: %s [#%02d]</b>" % (self.db.setup_name, self.db.active_setup_id))
 
         # prepare the table
         self.setup_list.clear()
         self.setup_list.setColumnCount(4)
-        self.setup_list.setHorizontalHeaderLabels(['id', 'setup name', 'current status', 'version'])
+        self.setup_list.setHorizontalHeaderLabels(['id', 'name', 'status', 'setup version'])
 
         # populate the table
         setups = self.db.setup_list
         if len(setups) == 0:
             self.setup_list.resizeColumnsToContents()
             return
+
         self.setup_list.setRowCount(len(setups))
         for i, setup in enumerate(setups):
             for j, field in enumerate(setup):

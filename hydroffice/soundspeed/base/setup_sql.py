@@ -1,14 +1,14 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .. import __version__ as lib_version
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-CREATE_SETTINGS = """ CREATE TABLE IF NOT EXISTS general(
+CREATE_SETTINGS = """-- noinspection SqlResolveForFile
+ CREATE TABLE IF NOT EXISTS general(
      id integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
-     library_version text NOT NULL DEFAULT "%s",
+     setup_version integer NOT NULL DEFAULT 1,
      setup_name text NOT NULL UNIQUE DEFAULT "default",
      setup_status text NOT NULL DEFAULT "inactive",
      /* input */
@@ -51,6 +51,9 @@ CREATE_SETTINGS = """ CREATE TABLE IF NOT EXISTS general(
      server_source text NOT NULL DEFAULT "WOA09",
      server_apply_surface_sound_speed text NOT NULL DEFAULT "True",
 
+     /* current settings */
+     current_project text NOT NULL DEFAULT "default",
+
      /* Checks */
      CHECK (setup_status IN ("active", "inactive")),
      /* input */
@@ -87,23 +90,25 @@ CREATE_SETTINGS = """ CREATE TABLE IF NOT EXISTS general(
      /* server */
      CHECK (server_source IN ("RTOFS", "WOA09", "WOA13")),
      CHECK (server_apply_surface_sound_speed IN ("True", "False"))
-     ) """ % lib_version
+     ) """
 
-CREATE_CLIENT_LIST = """ CREATE TABLE IF NOT EXISTS client_list(
+CREATE_CLIENT_LIST = """-- noinspection SqlResolveForFile
+ CREATE TABLE IF NOT EXISTS client_list(
      id integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
-     profile_id INTEGER NOT NULL,
+     setup_id INTEGER NOT NULL,
      name text NOT NULL DEFAULT "Local test",
      ip text NOT NULL DEFAULT "127.0.0.1",
      port integer NOT NULL DEFAULT 4001,
      protocol text NOT NULL DEFAULT "SIS",
-     CONSTRAINT profile_id_fk
-     FOREIGN KEY(profile_id) REFERENCES general(id)
+     CONSTRAINT setup_id_fk
+     FOREIGN KEY(setup_id) REFERENCES general(id)
      ON DELETE CASCADE,
      /* Checks */
      CHECK (port > 0),
      CHECK (protocol IN ("SIS", "HYPACK", "PDS2000", "QINSY"))
      ) """
 
-CREATE_SETTINGS_VIEW = """ CREATE VIEW IF NOT EXISTS settings_view AS
+CREATE_SETTINGS_VIEW = """-- noinspection SqlResolveForFile
+ CREATE VIEW IF NOT EXISTS settings_view AS
     SELECT * FROM general g
-    LEFT OUTER JOIN client_list c ON g.id=c.profile_id """
+    LEFT OUTER JOIN client_list c ON g.id=c.setup_id """
