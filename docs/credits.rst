@@ -16,7 +16,7 @@ HydrOffice Sound Speed is developed and maintained by:
 
 - `Brian R. Calder <mailto:brc@ccom.unh.edu>`_
 
-- `Chen Zang <mailto:chen.zang@noaa.gov>`_
+- `Chen Zhang <mailto:chen.zhang@noaa.gov>`_
 
 - `Matthew J. Wilson <mailto:matthew.wilson@noaa.gov>`_
 
