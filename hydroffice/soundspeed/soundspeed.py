@@ -537,7 +537,12 @@ class SoundSpeedLibrary(object):
 
     def list_projects(self):
         """Return a list with all the available projects"""
-        pass
+        prj_list = list()
+        for root, dirs, files in os.walk(self.projects_folder):
+            for f in files:
+                if f.endswith('.db'):
+                    prj_list.append(os.path.splitext(os.path.basename(f))[0])
+        return prj_list
 
     def store_data(self):
         """Store the current profile in the project db"""
