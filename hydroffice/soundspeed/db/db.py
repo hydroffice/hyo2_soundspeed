@@ -119,15 +119,8 @@ class ProjectDb(object):
 
                 self.conn.execute("""
                                   CREATE TABLE IF NOT EXISTS library(
-                                     version text PRIMARY KEY NOT NULL,
+                                     version int PRIMARY KEY NOT NULL DEFAULT 1,
                                      creation timestamp NOT NULL)
-                                  """)
-                self._add_version_if_missing()
-
-                self.conn.execute("""
-                                  CREATE TABLE IF NOT EXISTS project(
-                                     project_name text PRIMARY KEY NOT NULL,
-                                     project_creation timestamp NOT NULL)
                                   """)
 
                 self.conn.execute("""
@@ -141,7 +134,6 @@ class ProjectDb(object):
                 self.conn.execute("""
                                   CREATE TABLE IF NOT EXISTS ssp(
                                      pk integer NOT NULL,
-                                     project text NOT NULL,
                                      sensor_type integer NOT NULL,
                                      probe_type integer NOT NULL,
                                      original_path text,
@@ -151,7 +143,6 @@ class ProjectDb(object):
                                      proc_time timestamp,
                                      proc_info text,
                                      PRIMARY KEY (pk),
-                                     FOREIGN KEY(project) REFERENCES project(project_name),
                                      FOREIGN KEY(pk) REFERENCES ssp_pk(id))
                                   """)
 
@@ -203,7 +194,6 @@ class ProjectDb(object):
                                      SELECT pk, cast_datetime, cast_position,
                                         sensor_type, probe_type,
                                         original_path,
-                                        project,
                                         survey,
                                         vessel,
                                         sn,
@@ -231,10 +221,6 @@ class ProjectDb(object):
 
                 # logger.info("got a new SSP to store:\n%s" % self.tmp_data)
 
-                if not self._add_project_if_missing():
-                    logger.error("unable to add project: %s" % self.tmp_data.meta.project)
-                    return False
-
                 if not self._get_ssp_pk():
                     logger.error("unable to get ssp pk: %s" % self.tmp_ssp_pk)
                     return False
@@ -259,56 +245,6 @@ class ProjectDb(object):
                     if not self._add_sis():
                         logger.error("unable to add ssp sis data samples")
                         return False
-
-        return True
-
-    def _add_version_if_missing(self):
-        """add library version if not present"""
-        from .. import __version__ as ssp_version
-        version = ssp_version
-
-        try:
-            # noinspection SqlResolve
-            ret = self.conn.execute("""
-                                    SELECT COUNT(version) FROM library WHERE version=?
-                                    """, (version, )).fetchone()
-            # logger.info("found %s versions named %s" % (ret[0], version))
-
-            if ret[0] == 0:
-                new_row = (version, dt.now())
-                # logger.info("inserting: %s" % ", ".join(map(str, new_row)))
-
-                # noinspection SqlResolve
-                self.conn.execute("INSERT INTO library VALUES (?, ?)", new_row)
-
-        except sqlite3.Error as e:
-            logger.error("%s: %s" % (type(e), e))
-            return False
-
-        return True
-
-    def _add_project_if_missing(self):
-        """add a project row only if the project is not present"""
-
-        project = self.tmp_data.meta.project
-
-        try:
-            # noinspection SqlResolve
-            ret = self.conn.execute("""
-                                    SELECT COUNT(project_name) FROM project WHERE project_name=?
-                                    """, (project, )).fetchone()
-            # logger.info("found %s projects named %s" % (ret[0], project))
-
-            if ret[0] == 0:
-                new_row = (project, dt.now())
-                logger.info("inserting: %s" % ", ".join(map(str, new_row)))
-
-                # noinspection SqlResolve
-                self.conn.execute("INSERT INTO project VALUES (?, ?)", new_row)
-
-        except sqlite3.Error as e:
-            logger.error("%s: %s" % (type(e), e))
-            return False
 
         return True
 
@@ -409,9 +345,8 @@ class ProjectDb(object):
         try:
             # noinspection SqlResolve
             self.conn.execute("""
-                              INSERT INTO ssp VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                              INSERT INTO ssp VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                               """, (self.tmp_ssp_pk,
-                                    self.tmp_data.meta.project,
                                     self.tmp_data.meta.sensor_type,
                                     self.tmp_data.meta.probe_type,
                                     self.tmp_data.meta.original_path,
@@ -564,15 +499,14 @@ class ProjectDb(object):
                     ssp_list.append((row[b'pk'],  # 0
                                      row[b'cast_datetime'],  # 1
                                      row[b'cast_position'],  # 2
-                                     row[b'project'],  # 3
-                                     row[b'sensor_type'],  # 4
-                                     row[b'probe_type'],  # 5
-                                     row[b'original_path'],  # 6
-                                     row[b'survey'],  # 7
-                                     row[b'vessel'],  # 8
-                                     row[b'sn'],  # 9
-                                     row[b'proc_time'],  # 10
-                                     row[b'proc_info'],  # 11
+                                     row[b'sensor_type'],  # 3
+                                     row[b'probe_type'],  # 4
+                                     row[b'original_path'],  # 5
+                                     row[b'survey'],  # 6
+                                     row[b'vessel'],  # 7
+                                     row[b'sn'],  # 8
+                                     row[b'proc_time'],  # 9
+                                     row[b'proc_info'],  # 10
                                      ))
             return ssp_list
 
@@ -607,7 +541,6 @@ class ProjectDb(object):
                 # ssp metadata
                 # noinspection SqlResolve
                 ssp_meta = self.conn.execute("SELECT * FROM ssp WHERE pk=?", (pk, )).fetchone()
-                ssp.cur.meta.project = ssp_meta[b'project']
                 ssp.cur.meta.sensor_type = ssp_meta[b'sensor_type']
                 ssp.cur.meta.probe_type = ssp_meta[b'probe_type']
                 ssp.cur.meta.original_path = ssp_meta[b'original_path']

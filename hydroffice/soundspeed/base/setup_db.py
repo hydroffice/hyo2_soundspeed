@@ -586,3 +586,30 @@ class SetupDb(BaseDb):
     @current_project.setter
     def current_project(self, value):
         self._setter_str("current_project", value)
+
+    # --- default_survey
+    @property
+    def default_survey(self):
+        return self._getter_str("default_survey")
+
+    @default_survey.setter
+    def default_survey(self, value):
+        self._setter_str("default_survey", value)
+
+    # --- default_vessel
+    @property
+    def default_vessel(self):
+        return self._getter_str("default_vessel")
+
+    @default_vessel.setter
+    def default_vessel(self, value):
+        self._setter_str("default_vessel", value)
+
+    # --- default_sn
+    @property
+    def default_sn(self):
+        return self._getter_str("default_sn")
+
+    @default_sn.setter
+    def default_sn(self, value):
+        self._setter_str("default_sn", value)

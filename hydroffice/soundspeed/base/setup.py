@@ -66,6 +66,9 @@ class Setup(object):
 
         # current settings
         self.current_project = None
+        self.default_survey = None
+        self.default_vessel = None
+        self.default_sn = None
 
         # loading settings
         self.data_folder = data_folder
@@ -140,6 +143,9 @@ class Setup(object):
 
             # current settings
             self.current_project = db.current_project
+            self.default_survey = db.default_survey
+            self.default_vessel = db.default_vessel
+            self.default_sn = db.default_sn
 
             db.close()
 
@@ -213,6 +219,9 @@ class Setup(object):
 
             # current settings
             db.current_project = self.current_project
+            db.default_survey = self.default_survey
+            db.default_vessel = self.default_vessel
+            db.default_sn = self.default_sn
 
             db.close()
 
@@ -260,5 +269,10 @@ class Setup(object):
         msg += "      <server_append_caris_file: %s>\n" % self.server_append_caris_file
         msg += "      <server_apply_surface_sound_speed: %s>\n" % self.server_apply_surface_sound_speed
         msg += "      <server_auto_export_on_send: %s>\n" % self.server_auto_export_on_send
+        msg += "    <current settings>\n"
+        msg += "      <current_project: %s>\n" % self.current_project
+        msg += "      <default_survey: %s>\n" % self.default_survey
+        msg += "      <default_vessel: %s>\n" % self.default_vessel
+        msg += "      <default_sn: %s>\n" % self.default_sn
 
         return msg

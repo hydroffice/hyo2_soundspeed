@@ -40,6 +40,7 @@ class Database(AbstractWidget):
         self.ssp_list.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.ssp_list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.ssp_list.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        # noinspection PyUnresolvedReferences
         self.ssp_list.customContextMenuRequested.connect(self.make_context_menu)
         hbox.addWidget(self.ssp_list)
 
@@ -48,36 +49,43 @@ class Database(AbstractWidget):
         self.main_layout.addWidget(self.btn_box)
         # --- profile map
         self.btn_profile_map = QtGui.QPushButton("Profile map")
+        # noinspection PyUnresolvedReferences
         self.btn_profile_map.clicked.connect(self.profile_map)
         self.btn_profile_map.setToolTip("Create a map with all the profiles")
         self.btn_box.addButton(self.btn_profile_map, QtGui.QDialogButtonBox.ActionRole)
         # --- aggregate plot
         self.btn_aggregate_plot = QtGui.QPushButton("Aggregate plot")
+        # noinspection PyUnresolvedReferences
         self.btn_aggregate_plot.clicked.connect(self.aggregate_plot)
         self.btn_aggregate_plot.setToolTip("Create a plot aggregating multiple profiles")
         self.btn_box.addButton(self.btn_aggregate_plot, QtGui.QDialogButtonBox.ActionRole)
         # --- create daily plots
         self.btn_plot_daily = QtGui.QPushButton("Plot daily")
+        # noinspection PyUnresolvedReferences
         self.btn_plot_daily.clicked.connect(self.plot_daily_profiles)
         self.btn_plot_daily.setToolTip("Plot daily profiles")
         self.btn_box.addButton(self.btn_plot_daily, QtGui.QDialogButtonBox.ActionRole)
         # --- save daily plots
         self.btn_save_daily = QtGui.QPushButton("Save daily")
+        # noinspection PyUnresolvedReferences
         self.btn_save_daily.clicked.connect(self.save_daily_profiles)
         self.btn_save_daily.setToolTip("Save daily profiles")
         self.btn_box.addButton(self.btn_save_daily, QtGui.QDialogButtonBox.ActionRole)
         # --- export as shp
         self.btn_export_shp = QtGui.QPushButton("Export as .shp")
+        # noinspection PyUnresolvedReferences
         self.btn_export_shp.clicked.connect(self.export_as_shp)
         self.btn_export_shp.setToolTip("Export profiles as shapefile")
         self.btn_box.addButton(self.btn_export_shp, QtGui.QDialogButtonBox.ActionRole)
         # --- export as kml
         self.btn_export_kml = QtGui.QPushButton("Export as .kml")
+        # noinspection PyUnresolvedReferences
         self.btn_export_kml.clicked.connect(self.export_as_kml)
         self.btn_export_kml.setToolTip("Export profiles as kml")
         self.btn_box.addButton(self.btn_export_kml, QtGui.QDialogButtonBox.ActionRole)
         # --- export as csv
         self.btn_export_csv = QtGui.QPushButton("Export as .csv")
+        # noinspection PyUnresolvedReferences
         self.btn_export_csv.clicked.connect(self.export_as_csv)
         self.btn_export_csv.setToolTip("Export profiles as comma-separated values")
         self.btn_box.addButton(self.btn_export_csv, QtGui.QDialogButtonBox.ActionRole)
@@ -100,13 +108,15 @@ class Database(AbstractWidget):
         # check if any selection
         sel = self.ssp_list.selectedItems()
         if len(sel) == 0:
+            # noinspection PyCallByClass
             QtGui.QMessageBox.information(self, "Database", "You need to first select a profile to delete it!")
             return
 
         # ask if the user want to delete it
         pk = int(sel[0].text())
         msg = "Do you really want to delete profile #%02d?" % pk
-        ret = QtGui.QMessageBox.warning(self, "Database", msg, QtGui.QMessageBox.Ok|QtGui.QMessageBox.No)
+        # noinspection PyCallByClass
+        ret = QtGui.QMessageBox.warning(self, "Database", msg, QtGui.QMessageBox.Ok | QtGui.QMessageBox.No)
         if ret == QtGui.QMessageBox.No:
             return
 
@@ -114,12 +124,14 @@ class Database(AbstractWidget):
         if success:
             self.main_win.data_removed()
         else:
+            # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Database", "Unable to remove the selected profile!")
 
     def profile_map(self):
         logger.debug("user want to map the profiles")
         success = self.lib.map_db_profiles()
         if not success:
+            # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Database", "Unable to create a profile map!")
 
     def aggregate_plot(self):
@@ -129,6 +141,7 @@ class Database(AbstractWidget):
         # print(ssp_times[0][0], ssp_times[-1][0])
 
         if len(ssp_times) == 0:
+            # noinspection PyCallByClass
             QtGui.QMessageBox.information(self, "Database",
                                           "Missing SSPs in the database. Import and store them first!")
 
@@ -151,8 +164,10 @@ class Database(AbstractWidget):
                 self.cal_end_date.setSelectedDate(date_end)
 
                 self.ok = QtGui.QPushButton("OK")
+                # noinspection PyUnresolvedReferences
                 self.ok.clicked.connect(self.on_click_ok)
                 self.cancel = QtGui.QPushButton("Cancel")
+                # noinspection PyUnresolvedReferences
                 self.cancel.clicked.connect(self.on_click_cancel)
 
                 vbox = QtGui.QVBoxLayout()
@@ -185,24 +200,28 @@ class Database(AbstractWidget):
 
         # check the user selection
         if dates[0] > dates[1]:
+            # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, 'The start date (%s) comes after the end data (%s)' % (dates[0], dates[1]),
                                        'Invalid selection')
             return
 
         success = self.lib.aggregate_plot(dates=dates)
         if not success:
+            # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Database", "Unable to create an aggregate plot!")
 
     def plot_daily_profiles(self):
         logger.debug("user want to plot daily profiles")
         success = self.lib.plot_daily_db_profiles()
         if not success:
+            # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Database", "Unable to create daily plots!")
 
     def save_daily_profiles(self):
         logger.debug("user want to save daily profiles")
         success = self.lib.save_daily_db_profiles()
         if not success:
+            # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Database", "Unable to save daily plots!")
         else:
             self.lib.open_outputs_folder()
@@ -211,6 +230,7 @@ class Database(AbstractWidget):
         logger.debug("user want to export profiles as shp")
         success = self.lib.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile'])
         if not success:
+            # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Database", "Unable to export as shp!")
         else:
             self.lib.open_outputs_folder()
@@ -219,6 +239,7 @@ class Database(AbstractWidget):
         logger.debug("user want to export profiles as kml")
         success = self.lib.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'KML'])
         if not success:
+            # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Database", "Unable to export as kml!")
         else:
             self.lib.open_outputs_folder()
@@ -227,6 +248,7 @@ class Database(AbstractWidget):
         logger.debug("user want to export profiles as csv")
         success = self.lib.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'CSV'])
         if not success:
+            # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Database", "Unable to export as csv!")
         else:
             self.lib.open_outputs_folder()
@@ -236,8 +258,8 @@ class Database(AbstractWidget):
 
         # prepare the table
         self.ssp_list.clear()
-        self.ssp_list.setColumnCount(12)
-        self.ssp_list.setHorizontalHeaderLabels(['id', 'time', 'location', 'project',
+        self.ssp_list.setColumnCount(11)
+        self.ssp_list.setHorizontalHeaderLabels(['id', 'time', 'location',
                                                  'sensor', 'probe', 'original path',
                                                  'survey', 'vessel', 'sn',
                                                  'processing time', 'processing info'])

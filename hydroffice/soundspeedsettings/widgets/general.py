@@ -10,6 +10,37 @@ logger = logging.getLogger(__name__)
 
 from .widget import AbstractWidget
 
+vessel_list = [
+    "RA Rainier (ship)",
+    "R3 Rainier - Launch 2803",
+    "R4 Rainier - Launch 2801",
+    "R5 Rainier - Launch 2802",
+    "R6 Rainier - Launch 2804",
+    "TJ Thomas Jefferson (ship)",
+    "T1 Thomas Jefferson - Launch 3101",
+    "T2 Thomas Jefferson - Launch 3102",
+    "BH Bay Hydro II",
+    "N1 NRT-1  Gulf",
+    "N2 NRT-2  Atlantic",
+    "N3 NRT-3  Pacific",
+    "N4 NRT-4  Great Lakes",
+    "N5 NRT-5  New York",
+    "N6 NRT-6  San Francisco",
+    "N7 NRT-7  Middle Atlantic",
+    "FH Ferdinand R. Hassler (Ship)",
+    "FA Fairweather (Ship)",
+    "F5 Fairweather - Launch 2805",
+    "F6 Fairweather - Launch 2806",
+    "F7 Fairweather - Launch 2807",
+    "F8 Fairwaether - Launch 2808",
+    "AR MCArthur",
+    "NF Nancy Foster",
+    "HI Hi'Ialakai",
+    "GM Gloria Michelle",
+    "EX Okeanos Explorer",
+    "ZZ Other"
+]
+
 
 class General(AbstractWidget):
 
@@ -47,40 +78,118 @@ class General(AbstractWidget):
         self.right_frame.setLayout(self.right_layout)
         hbox.addWidget(self.right_frame, stretch=1)
 
+        # LEFT
+
+        # - Project
+        hbox = QtGui.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        hbox.addStretch()
+        self.label = QtGui.QLabel("Project")
+        hbox.addWidget(self.label)
+        hbox.addStretch()
+
         # - current project
         hbox = QtGui.QHBoxLayout()
         self.left_layout.addLayout(hbox)
         # -- label
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
         label = QtGui.QLabel("Current project:")
         label.setFixedWidth(lbl_width)
-        vbox.addWidget(label)
-        vbox.addStretch()
+        hbox.addWidget(label)
         # -- value
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
         self.current_project = QtGui.QLineEdit()
         rex = QtCore.QRegExp('[a-zA-Z0-9_.-]+')
         validator = QtGui.QRegExpValidator(rex)
         self.current_project.setValidator(validator)
         self.current_project.setReadOnly(True)
-        vbox.addWidget(self.current_project)
-        vbox.addStretch()
+        hbox.addWidget(self.current_project)
 
         self.left_layout.addStretch()
+
+        # RIGHT
+
+        # - Default metadata
+        hbox = QtGui.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        hbox.addStretch()
+        self.label = QtGui.QLabel("Default metadata")
+        hbox.addWidget(self.label)
+        hbox.addStretch()
+
+        # - default survey
+        hbox = QtGui.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        # -- label
+        label = QtGui.QLabel("Default survey:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.default_survey = QtGui.QLineEdit()
+        rex = QtCore.QRegExp('[a-zA-Z0-9_.-]+')
+        validator = QtGui.QRegExpValidator(rex)
+        self.default_survey.setValidator(validator)
+        hbox.addWidget(self.default_survey)
+
+        # - default vessel
+        hbox = QtGui.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        # -- label
+        label = QtGui.QLabel("Default vessel:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.default_vessel = QtGui.QComboBox()
+        self.default_vessel.setEditable(True)
+        self.default_vessel.addItems(vessel_list)
+        rex = QtCore.QRegExp('[a-zA-Z0-9_.-]+')
+        validator = QtGui.QRegExpValidator(rex)
+        self.default_vessel.setValidator(validator)
+        hbox.addWidget(self.default_vessel)
+
+        # - default sn
+        hbox = QtGui.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        # -- label
+        label = QtGui.QLabel("Default S/N:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.default_sn = QtGui.QLineEdit()
+        rex = QtCore.QRegExp('[a-zA-Z0-9_.-]+')
+        validator = QtGui.QRegExpValidator(rex)
+        self.default_sn.setValidator(validator)
+        hbox.addWidget(self.default_sn)
+
+        self.right_layout.addStretch()
 
         self.main_layout.addStretch()
 
         self.setup_changed()  # to trigger the first data population
 
-    def apply_sis_listen_port(self):
-        logger.debug("listen SIS port")
-        self.db.sis_listen_port = int(self.sis_listen_port.text())
+        # methods
+        # noinspection PyUnresolvedReferences
+        self.default_survey.textChanged.connect(self.apply_default_survey)
+        # noinspection PyUnresolvedReferences
+        self.default_vessel.textChanged.connect(self.apply_default_vessel)
+        # noinspection PyUnresolvedReferences
+        self.default_sn.textChanged.connect(self.apply_default_sn)
+
+    def apply_default_survey(self):
+        # logger.debug("apply default survey")
+        self.db.default_survey = self.default_survey.text()
         self.setup_changed()
-        self.main_win.setup_changed()
+        self.main_win.reload_settings()
+
+    def apply_default_vessel(self):
+        # logger.debug("apply default vessel")
+        self.db.default_vessel = self.default_vessel.currentText()
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+    def apply_default_sn(self):
+        # logger.debug("apply default sn")
+        self.db.default_sn = self.default_sn.text()
+        self.setup_changed()
+        self.main_win.reload_settings()
 
     def setup_changed(self):
         """Refresh items"""
@@ -91,3 +200,12 @@ class General(AbstractWidget):
 
         # current_project
         self.current_project.setText("%s" % self.db.current_project)
+
+        # default_survey
+        self.default_survey.setText("%s" % self.db.default_survey)
+
+        # default_vessel
+        self.default_vessel.setEditText("%s" % self.db.default_vessel)
+
+        # default_sn
+        self.default_sn.setText("%s" % self.db.default_sn)

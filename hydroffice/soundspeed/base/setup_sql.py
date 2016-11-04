@@ -19,7 +19,7 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      ssp_salinity_source text NOT NULL DEFAULT "WOA09",
      ssp_temp_sal_source text NOT NULL DEFAULT "WOA09",
      ssp_up_or_down text NOT NULL DEFAULT "down",
-     rx_max_wait_time integer NOT NULL DEFAULT 10,
+     rx_max_wait_time integer NOT NULL DEFAULT 20,
      use_sis text NOT NULL DEFAULT "True",
      use_sippican text NOT NULL DEFAULT "False",
      use_mvp text NOT NULL DEFAULT "False",
@@ -29,15 +29,15 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      log_server text NOT NULL DEFAULT "False",
      /* listeners - sis */
      sis_listen_port integer NOT NULL DEFAULT 16103,
-     sis_listen_timeout integer NOT NULL DEFAULT 1,
+     sis_listen_timeout integer NOT NULL DEFAULT 10,
      sis_auto_apply_manual_casts text NOT NULL DEFAULT "True",
      /* listeners - sippican */
      sippican_listen_port integer NOT NULL DEFAULT 2002,
-     sippican_listen_timeout integer NOT NULL DEFAULT 1,
+     sippican_listen_timeout integer NOT NULL DEFAULT 10,
      /* listeners - mvp */
      mvp_ip_address text NOT NULL DEFAULT "127.0.0.1",
      mvp_listen_port integer NOT NULL DEFAULT 2006,
-     mvp_listen_timeout integer NOT NULL DEFAULT 1,
+     mvp_listen_timeout integer NOT NULL DEFAULT 10,
      mvp_transmission_protocol text NOT NULL DEFAULT "NAVO_ISS60",
      mvp_format text NOT NULL DEFAULT "S12",
      mvp_winch_port integer NOT NULL DEFAULT 3601,
@@ -53,6 +53,9 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
 
      /* current settings */
      current_project text NOT NULL DEFAULT "default",
+     default_survey text NOT NULL DEFAULT "",
+     default_vessel text NOT NULL DEFAULT "",
+     default_sn text NOT NULL DEFAULT "",
 
      /* Checks */
      CHECK (setup_status IN ("active", "inactive")),

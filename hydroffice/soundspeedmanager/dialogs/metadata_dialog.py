@@ -98,17 +98,6 @@ class MetadataDialog(AbstractDialog):
         self.proc_info.setText("%s" % self.prj.cur.meta.proc_info)
         hbox.addWidget(self.proc_info)
 
-        # project
-        hbox = QtGui.QHBoxLayout()
-        self.mainLayout.addLayout(hbox)
-        label = QtGui.QLabel("Project:")
-        label.setFixedWidth(lbl_width)
-        hbox.addWidget(label)
-        self.project = QtGui.QLineEdit()
-        self.project.setDisabled(True)
-        self.project.setText("%s" % self.prj.cur.meta.project)
-        hbox.addWidget(self.project)
-
         # survey
         hbox = QtGui.QHBoxLayout()
         self.mainLayout.addLayout(hbox)
@@ -155,12 +144,14 @@ class MetadataDialog(AbstractDialog):
         edit_icon.addFile(os.path.join(self.media, 'unlock.png'), state=QtGui.QIcon.On)
         self.editable.setIcon(edit_icon)
         self.editable.setCheckable(True)
+        # noinspection PyUnresolvedReferences
         self.editable.clicked.connect(self.on_editable)
         self.editable.setToolTip("Unlock metadata editing")
         hbox.addWidget(self.editable)
         self.apply = QtGui.QPushButton("Apply")
         self.apply.setFixedHeight(self.editable.height())
         self.apply.setDisabled(True)
+        # noinspection PyUnresolvedReferences
         self.apply.clicked.connect(self.on_apply)
         self.apply.setToolTip("Apply changes (if any)")
         hbox.addWidget(self.apply)
@@ -171,13 +162,11 @@ class MetadataDialog(AbstractDialog):
         logger.debug("editable: %s" % self.editable.isChecked())
         if self.editable.isChecked():
             self.apply.setEnabled(True)
-            self.project.setEnabled(True)
             self.survey.setEnabled(True)
             self.vessel.setEnabled(True)
             self.sn.setEnabled(True)
         else:
             self.apply.setDisabled(True)
-            self.project.setDisabled(True)
             self.survey.setDisabled(True)
             self.vessel.setDisabled(True)
             self.sn.setDisabled(True)
@@ -186,12 +175,12 @@ class MetadataDialog(AbstractDialog):
         logger.debug("apply")
         # apply changes
         try:
-            self.prj.cur.meta.project = self.project.text()
             self.prj.cur.meta.survey = self.survey.text()
             self.prj.cur.meta.vessel = self.vessel.text()
             self.prj.cur.meta.sn = self.sn.text()
         except RuntimeError as e:
             msg = "Issue in apply changes\n%s" % e
+            # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Metadata error", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -199,5 +188,5 @@ class MetadataDialog(AbstractDialog):
         self.proc_time.setText(self.prj.cur.meta.proc_time.strftime("%d/%m/%y %H:%M"))
 
         msg = "Changes have been applied!"
+        # noinspection PyCallByClass
         QtGui.QMessageBox.information(self, "Metadata", msg, QtGui.QMessageBox.Ok)
-

@@ -17,10 +17,9 @@ class Metadata(object):
         self.longitude = None
         self.utc_time = None
         self.original_path = None
-        self._project = "default"
-        self._survey = None
-        self._vessel = None
-        self._sn = None  # serial number
+        self._survey = str()
+        self._vessel = str()
+        self._sn = str()  # serial number
         self.proc_time = None  # last processing time
         self.proc_info = None  # info about processing
 
@@ -31,15 +30,6 @@ class Metadata(object):
     @property
     def probe(self):
         return Dicts.first_match(Dicts.probe_types, self.probe_type)
-
-    @property
-    def project(self):
-        return self._project
-
-    @project.setter
-    def project(self, value):
-        self.update_proc_time()
-        self._project = value
 
     @property
     def survey(self):
@@ -76,7 +66,7 @@ class Metadata(object):
         msg += "    <sensor:%s[%s]>\n" % (self.sensor, self.probe)
         msg += "    <time:%s,lat:%s,long:%s>\n" % (self.utc_time, self.latitude, self.longitude)
         msg += "    <path:%s>\n" % self.original_path
-        msg += "    <project:%s,survey:%s,vessel:%s>\n" % (self.project, self.survey, self.vessel)
+        msg += "    <survey:%s,vessel:%s>\n" % (self.survey, self.vessel)
         msg += "    <sn:%s>\n" % self.sn
         msg += "    <proc_time:%s>\n" % self.proc_time
         msg += "    <proc_info:%s>\n" % self.proc_info
