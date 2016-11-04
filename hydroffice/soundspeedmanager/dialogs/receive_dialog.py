@@ -48,7 +48,7 @@ class ReceiveDialog(AbstractDialog):
     def on_click_woa09(self):
         """Retrieve WOA09 data"""
         try:
-            self.prj.retrieve_woa09()
+            self.lib.retrieve_woa09()
 
         except RuntimeError as e:
             msg = "Issue in importing the data:\n\n> %s" % e
@@ -60,7 +60,7 @@ class ReceiveDialog(AbstractDialog):
     def on_click_woa13(self):
         """Retrieve WOA13 data"""
         try:
-            self.prj.retrieve_woa13()
+            self.lib.retrieve_woa13()
 
         except RuntimeError as e:
             msg = "Issue in importing the data:\n\n> %s" % e
@@ -72,7 +72,7 @@ class ReceiveDialog(AbstractDialog):
     def on_click_rtofs(self):
         """Retrieve RTOFS data"""
         try:
-            self.prj.retrieve_rtofs()
+            self.lib.retrieve_rtofs()
 
         except RuntimeError as e:
             msg = "Issue in importing the data:\n\n> %s" % e
@@ -83,13 +83,13 @@ class ReceiveDialog(AbstractDialog):
 
     def on_click_sis(self):
         """Retrieve SIS data"""
-        if not self.prj.use_sis():
+        if not self.lib.use_sis():
             msg = "The SIS listening is not activated!\n\nGo to Settings/Input/Listen SIS"
             QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
             return
 
         try:
-            self.prj.retrieve_sis()
+            self.lib.retrieve_sis()
 
         except RuntimeError as e:
             msg = "Issue in retrieving data from SIS:\n\n%s" % e

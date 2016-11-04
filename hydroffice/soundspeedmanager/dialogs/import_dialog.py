@@ -24,21 +24,21 @@ class ImportDialog(AbstractDialog):
         self.mainLayout.addWidget(self.buttonBox)
 
         # add buttons
-        for idx, _ in enumerate(self.prj.name_readers):
-            if len(self.prj.ext_readers[idx]) == 0:
+        for idx, _ in enumerate(self.lib.name_readers):
+            if len(self.lib.ext_readers[idx]) == 0:
                 continue
-            btn = QtGui.QPushButton("%s" % self.prj.desc_readers[idx])
+            btn = QtGui.QPushButton("%s" % self.lib.desc_readers[idx])
             self.buttonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
-            btn.setToolTip("Import %s format [*.%s]" % (self.prj.desc_readers[idx],
-                                                        ", *.".join(self.prj.ext_readers[idx])))
+            btn.setToolTip("Import %s format [*.%s]" % (self.lib.desc_readers[idx],
+                                                        ", *.".join(self.lib.ext_readers[idx])))
         self.buttonBox.clicked.connect(self.on_click_btn)
 
     def on_click_btn(self, btn):
         # print("clicked %s" % btn.text())
-        idx = self.prj.desc_readers.index(btn.text())
-        name = self.prj.name_readers[idx]
-        desc = self.prj.desc_readers[idx]
-        ext = self.prj.ext_readers[idx]
+        idx = self.lib.desc_readers.index(btn.text())
+        name = self.lib.name_readers[idx]
+        desc = self.lib.desc_readers[idx]
+        ext = self.lib.ext_readers[idx]
 
         # ask the file path to the user
         flt = "Format %s(*.%s);;All files (*.*)" % (desc, " *.".join(ext))
@@ -54,7 +54,7 @@ class ImportDialog(AbstractDialog):
         self.progress.forceShow()
         self.progress.setValue(20)
         try:
-            self.prj.import_data(data_path=selection, data_format=name)
+            self.lib.import_data(data_path=selection, data_format=name)
 
         except RuntimeError as e:
             self.progress.setValue(100)

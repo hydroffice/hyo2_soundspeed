@@ -595,6 +595,27 @@ class SoundSpeedLibrary(object):
 
         self.clear_data()
         self.ssp = ssp
+
+        # retrieve atlases data for each retrieved profile
+        if self.use_woa09() and self.has_woa09():
+            self.ssp.cur.woa09 = self.atlases.woa09.query(lat=self.ssp.cur.meta.latitude,
+                                                          lon=self.ssp.cur.meta.longitude,
+                                                          datestamp=self.ssp.cur.meta.utc_time)
+
+        if self.use_woa13() and self.has_woa13():
+            self.ssp.cur.woa13 = self.atlases.woa13.query(lat=self.ssp.cur.meta.latitude,
+                                                          lon=self.ssp.cur.meta.longitude,
+                                                          datestamp=self.ssp.cur.meta.utc_time)
+
+        if self.use_rtofs():
+            try:
+                self.ssp.cur.rtofs = self.atlases.rtofs.query(lat=self.ssp.cur.meta.latitude,
+                                                              lon=self.ssp.cur.meta.longitude,
+                                                              datestamp=self.ssp.cur.meta.utc_time)
+            except RuntimeError:
+                self.ssp.cur.rtofs = None
+                logger.warning("unable to retrieve RTOFS data")
+        
         return True
 
     def delete_db_profile(self, pk):
@@ -653,7 +674,9 @@ class SoundSpeedLibrary(object):
     def export_db_profiles_metadata(self, ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile']):
         """Export the db profile metadata"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
-        lst = db.export.export_profiles_metadata(output_folder=self.outputs_folder, ogr_format=ogr_format)
+        lst = db.export.export_profiles_metadata(project_name=self.current_project,
+                                                 output_folder=self.outputs_folder,
+                                                 ogr_format=ogr_format)
         db.disconnect()
         return lst
 

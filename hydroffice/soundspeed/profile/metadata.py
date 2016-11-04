@@ -16,12 +16,12 @@ class Metadata(object):
         self.latitude = None
         self.longitude = None
         self.utc_time = None
-        self.original_path = None
+        self.original_path = str()
         self._survey = str()
         self._vessel = str()
         self._sn = str()  # serial number
         self.proc_time = None  # last processing time
-        self.proc_info = None  # info about processing
+        self.proc_info = str()  # info about processing
 
     @property
     def sensor(self):

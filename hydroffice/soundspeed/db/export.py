@@ -39,11 +39,6 @@ class ExportDb(object):
         if lyr.CreateField(field) != 0:
             raise RuntimeError("Creating field failed.")
 
-        field = ogr.FieldDefn(b'project', ogr.OFTString)
-        field.SetWidth(254)
-        if lyr.CreateField(field) != 0:
-            raise RuntimeError("Creating field failed.")
-
         field = ogr.FieldDefn(b'sensor', ogr.OFTString)
         field.SetWidth(254)
         if lyr.CreateField(field) != 0:
@@ -86,10 +81,10 @@ class ExportDb(object):
 
         return lyr
 
-    def export_profiles_metadata(self, output_folder, ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile']):
+    def export_profiles_metadata(self, project_name, output_folder, ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile']):
 
         GdalAux()
-        output = os.path.join(self.export_folder(output_folder=output_folder), "ssp")
+        output = os.path.join(self.export_folder(output_folder=output_folder), project_name)
 
         # create the data source
         try:
@@ -102,9 +97,9 @@ class ExportDb(object):
 
         rows = self.db.list_profiles()
         if rows is None:
-            raise RuntimeError("Unable to retrieve ssp view rows > Empty database?")
+            raise RuntimeError("Unable to retrieve profiles. Empty database?")
         if len(rows) == 0:
-            raise RuntimeError("Unable to retrieve ssp view rows > Empty database?")
+            raise RuntimeError("Unable to retrieve profiles. Empty database?")
 
         for row in rows:
 
@@ -112,18 +107,17 @@ class ExportDb(object):
 
             ft.SetField(b'pk', row[0])
             ft.SetField(b'datetime', row[1].isoformat())
-            ft.SetField(b'project', row[3].encode())
-            ft.SetField(b'sensor', Dicts.first_match(Dicts.sensor_types, row[4]).encode())
-            ft.SetField(b'probe', Dicts.first_match(Dicts.probe_types, row[5]).encode())
-            ft.SetField(b'path', row[6].encode())
+            ft.SetField(b'sensor', Dicts.first_match(Dicts.sensor_types, row[3]).encode())
+            ft.SetField(b'probe', Dicts.first_match(Dicts.probe_types, row[4]).encode())
+            ft.SetField(b'path', row[5].encode())
+            if row[6]:
+                ft.SetField(b'survey', row[6].encode())
             if row[7]:
-                ft.SetField(b'survey', row[7].encode())
+                ft.SetField(b'vessel', row[7].encode())
             if row[8]:
-                ft.SetField(b'vessel', row[8].encode())
-            if row[9]:
-                ft.SetField(b'sn', row[9].encode())
-            ft.SetField(b'proc_time', row[10].isoformat())
-            ft.SetField(b'proc_info', row[11].encode())
+                ft.SetField(b'sn', row[8].encode())
+            ft.SetField(b'proc_time', row[9].isoformat())
+            ft.SetField(b'proc_info', row[10].encode())
 
             pt = ogr.Geometry(ogr.wkbPoint)
             pt.SetPoint_2D(0, row[2].x, row[2].y)

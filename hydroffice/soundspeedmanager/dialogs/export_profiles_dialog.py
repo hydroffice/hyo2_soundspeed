@@ -7,17 +7,17 @@ import logging
 logger = logging.getLogger(__name__)
 
 from .dialog import AbstractDialog
-from hydroffice.soundspeed.base.helper import explore_folder
+from hydroffice.soundspeed.base.gdal_aux import GdalAux
 
 
-class ExportDialog(AbstractDialog):
+class ExportProfilesDialog(AbstractDialog):
 
     def __init__(self, main_win, lib, parent=None):
         AbstractDialog.__init__(self, main_win=main_win, lib=lib, parent=parent)
 
-        self.name_outputs = list()
+        self.fmt_outputs = list()
 
-        self.setWindowTitle("Export data")
+        self.setWindowTitle("Export profiles")
         self.setMinimumWidth(160)
 
         # outline ui
@@ -39,14 +39,13 @@ class ExportDialog(AbstractDialog):
         hbox.addWidget(self.buttonBox)
         hbox.addStretch()
         # add buttons
-        for idx, _ in enumerate(self.lib.name_writers):
-            if len(self.lib.ext_writers[idx]) == 0:
-                continue
-            btn = QtGui.QPushButton("%s" % self.lib.desc_writers[idx])
+        for fmt in GdalAux.ogr_formats.keys():
+
+            btn = QtGui.QPushButton("%s" % fmt)
             btn.setCheckable(True)
             self.buttonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
-            btn.setToolTip("Select %s format [*.%s]" % (self.lib.desc_writers[idx],
-                                                        ", *.".join(self.lib.ext_writers[idx])))
+            btn.setToolTip("Select %s format [*.%s]" % (fmt, ", *.".join(GdalAux.ogr_exts[fmt])))
+
         # noinspection PyUnresolvedReferences
         self.buttonBox.clicked.connect(self.on_select_btn)
 
@@ -65,54 +64,41 @@ class ExportDialog(AbstractDialog):
 
     def on_select_btn(self, btn):
         logger.debug("%s -> %s" % (btn.text(), btn.isChecked()))
-        idx = self.lib.desc_writers.index(btn.text())
-        name = self.lib.name_writers[idx]
+        fmt = btn.text()
 
         if btn.isChecked():
-            self.name_outputs.append(name)
+            self.fmt_outputs.append(fmt)
         else:
-            if name in self.name_outputs:
-                self.name_outputs.remove(name)
+            if fmt in self.fmt_outputs:
+                self.fmt_outputs.remove(fmt)
 
     def on_export_btn(self):
         logger.debug("export clicked")
-        if len(self.name_outputs) == 0:
-            msg = "Select output formats before data export!"
+        if len(self.fmt_outputs) == 0:
+            msg = "Select output formats before metadata export!"
             QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
             return
-
-        # ask user for output folder path
-        settings = QtCore.QSettings()
-        output_folder = QtGui.QFileDialog.getExistingDirectory(self, "Select output folder",
-                                                               settings.value("export_folder"))
-        if not output_folder:
-            return
-        settings.setValue("export_folder", output_folder)
-        logger.debug('user selection: %s' % output_folder)
-
-        # ask user for basename (only for single selection)
-        basenames = list()
-        if len(self.name_outputs) == 1:
-            basename_msg = "Enter output basename (without extension):"
-            while True:
-                basename, ok = QtGui.QInputDialog.getText(self, "Output basename", basename_msg,
-                                                          text=self.lib.cur_basename)
-                if not ok:
-                    return
-                basenames.append(basename)
-                break
 
         # actually do the export
         self.progress.forceShow()
         self.progress.setValue(20)
+        success = True
+
         try:
-            self.lib.export_data(data_path=output_folder, data_files=basenames,
-                                 data_formats=self.name_outputs)
+
+            for fmt in self.fmt_outputs:
+                ret = self.lib.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[fmt])
+                if not ret:
+                    success = False
+                    QtGui.QMessageBox.critical(self, "Database", "Unable to export as %s!" % fmt)
+
         except RuntimeError as e:
             self.progress.setValue(100)
-            msg = "Issue in exporting the data.\nReason: %s" % e
+            msg = "Issue in exporting the metadata.\nReason: %s" % e
             QtGui.QMessageBox.critical(self, "Export error", msg, QtGui.QMessageBox.Ok)
             return
 
-        explore_folder(output_folder)  # open the output folder
+        if success:
+            self.lib.open_outputs_folder()
+
         self.progress.setValue(100)

@@ -21,7 +21,7 @@ class AbstractDialog(QtGui.QDialog):
         if type(lib) != SoundSpeedLibrary:
             raise RuntimeError("Passed invalid project object: %s" % type(lib))
         self.main_win = main_win
-        self.prj = lib
+        self.lib = lib
 
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
 

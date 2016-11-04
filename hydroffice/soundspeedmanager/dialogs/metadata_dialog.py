@@ -32,11 +32,11 @@ class MetadataDialog(AbstractDialog):
         hbox.addWidget(label)
         self.sensor_type = QtGui.QLineEdit()
         self.sensor_type.setDisabled(True)
-        self.sensor_type.setText(self.prj.cur.meta.sensor)
+        self.sensor_type.setText(self.lib.cur.meta.sensor)
         hbox.addWidget(self.sensor_type)
         self.probe_type = QtGui.QLineEdit()
         self.probe_type.setDisabled(True)
-        self.probe_type.setText(self.prj.cur.meta.probe)
+        self.probe_type.setText(self.lib.cur.meta.probe)
         hbox.addWidget(self.probe_type)
 
         # original path
@@ -47,7 +47,7 @@ class MetadataDialog(AbstractDialog):
         hbox.addWidget(label)
         self.original_path = QtGui.QLineEdit()
         self.original_path.setDisabled(True)
-        self.original_path.setText(self.prj.cur.meta.original_path)
+        self.original_path.setText(self.lib.cur.meta.original_path)
         hbox.addWidget(self.original_path)
 
         # location
@@ -58,11 +58,11 @@ class MetadataDialog(AbstractDialog):
         hbox.addWidget(label)
         self.latitude = QtGui.QLineEdit()
         self.latitude.setDisabled(True)
-        self.latitude.setText("%s" % self.prj.cur.meta.latitude)
+        self.latitude.setText("%s" % self.lib.cur.meta.latitude)
         hbox.addWidget(self.latitude)
         self.longitude = QtGui.QLineEdit()
         self.longitude.setDisabled(True)
-        self.longitude.setText("%s" % self.prj.cur.meta.longitude)
+        self.longitude.setText("%s" % self.lib.cur.meta.longitude)
         hbox.addWidget(self.longitude)
 
         # datetime
@@ -73,7 +73,7 @@ class MetadataDialog(AbstractDialog):
         hbox.addWidget(label)
         self.timestamp = QtGui.QLineEdit()
         self.timestamp.setDisabled(True)
-        self.timestamp.setText(self.prj.cur.meta.utc_time.strftime("%d/%m/%y %H:%M"))
+        self.timestamp.setText(self.lib.cur.meta.utc_time.strftime("%d/%m/%y %H:%M"))
         hbox.addWidget(self.timestamp)
 
         # last edit
@@ -84,7 +84,7 @@ class MetadataDialog(AbstractDialog):
         hbox.addWidget(label)
         self.proc_time = QtGui.QLineEdit()
         self.proc_time.setDisabled(True)
-        self.proc_time.setText(self.prj.cur.meta.proc_time.strftime("%d/%m/%y %H:%M"))
+        self.proc_time.setText(self.lib.cur.meta.proc_time.strftime("%d/%m/%y %H:%M"))
         hbox.addWidget(self.proc_time)
 
         # proc info
@@ -95,7 +95,7 @@ class MetadataDialog(AbstractDialog):
         hbox.addWidget(label)
         self.proc_info = QtGui.QLineEdit()
         self.proc_info.setDisabled(True)
-        self.proc_info.setText("%s" % self.prj.cur.meta.proc_info)
+        self.proc_info.setText("%s" % self.lib.cur.meta.proc_info)
         hbox.addWidget(self.proc_info)
 
         # survey
@@ -106,7 +106,7 @@ class MetadataDialog(AbstractDialog):
         hbox.addWidget(label)
         self.survey = QtGui.QLineEdit()
         self.survey.setDisabled(True)
-        self.survey.setText("%s" % self.prj.cur.meta.survey)
+        self.survey.setText("%s" % self.lib.cur.meta.survey)
         hbox.addWidget(self.survey)
 
         # vessel
@@ -117,7 +117,7 @@ class MetadataDialog(AbstractDialog):
         hbox.addWidget(label)
         self.vessel = QtGui.QLineEdit()
         self.vessel.setDisabled(True)
-        self.vessel.setText("%s" % self.prj.cur.meta.vessel)
+        self.vessel.setText("%s" % self.lib.cur.meta.vessel)
         hbox.addWidget(self.vessel)
 
         # serial number
@@ -128,7 +128,7 @@ class MetadataDialog(AbstractDialog):
         hbox.addWidget(label)
         self.sn = QtGui.QLineEdit()
         self.sn.setDisabled(True)
-        self.sn.setText("%s" % self.prj.cur.meta.sn)
+        self.sn.setText("%s" % self.lib.cur.meta.sn)
         hbox.addWidget(self.sn)
 
         self.mainLayout.addStretch()
@@ -175,9 +175,9 @@ class MetadataDialog(AbstractDialog):
         logger.debug("apply")
         # apply changes
         try:
-            self.prj.cur.meta.survey = self.survey.text()
-            self.prj.cur.meta.vessel = self.vessel.text()
-            self.prj.cur.meta.sn = self.sn.text()
+            self.lib.cur.meta.survey = self.survey.text()
+            self.lib.cur.meta.vessel = self.vessel.text()
+            self.lib.cur.meta.sn = self.sn.text()
         except RuntimeError as e:
             msg = "Issue in apply changes\n%s" % e
             # noinspection PyCallByClass
@@ -185,7 +185,7 @@ class MetadataDialog(AbstractDialog):
             return
 
         # update proc_time widget
-        self.proc_time.setText(self.prj.cur.meta.proc_time.strftime("%d/%m/%y %H:%M"))
+        self.proc_time.setText(self.lib.cur.meta.proc_time.strftime("%d/%m/%y %H:%M"))
 
         msg = "Changes have been applied!"
         # noinspection PyCallByClass

@@ -188,7 +188,7 @@ class SpreadSheetDialog(AbstractDialog):
         hbox = QtGui.QHBoxLayout()
         self.mainLayout.addLayout(hbox)
         self.table = QtGui.QTableView()
-        self.model = DataModel(self.prj, table=self)
+        self.model = DataModel(self.lib, table=self)
         self.table.setModel(self.model)
         self.table.resizeColumnsToContents()
         # self.table.resizeRowsToContents()

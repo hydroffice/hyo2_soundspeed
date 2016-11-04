@@ -9,6 +9,8 @@ logger = logging.getLogger(__name__)
 
 from .widget import AbstractWidget
 from ...soundspeed.base.gdal_aux import GdalAux
+from hydroffice.soundspeed.base.helper import explore_folder
+from hydroffice.soundspeedmanager.dialogs.export_profiles_dialog import ExportProfilesDialog
 
 
 class Database(AbstractWidget):
@@ -47,6 +49,12 @@ class Database(AbstractWidget):
         # -- button box
         self.btn_box = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal)
         self.main_layout.addWidget(self.btn_box)
+        # --- project folder
+        self.btn_project_folder = QtGui.QPushButton("Project folder")
+        # noinspection PyUnresolvedReferences
+        self.btn_project_folder.clicked.connect(self.project_folder)
+        self.btn_project_folder.setToolTip("Open the project folder")
+        self.btn_box.addButton(self.btn_project_folder, QtGui.QDialogButtonBox.ActionRole)
         # --- profile map
         self.btn_profile_map = QtGui.QPushButton("Profile map")
         # noinspection PyUnresolvedReferences
@@ -71,24 +79,12 @@ class Database(AbstractWidget):
         self.btn_save_daily.clicked.connect(self.save_daily_profiles)
         self.btn_save_daily.setToolTip("Save daily profiles")
         self.btn_box.addButton(self.btn_save_daily, QtGui.QDialogButtonBox.ActionRole)
-        # --- export as shp
-        self.btn_export_shp = QtGui.QPushButton("Export as .shp")
+        # --- export profiles
+        self.btn_export_profiles = QtGui.QPushButton("Export info")
         # noinspection PyUnresolvedReferences
-        self.btn_export_shp.clicked.connect(self.export_as_shp)
-        self.btn_export_shp.setToolTip("Export profiles as shapefile")
-        self.btn_box.addButton(self.btn_export_shp, QtGui.QDialogButtonBox.ActionRole)
-        # --- export as kml
-        self.btn_export_kml = QtGui.QPushButton("Export as .kml")
-        # noinspection PyUnresolvedReferences
-        self.btn_export_kml.clicked.connect(self.export_as_kml)
-        self.btn_export_kml.setToolTip("Export profiles as kml")
-        self.btn_box.addButton(self.btn_export_kml, QtGui.QDialogButtonBox.ActionRole)
-        # --- export as csv
-        self.btn_export_csv = QtGui.QPushButton("Export as .csv")
-        # noinspection PyUnresolvedReferences
-        self.btn_export_csv.clicked.connect(self.export_as_csv)
-        self.btn_export_csv.setToolTip("Export profiles as comma-separated values")
-        self.btn_box.addButton(self.btn_export_csv, QtGui.QDialogButtonBox.ActionRole)
+        self.btn_export_profiles.clicked.connect(self.export_profiles)
+        self.btn_export_profiles.setToolTip("Export profile locations and metadata")
+        self.btn_box.addButton(self.btn_export_profiles, QtGui.QDialogButtonBox.ActionRole)
 
         # self.main_layout.addStretch()
         self.update_table()
@@ -96,11 +92,35 @@ class Database(AbstractWidget):
     def make_context_menu(self, pos):
         """Make a context menu to deal with profile specific actions"""
 
+        load_act = QtGui.QAction("Load", self, statusTip="Load a profile", triggered=self.load_profile)
         delete_act = QtGui.QAction("Delete", self, statusTip="Delete a profile", triggered=self.delete_profile)
 
         menu = QtGui.QMenu(parent=self)
+        menu.addAction(load_act)
         menu.addAction(delete_act)
         menu.exec_(self.ssp_list.mapToGlobal(pos))
+
+    def load_profile(self):
+        logger.debug("user want to load a profile")
+
+        # check if any selection
+        sel = self.ssp_list.selectedItems()
+        if len(sel) == 0:
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.information(self, "Database", "You need to select a profile before loading it!")
+            return
+
+        pk = int(sel[0].text())
+        success = self.lib.load_profile(pk)
+        if not success:
+            msg = "Unable to load profile!"
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.warning(self, "Database", msg, QtGui.QMessageBox.Ok)
+            return
+
+        if self.lib.has_ssp():
+            self.main_win.data_imported()
+            self.main_win.tabs.setCurrentIndex(0)
 
     def delete_profile(self):
         logger.debug("user want to delete a profile")
@@ -109,7 +129,7 @@ class Database(AbstractWidget):
         sel = self.ssp_list.selectedItems()
         if len(sel) == 0:
             # noinspection PyCallByClass
-            QtGui.QMessageBox.information(self, "Database", "You need to first select a profile to delete it!")
+            QtGui.QMessageBox.information(self, "Database", "You need to select a profile before deleting it!")
             return
 
         # ask if the user want to delete it
@@ -126,6 +146,10 @@ class Database(AbstractWidget):
         else:
             # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Database", "Unable to remove the selected profile!")
+
+    def project_folder(self):
+        logger.debug("user want to open the project folder")
+        explore_folder(self.lib.projects_folder)
 
     def profile_map(self):
         logger.debug("user want to map the profiles")
@@ -226,32 +250,10 @@ class Database(AbstractWidget):
         else:
             self.lib.open_outputs_folder()
 
-    def export_as_shp(self):
-        logger.debug("user want to export profiles as shp")
-        success = self.lib.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile'])
-        if not success:
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.critical(self, "Database", "Unable to export as shp!")
-        else:
-            self.lib.open_outputs_folder()
-
-    def export_as_kml(self):
-        logger.debug("user want to export profiles as kml")
-        success = self.lib.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'KML'])
-        if not success:
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.critical(self, "Database", "Unable to export as kml!")
-        else:
-            self.lib.open_outputs_folder()
-
-    def export_as_csv(self):
-        logger.debug("user want to export profiles as csv")
-        success = self.lib.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[b'CSV'])
-        if not success:
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.critical(self, "Database", "Unable to export as csv!")
-        else:
-            self.lib.open_outputs_folder()
+    def export_profiles(self):
+        logger.debug("user want to export profiles")
+        dlg = ExportProfilesDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        dlg.exec_()
 
     def update_table(self):
         lst = self.lib.db_list_profiles()
