@@ -30,6 +30,12 @@ class PlotDb(object):
         self.db = db
 
     @classmethod
+    def raise_window(cls):
+        cfm = plt.get_current_fig_manager()
+        cfm.window.activateWindow()
+        cfm.window.raise_()
+
+    @classmethod
     def plots_folder(cls, output_folder):
         folder = os.path.join(output_folder, "plots")
         if not os.path.exists(folder):
@@ -38,6 +44,9 @@ class PlotDb(object):
 
     def map_profiles(self, output_folder, save_fig=False):
         """plot all the ssp in the database"""
+
+        if not save_fig:
+            plt.ion()
 
         rows = self.db.list_profiles()
         if rows is None:
@@ -81,7 +90,10 @@ class PlotDb(object):
 
         max_delta_range = max(abs(ssp_x_min - ssp_x_max), abs(ssp_y_min - ssp_y_max))
         logger.info("maximum delta range: %s" % max_delta_range)
-        if max_delta_range > 15:
+
+        if max_delta_range > 50:
+            ins_scale = 0  # no inset
+        elif max_delta_range > 15:
             ins_scale = 6
         elif max_delta_range > 12:
             ins_scale = 9
@@ -104,32 +116,40 @@ class PlotDb(object):
             ssp_x_delta *= 40
             ssp_y_delta *= 40
 
-        ax_ins = zoomed_inset_axes(ax, ins_scale, loc=ssp_loc)
-        ax_ins.set_xlim((ssp_x_min - ssp_x_delta), (ssp_x_max + ssp_x_delta))
-        ax_ins.set_ylim((ssp_y_min - ssp_y_delta), (ssp_y_max + ssp_y_delta))
+        # to avoid inset for too large area
+        if ins_scale != 0:
 
-        m = self._inset_draw_map(llcrnrlon=(ssp_x_min - ssp_x_delta), llcrnrlat=(ssp_y_min - ssp_y_delta),
-                                 urcrnrlon=(ssp_x_max + ssp_x_delta), urcrnrlat=(ssp_y_max + ssp_y_delta),
-                                 ax_ins=ax_ins)
+            ax_ins = zoomed_inset_axes(ax, ins_scale, loc=ssp_loc)
+            ax_ins.set_xlim((ssp_x_min - ssp_x_delta), (ssp_x_max + ssp_x_delta))
+            ax_ins.set_ylim((ssp_y_min - ssp_y_delta), (ssp_y_max + ssp_y_delta))
 
-        x, y = m(ssp_x, ssp_y)
-        m.scatter(x, y, marker='o', s=16, color='r')
-        m.scatter(x, y, marker='.', s=1, color='k')
+            m = self._inset_draw_map(llcrnrlon=(ssp_x_min - ssp_x_delta), llcrnrlat=(ssp_y_min - ssp_y_delta),
+                                     urcrnrlon=(ssp_x_max + ssp_x_delta), urcrnrlat=(ssp_y_max + ssp_y_delta),
+                                     ax_ins=ax_ins)
 
-        if ssp_x_mean > 0:
-            mark_inset(ax, ax_ins, loc1=1, loc2=4, fc="none", ec='y')
+            x, y = m(ssp_x, ssp_y)
+            m.scatter(x, y, marker='o', s=16, color='r')
+            m.scatter(x, y, marker='.', s=1, color='k')
+
+            if ssp_x_mean > 0:
+                mark_inset(ax, ax_ins, loc1=1, loc2=4, fc="none", ec='y')
+            else:
+                mark_inset(ax, ax_ins, loc1=2, loc2=3, fc="none", ec='y')
+
+            ax_ins.tick_params(color='y', labelcolor='y')
+            for spine in ax_ins.spines.values():
+                spine.set_edgecolor('y')
+
         else:
-            mark_inset(ax, ax_ins, loc1=2, loc2=3, fc="none", ec='y')
-
-        ax_ins.tick_params(color='y', labelcolor='y')
-        for spine in ax_ins.spines.values():
-            spine.set_edgecolor('y')
+            x, y = wm(ssp_x, ssp_y)
+            wm.scatter(x, y, marker='o', s=16, color='r')
+            wm.scatter(x, y, marker='.', s=1, color='k')
 
         if save_fig:
             plt.savefig(os.path.join(self.plots_folder(output_folder), 'ssp_map.png'),
                         bbox_inches='tight')
-        else:
-            plt.show()
+        # else:
+        #     plt.show()
 
         return True
 
@@ -285,7 +305,7 @@ class PlotDb(object):
         logger.debug("plotted SSPs: %d" % ssp_count)
         return True
 
-    def daily_plots(self, output_folder, save_fig=False):
+    def daily_plots(self, project_name, output_folder, save_fig=False):
         """plot all the SSPs by day"""
 
         if not save_fig:
@@ -361,7 +381,8 @@ class PlotDb(object):
             fig = plt.figure(date_list.index(date))
 
             if save_fig:
-                fig.savefig(os.path.join(self.plots_folder(output_folder), 'day_%2d.png' % (date_list.index(date) + 1)),
+                fig.savefig(os.path.join(self.plots_folder(output_folder),
+                                         '%s.day_%2d.png' % (project_name, date_list.index(date) + 1)),
                             bbox_inches='tight')
             else:
                 fig.show()

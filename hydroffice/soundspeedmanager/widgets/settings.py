@@ -26,9 +26,11 @@ class Settings(AbstractWidget):
         self.settings_widget = MainWin(lib=lib, main_win=self.main_win)
         self.settings_widget.set_editable(False)
         self.mainLayout.addWidget(self.settings_widget)
-        # lock/unlock
+
         hbox = QtGui.QHBoxLayout()
         hbox.addStretch()
+
+        # lock/unlock
         self.editable = QtGui.QPushButton()
         self.editable.setIconSize(QtCore.QSize(30, 30))
         self.editable.setFixedHeight(34)
@@ -56,6 +58,9 @@ class Settings(AbstractWidget):
             self.settings_widget.set_editable(True)
         else:
             self.settings_widget.set_editable(False)
+
+    def setup_changed(self):
+        self.settings_widget.setup_changed()
 
     def server_started(self):
         self.setDisabled(True)

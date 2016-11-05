@@ -7,10 +7,13 @@ from PySide import QtGui, QtCore
 
 logger = logging.getLogger(__name__)
 
-from .widget import AbstractWidget
-from ...soundspeed.base.gdal_aux import GdalAux
-from hydroffice.soundspeed.base.helper import explore_folder
+from hydroffice.soundspeed.profile.dicts import Dicts
+from hydroffice.soundspeedmanager.widgets.widget import AbstractWidget
 from hydroffice.soundspeedmanager.dialogs.export_profiles_dialog import ExportProfilesDialog
+from hydroffice.soundspeedmanager.dialogs.plot_profiles_dialog import PlotProfilesDialog
+from hydroffice.soundspeedmanager.dialogs.new_project_dialog import NewProjectDialog
+from hydroffice.soundspeedmanager.dialogs.load_project_dialog import LoadProjectDialog
+from hydroffice.soundspeedmanager.dialogs.import_data_dialog import ImportDataDialog
 
 
 class Database(AbstractWidget):
@@ -21,21 +24,33 @@ class Database(AbstractWidget):
     def __init__(self, main_win, lib):
         AbstractWidget.__init__(self, main_win=main_win, lib=lib)
 
+        lbl_width = 80
+
         # create the overall layout
         self.main_layout = QtGui.QVBoxLayout()
         self.frame.setLayout(self.main_layout)
 
-        # - label
+        # - active setup
         hbox = QtGui.QHBoxLayout()
         self.main_layout.addLayout(hbox)
         hbox.addStretch()
-        self.label = QtGui.QLabel("Database content")
-        hbox.addWidget(self.label)
+        self.active_label = QtGui.QLabel()
+        hbox.addWidget(self.active_label)
         hbox.addStretch()
 
-        # - database table
+        # - list of setups
         hbox = QtGui.QHBoxLayout()
         self.main_layout.addLayout(hbox)
+
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtGui.QLabel("Profiles:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+
         # -- list
         self.ssp_list = QtGui.QTableWidget()
         self.ssp_list.setFocus()
@@ -46,47 +61,70 @@ class Database(AbstractWidget):
         self.ssp_list.customContextMenuRequested.connect(self.make_context_menu)
         hbox.addWidget(self.ssp_list)
 
-        # -- button box
-        self.btn_box = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal)
-        self.main_layout.addWidget(self.btn_box)
+        # - RIGHT COLUMN
+        right_vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(right_vbox)
+        # -- manage button box
+        self.manage_btn_box = QtGui.QDialogButtonBox(QtCore.Qt.Vertical)
+        right_vbox.addWidget(self.manage_btn_box)
+        right_vbox.addStretch()
+
+        # --- new project
+        self.btn_new_project = QtGui.QPushButton("New project")
+        # noinspection PyUnresolvedReferences
+        self.btn_new_project.clicked.connect(self.new_project)
+        self.btn_new_project.setToolTip("Create a new project")
+        self.manage_btn_box.addButton(self.btn_new_project, QtGui.QDialogButtonBox.ActionRole)
+        # --- load project
+        self.btn_load_project = QtGui.QPushButton("Load project")
+        # noinspection PyUnresolvedReferences
+        self.btn_load_project.clicked.connect(self.load_project)
+        self.btn_load_project.setToolTip("Load a project")
+        self.manage_btn_box.addButton(self.btn_load_project, QtGui.QDialogButtonBox.ActionRole)
+        # --- import profiles
+        self.btn_import_data = QtGui.QPushButton("Import data")
+        # noinspection PyUnresolvedReferences
+        self.btn_import_data.clicked.connect(self.import_data)
+        self.btn_import_data.setToolTip("Import data from another project")
+        self.manage_btn_box.addButton(self.btn_import_data, QtGui.QDialogButtonBox.ActionRole)
         # --- project folder
         self.btn_project_folder = QtGui.QPushButton("Project folder")
         # noinspection PyUnresolvedReferences
         self.btn_project_folder.clicked.connect(self.project_folder)
         self.btn_project_folder.setToolTip("Open the project folder")
-        self.btn_box.addButton(self.btn_project_folder, QtGui.QDialogButtonBox.ActionRole)
-        # --- profile map
-        self.btn_profile_map = QtGui.QPushButton("Profile map")
+        self.manage_btn_box.addButton(self.btn_project_folder, QtGui.QDialogButtonBox.ActionRole)
+
+        self.main_layout.addSpacing(8)
+
+        # - bottom
+        bottom_vbox = QtGui.QVBoxLayout()
+        right_vbox.addLayout(bottom_vbox)
+
+        # -- products button box
+        self.product_btn_box = QtGui.QDialogButtonBox(QtCore.Qt.Vertical)
+        bottom_vbox.addStretch()
+        bottom_vbox.addWidget(self.product_btn_box)
+        # --- plot profiles
+        btn = QtGui.QPushButton("Plot profiles")
         # noinspection PyUnresolvedReferences
-        self.btn_profile_map.clicked.connect(self.profile_map)
-        self.btn_profile_map.setToolTip("Create a map with all the profiles")
-        self.btn_box.addButton(self.btn_profile_map, QtGui.QDialogButtonBox.ActionRole)
-        # --- aggregate plot
-        self.btn_aggregate_plot = QtGui.QPushButton("Aggregate plot")
-        # noinspection PyUnresolvedReferences
-        self.btn_aggregate_plot.clicked.connect(self.aggregate_plot)
-        self.btn_aggregate_plot.setToolTip("Create a plot aggregating multiple profiles")
-        self.btn_box.addButton(self.btn_aggregate_plot, QtGui.QDialogButtonBox.ActionRole)
-        # --- create daily plots
-        self.btn_plot_daily = QtGui.QPushButton("Plot daily")
-        # noinspection PyUnresolvedReferences
-        self.btn_plot_daily.clicked.connect(self.plot_daily_profiles)
-        self.btn_plot_daily.setToolTip("Plot daily profiles")
-        self.btn_box.addButton(self.btn_plot_daily, QtGui.QDialogButtonBox.ActionRole)
-        # --- save daily plots
-        self.btn_save_daily = QtGui.QPushButton("Save daily")
-        # noinspection PyUnresolvedReferences
-        self.btn_save_daily.clicked.connect(self.save_daily_profiles)
-        self.btn_save_daily.setToolTip("Save daily profiles")
-        self.btn_box.addButton(self.btn_save_daily, QtGui.QDialogButtonBox.ActionRole)
+        btn.clicked.connect(self.plot_profiles)
+        btn.setToolTip("Create plots with profiles")
+        self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
         # --- export profiles
-        self.btn_export_profiles = QtGui.QPushButton("Export info")
+        btn = QtGui.QPushButton("Export info")
         # noinspection PyUnresolvedReferences
-        self.btn_export_profiles.clicked.connect(self.export_profiles)
-        self.btn_export_profiles.setToolTip("Export profile locations and metadata")
-        self.btn_box.addButton(self.btn_export_profiles, QtGui.QDialogButtonBox.ActionRole)
+        btn.clicked.connect(self.export_profiles)
+        btn.setToolTip("Export profile locations and metadata")
+        self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
+        # --- output folder
+        btn = QtGui.QPushButton("Output folder")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.output_folder)
+        btn.setToolTip("Open the output folder")
+        self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
 
         # self.main_layout.addStretch()
+
         self.update_table()
 
     def make_context_menu(self, pos):
@@ -99,6 +137,31 @@ class Database(AbstractWidget):
         menu.addAction(load_act)
         menu.addAction(delete_act)
         menu.exec_(self.ssp_list.mapToGlobal(pos))
+
+    def new_project(self):
+        logger.debug("user want to create a new project")
+
+        dlg = NewProjectDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        success = dlg.exec_()
+
+        if success:
+            self.update_table()
+
+    def load_project(self):
+        logger.debug("user want to load a project")
+
+        dlg = LoadProjectDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        dlg.exec_()
+
+        self.update_table()
+
+    def import_data(self):
+        logger.debug("user want to import data from another project")
+
+        dlg = ImportDataDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        dlg.exec_()
+
+        self.update_table()
 
     def load_profile(self):
         logger.debug("user want to load a profile")
@@ -149,113 +212,30 @@ class Database(AbstractWidget):
 
     def project_folder(self):
         logger.debug("user want to open the project folder")
-        explore_folder(self.lib.projects_folder)
+        self.lib.open_projects_folder()
 
-    def profile_map(self):
-        logger.debug("user want to map the profiles")
-        success = self.lib.map_db_profiles()
-        if not success:
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.critical(self, "Database", "Unable to create a profile map!")
-
-    def aggregate_plot(self):
-        logger.debug("user want to create an aggregate plot")
-
-        ssp_times = self.lib.db_timestamp_list()
-        # print(ssp_times[0][0], ssp_times[-1][0])
-
-        if len(ssp_times) == 0:
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.information(self, "Database",
-                                          "Missing SSPs in the database. Import and store them first!")
-
-        class DateDialog(QtGui.QDialog):
-
-            def __init__(self, date_start, date_end, *args, **kwargs):
-                super(DateDialog, self).__init__(*args, **kwargs)
-
-                self.setMinimumSize(300, 500)
-                self.setWindowTitle('SSP date range to plot')
-
-                self.start_date = QtGui.QLabel()
-                self.start_date.setText("Start date:")
-                self.cal_start_date = QtGui.QCalendarWidget()
-                self.cal_start_date.setSelectedDate(date_start)
-
-                self.end_date = QtGui.QLabel()
-                self.end_date.setText("End date:")
-                self.cal_end_date = QtGui.QCalendarWidget()
-                self.cal_end_date.setSelectedDate(date_end)
-
-                self.ok = QtGui.QPushButton("OK")
-                # noinspection PyUnresolvedReferences
-                self.ok.clicked.connect(self.on_click_ok)
-                self.cancel = QtGui.QPushButton("Cancel")
-                # noinspection PyUnresolvedReferences
-                self.cancel.clicked.connect(self.on_click_cancel)
-
-                vbox = QtGui.QVBoxLayout()
-                self.setLayout(vbox)
-                vbox.addWidget(self.start_date)
-                vbox.addWidget(self.cal_start_date)
-                vbox.addWidget(self.end_date)
-                vbox.addWidget(self.cal_end_date)
-                vbox.addWidget(self.ok)
-                vbox.addWidget(self.cancel)
-
-            def on_click_ok(self):
-                logger.debug("button: ok")
-                self.accept()
-
-            def on_click_cancel(self):
-                logger.debug("button: cancel")
-                self.reject()
-
-        dialog = DateDialog(date_start=ssp_times[0][0], date_end=ssp_times[-1][0], parent=self)
-        ret = dialog.exec_()
-        if ret == QtGui.QDialog.Accepted:
-            dates = dialog.cal_start_date.selectedDate().toPython(), \
-                    dialog.cal_end_date.selectedDate().toPython()
-            dialog.destroy()
-        else:
-            dialog.destroy()
-            return
-        # print(dates)
-
-        # check the user selection
-        if dates[0] > dates[1]:
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.critical(self, 'The start date (%s) comes after the end data (%s)' % (dates[0], dates[1]),
-                                       'Invalid selection')
-            return
-
-        success = self.lib.aggregate_plot(dates=dates)
-        if not success:
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.critical(self, "Database", "Unable to create an aggregate plot!")
-
-    def plot_daily_profiles(self):
-        logger.debug("user want to plot daily profiles")
-        success = self.lib.plot_daily_db_profiles()
-        if not success:
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.critical(self, "Database", "Unable to create daily plots!")
-
-    def save_daily_profiles(self):
-        logger.debug("user want to save daily profiles")
-        success = self.lib.save_daily_db_profiles()
-        if not success:
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.critical(self, "Database", "Unable to save daily plots!")
-        else:
-            self.lib.open_outputs_folder()
+    def output_folder(self):
+        logger.debug("user want to open the output folder")
+        self.lib.open_outputs_folder()
 
     def export_profiles(self):
         logger.debug("user want to export profiles")
         dlg = ExportProfilesDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
 
+    def plot_profiles(self):
+        logger.debug("user want to plot profiles")
+
+        dlg = PlotProfilesDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        success = dlg.exec_()
+
+        if success and not dlg.only_saved:
+            self.lib.raise_plot_window()
+
     def update_table(self):
+        # set the top label
+        self.active_label.setText("<b>Current project: %s</b>" % self.lib.current_project)
+
         lst = self.lib.db_list_profiles()
 
         # prepare the table
@@ -267,13 +247,18 @@ class Database(AbstractWidget):
                                                  'processing time', 'processing info'])
 
         # populate the table
-        if len(lst) == 0:
-            self.ssp_list.resizeColumnsToContents()
-            return
         self.ssp_list.setRowCount(len(lst))
+
         for i, ssp in enumerate(lst):
             for j, field in enumerate(ssp):
+                if j == 3:
+                    field = '%s' % Dicts.first_match(Dicts.sensor_types, int(field))
+                    # logger.debug('%s' % Dicts.first_match(Dicts.sensor_types, int(field)))
+                elif j == 4:
+                    field = '%s' % Dicts.first_match(Dicts.probe_types, int(field))
+                    # logger.debug('%s' % Dicts.first_match(Dicts.probe_types, int(field)))
                 item = QtGui.QTableWidgetItem("%s" % field)
+
                 item.setTextAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignHCenter)
                 item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
                 self.ssp_list.setItem(i, j, item)

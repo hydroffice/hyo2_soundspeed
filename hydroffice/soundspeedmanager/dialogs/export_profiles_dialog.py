@@ -17,7 +17,7 @@ class ExportProfilesDialog(AbstractDialog):
 
         self.fmt_outputs = list()
 
-        self.setWindowTitle("Export profiles")
+        self.setWindowTitle("Export metadata profiles")
         self.setMinimumWidth(160)
 
         # outline ui
@@ -93,6 +93,7 @@ class ExportProfilesDialog(AbstractDialog):
                     QtGui.QMessageBox.critical(self, "Database", "Unable to export as %s!" % fmt)
 
         except RuntimeError as e:
+
             self.progress.setValue(100)
             msg = "Issue in exporting the metadata.\nReason: %s" % e
             QtGui.QMessageBox.critical(self, "Export error", msg, QtGui.QMessageBox.Ok)
@@ -102,3 +103,4 @@ class ExportProfilesDialog(AbstractDialog):
             self.lib.open_outputs_folder()
 
         self.progress.setValue(100)
+        self.accept()

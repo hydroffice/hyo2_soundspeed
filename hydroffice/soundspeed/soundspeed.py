@@ -581,6 +581,52 @@ class SoundSpeedLibrary(object):
         db.disconnect()
         return ssp
 
+    def db_import_data_from_db(self, input_db_path):
+        """Import profiles from another db"""
+        in_projects_folder = os.path.dirname(input_db_path)
+        in_project_name = os.path.splitext(os.path.basename(input_db_path))[0]
+        logger.debug('input: folder: %s, db: %s' % (in_projects_folder, in_project_name))
+
+        in_db = ProjectDb(projects_folder=in_projects_folder, project_name=in_project_name)
+        cur_db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
+
+        in_lst = in_db.list_profiles()
+        cur_lst = cur_db.list_profiles()
+        logger.debug('profiles to import: %s' % len(in_lst))
+        logger.debug('current profiles: %s' % len(cur_lst))
+
+        # create list of current pks
+        cur_pks = list()
+        for cur_ssp in cur_lst:
+            cur_pks.append("%s;%s" % (cur_ssp[1], cur_ssp[2]))
+        # print(cur_pks)
+
+        # copy after having checked that the profile is not already there
+        pk_issues = list()
+        pk_done = list()
+
+        for in_ssp in in_lst:
+
+            in_key = "%s;%s" % (in_ssp[1], in_ssp[2])
+            # print(in_key)
+            if in_key in cur_pks:
+                pk_issues.append(in_ssp[0])
+                continue
+
+            ssp = in_db.profile_by_pk(pk=in_ssp[0])
+            success = cur_db.add_casts(ssp)
+            if success:
+                pk_done.append(in_ssp[0])
+
+            else:
+                pk_issues.append(in_ssp[0])
+
+            continue
+
+        in_db.disconnect()
+
+        return pk_issues, pk_done
+
     def db_timestamp_list(self):
         """Retrieve a list with the timestamp of all the profiles"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
@@ -615,7 +661,7 @@ class SoundSpeedLibrary(object):
             except RuntimeError:
                 self.ssp.cur.rtofs = None
                 logger.warning("unable to retrieve RTOFS data")
-        
+
         return True
 
     def delete_db_profile(self, pk):
@@ -626,6 +672,11 @@ class SoundSpeedLibrary(object):
         return ret
 
     # plotting
+
+    def raise_plot_window(self):
+        db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
+        ret = db.plot.raise_window()
+        db.disconnect()
 
     def map_db_profiles(self):
         """List the profile on the db"""
@@ -665,7 +716,8 @@ class SoundSpeedLibrary(object):
     def save_daily_db_profiles(self):
         """Save figure with the profile on the db by day"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
-        success = db.plot.daily_plots(output_folder=self.outputs_folder, save_fig=True)
+        success = db.plot.daily_plots(project_name=self.current_project,
+                                      output_folder=self.outputs_folder, save_fig=True)
         db.disconnect()
         return success
 
@@ -944,6 +996,10 @@ class SoundSpeedLibrary(object):
     def reload_settings_from_db(self):
         """Reload the current setup from the settings db"""
         self.setup.load_from_db()
+
+    def save_settings_to_db(self):
+        """Save the current setup to settings db"""
+        self.setup.save_to_db()
 
     # --- atlases
 

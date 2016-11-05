@@ -18,7 +18,7 @@ class Main(AbstractWidget):
     def __init__(self, main_win, db):
         AbstractWidget.__init__(self, main_win=main_win, db=db)
 
-        lbl_width = 120
+        lbl_width = 80
 
         # outline ui
         self.main_layout = QtGui.QVBoxLayout()
@@ -40,7 +40,7 @@ class Main(AbstractWidget):
         vbox = QtGui.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
-        label = QtGui.QLabel("Available setups:")
+        label = QtGui.QLabel("Setups:")
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
@@ -75,7 +75,7 @@ class Main(AbstractWidget):
         # --- refresh
         self.btn_refresh_list = QtGui.QPushButton("Refresh")
         # noinspection PyUnresolvedReferences
-        self.btn_refresh_list.clicked.connect(self.setup_changed)
+        self.btn_refresh_list.clicked.connect(self.on_setup_changed)
         self.btn_box.addButton(self.btn_refresh_list, QtGui.QDialogButtonBox.ActionRole)
 
         self.main_layout.addStretch()
@@ -148,9 +148,12 @@ class Main(AbstractWidget):
         self.db.activate_setup(setup_name)
         self.main_win.setup_changed()
 
+    def on_setup_changed(self):
+        self.main_win.setup_changed()
+
     def setup_changed(self):
         """Refresh the setup list"""
-        logger.debug("refresh main")
+        # logger.debug("refresh main")
 
         # set the top label
         self.active_label.setText("<b>Current setup: %s [#%02d]</b>" % (self.db.setup_name, self.db.active_setup_id))

@@ -87,6 +87,8 @@ class MainWin(QtGui.QMainWindow):
         self.tabs = QtGui.QTabWidget()
         self.setCentralWidget(self.tabs)
         self.tabs.setIconSize(QtCore.QSize(45, 45))
+        self.tabs.blockSignals(True)  # durign the initialization
+        self.tabs.currentChanged.connect(self.onChange)  # changed!
         # editor
         self.tab_editor = Editor(lib=self.lib, main_win=self)
         idx = self.tabs.insertTab(0, self.tab_editor,
@@ -126,8 +128,15 @@ class MainWin(QtGui.QMainWindow):
         timer.start(1500)
 
         self.data_cleared()
+        self.tabs.blockSignals(False)
 
         logger.info("* > APP: initialized!")
+
+    def onChange(self, i):
+        # logger.debug("Current Tab Index: %s" % type(self.tabs.widget(i)))
+        if type(self.tabs.widget(i)) == Settings:
+            self.tab_setup.setup_changed()
+
 
     def check_woa09(self):
         """ helper function that looks after WOA09 database"""
