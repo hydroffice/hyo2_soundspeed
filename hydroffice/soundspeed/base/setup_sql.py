@@ -57,6 +57,7 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      custom_outputs_folder text DEFAULT "",
      custom_woa09_folder text DEFAULT "",
      custom_woa13_folder text DEFAULT "",
+     noaa_tools text NOT NULL DEFAULT "False",
      default_survey text NOT NULL DEFAULT "",
      default_vessel text NOT NULL DEFAULT "",
      default_sn text NOT NULL DEFAULT "",
@@ -96,7 +97,9 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      CHECK (mvp_instrument IN ("AML_uSVP", "AML_uSVPT", "AML_Smart_SVP", "AML_uCTD", "AML_uCTD+", "Valeport_SVPT", "SBE_911+", "SBE_49")),
      /* server */
      CHECK (server_source IN ("RTOFS", "WOA09", "WOA13")),
-     CHECK (server_apply_surface_sound_speed IN ("True", "False"))
+     CHECK (server_apply_surface_sound_speed IN ("True", "False")),
+     /* user-defined */
+     CHECK (noaa_tools IN ("True", "False"))
      ) """
 
 CREATE_CLIENT_LIST = """-- noinspection SqlResolveForFile

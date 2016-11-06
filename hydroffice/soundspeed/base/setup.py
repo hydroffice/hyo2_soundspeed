@@ -70,6 +70,7 @@ class Setup(object):
         self.custom_outputs_folder = None
         self.custom_woa09_folder = None
         self.custom_woa13_folder = None
+        self.noaa_tools = None
         self.default_survey = None
         self.default_vessel = None
         self.default_sn = None
@@ -151,6 +152,7 @@ class Setup(object):
             self.custom_outputs_folder = db.custom_outputs_folder
             self.custom_woa09_folder = db.custom_woa09_folder
             self.custom_woa13_folder = db.custom_woa13_folder
+            self.noaa_tools = db.noaa_tools
             self.default_survey = db.default_survey
             self.default_vessel = db.default_vessel
             self.default_sn = db.default_sn
@@ -231,6 +233,7 @@ class Setup(object):
             db.custom_outputs_folder = self.custom_outputs_folder
             db.custom_woa09_folder = self.custom_woa09_folder
             db.custom_woa13_folder = self.custom_woa13_folder
+            db.noaa_tools = self.noaa_tools
             db.default_survey = self.default_survey
             db.default_vessel = self.default_vessel
             db.default_sn = self.default_sn
@@ -287,6 +290,7 @@ class Setup(object):
         msg += "      <outputs folder: %s>\n" % self.custom_outputs_folder
         msg += "      <woa09 folder: %s>\n" % self.custom_woa09_folder
         msg += "      <woa13 folder: %s>\n" % self.custom_woa13_folder
+        msg += "      <noaa tools: %s>\n" % self.noaa_tools
         msg += "      <default_survey: %s>\n" % self.default_survey
         msg += "      <default_vessel: %s>\n" % self.default_vessel
         msg += "      <default_sn: %s>\n" % self.default_sn

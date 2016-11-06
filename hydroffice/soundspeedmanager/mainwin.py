@@ -16,9 +16,10 @@ from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
 from .qtcallbacks import QtCallbacks
 from .widgets.editor import Editor
 from .widgets.database import Database
+from .widgets.seacat import Seacat
 from .widgets.server import Server
-from .widgets.settings import Settings
 from .widgets.refraction import Refraction
+from .widgets.settings import Settings
 from .widgets.info import Info
 
 
@@ -99,24 +100,31 @@ class MainWin(QtGui.QMainWindow):
         idx = self.tabs.insertTab(1, self.tab_database,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'database.png')), "")
         self.tabs.setTabToolTip(idx, "Database")
+        # seacat
+        self.tab_seacat = Seacat(lib=self.lib, main_win=self)
+        idx = self.tabs.insertTab(2, self.tab_seacat,
+                                  QtGui.QIcon(os.path.join(self.here, 'media', 'seacat.png')), "")
+        self.tabs.setTabToolTip(idx, "SeaCAT")
+        if not self.lib.setup.noaa_tools:
+            self.tab_seacat.setDisabled(True)
         # server
         self.tab_server = Server(lib=self.lib, main_win=self)
-        idx = self.tabs.insertTab(2, self.tab_server,
+        idx = self.tabs.insertTab(3, self.tab_server,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'server.png')), "")
         self.tabs.setTabToolTip(idx, "Server")
         # refraction
         self.tab_refraction = Refraction(lib=self.lib, main_win=self)
-        idx = self.tabs.insertTab(3, self.tab_refraction,
+        idx = self.tabs.insertTab(4, self.tab_refraction,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'refraction.png')), "")
         self.tabs.setTabToolTip(idx, "Refraction Monitor")
         # setup
         self.tab_setup = Settings(lib=self.lib, main_win=self)
-        idx = self.tabs.insertTab(4, self.tab_setup,
+        idx = self.tabs.insertTab(5, self.tab_setup,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'settings.png')), "")
         self.tabs.setTabToolTip(idx, "Setup")
         # info
         self.tab_info = Info(default_url='https://www.hydroffice.org/soundspeed/3_0_0')
-        idx = self.tabs.insertTab(5, self.tab_info,
+        idx = self.tabs.insertTab(6, self.tab_info,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'info.png')), "")
         self.tabs.setTabToolTip(idx, "Info")
 
@@ -356,6 +364,11 @@ class MainWin(QtGui.QMainWindow):
         self.statusBar().setStyleSheet(self.status_bar_normal_style)
 
     def update_gui(self):
+        if self.lib.setup.noaa_tools:
+            self.tab_seacat.setEnabled(True)
+        else:
+            self.tab_seacat.setDisabled(True)
+
         msg = str()
 
         tokens = list()

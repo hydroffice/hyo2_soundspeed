@@ -171,6 +171,26 @@ class General(AbstractWidget):
         btn.clicked.connect(self.on_woa13_folder)
         hbox.addWidget(btn)
 
+        # - use woa09
+        hbox = QtGui.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtGui.QLabel("NOAA tools:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.noaa_tools = QtGui.QComboBox()
+        self.noaa_tools.addItems(["True", "False"])
+        vbox.addWidget(self.noaa_tools)
+        vbox.addStretch()
+
         self.left_layout.addStretch()
 
         # RIGHT
@@ -246,6 +266,8 @@ class General(AbstractWidget):
         self.woa09_folder.textChanged.connect(self.apply_custom_folders)
         # noinspection PyUnresolvedReferences
         self.woa13_folder.textChanged.connect(self.apply_custom_folders)
+        # noinspection PyUnresolvedReferences
+        self.noaa_tools.currentIndexChanged.connect(self.apply_noaa_tools)
         # noinspection PyUnresolvedReferences
         self.default_sn.textChanged.connect(self.apply_default_sn)
 
@@ -340,6 +362,12 @@ class General(AbstractWidget):
         self.setup_changed()
         self.main_win.reload_settings()
 
+    def apply_noaa_tools(self):
+        # logger.debug("apply NOAA tools: %s" % self.noaa_tools.currentText())
+        self.db.noaa_tools = self.noaa_tools.currentText() == "True"
+        self.setup_changed()
+        self.main_win.reload_settings()
+
     def setup_changed(self):
         """Refresh items"""
         # logger.debug("refresh input settings")
@@ -361,6 +389,12 @@ class General(AbstractWidget):
 
         # woa13_folder
         self.woa13_folder.setText("%s" % self.db.custom_woa13_folder)
+
+        # noaa tools
+        if self.db.noaa_tools:
+            self.noaa_tools.setCurrentIndex(0)  # True
+        else:
+            self.noaa_tools.setCurrentIndex(1)  # False
 
         # default_survey
         self.default_survey.setText("%s" % self.db.default_survey)

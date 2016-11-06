@@ -623,6 +623,15 @@ class SetupDb(BaseDb):
     def custom_woa13_folder(self, value):
         self._setter_str("custom_woa13_folder", value)
 
+    # --- noaa tools
+    @property
+    def noaa_tools(self):
+        return self._getter_bool("noaa_tools")
+
+    @noaa_tools.setter
+    def noaa_tools(self, value):
+        self._setter_bool("noaa_tools", value)
+
     # --- default_survey
     @property
     def default_survey(self):
