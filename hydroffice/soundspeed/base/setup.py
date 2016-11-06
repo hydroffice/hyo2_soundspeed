@@ -66,6 +66,10 @@ class Setup(object):
 
         # current settings
         self.current_project = None
+        self.custom_projects_folder = None
+        self.custom_outputs_folder = None
+        self.custom_woa09_folder = None
+        self.custom_woa13_folder = None
         self.default_survey = None
         self.default_vessel = None
         self.default_sn = None
@@ -111,7 +115,7 @@ class Setup(object):
             # client list
             self.client_list = ClientList()  # to reset the list
             for client in db.client_list:
-                client_string = "\"%s\":%s:%s:%s" % (client[1], client[2], client[3], client[4])
+                client_string = "%s:%s:%s:%s" % (client[1], client[2], client[3], client[4])
                 self.client_list.add_client(client_string)
 
             # listeners - sis
@@ -143,6 +147,10 @@ class Setup(object):
 
             # current settings
             self.current_project = db.current_project
+            self.custom_projects_folder = db.custom_projects_folder
+            self.custom_outputs_folder = db.custom_outputs_folder
+            self.custom_woa09_folder = db.custom_woa09_folder
+            self.custom_woa13_folder = db.custom_woa13_folder
             self.default_survey = db.default_survey
             self.default_vessel = db.default_vessel
             self.default_sn = db.default_sn
@@ -219,6 +227,10 @@ class Setup(object):
 
             # current settings
             db.current_project = self.current_project
+            db.custom_projects_folder = self.custom_projects_folder
+            db.custom_outputs_folder = self.custom_outputs_folder
+            db.custom_woa09_folder = self.custom_woa09_folder
+            db.custom_woa13_folder = self.custom_woa13_folder
             db.default_survey = self.default_survey
             db.default_vessel = self.default_vessel
             db.default_sn = self.default_sn
@@ -271,6 +283,10 @@ class Setup(object):
         msg += "      <server_auto_export_on_send: %s>\n" % self.server_auto_export_on_send
         msg += "    <current settings>\n"
         msg += "      <current_project: %s>\n" % self.current_project
+        msg += "      <projects folder: %s>\n" % self.custom_projects_folder
+        msg += "      <outputs folder: %s>\n" % self.custom_outputs_folder
+        msg += "      <woa09 folder: %s>\n" % self.custom_woa09_folder
+        msg += "      <woa13 folder: %s>\n" % self.custom_woa13_folder
         msg += "      <default_survey: %s>\n" % self.default_survey
         msg += "      <default_vessel: %s>\n" % self.default_vessel
         msg += "      <default_sn: %s>\n" % self.default_sn

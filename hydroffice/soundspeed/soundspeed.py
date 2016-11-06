@@ -44,6 +44,7 @@ class SoundSpeedLibrary(object):
 
         # load settings and other functionalities
         self.setup = Setup(data_folder=self.release_folder)
+        self.check_custom_folders()
         self.atlases = Atlases(prj=self)
         self.listeners = Listeners(prj=self)
         self.server = Server(prj=self)
@@ -54,6 +55,45 @@ class SoundSpeedLibrary(object):
         self.logging()  # Set on/off logging for user and server based on loaded settings
 
         logger.info("** > LIB: initialized!")
+
+    def check_custom_folders(self):
+        logger.info("Checking for custom folders")
+
+        # projects folder
+        if len(self.setup.custom_projects_folder):
+
+            if os.path.exists(self.setup.custom_projects_folder):
+                self.projects_folder = self.setup.custom_projects_folder
+            else:  # delete the not-existing folder
+                self.setup.custom_projects_folder = str()
+                self.setup.save_to_db()
+
+        # outputs folder
+        if len(self.setup.custom_outputs_folder):
+
+            if os.path.exists(self.setup.custom_outputs_folder):
+                self.outputs_folder = self.setup.custom_outputs_folder
+            else:  # delete the not-existing folder
+                self.setup.custom_outputs_folder = str()
+                self.setup.save_to_db()
+
+        # woa09 folder
+        if len(self.setup.custom_woa09_folder):
+
+            if os.path.exists(self.setup.custom_woa09_folder):
+                self.woa09_folder = self.setup.custom_woa09_folder
+            else:  # delete the not-existing folder
+                self.setup.custom_woa09_folder = str()
+                self.setup.save_to_db()
+
+        # woa13 folder
+        if len(self.setup.custom_woa13_folder):
+
+            if os.path.exists(self.setup.custom_woa13_folder):
+                self.woa13_folder = self.setup.custom_woa13_folder
+            else:  # delete the not-existing folder
+                self.setup.custom_woa13_folder = str()
+                self.setup.save_to_db()
 
     def close(self):
         """Destructor"""
@@ -996,6 +1036,7 @@ class SoundSpeedLibrary(object):
     def reload_settings_from_db(self):
         """Reload the current setup from the settings db"""
         self.setup.load_from_db()
+        self.check_custom_folders()
 
     def save_settings_to_db(self):
         """Save the current setup to settings db"""

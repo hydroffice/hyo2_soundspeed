@@ -403,8 +403,8 @@ class Output(AbstractWidget):
 
         # prepare the table
         self.client_list.clear()
-        self.client_list.setColumnCount(5)
-        self.client_list.setHorizontalHeaderLabels(['id', 'name', 'IP', 'port', 'protocol'])
+        self.client_list.setColumnCount(4)
+        self.client_list.setHorizontalHeaderLabels(['name', 'IP', 'port', 'protocol'])
 
         # populate the table
         clients = self.db.client_list
@@ -414,10 +414,12 @@ class Output(AbstractWidget):
         self.client_list.setRowCount(len(clients))
         for i, client in enumerate(clients):
             for j, field in enumerate(client):
+                if j == 0:  # skip the id
+                    continue
                 item = QtGui.QTableWidgetItem("%s" % field)
                 item.setTextAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignHCenter)
                 item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
-                self.client_list.setItem(i, j, item)
+                self.client_list.setItem(i, j - 1, item)
 
         self.client_list.resizeColumnsToContents()
 

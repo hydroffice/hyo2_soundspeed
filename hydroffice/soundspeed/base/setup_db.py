@@ -587,6 +587,42 @@ class SetupDb(BaseDb):
     def current_project(self, value):
         self._setter_str("current_project", value)
 
+    # --- custom_projects_folder
+    @property
+    def custom_projects_folder(self):
+        return self._getter_str("custom_projects_folder")
+
+    @custom_projects_folder.setter
+    def custom_projects_folder(self, value):
+        self._setter_str("custom_projects_folder", value)
+
+    # --- custom_outputs_folder
+    @property
+    def custom_outputs_folder(self):
+        return self._getter_str("custom_outputs_folder")
+
+    @custom_outputs_folder.setter
+    def custom_outputs_folder(self, value):
+        self._setter_str("custom_outputs_folder", value)
+
+    # --- custom_woa09_folder
+    @property
+    def custom_woa09_folder(self):
+        return self._getter_str("custom_woa09_folder")
+
+    @custom_woa09_folder.setter
+    def custom_woa09_folder(self, value):
+        self._setter_str("custom_woa09_folder", value)
+
+    # --- custom_woa13_folder
+    @property
+    def custom_woa13_folder(self):
+        return self._getter_str("custom_woa13_folder")
+
+    @custom_woa13_folder.setter
+    def custom_woa13_folder(self, value):
+        self._setter_str("custom_woa13_folder", value)
+
     # --- default_survey
     @property
     def default_survey(self):

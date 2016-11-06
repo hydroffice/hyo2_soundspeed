@@ -53,6 +53,10 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
 
      /* current settings */
      current_project text NOT NULL DEFAULT "default",
+     custom_projects_folder text DEFAULT "",
+     custom_outputs_folder text DEFAULT "",
+     custom_woa09_folder text DEFAULT "",
+     custom_woa13_folder text DEFAULT "",
      default_survey text NOT NULL DEFAULT "",
      default_vessel text NOT NULL DEFAULT "",
      default_sn text NOT NULL DEFAULT "",

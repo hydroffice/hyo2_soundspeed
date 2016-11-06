@@ -84,7 +84,7 @@ class General(AbstractWidget):
         hbox = QtGui.QHBoxLayout()
         self.left_layout.addLayout(hbox)
         hbox.addStretch()
-        self.label = QtGui.QLabel("Project")
+        self.label = QtGui.QLabel("User-defined")
         hbox.addWidget(self.label)
         hbox.addStretch()
 
@@ -102,6 +102,74 @@ class General(AbstractWidget):
         self.current_project.setValidator(validator)
         self.current_project.setReadOnly(True)
         hbox.addWidget(self.current_project)
+
+        # - path to projects
+        hbox = QtGui.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        label = QtGui.QLabel("Path to projects:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.projects_folder = QtGui.QLineEdit()
+        hbox.addWidget(self.projects_folder)
+        # -- button
+        btn = QtGui.QPushButton("...")
+        btn.setMaximumWidth(24)
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_projects_folder)
+        hbox.addWidget(btn)
+
+        # - path to outputs
+        hbox = QtGui.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        label = QtGui.QLabel("Path to outputs:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.outputs_folder = QtGui.QLineEdit()
+        hbox.addWidget(self.outputs_folder)
+        # -- button
+        btn = QtGui.QPushButton("...")
+        btn.setMaximumWidth(24)
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_outputs_folder)
+        hbox.addWidget(btn)
+
+        # - path to woa09
+        hbox = QtGui.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        label = QtGui.QLabel("Path to WOA09:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.woa09_folder = QtGui.QLineEdit()
+        hbox.addWidget(self.woa09_folder)
+        # -- button
+        btn = QtGui.QPushButton("...")
+        btn.setMaximumWidth(24)
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_woa09_folder)
+        hbox.addWidget(btn)
+
+        # - path to woa13
+        hbox = QtGui.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        label = QtGui.QLabel("Path to WOA13:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.woa13_folder = QtGui.QLineEdit()
+        hbox.addWidget(self.woa13_folder)
+        # -- button
+        btn = QtGui.QPushButton("...")
+        btn.setMaximumWidth(24)
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_woa13_folder)
+        hbox.addWidget(btn)
 
         self.left_layout.addStretch()
 
@@ -171,6 +239,14 @@ class General(AbstractWidget):
         # noinspection PyUnresolvedReferences
         self.default_vessel.textChanged.connect(self.apply_default_vessel)
         # noinspection PyUnresolvedReferences
+        self.projects_folder.textChanged.connect(self.apply_custom_folders)
+        # noinspection PyUnresolvedReferences
+        self.outputs_folder.textChanged.connect(self.apply_custom_folders)
+        # noinspection PyUnresolvedReferences
+        self.woa09_folder.textChanged.connect(self.apply_custom_folders)
+        # noinspection PyUnresolvedReferences
+        self.woa13_folder.textChanged.connect(self.apply_custom_folders)
+        # noinspection PyUnresolvedReferences
         self.default_sn.textChanged.connect(self.apply_default_sn)
 
     def apply_default_survey(self):
@@ -185,9 +261,82 @@ class General(AbstractWidget):
         self.setup_changed()
         self.main_win.reload_settings()
 
+    def apply_custom_folders(self):
+        # logger.debug("apply default vessel")
+        self.db.custom_projects_folder = self.projects_folder.text()
+        self.db.custom_outputs_folder = self.outputs_folder.text()
+        self.db.custom_woa09_folder = self.woa09_folder.text()
+        self.db.custom_woa13_folder = self.woa13_folder.text()
+        self.setup_changed()
+        self.main_win.reload_settings()
+
     def apply_default_sn(self):
         # logger.debug("apply default sn")
         self.db.default_sn = self.default_sn.text()
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+    def on_projects_folder(self):
+        logger.debug("user wants to set the folder for projects")
+
+        # ask the file path to the user
+        settings = QtCore.QSettings()
+        selection = QtGui.QFileDialog.getExistingDirectory(self, "Path to projects",
+                                                           settings.value("export_folder"))
+        if not selection:
+            return
+        logger.debug('user selection: %s' % selection)
+
+        self.db.custom_projects_folder = selection
+
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+    def on_outputs_folder(self):
+        logger.debug("user wants to set the folder for outputs")
+
+        # ask the file path to the user
+        settings = QtCore.QSettings()
+        selection = QtGui.QFileDialog.getExistingDirectory(self, "Path to outputs",
+                                                           settings.value("export_folder"))
+        if not selection:
+            return
+        logger.debug('user selection: %s' % selection)
+
+        self.db.custom_outputs_folder = selection
+
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+    def on_woa09_folder(self):
+        logger.debug("user wants to set the folder for woa09")
+
+        # ask the file path to the user
+        settings = QtCore.QSettings()
+        selection = QtGui.QFileDialog.getExistingDirectory(self, "Path to WOA09",
+                                                           settings.value("export_folder"))
+        if not selection:
+            return
+        logger.debug('user selection: %s' % selection)
+
+        self.db.custom_woa09_folder = selection
+
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+    def on_woa13_folder(self):
+        logger.debug("user wants to set the folder for woa13")
+
+        # ask the file path to the user
+        settings = QtCore.QSettings()
+        selection = QtGui.QFileDialog.getExistingDirectory(self, "Path to WOA13",
+                                                           settings.value("export_folder"))
+        if not selection:
+            return
+        logger.debug('user selection: %s' % selection)
+
+        self.db.custom_woa13_folder = selection
+
         self.setup_changed()
         self.main_win.reload_settings()
 
@@ -200,6 +349,18 @@ class General(AbstractWidget):
 
         # current_project
         self.current_project.setText("%s" % self.db.current_project)
+
+        # projects_folder
+        self.projects_folder.setText("%s" % self.db.custom_projects_folder)
+
+        # outputs_folder
+        self.outputs_folder.setText("%s" % self.db.custom_outputs_folder)
+
+        # woa09_folder
+        self.woa09_folder.setText("%s" % self.db.custom_woa09_folder)
+
+        # woa13_folder
+        self.woa13_folder.setText("%s" % self.db.custom_woa13_folder)
 
         # default_survey
         self.default_survey.setText("%s" % self.db.default_survey)

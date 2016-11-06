@@ -137,7 +137,6 @@ class MainWin(QtGui.QMainWindow):
         if type(self.tabs.widget(i)) == Settings:
             self.tab_setup.setup_changed()
 
-
     def check_woa09(self):
         """ helper function that looks after WOA09 database"""
         if not self.lib.use_woa09():
