@@ -909,7 +909,7 @@ class SoundSpeedLibrary(object):
             if not self.has_ref():
                 logger.warning("missing reference profile")
                 return False
-            if not self.cur.extend(self.ref, ext_type=Dicts.sources['ref_ext']):
+            if not self.cur.extend_profile(self.ref, ext_type=Dicts.sources['ref_ext']):
                 return False
             self.cur.modify_proc_info('ext.from ref')
 
@@ -917,7 +917,7 @@ class SoundSpeedLibrary(object):
             if not self.has_rtofs():
                 logger.warning("missing RTOFS profile")
                 return False
-            if not self.cur.extend(self.cur.rtofs, ext_type=Dicts.sources['rtofs_ext']):
+            if not self.cur.extend_profile(self.cur.rtofs, ext_type=Dicts.sources['rtofs_ext']):
                 return False
             self.cur.modify_proc_info('ext.from RTOFS')
 
@@ -925,7 +925,7 @@ class SoundSpeedLibrary(object):
             if not self.has_woa09():
                 logger.warning("missing WOA09 profile")
                 return False
-            if not self.cur.extend(self.cur.woa09, ext_type=Dicts.sources['woa09_ext']):
+            if not self.cur.extend_profile(self.cur.woa09, ext_type=Dicts.sources['woa09_ext']):
                 return False
             self.cur.modify_proc_info('ext.from WOA09')
 
@@ -933,7 +933,7 @@ class SoundSpeedLibrary(object):
             if not self.has_woa13():
                 logger.warning("missing WOA13 profile")
                 return False
-            if not self.cur.extend(self.cur.woa13, ext_type=Dicts.sources['woa13_ext']):
+            if not self.cur.extend_profile(self.cur.woa13, ext_type=Dicts.sources['woa13_ext']):
                 return False
             self.cur.modify_proc_info('ext.from WOA13')
 

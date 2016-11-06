@@ -143,13 +143,12 @@ class DataPlots(AbstractWidget):
                                                    color=self.woa09_color,
                                                    linestyle='--'
                                                    )
-            if self.lib.cur.woa09.l[1]:
+            if len(self.lib.cur.woa09.l) == 3:
                 self.speed_woa09_min, = self.speed_ax.plot(self.lib.cur.woa09.l[1].proc.speed,
                                                            self.lib.cur.woa09.l[1].proc.depth,
                                                            color=self.woa09_color,
                                                            linestyle=':'
                                                            )
-            if self.lib.cur.woa09.l[2]:
                 self.speed_woa09_max, = self.speed_ax.plot(self.lib.cur.woa09.l[2].proc.speed,
                                                            self.lib.cur.woa09.l[2].proc.depth,
                                                            color=self.woa09_color,
@@ -161,13 +160,12 @@ class DataPlots(AbstractWidget):
                                                    color=self.woa13_color,
                                                    linestyle='--'
                                                    )
-            if self.lib.cur.woa13.l[1]:
+            if len(self.lib.cur.woa13.l) == 3:
                 self.speed_woa13_min, = self.speed_ax.plot(self.lib.cur.woa13.l[1].proc.speed,
                                                            self.lib.cur.woa13.l[1].proc.depth,
                                                            color=self.woa13_color,
                                                            linestyle=':'
                                                            )
-            if self.lib.cur.woa13.l[2]:
                 self.speed_woa13_max, = self.speed_ax.plot(self.lib.cur.woa13.l[2].proc.speed,
                                                            self.lib.cur.woa13.l[2].proc.depth,
                                                            color=self.woa13_color,
@@ -221,13 +219,12 @@ class DataPlots(AbstractWidget):
                                                  color=self.woa09_color,
                                                  linestyle='--'
                                                  )
-            if self.lib.cur.woa09.l[1]:
+            if len(self.lib.cur.woa09.l) == 3:
                 self.temp_woa09_min, = self.temp_ax.plot(self.lib.cur.woa09.l[1].proc.temp,
                                                          self.lib.cur.woa09.l[1].proc.depth,
                                                          color=self.woa09_color,
                                                          linestyle=':'
                                                          )
-            if self.lib.cur.woa09.l[2]:
                 self.temp_woa09_max, = self.temp_ax.plot(self.lib.cur.woa09.l[2].proc.temp,
                                                          self.lib.cur.woa09.l[2].proc.depth,
                                                          color=self.woa09_color,
@@ -239,13 +236,12 @@ class DataPlots(AbstractWidget):
                                                  color=self.woa13_color,
                                                  linestyle='--'
                                                  )
-            if self.lib.cur.woa13.l[1]:
+            if len(self.lib.cur.woa13.l) == 3:
                 self.temp_woa13_min, = self.temp_ax.plot(self.lib.cur.woa13.l[1].proc.temp,
                                                          self.lib.cur.woa13.l[1].proc.depth,
                                                          color=self.woa13_color,
                                                          linestyle=':'
                                                          )
-            if self.lib.cur.woa13.l[2]:
                 self.temp_woa13_max, = self.temp_ax.plot(self.lib.cur.woa13.l[2].proc.temp,
                                                          self.lib.cur.woa13.l[2].proc.depth,
                                                          color=self.woa13_color,
@@ -289,13 +285,12 @@ class DataPlots(AbstractWidget):
                                                color=self.woa09_color,
                                                linestyle='--'
                                                )
-            if self.lib.cur.woa09.l[1]:
+            if len(self.lib.cur.woa09.l) == 3:
                 self.sal_woa09_min, = self.sal_ax.plot(self.lib.cur.woa09.l[1].proc.sal,
                                                        self.lib.cur.woa09.l[1].proc.depth,
                                                        color=self.woa09_color,
                                                        linestyle=':'
                                                        )
-            if self.lib.cur.woa09.l[2]:
                 self.sal_woa09_max, = self.sal_ax.plot(self.lib.cur.woa09.l[2].proc.sal,
                                                        self.lib.cur.woa09.l[2].proc.depth,
                                                        color=self.woa09_color,
@@ -307,13 +302,12 @@ class DataPlots(AbstractWidget):
                                                color=self.woa13_color,
                                                linestyle='--'
                                                )
-            if self.lib.cur.woa13.l[1]:
+            if len(self.lib.cur.woa13.l) == 3:
                 self.sal_woa13_min, = self.sal_ax.plot(self.lib.cur.woa13.l[1].proc.sal,
                                                        self.lib.cur.woa13.l[1].proc.depth,
                                                        color=self.woa13_color,
                                                        linestyle=':'
                                                        )
-            if self.lib.cur.woa13.l[2]:
                 self.sal_woa13_max, = self.sal_ax.plot(self.lib.cur.woa13.l[2].proc.sal,
                                                        self.lib.cur.woa13.l[2].proc.depth,
                                                        color=self.woa13_color,

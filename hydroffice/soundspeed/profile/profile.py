@@ -465,9 +465,9 @@ class Profile(object):
 
             self.proc.num_samples += 1
 
-    def extend(self, extender, ext_type):
+    def extend_profile(self, extender, ext_type):
         """ Use the extender samples to extend the profile """
-        logger.debug("extension source type: %s" % ext_type)
+        logger.debug("extension source type: %s" % Dicts.first_match(Dicts.sources, ext_type))
         extender.cur.proc.source[:] = ext_type
 
         # find the max valid depth in the current profile
@@ -485,12 +485,16 @@ class Profile(object):
 
         # find the depth values in the extender that are deeper than the current (valid) max depth
         ext_vi = extender.cur.proc_valid
-        # noinspection PyTypeChecker
-        ind2 = np.argwhere(extender.cur.proc.depth[ext_vi][:] > max_depth)[0][0]
-        if ind2 <= 0:
-            logger.info("nothing to extend with")
+        try:
+            # noinspection PyTypeChecker
+            ind2 = np.argwhere(extender.cur.proc.depth[ext_vi][:] > max_depth)[0][0]
+            if ind2 <= 0:
+                logger.info("nothing to extend with")
+                return True
+            # logger.debug("ext.max depth: [%s]" % ind2)
+        except IndexError as e:
+            logger.warning("too short to extend with: %s" % e)
             return True
-        # logger.debug("ext.max depth: [%s]" % ind2)
 
         # stack the extending samples after the last valid (max depth) index
         self.proc.pressure = np.hstack([self.proc.depth[:max_idx],

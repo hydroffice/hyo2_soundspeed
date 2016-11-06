@@ -1,19 +1,19 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import os
-import copy
 import logging
 
 from PySide import QtGui, QtCore
 
 logger = logging.getLogger(__name__)
 
-from .widget import AbstractWidget
-from ..dialogs.input_dialog import InputDialog
-from ..dialogs.spreadsheet_dialog import SpreadSheetDialog
-from ..dialogs.metadata_dialog import MetadataDialog
-from ..dialogs.export_dialog import ExportDialog
-from .dataplots import DataPlots
+from hydroffice.soundspeedmanager.widgets.widget import AbstractWidget
+from hydroffice.soundspeedmanager.dialogs.input_dialog import InputDialog
+from hydroffice.soundspeedmanager.dialogs.reference_dialog import ReferenceDialog
+from hydroffice.soundspeedmanager.dialogs.spreadsheet_dialog import SpreadSheetDialog
+from hydroffice.soundspeedmanager.dialogs.metadata_dialog import MetadataDialog
+from hydroffice.soundspeedmanager.dialogs.export_dialog import ExportDialog
+from hydroffice.soundspeedmanager.widgets.dataplots import DataPlots
 
 from hydroffice.soundspeed.profile.dicts import Dicts
 
@@ -41,6 +41,12 @@ class Editor(AbstractWidget):
         # noinspection PyUnresolvedReferences
         self.clear_act.triggered.connect(self.on_clear_data)
         self.input_bar.addAction(self.clear_act)
+        # set ref
+        self.set_ref_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'ref.png')), 'Reference cast', self)
+        self.set_ref_act.setShortcut('Alt+R')
+        # noinspection PyUnresolvedReferences
+        self.set_ref_act.triggered.connect(self.on_set_ref)
+        self.input_bar.addAction(self.set_ref_act)
 
         self.process_bar = self.addToolBar('Process')
         self.process_bar.setIconSize(QtCore.QSize(42, 42))
@@ -120,12 +126,6 @@ class Editor(AbstractWidget):
         # noinspection PyUnresolvedReferences
         self.save_db_act.triggered.connect(self.on_save_db)
         self.output_bar.addAction(self.save_db_act)
-        # set ref
-        self.set_ref_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'ref.png')), 'Reference cast', self)
-        self.set_ref_act.setShortcut('Alt+R')
-        # noinspection PyUnresolvedReferences
-        self.set_ref_act.triggered.connect(self.on_set_ref)
-        self.output_bar.addAction(self.set_ref_act)
 
         # plots
         self.dataplots = DataPlots(main_win=self.main_win, lib=self.lib)
@@ -143,6 +143,14 @@ class Editor(AbstractWidget):
         logger.debug('user wants to clear data')
         self.lib.clear_data()
         self.main_win.data_cleared()
+
+    def on_set_ref(self):
+        logger.debug('user wants to set as a reference')
+
+        dlg = ReferenceDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        success = dlg.exec_()
+        if success:
+            self.main_win.data_imported()
 
     def on_restart_proc(self):
         logger.debug('user wants to restart processing')
@@ -265,22 +273,14 @@ class Editor(AbstractWidget):
         else:
             self.main_win.data_stored()
 
-    def on_set_ref(self):
-        logger.debug('user wants to set as a reference')
-        if not self.lib.has_ssp():
-            logger.debug('cleaning reference')
-            self.lib.ref = None
-        else:
-            logger.debug('cloning current profile')
-            self.lib.ref = copy.deepcopy(self.lib.ssp)
-
     def data_cleared(self):
         # bars
         self.process_bar.hide()
         self.output_bar.hide()
         # dialogs
-        self.restart_act.setDisabled(True)
         self.clear_act.setDisabled(True)
+        self.set_ref_act.setDisabled(True)
+        self.restart_act.setDisabled(True)
         self.spreadsheet_act.setDisabled(True)
         self.sal_act.setDisabled(True)
         self.temp_sal_act.setDisabled(True)
@@ -299,8 +299,9 @@ class Editor(AbstractWidget):
         self.process_bar.show()
         self.output_bar.show()
         # dialogs
-        self.restart_act.setDisabled(False)
         self.clear_act.setDisabled(False)
+        self.set_ref_act.setDisabled(False)
+        self.restart_act.setDisabled(False)
         self.spreadsheet_act.setDisabled(False)
         self.metadata_act.setDisabled(False)
         if self.lib.cur.meta.sensor_type == Dicts.sensor_types['XBT']:
