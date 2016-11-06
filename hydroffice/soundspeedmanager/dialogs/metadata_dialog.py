@@ -18,7 +18,7 @@ class MetadataDialog(AbstractDialog):
         self.setWindowTitle("Metadata")
         self.setMinimumWidth(550)
 
-        lbl_width = 60
+        lbl_width = 90
 
         # outline ui
         self.mainLayout = QtGui.QVBoxLayout()
@@ -131,6 +131,72 @@ class MetadataDialog(AbstractDialog):
         self.sn.setText("%s" % self.lib.cur.meta.sn)
         hbox.addWidget(self.sn)
 
+        # pressure uom
+        hbox = QtGui.QHBoxLayout()
+        self.mainLayout.addLayout(hbox)
+        label = QtGui.QLabel("Pressure UoM:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        self.pressure_uom = QtGui.QLineEdit()
+        self.pressure_uom.setDisabled(True)
+        self.pressure_uom.setText("%s" % self.lib.cur.meta.pressure_uom)
+        hbox.addWidget(self.pressure_uom)
+        
+        # depth uom
+        hbox = QtGui.QHBoxLayout()
+        self.mainLayout.addLayout(hbox)
+        label = QtGui.QLabel("depth UoM:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        self.depth_uom = QtGui.QLineEdit()
+        self.depth_uom.setDisabled(True)
+        self.depth_uom.setText("%s" % self.lib.cur.meta.depth_uom)
+        hbox.addWidget(self.depth_uom)
+        
+        # speed uom
+        hbox = QtGui.QHBoxLayout()
+        self.mainLayout.addLayout(hbox)
+        label = QtGui.QLabel("speed UoM:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        self.speed_uom = QtGui.QLineEdit()
+        self.speed_uom.setDisabled(True)
+        self.speed_uom.setText("%s" % self.lib.cur.meta.speed_uom)
+        hbox.addWidget(self.speed_uom)
+        
+        # temperature uom
+        hbox = QtGui.QHBoxLayout()
+        self.mainLayout.addLayout(hbox)
+        label = QtGui.QLabel("temperature UoM:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        self.temperature_uom = QtGui.QLineEdit()
+        self.temperature_uom.setDisabled(True)
+        self.temperature_uom.setText("%s" % self.lib.cur.meta.temperature_uom)
+        hbox.addWidget(self.temperature_uom)
+        
+        # conductivity uom
+        hbox = QtGui.QHBoxLayout()
+        self.mainLayout.addLayout(hbox)
+        label = QtGui.QLabel("conductivity UoM:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        self.conductivity_uom = QtGui.QLineEdit()
+        self.conductivity_uom.setDisabled(True)
+        self.conductivity_uom.setText("%s" % self.lib.cur.meta.conductivity_uom)
+        hbox.addWidget(self.conductivity_uom)
+        
+        # salinity uom
+        hbox = QtGui.QHBoxLayout()
+        self.mainLayout.addLayout(hbox)
+        label = QtGui.QLabel("salinity UoM:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        self.salinity_uom = QtGui.QLineEdit()
+        self.salinity_uom.setDisabled(True)
+        self.salinity_uom.setText("%s" % self.lib.cur.meta.salinity_uom)
+        hbox.addWidget(self.salinity_uom)
+
         self.mainLayout.addStretch()
 
         # edit/apply
@@ -165,11 +231,24 @@ class MetadataDialog(AbstractDialog):
             self.survey.setEnabled(True)
             self.vessel.setEnabled(True)
             self.sn.setEnabled(True)
+            self.pressure_uom.setEnabled(True)
+            self.depth_uom.setEnabled(True)
+            self.speed_uom.setEnabled(True)
+            self.temperature_uom.setEnabled(True)
+            self.conductivity_uom.setEnabled(True)
+            self.salinity_uom.setEnabled(True)
+
         else:
             self.apply.setDisabled(True)
             self.survey.setDisabled(True)
             self.vessel.setDisabled(True)
             self.sn.setDisabled(True)
+            self.pressure_uom.setDisabled(True)
+            self.depth_uom.setDisabled(True)
+            self.speed_uom.setDisabled(True)
+            self.temperature_uom.setDisabled(True)
+            self.conductivity_uom.setDisabled(True)
+            self.salinity_uom.setDisabled(True)
 
     def on_apply(self):
         logger.debug("apply")
@@ -178,6 +257,12 @@ class MetadataDialog(AbstractDialog):
             self.lib.cur.meta.survey = self.survey.text()
             self.lib.cur.meta.vessel = self.vessel.text()
             self.lib.cur.meta.sn = self.sn.text()
+            self.lib.cur.meta.pressure_uom = self.pressure_uom.text()
+            self.lib.cur.meta.depth_uom = self.depth_uom.text()
+            self.lib.cur.meta.speed_uom = self.speed_uom.text()
+            self.lib.cur.meta.conductivity_uom = self.conductivity_uom.text()
+            self.lib.cur.meta.salinity_uom = self.salinity_uom.text()
+
         except RuntimeError as e:
             msg = "Issue in apply changes\n%s" % e
             # noinspection PyCallByClass

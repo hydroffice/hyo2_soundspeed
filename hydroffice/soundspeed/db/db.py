@@ -2,7 +2,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import sqlite3
 import os
-from datetime import datetime as dt
 import logging
 
 logger = logging.getLogger(__name__)
@@ -142,6 +141,12 @@ class ProjectDb(object):
                                      sn text,
                                      proc_time timestamp,
                                      proc_info text,
+                                     pressure_uom text,
+                                     depth_uom text,
+                                     speed_uom text,
+                                     temperature_uom text,
+                                     conductivity_uom text,
+                                     salinity_uom text,
                                      PRIMARY KEY (pk),
                                      FOREIGN KEY(pk) REFERENCES ssp_pk(id))
                                   """)
@@ -150,9 +155,11 @@ class ProjectDb(object):
                 self.conn.execute("""
                                   CREATE TABLE IF NOT EXISTS data(
                                      ssp_pk integer NOT NULL,
+                                     pressure real,
                                      depth real NOT NULL,
                                      speed real,
                                      temperature real,
+                                     conductivity real,
                                      salinity real,
                                      source int NOT NULL DEFAULT  0,
                                      flag int NOT NULL DEFAULT 0,
@@ -164,9 +171,11 @@ class ProjectDb(object):
                 self.conn.execute("""
                                   CREATE TABLE IF NOT EXISTS proc(
                                      ssp_pk integer NOT NULL,
+                                     pressure real,
                                      depth real NOT NULL,
                                      speed real,
                                      temperature real,
+                                     conductivity real,
                                      salinity real,
                                      source int NOT NULL DEFAULT  0,
                                      flag int NOT NULL DEFAULT 0,
@@ -178,9 +187,11 @@ class ProjectDb(object):
                 self.conn.execute("""
                                   CREATE TABLE IF NOT EXISTS sis(
                                      ssp_pk integer NOT NULL,
+                                     pressure real,
                                      depth real NOT NULL,
                                      speed real,
                                      temperature real,
+                                     conductivity real,
                                      salinity real,
                                      source int NOT NULL DEFAULT  0,
                                      flag int NOT NULL DEFAULT 0,
@@ -198,7 +209,13 @@ class ProjectDb(object):
                                         vessel,
                                         sn,
                                         proc_time,
-                                        proc_info
+                                        proc_info,
+                                        pressure_uom,
+                                        depth_uom,
+                                        speed_uom,
+                                        temperature_uom,
+                                        conductivity_uom,
+                                        salinity_uom
                                         FROM ssp a LEFT OUTER JOIN ssp_pk b ON a.pk=b.id
                                   """)
 
@@ -345,7 +362,7 @@ class ProjectDb(object):
         try:
             # noinspection SqlResolve
             self.conn.execute("""
-                              INSERT INTO ssp VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                              INSERT INTO ssp VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                               """, (self.tmp_ssp_pk,
                                     self.tmp_data.meta.sensor_type,
                                     self.tmp_data.meta.probe_type,
@@ -354,7 +371,13 @@ class ProjectDb(object):
                                     self.tmp_data.meta.vessel,
                                     self.tmp_data.meta.sn,
                                     self.tmp_data.meta.proc_time,
-                                    self.tmp_data.meta.proc_info
+                                    self.tmp_data.meta.proc_info,
+                                    self.tmp_data.meta.pressure_uom,
+                                    self.tmp_data.meta.depth_uom,
+                                    self.tmp_data.meta.speed_uom,
+                                    self.tmp_data.meta.temperature_uom,
+                                    self.tmp_data.meta.conductivity_uom,
+                                    self.tmp_data.meta.salinity_uom
                                     ))
             # logger.info("insert new %s pk in ssp" % self.tmp_ssp_pk)
 
@@ -376,11 +399,13 @@ class ProjectDb(object):
                 # first check if the sample is already present with exactly the same values
                 # noinspection SqlResolve
                 self.conn.execute("""
-                                  INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?)
+                                  INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                                   """, (self.tmp_ssp_pk,
+                                        self.tmp_data.data.pressure[i],
                                         self.tmp_data.data.depth[i],
                                         self.tmp_data.data.speed[i],
                                         self.tmp_data.data.temp[i],
+                                        self.tmp_data.data.conductivity[i],
                                         self.tmp_data.data.sal[i],
                                         self.tmp_data.data.source[i],
                                         self.tmp_data.data.flag[i],
@@ -408,11 +433,13 @@ class ProjectDb(object):
                 # first check if the sample is already present with exactly the same values
                 # noinspection SqlResolve
                 self.conn.execute("""
-                                  INSERT INTO proc VALUES (?, ?, ?, ?, ?, ?, ?)
+                                  INSERT INTO proc VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                                   """, (self.tmp_ssp_pk,
+                                        self.tmp_data.proc.pressure[i],
                                         self.tmp_data.proc.depth[i],
                                         self.tmp_data.proc.speed[i],
                                         self.tmp_data.proc.temp[i],
+                                        self.tmp_data.proc.conductivity[i],
                                         self.tmp_data.proc.sal[i],
                                         self.tmp_data.proc.source[i],
                                         self.tmp_data.proc.flag[i],
@@ -441,11 +468,13 @@ class ProjectDb(object):
                 # first check if the sample is already present with exactly the same values
                 # noinspection SqlResolve
                 self.conn.execute("""
-                                  INSERT INTO sis VALUES (?, ?, ?, ?, ?, ?, ?)
+                                  INSERT INTO sis VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                                   """, (self.tmp_ssp_pk,
+                                        self.tmp_data.sis.pressure[i],
                                         self.tmp_data.sis.depth[i],
                                         self.tmp_data.sis.speed[i],
                                         self.tmp_data.sis.temp[i],
+                                        self.tmp_data.sis.conductivity[i],
                                         self.tmp_data.sis.sal[i],
                                         self.tmp_data.sis.source[i],
                                         self.tmp_data.sis.flag[i],
@@ -507,6 +536,12 @@ class ProjectDb(object):
                                      row[b'sn'],  # 8
                                      row[b'proc_time'],  # 9
                                      row[b'proc_info'],  # 10
+                                     row[b'pressure_uom'],  # 11
+                                     row[b'depth_uom'],  # 12
+                                     row[b'speed_uom'],  # 13
+                                     row[b'temperature_uom'],  # 14
+                                     row[b'conductivity_uom'],  # 15
+                                     row[b'salinity_uom'],  # 16
                                      ))
             return ssp_list
 
@@ -550,6 +585,13 @@ class ProjectDb(object):
                 ssp.cur.meta.proc_time = ssp_meta[b'proc_time']
                 ssp.cur.meta.proc_info = ssp_meta[b'proc_info']
 
+                ssp.cur.meta.pressure_uom = ssp_meta[b'pressure_uom']
+                ssp.cur.meta.depth_uom = ssp_meta[b'depth_uom']
+                ssp.cur.meta.speed_uom = ssp_meta[b'speed_uom']
+                ssp.cur.meta.temperature_uom = ssp_meta[b'temperature_uom']
+                ssp.cur.meta.conductivity_uom = ssp_meta[b'conductivity_uom']
+                ssp.cur.meta.salinity_uom = ssp_meta[b'salinity_uom']
+
             except sqlite3.Error as e:
                 logger.error("ssp meta for %s pk > %s: %s" % (pk, type(e), e))
                 return None
@@ -563,9 +605,11 @@ class ProjectDb(object):
                 # logger.debug("raw data samples: %s" % num_samples)
                 for i in range(num_samples):
                     # print(ssp_samples[i])
+                    ssp.cur.data.pressure[i] = ssp_samples[i][b'pressure']
                     ssp.cur.data.depth[i] = ssp_samples[i][b'depth']
                     ssp.cur.data.speed[i] = ssp_samples[i][b'speed']
                     ssp.cur.data.temp[i] = ssp_samples[i][b'temperature']
+                    ssp.cur.data.conductivity[i] = ssp_samples[i][b'conductivity']
                     ssp.cur.data.sal[i] = ssp_samples[i][b'salinity']
                     ssp.cur.data.source[i] = ssp_samples[i][b'source']
                     ssp.cur.data.flag[i] = ssp_samples[i][b'flag']
@@ -583,9 +627,11 @@ class ProjectDb(object):
                 # logger.debug("proc data samples: %s" % num_samples)
                 for i in range(num_samples):
                     # print(ssp_samples[i])
+                    ssp.cur.proc.pressure[i] = ssp_samples[i][b'pressure']
                     ssp.cur.proc.depth[i] = ssp_samples[i][b'depth']
                     ssp.cur.proc.speed[i] = ssp_samples[i][b'speed']
                     ssp.cur.proc.temp[i] = ssp_samples[i][b'temperature']
+                    ssp.cur.proc.conductivity[i] = ssp_samples[i][b'conductivity']
                     ssp.cur.proc.sal[i] = ssp_samples[i][b'salinity']
                     ssp.cur.proc.source[i] = ssp_samples[i][b'source']
                     ssp.cur.proc.flag[i] = ssp_samples[i][b'flag']
@@ -603,9 +649,11 @@ class ProjectDb(object):
                 # logger.debug("sis data samples: %s" % num_samples)
                 for i in range(num_samples):
                     # print(ssp_samples[i])
+                    ssp.cur.sis.pressure[i] = ssp_samples[i][b'depth']
                     ssp.cur.sis.depth[i] = ssp_samples[i][b'depth']
                     ssp.cur.sis.speed[i] = ssp_samples[i][b'speed']
                     ssp.cur.sis.temp[i] = ssp_samples[i][b'temperature']
+                    ssp.cur.sis.conductivity[i] = ssp_samples[i][b'conductivity']
                     ssp.cur.sis.sal[i] = ssp_samples[i][b'salinity']
                     ssp.cur.sis.source[i] = ssp_samples[i][b'source']
                     ssp.cur.sis.flag[i] = ssp_samples[i][b'flag']

@@ -24,7 +24,7 @@ class Database(AbstractWidget):
     def __init__(self, main_win, lib):
         AbstractWidget.__init__(self, main_win=main_win, lib=lib)
 
-        lbl_width = 80
+        lbl_width = 60
 
         # create the overall layout
         self.main_layout = QtGui.QVBoxLayout()
@@ -240,11 +240,14 @@ class Database(AbstractWidget):
 
         # prepare the table
         self.ssp_list.clear()
-        self.ssp_list.setColumnCount(11)
+        self.ssp_list.setColumnCount(17)
         self.ssp_list.setHorizontalHeaderLabels(['id', 'time', 'location',
                                                  'sensor', 'probe', 'original path',
                                                  'survey', 'vessel', 'sn',
-                                                 'processing time', 'processing info'])
+                                                 'processing time', 'processing info',
+                                                 'pressure uom', 'depth uom', 'speed uom',
+                                                 'temperature uom', 'conductivity uom', 'salinity uom',
+                                                 ])
 
         # populate the table
         self.ssp_list.setRowCount(len(lst))

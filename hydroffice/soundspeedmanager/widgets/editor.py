@@ -9,8 +9,7 @@ from PySide import QtGui, QtCore
 logger = logging.getLogger(__name__)
 
 from .widget import AbstractWidget
-from ..dialogs.import_dialog import ImportDialog
-from ..dialogs.receive_dialog import ReceiveDialog
+from ..dialogs.input_dialog import InputDialog
 from ..dialogs.spreadsheet_dialog import SpreadSheetDialog
 from ..dialogs.metadata_dialog import MetadataDialog
 from ..dialogs.export_dialog import ExportDialog
@@ -27,140 +26,116 @@ class Editor(AbstractWidget):
     def __init__(self, main_win, lib):
         AbstractWidget.__init__(self, main_win=main_win, lib=lib)
 
-        self.file_bar = self.addToolBar('File')
-        self.file_bar.setIconSize(QtCore.QSize(36, 36))
+        self.input_bar = self.addToolBar('Input')
+        self.input_bar.setIconSize(QtCore.QSize(42, 42))
         # import
-        self.import_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'import.png')),
-                                        'Import data', self)
-        self.import_act.setShortcut('Alt+I')
-        self.import_act.triggered.connect(self.on_import_data)
-        self.file_bar.addAction(self.import_act)
-        # receive
-        self.receive_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'receive.png')),
-                                         'Retrieve data', self)
-        self.receive_act.setShortcut('Alt+R')
-        self.receive_act.triggered.connect(self.on_receive_data)
-        self.file_bar.addAction(self.receive_act)
-        # load db
-        self.load_db_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'db_load.png')),
-                                         'Load from database', self)
-        self.load_db_act.setShortcut('Alt+L')
-        self.load_db_act.triggered.connect(self.on_load_db)
-        self.file_bar.addAction(self.load_db_act)
-        # restart processing
-        self.restart_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'restart.png')),
-                                         'Restart processing', self)
-        self.restart_act.setShortcut('Alt+N')
-        self.restart_act.triggered.connect(self.on_restart_proc)
-        self.file_bar.addAction(self.restart_act)
+        self.input_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'input.png')),
+                                        'Input data', self)
+        self.input_act.setShortcut('Alt+I')
+        # noinspection PyUnresolvedReferences
+        self.input_act.triggered.connect(self.on_input_data)
+        self.input_bar.addAction(self.input_act)
         # clear
         self.clear_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'clear.png')), 'Clear data', self)
         self.clear_act.setShortcut('Alt+C')
+        # noinspection PyUnresolvedReferences
         self.clear_act.triggered.connect(self.on_clear_data)
-        self.file_bar.addAction(self.clear_act)
-        # separator
-        self.file_bar.addSeparator()
+        self.input_bar.addAction(self.clear_act)
+
+        self.process_bar = self.addToolBar('Process')
+        self.process_bar.setIconSize(QtCore.QSize(42, 42))
         # spreadsheet
         self.spreadsheet_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'grid.png')), 'Spreadsheet', self)
         self.spreadsheet_act.setShortcut('Alt+S')
+        # noinspection PyUnresolvedReferences
         self.spreadsheet_act.triggered.connect(self.on_spreadsheet)
-        self.file_bar.addAction(self.spreadsheet_act)
+        self.process_bar.addAction(self.spreadsheet_act)
         # metadata
         self.metadata_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata.png')), 'Metadata', self)
         self.metadata_act.setShortcut('Alt+M')
+        # noinspection PyUnresolvedReferences
         self.metadata_act.triggered.connect(self.on_metadata)
-        self.file_bar.addAction(self.metadata_act)
+        self.process_bar.addAction(self.metadata_act)
+        # - separator
+        self.process_bar.addSeparator()
         # retrieve sal
         self.sal_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'sal.png')), 'Retrieve salinity', self)
         self.sal_act.setShortcut('Alt+A')
+        # noinspection PyUnresolvedReferences
         self.sal_act.triggered.connect(self.on_retrieve_sal)
-        self.file_bar.addAction(self.sal_act)
+        self.process_bar.addAction(self.sal_act)
         # retrieve temp/sal
         self.temp_sal_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'temp_sal.png')),
                                           'Retrieve temperature/salinity', self)
         self.temp_sal_act.setShortcut('Alt+T')
+        # noinspection PyUnresolvedReferences
         self.temp_sal_act.triggered.connect(self.on_retrieve_temp_sal)
-        self.file_bar.addAction(self.temp_sal_act)
+        self.process_bar.addAction(self.temp_sal_act)
         # retrieve transducer sound speed
         self.tss_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'tss.png')),
                                      'Retrieve transducer sound speed', self)
         self.tss_act.setShortcut('Alt+W')
+        # noinspection PyUnresolvedReferences
         self.tss_act.triggered.connect(self.on_retrieve_tss)
-        self.file_bar.addAction(self.tss_act)
+        self.process_bar.addAction(self.tss_act)
         # extend profile
         self.extend_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'extend.png')), 'Extend profile', self)
         self.extend_act.setShortcut('Alt+E')
+        # noinspection PyUnresolvedReferences
         self.extend_act.triggered.connect(self.on_extend_profile)
-        self.file_bar.addAction(self.extend_act)
+        self.process_bar.addAction(self.extend_act)
         # preview thinning
         self.thin_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'thinning.png')), 'Preview thinning', self)
         self.thin_act.setShortcut('Alt+H')
+        # noinspection PyUnresolvedReferences
         self.thin_act.triggered.connect(self.on_preview_thinning)
-        self.file_bar.addAction(self.thin_act)
-        # separator
-        self.file_bar.addSeparator()
+        self.process_bar.addAction(self.thin_act)
+        # - separator
+        self.process_bar.addSeparator()
+        # restart processing
+        self.restart_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'restart.png')),
+                                         'Restart processing', self)
+        self.restart_act.setShortcut('Alt+N')
+        # noinspection PyUnresolvedReferences
+        self.restart_act.triggered.connect(self.on_restart_proc)
+        self.process_bar.addAction(self.restart_act)
+
+        self.output_bar = self.addToolBar('Output')
+        self.output_bar.setIconSize(QtCore.QSize(42, 42))
         # export
         self.export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export.png')), 'Export data', self)
         self.export_act.setShortcut('Alt+E')
+        # noinspection PyUnresolvedReferences
         self.export_act.triggered.connect(self.on_export_data)
-        self.file_bar.addAction(self.export_act)
+        self.output_bar.addAction(self.export_act)
         # transmit
         self.transmit_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'transmit.png')), 'Transmit data', self)
         self.transmit_act.setShortcut('Alt+E')
+        # noinspection PyUnresolvedReferences
         self.transmit_act.triggered.connect(self.on_transmit_data)
-        self.file_bar.addAction(self.transmit_act)
+        self.output_bar.addAction(self.transmit_act)
         # save db
         self.save_db_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'db_save.png')), 'Save to database', self)
         self.save_db_act.setShortcut('Alt+D')
+        # noinspection PyUnresolvedReferences
         self.save_db_act.triggered.connect(self.on_save_db)
-        self.file_bar.addAction(self.save_db_act)
+        self.output_bar.addAction(self.save_db_act)
         # set ref
         self.set_ref_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'ref.png')), 'Reference cast', self)
         self.set_ref_act.setShortcut('Alt+R')
+        # noinspection PyUnresolvedReferences
         self.set_ref_act.triggered.connect(self.on_set_ref)
-        self.file_bar.addAction(self.set_ref_act)
+        self.output_bar.addAction(self.set_ref_act)
 
         # plots
         self.dataplots = DataPlots(main_win=self.main_win, lib=self.lib)
         self.setCentralWidget(self.dataplots)
 
-    def on_import_data(self):
+    def on_input_data(self):
         """Import a data file"""
-        logger.debug('user wants to import a data file')
-        dlg = ImportDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        logger.debug('user wants to input data')
+        dlg = InputDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
-        if self.lib.has_ssp():
-            self.main_win.data_imported()
-
-    def on_receive_data(self):
-        """Receive data"""
-        logger.debug('user wants to receive data')
-        dlg = ReceiveDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        dlg.exec_()
-        if self.lib.has_ssp():
-            self.main_win.data_imported()
-
-    def on_load_db(self):
-        """Load data from database"""
-        logger.debug('user wants to load data from db')
-
-        profiles = self.lib.db_list_profiles()
-        lst = ["#%03d: %s" % (p[0], p[1]) for p in profiles]
-        if len(lst) == 0:
-            msg = "Store data before import!"
-            QtGui.QMessageBox.warning(self, "Database", msg, QtGui.QMessageBox.Ok)
-            return
-
-        sel, ok = QtGui.QInputDialog.getItem(self, 'Database', 'Select profile to load:', lst, 0, False)
-        if not ok:
-            return
-
-        success = self.lib.load_profile(profiles[lst.index(sel)][0])
-        if not success:
-            msg = "Unable to load profile!"
-            QtGui.QMessageBox.warning(self, "Database", msg, QtGui.QMessageBox.Ok)
-            return
-
         if self.lib.has_ssp():
             self.main_win.data_imported()
 
@@ -300,7 +275,11 @@ class Editor(AbstractWidget):
             self.lib.ref = copy.deepcopy(self.lib.ssp)
 
     def data_cleared(self):
+        # bars
+        self.process_bar.hide()
+        self.output_bar.hide()
         # dialogs
+        self.restart_act.setDisabled(True)
         self.clear_act.setDisabled(True)
         self.spreadsheet_act.setDisabled(True)
         self.sal_act.setDisabled(True)
@@ -316,7 +295,11 @@ class Editor(AbstractWidget):
         self.dataplots.setHidden(True)
 
     def data_imported(self):
+        # bars
+        self.process_bar.show()
+        self.output_bar.show()
         # dialogs
+        self.restart_act.setDisabled(False)
         self.clear_act.setDisabled(False)
         self.spreadsheet_act.setDisabled(False)
         self.metadata_act.setDisabled(False)

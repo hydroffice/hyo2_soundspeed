@@ -23,7 +23,7 @@ class Saiv(AbstractTextReader):
         self._ext.add('txt')
 
         self.tk_header = 'Ser\tMeas'
-        self.tk_depth = 'Press'
+        self.tk_pressure = 'Press'
         self.tk_speed = 'S. vel.'
         self.tk_temp = 'Temp'
         self.tk_sal = 'Sal.'
@@ -49,7 +49,6 @@ class Saiv(AbstractTextReader):
         self._parse_body()
 
         self.fix()
-        self.ssp.cur.calc_data_depth()
         self.finalize()
 
         logger.debug('*** %s ***: done' % self.driver)
@@ -62,7 +61,7 @@ class Saiv(AbstractTextReader):
         # control flags
         has_date = False
         has_time = False
-        has_depth = False
+        has_pressure = False
         has_speed = False
         has_temp = False
         has_sal = False
@@ -79,8 +78,8 @@ class Saiv(AbstractTextReader):
                     if len(field_type) == 0:
                         continue
                     self.field_index[field_type] = col
-                    if field_type == self.tk_depth:
-                        has_depth = True
+                    if field_type == self.tk_pressure:
+                        has_pressure = True
                         self.more_fields.insert(0, field_type)  # prepend depth to additional fields
                     elif field_type == self.tk_speed:
                         has_speed = True
@@ -104,8 +103,8 @@ class Saiv(AbstractTextReader):
         # sample fields checks
         if (not has_date) or (not has_time):
             logger.warning("Missing data/time field: %s/%s" % (self.tk_date, self.tk_time))
-        if not has_depth:
-            raise RuntimeError("Missing depth field: %s" % self.tk_depth)
+        if not has_pressure:
+            raise RuntimeError("Missing depth field: %s" % self.tk_pressure)
         if not has_speed:
             raise RuntimeError("Missing sound speed field: %s" % self.tk_speed)
         if not has_temp:
@@ -153,7 +152,7 @@ class Saiv(AbstractTextReader):
 
             # first required data fields
             try:
-                self.ssp.cur.data.depth[count] = float(data[self.field_index[self.tk_depth]])
+                self.ssp.cur.data.pressure[count] = float(data[self.field_index[self.tk_pressure]])
                 self.ssp.cur.data.speed[count] = float(data[self.field_index[self.tk_speed]])
                 self.ssp.cur.data.temp[count] = float(data[self.field_index[self.tk_temp]])
                 self.ssp.cur.data.sal[count] = float(data[self.field_index[self.tk_sal]])
@@ -174,4 +173,5 @@ class Saiv(AbstractTextReader):
 
             count += 1
 
+        self.ssp.cur.calc_data_depth()
         self.ssp.cur.data_resize(count)

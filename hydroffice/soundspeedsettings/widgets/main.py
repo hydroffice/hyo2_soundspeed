@@ -18,7 +18,7 @@ class Main(AbstractWidget):
     def __init__(self, main_win, db):
         AbstractWidget.__init__(self, main_win=main_win, db=db)
 
-        lbl_width = 80
+        lbl_width = 60
 
         # outline ui
         self.main_layout = QtGui.QVBoxLayout()

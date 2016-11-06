@@ -18,16 +18,20 @@ class Valeport(AbstractTextReader):
     sensor_dict = {
         Dicts.probe_types['MONITOR SVP 500']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVP 6000']: Dicts.sensor_types["SVPT"],
+        Dicts.probe_types['MIDAS SVX2 100']: Dicts.sensor_types["SVPT"],
+        Dicts.probe_types['MIDAS SVX2 500']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVX2 1000']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVX2 3000']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVX2 6000']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MiniSVP']: Dicts.sensor_types["SVPT"],
+        Dicts.probe_types['MONITOR SVP 500']: Dicts.sensor_types["SVPT"],
+        Dicts.probe_types['RapidSVT']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['Unknown']: Dicts.sensor_types["Unknown"]
     }
 
     def __init__(self):
         super(Valeport, self).__init__()
-        self.desc = "Valeport Monitor/Midas/MiniSVP"
+        self.desc = "Valeport"  # Monitor/Midas/MiniSVP/RapidSVT
         self._ext.add('000')
         self._ext.add('txt')
 
@@ -35,6 +39,9 @@ class Valeport(AbstractTextReader):
         self.tk_time = ""
         self.tk_latitude = 'Latitude'
         self.tk_probe_type = ""
+
+        # flag used to remember if the pressure in in meter (we check that: 'Pressure units: m'), thus depth
+        self.minisvp_has_depth = False
 
     def read(self, data_path, settings, callbacks=CliCallbacks()):
         logger.debug('*** %s ***: start' % self.driver)
@@ -50,8 +57,7 @@ class Valeport(AbstractTextReader):
         self._parse_body()
 
         self.fix()
-        if self.ssp.cur.meta.probe_type not in [Dicts.probe_types['MiniSVP']]:
-            self.ssp.cur.calc_data_depth()
+
         if self.ssp.cur.meta.probe_type not \
                 in [Dicts.probe_types['MIDAS SVX2 1000'], Dicts.probe_types['MIDAS SVX2 3000']]:
             self.ssp.cur.calc_salinity()
@@ -71,11 +77,18 @@ class Valeport(AbstractTextReader):
     def _mini_header(self):
         self.tk_start_data = 'Pressure units:'
         self.tk_time = 'Now'
-        self.tk_probe_type = 'MiniSVP:'
 
         for line in self.lines:
             if line[:len(self.tk_start_data)] == self.tk_start_data:
                 self.samples_offset += 1
+                if ' m' in line[len(self.tk_start_data):]:
+                    self.minisvp_has_depth = True
+                    self.ssp.cur.meta.depth_uom = Dicts.uom_symbols['meter']
+                else:
+                    if ' dBar' in line[len(self.tk_start_data):]:
+                        self.ssp.cur.meta.pressure_uom = Dicts.uom_symbols['decibar']
+                    self.minisvp_has_depth = False
+                logger.info("MiniSVP/RapidSVT has depth: %s" % self.minisvp_has_depth)
                 break
 
             elif line[:len(self.tk_time)] == self.tk_time:
@@ -99,13 +112,22 @@ class Valeport(AbstractTextReader):
                 except ValueError:
                     logger.warning("unable to parse latitude from line #%s" % self.samples_offset)
 
-            elif line[:len(self.tk_probe_type)] == self.tk_probe_type:
+            elif line[:len('MiniSVP:')] == 'MiniSVP:':
                 self.ssp.cur.meta.probe_type = Dicts.probe_types['MiniSVP']
                 try:
                     self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
                 except KeyError:
                     logger.warning("unable to recognize probe type from line #%s" % self.samples_offset)
                     self.ssp.cur.meta.sensor_type = Dicts.sensor_types['Unknown']
+
+            elif line[:len('RapidSVT:')] == 'RapidSVT:':
+                self.ssp.cur.meta.probe_type = Dicts.probe_types['RapidSVT']
+                try:
+                    self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
+                except KeyError:
+                    logger.warning("unable to recognize probe type from line #%s" % self.samples_offset)
+                    self.ssp.cur.meta.sensor_type = Dicts.sensor_types['Unknown']
+
             self.samples_offset += 1
 
         if not self.ssp.cur.meta.original_path:
@@ -177,10 +199,14 @@ class Valeport(AbstractTextReader):
             try:
                 data = line.split()
                 # Skipping invalid data (above water, negative temperature or crazy sound speed)
-                if float(data[0]) < 0.0 or float(data[1]) < -2.0 or float(data[2]) < 1400.0 or float(data[2]) > 1650.0:
+                if (float(data[0]) < 0.0) or (float(data[1]) < -2.0) or (float(data[2]) < 1400.0) \
+                        or (float(data[2]) > 1650.0):
                     continue
 
-                self.ssp.cur.data.depth[count] = float(data[0])
+                if self.minisvp_has_depth:
+                    self.ssp.cur.data.depth[count] = float(data[0])
+                else:
+                    self.ssp.cur.data.pressure[count] = float(data[0])
                 self.ssp.cur.data.temp[count] = float(data[1])
                 self.ssp.cur.data.speed[count] = float(data[2])
                 count += 1
@@ -190,6 +216,9 @@ class Valeport(AbstractTextReader):
                 continue
 
         self.ssp.cur.data_resize(count)
+
+        if not self.minisvp_has_depth:
+            self.ssp.cur.calc_data_depth()
 
     def _midas_body(self):
 

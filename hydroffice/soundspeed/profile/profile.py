@@ -2,7 +2,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import numpy as np
 import logging
-import os
 
 logger = logging.getLogger(__name__)
 
@@ -39,9 +38,11 @@ class Profile(object):
             return
 
         self.data.num_samples = num_samples
+        self.data.init_pressure()
         self.data.init_depth()
         self.data.init_speed()
         self.data.init_temp()
+        self.data.init_conductivity()
         self.data.init_sal()
         self.data.init_source()
         self.data.init_flag()
@@ -51,18 +52,22 @@ class Profile(object):
             return
 
         self.proc.num_samples = num_samples
+        self.proc.init_pressure()
         self.proc.init_depth()
         self.proc.init_speed()
         self.proc.init_temp()
+        self.proc.init_conductivity()
         self.proc.init_sal()
         self.proc.init_source()
         self.proc.init_flag()
 
     def init_sis(self, num_samples=0):
         self.sis.num_samples = num_samples
+        self.sis.init_pressure()
         self.sis.init_depth()
         self.sis.init_speed()
         self.sis.init_temp()
+        self.sis.init_conductivity()
         self.sis.init_sal()
         self.sis.init_source()
         self.sis.init_flag()
@@ -111,12 +116,13 @@ class Profile(object):
         # loop through the sample using max depth as turning point
         max_depth_reached = False
         for i in range(self.data.num_samples):
-            if self.data.depth[i] == max_depth:
-                max_depth_reached = True
 
             if (ssp_direction == Dicts.ssp_directions['up'] and not max_depth_reached) \
                     or (ssp_direction == Dicts.ssp_directions['down'] and max_depth_reached):
                 self.data.flag[i] = Dicts.flags['direction']  # set invalid for direction
+
+            if self.data.depth[i] == max_depth:
+                max_depth_reached = True
 
     def calc_salinity(self):
         """Helper method to calculate salinity from depth, sound speed and temperature"""
@@ -142,7 +148,7 @@ class Profile(object):
             latitude = self.meta.latitude
 
         for count in range(self.data.num_samples):
-            self.data.depth[count] = Oc.p2d(p=self.data.depth[count], lat=latitude)
+            self.data.depth[count] = Oc.p2d(p=self.data.pressure[count], lat=latitude)
 
         self.modify_proc_info('calc.depth')
 
@@ -216,12 +222,14 @@ class Profile(object):
 
         # find depth index both in the valid and in the possible samples
         try:
+            # noinspection PyTypeChecker
             v_i = np.argwhere(self.proc.depth[valid] > depth)[0][0]  # the index in the valid array
             i = iv[v_i]  # the corresponding index of the masked index in the full array
         except IndexError:  # in case that there are not
             v_i = self.proc.depth[valid].size - 1
             i = iv[v_i]
         try:
+            # noinspection PyTypeChecker
             p_i = np.argwhere(self.proc.depth[possible] > depth)[0][0]  # the index in the possible array
             j = ip[p_i]
         except IndexError:  # in case that there are not
@@ -255,13 +263,26 @@ class Profile(object):
                     m_ids = [v_i - 1, v_i]
                 # print('in the middle')
 
-            # interpolate for temp
             di = np.array([self.proc.depth[valid][m_ids[0]], self.proc.depth[valid][m_ids[1]]])
             a = np.array([[di[0], 1.], [di[1], 1.]])
+
+            # interpolate for pressure
+            pi = np.array([self.proc.pressure[valid][m_ids[0]], self.proc.pressure[valid][m_ids[1]]])
+            pm, pc = np.linalg.lstsq(a, pi)[0]
+            self.proc.pressure = np.insert(self.proc.pressure, j, pm * depth + pc)
+            # print(self.proc.pressure[0], self.proc.pressure.size)
+
+            # interpolate for temp
             ti = np.array([self.proc.temp[valid][m_ids[0]], self.proc.temp[valid][m_ids[1]]])
             tm, tc = np.linalg.lstsq(a, ti)[0]
             self.proc.temp = np.insert(self.proc.temp, j, tm * depth + tc)
             # print(self.proc.temp[0], self.proc.temp.size)
+
+            # interpolate for conductivity
+            ci = np.array([self.proc.conductivity[valid][m_ids[0]], self.proc.conductivity[valid][m_ids[1]]])
+            cm, cc = np.linalg.lstsq(a, ci)[0]
+            self.proc.conductivity = np.insert(self.proc.conductivity, j, cm * depth + cc)
+            # print(self.proc.conductivity[0], self.proc.conductivity.size)
 
             # interpolate for sal
             si = np.array([self.proc.sal[valid][m_ids[0]], self.proc.sal[valid][m_ids[1]]])
@@ -280,7 +301,7 @@ class Profile(object):
         logger.debug("insert speed to sis data: d:%s, vs:%s" % (depth, speed))
 
         # we need to take care of valid samples and user-invalidated samples (to avoid to brake in case un-flagged)
-        valid = self.sis_thinned # valid samples
+        valid = self.sis_thinned  # valid samples
         iv = np.indices(self.sis.flag.shape)[0][valid]  # indices of valid samples
         user_invalid = self.sis.flag == Dicts.flags['user']  # user-invalidate samples
         possible = np.logical_or(valid, user_invalid)  # possible samples
@@ -288,12 +309,14 @@ class Profile(object):
 
         # find depth index both in the valid and in the possible samples
         try:
+            # noinspection PyTypeChecker
             v_i = np.argwhere(self.sis.depth[valid] > depth)[0][0]  # the index in the valid array
             i = iv[v_i]  # the corresponding index of the masked index in the full array
         except IndexError:  # in case that there are not
             v_i = self.sis.depth[valid].size - 1
             i = iv[v_i]
         try:
+            # noinspection PyTypeChecker
             p_i = np.argwhere(self.sis.depth[possible] > depth)[0][0]  # the index in the possible array
             j = ip[p_i]
         except IndexError:  # in case that there are not
@@ -327,13 +350,26 @@ class Profile(object):
                     m_ids = [v_i - 1, v_i]
                 # print('in the middle')
 
-            # interpolate for temp
             di = np.array([self.sis.depth[valid][m_ids[0]], self.sis.depth[valid][m_ids[1]]])
             a = np.array([[di[0], 1.], [di[1], 1.]])
+
+            # interpolate for pressure
+            pi = np.array([self.sis.pressure[valid][m_ids[0]], self.sis.pressure[valid][m_ids[1]]])
+            pm, pc = np.linalg.lstsq(a, pi)[0]
+            self.sis.pressure = np.insert(self.sis.pressure, j, pm * depth + pc)
+            # print(self.sis.pressure[0], self.sis.pressure.size)
+
+            # interpolate for temp
             ti = np.array([self.sis.temp[valid][m_ids[0]], self.sis.temp[valid][m_ids[1]]])
             tm, tc = np.linalg.lstsq(a, ti)[0]
             self.sis.temp = np.insert(self.sis.temp, j, tm * depth + tc)
             # print(self.sis.temp[0], self.sis.temp.size)
+
+            # interpolate for conductivity
+            ci = np.array([self.sis.conductivity[valid][m_ids[0]], self.sis.conductivity[valid][m_ids[1]]])
+            cm, cc = np.linalg.lstsq(a, ci)[0]
+            self.sis.conductivity = np.insert(self.sis.conductivity, j, cm * depth + cc)
+            # print(self.proc.conductivity[0], self.proc.conductivity.size)
 
             # interpolate for sal
             si = np.array([self.sis.sal[valid][m_ids[0]], self.sis.sal[valid][m_ids[1]]])
@@ -362,12 +398,14 @@ class Profile(object):
 
         # find depth index both in the valid and in the possible samples
         try:
+            # noinspection PyTypeChecker
             v_i = np.argwhere(self.proc.depth[valid] > depth)[0][0]  # the index in the valid array
             i = iv[v_i]  # the corresponding index of the masked index in the full array
         except IndexError:  # in case that there are not
             v_i = self.proc.depth[valid].size - 1
             i = iv[v_i]
         try:
+            # noinspection PyTypeChecker
             p_i = np.argwhere(self.proc.depth[possible] > depth)[0][0]  # the index in the possible array
             j = ip[p_i]
         except IndexError:  # in case that there are not
@@ -387,13 +425,36 @@ class Profile(object):
             self.proc.flag[i] = Dicts.flags['valid']
         else:
             # print('new depth')
-            if depth > self.proc.depth[valid][-1]:
+            if depth < self.proc.depth[valid][0]:
+                m_ids = [0, 1]
+                # print('before beginning: %s' % j)
+
+            elif depth > self.proc.depth[valid][-1]:
                 j += 1
-            #     print('after end')
-            # elif depth < self.proc.depth[valid][0]:
-            #     print('before beginning: %s' % j)
-            # else:
-            #     print('in the middle')
+                m_ids = [-2, -1]
+                # print('after end')
+
+            else:
+                if self.proc.depth[valid][v_i] < depth:
+                    m_ids = [v_i, v_i + 1]
+                else:
+                    m_ids = [v_i - 1, v_i]
+                # print('in the middle')
+
+            di = np.array([self.proc.depth[valid][m_ids[0]], self.proc.depth[valid][m_ids[1]]])
+            a = np.array([[di[0], 1.], [di[1], 1.]])
+
+            # interpolate for pressure
+            pi = np.array([self.proc.pressure[valid][m_ids[0]], self.proc.pressure[valid][m_ids[1]]])
+            pm, pc = np.linalg.lstsq(a, pi)[0]
+            self.proc.pressure = np.insert(self.proc.pressure, j, pm * depth + pc)
+            # print(self.proc.pressure[0], self.proc.pressure.size)
+
+            # interpolate for conductivity
+            ci = np.array([self.proc.conductivity[valid][m_ids[0]], self.proc.conductivity[valid][m_ids[1]]])
+            cm, cc = np.linalg.lstsq(a, ci)[0]
+            self.proc.conductivity = np.insert(self.proc.conductivity, j, cm * depth + cc)
+            # print(self.proc.conductivity[0], self.proc.conductivity.size)
 
             self.proc.depth = np.insert(self.proc.depth, j, depth)
             self.proc.speed = np.insert(self.proc.speed, j, speed)
@@ -414,6 +475,7 @@ class Profile(object):
             vi = self.proc_valid
             ivs = np.indices(self.proc.flag.shape)[0][vi]  # indices of valid samples
             max_depth = self.proc.depth[vi].max()  # this is the max of the valid samples
+            # noinspection PyTypeChecker
             vi_idx = np.argwhere(self.proc.depth[vi] >= max_depth)[0][0]  # index of the max depth
             max_idx = ivs[vi_idx]  # index of the max depth in the original array
         else:
@@ -423,6 +485,7 @@ class Profile(object):
 
         # find the depth values in the extender that are deeper than the current (valid) max depth
         ext_vi = extender.cur.proc_valid
+        # noinspection PyTypeChecker
         ind2 = np.argwhere(extender.cur.proc.depth[ext_vi][:] > max_depth)[0][0]
         if ind2 <= 0:
             logger.info("nothing to extend with")
@@ -430,12 +493,22 @@ class Profile(object):
         # logger.debug("ext.max depth: [%s]" % ind2)
 
         # stack the extending samples after the last valid (max depth) index
-        self.proc.depth = np.hstack([self.proc.depth[:max_idx], extender.cur.proc.depth[ext_vi][ind2:]])
-        self.proc.speed = np.hstack([self.proc.speed[:max_idx], extender.cur.proc.speed[ext_vi][ind2:]])
-        self.proc.temp = np.hstack([self.proc.temp[:max_idx], extender.cur.proc.temp[ext_vi][ind2:]])
-        self.proc.sal = np.hstack([self.proc.sal[:max_idx], extender.cur.proc.sal[ext_vi][ind2:]])
-        self.proc.source = np.hstack([self.proc.source[:max_idx], extender.cur.proc.source[ext_vi][ind2:]])
-        self.proc.flag = np.hstack([self.proc.flag[:max_idx], extender.cur.proc.flag[ext_vi][ind2:]])
+        self.proc.pressure = np.hstack([self.proc.depth[:max_idx],
+                                        np.zeros_like(extender.cur.proc.depth[ext_vi][ind2:])])
+        self.proc.depth = np.hstack([self.proc.depth[:max_idx],
+                                     extender.cur.proc.depth[ext_vi][ind2:]])
+        self.proc.speed = np.hstack([self.proc.speed[:max_idx],
+                                     extender.cur.proc.speed[ext_vi][ind2:]])
+        self.proc.temp = np.hstack([self.proc.temp[:max_idx],
+                                    extender.cur.proc.temp[ext_vi][ind2:]])
+        self.proc.conductivity = np.hstack([self.proc.sal[:max_idx],
+                                            np.zeros_like(extender.cur.proc.sal[ext_vi][ind2:])])
+        self.proc.sal = np.hstack([self.proc.sal[:max_idx],
+                                   extender.cur.proc.sal[ext_vi][ind2:]])
+        self.proc.source = np.hstack([self.proc.source[:max_idx],
+                                      extender.cur.proc.source[ext_vi][ind2:]])
+        self.proc.flag = np.hstack([self.proc.flag[:max_idx],
+                                    extender.cur.proc.flag[ext_vi][ind2:]])
         self.proc.num_samples = self.proc.depth.size
 
         return True
@@ -463,9 +536,11 @@ class Profile(object):
         vi = self.data_valid  # invalid samples (no direction-flagged)
 
         self.init_proc(np.sum(vi))
+        self.proc.pressure[:] = self.data.pressure[vi]
         self.proc.depth[:] = self.data.depth[vi]
         self.proc.speed[:] = self.data.speed[vi]
         self.proc.temp[:] = self.data.temp[vi]
+        self.proc.conductivity[:] = self.data.conductivity[vi]
         self.proc.sal[:] = self.data.sal[vi]
         self.proc.source[:] = self.data.source[vi]
         self.proc.flag[:] = self.data.flag[vi]
@@ -480,9 +555,11 @@ class Profile(object):
             return
 
         self.init_sis(self.proc.depth.size)
+        self.sis.pressure[:] = self.proc.pressure
         self.sis.depth[:] = self.proc.depth
         self.sis.speed[:] = self.proc.speed
         self.sis.temp[:] = self.proc.temp
+        self.sis.conductivity[:] = self.proc.conductivity
         self.sis.sal[:] = self.proc.sal
         self.sis.source[:] = self.proc.source
         self.sis.flag[:] = self.proc.flag
@@ -490,7 +567,7 @@ class Profile(object):
     def update_proc_time(self):
         self.meta.update_proc_time()
 
-    def replace_proc_sal(self, source):
+    def replace_proc_sal(self, source):  # unused
         try:
             self.proc.sal = np.interp(self.proc.depth[:], source.cur.proc.depth[:], source.cur.proc.sal[:])
         except Exception as e:
@@ -498,7 +575,7 @@ class Profile(object):
             return False
         return True
 
-    def replace_proc_temp_sal(self, source):
+    def replace_proc_temp_sal(self, source):  # unused
         try:
             self.proc.temp = np.interp(self.proc.depth[:], source.cur.proc.depth[:], source.cur.proc.temp[:])
             self.proc.sal = np.interp(self.proc.depth[:], source.cur.proc.depth[:], source.cur.proc.sal[:])
