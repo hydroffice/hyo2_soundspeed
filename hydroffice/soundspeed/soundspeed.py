@@ -43,7 +43,7 @@ class SoundSpeedLibrary(object):
         self.set_folders(data_folder=data_folder)
 
         # load settings and other functionalities
-        self.setup = Setup(data_folder=self.release_folder)
+        self.setup = Setup(release_folder=self.release_folder)
         self.check_custom_folders()
         self.atlases = Atlases(prj=self)
         self.listeners = Listeners(prj=self)
@@ -109,28 +109,83 @@ class SoundSpeedLibrary(object):
 
     # --- library, release, atlases, and projects folders
 
+    @classmethod
+    def make_data_folder(cls, data_folder=None):
+
+        # output data folder: where all the library data are written
+        if data_folder is None:
+            data_folder = user_data_dir(soundspeed_name, "HydrOffice")
+        if not os.path.exists(data_folder):  # create it if it does not exist
+            os.makedirs(data_folder)
+        # logger.debug("library folder: %s" % data_folder)
+        return data_folder
+
+    @classmethod
+    def make_releases_folder(cls, data_folder=None):
+
+        data_folder = cls.make_data_folder(data_folder=data_folder)
+
+        # releases data folder
+        releases_folder = os.path.join(data_folder, "releases")
+        if not os.path.exists(releases_folder):  # create it if it does not exist
+            os.makedirs(releases_folder)
+        # logger.debug("releases folder: %s" % self.releases_folder)
+
+        return releases_folder
+
+    @classmethod
+    def make_release_folder(cls, data_folder=None):
+        # release data folder: release-specific data (as settings)
+        releases_folder = cls.make_releases_folder(data_folder=data_folder)
+        release_folder = os.path.join(releases_folder, soundspeed_version[:soundspeed_version.rindex('.')])
+        if not os.path.exists(release_folder):  # create it if it does not exist
+            os.makedirs(release_folder)
+        # logger.debug("release folder: %s" % self.release_folder)
+
+        return release_folder
+
+    @classmethod
+    def setup_exists(cls, data_folder=None):
+        release_folder = cls.make_release_folder()
+        return os.path.exists(os.path.join(release_folder, "setup.db"))
+
+    @classmethod
+    def list_other_setups(cls, data_folder=None):
+        releases_folder = cls.make_releases_folder()
+        old_setups = list()
+        for release in os.listdir(releases_folder):
+
+            release_path = os.path.join(releases_folder, release)
+            setup_path = os.path.join(release_path, "setup.db")
+
+            if not os.path.exists(setup_path):
+                continue
+
+            # if exists, attempt to load the setup
+            try:
+                Setup(release_folder=release_path)
+            except Exception:
+                continue
+
+            logger.debug("found setup: %s" % setup_path)
+            old_setups.append(setup_path)
+
+        return old_setups
+
+    @classmethod
+    def copy_setup(cls, input_setup, data_folder=None):
+        from shutil import copyfile
+        release_folder = cls.make_release_folder()
+        output_setup = os.path.join(release_folder, "setup.db")
+        copyfile(input_setup, output_setup)
+        logger.info("copied from: %s to: %s" % (input_setup, output_setup))
+
     def set_folders(self, data_folder):
         """manage library folders creation"""
 
-        # output data folder: where all the library data are written
-        self._data_folder = data_folder
-        if self._data_folder is None:
-            self._data_folder = user_data_dir(soundspeed_name, "HydrOffice")
-        if not os.path.exists(self._data_folder):  # create it if it does not exist
-            os.makedirs(self._data_folder)
-        logger.debug("library folder: %s" % self.data_folder)
-
-        # releases data folder
-        self._releases_folder = os.path.join(self.data_folder, "releases")
-        if not os.path.exists(self._releases_folder):  # create it if it does not exist
-            os.makedirs(self._releases_folder)
-        # logger.debug("releases folder: %s" % self.releases_folder)
-
-        # release data folder: release-specific data (as settings)
-        self._release_folder = os.path.join(self.releases_folder, soundspeed_version[:soundspeed_version.rindex('.')])
-        if not os.path.exists(self._release_folder):  # create it if it does not exist
-            os.makedirs(self._release_folder)
-        # logger.debug("release folder: %s" % self.release_folder)
+        self._data_folder = self.make_data_folder(data_folder=data_folder)
+        self._releases_folder = self.make_releases_folder(data_folder=data_folder)
+        self._release_folder = self.make_release_folder(data_folder=data_folder)
 
         # projects folder
         self._projects_folder = os.path.join(self.data_folder, "projects")
@@ -1041,6 +1096,31 @@ class SoundSpeedLibrary(object):
     def save_settings_to_db(self):
         """Save the current setup to settings db"""
         self.setup.save_to_db()
+
+    def clone_setup(self, original_setup_name, cloned_setup_name):
+        """Clone the passed setup using the passed output name"""
+
+        # first check if the new name is valid
+        if self.setup.db.setup_exists(cloned_setup_name):
+            logger.warning('setup name duplicated: %s' % cloned_setup_name)
+            return
+
+        # create the clone setup
+        self.setup.db.add_setup(cloned_setup_name)
+
+        # load the original setup
+        original_setup = Setup(release_folder=self.release_folder, use_setup_name=original_setup_name)
+
+        # change the setup in use for input/output
+        original_setup.use_setup_name = cloned_setup_name
+
+        # store to db
+        original_setup.save_to_db()
+
+    def rename_setup(self, original_setup_name, cloned_setup_name):
+        """Rename by cloning the passed setup (using the passed output name), then deleting"""
+        self.clone_setup(original_setup_name=original_setup_name, cloned_setup_name=cloned_setup_name)
+        self.setup.db.delete_setup(original_setup_name)
 
     # --- atlases
 

@@ -14,7 +14,7 @@ ch.setFormatter(ch_formatter)
 logger.addHandler(ch)
 
 from hydroffice.soundspeed.atlas import atlases
-from hydroffice.soundspeed.project import Project
+from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
 
 
 class TestSoundSpeedAtlasAtlases(unittest.TestCase):
@@ -31,8 +31,8 @@ class TestSoundSpeedAtlasAtlases(unittest.TestCase):
                 shutil.rmtree(os.path.join(self.curdir, item))
 
     def test_creation_of_Atlases(self):
-        prj = Project(data_folder=self.curdir)
-        atl = atlases.Atlases(prj=prj)
+        lib = SoundSpeedLibrary(data_folder=self.curdir)
+        atl = atlases.Atlases(prj=lib)
 
         self.assertTrue("atlases" in atl.rtofs_folder)
         self.assertTrue("woa" in atl.woa09_folder)

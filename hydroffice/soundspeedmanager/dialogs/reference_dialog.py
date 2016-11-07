@@ -31,6 +31,7 @@ class ReferenceDialog(AbstractDialog):
         # - button
         btn = QtGui.QPushButton("Apply")
         btn.setToolTip("Apply!")
+        btn.setFixedWidth(60)
         if not self.lib.has_ssp():
             btn.setDisabled(True)
         # noinspection PyUnresolvedReferences
@@ -46,6 +47,7 @@ class ReferenceDialog(AbstractDialog):
         # - button
         btn = QtGui.QPushButton("Apply")
         btn.setToolTip("Apply!")
+        btn.setFixedWidth(60)
         if not self.lib.has_ref():
             btn.setDisabled(True)
         # noinspection PyUnresolvedReferences
@@ -61,6 +63,7 @@ class ReferenceDialog(AbstractDialog):
         # - button
         btn = QtGui.QPushButton("Apply")
         btn.setToolTip("Apply!")
+        btn.setFixedWidth(60)
         if not self.lib.has_ref():
             btn.setDisabled(True)
         # noinspection PyUnresolvedReferences

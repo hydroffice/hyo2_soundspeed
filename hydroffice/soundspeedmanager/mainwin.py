@@ -65,6 +65,19 @@ class MainWin(QtGui.QMainWindow):
         style_content = open(style_info.filePath()).read()
         self.setStyleSheet(style_content)
 
+        # check if setup db exists; if yes, ask to copy
+        has_setup = SoundSpeedLibrary.setup_exists()
+        logger.info("setup exists: %s" % has_setup)
+        if not has_setup:
+            other_setups = SoundSpeedLibrary.list_other_setups()
+            if len(other_setups) != 0:
+                logger.debug("other existing setups: %d" % len(other_setups))
+                sel, ok = QtGui.QInputDialog.getItem(self, 'Do you want to copy an existing setup?',
+                                                     'Select one (or click on Cancel to create a new one):',
+                                                     other_setups, 0, False)
+                if ok:
+                    SoundSpeedLibrary.copy_setup(input_setup=sel)
+
         # create the project
         self.lib = SoundSpeedLibrary(qt_progress=QtGui.QProgressDialog, qt_parent=self)
         self.lib.set_callbacks(QtCallbacks(parent=self))  # set the PySide callbacks

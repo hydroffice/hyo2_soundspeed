@@ -12,11 +12,13 @@ from .setup_sql import CREATE_SETTINGS, CREATE_SETTINGS_VIEW, CREATE_CLIENT_LIST
 
 class SetupDb(BaseDb):
 
-    def __init__(self, data_folder, db_file="setup.db"):
+    def __init__(self, data_folder, db_file="setup.db", use_setup_name=None):
+        self.data_folder = data_folder
         db_path = os.path.join(data_folder, db_file)
         super(SetupDb, self).__init__(db_path=db_path)
         self.reconnect_or_create()
         self._check_default_setup()
+        self.use_setup_name = use_setup_name
 
     def build_tables(self):
         if not self.conn:
@@ -43,11 +45,12 @@ class SetupDb(BaseDb):
     # --- setup stuff
     
     def _check_default_setup(self):
-        """Check for the presence of default settings, creating them if missing. """
-        default_setup = "default"
-        if not self.setup_exists(default_setup):
-            self.add_setup(setup_name=default_setup)
-            self.activate_setup(setup_name=default_setup)
+        """Check for the presence of default settings, creating them if missing and not other setups. """
+        if len(self.setup_list) == 0:
+            default_setup = "default"
+            if not self.setup_exists(default_setup):
+                self.add_setup(setup_name=default_setup)
+                self.activate_setup(setup_name=default_setup)
 
     # noinspection SqlResolve
     def setup_exists(self, setup_name):
@@ -128,7 +131,19 @@ class SetupDb(BaseDb):
     @property
     def active_setup_id(self):
         """ Retrieve the active settings id """
-        ret = self.conn.execute(""" SELECT id FROM general WHERE setup_status="active" """).fetchone()
+        if self.use_setup_name is None:
+            ret = self.conn.execute(""" SELECT id FROM general WHERE setup_status="active" """).fetchone()
+            return ret[0]
+
+        # logger.debug('using setup name: %s' % self.use_setup_name)
+        ret = self.conn.execute(""" SELECT id FROM general WHERE setup_name=? """,
+                                (self.use_setup_name, )).fetchone()
+        return ret[0]
+
+    # noinspection SqlResolve
+    def setup_id_from_setup_name(self, setup_name):
+        ret = self.conn.execute(""" SELECT id FROM general WHERE setup_name=? """,
+                                (setup_name, )).fetchone()
         return ret[0]
 
     # --- clients list
@@ -174,7 +189,8 @@ class SetupDb(BaseDb):
         """Delete a client."""
         with self.conn:
             try:
-                self.conn.execute(""" DELETE FROM client_list WHERE name=? """, (client_name,))
+                self.conn.execute(""" DELETE FROM client_list WHERE name=? AND setup_id=?""",
+                                  (client_name, self.active_setup_id,))
                 # logger.info("deleted client: %s" % client_name)
 
             except sqlite3.Error as e:
@@ -186,7 +202,8 @@ class SetupDb(BaseDb):
         """Delete all clients."""
         with self.conn:
             try:
-                self.conn.execute(""" DELETE FROM client_list""")
+                self.conn.execute(""" DELETE FROM client_list WHERE setup_id=?""",
+                                  (self.active_setup_id,))
                 # logger.info("deleted clients")
 
             except sqlite3.Error as e:

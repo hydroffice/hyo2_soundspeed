@@ -1,6 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-
 import logging
 
 logger = logging.getLogger(__name__)
@@ -13,7 +12,9 @@ from .helper import first_match
 
 class Setup(object):
 
-    def __init__(self, data_folder):
+    def __init__(self, release_folder, use_setup_name=None):
+        self.use_setup_name = use_setup_name
+
         self.setup_version = None
         self.setup_id = None
         self.setup_name = None
@@ -76,103 +77,108 @@ class Setup(object):
         self.default_sn = None
 
         # loading settings
-        self.data_folder = data_folder
+        self.release_folder = release_folder
         self.load_from_db()
 
     @property
     def db(self):
         """Usually the data_folder is set when the project is instantiated, so this is safe"""
-        return SetupDb(self.data_folder)
+        logger.debug("release_folder: %s, use setup: %s" % (self.release_folder, self.use_setup_name))
+        return SetupDb(self.release_folder, use_setup_name=self.use_setup_name)
 
     def load_from_db(self):
         """Load/reload the setting from the setup db"""
         logger.info("*** > SETUP: loading ...")
-        try:
-            db = self.db
-            if db.setup_version > 1:
-                raise RuntimeError("unsupported setup version: %s" % db.setup_version)
 
-            self.setup_version = db.setup_version
-            self.setup_id = db.active_setup_id
-            self.setup_name = db.setup_name
+        # try:
 
-            # input
-            self.use_woa09 = db.use_woa09
-            self.use_woa13 = db.use_woa13
-            self.use_rtofs = db.use_rtofs
-            self.ssp_extension_source = Dicts.atlases[db.ssp_extension_source]
-            self.ssp_salinity_source = Dicts.atlases[db.ssp_salinity_source]
-            self.ssp_temp_sal_source = Dicts.atlases[db.ssp_temp_sal_source]
-            self.ssp_up_or_down = Dicts.ssp_directions[db.ssp_up_or_down]
-            self.rx_max_wait_time = db.rx_max_wait_time
-            self.use_sis = db.use_sis
-            self.use_sippican = db.use_sippican
-            self.use_mvp = db.use_mvp
+        db = self.db
+        if db.setup_version > 1:
+            raise RuntimeError("unsupported setup version: %s" % db.setup_version)
 
-            # output
-            self.append_caris_file = db.append_caris_file
-            self.log_user = db.log_user
-            self.log_server = db.log_server
-            # client list
-            self.client_list = ClientList()  # to reset the list
-            for client in db.client_list:
-                client_string = "%s:%s:%s:%s" % (client[1], client[2], client[3], client[4])
-                self.client_list.add_client(client_string)
+        self.setup_version = db.setup_version
+        self.setup_id = db.active_setup_id
+        self.setup_name = db.setup_name
 
-            # listeners - sis
-            self.sis_listen_port = db.sis_listen_port
-            self.sis_listen_timeout = db.sis_listen_timeout
-            self.sis_auto_apply_manual_casts = db.sis_auto_apply_manual_casts
+        # input
+        self.use_woa09 = db.use_woa09
+        self.use_woa13 = db.use_woa13
+        self.use_rtofs = db.use_rtofs
+        self.ssp_extension_source = Dicts.atlases[db.ssp_extension_source]
+        self.ssp_salinity_source = Dicts.atlases[db.ssp_salinity_source]
+        self.ssp_temp_sal_source = Dicts.atlases[db.ssp_temp_sal_source]
+        self.ssp_up_or_down = Dicts.ssp_directions[db.ssp_up_or_down]
+        self.rx_max_wait_time = db.rx_max_wait_time
+        self.use_sis = db.use_sis
+        self.use_sippican = db.use_sippican
+        self.use_mvp = db.use_mvp
 
-            # listeners - sippican
-            self.sippican_listen_port = db.sippican_listen_port
-            self.sippican_listen_timeout = db.sippican_listen_timeout
+        # output
+        self.append_caris_file = db.append_caris_file
+        self.log_user = db.log_user
+        self.log_server = db.log_server
+        # client list
+        self.client_list = ClientList()  # to reset the list
+        for client in db.client_list:
+            client_string = "%s:%s:%s:%s" % (client[1], client[2], client[3], client[4])
+            self.client_list.add_client(client_string)
+            logger.debug('- load: %s' % client_string)
 
-            # listeners - mvp
-            self.mvp_ip_address = db.mvp_ip_address
-            self.mvp_listen_port = db.mvp_listen_port
-            self.mvp_listen_timeout = db.mvp_listen_timeout
-            self.mvp_transmission_protocol = db.mvp_transmission_protocol
-            self.mvp_format = db.mvp_format
-            self.mvp_winch_port = db.mvp_winch_port
-            self.mvp_fish_port = db.mvp_fish_port
-            self.mvp_nav_port = db.mvp_nav_port
-            self.mvp_system_port = db.mvp_system_port
-            self.mvp_sw_version = db.mvp_sw_version
-            self.mvp_instrument_id = db.mvp_instrument_id
-            self.mvp_instrument = db.mvp_instrument
+        # listeners - sis
+        self.sis_listen_port = db.sis_listen_port
+        self.sis_listen_timeout = db.sis_listen_timeout
+        self.sis_auto_apply_manual_casts = db.sis_auto_apply_manual_casts
 
-            # server
-            self.server_source = db.server_source
-            self.server_apply_surface_sound_speed = db.server_apply_surface_sound_speed
+        # listeners - sippican
+        self.sippican_listen_port = db.sippican_listen_port
+        self.sippican_listen_timeout = db.sippican_listen_timeout
 
-            # current settings
-            self.current_project = db.current_project
-            self.custom_projects_folder = db.custom_projects_folder
-            self.custom_outputs_folder = db.custom_outputs_folder
-            self.custom_woa09_folder = db.custom_woa09_folder
-            self.custom_woa13_folder = db.custom_woa13_folder
-            self.noaa_tools = db.noaa_tools
-            self.default_survey = db.default_survey
-            self.default_vessel = db.default_vessel
-            self.default_sn = db.default_sn
+        # listeners - mvp
+        self.mvp_ip_address = db.mvp_ip_address
+        self.mvp_listen_port = db.mvp_listen_port
+        self.mvp_listen_timeout = db.mvp_listen_timeout
+        self.mvp_transmission_protocol = db.mvp_transmission_protocol
+        self.mvp_format = db.mvp_format
+        self.mvp_winch_port = db.mvp_winch_port
+        self.mvp_fish_port = db.mvp_fish_port
+        self.mvp_nav_port = db.mvp_nav_port
+        self.mvp_system_port = db.mvp_system_port
+        self.mvp_sw_version = db.mvp_sw_version
+        self.mvp_instrument_id = db.mvp_instrument_id
+        self.mvp_instrument = db.mvp_instrument
 
-            db.close()
+        # server
+        self.server_source = db.server_source
+        self.server_apply_surface_sound_speed = db.server_apply_surface_sound_speed
 
-        except Exception as e:
-            raise RuntimeError("while loading db setup, %s" % e)
+        # current settings
+        self.current_project = db.current_project
+        self.custom_projects_folder = db.custom_projects_folder
+        self.custom_outputs_folder = db.custom_outputs_folder
+        self.custom_woa09_folder = db.custom_woa09_folder
+        self.custom_woa13_folder = db.custom_woa13_folder
+        self.noaa_tools = db.noaa_tools
+        self.default_survey = db.default_survey
+        self.default_vessel = db.default_vessel
+        self.default_sn = db.default_sn
+
+        db.close()
+
+        # except Exception as e:
+        #     raise RuntimeError("while loading db setup, %s" % e)
 
         logger.info("*** > SETUP: loaded!")
 
     def save_to_db(self):
         """Save setup to db"""
         logger.info("*** > SETUP: saving ...")
+
         try:
             db = self.db
             db.setup_version = self.setup_version
             # db.active_setup_id = self.setup_id  # obviously, unactivated to avoid db logic corruption
             # db.setup_status  # only the current setup is visualized
-            db.setup_name = self.setup_name
+            # db.setup_name = self.setup_name
 
             # input
             db.use_woa09 = self.use_woa09
@@ -196,6 +202,7 @@ class Setup(object):
             # client list
             db.delete_clients()
             for client in self.client_list.clients:
+                logger.debug('- save: %s' % client.name)
                 db.add_client(client_name=client.name,
                               client_ip=client.ip, client_port=client.port,
                               client_protocol=client.protocol)
