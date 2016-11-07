@@ -39,4 +39,4 @@ Other info
 
 * Bitbucket: `https://bitbucket.org/ccomjhc/hyo_soundspeed <https://bitbucket.org/ccomjhc/hyo_soundspeed>`_
 * Project page: `http://www.hydroffice.org <http://www.hydroffice.org>`_
-* License: LGPLv3 license (See `LICENSE <https://bitbucket.org/ccomjhc/hyo_bag/raw/tip/LICENSE>`_)
+* License: LGPLv2.1 license (See `LICENSE <https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/tip/LICENSE>`_)
