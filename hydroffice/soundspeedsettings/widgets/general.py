@@ -41,6 +41,11 @@ vessel_list = [
     "ZZ Other"
 ]
 
+institution_list = [
+    "NOAA Office of Coast Survey",
+    "UNH CCOM/JHC"
+]
+
 
 class General(AbstractWidget):
 
@@ -203,6 +208,22 @@ class General(AbstractWidget):
         hbox.addWidget(self.label)
         hbox.addStretch()
 
+        # - default institution
+        hbox = QtGui.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        # -- label
+        label = QtGui.QLabel("Default institution:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.default_institution = QtGui.QComboBox()
+        self.default_institution.setEditable(True)
+        self.default_institution.addItems(institution_list)
+        rex = QtCore.QRegExp('[a-zA-Z0-9_.-\s]+')
+        validator = QtGui.QRegExpValidator(rex)
+        self.default_institution.setValidator(validator)
+        hbox.addWidget(self.default_institution)
+
         # - default survey
         hbox = QtGui.QHBoxLayout()
         self.right_layout.addLayout(hbox)
@@ -212,7 +233,7 @@ class General(AbstractWidget):
         hbox.addWidget(label)
         # -- value
         self.default_survey = QtGui.QLineEdit()
-        rex = QtCore.QRegExp('[a-zA-Z0-9_.-]+')
+        rex = QtCore.QRegExp('[a-zA-Z0-9_.-\s]+')
         validator = QtGui.QRegExpValidator(rex)
         self.default_survey.setValidator(validator)
         hbox.addWidget(self.default_survey)
@@ -228,7 +249,7 @@ class General(AbstractWidget):
         self.default_vessel = QtGui.QComboBox()
         self.default_vessel.setEditable(True)
         self.default_vessel.addItems(vessel_list)
-        rex = QtCore.QRegExp('[a-zA-Z0-9_.-]+')
+        rex = QtCore.QRegExp('[a-zA-Z0-9_.-\s]+')
         validator = QtGui.QRegExpValidator(rex)
         self.default_vessel.setValidator(validator)
         hbox.addWidget(self.default_vessel)
@@ -242,7 +263,7 @@ class General(AbstractWidget):
         hbox.addWidget(label)
         # -- value
         self.default_sn = QtGui.QLineEdit()
-        rex = QtCore.QRegExp('[a-zA-Z0-9_.-]+')
+        rex = QtCore.QRegExp('[a-zA-Z0-9_.-\s]+')
         validator = QtGui.QRegExpValidator(rex)
         self.default_sn.setValidator(validator)
         hbox.addWidget(self.default_sn)
@@ -254,6 +275,8 @@ class General(AbstractWidget):
         self.setup_changed()  # to trigger the first data population
 
         # methods
+        # noinspection PyUnresolvedReferences
+        self.default_institution.textChanged.connect(self.apply_default_institution)
         # noinspection PyUnresolvedReferences
         self.default_survey.textChanged.connect(self.apply_default_survey)
         # noinspection PyUnresolvedReferences
@@ -271,6 +294,12 @@ class General(AbstractWidget):
         # noinspection PyUnresolvedReferences
         self.default_sn.textChanged.connect(self.apply_default_sn)
 
+    def apply_default_institution(self):
+        # logger.debug("apply default institution")
+        self.db.default_institution = self.default_institution.currentText()
+        self.setup_changed()
+        self.main_win.reload_settings()
+
     def apply_default_survey(self):
         # logger.debug("apply default survey")
         self.db.default_survey = self.default_survey.text()
@@ -283,18 +312,18 @@ class General(AbstractWidget):
         self.setup_changed()
         self.main_win.reload_settings()
 
+    def apply_default_sn(self):
+        # logger.debug("apply default sn")
+        self.db.default_sn = self.default_sn.text()
+        self.setup_changed()
+        self.main_win.reload_settings()
+
     def apply_custom_folders(self):
         # logger.debug("apply default vessel")
         self.db.custom_projects_folder = self.projects_folder.text()
         self.db.custom_outputs_folder = self.outputs_folder.text()
         self.db.custom_woa09_folder = self.woa09_folder.text()
         self.db.custom_woa13_folder = self.woa13_folder.text()
-        self.setup_changed()
-        self.main_win.reload_settings()
-
-    def apply_default_sn(self):
-        # logger.debug("apply default sn")
-        self.db.default_sn = self.default_sn.text()
         self.setup_changed()
         self.main_win.reload_settings()
 
@@ -365,6 +394,7 @@ class General(AbstractWidget):
     def apply_noaa_tools(self):
         # logger.debug("apply NOAA tools: %s" % self.noaa_tools.currentText())
         self.db.noaa_tools = self.noaa_tools.currentText() == "True"
+        self.db.default_institution = institution_list[0]  # NOAA OCS
         self.setup_changed()
         self.main_win.reload_settings()
 
@@ -395,6 +425,9 @@ class General(AbstractWidget):
             self.noaa_tools.setCurrentIndex(0)  # True
         else:
             self.noaa_tools.setCurrentIndex(1)  # False
+
+        # default_institution
+        self.default_institution.setEditText("%s" % self.db.default_institution)
 
         # default_survey
         self.default_survey.setText("%s" % self.db.default_survey)

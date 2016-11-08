@@ -649,6 +649,15 @@ class SetupDb(BaseDb):
     def noaa_tools(self, value):
         self._setter_bool("noaa_tools", value)
 
+    # --- default_institution
+    @property
+    def default_institution(self):
+        return self._getter_str("default_institution")
+
+    @default_institution.setter
+    def default_institution(self, value):
+        self._setter_str("default_institution", value)
+
     # --- default_survey
     @property
     def default_survey(self):

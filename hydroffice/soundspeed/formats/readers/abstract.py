@@ -64,6 +64,10 @@ class AbstractReader(AbstractFormat):
                     raise RuntimeError("missing date required for database lookup")
 
             # check for default metadata
+            if len(profile.meta.institution) == 0:
+                if len(self.s.default_institution) != 0:
+                    profile.meta.institution = self.s.default_institution
+                    # logger.debug('default institution: %s' % profile.meta.institution)
             if len(profile.meta.survey) == 0:
                 if len(self.s.default_survey) != 0:
                     profile.meta.survey = self.s.default_survey

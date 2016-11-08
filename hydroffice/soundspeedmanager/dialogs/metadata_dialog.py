@@ -98,6 +98,17 @@ class MetadataDialog(AbstractDialog):
         self.proc_info.setText("%s" % self.lib.cur.meta.proc_info)
         hbox.addWidget(self.proc_info)
 
+        # institution
+        hbox = QtGui.QHBoxLayout()
+        self.mainLayout.addLayout(hbox)
+        label = QtGui.QLabel("Institution:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        self.institution = QtGui.QLineEdit()
+        self.institution.setDisabled(True)
+        self.institution.setText("%s" % self.lib.cur.meta.institution)
+        hbox.addWidget(self.institution)
+
         # survey
         hbox = QtGui.QHBoxLayout()
         self.mainLayout.addLayout(hbox)
@@ -228,6 +239,7 @@ class MetadataDialog(AbstractDialog):
         logger.debug("editable: %s" % self.editable.isChecked())
         if self.editable.isChecked():
             self.apply.setEnabled(True)
+            self.institution.setEnabled(True)
             self.survey.setEnabled(True)
             self.vessel.setEnabled(True)
             self.sn.setEnabled(True)
@@ -240,6 +252,7 @@ class MetadataDialog(AbstractDialog):
 
         else:
             self.apply.setDisabled(True)
+            self.institution.setDisabled(True)
             self.survey.setDisabled(True)
             self.vessel.setDisabled(True)
             self.sn.setDisabled(True)
@@ -254,6 +267,7 @@ class MetadataDialog(AbstractDialog):
         logger.debug("apply")
         # apply changes
         try:
+            self.lib.cur.meta.institution = self.institution.text()
             self.lib.cur.meta.survey = self.survey.text()
             self.lib.cur.meta.vessel = self.vessel.text()
             self.lib.cur.meta.sn = self.sn.text()

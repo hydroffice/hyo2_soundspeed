@@ -382,6 +382,9 @@ class MainWin(QtGui.QMainWindow):
         else:
             self.tab_seacat.setDisabled(True)
 
+        # update the windows title
+        self.setWindowTitle('%s v.%s [project: %s]' % (self.name, self.version, self.lib.current_project))
+
         msg = str()
 
         tokens = list()

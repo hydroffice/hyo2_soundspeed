@@ -17,6 +17,7 @@ class Metadata(object):
         self.longitude = None
         self.utc_time = None
         self.original_path = str()
+        self._institution = str()
         self._survey = str()
         self._vessel = str()
         self._sn = str()  # serial number
@@ -36,6 +37,14 @@ class Metadata(object):
     @property
     def probe(self):
         return Dicts.first_match(Dicts.probe_types, self.probe_type)
+
+    @property
+    def institution(self):
+        return self._institution
+
+    @institution.setter
+    def institution(self, value):
+        self._institution = value
 
     @property
     def survey(self):
@@ -72,6 +81,7 @@ class Metadata(object):
         msg += "    <sensor:%s[%s]>\n" % (self.sensor, self.probe)
         msg += "    <time:%s,lat:%s,long:%s>\n" % (self.utc_time, self.latitude, self.longitude)
         msg += "    <path:%s>\n" % self.original_path
+        msg += "    <institution:%s>\n" % self.institution
         msg += "    <survey:%s,vessel:%s>\n" % (self.survey, self.vessel)
         msg += "    <sn:%s>\n" % self.sn
         msg += "    <proc_time:%s>\n" % self.proc_time

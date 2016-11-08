@@ -54,6 +54,11 @@ class ExportDb(object):
         if lyr.CreateField(field) != 0:
             raise RuntimeError("Creating field failed.")
 
+        field = ogr.FieldDefn(b'institution', ogr.OFTString)
+        field.SetWidth(254)
+        if lyr.CreateField(field) != 0:
+            raise RuntimeError("Creating field failed.")
+
         field = ogr.FieldDefn(b'survey', ogr.OFTString)
         field.SetWidth(254)
         if lyr.CreateField(field) != 0:
@@ -111,13 +116,15 @@ class ExportDb(object):
             ft.SetField(b'probe', Dicts.first_match(Dicts.probe_types, row[4]).encode())
             ft.SetField(b'path', row[5].encode())
             if row[6]:
-                ft.SetField(b'survey', row[6].encode())
+                ft.SetField(b'institution', row[6].encode())
             if row[7]:
-                ft.SetField(b'vessel', row[7].encode())
+                ft.SetField(b'survey', row[7].encode())
             if row[8]:
-                ft.SetField(b'sn', row[8].encode())
-            ft.SetField(b'proc_time', row[9].isoformat())
-            ft.SetField(b'proc_info', row[10].encode())
+                ft.SetField(b'vessel', row[8].encode())
+            if row[9]:
+                ft.SetField(b'sn', row[9].encode())
+            ft.SetField(b'proc_time', row[10].isoformat())
+            ft.SetField(b'proc_info', row[11].encode())
 
             pt = ogr.Geometry(ogr.wkbPoint)
             pt.SetPoint_2D(0, row[2].x, row[2].y)

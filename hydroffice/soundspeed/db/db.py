@@ -136,6 +136,7 @@ class ProjectDb(object):
                                      sensor_type integer NOT NULL,
                                      probe_type integer NOT NULL,
                                      original_path text,
+                                     institution text,
                                      survey text,
                                      vessel text,
                                      sn text,
@@ -205,6 +206,7 @@ class ProjectDb(object):
                                      SELECT pk, cast_datetime, cast_position,
                                         sensor_type, probe_type,
                                         original_path,
+                                        institution,
                                         survey,
                                         vessel,
                                         sn,
@@ -362,11 +364,12 @@ class ProjectDb(object):
         try:
             # noinspection SqlResolve
             self.conn.execute("""
-                              INSERT INTO ssp VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                              INSERT INTO ssp VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                               """, (self.tmp_ssp_pk,
                                     self.tmp_data.meta.sensor_type,
                                     self.tmp_data.meta.probe_type,
                                     self.tmp_data.meta.original_path,
+                                    self.tmp_data.meta.institution,
                                     self.tmp_data.meta.survey,
                                     self.tmp_data.meta.vessel,
                                     self.tmp_data.meta.sn,
@@ -531,17 +534,18 @@ class ProjectDb(object):
                                      row[b'sensor_type'],  # 3
                                      row[b'probe_type'],  # 4
                                      row[b'original_path'],  # 5
-                                     row[b'survey'],  # 6
-                                     row[b'vessel'],  # 7
-                                     row[b'sn'],  # 8
-                                     row[b'proc_time'],  # 9
-                                     row[b'proc_info'],  # 10
-                                     row[b'pressure_uom'],  # 11
-                                     row[b'depth_uom'],  # 12
-                                     row[b'speed_uom'],  # 13
-                                     row[b'temperature_uom'],  # 14
-                                     row[b'conductivity_uom'],  # 15
-                                     row[b'salinity_uom'],  # 16
+                                     row[b'institution'],  # 6
+                                     row[b'survey'],  # 7
+                                     row[b'vessel'],  # 8
+                                     row[b'sn'],  # 9
+                                     row[b'proc_time'],  # 10
+                                     row[b'proc_info'],  # 11
+                                     row[b'pressure_uom'],  # 12
+                                     row[b'depth_uom'],  # 13
+                                     row[b'speed_uom'],  # 14
+                                     row[b'temperature_uom'],  # 15
+                                     row[b'conductivity_uom'],  # 16
+                                     row[b'salinity_uom'],  # 17
                                      ))
             return ssp_list
 
@@ -579,6 +583,7 @@ class ProjectDb(object):
                 ssp.cur.meta.sensor_type = ssp_meta[b'sensor_type']
                 ssp.cur.meta.probe_type = ssp_meta[b'probe_type']
                 ssp.cur.meta.original_path = ssp_meta[b'original_path']
+                ssp.cur.meta.institution = ssp_meta[b'institution']
                 ssp.cur.meta.survey = ssp_meta[b'survey']
                 ssp.cur.meta.vessel = ssp_meta[b'vessel']
                 ssp.cur.meta.sn = ssp_meta[b'sn']

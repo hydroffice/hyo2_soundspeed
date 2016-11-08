@@ -58,6 +58,7 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      custom_woa09_folder text DEFAULT "",
      custom_woa13_folder text DEFAULT "",
      noaa_tools text NOT NULL DEFAULT "False",
+     default_institution text NOT NULL DEFAULT "",
      default_survey text NOT NULL DEFAULT "",
      default_vessel text NOT NULL DEFAULT "",
      default_sn text NOT NULL DEFAULT "",
