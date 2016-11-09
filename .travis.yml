@@ -16,7 +16,7 @@ env:
 matrix:
   allow_failures:
   - os: osx
-  - end: PYTHON_VERSION=3.5
+  - env: PYTHON_VERSION=3.5
 
 before_install:
   # Set the anaconda environment

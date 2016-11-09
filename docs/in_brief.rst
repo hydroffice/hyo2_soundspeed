@@ -5,10 +5,12 @@ In brief
 .. image:: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/master/hydroffice/soundspeedmanager/media/favicon.png
     :alt: logo
 
+This package is part of the `HydrOffice <https://www.hydroffice.org/license/>`_ framework.
+
 HydrOffice is a research development environment for ocean mapping. It provides a collection of hydro-packages, each of them dealing with a specific issue of the field. The main goal is to speed up both algorithms testing and research-2-operation.
 
 This package provides both a library and an application with functionalities to manage sound speed profiles, and
-to provide pre-processing tools to help bridge the gap between sound speed profiling instrumentation and multibeam
+to provide pre-processing ocean mapping tools to help bridge the gap between sound speed profiling instrumentation and multibeam
 echosounder acquisition systems.
 
 It has been developing with the aim to merge together functionalities present in several applications that process sound
@@ -44,7 +46,7 @@ The :ref:`operator_mode` represents the primary mode, and it is used to convert 
 to graphically edit them, and to export/send the resulting profiles for use by underwater acoustic systems.
 Optional steps are the augmentation with measurements from a reference cast (to either improve salinity modeling
 or extrapolate the cast to the required depth), either manually specifiying a loaded profile as reference cast,
-or deriving the reference from oceanographic models (currently, WOA09 and RTOFS) as described
+or deriving the reference from oceanographic models (currently, WOA09, WOA13 and RTOFS) as described
 in :ref:`app_a_oceanographic_atlases`.
 
 The :ref:`server_mode` was developed to deliver WOA/RTOFS-derived synthetic SSPs to one or more network clients in
@@ -80,7 +82,7 @@ Currently implemented features
 
 * Data visualization and interactive graphical inspection (e.g., outlier removal, point additions) of sound speed, temperature and salinity profiles
 
-* Use of the World Ocean Atlas of 2009 (WOA09/13) and Real-Time Ocean Forecast System (RTOFS) for tasks such as:
+* Use of the World Ocean Atlas of 2009/2013 (WOA09/13) and Real-Time Ocean Forecast System (RTOFS) for tasks such as:
 
   * Salinity augmentation for Sippican XBT probes
   * Temperature/salinity augmentation for Sippican XSV probes and SVP sensors
