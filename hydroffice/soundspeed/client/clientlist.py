@@ -59,7 +59,8 @@ class ClientList(object):
             logger.debug("waiting for receipt confirmation...")
             wait = 0
             wait_max = prj.setup.rx_max_wait_time
-            while (not prj.listeners.sis.ssp) and (wait < wait_max):
+            # For multiple SIS clients, make sure the client IP match with the sender IP.
+            while (not prj.listeners.sis.ssp or client.ip != prj.listeners.sis.sender[0]) and (wait < wait_max):
                 time.sleep(1)
                 wait += 1
                 logger.debug("waiting for %s sec" % wait)
