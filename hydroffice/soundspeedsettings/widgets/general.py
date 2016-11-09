@@ -394,7 +394,10 @@ class General(AbstractWidget):
     def apply_noaa_tools(self):
         # logger.debug("apply NOAA tools: %s" % self.noaa_tools.currentText())
         self.db.noaa_tools = self.noaa_tools.currentText() == "True"
-        self.db.default_institution = institution_list[0]  # NOAA OCS
+        if self.noaa_tools.currentText() == "True":
+            self.db.default_institution = institution_list[0]  # NOAA OCS
+        else:
+            self.db.default_institution = ""
         self.setup_changed()
         self.main_win.reload_settings()
 
