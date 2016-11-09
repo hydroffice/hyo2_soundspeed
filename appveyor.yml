@@ -37,7 +37,7 @@ install:
   - "python --version"
 
   # Install dependencies
-  - conda install -q numpy basemap  #  matplotlib h5py lxml cython gdal==1.11.2
+  - conda install -q numpy basemap pyside #  matplotlib h5py lxml cython gdal==1.11.2
 
 build: off
 build_script:
