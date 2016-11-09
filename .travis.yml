@@ -50,6 +50,7 @@ install:
   - conda config --add channels SciTools
   - conda config --add channels IOOS
   - conda install -q numpy basemap pyside #  matplotlib h5py lxml gdal==1.11.2
+  - pip install https://github.com/TEOS-10/python-gsw/archive/master.zip
   - pip install --no-deps -e .
 
 script:
