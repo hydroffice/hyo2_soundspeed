@@ -76,10 +76,6 @@ class AbstractReader(AbstractFormat):
                 if len(self.s.default_vessel) != 0:
                     profile.meta.vessel = self.s.default_vessel
                     # logger.debug('default vessel: %s' % profile.meta.vessel)
-            if len(profile.meta.sn) == 0:
-                if len(self.s.default_sn) != 0:
-                    profile.meta.sn = self.s.default_sn
-                    # logger.debug('default sn: %s' % profile.meta.sn)
 
     def finalize(self):
         """Function called at the end, to finalize the reading (e.g., clone raw to proc)"""

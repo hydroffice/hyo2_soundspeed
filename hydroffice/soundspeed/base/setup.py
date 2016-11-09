@@ -75,7 +75,6 @@ class Setup(object):
         self.default_institution = None
         self.default_survey = None
         self.default_vessel = None
-        self.default_sn = None
 
         # loading settings
         self.release_folder = release_folder
@@ -162,7 +161,6 @@ class Setup(object):
         self.default_institution = db.default_institution
         self.default_survey = db.default_survey
         self.default_vessel = db.default_vessel
-        self.default_sn = db.default_sn
 
         db.close()
 
@@ -246,7 +244,6 @@ class Setup(object):
             db.default_institution = self.default_institution
             db.default_survey = self.default_survey
             db.default_vessel = self.default_vessel
-            db.default_sn = self.default_sn
 
             db.close()
 
@@ -304,6 +301,5 @@ class Setup(object):
         msg += "      <default_institution: %s>\n" % self.default_institution
         msg += "      <default_survey: %s>\n" % self.default_survey
         msg += "      <default_vessel: %s>\n" % self.default_vessel
-        msg += "      <default_sn: %s>\n" % self.default_sn
 
         return msg

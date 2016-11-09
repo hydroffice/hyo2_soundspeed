@@ -61,7 +61,6 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      default_institution text NOT NULL DEFAULT "",
      default_survey text NOT NULL DEFAULT "",
      default_vessel text NOT NULL DEFAULT "",
-     default_sn text NOT NULL DEFAULT "",
 
      /* Checks */
      CHECK (setup_status IN ("active", "inactive")),

@@ -2,10 +2,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import sqlite3
 import os
+import datetime
 import logging
 
 logger = logging.getLogger(__name__)
 
+from hydroffice.soundspeed import __version__ as version
+from hydroffice.soundspeed import __doc__ as name
 from .point import Point, convert_point, adapt_point
 from .plot import PlotDb
 from .export import ExportDb
@@ -119,8 +122,19 @@ class ProjectDb(object):
                 self.conn.execute("""
                                   CREATE TABLE IF NOT EXISTS library(
                                      version int PRIMARY KEY NOT NULL DEFAULT 1,
+                                     creator_info text,
                                      creation timestamp NOT NULL)
                                   """)
+
+                # check if the library table is empty
+                # noinspection SqlResolve
+                ret = self.conn.execute("""SELECT COUNT(*) FROM library""").fetchone()
+                # if not present, add it
+                if ret[0] == 0:
+                    # noinspection SqlResolve
+                    self.conn.execute("""
+                                      INSERT INTO library VALUES (?, ?, ?)
+                                      """, (1, "%s v.%s" % (name, version), datetime.datetime.utcnow(),))
 
                 self.conn.execute("""
                                   CREATE TABLE IF NOT EXISTS ssp_pk(
@@ -266,6 +280,21 @@ class ProjectDb(object):
                         return False
 
         return True
+
+    def get_db_version(self):
+        """Get the project db version"""
+        if not self.conn:
+            logger.error("missing db connection")
+            return False
+
+        try:
+            # noinspection SqlResolve
+            ret = self.conn.execute("""SELECT * FROM library""").fetchone()
+            return ret[0]
+
+        except sqlite3.Error as e:
+            logger.error("whilte getting db version, %s: %s" % (type(e), e))
+            return None
 
     def _get_ssp_pk(self):
 

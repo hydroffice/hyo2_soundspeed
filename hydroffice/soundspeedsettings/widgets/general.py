@@ -254,20 +254,6 @@ class General(AbstractWidget):
         self.default_vessel.setValidator(validator)
         hbox.addWidget(self.default_vessel)
 
-        # - default sn
-        hbox = QtGui.QHBoxLayout()
-        self.right_layout.addLayout(hbox)
-        # -- label
-        label = QtGui.QLabel("Default S/N:")
-        label.setFixedWidth(lbl_width)
-        hbox.addWidget(label)
-        # -- value
-        self.default_sn = QtGui.QLineEdit()
-        rex = QtCore.QRegExp('[a-zA-Z0-9_.-\s]+')
-        validator = QtGui.QRegExpValidator(rex)
-        self.default_sn.setValidator(validator)
-        hbox.addWidget(self.default_sn)
-
         self.right_layout.addStretch()
 
         self.main_layout.addStretch()
@@ -291,8 +277,6 @@ class General(AbstractWidget):
         self.woa13_folder.textChanged.connect(self.apply_custom_folders)
         # noinspection PyUnresolvedReferences
         self.noaa_tools.currentIndexChanged.connect(self.apply_noaa_tools)
-        # noinspection PyUnresolvedReferences
-        self.default_sn.textChanged.connect(self.apply_default_sn)
 
     def apply_default_institution(self):
         # logger.debug("apply default institution")
@@ -309,12 +293,6 @@ class General(AbstractWidget):
     def apply_default_vessel(self):
         # logger.debug("apply default vessel")
         self.db.default_vessel = self.default_vessel.currentText()
-        self.setup_changed()
-        self.main_win.reload_settings()
-
-    def apply_default_sn(self):
-        # logger.debug("apply default sn")
-        self.db.default_sn = self.default_sn.text()
         self.setup_changed()
         self.main_win.reload_settings()
 
@@ -437,6 +415,3 @@ class General(AbstractWidget):
 
         # default_vessel
         self.default_vessel.setEditText("%s" % self.db.default_vessel)
-
-        # default_sn
-        self.default_sn.setText("%s" % self.db.default_sn)

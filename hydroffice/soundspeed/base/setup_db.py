@@ -675,12 +675,3 @@ class SetupDb(BaseDb):
     @default_vessel.setter
     def default_vessel(self, value):
         self._setter_str("default_vessel", value)
-
-    # --- default_sn
-    @property
-    def default_sn(self):
-        return self._getter_str("default_sn")
-
-    @default_sn.setter
-    def default_sn(self, value):
-        self._setter_str("default_sn", value)
