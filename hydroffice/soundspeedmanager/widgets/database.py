@@ -53,6 +53,7 @@ class Database(AbstractWidget):
 
         # -- list
         self.ssp_list = QtGui.QTableWidget()
+        self.ssp_list.setSortingEnabled(True)
         self.ssp_list.setFocus()
         self.ssp_list.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.ssp_list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
