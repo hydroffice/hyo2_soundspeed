@@ -54,11 +54,11 @@ install:
   - pip install --no-deps -e .
 
 script:
-  - python setup.py test
+  - python -m unittest discover
 
 after_script:
   # If tests are successful, create a source distribution.
-  - python setup.py sdist
+  # - python setup.py sdist
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       python setup.py bdist_wheel;
     fi
