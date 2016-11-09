@@ -44,7 +44,8 @@ class Metadata(object):
 
     @institution.setter
     def institution(self, value):
-        self._institution = value
+        self.update_proc_time()
+        self._institution = value.strip()
 
     @property
     def survey(self):
@@ -53,7 +54,7 @@ class Metadata(object):
     @survey.setter
     def survey(self, value):
         self.update_proc_time()
-        self._survey = value
+        self._survey = value.strip()
 
     @property
     def vessel(self):
@@ -62,7 +63,7 @@ class Metadata(object):
     @vessel.setter
     def vessel(self, value):
         self.update_proc_time()
-        self._vessel = value
+        self._vessel = value.strip()
 
     @property
     def sn(self):
@@ -71,7 +72,7 @@ class Metadata(object):
     @sn.setter
     def sn(self, value):
         self.update_proc_time()
-        self._sn = value
+        self._sn = value.strip()
 
     def update_proc_time(self):
         self.proc_time = datetime.utcnow()
