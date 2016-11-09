@@ -25,9 +25,9 @@ class TestSoundSpeedBaseHelper(unittest.TestCase):
 
     def test_creation_of_File_info(self):
         fi = helper.FileInfo(__file__)
-        self.assertEqual(fi.path, __file__)
-        self.assertEqual(fi.basename, os.path.basename(__file__).split('.')[0])
-        self.assertEqual(fi.ext, os.path.basename(__file__).split('.')[1])
+        self.assertEqual(fi.path, os.path.abspath(__file__))
+        self.assertEqual(fi.basename, os.path.basename(os.path.abspath(__file__)).split('.')[0])
+        self.assertEqual(fi.ext, os.path.basename(os.path.abspath(__file__)).split('.')[1])
         self.assertEqual(fi.io, None)
 
         fi.io = open(__file__)
@@ -35,17 +35,17 @@ class TestSoundSpeedBaseHelper(unittest.TestCase):
 
     def test_creation_with_File_manager(self):
         fm = helper.FileManager(__file__, b'r')
-        self.assertEqual(fm.path, __file__)
-        self.assertEqual(fm.basename, os.path.basename(__file__).split('.')[0])
-        self.assertEqual(fm.ext, os.path.basename(__file__).split('.')[1])
+        self.assertEqual(fm.path, os.path.abspath(__file__))
+        self.assertEqual(fm.basename, os.path.basename(os.path.abspath(__file__)).split('.')[0])
+        self.assertEqual(fm.ext, os.path.basename(os.path.abspath(__file__)).split('.')[1])
         self.assertNotEqual(fm.io, None)
         self.assertFalse(fm.append_exists)
 
     def test_append_with_File_manager(self):
         fm = helper.FileManager(__file__, b'a')
-        self.assertEqual(fm.path, __file__)
-        self.assertEqual(fm.basename, os.path.basename(__file__).split('.')[0])
-        self.assertEqual(fm.ext, os.path.basename(__file__).split('.')[1])
+        self.assertEqual(fm.path, os.path.abspath(__file__))
+        self.assertEqual(fm.basename, os.path.basename(os.path.abspath(__file__)).split('.')[0])
+        self.assertEqual(fm.ext, os.path.basename(os.path.abspath(__file__)).split('.')[1])
         self.assertNotEqual(fm.io, None)
         self.assertTrue(fm.append_exists)
 

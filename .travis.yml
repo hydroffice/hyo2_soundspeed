@@ -49,7 +49,7 @@ install:
   - conda config --add channels hydroffice
   - conda config --add channels SciTools
   - conda config --add channels IOOS
-  - conda install -q numpy basemap pyside matplotlib netCDF4 gdal libgdal pyproj
+  - conda install -q numpy basemap pyside matplotlib netCDF4 libnetcdf gdal==1.11.2 libgdal==1.11.2 pyproj
   - pip install https://github.com/TEOS-10/python-gsw/archive/master.zip
   - pip install --no-deps -e .
 
