@@ -14,7 +14,7 @@ ch.setFormatter(ch_formatter)
 logger.addHandler(ch)
 
 from hydroffice.soundspeed.atlas.rtofs.rtofs import Rtofs
-from hydroffice.soundspeed.project import Project
+from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
 
 
 class TestSoundSpeedAtlasRtofs(unittest.TestCase):
@@ -31,14 +31,14 @@ class TestSoundSpeedAtlasRtofs(unittest.TestCase):
                 shutil.rmtree(os.path.join(self.curdir, item))
 
     def test_creation_of_Rtofs(self):
-        prj = Project(data_folder=self.curdir)
+        prj = SoundSpeedLibrary(data_folder=self.curdir)
         rtofs = Rtofs(data_folder=prj.data_folder, prj=prj)
         self.assertTrue('rtofs' in rtofs.folder)
         self.assertFalse(rtofs.is_present())
         prj.close()
 
     def test_download_db_from_Rtofs(self):
-        prj = Project(data_folder=self.curdir)
+        prj = SoundSpeedLibrary(data_folder=self.curdir)
         rtofs = Rtofs(data_folder=prj.data_folder, prj=prj)
         rtofs.download_db(server_mode=True)
         self.assertTrue(rtofs.is_present())

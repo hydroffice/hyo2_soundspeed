@@ -37,6 +37,7 @@ The package is jointly developed by NOAA OCS and UNH CCOM.
 Other info
 ----------
 
+* GitHub: `https://github.com/hydroffice/hyo_soundspeed <https://github.com/hydroffice/hyo_soundspeed>`_
 * Bitbucket: `https://bitbucket.org/ccomjhc/hyo_soundspeed <https://bitbucket.org/ccomjhc/hyo_soundspeed>`_
-* Project page: `http://www.hydroffice.org <http://www.hydroffice.org>`_
-* License: LGPLv2.1 license (See `LICENSE <https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/tip/LICENSE>`_)
+* Project page: `https://www.hydroffice.org/soundspeed/ <https://www.hydroffice.org/soundspeed/>`_
+* License: LGPLv2.1 or IA license (See `Dual license <https://www.hydroffice.org/license_lgpl21/>`_)

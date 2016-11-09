@@ -54,3 +54,8 @@ docs/_build/*
 # Downloaded/Output data
 data/download/
 data/output/
+
+tests/outputs
+tests/projects
+tests/releases
+tests/rtofs

@@ -38,7 +38,7 @@ class TestSoundSpeedAtlasAtlases(unittest.TestCase):
         self.assertTrue("woa" in atl.woa09_folder)
         self.assertTrue("woa" in atl.woa13_folder)
 
-        prj.close()
+        lib.close()
 
 
 def suite():

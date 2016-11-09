@@ -9,13 +9,13 @@ environment:
     - PYTHON_VERSION: 2.7
       PYTHON_ARCH: x86
       MINICONDA: C:\Miniconda
-    - PYTHON_VERSION: 3.4
+    - PYTHON_VERSION: 3.5
       PYTHON_ARCH: x64
       MINICONDA: C:\Miniconda3-x64
 
 matrix:
   allow_failures:
-    - PYTHON_VERSION: 3.4
+    - PYTHON_VERSION: 3.5
       PYTHON_ARCH: x64
       MINICONDA: C:\Miniconda3-x64
 
@@ -37,7 +37,7 @@ install:
   - "python --version"
 
   # Install dependencies
-  - conda install -q numpy  #  matplotlib h5py lxml cython gdal==1.11.2
+  - conda install -q numpy basemap  #  matplotlib h5py lxml cython gdal==1.11.2
 
 build: off
 build_script:
