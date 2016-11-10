@@ -19,7 +19,7 @@ class Sonardyne(AbstractTextWriter):
         self.desc = "Sonardyne"
         self._ext.add('pro')
 
-    def write(self, ssp, data_path, data_file=None, data_append=False):
+    def write(self, ssp, data_path, data_file=None, data_append=False, project=''):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.ssp = ssp

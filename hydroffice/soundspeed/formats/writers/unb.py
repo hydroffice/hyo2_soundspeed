@@ -19,7 +19,7 @@ class Unb(AbstractTextWriter):
         self.desc = "UNB"
         self._ext.add('unb')
 
-    def write(self, ssp, data_path, data_file=None, data_append=False):
+    def write(self, ssp, data_path, data_file=None, data_append=False, project=''):
         """Writing version 2 since it holds T/S and flags"""
         logger.debug('*** %s ***: start' % self.driver)
 

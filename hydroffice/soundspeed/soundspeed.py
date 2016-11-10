@@ -610,9 +610,12 @@ class SoundSpeedLibrary(object):
             if writer.name == 'asvp':
                 self.prepare_sis(thin=True)
             if not has_data_files:  # we don't have the output file names
-                writer.write(ssp=self.ssp, data_path=data_path, data_append=data_append)
+                if len(data_formats) == 1 and name == 'ncei': # NCEI requires special filename convention
+                    writer.write(ssp=self.ssp, data_path=data_path, data_file='ncei', data_append=data_append, project=self.current_project)
+                else:
+                    writer.write(ssp=self.ssp, data_path=data_path, data_append=data_append, project=self.current_project)
             else:
-                writer.write(ssp=self.ssp, data_path=data_path, data_file=data_files[i], data_append=data_append)
+                writer.write(ssp=self.ssp, data_path=data_path, data_file=data_files[i], data_append=data_append, project=self.current_project)
 
         # take care of listeners
         if self.has_sippican_to_process():

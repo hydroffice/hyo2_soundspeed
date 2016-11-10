@@ -23,7 +23,7 @@ class AbstractWriter(AbstractFormat):
         self.fod = None
 
     @abstractmethod
-    def write(self, ssp, data_path, data_file=None, data_append=False):
+    def write(self, ssp, data_path, data_file=None, data_append=False, project=''):
         pass
 
     @abstractmethod

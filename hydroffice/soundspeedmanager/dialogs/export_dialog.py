@@ -92,7 +92,7 @@ class ExportDialog(AbstractDialog):
 
         # ask user for basename (only for single selection)
         basenames = list()
-        if len(self.name_outputs) == 1:
+        if len(self.name_outputs) == 1 and self.name_outputs[0] != 'ncei': # NCEI requires special filename convention
             basename_msg = "Enter output basename (without extension):"
             while True:
                 basename, ok = QtGui.QInputDialog.getText(self, "Output basename", basename_msg,

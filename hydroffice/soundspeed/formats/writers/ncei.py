@@ -6,8 +6,9 @@ import os
 import calendar
 import datetime as dt
 import logging
-
 logger = logging.getLogger(__name__)
+
+from PySide import QtGui
 
 from ... import __version__ as ssp_version
 from ... import __doc__ as ssp_name
@@ -29,26 +30,26 @@ class Ncei(AbstractWriter):
         self._ext.add('nc')
         self.root_group = None
 
-    def write(self, ssp, data_path, data_file=None, data_append=False):
+    def write(self, ssp, data_path, data_file=None, data_append=False, project=''):
         """Writing profile data"""
         logger.debug('*** %s ***: start' % self.driver)
 
         self.ssp = ssp
-
+        self.project = project
+        
+        ship_code = self.ssp.cur.meta.vessel[:2] if len(self.ssp.cur.meta.vessel) >= 2 else 'ZZ'
+        nc_file = '%s_%s.nc' %(self.ssp.cur.meta.utc_time.strftime('%Y%m%d%H%M%S'), ship_code)
         # define the output file path
         if data_file:
-            if len(data_file.split('.')) == 1:
-                data_file += (".%s" % list(self.ext)[0])
-            file_path = os.path.join(data_path, data_file)
+            file_path = os.path.join(data_path, nc_file)
         else:
-            if self.ssp.cur.meta.original_path:
-                data_file = os.path.basename(self.ssp.cur.meta.original_path) + '.' + list(self.ext)[0]
-            else:
-                data_file = 'output.' + list(self.ext)[0]
             data_path = os.path.join(data_path, self.name.lower())
             if not os.path.exists(data_path):
                 os.makedirs(data_path)
-            file_path = os.path.join(data_path, data_file)
+            file_path = os.path.join(data_path, nc_file)
+
+        if self._miss_metadata():
+            return
         logger.info("output file: %s" % file_path)
 
         # create the file
@@ -142,11 +143,11 @@ class Ncei(AbstractWriter):
         self.root_group.ncei_template_version = b'NCEI_NetCDF_Profile_Orthogonal_Template_v2.0'  # REQUIRED(NCEI)
         self.root_group.featureType = b'profile'  # REQUIRED - CF attribute for identifying the featureType.(CF)
         # HIGHLY RECOMMENDED - Provide a useful title for the data in the file.(ACDD)
-        self.root_group.title = b'Sound speed profile'
+        self.root_group.title = b'%s_%s profile' % (self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
         # HIGHLY RECOMMENDED - Provide a useful summary or abstract for the data in the file.(ACDD)
-        self.root_group.summary = b''
+        #self.root_group.summary = b''
         # HIGHLY RECOMMENDED - A comma separated list of keywords coming from the keywords_vocabulary.(ACDD)
-        self.root_group.keywords = b''
+        #self.root_group.keywords = b''
         # HIGHLY RECOMMENDED - A comma separated list of the conventions being followed. Always try to use latest
         # version.(CF / ACDD)
         self.root_group.Conventions = b'CF-1.6, ACDD-1.3'
@@ -154,20 +155,29 @@ class Ncei(AbstractWriter):
         self.root_group.date_created = b'%s' % dt.datetime.utcnow().isoformat()
         # SUGGESTED - The data type, as derived from Unidata's Common Data Model Scientific Data types and understood
         # by THREDDS. (ACDD)
-        self.root_group.cdm_data_type = b'Station'
-        # RECOMMENDED - Provide useful additional information here.(CF)
-        self.root_group.comment = b'Created using HydrOffice %s v.%s' % (ssp_name, ssp_version)
-        # SUGGESTED - Published or web - based references that describe the data or methods used to produce it.
-        # Recommend URIs(such as a URL or DOI)
-        self.root_group.references = b'https://www.hydroffice.org/soundspeed/'
+        self.root_group.cdm_data_type = b'profile'
+        # RECOMMENDED - The name of the project(s) principally responsible for originating this data.
+        # Multiple projects can be separated by commas.(ACDD)
+        self.root_group.project = b'%s' % self.project
         # SUGGESTED - Name of the platform(s) that supported the sensor data used to create this data set or product.
         # Platforms can be of any type, including satellite, ship, station, aircraft or other.(ACDD)
         self.root_group.platform = b'%s' % self.ssp.cur.meta.vessel
-        # RECOMMENDED - The name of the project(s) principally responsible for originating this data.
-        # Multiple projects can be separated by commas.(ACDD)
-        self.root_group.project = b'%s' % self.ssp.cur.meta.project
+        # RECOMMENDED -The name of the institution principally responsible for originating this data..  An institution
+        # attribute can be used for each variable if variables come from more than one institution. (CF/ACDD)
+        self.root_group.institution = b'%s' % self.ssp.cur.meta.institution
         # RECOMMENDED - The method of production of the original data.(CF)
-        self.root_group.source = b'sensor: %s, probe type: %s' % (self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
+        # self.root_group.source = b'sensor: %s, probe type: %s' % (self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
+        # SUGGESTED - Name of the contributing instrument(s) or sensor(s) used to create this data set or product. (ACDD)
+        self.root_group.instrument = b'sensor: %s, probe type: %s' % (self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
+        if self.ssp.cur.meta.sn: self.root_group.instrument_sn = b'%s' % self.ssp.cur.meta.sn
+        # SUGGESTED - Published or web - based references that describe the data or methods used to produce it.
+        # Recommend URIs(such as a URL or DOI)
+        self.root_group.references = b'https://www.hydroffice.org/soundspeed/'        
+        # RECOMMENDED - Provide useful additional information here.(CF)
+        # self.root_group.comment = b'Created using HydrOffice %s v.%s' % (ssp_name, ssp_version)
+        # SUGGESTED - Version identifier of the data file or product as assigned by the data creator. (ACDD)
+        self.root_group.product_version = b'Created using HydrOffice %s v.%s' % (ssp_name, ssp_version)
+
 
     def _write_body(self):
         logger.debug('generating body')
@@ -176,7 +186,7 @@ class Ncei(AbstractWriter):
         vi = self.ssp.cur.data_valid
 
         # var: temperature
-        if np.mean(self.ssp.cur.data.temp[vi]) != 0.0:
+        if self._not_empty(self.ssp.cur.data.temp[vi]):
             temperature = self.root_group.createVariable(b'temperature', b'f4', (b'profile', b'z',))
             temperature[:] = self.ssp.cur.data.temp[vi]
             # RECOMMENDED - Provide a descriptive, long name for this variable.
@@ -186,7 +196,7 @@ class Ncei(AbstractWriter):
             temperature.units = b'degree_C'  # REQUIRED - Use UDUNITS compatible units.
 
         # var: salinity
-        if np.mean(self.ssp.cur.data.sal[vi]) != 0.0:
+        if self._not_empty(self.ssp.cur.data.sal[vi]):
             salinity = self.root_group.createVariable(b'salinity', b'f4', (b'profile', b'z',))
             salinity[:] = self.ssp.cur.data.sal[vi]
             # RECOMMENDED - Provide a descriptive, long name for this variable.
@@ -196,7 +206,7 @@ class Ncei(AbstractWriter):
             salinity.units = b'1e-3'  # REQUIRED - Use UDUNITS compatible units.
 
         # var: sound speed
-        if np.mean(self.ssp.cur.data.speed[vi]) != 0.0:
+        if self._not_empty(self.ssp.cur.data.speed[vi]):
             sound_speed = self.root_group.createVariable(b'sound_speed', b'f4', (b'profile', b'z',))
             sound_speed[:] = self.ssp.cur.data.speed[vi]
             # RECOMMENDED - Provide a descriptive, long name for this variable.
@@ -206,3 +216,44 @@ class Ncei(AbstractWriter):
             sound_speed.units = b'm s-1'  # REQUIRED - Use UDUNITS compatible units.
 
         self.root_group.close()
+
+    def _is_empty(self, data):
+        return data.min() == data.max()
+    
+    def _not_empty(self, data):
+        return data.min() != data.max()
+
+    def _miss_metadata(self):
+        vi = self.ssp.cur.data_valid
+        msg = 'Missing metadata:'
+        
+        if self.ssp.cur.meta.sensor_type <=1 or self.ssp.cur.meta.probe_type <=4:
+            msg = 'Cannot export from sensor: %s, probe type: %s' %(self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
+            QtGui.QMessageBox.critical(None, "NCEI export error", msg, QtGui.QMessageBox.Ok)
+            return True
+        
+        if self._is_empty(self.ssp.cur.data.depth[vi]) and self._is_empty(self.ssp.cur.data.pressure[vi]):
+            msg = 'missing depth or pressure'
+        elif self._is_empty(self.ssp.cur.data.speed[vi]) and self._is_empty(self.ssp.cur.data.temp[vi]) and \
+            self._is_empty(self.ssp.cur.data.conductivity[vi]) and self._is_empty(self.ssp.cur.data.sal[vi]):
+            msg = 'missing critical data'   
+        if msg != 'Missing metadata:':
+            QtGui.QMessageBox.critical(None, "NCEI export error", msg, QtGui.QMessageBox.Ok)
+            return True
+
+        if self.project in ['', 'default']:
+            msg = '%s project name, cannot export NCEI file from default project' %msg
+        else:       
+            if not self.ssp.cur.meta.survey:
+                msg = '%s survey' %msg
+            if not self.ssp.cur.meta.vessel:
+                msg = '%s vessel' %msg
+            if not self.ssp.cur.meta.institution:
+                msg = '%s institution' %msg
+        if msg != 'Missing metadata:':
+            QtGui.QMessageBox.critical(None, "NCEI export error", msg, QtGui.QMessageBox.Ok)  
+            return True      
+        
+        return False
+        
+

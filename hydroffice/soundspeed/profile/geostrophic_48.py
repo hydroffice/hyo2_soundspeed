@@ -223,7 +223,7 @@ def d_from_p(pro):
     
     if error:
         for count in range(num):
-            pro.data.depth[count] = Oc.p2d(p=pro.data.press[count], lat=lat) 
+            pro.data.depth[count] = Oc.p2d(p=pro.data.pressure[count], lat=lat) 
     else:
         for count in range(num):
             pro.data.depth[count] = depth[count]        

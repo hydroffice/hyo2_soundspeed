@@ -22,7 +22,7 @@ class Calc(AbstractTextWriter):
         self.desc = "aml calc"
         self._ext.add('calc')
 
-    def write(self, ssp, data_path, data_file=None, data_append=False):
+    def write(self, ssp, data_path, data_file=None, data_append=False, project=''):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.ssp = ssp
