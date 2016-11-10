@@ -64,18 +64,19 @@ class AbstractReader(AbstractFormat):
                     raise RuntimeError("missing date required for database lookup")
 
             # check for default metadata
-            if len(profile.meta.institution) == 0:
-                if len(self.s.default_institution) != 0:
-                    profile.meta.institution = self.s.default_institution
-                    # logger.debug('default institution: %s' % profile.meta.institution)
-            if len(profile.meta.survey) == 0:
-                if len(self.s.default_survey) != 0:
-                    profile.meta.survey = self.s.default_survey
-                    # logger.debug('default survey: %s' % profile.meta.survey)
-            if len(profile.meta.vessel) == 0:
-                if len(self.s.default_vessel) != 0:
-                    profile.meta.vessel = self.s.default_vessel
-                    # logger.debug('default vessel: %s' % profile.meta.vessel)
+            if self.s.auto_apply_default_metadata:
+                if len(profile.meta.institution) == 0:
+                    if len(self.s.default_institution) != 0:
+                        profile.meta.institution = self.s.default_institution
+                        # logger.debug('default institution: %s' % profile.meta.institution)
+                if len(profile.meta.survey) == 0:
+                    if len(self.s.default_survey) != 0:
+                        profile.meta.survey = self.s.default_survey
+                        # logger.debug('default survey: %s' % profile.meta.survey)
+                if len(profile.meta.vessel) == 0:
+                    if len(self.s.default_vessel) != 0:
+                        profile.meta.vessel = self.s.default_vessel
+                        # logger.debug('default vessel: %s' % profile.meta.vessel)
 
     def finalize(self):
         """Function called at the end, to finalize the reading (e.g., clone raw to proc)"""

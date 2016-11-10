@@ -254,6 +254,18 @@ class General(AbstractWidget):
         self.default_vessel.setValidator(validator)
         hbox.addWidget(self.default_vessel)
 
+        # - auto_apply_default_metadata
+        hbox = QtGui.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        # -- label
+        label = QtGui.QLabel("Auto apply default:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- label
+        self.auto_apply_default_metadata = QtGui.QComboBox()
+        self.auto_apply_default_metadata.addItems(["True", "False"])
+        hbox.addWidget(self.auto_apply_default_metadata)
+
         self.right_layout.addStretch()
 
         self.main_layout.addStretch()
@@ -277,6 +289,8 @@ class General(AbstractWidget):
         self.woa13_folder.textChanged.connect(self.apply_custom_folders)
         # noinspection PyUnresolvedReferences
         self.noaa_tools.currentIndexChanged.connect(self.apply_noaa_tools)
+        # noinspection PyUnresolvedReferences
+        self.auto_apply_default_metadata.currentIndexChanged.connect(self.apply_auto_apply_default_metadata)
 
     def apply_default_institution(self):
         # logger.debug("apply default institution")
@@ -379,6 +393,12 @@ class General(AbstractWidget):
         self.setup_changed()
         self.main_win.reload_settings()
 
+    def apply_auto_apply_default_metadata(self):
+        # logger.debug("auto_apply_default_metadata: %s" % self.auto_apply_default_metadata.currentText())
+        self.db.auto_apply_default_metadata = self.auto_apply_default_metadata.currentText() == "True"
+        self.setup_changed()
+        self.main_win.reload_settings()
+
     def setup_changed(self):
         """Refresh items"""
         # logger.debug("refresh input settings")
@@ -415,3 +435,9 @@ class General(AbstractWidget):
 
         # default_vessel
         self.default_vessel.setEditText("%s" % self.db.default_vessel)
+
+        # auto_apply_default_metadata
+        if self.db.auto_apply_default_metadata:
+            self.auto_apply_default_metadata.setCurrentIndex(0)  # True
+        else:
+            self.auto_apply_default_metadata.setCurrentIndex(1)  # False

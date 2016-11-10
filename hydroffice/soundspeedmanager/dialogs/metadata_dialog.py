@@ -108,6 +108,9 @@ class MetadataDialog(AbstractDialog):
         self.institution.setDisabled(True)
         self.institution.setText("%s" % self.lib.cur.meta.institution)
         hbox.addWidget(self.institution)
+        self.institution.setAutoFillBackground(True)
+        # noinspection PyUnresolvedReferences
+        self.institution.textChanged.connect(self.changed_institution)
 
         # survey
         hbox = QtGui.QHBoxLayout()
@@ -119,6 +122,9 @@ class MetadataDialog(AbstractDialog):
         self.survey.setDisabled(True)
         self.survey.setText("%s" % self.lib.cur.meta.survey)
         hbox.addWidget(self.survey)
+        self.survey.setAutoFillBackground(True)
+        # noinspection PyUnresolvedReferences
+        self.survey.textChanged.connect(self.changed_survey)
 
         # vessel
         hbox = QtGui.QHBoxLayout()
@@ -130,6 +136,9 @@ class MetadataDialog(AbstractDialog):
         self.vessel.setDisabled(True)
         self.vessel.setText("%s" % self.lib.cur.meta.vessel)
         hbox.addWidget(self.vessel)
+        self.vessel.setAutoFillBackground(True)
+        # noinspection PyUnresolvedReferences
+        self.vessel.textChanged.connect(self.changed_vessel)
 
         # serial number
         hbox = QtGui.QHBoxLayout()
@@ -141,6 +150,9 @@ class MetadataDialog(AbstractDialog):
         self.sn.setDisabled(True)
         self.sn.setText("%s" % self.lib.cur.meta.sn)
         hbox.addWidget(self.sn)
+        self.sn.setAutoFillBackground(True)
+        # noinspection PyUnresolvedReferences
+        self.sn.textChanged.connect(self.changed_sn)
 
         # pressure uom
         hbox = QtGui.QHBoxLayout()
@@ -152,6 +164,9 @@ class MetadataDialog(AbstractDialog):
         self.pressure_uom.setDisabled(True)
         self.pressure_uom.setText("%s" % self.lib.cur.meta.pressure_uom)
         hbox.addWidget(self.pressure_uom)
+        self.pressure_uom.setAutoFillBackground(True)
+        # noinspection PyUnresolvedReferences
+        self.pressure_uom.textChanged.connect(self.changed_pressure_uom)
         
         # depth uom
         hbox = QtGui.QHBoxLayout()
@@ -163,6 +178,9 @@ class MetadataDialog(AbstractDialog):
         self.depth_uom.setDisabled(True)
         self.depth_uom.setText("%s" % self.lib.cur.meta.depth_uom)
         hbox.addWidget(self.depth_uom)
+        self.depth_uom.setAutoFillBackground(True)
+        # noinspection PyUnresolvedReferences
+        self.depth_uom.textChanged.connect(self.changed_depth_uom)
         
         # speed uom
         hbox = QtGui.QHBoxLayout()
@@ -174,6 +192,9 @@ class MetadataDialog(AbstractDialog):
         self.speed_uom.setDisabled(True)
         self.speed_uom.setText("%s" % self.lib.cur.meta.speed_uom)
         hbox.addWidget(self.speed_uom)
+        self.speed_uom.setAutoFillBackground(True)
+        # noinspection PyUnresolvedReferences
+        self.speed_uom.textChanged.connect(self.changed_speed_uom)
         
         # temperature uom
         hbox = QtGui.QHBoxLayout()
@@ -185,6 +206,9 @@ class MetadataDialog(AbstractDialog):
         self.temperature_uom.setDisabled(True)
         self.temperature_uom.setText("%s" % self.lib.cur.meta.temperature_uom)
         hbox.addWidget(self.temperature_uom)
+        self.temperature_uom.setAutoFillBackground(True)
+        # noinspection PyUnresolvedReferences
+        self.temperature_uom.textChanged.connect(self.changed_temperature_uom)
         
         # conductivity uom
         hbox = QtGui.QHBoxLayout()
@@ -196,6 +220,9 @@ class MetadataDialog(AbstractDialog):
         self.conductivity_uom.setDisabled(True)
         self.conductivity_uom.setText("%s" % self.lib.cur.meta.conductivity_uom)
         hbox.addWidget(self.conductivity_uom)
+        self.conductivity_uom.setAutoFillBackground(True)
+        # noinspection PyUnresolvedReferences
+        self.conductivity_uom.textChanged.connect(self.changed_conductivity_uom)
         
         # salinity uom
         hbox = QtGui.QHBoxLayout()
@@ -207,6 +234,9 @@ class MetadataDialog(AbstractDialog):
         self.salinity_uom.setDisabled(True)
         self.salinity_uom.setText("%s" % self.lib.cur.meta.salinity_uom)
         hbox.addWidget(self.salinity_uom)
+        self.salinity_uom.setAutoFillBackground(True)
+        # noinspection PyUnresolvedReferences
+        self.salinity_uom.textChanged.connect(self.changed_salinity_uom)
 
         self.mainLayout.addStretch()
 
@@ -225,6 +255,15 @@ class MetadataDialog(AbstractDialog):
         self.editable.clicked.connect(self.on_editable)
         self.editable.setToolTip("Unlock metadata editing")
         hbox.addWidget(self.editable)
+        # --
+        self.load_default = QtGui.QPushButton("Load default")
+        self.load_default.setFixedHeight(self.editable.height())
+        self.load_default.setDisabled(True)
+        # noinspection PyUnresolvedReferences
+        self.load_default.clicked.connect(self.on_load_default)
+        self.load_default.setToolTip("Load default metadata (if any)")
+        hbox.addWidget(self.load_default)
+        # --
         self.apply = QtGui.QPushButton("Apply")
         self.apply.setFixedHeight(self.editable.height())
         self.apply.setDisabled(True)
@@ -235,9 +274,40 @@ class MetadataDialog(AbstractDialog):
         hbox.addStretch()
         self.mainLayout.addLayout(hbox)
 
+    def changed_institution(self):
+        self.institution.setStyleSheet("background-color: rgba(255,255,153, 255);")
+
+    def changed_survey(self):
+        self.survey.setStyleSheet("background-color: rgba(255,255,153, 255);")
+
+    def changed_vessel(self):
+        self.vessel.setStyleSheet("background-color: rgba(255,255,153, 255);")
+
+    def changed_sn(self):
+        self.sn.setStyleSheet("background-color: rgba(255,255,153, 255);")
+
+    def changed_pressure_uom(self):
+        self.pressure_uom.setStyleSheet("background-color: rgba(255,255,153, 255);")
+
+    def changed_depth_uom(self):
+        self.depth_uom.setStyleSheet("background-color: rgba(255,255,153, 255);")
+
+    def changed_speed_uom(self):
+        self.speed_uom.setStyleSheet("background-color: rgba(255,255,153, 255);")
+
+    def changed_temperature_uom(self):
+        self.temperature_uom.setStyleSheet("background-color: rgba(255,255,153, 255);")
+
+    def changed_conductivity_uom(self):
+        self.conductivity_uom.setStyleSheet("background-color: rgba(255,255,153, 255);")
+
+    def changed_salinity_uom(self):
+        self.salinity_uom.setStyleSheet("background-color: rgba(255,255,153, 255);")
+
     def on_editable(self):
         logger.debug("editable: %s" % self.editable.isChecked())
         if self.editable.isChecked():
+            self.load_default.setEnabled(True)
             self.apply.setEnabled(True)
             self.institution.setEnabled(True)
             self.survey.setEnabled(True)
@@ -251,6 +321,7 @@ class MetadataDialog(AbstractDialog):
             self.salinity_uom.setEnabled(True)
 
         else:
+            self.load_default.setDisabled(True)
             self.apply.setDisabled(True)
             self.institution.setDisabled(True)
             self.survey.setDisabled(True)
@@ -262,6 +333,13 @@ class MetadataDialog(AbstractDialog):
             self.temperature_uom.setDisabled(True)
             self.conductivity_uom.setDisabled(True)
             self.salinity_uom.setDisabled(True)
+
+    def on_load_default(self):
+        logger.debug("load default")
+
+        self.institution.setText(self.lib.setup.default_institution)
+        self.survey.setText(self.lib.setup.default_survey)
+        self.vessel.setText(self.lib.setup.default_vessel)
 
     def on_apply(self):
         logger.debug("apply")
@@ -286,6 +364,18 @@ class MetadataDialog(AbstractDialog):
         # update proc_time widget
         self.proc_time.setText(self.lib.cur.meta.proc_time.strftime("%d/%m/%y %H:%M"))
 
-        msg = "Changes have been applied!"
-        # noinspection PyCallByClass
-        QtGui.QMessageBox.information(self, "Metadata", msg, QtGui.QMessageBox.Ok)
+        # reset to transparent
+        self.institution.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
+        self.survey.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
+        self.vessel.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
+        self.sn.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
+        self.pressure_uom.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
+        self.depth_uom.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
+        self.speed_uom.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
+        self.temperature_uom.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
+        self.conductivity_uom.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
+        self.salinity_uom.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
+
+        # msg = "Changes have been applied!"
+        # # noinspection PyCallByClass
+        # QtGui.QMessageBox.information(self, "Metadata", msg, QtGui.QMessageBox.Ok)

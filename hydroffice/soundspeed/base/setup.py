@@ -75,6 +75,7 @@ class Setup(object):
         self.default_institution = None
         self.default_survey = None
         self.default_vessel = None
+        self.auto_apply_default_metadata = None
 
         # loading settings
         self.release_folder = release_folder
@@ -161,6 +162,7 @@ class Setup(object):
         self.default_institution = db.default_institution
         self.default_survey = db.default_survey
         self.default_vessel = db.default_vessel
+        self.auto_apply_default_metadata = db.auto_apply_default_metadata
 
         db.close()
 
@@ -244,6 +246,7 @@ class Setup(object):
             db.default_institution = self.default_institution
             db.default_survey = self.default_survey
             db.default_vessel = self.default_vessel
+            db.auto_apply_default_metadata = self.auto_apply_default_metadata
 
             db.close()
 
@@ -301,5 +304,6 @@ class Setup(object):
         msg += "      <default_institution: %s>\n" % self.default_institution
         msg += "      <default_survey: %s>\n" % self.default_survey
         msg += "      <default_vessel: %s>\n" % self.default_vessel
+        msg += "      <auto_apply_default_metadata: %s>\n" % self.auto_apply_default_metadata
 
         return msg

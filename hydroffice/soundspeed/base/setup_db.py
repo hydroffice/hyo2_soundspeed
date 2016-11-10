@@ -675,3 +675,12 @@ class SetupDb(BaseDb):
     @default_vessel.setter
     def default_vessel(self, value):
         self._setter_str("default_vessel", value)
+
+    # --- auto_apply_default_metadata
+    @property
+    def auto_apply_default_metadata(self):
+        return self._getter_bool("auto_apply_default_metadata")
+
+    @auto_apply_default_metadata.setter
+    def auto_apply_default_metadata(self, value):
+        self._setter_bool("auto_apply_default_metadata", value)

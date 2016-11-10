@@ -61,6 +61,7 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      default_institution text NOT NULL DEFAULT "",
      default_survey text NOT NULL DEFAULT "",
      default_vessel text NOT NULL DEFAULT "",
+     auto_apply_default_metadata text NOT NULL DEFAULT "True",
 
      /* Checks */
      CHECK (setup_status IN ("active", "inactive")),
@@ -99,7 +100,8 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      CHECK (server_source IN ("RTOFS", "WOA09", "WOA13")),
      CHECK (server_apply_surface_sound_speed IN ("True", "False")),
      /* user-defined */
-     CHECK (noaa_tools IN ("True", "False"))
+     CHECK (noaa_tools IN ("True", "False")),
+     CHECK (auto_apply_default_metadata IN ("True", "False"))
      ) """
 
 CREATE_CLIENT_LIST = """-- noinspection SqlResolveForFile
