@@ -696,6 +696,9 @@ class ProjectDb(object):
                 logger.error("reading sis samples for %s pk, %s: %s" % (pk, type(e), e))
                 return None
 
+        # This is the only way for the library to load a profile from the project database
+        ssp.loaded_from_db = True
+
         return ssp
 
     def delete_profile_by_pk(self, pk):

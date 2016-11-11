@@ -14,6 +14,10 @@ class ProfileList(object):
         self._list = list()
         self._current_index = None
 
+        # True only if loaded from a project db
+        # The current use of this flag is in the app to change the behavior of the metadata dialog
+        self.loaded_from_db = False
+
     @property
     def l(self):
         return self._list

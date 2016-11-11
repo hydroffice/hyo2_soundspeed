@@ -264,12 +264,18 @@ class MetadataDialog(AbstractDialog):
         self.load_default.setToolTip("Load default metadata (if any)")
         hbox.addWidget(self.load_default)
         # --
-        self.apply = QtGui.QPushButton("Apply")
+        if self.lib.ssp.loaded_from_db:
+            self.apply = QtGui.QPushButton("Apply and save")
+        else:
+            self.apply = QtGui.QPushButton("Apply")
         self.apply.setFixedHeight(self.editable.height())
         self.apply.setDisabled(True)
         # noinspection PyUnresolvedReferences
         self.apply.clicked.connect(self.on_apply)
-        self.apply.setToolTip("Apply changes (if any)")
+        if self.lib.ssp.loaded_from_db:
+            self.apply.setToolTip("Apply changes (if any) and store them in the database")
+        else:
+            self.apply.setToolTip("Apply changes (if any)")
         hbox.addWidget(self.apply)
         hbox.addStretch()
         self.mainLayout.addLayout(hbox)
@@ -364,6 +370,15 @@ class MetadataDialog(AbstractDialog):
         # update proc_time widget
         self.proc_time.setText(self.lib.cur.meta.proc_time.strftime("%d/%m/%y %H:%M"))
 
+        # we also store the metadata to the db, but only if the profile was loading from a db
+        if self.lib.ssp.loaded_from_db:
+            if not self.lib.store_data():
+                msg = "Unable to save to db!"
+                QtGui.QMessageBox.warning(self, "Database warning", msg, QtGui.QMessageBox.Ok)
+                return
+            else:
+                self.main_win.data_stored()
+
         # reset to transparent
         self.institution.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
         self.survey.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
@@ -375,7 +390,3 @@ class MetadataDialog(AbstractDialog):
         self.temperature_uom.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
         self.conductivity_uom.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
         self.salinity_uom.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
-
-        # msg = "Changes have been applied!"
-        # # noinspection PyCallByClass
-        # QtGui.QMessageBox.information(self, "Metadata", msg, QtGui.QMessageBox.Ok)
