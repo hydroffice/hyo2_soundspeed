@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import sqlite3
+import shutil
 import os
 import datetime
 import logging
@@ -31,6 +32,8 @@ class ProjectDb(object):
 
         # the passed project name (lower case) is used to identify the project database to open
         self.db_path = os.path.join(projects_folder, self.clean_name(project_name.lower()) + ".db")
+        # backup path
+        self.bk_path = self.db_path + '.bk'
         logger.debug('current project db: %s' % self.db_path)
 
         # add plotting and exporting capabilities
@@ -241,6 +244,45 @@ class ProjectDb(object):
             logger.error("during building tables, %s: %s" % (type(e), e))
             return False
 
+    def _make_backup_db(self):
+
+        try:
+            # Lock the project database before making a backup
+            self.conn.execute('begin immediate')
+
+            if os.path.exists(self.bk_path):
+                os.remove(self.bk_path)
+
+            # Make new backup file
+            shutil.copyfile(self.db_path, self.bk_path)
+            logger.debug('backed up current project: %s' % self.bk_path)
+
+            # Unlock the project database
+            self.conn.rollback()
+
+        except Exception as e:
+            logger.error('while backing up the db, %s' % e)
+            return False
+
+        return True
+
+    def _restore_backup_db(self):
+        """Emergency function called when we need to revert to the project back-up"""
+        self.disconnect()
+
+        if os.path.exists(self.db_path):
+            os.remove(self.db_path)
+
+        shutil.copyfile(self.bk_path, self.db_path)
+        logger.info('reverted project from backup')
+
+        self._remove_backup_db()
+
+    def _remove_backup_db(self):
+        """Remove the backup file"""
+        if os.path.exists(self.bk_path):
+            os.remove(self.bk_path)
+
     def add_casts(self, ssp):
         if not isinstance(ssp, ProfileList):
             raise RuntimeError("not passed a ProfileList, but %s" % type(ssp))
@@ -250,6 +292,12 @@ class ProjectDb(object):
             return False
 
         with self.conn:
+
+            success = self._make_backup_db()
+            if not success:
+                logger.error("unable to first backup the current project db")
+                return False
+
             for self.tmp_data in ssp.l:
 
                 # logger.info("got a new SSP to store:\n%s" % self.tmp_data)
@@ -260,25 +308,31 @@ class ProjectDb(object):
 
                 if not self._delete_old_ssp():
                     logger.error("unable to clean ssp")
+                    self._restore_backup_db()
                     return False
 
                 if not self._add_ssp():
                     logger.error("unable to add ssp")
+                    self._restore_backup_db()
                     return False
 
                 if not self._add_data():
                     logger.error("unable to add ssp raw data samples")
+                    self._restore_backup_db()
                     return False
 
                 if not self._add_proc():
                     logger.error("unable to add ssp processed data samples")
+                    self._restore_backup_db()
                     return False
 
                 if self.tmp_data.sis is not None:
                     if not self._add_sis():
                         logger.error("unable to add ssp sis data samples")
+                        self._restore_backup_db()
                         return False
 
+        self._remove_backup_db()
         return True
 
     def get_db_version(self):
