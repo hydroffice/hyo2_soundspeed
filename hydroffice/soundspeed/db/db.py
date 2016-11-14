@@ -244,45 +244,6 @@ class ProjectDb(object):
             logger.error("during building tables, %s: %s" % (type(e), e))
             return False
 
-    def _make_backup_db(self):
-
-        try:
-            # Lock the project database before making a backup
-            self.conn.execute('begin immediate')
-
-            if os.path.exists(self.bk_path):
-                os.remove(self.bk_path)
-
-            # Make new backup file
-            shutil.copyfile(self.db_path, self.bk_path)
-            logger.debug('backed up current project: %s' % self.bk_path)
-
-            # Unlock the project database
-            self.conn.rollback()
-
-        except Exception as e:
-            logger.error('while backing up the db, %s' % e)
-            return False
-
-        return True
-
-    def _restore_backup_db(self):
-        """Emergency function called when we need to revert to the project back-up"""
-        self.disconnect()
-
-        if os.path.exists(self.db_path):
-            os.remove(self.db_path)
-
-        shutil.copyfile(self.bk_path, self.db_path)
-        logger.info('reverted project from backup')
-
-        self._remove_backup_db()
-
-    def _remove_backup_db(self):
-        """Remove the backup file"""
-        if os.path.exists(self.bk_path):
-            os.remove(self.bk_path)
-
     def add_casts(self, ssp):
         if not isinstance(ssp, ProfileList):
             raise RuntimeError("not passed a ProfileList, but %s" % type(ssp))
@@ -291,49 +252,37 @@ class ProjectDb(object):
             logger.error("missing db connection")
             return False
 
-        with self.conn:
+        try:
+            with self.conn:
 
-            success = self._make_backup_db()
-            if not success:
-                logger.error("unable to first backup the current project db")
-                return False
+                for self.tmp_data in ssp.l:
 
-            for self.tmp_data in ssp.l:
+                    # logger.info("got a new SSP to store:\n%s" % self.tmp_data)
 
-                # logger.info("got a new SSP to store:\n%s" % self.tmp_data)
+                    if not self._get_ssp_pk():
+                        raise sqlite3.Error("unable to get ssp pk: %s" % self.tmp_ssp_pk)
 
-                if not self._get_ssp_pk():
-                    logger.error("unable to get ssp pk: %s" % self.tmp_ssp_pk)
-                    return False
+                    if not self._delete_old_ssp():
+                        raise sqlite3.Error("unable to clean ssp")
 
-                if not self._delete_old_ssp():
-                    logger.error("unable to clean ssp")
-                    self._restore_backup_db()
-                    return False
+                    if not self._add_ssp():
+                        raise sqlite3.Error("unable to add ssp")
 
-                if not self._add_ssp():
-                    logger.error("unable to add ssp")
-                    self._restore_backup_db()
-                    return False
+                    if not self._add_data():
+                        raise sqlite3.Error("unable to add ssp raw data samples")
 
-                if not self._add_data():
-                    logger.error("unable to add ssp raw data samples")
-                    self._restore_backup_db()
-                    return False
+                    if not self._add_proc():
+                        raise sqlite3.Error("unable to add ssp processed data samples")
 
-                if not self._add_proc():
-                    logger.error("unable to add ssp processed data samples")
-                    self._restore_backup_db()
-                    return False
+                    if self.tmp_data.sis is not None:
+                        if not self._add_sis():
+                            raise sqlite3.Error("unable to add ssp sis data samples")
 
-                if self.tmp_data.sis is not None:
-                    if not self._add_sis():
-                        logger.error("unable to add ssp sis data samples")
-                        self._restore_backup_db()
-                        return False
+            return True
 
-        self._remove_backup_db()
-        return True
+        except sqlite3.Error as e:
+            logger.error("during adding casts, %s: %s" % (type(e), e))
+            return False
 
     def get_db_version(self):
         """Get the project db version"""
