@@ -49,7 +49,7 @@ class Ncei(AbstractWriter):
             file_path = os.path.join(data_path, nc_file)
 
         if self._miss_metadata():
-            return
+            return False
         logger.info("output file: %s" % file_path)
 
         # create the file
@@ -74,7 +74,7 @@ class Ncei(AbstractWriter):
         # var: profile
         # RECOMMENDED - If using the attribute below: cf_role. Data type can be whatever is appropriate for the
         # unique feature type.
-        profile_str = "%s %.7f %.7s %s" % (self.ssp.cur.meta.utc_time.isoformat(), self.ssp.cur.meta.longitude,
+        profile_str = "%s %.7f %.7f %s" % (self.ssp.cur.meta.utc_time.strftime('%Y-%m-%dT%H:%M:%SZ'), self.ssp.cur.meta.longitude,
                                            self.ssp.cur.meta.latitude, self.ssp.cur.meta.vessel)
         default_profile_str_length = 64
         profile_str_length = max(default_profile_str_length, len(profile_str))
@@ -87,7 +87,7 @@ class Ncei(AbstractWriter):
         # var: time
         # Depending on the precision used for the variable, the data type could be int or double instead of float.
         time = self.root_group.createVariable(b'time', b'i4', (b'profile',), fill_value=0.0)
-        time[:] = calendar.timegm(self.ssp.cur.meta.utc_time.timetuple())
+        time[:] = int(calendar.timegm(self.ssp.cur.meta.utc_time.timetuple()))
         time.long_name = b'cast time'  # RECOMMENDED - Provide a descriptive, long name for this variable.
         time.standard_name = b'time'  # REQUIRED - Do not change
         time.units = b'seconds since 1970-01-01 00:00:00'  # REQUIRED - Use approved CF convention with approved UDUNITS.
@@ -152,7 +152,7 @@ class Ncei(AbstractWriter):
         # version.(CF / ACDD)
         self.root_group.Conventions = b'CF-1.6, ACDD-1.3'
         # RECOMMENDED - Creation date of this version of the data(netCDF).  Use ISO 8601:2004 for date and time. (ACDD)
-        self.root_group.date_created = b'%s' % dt.datetime.utcnow().isoformat()
+        self.root_group.date_created = b'%s' % dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
         # SUGGESTED - The data type, as derived from Unidata's Common Data Model Scientific Data types and understood
         # by THREDDS. (ACDD)
         self.root_group.cdm_data_type = b'profile'
@@ -227,8 +227,8 @@ class Ncei(AbstractWriter):
         vi = self.ssp.cur.data_valid
         msg = 'Missing metadata:'
         
-        if self.ssp.cur.meta.sensor_type <=1 or self.ssp.cur.meta.probe_type <=4:
-            msg = 'Cannot export from sensor: %s, probe type: %s' %(self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
+        if self.ssp.cur.meta.sensor_probe_is_valid:
+            msg = 'Cannot export from sensor type: %s, probe type: %s' %(self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
             QtGui.QMessageBox.critical(None, "NCEI export error", msg, QtGui.QMessageBox.Ok)
             return True
         
@@ -252,7 +252,7 @@ class Ncei(AbstractWriter):
                 msg = '%s institution' %msg
         if msg != 'Missing metadata:':
             QtGui.QMessageBox.critical(None, "NCEI export error", msg, QtGui.QMessageBox.Ok)  
-            return True      
+            return True
         
         return False
         
