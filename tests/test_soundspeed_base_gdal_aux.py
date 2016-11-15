@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import unittest
+import sys
 import os
 import logging
 
@@ -27,11 +28,11 @@ class TestSoundSpeedGdalAux(unittest.TestCase):
         import sys
         self.assertEqual(python_path(), sys.prefix)
 
-    @unittest.expectedFailure
+    @unittest.skipUnless(sys.platform.startswith("win"), "only works with GDAL < 2.0 on Windows")
     def test_check_gdal_data(self):
         check_gdal_data()
 
-    @unittest.expectedFailure
+    @unittest.skipUnless(sys.platform.startswith("win"), "only works with GDAL < 2.0 on Windows")
     def test_use_of_Gdal_aux(self):
         aux = GdalAux()
 

@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import os
+import sys
 import unittest
 from datetime import datetime
 import time
@@ -28,7 +29,7 @@ class TestSoundSpeedDb(unittest.TestCase):
         self.depth = np.array(range(self.levels))
         projects_folder = os.path.abspath(os.curdir)
         project_name = 'unittest'
-        db_name = '%s.db' %project_name
+        db_name = '%s.db' % project_name
         self.db_path = os.path.join(projects_folder, db_name)
         self.tearDown()
         self.lib = SoundSpeedLibrary()
@@ -38,12 +39,13 @@ class TestSoundSpeedDb(unittest.TestCase):
         self.lib.ssp.append()
         if len(self.lib.db_list_profiles()) < self.max_pk:
             for i in range(self.max_pk):
-                add_cast(20+i, -75)
-                
+                add_cast(20 + i, -75)
+
     def tearDown(self):
         if os.path.exists(self.db_path):
             os.remove(self.db_path)
 
+    @unittest.skipUnless(sys.platform.startswith("win"), "only works with GDAL < 2.0 on Windows")
     def test_save_load_cast(self):
         def test_pk(pk):
             self.lib.ssp = self.lib.db_retrieve_profile(pk)
@@ -51,13 +53,13 @@ class TestSoundSpeedDb(unittest.TestCase):
             self.lib.ssp = self.lib.db_retrieve_profile(pk)
             sum_ = len(self.lib.ssp.cur.proc.speed) + len(self.lib.ssp.cur.proc.depth)
             sum_ += len(self.lib.ssp.cur.data.speed) + len(self.lib.ssp.cur.data.depth)
-            self.assertEqual(sum_, self.levels*4)
-            self.assertTrue((self.lib.ssp.cur.data.depth==self.depth).all())
-            self.assertTrue((self.lib.ssp.cur.proc.depth==self.depth).all())
+            self.assertEqual(sum_, self.levels * 4)
+            self.assertTrue((self.lib.ssp.cur.data.depth == self.depth).all())
+            self.assertTrue((self.lib.ssp.cur.proc.depth == self.depth).all())
 
         for i in range(self.levels):
-            #pk = random.randint(1, self.max_pk)
-            pk = i%self.max_pk + 1
+            # pk = random.randint(1, self.max_pk)
+            pk = i % self.max_pk + 1
             test_pk(pk)
 
 
@@ -66,5 +68,5 @@ def suite():
     s.addTests(unittest.TestLoader().loadTestsFromTestCase(TestSoundSpeedDb))
     return s
 
-#if __name__ == '__main__':
+# if __name__ == '__main__':
 #    unittest.main()
