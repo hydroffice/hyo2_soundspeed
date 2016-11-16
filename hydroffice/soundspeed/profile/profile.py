@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import numpy as np
 import logging
+import gsw
 
 logger = logging.getLogger(__name__)
 
@@ -10,6 +11,7 @@ from .samples import Samples
 from .more import More
 from .dicts import Dicts
 from .oceanography import Oceanography as Oc
+from .geostrophic_48 import geo_strf_dyn_height
 
 
 class Profile(object):
@@ -713,3 +715,48 @@ class Profile(object):
 
         if more:
             self.more.debug_plot()
+
+    def d_from_p(self):
+        """Convert pressure to depth for a given pro (profile object)"""
+        num = self.data.num_samples
+        p = self.data.press[:num]
+        t = self.data.temp[:num]
+        SP = self.data.sal[:num]
+        
+        if not self.meta.latitude:
+            lat = 30.0
+            logger.warning("using default latitude: %s" % lat)
+        else:
+            lat = self.meta.latitude    
+        
+        if t.min() == t.max() or SP.min() == SP.max():
+            # temperature and/or salinity is not available
+            error = True
+        else:
+            error = False
+            try:
+                if not self.meta.longitude:
+                    lon = -70.0
+                    logger.warning("using default longitude: %s" % lon)
+                else:
+                    lon = self.meta.longitude
+                SA = gsw.conversions.SA_from_SP(SP, p, lon, lat)
+                CT = gsw.conversions.CT_from_t(SA, t, p)
+                dyn = geo_strf_dyn_height(SA, CT, p, p_ref=0)
+                depth = -gsw.conversions.z_from_p(p, lat, geo_strf_dyn_height=dyn)
+                for d in depth:
+                    if np.isnan(d):
+                        error = True
+                        logger.warning("error in geo_strf_dyn_height") 
+                        break    
+            except:
+                error = True
+                logger.warning("error in gsw lib") 
+        
+        if error:
+            for count in range(num):
+                self.data.depth[count] = Oc.p2d(p=self.data.pressure[count], lat=lat) 
+        else:
+            for count in range(num):
+                self.data.depth[count] = depth[count]
+
