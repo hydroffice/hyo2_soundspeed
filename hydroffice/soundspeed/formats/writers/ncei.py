@@ -48,8 +48,7 @@ class Ncei(AbstractWriter):
                 os.makedirs(data_path)
             file_path = os.path.join(data_path, nc_file)
 
-        if self._miss_metadata():
-            return False
+        self._miss_metadata()
         logger.info("output file: %s" % file_path)
 
         # create the file
@@ -74,8 +73,8 @@ class Ncei(AbstractWriter):
         # var: profile
         # RECOMMENDED - If using the attribute below: cf_role. Data type can be whatever is appropriate for the
         # unique feature type.
-        profile_str = "%s %.7f %.7f %s" % (self.ssp.cur.meta.utc_time.strftime('%Y-%m-%dT%H:%M:%SZ'), self.ssp.cur.meta.longitude,
-                                           self.ssp.cur.meta.latitude, self.ssp.cur.meta.vessel)
+        profile_str = "%s %.7f %.7f" % (self.ssp.cur.meta.utc_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                                        self.ssp.cur.meta.longitude, self.ssp.cur.meta.latitude)
         default_profile_str_length = 64
         profile_str_length = max(default_profile_str_length, len(profile_str))
         self.root_group.createDimension(b'profile_id_length', profile_str_length)
@@ -142,6 +141,9 @@ class Ncei(AbstractWriter):
         # global attributes:
         self.root_group.ncei_template_version = b'NCEI_NetCDF_Profile_Orthogonal_Template_v2.0'  # REQUIRED(NCEI)
         self.root_group.featureType = b'profile'  # REQUIRED - CF attribute for identifying the featureType.(CF)
+        # SUGGESTED - The data type, as derived from Unidata's Common Data Model Scientific Data types and understood
+        # by THREDDS. (ACDD)
+        self.root_group.cdm_data_type = b'profile'
         # HIGHLY RECOMMENDED - Provide a useful title for the data in the file.(ACDD)
         self.root_group.title = b'%s_%s profile' % (self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
         # HIGHLY RECOMMENDED - Provide a useful summary or abstract for the data in the file.(ACDD)
@@ -153,15 +155,13 @@ class Ncei(AbstractWriter):
         self.root_group.Conventions = b'CF-1.6, ACDD-1.3'
         # RECOMMENDED - Creation date of this version of the data(netCDF).  Use ISO 8601:2004 for date and time. (ACDD)
         self.root_group.date_created = b'%s' % dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
-        # SUGGESTED - The data type, as derived from Unidata's Common Data Model Scientific Data types and understood
-        # by THREDDS. (ACDD)
-        self.root_group.cdm_data_type = b'profile'
+        self.root_group.survey = b'%s' % self.ssp.cur.meta.survey
         # RECOMMENDED - The name of the project(s) principally responsible for originating this data.
         # Multiple projects can be separated by commas.(ACDD)
         self.root_group.project = b'%s' % self.project
         # SUGGESTED - Name of the platform(s) that supported the sensor data used to create this data set or product.
         # Platforms can be of any type, including satellite, ship, station, aircraft or other.(ACDD)
-        self.root_group.platform = b'%s' % self.ssp.cur.meta.vessel
+        self.root_group.platform = b'%s' % self.ssp.cur.meta.vessel.replace("NRT-", 'NOAA NAVIGATION RESPONSE TEAM-')
         # RECOMMENDED -The name of the institution principally responsible for originating this data..  An institution
         # attribute can be used for each variable if variables come from more than one institution. (CF/ACDD)
         self.root_group.institution = b'%s' % self.ssp.cur.meta.institution
@@ -185,6 +185,28 @@ class Ncei(AbstractWriter):
         # valid indices
         vi = self.ssp.cur.data_valid
 
+        # var: depth
+        if self._not_empty(self.ssp.cur.data.depth[vi]):
+            depth = self.root_group.createVariable(b'depth', b'f4', (b'profile', b'z',))
+            depth[:] = self.ssp.cur.data.depth[vi]
+            # RECOMMENDED - Provide a descriptive, long name for this variable.
+            depth.long_name = b'depth in sea water'
+            # REQUIRED - If using a CF standard name and a suitable name exists in the CF standard name table.
+            depth.standard_name = b'depth'
+            depth.units = b'm'
+            depth.axis = b'Z'
+            depth.positive = b'down'
+
+        # var: pressure
+        if self._not_empty(self.ssp.cur.data.pressure[vi]):
+            pressure = self.root_group.createVariable(b'pressure', b'f4', (b'profile', b'z',))
+            pressure[:] = self.ssp.cur.data.pressure[vi]
+            # RECOMMENDED - Provide a descriptive, long name for this variable.
+            pressure.long_name = b'pressure in sea water'
+            # REQUIRED - If using a CF standard name and a suitable name exists in the CF standard name table.
+            pressure.standard_name = b'sea_water_pressure'
+            pressure.units = b'dbar'
+            
         # var: temperature
         if self._not_empty(self.ssp.cur.data.temp[vi]):
             temperature = self.root_group.createVariable(b'temperature', b'f4', (b'profile', b'z',))
@@ -202,8 +224,18 @@ class Ncei(AbstractWriter):
             # RECOMMENDED - Provide a descriptive, long name for this variable.
             salinity.long_name = b'salinity in sea water'
             # REQUIRED - If using a CF standard name and a suitable name exists in the CF standard name table.
-            salinity.standard_name = b'sea_water_salinity'
+            salinity.standard_name = b'sea_water_practical_salinity'
             salinity.units = b'1e-3'  # REQUIRED - Use UDUNITS compatible units.
+
+        # var: conductivity
+        if self._not_empty(self.ssp.cur.data.conductivity[vi]):
+            conductivity = self.root_group.createVariable(b'conductivity', b'f4', (b'profile', b'z',))
+            conductivity[:] = self.ssp.cur.data.conductivity[vi]
+            # RECOMMENDED - Provide a descriptive, long name for this variable.
+            conductivity.long_name = b'conductivity in sea water'
+            # REQUIRED - If using a CF standard name and a suitable name exists in the CF standard name table.
+            conductivity.standard_name = b'sea_water_electrical_conductivity'
+            conductivity.units = b'S m-1'
 
         # var: sound speed
         if self._not_empty(self.ssp.cur.data.speed[vi]):
@@ -212,9 +244,20 @@ class Ncei(AbstractWriter):
             # RECOMMENDED - Provide a descriptive, long name for this variable.
             sound_speed.long_name = b'sound speed in sea water'
             # REQUIRED - If using a CF standard name and a suitable name exists in the CF standard name table.
-            sound_speed.standard_name = b'sea_water_speed'
+            sound_speed.standard_name = b'speed_of_sound_in_sea_water'
             sound_speed.units = b'm s-1'  # REQUIRED - Use UDUNITS compatible units.
 
+        # var: flag
+        if True:
+            flag = self.root_group.createVariable(b'flag', b'i1', (b'profile', b'z',))
+            flag[:] = self.ssp.cur.data.flag[vi]
+            # RECOMMENDED - Provide a descriptive, long name for this variable.
+            flag.long_name = b'quality flag'
+            # REQUIRED - If using a CF standard name and a suitable name exists in the CF standard name table.
+            flag.standard_name = b''
+            flag.flag_values = 0, 1
+            flag.flag_meanings = b'valid invalid'
+            
         self.root_group.close()
 
     def _is_empty(self, data):
@@ -225,35 +268,20 @@ class Ncei(AbstractWriter):
 
     def _miss_metadata(self):
         vi = self.ssp.cur.data_valid
-        msg = 'Missing metadata:'
+        msg = 'NCEI export error --'
         
         if self.ssp.cur.meta.sensor_probe_is_valid:
-            msg = 'Cannot export from sensor type: %s, probe type: %s' %(self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
-            QtGui.QMessageBox.critical(None, "NCEI export error", msg, QtGui.QMessageBox.Ok)
-            return True
-        
-        if self._is_empty(self.ssp.cur.data.depth[vi]) and self._is_empty(self.ssp.cur.data.pressure[vi]):
-            msg = 'missing depth or pressure'
+            msg = '%s cannot export from sensor type %s, probe type %s' %(msg, self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
+        elif self._is_empty(self.ssp.cur.data.depth[vi]) and self._is_empty(self.ssp.cur.data.pressure[vi]):
+            msg = '%s missing depth or pressure' %msg
         elif self._is_empty(self.ssp.cur.data.speed[vi]) and self._is_empty(self.ssp.cur.data.temp[vi]) and \
             self._is_empty(self.ssp.cur.data.conductivity[vi]) and self._is_empty(self.ssp.cur.data.sal[vi]):
-            msg = 'missing critical data'   
-        if msg != 'Missing metadata:':
-            QtGui.QMessageBox.critical(None, "NCEI export error", msg, QtGui.QMessageBox.Ok)
-            return True
+            msg = '%s missing critical data' %msg
+        elif self.project in ['', 'default']:
+            msg = '%s missing project name, cannot export NCEI file from default project' %msg
+        elif not self.ssp.cur.meta.survey or not self.ssp.cur.meta.vessel or not self.ssp.cur.meta.institution:
+            msg = '%s missing survey, vessel, or institution' %msg
 
-        if self.project in ['', 'default']:
-            msg = '%s project name, cannot export NCEI file from default project' %msg
-        else:       
-            if not self.ssp.cur.meta.survey:
-                msg = '%s survey' %msg
-            if not self.ssp.cur.meta.vessel:
-                msg = '%s vessel' %msg
-            if not self.ssp.cur.meta.institution:
-                msg = '%s institution' %msg
-        if msg != 'Missing metadata:':
-            QtGui.QMessageBox.critical(None, "NCEI export error", msg, QtGui.QMessageBox.Ok)  
-            return True
-        
-        return False
-        
+        if msg != 'NCEI export error --':
+            raise RuntimeError(msg)
 
