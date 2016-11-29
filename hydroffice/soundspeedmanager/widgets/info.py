@@ -123,17 +123,17 @@ class Info(QtGui.QMainWindow):
         self.web.load(QtCore.QUrl(self.default_url))
 
     def load_docs(self):
-        url = 'https://hydroffice.github.io/hyo_soundspeed/latest/index.html'
+        url = 'https://www.hydroffice.org/manuals/soundspeed/index.html'
         self.url_input.setText(url)
         self.web.load(QtCore.QUrl(url))
 
     def load_license(self):
-        url = 'http://www.hydroffice.org/license_lgpl21/'
+        url = 'https://www.hydroffice.org/license_lgpl21/'
         self.url_input.setText(url)
         self.web.load(QtCore.QUrl(url))
 
     def load_hydroffice_org(self):
-        url = 'http://www.hydroffice.org'
+        url = 'https://www.hydroffice.org'
         self.url_input.setText(url)
         self.web.load(QtCore.QUrl(url))
 
