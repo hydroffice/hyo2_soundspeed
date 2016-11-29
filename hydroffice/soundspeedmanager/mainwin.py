@@ -515,43 +515,4 @@ class MainWin(QtGui.QMainWindow):
 
     def do(self):
         """ development-mode only helper function """
-        from hydroffice.soundspeed.base import helper
-        data_input = helper.get_testing_input_folder()
-        data_sub_folders = helper.get_testing_input_subfolders()
-
-        def pair_reader_and_folder(folders, readers):
-            """ create pairs of folder and reader"""
-            data_pairs = dict()
-            for folder in folders:
-                for reader in readers:
-                    if reader.name.lower() != 'sippican':  # reader filter
-                        continue
-                    if reader.name.lower() != folder.lower():  # skip not matching readers
-                        continue
-                    data_pairs[folder] = reader
-            logger.info('pairs: %s' % data_pairs.keys())
-            return data_pairs
-
-        def list_test_files(input_data, data_pairs):
-            """ create a dictionary of test file and reader to use with """
-            output_tests = dict()
-            for folder in data_pairs.keys():
-                reader = data_pairs[folder]
-                reader_folder = os.path.join(input_data, folder)
-
-                for root, dirs, files in os.walk(reader_folder):
-                    for fid in files:
-
-                        # check the extension
-                        ext = fid.split('.')[-1].lower()
-                        if ext not in reader.ext:
-                            continue
-
-                        output_tests[os.path.join(root, file)] = reader
-            # logger.info("tests: %s" % tests)
-            return output_tests
-
-        pairs = pair_reader_and_folder(folders=data_sub_folders, readers=self.lib.readers)
-        tests = list_test_files(input_data=data_input, data_pairs=pairs)
-        self.lib.import_data(data_path=tests.keys()[8], data_format=tests[tests.keys()[8]].name)
-        self.data_imported()
+        pass

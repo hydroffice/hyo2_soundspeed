@@ -60,7 +60,6 @@ class Database(AbstractWidget):
         self.ssp_list.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         # noinspection PyUnresolvedReferences
         self.ssp_list.customContextMenuRequested.connect(self.make_context_menu)
-        self.ssp_list.horizontalHeader().setStyleSheet("color:rgba(0,0,255,180);font-weight:bold")
         hbox.addWidget(self.ssp_list)
 
         # - RIGHT COLUMN

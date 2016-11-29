@@ -50,6 +50,7 @@ class Main(AbstractWidget):
         self.setup_list = QtGui.QTableWidget()
         self.setup_list.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.setup_list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.setup_list.setSortingEnabled(True)
         hbox.addWidget(self.setup_list)
 
         # -- button box
