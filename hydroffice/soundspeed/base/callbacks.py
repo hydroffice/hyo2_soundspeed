@@ -14,14 +14,37 @@ class AbstractCallbacks(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
+    def ask_number(self, title="", msg="Enter number", default=0,
+                   minval=-2147483647, maxval=2147483647, decimals=7):
+        """Ask user for number"""
+        logger.warning("to be implemented")
+
+    @abstractmethod
+    def ask_text(self, title="", msg="Enter text"):
+        """Ask user for text"""
+        logger.warning("to be implemented")
+
+    @abstractmethod
     def ask_date(self):
         """Ask user for date"""
         logger.warning("to be implemented")
 
-    @abstractmethod
     def ask_location(self):
         """Ask user for location"""
-        logger.warning("to be implemented")
+
+        # latitude
+        lat = self.ask_number("Location", "Enter latitude as dd.ddd:",
+                                  37.540, -90.0, 90.0, 7)
+
+        if lat is not None:  # don't check for lon if lat already failed
+            # longitude
+            lon = self.ask_number("Location", "Enter longitude as dd.ddd:",
+                                      -42.910, -180.0, 180.0, 7)
+
+        if (lat is None) or (lon is None):  # return None if one of the two is invalid
+            return None, None
+
+        return lat, lon
 
     @abstractmethod
     def ask_location_from_sis(self):
@@ -62,6 +85,15 @@ class AbstractCallbacks(object):
 class TestCallbacks(AbstractCallbacks):
     """Used only for testing since the methods do not require user interaction"""
 
+    @abstractmethod
+    def ask_number(self, title="", msg="Enter number", default=0,
+                   minval=-2147483647, maxval=2147483647, decimals=7):
+        return random.random()*100.0
+
+    @abstractmethod
+    def ask_text(self, title="", msg="Enter text"):
+        return "Hello world"
+
     def ask_date(self):
         return datetime.utcnow()
 
@@ -96,6 +128,30 @@ class TestCallbacks(AbstractCallbacks):
 
 class CliCallbacks(AbstractCallbacks):
     """CLI-based callbacks"""
+
+    def ask_number(self, title="", msg="Enter number", default=0,
+                   minval=-2147483647, maxval=2147483647, decimals=7):
+        val = None
+        while val is None:
+            raw = raw_input(msg)
+            # print(raw)
+            if raw == "":
+                break
+            try:
+                testval = float(raw)
+            except ValueError as e:
+                logger.info("invalid input: %s\n" % e)
+                continue
+
+            if (testval > maxval) or (testval < minval):
+                logger.info("invalid value, use range [%f/%f]: %s" % (minval, maxval, raw))
+                continue
+            else:
+                val = testval
+        return val
+    def ask_text(self, title="", msg="Enter text"):
+        val = raw_input(msg)
+        return val
 
     def ask_date(self):
         """Ask user for date"""

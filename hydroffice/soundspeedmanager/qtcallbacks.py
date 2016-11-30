@@ -16,6 +16,20 @@ class QtCallbacks(AbstractCallbacks):
     def __init__(self, parent):
         self.parent = parent
 
+    def ask_number(self, title="", msg="Enter number", default=0,
+                   minval=-2147483647, maxval=2147483647, decimals=7):
+        val, ok = QtGui.QInputDialog.getDouble(self.parent, title, msg,
+                                               default, minval, maxval, decimals)
+        if not ok:
+            val = None
+        return val
+
+    def ask_text(self, title="", msg="Enter text"):
+            date, ok = QtGui.QInputDialog.getText(self.parent, title, msg)
+            if not ok:
+                date = None
+            return date
+
     def ask_date(self):
         """Ask user for date"""
         now = datetime.utcnow()
@@ -67,24 +81,22 @@ class QtCallbacks(AbstractCallbacks):
 
         return dt
 
-    def ask_location(self):
-        """Ask user for location"""
-
-        # latitude
-        lat, ok = QtGui.QInputDialog.getDouble(self.parent, "Location", "Enter latitude as dd.ddd:",
-                                               37.540, -90.0, 90.0, 7)
-        if not ok:
-            lat = None
-        # longitude
-        lon, ok = QtGui.QInputDialog.getDouble(self.parent, "Location", "Enter longitude as dd.ddd:",
-                                               -42.910, -180.0, 180.0, 7)
-        if not ok:
-            lon = None
-
-        if (lat is None) or (lon is None):  # return None if one of the two is invalid
-            return None, None
-
-        return lat, lon
+#     def ask_location(self):
+#         """Ask user for location"""
+# 
+#         # latitude
+#         lat = self.ask_number("Location", "Enter latitude as dd.ddd:",
+#                                   37.540, -90.0, 90.0, 7)
+# 
+#         if lat is not None:  # don't check for lon if lat already failed
+#             # longitude
+#             lon = self.ask_number("Location", "Enter longitude as dd.ddd:",
+#                                       -42.910, -180.0, 180.0, 7)
+# 
+#         if (lat is None) or (lon is None):  # return None if one of the two is invalid
+#             return None, None
+# 
+#         return lat, lon
 
     def ask_location_from_sis(self):
         """Ask user whether retrieving location from SIS"""
