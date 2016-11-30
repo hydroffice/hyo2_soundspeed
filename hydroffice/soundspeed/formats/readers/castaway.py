@@ -33,6 +33,8 @@ class Castaway(AbstractTextReader):
         self.tk_sal = 'Salinity'
         self.tk_temp = 'Temperature'
         self.tk_speed = 'Sound'
+        self.tk_pressure = 'Pressure'
+        self.tk_conductivity = 'Conductivity'
 
     def read(self, data_path, settings, callbacks=CliCallbacks()):
         logger.debug('*** %s ***: start' % self.driver)
@@ -66,7 +68,10 @@ class Castaway(AbstractTextReader):
         has_speed = False
         has_temp = False
         has_sal = False
-
+        has_pressure = False
+        has_conductivity = False
+        self.conductivity_ms_per_cm = False
+        
         for line in self.lines:
 
             if not line:  # skip empty lines
@@ -87,6 +92,12 @@ class Castaway(AbstractTextReader):
                         has_temp = True
                     elif field_type == self.tk_sal:
                         has_sal = True
+                    elif field_type == self.tk_pressure:
+                        has_pressure = True
+                    elif field_type == self.tk_conductivity:
+                        has_conductivity = True
+                        if field.find('MicroSiemens per Centimeter') > 0:
+                            self.conductivity_ms_per_cm = True
                     else:
                         self.more_fields.append(field_type)
                     col += 1
@@ -161,13 +172,21 @@ class Castaway(AbstractTextReader):
                 self.ssp.cur.data.speed[count] = float(data[self.field_index[self.tk_speed]])
                 self.ssp.cur.data.temp[count] = float(data[self.field_index[self.tk_temp]])
                 self.ssp.cur.data.sal[count] = float(data[self.field_index[self.tk_sal]])
-
             except ValueError:
                 logger.warning("invalid conversion parsing of line #%s" % (self.samples_offset + count))
                 continue
             except IndexError:
                 logger.warning("invalid index parsing of line #%s" % (self.samples_offset + count))
                 continue
+
+            # pressure and conductivity
+            try:
+                self.ssp.cur.data.pressure[count] = float(data[self.field_index[self.tk_pressure]])
+                self.ssp.cur.data.conductivity[count] = float(data[self.field_index[self.tk_conductivity]])
+                if self.conductivity_ms_per_cm: # convert MicroS/cm to S/m
+                    self.ssp.cur.data.conductivity[count] = self.ssp.cur.data.conductivity[count] / 10000.0
+            except Exception as e:
+                logger.debug("issue in reading pressure and conductivity: %s -> skipping" % e)
 
             # additional data field
             try:
