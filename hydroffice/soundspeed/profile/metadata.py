@@ -23,12 +23,12 @@ class Metadata(object):
         self._sn = str()  # serial number
         self.proc_time = None  # last processing time
         self.proc_info = str()  # info about processing
-        self.pressure_uom = str()
-        self.depth_uom = str()
-        self.speed_uom = str()
-        self.temperature_uom = str()
-        self.conductivity_uom = str()
-        self.salinity_uom = str()
+        self.pressure_uom = 'dbar'
+        self.depth_uom = 'm'
+        self.speed_uom = 'm/s'
+        self.temperature_uom = 'deg C'
+        self.conductivity_uom = 'S/m'
+        self.salinity_uom = 'PSU'
 
     @property
     def sensor_probe_is_valid(self):

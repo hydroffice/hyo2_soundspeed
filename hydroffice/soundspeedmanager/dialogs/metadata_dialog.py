@@ -319,12 +319,12 @@ class MetadataDialog(AbstractDialog):
             self.survey.setEnabled(True)
             self.vessel.setEnabled(True)
             self.sn.setEnabled(True)
-            self.pressure_uom.setEnabled(True)
-            self.depth_uom.setEnabled(True)
-            self.speed_uom.setEnabled(True)
-            self.temperature_uom.setEnabled(True)
-            self.conductivity_uom.setEnabled(True)
-            self.salinity_uom.setEnabled(True)
+#             self.pressure_uom.setEnabled(True)
+#             self.depth_uom.setEnabled(True)
+#             self.speed_uom.setEnabled(True)
+#             self.temperature_uom.setEnabled(True)
+#             self.conductivity_uom.setEnabled(True)
+#             self.salinity_uom.setEnabled(True)
 
         else:
             self.load_default.setDisabled(True)
@@ -358,6 +358,7 @@ class MetadataDialog(AbstractDialog):
             self.lib.cur.meta.pressure_uom = self.pressure_uom.text()
             self.lib.cur.meta.depth_uom = self.depth_uom.text()
             self.lib.cur.meta.speed_uom = self.speed_uom.text()
+            self.lib.cur.meta.temperature_uom = self.temperature_uom.text()
             self.lib.cur.meta.conductivity_uom = self.conductivity_uom.text()
             self.lib.cur.meta.salinity_uom = self.salinity_uom.text()
 
