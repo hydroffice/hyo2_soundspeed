@@ -57,6 +57,7 @@ from .writers.ixblue import Ixblue
 from .writers.ncei import Ncei
 from .writers.sonardyne import Sonardyne
 from .writers.unb import Unb
+from .writers.qps import Qps
 
 writers = list()
 writers.append(Asvp())
@@ -68,6 +69,7 @@ writers.append(Ixblue())
 writers.append(Ncei())
 writers.append(Sonardyne())
 writers.append(Unb())
+writers.append(Qps())
 
 name_writers = list()
 ext_writers = list()

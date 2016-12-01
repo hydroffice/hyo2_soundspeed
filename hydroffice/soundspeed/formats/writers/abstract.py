@@ -48,7 +48,7 @@ class AbstractTextWriter(AbstractWriter):
     def __init__(self):
         super(AbstractTextWriter, self).__init__()
 
-    def _write(self, data_path, data_file, encoding='utf8', append=False):
+    def _write(self, data_path, data_file, encoding='utf8', append=False, binary=False):
         """Helper function to write the raw file"""
         if data_file:
             if len(data_file.split('.')) == 1:
@@ -65,6 +65,9 @@ class AbstractTextWriter(AbstractWriter):
             file_path = os.path.join(data_path, data_file)
         logger.info("output file: %s" % file_path)
         if append:
-            self.fod = FileManager(file_path, mode='a', encoding=encoding)
+            mode = 'a'
         else:
-            self.fod = FileManager(file_path, mode='w', encoding=encoding)
+            mode = 'w'
+        if binary:
+            mode = '%sb' % mode
+        self.fod = FileManager(file_path, mode=mode, encoding=encoding)
