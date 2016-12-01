@@ -6,9 +6,8 @@ import os
 import calendar
 import datetime as dt
 import logging
-logger = logging.getLogger(__name__)
 
-from PySide import QtGui
+logger = logging.getLogger(__name__)
 
 from ... import __version__ as ssp_version
 from ... import __doc__ as ssp_name
@@ -31,7 +30,7 @@ class Ncei(AbstractWriter):
         self.root_group = None
 
     def write(self, ssp, data_path, data_file=None, data_append=False, project=''):
-        """Writing profile data"""
+        """Writing raw profile data to NetCDF4 file"""
         logger.debug('*** %s ***: start' % self.driver)
 
         self.ssp = ssp
@@ -270,17 +269,17 @@ class Ncei(AbstractWriter):
         vi = self.ssp.cur.data_valid
         msg = 'NCEI export error --'
         
-        if self.ssp.cur.meta.sensor_probe_is_valid:
-            msg = '%s cannot export from sensor type %s, probe type %s' %(msg, self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
+        if not self.ssp.cur.meta.sensor_probe_is_valid:
+            msg = '%s cannot export from sensor type %s, probe type %s' % (msg, self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
         elif self._is_empty(self.ssp.cur.data.depth[vi]) and self._is_empty(self.ssp.cur.data.pressure[vi]):
-            msg = '%s missing depth or pressure' %msg
+            msg = '%s missing depth or pressure' % msg
         elif self._is_empty(self.ssp.cur.data.speed[vi]) and self._is_empty(self.ssp.cur.data.temp[vi]) and \
             self._is_empty(self.ssp.cur.data.conductivity[vi]) and self._is_empty(self.ssp.cur.data.sal[vi]):
-            msg = '%s missing critical data' %msg
+            msg = '%s missing critical data' % msg
         elif self.project in ['', 'default']:
-            msg = '%s missing project name, cannot export NCEI file from default project' %msg
+            msg = '%s missing project name, cannot export NCEI file from default project' % msg
         elif not self.ssp.cur.meta.survey or not self.ssp.cur.meta.vessel or not self.ssp.cur.meta.institution:
-            msg = '%s missing survey, vessel, or institution' %msg
+            msg = '%s missing survey, vessel, or institution' % msg
 
         if msg != 'NCEI export error --':
             raise RuntimeError(msg)
