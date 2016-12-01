@@ -35,7 +35,7 @@ class Metadata(object):
         """Check to make sure only export NCEI data file from the valid sensor_probe types.
         This is depending on class Dicts. Modify this according to class Dicts.
         """
-        return self.sensor_type <= 1 or self.probe_type <= 10
+        return self.sensor_type > 1 and self.probe_type > 100
 
     @property
     def sensor(self):
