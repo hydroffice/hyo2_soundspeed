@@ -31,13 +31,6 @@ class Metadata(object):
         self.salinity_uom = 'PSU'
 
     @property
-    def sensor_probe_is_valid(self):
-        """Check to make sure only export NCEI data file from the valid sensor_probe types.
-        This is depending on class Dicts. Modify this according to class Dicts.
-        """
-        return self.sensor_type > 1 and self.probe_type > 100
-
-    @property
     def sensor(self):
         return Dicts.first_match(Dicts.sensor_types, self.sensor_type)
 

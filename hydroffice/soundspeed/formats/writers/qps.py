@@ -54,9 +54,10 @@ class Qps(AbstractTextWriter):
         // 0x02 = Added (by user)
         """
         logger.debug('generating body')
-        if self.ssp.cur.meta.sensor_probe_is_valid:
+        if self.ssp.cur.meta.sensor_type != Dicts.sensor_types['Unknown'] and \
+                self.ssp.cur.meta.sensor_type != Dicts.sensor_types['Synthetic']:
             _flags = 2**0 # Observed
-        elif self.ssp.cur.meta.probe_type in [1]:
+        elif self.ssp.cur.meta.probe_type == Dicts.probe_types['RTOFS']:
             _flags = 2**1 # Oceanographic Model
         else:
             _flags = 2**2 # User designated
@@ -69,11 +70,11 @@ class Qps(AbstractTextWriter):
             pressure = self.ssp.cur.proc.pressure[vi][idx]
             conductivity = self.ssp.cur.proc.conductivity[vi][idx]
             source = self.ssp.cur.proc.source[vi][idx]
-            if source == 0:
+            if source == Dicts.sources['raw']:
                 flags = _flags
-            elif source == 1:
+            elif source == Dicts.sources['user']:
                 flags = 2**2 + 2**17 # User designated and Added (by user)
-            elif source in [5]:
+            elif source == Dicts.sources['rtofs_ext']:
                 flags = 2**1 # Oceanographic Model
             else:
                 flags = 2**2 # User designated

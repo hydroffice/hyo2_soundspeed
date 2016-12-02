@@ -92,8 +92,8 @@ class Ncei(AbstractWriter):
         # time.calendar = 'julian'  # REQUIRED    - IF the calendar is not default calendar, which is "gregorian".
         time.axis = b'T'  # REQUIRED    - Do not change.
         # time._FillValue = 0.0  # REQUIRED  if there could be missing values in the data. >> set at var creation
-        time.ancillary_variables = b''  # RECOMMENDED - List other variables providing information about this variable.
-        time.comment = b''  # RECOMMENDED - Add useful, additional information here.
+        # time.ancillary_variables = b''  # RECOMMENDED - List other variables providing information about this variable.
+        # time.comment = b''  # RECOMMENDED - Add useful, additional information here.
 
         # var: lat
         # depending on the precision used for the variable, the data type could be int, float or double.
@@ -106,8 +106,8 @@ class Ncei(AbstractWriter):
         lat.valid_min = -90.0  # RECOMMENDED - Replace with correct value.
         lat.valid_max = 180.0  # RECOMMENDED - Replace with correct value.
         # lat._FillValue = 180.0  # REQUIRED if there could be missing values in the data.
-        lat.ancillary_variables = b''  # RECOMMENDED - List other variables providing information about this variable.
-        lat.comment = b''  # RECOMMENDED - Add useful, additional information here.
+        # lat.ancillary_variables = b''  # RECOMMENDED - List other variables providing information about this variable.
+        # lat.comment = b''  # RECOMMENDED - Add useful, additional information here.
 
         # var: lon
         # Depending on the precision used for the variable, the data type could be int, float or double.
@@ -120,8 +120,8 @@ class Ncei(AbstractWriter):
         lon.valid_min = -180.0  # RECOMMENDED - Replace this with correct value.
         lon.valid_max = 360.0  # RECOMMENDED - Replace this with correct value.
         # lon:_FillValue = 360.0 # REQUIRED if there could be missing values in the data.
-        lon.ancillary_variables = b''  # RECOMMENDED - List other variables providing information about this variable.
-        lon.comment = b''  # RECOMMENDED - Add useful, additional information here.
+        # lon.ancillary_variables = b''  # RECOMMENDED - List other variables providing information about this variable.
+        # lon.comment = b''  # RECOMMENDED - Add useful, additional information here.
 
         # var: crs
         # RECOMMENDED - A container variable storing information about the grid_mapping.
@@ -146,9 +146,9 @@ class Ncei(AbstractWriter):
         # HIGHLY RECOMMENDED - Provide a useful title for the data in the file.(ACDD)
         self.root_group.title = b'%s_%s profile' % (self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
         # HIGHLY RECOMMENDED - Provide a useful summary or abstract for the data in the file.(ACDD)
-        #self.root_group.summary = b''
+        # self.root_group.summary = b''
         # HIGHLY RECOMMENDED - A comma separated list of keywords coming from the keywords_vocabulary.(ACDD)
-        #self.root_group.keywords = b''
+        # self.root_group.keywords = b''
         # HIGHLY RECOMMENDED - A comma separated list of the conventions being followed. Always try to use latest
         # version.(CF / ACDD)
         self.root_group.Conventions = b'CF-1.6, ACDD-1.3'
@@ -168,7 +168,8 @@ class Ncei(AbstractWriter):
         # self.root_group.source = b'sensor: %s, probe type: %s' % (self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
         # SUGGESTED - Name of the contributing instrument(s) or sensor(s) used to create this data set or product. (ACDD)
         self.root_group.instrument = b'sensor: %s, probe type: %s' % (self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
-        if self.ssp.cur.meta.sn: self.root_group.instrument_sn = b'%s' % self.ssp.cur.meta.sn
+        if self.ssp.cur.meta.sn:
+            self.root_group.instrument_sn = b'%s' % self.ssp.cur.meta.sn
         # SUGGESTED - Published or web - based references that describe the data or methods used to produce it.
         # Recommend URIs(such as a URL or DOI)
         self.root_group.references = b'https://www.hydroffice.org/soundspeed/'        
@@ -253,7 +254,7 @@ class Ncei(AbstractWriter):
             # RECOMMENDED - Provide a descriptive, long name for this variable.
             flag.long_name = b'quality flag'
             # REQUIRED - If using a CF standard name and a suitable name exists in the CF standard name table.
-            flag.standard_name = b''
+            # flag.standard_name = b''
             flag.flag_values = 0, 1
             flag.flag_meanings = b'valid invalid'
             
@@ -269,12 +270,13 @@ class Ncei(AbstractWriter):
         vi = self.ssp.cur.data_valid
         msg = 'NCEI export error --'
         
-        if not self.ssp.cur.meta.sensor_probe_is_valid:
-            msg = '%s cannot export from sensor type %s, probe type %s' % (msg, self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
+        if self.ssp.cur.meta.sensor_type == Dicts.sensor_types['Unknown'] or \
+                self.ssp.cur.meta.sensor_type == Dicts.sensor_types['Synthetic']:
+            msg = '%s cannot export from sensor - %s, probe - %s' % (msg, self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
         elif self._is_empty(self.ssp.cur.data.depth[vi]) and self._is_empty(self.ssp.cur.data.pressure[vi]):
             msg = '%s missing depth or pressure' % msg
         elif self._is_empty(self.ssp.cur.data.speed[vi]) and self._is_empty(self.ssp.cur.data.temp[vi]) and \
-            self._is_empty(self.ssp.cur.data.conductivity[vi]) and self._is_empty(self.ssp.cur.data.sal[vi]):
+                self._is_empty(self.ssp.cur.data.conductivity[vi]) and self._is_empty(self.ssp.cur.data.sal[vi]):
             msg = '%s missing critical data' % msg
         elif self.project in ['', 'default']:
             msg = '%s missing project name, cannot export NCEI file from default project' % msg
