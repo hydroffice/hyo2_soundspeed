@@ -15,8 +15,8 @@ class GeneralAbstractCallbacks(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def ask_number(self, title="", msg="Enter number", default=0,
-                   minval=-2147483647, maxval=2147483647, decimals=7):
+    def ask_number(self, title="", msg="Enter number", default=0.0,
+                   minval=-2147483647.0, maxval=2147483647.0, decimals=7):
         """Ask user for number"""
         logger.warning("to be implemented")
 
@@ -31,16 +31,18 @@ class GeneralAbstractCallbacks(object):
         logger.warning("to be implemented")
 
     def ask_location(self):
-        """Ask user for location"""
+        """Ask user for location (based on ask_number)"""
 
         # latitude
-        lat = self.ask_number("Location", "Enter latitude as dd.ddd:",
-                                  37.540, -90.0, 90.0, 7)
+        lat = self.ask_number(title="Location", msg="Enter latitude as dd.ddd:", default=37.540,
+                              minval=-90.0, maxval=90.0, decimals=7)
 
         if lat is not None:  # don't check for lon if lat already failed
             # longitude
-            lon = self.ask_number("Location", "Enter longitude as dd.ddd:",
-                                      -42.910, -180.0, 180.0, 7)
+            lon = self.ask_number(title="Location", msg="Enter longitude as dd.ddd:", default=-42.910,
+                                  minval=-180.0, maxval=180.0, decimals=7)
+        else:
+            lon = None
 
         if (lat is None) or (lon is None):  # return None if one of the two is invalid
             return None, None
@@ -108,12 +110,10 @@ class AbstractCallbacks(GeneralAbstractCallbacks):
 class TestCallbacks(AbstractCallbacks):
     """Used only for testing since the methods do not require user interaction"""
 
-    @abstractmethod
-    def ask_number(self, title="", msg="Enter number", default=0,
-                   minval=-2147483647, maxval=2147483647, decimals=7):
-        return random.random()*100.0
+    def ask_number(self, title="", msg="Enter number", default=0.0,
+                   minval=-2147483647.0, maxval=2147483647.0, decimals=7):
+        return random.random() * 100.0
 
-    @abstractmethod
     def ask_text(self, title="", msg="Enter text"):
         return "Hello world"
 
@@ -181,6 +181,7 @@ class CliCallbacks(AbstractCallbacks):
             else:
                 val = testval
         return val
+
     def ask_text(self, title="", msg="Enter text"):
         val = raw_input(msg)
         return val
