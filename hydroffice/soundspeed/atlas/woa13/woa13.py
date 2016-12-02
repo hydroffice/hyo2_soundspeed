@@ -326,7 +326,7 @@ class Woa13(AbstractAtlas):
         ssp.meta.longitude = lon_out
         ssp.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
         ssp.init_data(num_values)
-        ssp.data.depth = self.t[self.season_idx].variables['depth'][0:num_values].astype(np.float64)
+        ssp.data.depth = self.t[self.season_idx].variables['depth'][0:num_values]
         ssp.data.temp = t[valid]
         ssp.data.sal = s[valid]
         ssp.calc_data_speed()
@@ -348,7 +348,7 @@ class Woa13(AbstractAtlas):
         ssp_min.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
         if num_values > 0:
             ssp_min.init_data(num_values)
-            ssp_min.data.depth = self.t[self.season_idx].variables['depth'][0:num_values].astype(np.float64)
+            ssp_min.data.depth = self.t[self.season_idx].variables['depth'][0:num_values]
             ssp_min.data.temp = t_min[valid][0:num_values]
             ssp_min.data.sal = s_min[valid][0:num_values]
             ssp_min.calc_data_speed()
