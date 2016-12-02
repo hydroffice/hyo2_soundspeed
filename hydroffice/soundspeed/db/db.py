@@ -30,8 +30,8 @@ class ProjectDb(object):
         if project_name is None:
             project_name = "default"
 
-        # the passed project name (lower case) is used to identify the project database to open
-        self.db_path = os.path.join(projects_folder, self.clean_name(project_name.lower()) + ".db")
+        # the passed project name is used to identify the project database to open
+        self.db_path = os.path.join(projects_folder, self.clean_project_name(project_name) + ".db")
         # backup path
         self.bk_path = self.db_path + '.bk'
         logger.debug('current project db: %s' % self.db_path)
@@ -51,6 +51,10 @@ class ProjectDb(object):
     @staticmethod
     def clean_name(some_var):
         return ''.join(char for char in some_var if char.isalnum())
+
+    @staticmethod
+    def clean_project_name(some_var):
+        return ''.join(char for char in some_var if char.isalnum() or char in ['-', '_', '.'])
 
     def reconnect_or_create(self):
         """ Reconnection to an existing database or create a new db """
