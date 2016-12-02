@@ -3,17 +3,20 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import sqlite3
 import shutil
 import os
+import sys
 import datetime
+import traceback
+import numpy as np
 import logging
 
 logger = logging.getLogger(__name__)
 
 from hydroffice.soundspeed import __version__ as version
 from hydroffice.soundspeed import __doc__ as name
-from .point import Point, convert_point, adapt_point
-from .plot import PlotDb
-from .export import ExportDb
-from ..profile.profilelist import ProfileList
+from hydroffice.soundspeed.db.point import Point, convert_point, adapt_point
+from hydroffice.soundspeed.db.plot import PlotDb
+from hydroffice.soundspeed.db.export import ExportDb
+from hydroffice.soundspeed.profile.profilelist import ProfileList
 
 
 class ProjectDb(object):
@@ -90,6 +93,13 @@ class ProjectDb(object):
 
         except sqlite3.Error as e:
             raise RuntimeError("Unable to register 'point': %s - %s" % (type(e), e))
+
+        try:
+            # Register the adapter
+            sqlite3.register_adapter(np.float32, float)
+
+        except sqlite3.Error as e:
+            raise RuntimeError("Unable to register numpy float adapter: %s - %s" % (type(e), e))
 
         built = self.build_tables()
         if not isinstance(built, bool):
@@ -259,7 +269,7 @@ class ProjectDb(object):
         try:
             with self.conn:
 
-                for self.tmp_data in ssp.l:
+                for i, self.tmp_data in enumerate(ssp.l):
 
                     # logger.info("got a new SSP to store:\n%s" % self.tmp_data)
 
@@ -454,6 +464,8 @@ class ProjectDb(object):
                 logger.info("skipping row #%s due to %s: %s" % (i, type(e), e))
                 continue
             except sqlite3.Error as e:
+                print(self.tmp_data.data.depth[i], type(self.tmp_data.data.depth[i]))
+                # traceback.print_stack()
                 logger.error("during adding ssp raw samples, %s: %s" % (type(e), e))
                 return False
 

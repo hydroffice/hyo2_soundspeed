@@ -6,8 +6,9 @@ from PySide import QtCore
 import logging
 logger = logging.getLogger(__name__)
 
-from .dialog import AbstractDialog
+from hydroffice.soundspeedmanager.dialogs.dialog import AbstractDialog
 from hydroffice.soundspeed.base.helper import explore_folder
+from hydroffice.soundspeed.profile.dicts import Dicts
 
 
 class ExportDialog(AbstractDialog):
@@ -94,6 +95,12 @@ class ExportDialog(AbstractDialog):
             QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
             return
 
+        # special case: synthetic multiple profiles, we just save the average profile
+        if (self.name_outputs[0] == 'ncei') and (self.lib.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']):
+            msg = "Attempt to export a synthetic profile in NCEI format!"
+            QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
+            return
+
         # ask user for output folder path
         settings = QtCore.QSettings()
         output_folder = QtGui.QFileDialog.getExistingDirectory(self, "Select output folder",
@@ -132,8 +139,13 @@ class ExportDialog(AbstractDialog):
         export_open_folder = self.openFolder.isChecked()
         if export_open_folder:
             explore_folder(output_folder)  # open the output folder
+            self.progress.setValue(100)
+
+        else:
+            self.progress.setValue(100)
+            msg = "Profile successfully exported!"
+            QtGui.QMessageBox.information(self, "Export profile", msg, QtGui.QMessageBox.Ok)
+
         settings.setValue("export_open_folder", export_open_folder)
 
-        self.progress.setValue(100)
         self.accept()
-        
