@@ -52,6 +52,19 @@ class ExportDialog(AbstractDialog):
 
         self.mainLayout.addSpacing(16)
 
+        # option for opening the output folder
+        settings = QtCore.QSettings()
+        export_open_folder = settings.value("export_open_folder")
+        if export_open_folder is None:
+            settings.setValue("export_open_folder", True)
+        hbox = QtGui.QHBoxLayout()
+        self.mainLayout.addLayout(hbox)
+        hbox.addStretch()
+        self.openFolder = QtGui.QCheckBox('Open output folder', self)
+        self.openFolder.setChecked(settings.value("export_open_folder") == 'true')
+        hbox.addWidget(self.openFolder)
+        hbox.addStretch()
+
         # export
         hbox = QtGui.QHBoxLayout()
         self.mainLayout.addLayout(hbox)
@@ -114,5 +127,11 @@ class ExportDialog(AbstractDialog):
             QtGui.QMessageBox.critical(self, "Export error", msg, QtGui.QMessageBox.Ok)
             return
 
-        explore_folder(output_folder)  # open the output folder
+        # opening the output folder
+        settings = QtCore.QSettings()
+        export_open_folder = self.openFolder.isChecked()
+        if export_open_folder:
+            explore_folder(output_folder)  # open the output folder
+        settings.setValue("export_open_folder", export_open_folder)
+
         self.progress.setValue(100)
