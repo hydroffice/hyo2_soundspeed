@@ -135,3 +135,5 @@ class ExportDialog(AbstractDialog):
         settings.setValue("export_open_folder", export_open_folder)
 
         self.progress.setValue(100)
+        self.accept()
+        
