@@ -12,7 +12,7 @@ from hydroffice.soundspeedmanager.widgets.widget import AbstractWidget
 from hydroffice.soundspeedmanager.dialogs.export_profiles_dialog import ExportProfilesDialog
 from hydroffice.soundspeedmanager.dialogs.plot_profiles_dialog import PlotProfilesDialog
 from hydroffice.soundspeedmanager.dialogs.new_project_dialog import NewProjectDialog
-from hydroffice.soundspeedmanager.dialogs.load_project_dialog import LoadProjectDialog
+from hydroffice.soundspeedmanager.dialogs.switch_project_dialog import SwitchProjectDialog
 from hydroffice.soundspeedmanager.dialogs.import_data_dialog import ImportDataDialog
 
 
@@ -77,10 +77,10 @@ class Database(AbstractWidget):
         self.btn_new_project.setToolTip("Create a new project")
         self.manage_btn_box.addButton(self.btn_new_project, QtGui.QDialogButtonBox.ActionRole)
         # --- load project
-        self.btn_load_project = QtGui.QPushButton("Load project")
+        self.btn_load_project = QtGui.QPushButton("Switch project")
         # noinspection PyUnresolvedReferences
-        self.btn_load_project.clicked.connect(self.load_project)
-        self.btn_load_project.setToolTip("Load a project")
+        self.btn_load_project.clicked.connect(self.switch_project)
+        self.btn_load_project.setToolTip("Switch to another existing project")
         self.manage_btn_box.addButton(self.btn_load_project, QtGui.QDialogButtonBox.ActionRole)
         # --- import profiles
         self.btn_import_data = QtGui.QPushButton("Import data")
@@ -148,10 +148,10 @@ class Database(AbstractWidget):
         if success:
             self.update_table()
 
-    def load_project(self):
-        logger.debug("user want to load a project")
+    def switch_project(self):
+        logger.debug("user want to switch to another project")
 
-        dlg = LoadProjectDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        dlg = SwitchProjectDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
 
         self.update_table()

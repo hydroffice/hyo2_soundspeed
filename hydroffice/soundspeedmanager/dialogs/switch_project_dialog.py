@@ -10,14 +10,14 @@ from .dialog import AbstractDialog
 from hydroffice.soundspeed.base.gdal_aux import GdalAux
 
 
-class LoadProjectDialog(AbstractDialog):
+class SwitchProjectDialog(AbstractDialog):
 
     def __init__(self, main_win, lib, parent=None):
         AbstractDialog.__init__(self, main_win=main_win, lib=lib, parent=parent)
 
         self.fmt_outputs = list()
 
-        self.setWindowTitle("Load project")
+        self.setWindowTitle("Switch project")
         self.setMinimumWidth(160)
 
         # outline ui
@@ -38,13 +38,13 @@ class LoadProjectDialog(AbstractDialog):
         # -- space
         self.mainLayout.addSpacing(6)
         # -- button
-        btn = QtGui.QPushButton("Load")
+        btn = QtGui.QPushButton("Switch")
         self.mainLayout.addWidget(btn)
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_load)
 
     def on_load(self):
-        logger.debug("loading project")
+        logger.debug("switching project")
 
         txt = self.load_project.currentText()
 
