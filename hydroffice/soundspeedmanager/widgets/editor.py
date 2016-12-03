@@ -270,8 +270,8 @@ class Editor(AbstractWidget):
             msg = "Unable to save to db!"
             QtGui.QMessageBox.warning(self, "Database warning", msg, QtGui.QMessageBox.Ok)
             return
-        else:
-            self.main_win.data_stored()
+
+        self.main_win.data_stored()
 
     def data_cleared(self):
         # bars

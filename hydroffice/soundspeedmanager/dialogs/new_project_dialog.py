@@ -48,7 +48,7 @@ class NewProjectDialog(AbstractDialog):
     def on_create(self):
         logger.debug("creating project")
 
-        txt = self.new_project.text().lower()
+        txt = self.new_project.text()
 
         if len(txt) == 0:
             msg = "Set the project name!"

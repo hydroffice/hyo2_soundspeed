@@ -366,7 +366,7 @@ class Woa13(AbstractAtlas):
         ssp.meta.original_path = "WOA13_%s" % datestamp.strftime("%Y%m%d")
         if num_values > 0:
             ssp_max.init_data(num_values)
-            ssp_max.data.depth = self.t[self.season_idx].variables['depth'][0:num_values]
+            ssp_max.data.depth = self.t[self.season_idx].variables['depth'][0:num_values].astype(np.float64)
             ssp_max.data.temp = t_max[valid][0:num_values]
             ssp_max.data.sal = s_max[valid][0:num_values]
             ssp_max.calc_data_speed()

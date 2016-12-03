@@ -6,8 +6,9 @@ from PySide import QtCore
 import logging
 logger = logging.getLogger(__name__)
 
-from .dialog import AbstractDialog
+from hydroffice.soundspeedmanager.dialogs.dialog import AbstractDialog
 from hydroffice.soundspeed.base.helper import explore_folder
+from hydroffice.soundspeed.profile.dicts import Dicts
 
 
 class ExportDialog(AbstractDialog):
@@ -52,6 +53,19 @@ class ExportDialog(AbstractDialog):
 
         self.mainLayout.addSpacing(16)
 
+        # option for opening the output folder
+        settings = QtCore.QSettings()
+        export_open_folder = settings.value("export_open_folder")
+        if export_open_folder is None:
+            settings.setValue("export_open_folder", True)
+        hbox = QtGui.QHBoxLayout()
+        self.mainLayout.addLayout(hbox)
+        hbox.addStretch()
+        self.openFolder = QtGui.QCheckBox('Open output folder', self)
+        self.openFolder.setChecked(settings.value("export_open_folder") == 'true')
+        hbox.addWidget(self.openFolder)
+        hbox.addStretch()
+
         # export
         hbox = QtGui.QHBoxLayout()
         self.mainLayout.addLayout(hbox)
@@ -78,6 +92,12 @@ class ExportDialog(AbstractDialog):
         logger.debug("export clicked")
         if len(self.name_outputs) == 0:
             msg = "Select output formats before data export!"
+            QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
+            return
+
+        # special case: synthetic multiple profiles, we just save the average profile
+        if (self.name_outputs[0] == 'ncei') and (self.lib.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']):
+            msg = "Attempt to export a synthetic profile in NCEI format!"
             QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -114,5 +134,18 @@ class ExportDialog(AbstractDialog):
             QtGui.QMessageBox.critical(self, "Export error", msg, QtGui.QMessageBox.Ok)
             return
 
-        explore_folder(output_folder)  # open the output folder
-        self.progress.setValue(100)
+        # opening the output folder
+        settings = QtCore.QSettings()
+        export_open_folder = self.openFolder.isChecked()
+        if export_open_folder:
+            explore_folder(output_folder)  # open the output folder
+            self.progress.setValue(100)
+
+        else:
+            self.progress.setValue(100)
+            msg = "Profile successfully exported!"
+            QtGui.QMessageBox.information(self, "Export profile", msg, QtGui.QMessageBox.Ok)
+
+        settings.setValue("export_open_folder", export_open_folder)
+
+        self.accept()

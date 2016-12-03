@@ -352,7 +352,7 @@ class Woa09(AbstractAtlas):
         ssp_max.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
         if num_values > 0:
             ssp_max.init_data(num_values)
-            ssp_max.data.depth = self.t_seasonal.variables['depth'][0:num_values]
+            ssp_max.data.depth = self.t_seasonal.variables['depth'][0:num_values].astype(np.float64)
             ssp_max.data.temp = t_max[valid][0:num_values]
             ssp_max.data.sal = s_max[valid][0:num_values]
             ssp_max.calc_data_speed()

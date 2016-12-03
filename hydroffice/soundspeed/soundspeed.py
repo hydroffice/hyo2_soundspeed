@@ -2,26 +2,27 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import time
 import os
+import copy
 import logging
 
 logger = logging.getLogger(__name__)
 
-from . import __version__ as soundspeed_version
-from . import __doc__ as soundspeed_name
-from . import formats
-from .appdirs.appdirs import user_data_dir
-from .atlas.atlases import Atlases
-from .base.callbacks import CliCallbacks, AbstractCallbacks
-from .base.gdal_aux import GdalAux
-from .base.helper import explore_folder
-from .base.progress import Progress
-from .base.setup import Setup
-from .db.db import ProjectDb
-from .listener.listeners import Listeners
-from .logging.sqlitelogging import SqliteLogging
-from .profile.profilelist import ProfileList
-from .profile.dicts import Dicts
-from .server.server import Server
+from hydroffice.soundspeed import __version__ as soundspeed_version
+from hydroffice.soundspeed import __doc__ as soundspeed_name
+from hydroffice.soundspeed import formats
+from hydroffice.soundspeed.appdirs.appdirs import user_data_dir
+from hydroffice.soundspeed.atlas.atlases import Atlases
+from hydroffice.soundspeed.base.callbacks import CliCallbacks, AbstractCallbacks
+from hydroffice.soundspeed.base.gdal_aux import GdalAux
+from hydroffice.soundspeed.base.helper import explore_folder
+from hydroffice.soundspeed.base.progress import Progress
+from hydroffice.soundspeed.base.setup import Setup
+from hydroffice.soundspeed.db.db import ProjectDb
+from hydroffice.soundspeed.listener.listeners import Listeners
+from hydroffice.soundspeed.logging.sqlitelogging import SqliteLogging
+from hydroffice.soundspeed.profile.profilelist import ProfileList
+from hydroffice.soundspeed.profile.dicts import Dicts
+from hydroffice.soundspeed.server.server import Server
 
 
 class SoundSpeedLibrary(object):
@@ -599,6 +600,11 @@ class SoundSpeedLibrary(object):
 
         # create the outputs
         for i, name in enumerate(data_formats):
+
+            # special case: synthetic multiple profiles, we just save the average profile
+            if (name == 'ncei') and (self.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']):
+                raise RuntimeError("Attempt to export a synthetic profile in NCEI format!")
+
             idx = self.name_writers.index(name)
             writer = self.writers[idx]
             data_append = False
@@ -650,7 +656,17 @@ class SoundSpeedLibrary(object):
             raise RuntimeError("Data not loaded")
 
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
-        success = db.add_casts(self.ssp)
+
+        # special case: synthetic multiple profiles, we just save the average profile
+        if (self.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']) and \
+                ((self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA09']) or
+                     (self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA13'])):
+            tmp_ssp = copy.deepcopy(self.ssp)
+            del tmp_ssp.l[1:]
+            success = db.add_casts(tmp_ssp)
+
+        else:
+            success = db.add_casts(self.ssp)
         db.disconnect()
 
         # take care of listeners
@@ -688,7 +704,7 @@ class SoundSpeedLibrary(object):
         in_db = ProjectDb(projects_folder=in_projects_folder, project_name=in_project_name)
 
         if in_db.get_db_version() > 1:
-            raise RuntimeError("unsupported setup version: %s" % db.setup_version)
+            raise RuntimeError("unsupported setup version: %s" % in_db.get_db_version())
         logger.debug('input project db version: %s' % in_db.get_db_version())
 
         cur_db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
