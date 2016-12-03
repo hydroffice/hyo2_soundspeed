@@ -1,13 +1,53 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from PySide import QtGui
 from datetime import datetime, timedelta
+import os
+
+from PySide import QtGui, QtCore
 
 import logging
 
+from hydroffice.soundspeed.base.callbacks import AbstractCallbacks
+
 logger = logging.getLogger(__name__)
 
-from hydroffice.soundspeed.base.callbacks import AbstractCallbacks
+
+def get_filename(parent=None, saving=True, keyname=None, default_path=".",
+                 title="Choose a path/filename", default_file="",
+                 ffilter="All Files (*.*)", multifile=False):
+    #flt = "Format %s(*.%s);;All files (*.*)" % (desc, " *.".join(ext))
+    settings = QtCore.QSettings()
+    dlg_options = {'parent': parent, 'caption': title, 'filter': ffilter}
+    if keyname:
+        dlg_options['dir'] = settings.value(keyname)
+    if not multifile:
+        if saving:
+            selection, _ = QtGui.QFileDialog.getSaveFileName(**dlg_options)
+        else:
+            selection, _ = QtGui.QFileDialog.getOpenFileName(**dlg_options)
+        if selection:
+            settings.setValue("import_folder", os.path.dirname(selection))
+    else:
+        selection, _ = QtGui.QFileDialog.getOpenFileNames(**dlg_options)
+        if selection:
+            settings.setValue("import_folder", os.path.dirname(selection[0]))
+
+    if selection:
+        logger.debug('user selection: %s' % selection)
+    return selection
+
+
+def get_directory(parent=None, keyname=None, default_path=".",
+                  title="Select output folder", message=""):
+    # ask user for output folder path
+    settings = QtCore.QSettings()
+    default_dir = settings.value(keyname) if keyname else ""
+    output_folder = QtGui.QFileDialog.getExistingDirectory(self, caption=title,
+                                                           dir=default_dir)
+    if output_folder:
+        settings.setValue("export_folder", output_folder)
+        logger.debug('user selection: %s' % output_folder)
+    return output_folder
 
 
 class QtCallbacks(AbstractCallbacks):
@@ -97,6 +137,18 @@ class QtCallbacks(AbstractCallbacks):
 #             return None, None
 # 
 #         return lat, lon
+
+    def ask_filename(self, saving=True, keyname=None, default_path=".",
+                     title="Choose a path/filename", default_file="",
+                     ffilter="All Files|*.*", multifile=False): 
+        return get_filename(self.parent, saving, keyname, default_path, title, default_file, ffilter, multifile)
+
+    def ask_directory(self, keyname=None, default_path=".",
+                       title="Browse for folder", message=""):
+        '''Pops up a wx.DirDialog to get a directory from the user.
+           Returns a two-item tuple (return code, pathname or None)
+        '''
+        return get_directory(self.parent, keyname, default_path, title, message)
 
     def ask_location_from_sis(self):
         """Ask user whether retrieving location from SIS"""

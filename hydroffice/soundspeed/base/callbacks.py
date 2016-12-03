@@ -2,13 +2,14 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from abc import ABCMeta, abstractmethod, abstractproperty
 from datetime import datetime, timedelta
+import os
 import random
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class AbstractCallbacks(object):
+class GeneralAbstractCallbacks(object):
     """Abstract class with several callbacks that has to be implemented for a new backend"""
 
     __metaclass__ = ABCMeta
@@ -45,6 +46,28 @@ class AbstractCallbacks(object):
             return None, None
 
         return lat, lon
+
+    @abstractmethod
+    def ask_filename(self, saving=True, keyname=None, default_path=".",
+                     title="Choose a path/filename", default_file="",
+                     ffilter="All Files|*.*", multifile=False):
+        """Ask user for filename(s) and remembers last location used if applicable.
+        To store last location keyname must be a string and be a gui callback (not command line)."""
+        logger.warning("to be implemented")
+
+    @abstractmethod
+    def ask_directory(self, keyname=None, default_path=".",
+                      title="Browse for folder", message=""):
+        """Ask user for a directory path and remembers last location used if applicable
+        To store last location keyname must be a string and be a gui callback (not command line)."""
+        logger.warning("to be implemented")
+
+
+class AbstractCallbacks(GeneralAbstractCallbacks):
+    """Abstract class with several callbacks that has to be implemented for a new backend
+    Specifies that the general callback exist as well as soundspeed specific ones."""
+
+    __metaclass__ = ABCMeta
 
     @abstractmethod
     def ask_location_from_sis(self):
@@ -99,6 +122,15 @@ class TestCallbacks(AbstractCallbacks):
 
     def ask_location(self):
         return 43.13555 + random.random(), -70.9395 + random.random()
+
+    def ask_filename(self, saving=True, keyname=None, default_path=".",
+                     title="Choose a path/filename", default_file="",
+                     ffilter="All Files|*.*", multifile=False):
+        return os.path.normpath("c:/test/fakename.txt")
+
+    def ask_directory(self, keyname=None, default_path=".",
+                      title="Browse for folder", message=""):
+        return os.path.normpath("c:/test/")
 
     def ask_location_from_sis(self):
         return True
@@ -236,6 +268,22 @@ class CliCallbacks(AbstractCallbacks):
                 continue
 
         return lat, lon
+
+    def ask_filename(self, saving=True, keyname=None, default_path=".",
+                     title="Choose a path/filename", default_file="",
+                     ffilter="All Files|*.*", multifile=False):
+        raw = " "
+        if not saving:
+            filemsg = "Enter existing filename:"
+        else:
+            filemsg = "Enter filename:"
+        while raw == " " or (os.path.exists(raw) and raw != ""):
+            raw = raw_input(filemsg)
+        return os.path.normpath(raw)
+
+    def ask_directory(self, keyname=None, default_path=".",
+                      title="Browse for folder", message=""):
+        return os.path.normpath("c:/test/")
 
     def ask_location_from_sis(self):
         """Ask user whether retrieving location from SIS"""
