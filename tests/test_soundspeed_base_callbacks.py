@@ -23,6 +23,12 @@ class TestSoundSpeedTestCallbacks(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def test_ask_number(self):
+        self.assertTrue(isinstance(self.cb.ask_number(), float))
+
+    def test_ask_text(self):
+        self.assertTrue(type(self.cb.ask_text()) in [str, unicode])
+
     def test_ask_date(self):
         from datetime import datetime as dt
         self.assertEqual(self.cb.ask_date().year, dt.utcnow().year)
@@ -48,6 +54,30 @@ class TestSoundSpeedTestCallbacks(unittest.TestCase):
 
     def test_ask_draft(self):
         self.assertEqual(self.cb.ask_draft(), 8.)
+
+    def test_msg_tx_no_verification(self):
+        try:
+            self.cb.msg_tx_no_verification("", "")
+        except Exception as e:
+            self.fail(e)
+
+    def test_msg_tx_sis_wait(self):
+        try:
+            self.cb.msg_tx_sis_wait("")
+        except Exception as e:
+            self.fail(e)
+
+    def test_msg_tx_sis_confirmed(self):
+        try:
+            self.cb.msg_tx_sis_confirmed("")
+        except Exception as e:
+            self.fail(e)
+
+    def test_msg_tx_sis_not_confirmed(self):
+        try:
+            self.cb.msg_tx_sis_not_confirmed("", 0)
+        except Exception as e:
+            self.fail(e)
 
 
 def suite():
