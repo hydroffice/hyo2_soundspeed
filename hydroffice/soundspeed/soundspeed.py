@@ -704,7 +704,7 @@ class SoundSpeedLibrary(object):
         in_db = ProjectDb(projects_folder=in_projects_folder, project_name=in_project_name)
 
         if in_db.get_db_version() > 1:
-            raise RuntimeError("unsupported setup version: %s" % in_db.get_db_version())
+            raise RuntimeError("unsupported db version: %s" % in_db.get_db_version())
         logger.debug('input project db version: %s' % in_db.get_db_version())
 
         cur_db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
