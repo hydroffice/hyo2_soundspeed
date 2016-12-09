@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import numpy as np
-from scipy import sin, cos, tan, arcsin, log, arctan, exp, sqrt
+from numpy import sin, cos, tan, arcsin, log, arctan, exp, sqrt
 import logging
 
 logger = logging.getLogger(__name__)

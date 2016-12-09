@@ -809,8 +809,8 @@ class Profile(object):
         details += "SSManager, Version     %s\n\n" % ssp_version
         details += "REFERENCE PROFILE:     %s\n" % self.meta.original_path 
         details += "COMPARISON PROFILE:    %s\n\n" % prof.meta.original_path
-        details += "REFERENCE INSTRUMENT:  sensor-%s, probe-%s sn-%s\n" % (self.meta.sensor, self.meta.probe, self.meta.sn)
-        details += "COMPARISON INSTRUMENT: sensor-%s, probe-%s sn-%s\n\n" % (prof.meta.sensor, prof.meta.probe, prof.meta.sn)
+        details += "REFERENCE INSTRUMENT:  sensor-%s, probe-%s, sn-%s\n" % (self.meta.sensor, self.meta.probe, self.meta.sn)
+        details += "COMPARISON INSTRUMENT: sensor-%s, probe-%s, sn-%s\n\n" % (prof.meta.sensor, prof.meta.probe, prof.meta.sn)
         #Space(10) & "SYSTEM: %s\n" & UserSystem & CRLF
         details += "DRAFT                               = %.2fm\n" % draft
         details += "MAXIMUM COMMON DEPTH                = %.2f\n" % DepMax 
