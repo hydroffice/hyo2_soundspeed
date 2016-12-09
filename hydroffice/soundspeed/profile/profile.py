@@ -1,16 +1,20 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import time
 import numpy as np
 import logging
 
 logger = logging.getLogger(__name__)
 
+from .. import __version__ as ssp_version
 from .metadata import Metadata
 from .samples import Samples
 from .more import More
 from .dicts import Dicts
 from .oceanography import Oceanography as Oc
 from . import geostrophic_48
+from .svequations import SVEquations
+from .raypath import Raypath
 
 
 class Profile(object):
@@ -143,6 +147,16 @@ class Profile(object):
         """Helper method to calculate depth from pressure (in dBar)"""
         # logger.debug("calculate depth from pressure")
         geostrophic_48.d_from_p(self)
+#         if not self.meta.latitude:
+#             latitude = 30.0
+#             logger.warning("using default latitude: %s" % latitude)
+#         else:
+#             latitude = self.meta.latitude
+# 
+#         self.data.depth = self.data.pressure.copy()
+#         for count in range(self.data.num_samples):
+#             self.data.depth[count] = Oc.p2d(p=self.data.pressure[count], lat=latitude, prof=self)
+
         self.modify_proc_info('calc.depth')
 
     def calc_data_speed(self):
@@ -706,6 +720,129 @@ class Profile(object):
 
         if more:
             self.more.debug_plot()
+
+    def _no_dupes_goodflags(self, spacing = 0.1):
+        '''Returns a new array with 'flag' values !=0 and the depths sorted and spaced by at least the spacing value
+        '''
+        #layers = copy.deepcopy(self.ssp) 
+        dtype = [(b'depth', '<f8'), (b'speed', '<f8'), (b'flag', '<f8')]
+        data = []
+        #vi = np.equal(self.proc.flag, Dicts.flags['valid'])
+        for count in range(self.proc.num_samples):
+            data.append((self.proc.depth[count], self.proc.speed[count], self.proc.flag[count]))
+        layers = np.array(data, dtype=dtype)
+        #if 'flag' in self.dtype.names:
+        #    layers=scipy.compress(layers['flag']>=0, d)
+        layers.sort(order = ['depth']) #must sort before taking the differences
+        depths = layers['depth']
+        #TODO: should we use QC( ) here or just the first sample that passes the spacing check?  Depends on if averaging the other data fields is ok.
+        ilist = [0]
+        for i in range(len(layers)):
+            if depths[i]-depths[ilist[-1]] >= spacing:
+                ilist.append(i)
+        layers = layers.take(ilist)
+        #delta_depth = scipy.hstack(([spacing*2],scipy.diff(layers['depth']))) #add a true value for the first difference that
+        #layers = scipy.compress(delta_depth>=spacing, layers) #make sure duplicate depths not written
+        return layers
+
+    def compute_raypaths(self, draft, thetas_deg, traveltimes=None, res=.005, bProject=False):
+        '''Performs a multiple raytraces.  
+        Returns a RayPath object for each launch angle (thetas_deg).
+        Will return points within the RayPath at each traveltime specified or 
+          will compute traveltimes needed to reach the end of the profile at each launch angle
+        Draft will be used as the starting point within the profile and be added to depths 
+        '''
+        if not draft or draft == 'Unknown':
+            draft = 0.0
+        else:
+            draft = float(draft)
+        layers = self._no_dupes_goodflags() #Get the data so we can sort and remove stuff
+        layers['depth'] -= draft
+        zero_ind = layers['depth'].searchsorted(0.0, side='right')
+        if zero_ind > 0:
+            layers['depth'][zero_ind - 1] = 0.0 #set the depth for the first layer to zero (so it doesn't get cut off).  
+            #i.e. first layer goes from 0 to 5, draft ==2, that changes first layer to -2 to 3 which needs to be 0.0 to 3 so we don't cut off the sound velocity for the layer.
+        layers = layers.compress(layers['depth'] >= 0)
+        raypaths = []
+        for launch in thetas_deg:
+            params = SVEquations.GetSVPLayerParameters(np.deg2rad(launch), layers)
+            if traveltimes is None:
+                tt = np.arange(res, params[-2][-1], res) #make traveltimes to reach end of profile
+            else:
+                tt = np.array(traveltimes)
+            rays = SVEquations.RayTraceUsingParameters(tt, layers, params, bProject=bProject)
+            rays[:,0]+=draft
+            raypaths.append(Raypath(np.vstack((tt, rays.transpose())).transpose()))
+        return raypaths
+
+    def DQA_compare(self, prof, angle):
+        DepMax = min(self.proc.depth.max(), prof.proc.depth.max())
+        # Generate the travel time table for the two profiles.
+        if DepMax < 30:  # Modify time increment for shallow casts 02/14/00
+            TTInc = 0.002
+        elif DepMax <= 400:
+            TTInc = 0.002  # Travel time increment in seconds.
+        elif DepMax <= 800:
+            TTInc = 0.005
+        else:
+            TTInc = 0.01
+
+        draft1 = 0.0 # TODO
+        draft2 = 0.0 # TODO
+
+        draft = max(draft1, draft2)
+        ray1 = self.compute_raypaths(draft, [angle], res=TTInc)[0]
+        ray2 = prof.compute_raypaths(draft, [angle], res=TTInc)[0]
         
-    def DQA_compare(self, pro, angle):
-        pass
+        npts = min(len(ray1.data), len(ray2.data))
+        depth1 = ray1.data[:npts, 1]
+        depth2 = ray2.data[:npts, 1]
+        delta_depth = depth2 - depth1
+        larger_depths = np.maximum(depth1, depth2)
+        perc_diff = np.absolute(delta_depth / larger_depths) * 100.0
+        max_diff_index = perc_diff.argmax()
+        max_diff = perc_diff[max_diff_index]
+        max_diff_depth = larger_depths[max_diff_index]
+        
+        
+        details  = "SUMMARY OF RESULTS - COMPARE 2 CASTS   " 
+        details += "SSManager, Version     %s\n\n" % ssp_version
+        details += "REFERENCE PROFILE:     %s\n" % self.meta.original_path 
+        details += "COMPARISON PROFILE:    %s\n\n" % prof.meta.original_path
+        details += "REFERENCE INSTRUMENT:  sensor-%s, probe-%s sn-%s\n" % (self.meta.sensor, self.meta.probe, self.meta.sn)
+        details += "COMPARISON INSTRUMENT: sensor-%s, probe-%s sn-%s\n\n" % (prof.meta.sensor, prof.meta.probe, prof.meta.sn)
+        #Space(10) & "SYSTEM: %s\n" & UserSystem & CRLF
+        details += "DRAFT                               = %.2fm\n" % draft
+        details += "MAXIMUM COMMON DEPTH                = %.2f\n" % DepMax 
+        details += "MAXIMUM DEPTH PERCENTAGE DIFFERENCE = %.2f%%\n" % max_diff
+        details += "MAXIMUM PERCENTAGE DIFFERENCE AT    = %.2fm\n" % max_diff_depth
+        details += "Max percentage diff line and last line of travel time table:\n"
+        details += "Travel time, Avg Depth, Depth Diff, Pct Depth Diff, Avg Crosstrack, Crosstrack Diff, Pct Crosstrack Diff\n"
+        for ni in (max_diff_index, npts-1):
+            diff_data = (ray1.data[ni,0], 
+                         np.average([ray1.data[ni,1], ray2.data[ni,1]]), np.absolute(delta_depth[ni]), perc_diff[ni], 
+                         np.average([ray1.data[ni,2], ray2.data[ni,2]]), np.absolute(ray1.data[ni,2]-ray2.data[ni,2]), 100.0*np.absolute(ray1.data[ni,2]-ray2.data[ni,2])/max(ray1.data[ni,2],ray2.data[ni,2]))
+            details += "    %5.2fs ,   %6.2fm,   %5.2fm  ,     %5.2f%%    ,      %6.2fm  ,      %5.2fm    ,         %5.2f%%\n" % diff_data
+ 
+        DQAResults = '\n' + time.ctime() + '\n'
+        if max_diff > 0.25:
+            message  = "RESULTS INDICATE PROBLEM.\n\n"
+            message += "The absolute value of percent depth difference exceeds the recommended amount (.25).\n\n"
+            message += "If test was conducted to compare 2 casts for possible\n"
+            message += "grouping into one representative cast, then\n"
+            message += "the 2 casts should NOT be grouped.\n\n"
+            message += "If test was run as part of a Data Quality Assurance for\n"
+            message += "2 simultaneous casts, then one or both of the instruments\n"
+            message += "used is functioning improperly.  Investigate further by\n"
+            message += "performing simultaneous casts of each of the instruments\n"
+            message += "with a third instrument.  Then rerun this procedure with\n"
+            message += "the 2 new pairs of casts to determine which one of the\n"
+            message += "instruments is not functioning properly.\n\n"
+            message += "If the test was run to compare an XBT cast with\n"
+            message += "the last CTD cast, then it is time to take a new CTD cast."
+            DQAResults += "COMPARE 2 FILES\n  RESULTS: PERCENT DEPTH DIFFERENCE TOO LARGE\n"
+        else:
+            message  = "RESULTS OK.\n\n"
+            message += "Percent depth difference is within recommended bounds."
+            DQAResults += "COMPARE 2 FILES\n  RESULTS: PERCENT DEPTH DIFFERENCE OK\n"
+        return DQAResults, message, details, (max_diff, max_diff_depth)
