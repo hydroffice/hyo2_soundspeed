@@ -24,7 +24,7 @@ class ClientList(object):
 
     def transmit_ssp(self, prj, server_mode=False):
 
-        prj.progress.start('Transmitting', server_mode=server_mode)
+        prj.progress.start(text='Transmitting', is_disabled=server_mode)
 
         # loop through the client list
         success = True  # false if one tx has troubles

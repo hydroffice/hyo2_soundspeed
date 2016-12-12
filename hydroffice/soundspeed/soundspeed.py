@@ -15,7 +15,8 @@ from hydroffice.soundspeed.atlas.atlases import Atlases
 from hydroffice.soundspeed.base.callbacks import CliCallbacks, AbstractCallbacks
 from hydroffice.soundspeed.base.gdal_aux import GdalAux
 from hydroffice.soundspeed.base.helper import explore_folder
-from hydroffice.soundspeed.base.progress import Progress
+from hydroffice.soundspeed.base.progress.abstract_progress import AbstractProgress
+from hydroffice.soundspeed.base.progress.cli_progress import CliProgress
 from hydroffice.soundspeed.base.setup import Setup
 from hydroffice.soundspeed.db.db import ProjectDb
 from hydroffice.soundspeed.listener.listeners import Listeners
@@ -28,9 +29,18 @@ from hydroffice.soundspeed.server.server import Server
 class SoundSpeedLibrary(object):
     """Sound Speed library"""
 
-    def __init__(self, data_folder=None, qt_progress=None, qt_parent=None):
+    def __init__(self, data_folder=None, callbacks=CliCallbacks(), progress=CliProgress()):
         """Initialization for the library"""
         logger.info("** > LIB: initializing ...")
+
+        # callbacks
+        if not issubclass(type(callbacks), AbstractCallbacks):
+                raise RuntimeError("invalid callbacks object")
+        self.cb = callbacks
+        # progress bar
+        if not issubclass(type(progress), AbstractProgress):
+                raise RuntimeError("invalid progress object")
+        self.progress = progress
 
         self.ssp = None  # current profile
         self.ref = None  # reference profile
@@ -50,8 +60,6 @@ class SoundSpeedLibrary(object):
         self.listeners = Listeners(prj=self)
         self.server = Server(prj=self)
         self.logs = SqliteLogging(self._release_folder)  # (user and server) loggers
-        self.cb = CliCallbacks()  # default callbacks use command line inputs
-        self.progress = Progress(qprogress=qt_progress, qparent=qt_parent)
 
         self.logging()  # Set on/off logging for user and server based on loaded settings
 
@@ -423,14 +431,6 @@ class SoundSpeedLibrary(object):
 
         return self.listeners.sippican_to_process
 
-    # --- callbacks
-
-    def set_callbacks(self, cb):
-        """Set user-input callbacks"""
-        if not issubclass(type(cb), AbstractCallbacks):
-            raise RuntimeError("invalid callbacks object")
-        self.cb = cb
-
     # --- import data
 
     def import_data(self, data_path, data_format):
@@ -442,7 +442,7 @@ class SoundSpeedLibrary(object):
         logger.debug("%s > path: %s" % (data_format, data_path))
 
         # call the reader to process the data file
-        success = reader.read(data_path=data_path, settings=self.setup, callbacks=self.cb)
+        success = reader.read(data_path=data_path, settings=self.setup, callbacks=self.cb, progress=self.progress)
         if not success:
             raise RuntimeError("Error using %s reader for file: %s"
                                % (reader.desc, data_path))
@@ -537,7 +537,7 @@ class SoundSpeedLibrary(object):
             logger.warning("use SIS option is disabled")
             return
 
-        self.progress.start("Retrieve from SIS")
+        self.progress.start(text="Retrieve from SIS")
 
         self.listen_sis()
 

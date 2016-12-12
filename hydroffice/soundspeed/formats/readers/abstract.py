@@ -25,7 +25,7 @@ class AbstractReader(AbstractFormat):
         return "<%s:reader:%s:%s>" % (self.name, self.version, ",".join(self.ext))
 
     @abstractmethod
-    def read(self, data_path, settings, callbacks=CliCallbacks()):
+    def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
         """Common read function signature
 
         The settings is a container with all the library settings.

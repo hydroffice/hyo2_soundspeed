@@ -188,7 +188,7 @@ class Woa13(AbstractAtlas):
             logger.error("invalid query: %s @ (%.6f, %.6f)" % (datestamp.strftime("%Y%m%d"), lon, lat))
             return None
 
-        self.prj.progress.start("Retrieve WOA13 data", server_mode=server_mode)
+        self.prj.progress.start(text="Retrieve WOA13 data", is_disabled=server_mode)
 
         if not self.has_data_loaded:
             if not self.load_grids():

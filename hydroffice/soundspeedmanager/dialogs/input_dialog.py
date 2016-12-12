@@ -125,18 +125,17 @@ class InputDialog(AbstractDialog):
         settings.setValue("import_folder", os.path.dirname(selection))
         logger.debug('user selection: %s' % selection)
 
-        self.progress.forceShow()
-        self.progress.setValue(20)
+        self.progress.start()
         try:
             self.lib.import_data(data_path=selection, data_format=name)
 
         except RuntimeError as e:
-            self.progress.setValue(100)
+            self.progress.end()
             msg = "Issue in importing the data:\n\n> %s" % e
             QtGui.QMessageBox.critical(self, "Import error", msg, QtGui.QMessageBox.Ok)
             return
 
-        self.progress.setValue(100)
+        self.progress.end()
         self.accept()
 
     def on_load_db(self):

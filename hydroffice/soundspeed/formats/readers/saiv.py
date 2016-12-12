@@ -31,7 +31,7 @@ class Saiv(AbstractTextReader):
         self.tk_time = 'Time'
         self.tk_probe_type = 'From file:'
 
-    def read(self, data_path, settings, callbacks=CliCallbacks()):
+    def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings

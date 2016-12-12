@@ -22,7 +22,7 @@ class DigibarS(AbstractTextReader):
         self.desc = "Digibar S"
         self._ext.add('csv')
 
-    def read(self, data_path, settings, callbacks=CliCallbacks()):
+    def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings

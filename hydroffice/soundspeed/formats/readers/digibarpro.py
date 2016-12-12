@@ -25,7 +25,7 @@ class DigibarPro(AbstractTextReader):
         self.tk_cast_time = "DATE:"
         self.tk_field_header = "DEPTH (M)"
 
-    def read(self, data_path, settings, callbacks=CliCallbacks()):
+    def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings

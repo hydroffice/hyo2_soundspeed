@@ -10,17 +10,18 @@ from PySide import QtCore
 import logging
 logger = logging.getLogger(__name__)
 
-from . import __version__ as ssm_version
-from . import __doc__ as ssm_name
+from hydroffice.soundspeedmanager import __version__ as ssm_version
+from hydroffice.soundspeedmanager import __doc__ as ssm_name
 from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
-from .qtcallbacks import QtCallbacks
-from .widgets.editor import Editor
-from .widgets.database import Database
-from .widgets.seacat import Seacat
-from .widgets.server import Server
-from .widgets.refraction import Refraction
-from .widgets.settings import Settings
-from .widgets.info import Info
+from hydroffice.soundspeedmanager.qt_progress import QtProgress
+from hydroffice.soundspeedmanager.qt_callbacks import QtCallbacks
+from hydroffice.soundspeedmanager.widgets.editor import Editor
+from hydroffice.soundspeedmanager.widgets.database import Database
+from hydroffice.soundspeedmanager.widgets.seacat import Seacat
+from hydroffice.soundspeedmanager.widgets.server import Server
+from hydroffice.soundspeedmanager.widgets.refraction import Refraction
+from hydroffice.soundspeedmanager.widgets.settings import Settings
+from hydroffice.soundspeedmanager.widgets.info import Info
 
 
 class MainWin(QtGui.QMainWindow):
@@ -79,8 +80,7 @@ class MainWin(QtGui.QMainWindow):
                     SoundSpeedLibrary.copy_setup(input_setup=sel)
 
         # create the project
-        self.lib = SoundSpeedLibrary(qt_progress=QtGui.QProgressDialog, qt_parent=self)
-        self.lib.set_callbacks(QtCallbacks(parent=self))  # set the PySide callbacks
+        self.lib = SoundSpeedLibrary(callbacks=QtCallbacks(parent=self), progress=QtProgress(parent=self))
         self.check_woa09()
         self.check_woa13()
         # self.check_rtofs()  # no need to wait for the download at the beginning

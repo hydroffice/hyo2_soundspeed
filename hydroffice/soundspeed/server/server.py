@@ -31,7 +31,7 @@ class Server(Thread):
     def check_settings(self):
         """Check the server settings"""
 
-        self.prj.progress.start('Check settings')
+        self.prj.progress.start(text='Check settings')
 
         # server sources
         if self.prj.setup.server_source == 'RTOFS':  # RTOFS case

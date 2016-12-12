@@ -21,7 +21,7 @@ class Unb(AbstractTextReader):
 
         self.version = None  # Only version 2 and higher holds T/S and flags
 
-    def read(self, data_path, settings, callbacks=CliCallbacks()):
+    def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings

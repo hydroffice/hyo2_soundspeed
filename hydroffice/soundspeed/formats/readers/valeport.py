@@ -43,7 +43,7 @@ class Valeport(AbstractTextReader):
         # flag used to remember if the pressure in in meter (we check that: 'Pressure units: m'), thus depth
         self.minisvp_has_depth = False
 
-    def read(self, data_path, settings, callbacks=CliCallbacks()):
+    def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings

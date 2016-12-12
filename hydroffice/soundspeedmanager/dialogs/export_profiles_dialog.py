@@ -80,8 +80,7 @@ class ExportProfilesDialog(AbstractDialog):
             return
 
         # actually do the export
-        self.progress.forceShow()
-        self.progress.setValue(20)
+        self.progress.start()
         success = True
 
         try:
@@ -94,7 +93,7 @@ class ExportProfilesDialog(AbstractDialog):
 
         except RuntimeError as e:
 
-            self.progress.setValue(100)
+            self.progress.end()
             msg = "Issue in exporting the metadata.\nReason: %s" % e
             QtGui.QMessageBox.critical(self, "Export error", msg, QtGui.QMessageBox.Ok)
             return
@@ -102,5 +101,5 @@ class ExportProfilesDialog(AbstractDialog):
         if success:
             self.lib.open_outputs_folder()
 
-        self.progress.setValue(100)
+        self.progress.end()
         self.accept()

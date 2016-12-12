@@ -183,7 +183,7 @@ class Woa09(AbstractAtlas):
         if lon < 0:  # Make all longitudes positive
             lon += 360.0
 
-        self.prj.progress.start("Retrieve WOA09 data", server_mode=server_mode)
+        self.prj.progress.start(text="Retrieve WOA09 data", is_disabled=server_mode)
 
         if not self.has_data_loaded:
             if not self.load_grids():

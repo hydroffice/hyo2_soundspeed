@@ -14,7 +14,7 @@ ch.setFormatter(ch_formatter)
 logger.addHandler(ch)
 
 from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
-from hydroffice.soundspeedmanager.qtcallbacks import QtCallbacks
+from hydroffice.soundspeedmanager.qt_callbacks import QtCallbacks
 
 
 def main():

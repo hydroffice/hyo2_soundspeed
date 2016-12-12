@@ -113,7 +113,7 @@ class Rtofs(AbstractAtlas):
         if lon < self._lon_0:  # Make all longitudes safe
             lon += 360.0
 
-        self.prj.progress.start("Retrieve RTOFS data", server_mode=server_mode)
+        self.prj.progress.start(text="Retrieve RTOFS data", is_disabled=server_mode)
 
         longitudes = np.zeros((self._search_window, self._search_window))
         if (lon_e_idx < self._lon.size) and (lon_w_idx >= 0):
@@ -363,7 +363,7 @@ class Rtofs(AbstractAtlas):
                 logger.info("cleaning data: %s %s" % (self._last_loaded_day, datestamp))
                 self.clear_data()
 
-        self.prj.progress.start("Download RTOFS", server_mode=server_mode)
+        self.prj.progress.start(text="Download RTOFS", is_disabled=server_mode)
 
         # check if the data are available on the RTOFS server
         url_ck_temp, url_ck_sal = self._build_check_urls(datestamp)

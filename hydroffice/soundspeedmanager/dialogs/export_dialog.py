@@ -123,13 +123,12 @@ class ExportDialog(AbstractDialog):
                 break
 
         # actually do the export
-        self.progress.forceShow()
-        self.progress.setValue(20)
+        self.progress.start()
         try:
             self.lib.export_data(data_path=output_folder, data_files=basenames,
                                  data_formats=self.name_outputs)
         except RuntimeError as e:
-            self.progress.setValue(100)
+            self.progress.end()
             msg = "Issue in exporting the data.\nReason: %s" % e
             QtGui.QMessageBox.critical(self, "Export error", msg, QtGui.QMessageBox.Ok)
             return
@@ -139,10 +138,10 @@ class ExportDialog(AbstractDialog):
         export_open_folder = self.openFolder.isChecked()
         if export_open_folder:
             explore_folder(output_folder)  # open the output folder
-            self.progress.setValue(100)
+            self.progress.end()
 
         else:
-            self.progress.setValue(100)
+            self.progress.end()
             msg = "Profile successfully exported!"
             QtGui.QMessageBox.information(self, "Export profile", msg, QtGui.QMessageBox.Ok)
 

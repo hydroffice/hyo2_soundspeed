@@ -24,7 +24,7 @@ class Iss(AbstractTextReader):
         self.is_v = False
         self.is_d = False
 
-    def read(self, data_path, settings, callbacks=CliCallbacks()):
+    def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings

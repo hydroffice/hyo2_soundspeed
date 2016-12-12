@@ -25,7 +25,7 @@ class Turo(AbstractBinaryReader):
         self.desc = "Turo"
         self._ext.add('nc')
 
-    def read(self, data_path, settings, callbacks=CliCallbacks()):
+    def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings

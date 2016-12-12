@@ -30,7 +30,7 @@ class Editor(AbstractWidget):
         self.input_bar.setIconSize(QtCore.QSize(42, 42))
         # import
         self.input_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'input.png')),
-                                        'Input data', self)
+                                       'Input data', self)
         self.input_act.setShortcut('Alt+I')
         # noinspection PyUnresolvedReferences
         self.input_act.triggered.connect(self.on_input_data)

@@ -9,6 +9,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
+from hydroffice.soundspeedmanager.qt_progress import QtProgress
 
 
 class AbstractWidget(QtGui.QMainWindow):
@@ -34,10 +35,7 @@ class AbstractWidget(QtGui.QMainWindow):
         self.setCentralWidget(self.frame)
 
         # progress dialog
-        self.progress = QtGui.QProgressDialog(self)
-        self.progress.setWindowTitle("Processing")
-        self.progress.setCancelButtonText("Abort")
-        self.progress.setWindowModality(QtCore.Qt.WindowModal)
+        self.progress = QtProgress(parent=self)
 
     def data_cleared(self):
         pass

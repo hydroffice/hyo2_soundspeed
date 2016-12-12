@@ -29,7 +29,7 @@ class Elac(AbstractTextReader):
         self.tk_temp = 'temp.'
         self.tk_speed = 'veloc.'
 
-    def read(self, data_path, settings, callbacks=CliCallbacks()):
+    def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings

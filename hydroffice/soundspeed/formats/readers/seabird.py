@@ -35,7 +35,7 @@ class Seabird(AbstractTextReader):
         self.tk_temp = ''  # will be assigned during the header parsing
         self.tk_sal = 'sal00'
 
-    def read(self, data_path, settings, callbacks=CliCallbacks()):
+    def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings

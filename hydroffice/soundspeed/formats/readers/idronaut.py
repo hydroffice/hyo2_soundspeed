@@ -37,7 +37,7 @@ class Idronaut(AbstractTextReader):
         self.tk_temp = 'Temperature'
         self.tk_speed = 'Sound Velocity (calc)'
 
-    def read(self, data_path, settings, callbacks=CliCallbacks()):
+    def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings

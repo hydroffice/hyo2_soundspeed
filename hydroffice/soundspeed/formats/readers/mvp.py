@@ -28,7 +28,7 @@ class Mvp(AbstractReader):  # TODO: ATYPICAL READER!!!
         "S12": 2
     }
 
-    def __init__(self, header, data_blocks, footer, protocol, fmt):
+    def __init__(self, header, data_blocks, footer, protocol, fmt, progress=None):
         super(Mvp, self).__init__()
 
         self.init_data()  # create a new empty profile list
