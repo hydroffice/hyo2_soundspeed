@@ -8,12 +8,12 @@ import logging
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
-__version__ = '3.0.a4'
+__version__ = '2017.0.rc1'
 __doc__ = "Sound Speed Settings"
 __author__ = 'gmasetti@ccom.unh.edu; barry.gallagher@noaa.gov; brc@ccom.unh.edu; chen.zang@noaa.gov; ' \
              'matthew.wilson@noaa.gov; jack.riley@noaa.gov'
-__license__ = 'LGPLv3 license'
-__copyright__ = 'Copyright 2016 University of New Hampshire, Center for Coastal and Ocean Mapping'
+__license__ = 'LGPLv2.1 or CCOM-UNH Industrial Associate license'
+__copyright__ = 'Copyright 2017 University of New Hampshire, Center for Coastal and Ocean Mapping'
 
 
 # def hyo():
