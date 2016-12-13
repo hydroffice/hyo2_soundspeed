@@ -9,11 +9,14 @@ from PySide import QtWebKit
 
 logger = logging.getLogger(__name__)
 
+from hydroffice.soundspeed.base.helper import explore_folder
+
 
 class Info(QtGui.QMainWindow):
 
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
+    pdf = os.path.join(here, os.pardir, 'pdf')
 
     def __init__(self, default_url="http://www.hydroffice.org"):
         QtGui.QMainWindow.__init__(self)
@@ -24,21 +27,32 @@ class Info(QtGui.QMainWindow):
         # default
         home_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'home.png')), 'Home page', self)
         home_action.setShortcut('Alt+H')
+        # noinspection PyUnresolvedReferences
         home_action.triggered.connect(self.load_default)
         self.toolbar.addAction(home_action)
         # docs
-        docs_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'docs.png')), 'Documentation', self)
-        docs_action.setShortcut('Alt+D')
-        docs_action.triggered.connect(self.load_docs)
-        self.toolbar.addAction(docs_action)
+        online_docs_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'online_docs.png')),
+                                           'Online Documentation', self)
+        online_docs_action.setShortcut('Alt+D')
+        # noinspection PyUnresolvedReferences
+        online_docs_action.triggered.connect(self.load_online_docs)
+        self.toolbar.addAction(online_docs_action)
+        offline_docs_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'offline_docs.png')),
+                                            'Offline Documentation', self)
+        offline_docs_action.setShortcut('Alt+O')
+        # noinspection PyUnresolvedReferences
+        offline_docs_action.triggered.connect(self.load_offline_docs)
+        self.toolbar.addAction(offline_docs_action)
         # license
         license_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'license.png')), 'License', self)
         license_action.setShortcut('Alt+L')
+        # noinspection PyUnresolvedReferences
         license_action.triggered.connect(self.load_license)
         self.toolbar.addAction(license_action)
         # authors
         authors_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'authors.png')), 'Authors', self)
         authors_action.setShortcut('Alt+A')
+        # noinspection PyUnresolvedReferences
         authors_action.triggered.connect(self.show_authors)
         self.toolbar.addAction(authors_action)
 
@@ -47,21 +61,25 @@ class Info(QtGui.QMainWindow):
         # HydrOffice.org
         hyo_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'hyo.png')), 'HydrOffice.org', self)
         hyo_action.setShortcut('Ctrl+H')
+        # noinspection PyUnresolvedReferences
         hyo_action.triggered.connect(self.load_hydroffice_org)
         self.toolbar.addAction(hyo_action)
         # noaa
         noaa_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'noaa.png')), 'nauticalcharts.noaa.gov', self)
         noaa_action.setShortcut('Alt+N')
+        # noinspection PyUnresolvedReferences
         noaa_action.triggered.connect(self.load_noaa_ocs_gov)
         self.toolbar.addAction(noaa_action)
         # ccom.unh.edu
         ccom_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'ccom.png')), 'ccom.unh.edu', self)
         ccom_action.setShortcut('Alt+C')
+        # noinspection PyUnresolvedReferences
         ccom_action.triggered.connect(self.load_ccom_unh_edu)
         self.toolbar.addAction(ccom_action)
         # unh.edu
         unh_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'unh.png')), 'unh.edu', self)
         unh_action.setShortcut('Alt+U')
+        # noinspection PyUnresolvedReferences
         unh_action.triggered.connect(self.load_unh_edu)
         self.toolbar.addAction(unh_action)
 
@@ -122,10 +140,18 @@ class Info(QtGui.QMainWindow):
         self.url_input.setText(self.default_url)
         self.web.load(QtCore.QUrl(self.default_url))
 
-    def load_docs(self):
+    def load_online_docs(self):
         url = 'https://www.hydroffice.org/manuals/soundspeed/index.html'
         self.url_input.setText(url)
         self.web.load(QtCore.QUrl(url))
+
+    def load_offline_docs(self):
+        pdf_path = os.path.join(self.pdf, "SoundSpeedManager.pdf")
+        if not os.path.exists(pdf_path):
+            logger.warning("unable to find offline manual at %s" % pdf_path)
+            return
+        
+        explore_folder(pdf_path)
 
     def load_license(self):
         url = 'https://www.hydroffice.org/license_lgpl21/'

@@ -136,7 +136,7 @@ class MainWin(QtGui.QMainWindow):
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'settings.png')), "")
         self.tabs.setTabToolTip(idx, "Setup")
         # info
-        self.tab_info = Info(default_url='https://www.hydroffice.org/soundspeed/3_0_0')
+        self.tab_info = Info(default_url='https://www.hydroffice.org/soundspeed/2017_0_0')
         idx = self.tabs.insertTab(6, self.tab_info,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'info.png')), "")
         self.tabs.setTabToolTip(idx, "Info")
