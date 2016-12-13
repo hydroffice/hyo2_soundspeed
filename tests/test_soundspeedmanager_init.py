@@ -44,7 +44,8 @@ class TestSoundSpeedManagerInit(unittest.TestCase):
     def test_has_current_year_in_copyright(self):
         from hydroffice.soundspeedmanager import __copyright__
         from datetime import datetime
-        self.assertTrue(("%s" % datetime.now().year) in __copyright__)
+        self.assertTrue((("%s" % datetime.now().year) in __copyright__) or
+                        (("%s" % (datetime.now().year + 1)) in __copyright__))
 
 
 def suite():
