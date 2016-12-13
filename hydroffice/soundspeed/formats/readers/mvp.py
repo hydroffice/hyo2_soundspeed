@@ -8,10 +8,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-from .abstract import AbstractReader
-from ...profile.dicts import Dicts
-from ...base.callbacks import CliCallbacks
-from ...profile.profilelist import ProfileList
+from hydroffice.soundspeed.formats.readers.abstract import AbstractReader
+from hydroffice.soundspeed.profile.dicts import Dicts
+from hydroffice.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
+from hydroffice.soundspeed.profile.profilelist import ProfileList
 
 
 class Mvp(AbstractReader):  # TODO: ATYPICAL READER!!!
@@ -58,7 +58,7 @@ class Mvp(AbstractReader):  # TODO: ATYPICAL READER!!!
         self.ssp.cur.clone_data_to_proc()
         self.ssp.cur.init_sis()
 
-    def read(self, data_path, settings, callbacks=CliCallbacks()):  # UNUSED
+    def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):  # UNUSED
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings

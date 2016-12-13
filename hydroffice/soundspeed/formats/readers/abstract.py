@@ -1,15 +1,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from abc import ABCMeta, abstractmethod, abstractproperty
-import os
+from abc import ABCMeta, abstractmethod
 import logging
 
 logger = logging.getLogger(__name__)
 
-from ...base.helper import FileManager
-from ...profile.dicts import Dicts
-from ..abstract import AbstractFormat
-from ...base.callbacks import CliCallbacks
+from hydroffice.soundspeed.base.helper import FileManager
+from hydroffice.soundspeed.formats.abstract import AbstractFormat
+from hydroffice.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 
 
 class AbstractReader(AbstractFormat):

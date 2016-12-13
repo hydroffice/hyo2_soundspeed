@@ -61,7 +61,7 @@ class TestSoundSpeedTestCliProgress(unittest.TestCase):
             self.progress.add(50)
         except Exception as e:
             self.fail(e)
-    
+
     def test_start_minimal_add_raising(self):
         with self.assertRaises(Exception) as context:
             self.progress.start()

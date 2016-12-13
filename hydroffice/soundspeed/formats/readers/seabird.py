@@ -5,10 +5,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
-from .abstract import AbstractTextReader
-from ...profile.dicts import Dicts
-from ...base.callbacks import CliCallbacks
+from hydroffice.soundspeed.formats.readers.abstract import AbstractTextReader
+from hydroffice.soundspeed.profile.dicts import Dicts
+from hydroffice.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 
 
 class Seabird(AbstractTextReader):
@@ -127,7 +126,7 @@ class Seabird(AbstractTextReader):
                     deg = float(line.split()[-3])
                     min_deg = float(line.split()[-2])
                     hemisphere = line.split()[-1]
-                    latitude = deg + min_deg/60.0
+                    latitude = deg + min_deg / 60.0
                     if hemisphere == "S":
                         latitude *= -1
                 except ValueError:
@@ -138,7 +137,7 @@ class Seabird(AbstractTextReader):
                     deg = float(line.split()[-3])
                     min_deg = float(line.split()[-2])
                     hemisphere = line.split()[-1]
-                    longitude = deg + min_deg/60.0
+                    longitude = deg + min_deg / 60.0
                     if hemisphere == "W":
                         longitude *= -1
                 except ValueError:

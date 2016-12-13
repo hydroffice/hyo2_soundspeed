@@ -5,10 +5,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
-from .abstract import AbstractTextReader
-from ...profile.dicts import Dicts
-from ...base.callbacks import CliCallbacks
+from hydroffice.soundspeed.formats.readers.abstract import AbstractTextReader
+from hydroffice.soundspeed.profile.dicts import Dicts
+from hydroffice.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 
 
 class Unb(AbstractTextReader):
@@ -60,7 +59,7 @@ class Unb(AbstractTextReader):
             jday = int(self.lines[1].split()[1])
             time = self.lines[1].split()[2]
             hour, minute, second = [int(i) for i in time.split(':')]
-            self.ssp.cur.meta.utc_time = dt.datetime(year, 1, 1, hour, minute, second) + dt.timedelta(days=jday-1)
+            self.ssp.cur.meta.utc_time = dt.datetime(year, 1, 1, hour, minute, second) + dt.timedelta(days=jday - 1)
         except ValueError:
             logger.warning("unable to parse the time from line #%s" % self.samples_offset)
 

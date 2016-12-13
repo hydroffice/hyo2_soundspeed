@@ -7,11 +7,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
-from .abstract import AbstractBinaryReader
-from ...profile.dicts import Dicts
-from ...base.helper import FileInfo
-from ...base.callbacks import CliCallbacks
+from hydroffice.soundspeed.formats.readers.abstract import AbstractBinaryReader
+from hydroffice.soundspeed.base.helper import FileInfo
+from hydroffice.soundspeed.profile.dicts import Dicts
+from hydroffice.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 
 
 class Turo(AbstractBinaryReader):

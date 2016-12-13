@@ -5,10 +5,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
-from .abstract import AbstractTextReader
-from ...profile.dicts import Dicts
-from ...base.callbacks import CliCallbacks
+from hydroffice.soundspeed.formats.readers.abstract import AbstractTextReader
+from hydroffice.soundspeed.profile.dicts import Dicts
+from hydroffice.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 
 
 class Valeport(AbstractTextReader):
@@ -256,4 +255,3 @@ class Valeport(AbstractTextReader):
             count += 1
 
         self.ssp.cur.data_resize(count)
-

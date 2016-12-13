@@ -1,168 +1,19 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from abc import ABCMeta, abstractmethod, abstractproperty
 from datetime import datetime, timedelta
 import os
-import random
 import logging
 
 logger = logging.getLogger(__name__)
 
-
-class GeneralAbstractCallbacks(object):
-    """Abstract class with several callbacks that has to be implemented for a new backend"""
-
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def ask_number(self, title="", msg="Enter number", default=0.0,
-                   minval=-2147483647.0, maxval=2147483647.0, decimals=7):
-        """Ask user for number"""
-        logger.warning("to be implemented")
-
-    @abstractmethod
-    def ask_text(self, title="", msg="Enter text"):
-        """Ask user for text"""
-        logger.warning("to be implemented")
-
-    @abstractmethod
-    def ask_date(self):
-        """Ask user for date"""
-        logger.warning("to be implemented")
-
-    def ask_location(self):
-        """Ask user for location (based on ask_number)"""
-
-        # latitude
-        lat = self.ask_number(title="Location", msg="Enter latitude as dd.ddd:", default=37.540,
-                              minval=-90.0, maxval=90.0, decimals=7)
-
-        if lat is not None:  # don't check for lon if lat already failed
-            # longitude
-            lon = self.ask_number(title="Location", msg="Enter longitude as dd.ddd:", default=-42.910,
-                                  minval=-180.0, maxval=180.0, decimals=7)
-        else:
-            lon = None
-
-        if (lat is None) or (lon is None):  # return None if one of the two is invalid
-            return None, None
-
-        return lat, lon
-
-    @abstractmethod
-    def ask_filename(self, saving=True, keyname=None, default_path=".",
-                     title="Choose a path/filename", default_file="",
-                     ffilter="All Files|*.*", multifile=False):
-        """Ask user for filename(s) and remembers last location used if applicable.
-        To store last location keyname must be a string and be a gui callback (not command line)."""
-        logger.warning("to be implemented")
-
-    @abstractmethod
-    def ask_directory(self, keyname=None, default_path=".",
-                      title="Browse for folder", message=""):
-        """Ask user for a directory path and remembers last location used if applicable
-        To store last location keyname must be a string and be a gui callback (not command line)."""
-        logger.warning("to be implemented")
-
-
-class AbstractCallbacks(GeneralAbstractCallbacks):
-    """Abstract class with several callbacks that has to be implemented for a new backend
-    Specifies that the general callback exist as well as soundspeed specific ones."""
-
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def ask_location_from_sis(self):
-        """Ask user for location"""
-        logger.warning("to be implemented")
-
-    @abstractmethod
-    def ask_tss(self):
-        """Ask user for transducer sound speed"""
-        logger.warning("to be implemented")
-
-    @abstractmethod
-    def ask_draft(self):
-        """Ask user for draft"""
-        logger.warning("to be implemented")
-
-    @abstractmethod
-    def msg_tx_no_verification(self, name, protocol):
-        """Profile transmitted but not verification available"""
-        logger.warning("to be implemented")
-
-    @abstractmethod
-    def msg_tx_sis_wait(self, name):
-        """Profile transmitted, SIS is waiting for confirmation"""
-        logger.warning("to be implemented")
-
-    @abstractmethod
-    def msg_tx_sis_confirmed(self, name):
-        """Profile transmitted, SIS confirmed"""
-        logger.warning("to be implemented")
-
-    @abstractmethod
-    def msg_tx_sis_not_confirmed(self, name, ip):
-        """Profile transmitted, SIS not confirmed"""
-        logger.warning("to be implemented")
-
-
-class TestCallbacks(AbstractCallbacks):
-    """Used only for testing since the methods do not require user interaction"""
-
-    def ask_number(self, title="", msg="Enter number", default=0.0,
-                   minval=-2147483647.0, maxval=2147483647.0, decimals=7):
-        return random.random() * 100.0
-
-    def ask_text(self, title="", msg="Enter text"):
-        return "Hello world"
-
-    def ask_date(self):
-        return datetime.utcnow()
-
-    def ask_location(self):
-        return 43.13555 + random.random(), -70.9395 + random.random()
-
-    def ask_filename(self, saving=True, keyname=None, default_path=".",
-                     title="Choose a path/filename", default_file="",
-                     ffilter="All Files|*.*", multifile=False):
-        return os.path.normpath("c:/test/fakename.txt")
-
-    def ask_directory(self, keyname=None, default_path=".",
-                      title="Browse for folder", message=""):
-        return os.path.normpath("c:/test/")
-
-    def ask_location_from_sis(self):
-        return True
-
-    def ask_tss(self):
-        return 1500.0
-
-    def ask_draft(self):
-        return 8.0
-
-    def msg_tx_no_verification(self, name, protocol):
-        """Profile transmitted but not verification available"""
-        pass
-
-    def msg_tx_sis_wait(self, name):
-        """Profile transmitted, SIS is waiting for confirmation"""
-        pass
-
-    def msg_tx_sis_confirmed(self, name):
-        """Profile transmitted, SIS confirmed"""
-        pass
-
-    def msg_tx_sis_not_confirmed(self, name, ip):
-        """Profile transmitted, SIS not confirmed"""
-        pass
+from hydroffice.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
 
 
 class CliCallbacks(AbstractCallbacks):
     """CLI-based callbacks"""
 
-    def ask_number(self, title="", msg="Enter number", default=0,
-                   minval=-2147483647, maxval=2147483647, decimals=7):
+    def ask_number(self, title="", msg="Enter number", default=0.0,
+                   min_val=-2147483647.0, max_val=2147483647.0, decimals=7):
         val = None
         while val is None:
             raw = raw_input(msg)
@@ -175,8 +26,8 @@ class CliCallbacks(AbstractCallbacks):
                 logger.info("invalid input: %s\n" % e)
                 continue
 
-            if (testval > maxval) or (testval < minval):
-                logger.info("invalid value, use range [%f/%f]: %s" % (minval, maxval, raw))
+            if (testval > max_val) or (testval < min_val):
+                logger.info("invalid value, use range [%f/%f]: %s" % (min_val, max_val, raw))
                 continue
             else:
                 val = testval
@@ -270,9 +121,9 @@ class CliCallbacks(AbstractCallbacks):
 
         return lat, lon
 
-    def ask_filename(self, saving=True, keyname=None, default_path=".",
+    def ask_filename(self, saving=True, key_name=None, default_path=".",
                      title="Choose a path/filename", default_file="",
-                     ffilter="All Files|*.*", multifile=False):
+                     file_filter="All Files|*.*", multi_file=False):
         raw = " "
         if not saving:
             filemsg = "Enter existing filename:"
@@ -282,7 +133,7 @@ class CliCallbacks(AbstractCallbacks):
             raw = raw_input(filemsg)
         return os.path.normpath(raw)
 
-    def ask_directory(self, keyname=None, default_path=".",
+    def ask_directory(self, key_name=None, default_path=".",
                       title="Browse for folder", message=""):
         return os.path.normpath("c:/test/")
 

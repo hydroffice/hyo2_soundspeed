@@ -6,9 +6,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-from .abstract import AbstractTextReader
-from ...profile.dicts import Dicts
-from ...base.callbacks import CliCallbacks
+from hydroffice.soundspeed.formats.readers.abstract import AbstractTextReader
+from hydroffice.soundspeed.profile.dicts import Dicts
+from hydroffice.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 
 
 class Castaway(AbstractTextReader):
@@ -36,7 +36,7 @@ class Castaway(AbstractTextReader):
         self.tk_pressure = 'Pressure'
         self.tk_conductivity = 'Conductivity'
 
-    def read(self, data_path, settings, callbacks=CliCallbacks()):
+    def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings

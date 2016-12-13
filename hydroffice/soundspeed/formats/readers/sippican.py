@@ -5,10 +5,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
-from .abstract import AbstractTextReader
-from ...profile.dicts import Dicts
-from ...base.callbacks import CliCallbacks
+from hydroffice.soundspeed.formats.readers.abstract import AbstractTextReader
+from hydroffice.soundspeed.profile.dicts import Dicts
+from hydroffice.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 
 
 class Sippican(AbstractTextReader):
@@ -141,14 +140,14 @@ class Sippican(AbstractTextReader):
                 try:
                     self.input_salinity = float(sal_str)
                 except ValueError:
-                        logger.warning("issue in casting the salinity at line #%s" % self.samples_offset)
+                    logger.warning("issue in casting the salinity at line #%s" % self.samples_offset)
 
             elif line[:len(self.tk_salinity_alpha)] == self.tk_salinity_alpha:
                 sal_str = line.split()[-2]
                 try:
                     self.input_salinity = float(sal_str)
                 except ValueError:
-                        logger.warning("issue in casting the salinity (alpha) at line #%s" % self.samples_offset)
+                    logger.warning("issue in casting the salinity (alpha) at line #%s" % self.samples_offset)
 
             elif line[:len(self.tk_probe)] == self.tk_probe:
                 try:

@@ -12,7 +12,8 @@ from hydroffice.soundspeed import __doc__ as soundspeed_name
 from hydroffice.soundspeed import formats
 from hydroffice.soundspeed.appdirs.appdirs import user_data_dir
 from hydroffice.soundspeed.atlas.atlases import Atlases
-from hydroffice.soundspeed.base.callbacks import CliCallbacks, AbstractCallbacks
+from hydroffice.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
+from hydroffice.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 from hydroffice.soundspeed.base.gdal_aux import GdalAux
 from hydroffice.soundspeed.base.helper import explore_folder
 from hydroffice.soundspeed.base.progress.abstract_progress import AbstractProgress

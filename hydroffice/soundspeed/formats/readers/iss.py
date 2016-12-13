@@ -5,10 +5,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
-from .abstract import AbstractTextReader
-from ...profile.dicts import Dicts
-from ...base.callbacks import CliCallbacks
+from hydroffice.soundspeed.formats.readers.abstract import AbstractTextReader
+from hydroffice.soundspeed.profile.dicts import Dicts
+from hydroffice.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 
 
 class Iss(AbstractTextReader):
@@ -235,14 +234,14 @@ class Iss(AbstractTextReader):
                             logger.info("date: %s" % self.ssp.cur.meta.utc_time)
 
                             # latitude
-                            latitude = float(hdr_tokens[2]) + float(hdr_tokens[3])/60.0
+                            latitude = float(hdr_tokens[2]) + float(hdr_tokens[3]) / 60.0
                             if hdr_tokens[4] == 'S':
                                 self.ssp.cur.meta.latitude = -latitude
                             else:
                                 self.ssp.cur.meta.latitude = latitude
 
                             # longitude
-                            longitude = float(hdr_tokens[5]) + float(hdr_tokens[6])/60.0
+                            longitude = float(hdr_tokens[5]) + float(hdr_tokens[6]) / 60.0
                             if hdr_tokens[7] == 'W':
                                 self.ssp.cur.meta.longitude = -longitude
                             else:

@@ -12,7 +12,7 @@ ch_formatter = logging.Formatter('%(levelname)-9s %(name)s.%(funcName)s:%(lineno
 ch.setFormatter(ch_formatter)
 logger.addHandler(ch)
 
-from hydroffice.soundspeed.base.callbacks import TestCallbacks
+from hydroffice.soundspeed.base.callbacks.test_callbacks import TestCallbacks
 
 
 class TestSoundSpeedTestCallbacks(unittest.TestCase):
@@ -46,14 +46,20 @@ class TestSoundSpeedTestCallbacks(unittest.TestCase):
         self.assertGreater(loc[0], 40.)
         self.assertGreater(loc[1], -80.)
 
+    def test_ask_filename(self):
+        self.assertTrue(os.path.exists(self.cb.ask_filename()))
+
+    def test_ask_directory(self):
+        self.assertTrue(os.path.exists(self.cb.ask_directory()))
+
     def test_ask_location_from_sis(self):
         self.assertTrue(self.cb.ask_location_from_sis())
 
     def test_ask_tss(self):
-        self.assertEqual(self.cb.ask_tss(), 1500.)
+        self.assertTrue(type(self.cb.ask_tss()) is float)
 
     def test_ask_draft(self):
-        self.assertEqual(self.cb.ask_draft(), 8.)
+        self.assertTrue(type(self.cb.ask_draft()) is float)
 
     def test_msg_tx_no_verification(self):
         try:
