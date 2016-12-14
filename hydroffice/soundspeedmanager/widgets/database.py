@@ -139,10 +139,18 @@ class Database(AbstractWidget):
 
         menu = QtGui.QMenu(parent=self)
 
-        # load (only single selection)
+        # single selection
         if len(rows) == 1:
+
             load_act = QtGui.QAction("Load", self, statusTip="Load a profile", triggered=self.load_profile)
             menu.addAction(load_act)
+
+            export_act = QtGui.QAction("Export", self, statusTip="Export a single profile",
+                                       triggered=self.export_single_profile)
+            menu.addAction(export_act)
+
+        else:  # multiple selection
+            pass
 
         delete_act = QtGui.QAction("Delete", self, statusTip="Delete a profile", triggered=self.delete_profile)
         menu.addAction(delete_act)
@@ -170,6 +178,34 @@ class Database(AbstractWidget):
         if self.lib.has_ssp():
             self.main_win.data_imported()
             self.main_win.tabs.setCurrentIndex(0)
+
+    def export_single_profile(self):
+        logger.debug("user want to export a single profile")
+
+        # TODO
+
+        # loaded_pk = None
+        # if self.lib.has_ssp():
+        #     self.lib.ssp.
+
+        # # check if any selection
+        # rows = self.ssp_list.selectionModel().selectedRows()
+        # if len(rows) != 1:
+        #     # noinspection PyCallByClass
+        #     QtGui.QMessageBox.information(self, "Database", "You need to select a single profile before loading it!")
+        #     return
+        #
+        # # the primary key is the first column (= 0)
+        # pk = int(self.ssp_list.item(rows[0].row(), 0).text())
+        # success = self.lib.load_profile(pk)
+        # if not success:
+        #     # noinspection PyCallByClass
+        #     QtGui.QMessageBox.warning(self, "Database", "Unable to load profile!", QtGui.QMessageBox.Ok)
+        #     return
+        #
+        # if self.lib.has_ssp():
+        #     self.main_win.data_imported()
+        #     self.main_win.tabs.setCurrentIndex(0)
 
     def delete_profile(self):
         logger.debug("user want to delete a profile")

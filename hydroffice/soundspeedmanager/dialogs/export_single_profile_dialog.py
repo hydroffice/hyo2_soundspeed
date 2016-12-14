@@ -11,15 +11,18 @@ from hydroffice.soundspeed.base.helper import explore_folder
 from hydroffice.soundspeed.profile.dicts import Dicts
 
 
-class ExportDialog(AbstractDialog):
+class ExportSingleProfileDialog(AbstractDialog):
 
     def __init__(self, main_win, lib, parent=None):
         AbstractDialog.__init__(self, main_win=main_win, lib=lib, parent=parent)
 
-        self.name_outputs = list()
+        # the list of selected writers passed to the library
+        self.selected_writers = list()
 
-        self.setWindowTitle("Export data")
+        self.setWindowTitle("Export single profile")
         self.setMinimumWidth(160)
+
+        settings = QtCore.QSettings()
 
         # outline ui
         self.mainLayout = QtGui.QVBoxLayout()
@@ -39,22 +42,42 @@ class ExportDialog(AbstractDialog):
         self.buttonBox = QtGui.QDialogButtonBox(QtCore.Qt.Vertical)
         hbox.addWidget(self.buttonBox)
         hbox.addStretch()
-        # add buttons
-        for idx, _ in enumerate(self.lib.name_writers):
+        # add buttons (retrieving name, description and extension from the library)
+        for idx, name in enumerate(self.lib.name_writers):
+
             if len(self.lib.ext_writers[idx]) == 0:
                 continue
+
             btn = QtGui.QPushButton("%s" % self.lib.desc_writers[idx])
             btn.setCheckable(True)
-            self.buttonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
             btn.setToolTip("Select %s format [*.%s]" % (self.lib.desc_writers[idx],
                                                         ", *.".join(self.lib.ext_writers[idx])))
+
+            btn_settings = settings.value("export_single_%s" % name)
+            if btn_settings is None:
+                settings.setValue("export_single_%s" % name, False)
+            btn.setChecked(settings.value("export_single_%s" % name) == 'true')
+
+            self.buttonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
+
         # noinspection PyUnresolvedReferences
-        self.buttonBox.clicked.connect(self.on_select_btn)
+        self.buttonBox.clicked.connect(self.on_select_writer_btn)
 
         self.mainLayout.addSpacing(16)
 
+        # option for selecting the output folder
+        select_output_folder = settings.value("select_output_folder")
+        if select_output_folder is None:
+            settings.setValue("select_output_folder", False)
+        hbox = QtGui.QHBoxLayout()
+        self.mainLayout.addLayout(hbox)
+        hbox.addStretch()
+        self.selectFolder = QtGui.QCheckBox('Select output folder', self)
+        self.selectFolder.setChecked(settings.value("select_output_folder") == 'true')
+        hbox.addWidget(self.selectFolder)
+        hbox.addStretch()
+
         # option for opening the output folder
-        settings = QtCore.QSettings()
         export_open_folder = settings.value("export_open_folder")
         if export_open_folder is None:
             settings.setValue("export_open_folder", True)
@@ -70,63 +93,87 @@ class ExportDialog(AbstractDialog):
         hbox = QtGui.QHBoxLayout()
         self.mainLayout.addLayout(hbox)
         hbox.addStretch()
-        btn = QtGui.QPushButton("Export data")
+        btn = QtGui.QPushButton("Export profile")
         btn.setMinimumHeight(36)
         hbox.addWidget(btn)
         # noinspection PyUnresolvedReferences
-        btn.clicked.connect(self.on_export_btn)
+        btn.clicked.connect(self.on_export_profile_btn)
         hbox.addStretch()
 
-    def on_select_btn(self, btn):
+    def on_select_writer_btn(self, btn):
+        """Update the list of writers to pass to the library"""
         logger.debug("%s -> %s" % (btn.text(), btn.isChecked()))
         idx = self.lib.desc_writers.index(btn.text())
         name = self.lib.name_writers[idx]
 
-        if btn.isChecked():
-            self.name_outputs.append(name)
-        else:
-            if name in self.name_outputs:
-                self.name_outputs.remove(name)
+        settings = QtCore.QSettings()
 
-    def on_export_btn(self):
-        logger.debug("export clicked")
-        if len(self.name_outputs) == 0:
+        if btn.isChecked():
+            self.selected_writers.append(name)
+            settings.setValue("export_single_%s" % name, True)
+
+        else:
+            settings.setValue("export_single_%s" % name, False)
+            if name in self.selected_writers:
+                self.selected_writers.remove(name)
+
+    def on_export_profile_btn(self):
+        logger.debug("export profile clicked")
+
+        if len(self.selected_writers) == 0:
             msg = "Select output formats before data export!"
             QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
             return
 
-        # special case: synthetic multiple profiles, we just save the average profile
-        if (self.name_outputs[0] == 'ncei') and (self.lib.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']):
+        # special case: synthetic profile and NCEI
+        if (self.selected_writers[0] == 'ncei') and \
+                (self.lib.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']):
             msg = "Attempt to export a synthetic profile in NCEI format!"
             QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
             return
 
-        # ask user for output folder path
         settings = QtCore.QSettings()
-        output_folder = QtGui.QFileDialog.getExistingDirectory(self, "Select output folder",
-                                                               settings.value("export_folder"))
-        if not output_folder:
-            return
-        settings.setValue("export_folder", output_folder)
-        logger.debug('user selection: %s' % output_folder)
 
-        # ask user for basename (only for single selection)
+        select_output_folder = self.selectFolder.isChecked()
+        settings.setValue("select_output_folder", select_output_folder)
+        if select_output_folder:
+
+            # ask user for output folder path
+            # noinspection PyCallByClass
+            output_folder = QtGui.QFileDialog.getExistingDirectory(self, "Select output folder",
+                                                                   settings.value("export_folder"))
+            if not output_folder:
+                return
+        else:
+            output_folder = self.lib.outputs_folder
+        settings.setValue("export_folder", output_folder)
+        logger.debug('output folder: %s' % output_folder)
+
+        # ask user for basename
         basenames = list()
-        if len(self.name_outputs) == 1 and self.name_outputs[0] != 'ncei': # NCEI requires special filename convention
+        # NCEI has special filename convention
+        if (len(self.selected_writers) == 1) and (self.selected_writers[0] == 'ncei'):
+
+            pass
+
+        else:
+
             basename_msg = "Enter output basename (without extension):"
             while True:
+                # noinspection PyCallByClass
                 basename, ok = QtGui.QInputDialog.getText(self, "Output basename", basename_msg,
                                                           text=self.lib.cur_basename)
                 if not ok:
                     return
-                basenames.append(basename)
+                for _ in self.selected_writers:
+                    basenames.append(basename)
                 break
 
         # actually do the export
         self.progress.start()
         try:
             self.lib.export_data(data_path=output_folder, data_files=basenames,
-                                 data_formats=self.name_outputs)
+                                 data_formats=self.selected_writers)
         except RuntimeError as e:
             self.progress.end()
             msg = "Issue in exporting the data.\nReason: %s" % e
@@ -134,8 +181,8 @@ class ExportDialog(AbstractDialog):
             return
 
         # opening the output folder
-        settings = QtCore.QSettings()
         export_open_folder = self.openFolder.isChecked()
+        settings.setValue("export_open_folder", export_open_folder)
         if export_open_folder:
             explore_folder(output_folder)  # open the output folder
             self.progress.end()
@@ -144,7 +191,5 @@ class ExportDialog(AbstractDialog):
             self.progress.end()
             msg = "Profile successfully exported!"
             QtGui.QMessageBox.information(self, "Export profile", msg, QtGui.QMessageBox.Ok)
-
-        settings.setValue("export_open_folder", export_open_folder)
 
         self.accept()

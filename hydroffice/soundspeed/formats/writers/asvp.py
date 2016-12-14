@@ -23,7 +23,7 @@ class Asvp(AbstractTextWriter):
         self._ext.add('asvp')
         self.header = None  # required for checksum
 
-    def write(self, ssp, data_path, data_file=None, data_append=False, project=''):
+    def write(self, ssp, data_path, data_file=None, project=''):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.ssp = ssp

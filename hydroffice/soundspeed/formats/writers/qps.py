@@ -19,11 +19,11 @@ class Qps(AbstractTextWriter):
         self.desc = "QPS"
         self._ext.add('bsvp')
 
-    def write(self, ssp, data_path, data_file=None, data_append=False, project=''):
+    def write(self, ssp, data_path, data_file=None, project=''):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.ssp = ssp
-        self._write(data_path=data_path, data_file=data_file, append=data_append, encoding=None, binary=True)
+        self._write(data_path=data_path, data_file=data_file, encoding=None, binary=True)
 
         self._write_header()
         self._write_body()

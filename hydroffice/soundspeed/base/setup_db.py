@@ -397,15 +397,6 @@ class SetupDb(BaseDb):
     def rx_max_wait_time(self, value):
         self._setter_int("rx_max_wait_time", value)
 
-    # --- append_caris_file
-    @property
-    def append_caris_file(self):
-        return self._getter_bool("append_caris_file")
-
-    @append_caris_file.setter
-    def append_caris_file(self, value):
-        self._setter_bool("append_caris_file", value)
-
     # --- log_user
     @property
     def log_user(self):

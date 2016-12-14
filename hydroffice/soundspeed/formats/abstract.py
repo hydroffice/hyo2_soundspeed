@@ -19,6 +19,7 @@ class AbstractFormat(object):
         self.version = "0.1.0"
         self._ssp = None  # profile list
         self._ext = set()
+        self._project = str()
         self.multicast_support = False
 
         self.s = None  # settings

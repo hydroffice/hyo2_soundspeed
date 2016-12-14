@@ -29,20 +29,23 @@ class Ncei(AbstractWriter):
         self._ext.add('nc')
         self.root_group = None
 
-    def write(self, ssp, data_path, data_file=None, data_append=False, project=''):
+    def write(self, ssp, data_path, data_file=None, project=''):
         """Writing raw profile data to NetCDF4 file"""
         logger.debug('*** %s ***: start' % self.driver)
 
         self.ssp = ssp
-        self.project = project
+        self._project = project
         
         ship_code = self.ssp.cur.meta.vessel[:2] if len(self.ssp.cur.meta.vessel) >= 2 else 'ZZ'
         nc_file = '%s_%s.nc' %(self.ssp.cur.meta.utc_time.strftime('%Y%m%d%H%M%S'), ship_code)
+
         # define the output file path
+        data_path = os.path.join(data_path, self.name.lower())
+        if not os.path.exists(data_path):
+            os.makedirs(data_path)
         if data_file:
             file_path = os.path.join(data_path, nc_file)
         else:
-            data_path = os.path.join(data_path, self.name.lower())
             if not os.path.exists(data_path):
                 os.makedirs(data_path)
             file_path = os.path.join(data_path, nc_file)
@@ -157,7 +160,7 @@ class Ncei(AbstractWriter):
         self.root_group.survey = b'%s' % self.ssp.cur.meta.survey
         # RECOMMENDED - The name of the project(s) principally responsible for originating this data.
         # Multiple projects can be separated by commas.(ACDD)
-        self.root_group.project = b'%s' % self.project
+        self.root_group.project = b'%s' % self._project
         # SUGGESTED - Name of the platform(s) that supported the sensor data used to create this data set or product.
         # Platforms can be of any type, including satellite, ship, station, aircraft or other.(ACDD)
         self.root_group.platform = b'%s' % self.ssp.cur.meta.vessel.replace("NRT-", 'NOAA NAVIGATION RESPONSE TEAM-')
@@ -278,7 +281,7 @@ class Ncei(AbstractWriter):
         elif self._is_empty(self.ssp.cur.data.speed[vi]) and self._is_empty(self.ssp.cur.data.temp[vi]) and \
                 self._is_empty(self.ssp.cur.data.conductivity[vi]) and self._is_empty(self.ssp.cur.data.sal[vi]):
             msg = '%s missing critical data' % msg
-        elif self.project in ['', 'default']:
+        elif self._project in ['', 'default']:
             msg = '%s missing project name, cannot export NCEI file from default project' % msg
         elif not self.ssp.cur.meta.survey or not self.ssp.cur.meta.vessel or not self.ssp.cur.meta.institution:
             msg = '%s missing survey, vessel, or institution' % msg

@@ -12,7 +12,7 @@ from hydroffice.soundspeedmanager.dialogs.input_dialog import InputDialog
 from hydroffice.soundspeedmanager.dialogs.reference_dialog import ReferenceDialog
 from hydroffice.soundspeedmanager.dialogs.spreadsheet_dialog import SpreadSheetDialog
 from hydroffice.soundspeedmanager.dialogs.metadata_dialog import MetadataDialog
-from hydroffice.soundspeedmanager.dialogs.export_dialog import ExportDialog
+from hydroffice.soundspeedmanager.dialogs.export_single_profile_dialog import ExportSingleProfileDialog
 from hydroffice.soundspeedmanager.widgets.dataplots import DataPlots
 
 from hydroffice.soundspeed.profile.dicts import Dicts
@@ -112,7 +112,7 @@ class Editor(AbstractWidget):
         self.export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export.png')), 'Export data', self)
         self.export_act.setShortcut('Alt+E')
         # noinspection PyUnresolvedReferences
-        self.export_act.triggered.connect(self.on_export_data)
+        self.export_act.triggered.connect(self.on_export_single_profile)
         self.output_bar.addAction(self.export_act)
         # transmit
         self.transmit_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'transmit.png')), 'Transmit data', self)
@@ -236,13 +236,13 @@ class Editor(AbstractWidget):
         dlg = MetadataDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
 
-    def on_export_data(self):
-        logger.debug('user wants to export the data')
+    def on_export_single_profile(self):
+        logger.debug('user wants to export a single profile')
         if not self.lib.has_ssp():
             msg = "Import data before export!"
             QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
             return
-        dlg = ExportDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        dlg = ExportSingleProfileDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
 
     def on_transmit_data(self):

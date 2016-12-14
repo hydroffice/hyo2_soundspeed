@@ -20,11 +20,11 @@ class Hypack(AbstractTextWriter):
         self.desc = "Hypack"
         self._ext.add('vel')
 
-    def write(self, ssp, data_path, data_file=None, data_append=False, project=''):
+    def write(self, ssp, data_path, data_file=None, project=''):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.ssp = ssp
-        self._write(data_path=data_path, data_file=data_file, append=data_append)
+        self._write(data_path=data_path, data_file=data_file)
 
         self._write_header()
         self._write_body()

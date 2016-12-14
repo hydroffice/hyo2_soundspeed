@@ -87,29 +87,9 @@ class Output(AbstractWidget):
         hbox = QtGui.QHBoxLayout()
         self.left_layout.addLayout(hbox)
         hbox.addStretch()
-        self.label = QtGui.QLabel("Editor settings:")
+        self.label = QtGui.QLabel("SQLite logging:")
         hbox.addWidget(self.label)
         hbox.addStretch()
-
-        # - append_caris_file
-        hbox = QtGui.QHBoxLayout()
-        self.left_layout.addLayout(hbox)
-        # -- label
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        label = QtGui.QLabel("Append Caris file:")
-        label.setFixedWidth(lbl_width)
-        vbox.addWidget(label)
-        vbox.addStretch()
-        # -- value
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        self.append_caris_file = QtGui.QComboBox()
-        self.append_caris_file.addItems(["True", "False"])
-        vbox.addWidget(self.append_caris_file)
-        vbox.addStretch()
 
         # - log_user
         hbox = QtGui.QHBoxLayout()
@@ -129,6 +109,26 @@ class Output(AbstractWidget):
         self.log_user = QtGui.QComboBox()
         self.log_user.addItems(["True", "False"])
         vbox.addWidget(self.log_user)
+        vbox.addStretch()
+
+        # - log_server
+        hbox = QtGui.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtGui.QLabel("Server logging:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- value
+        vbox = QtGui.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.log_server = QtGui.QComboBox()
+        self.log_server.addItems(["True", "False"])
+        vbox.addWidget(self.log_server)
         vbox.addStretch()
 
         self.left_layout.addStretch()
@@ -183,26 +183,6 @@ class Output(AbstractWidget):
         vbox.addWidget(self.server_apply_surface_sound_speed)
         vbox.addStretch()
 
-        # - log_server
-        hbox = QtGui.QHBoxLayout()
-        self.right_layout.addLayout(hbox)
-        # -- label
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        label = QtGui.QLabel("Server logging:")
-        label.setFixedWidth(lbl_width)
-        vbox.addWidget(label)
-        vbox.addStretch()
-        # -- value
-        vbox = QtGui.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        self.log_server = QtGui.QComboBox()
-        self.log_server.addItems(["True", "False"])
-        vbox.addWidget(self.log_server)
-        vbox.addStretch()
-
         self.right_layout.addStretch()
 
         self.main_layout.addStretch()
@@ -215,8 +195,6 @@ class Output(AbstractWidget):
         self.btn_delete_client.clicked.connect(self.delete_client)
         # noinspection PyUnresolvedReferences
         self.btn_refresh_list.clicked.connect(self.setup_changed)
-        # noinspection PyUnresolvedReferences
-        self.append_caris_file.currentIndexChanged.connect(self.apply_append_caris_file)
         # noinspection PyUnresolvedReferences
         self.log_user.currentIndexChanged.connect(self.apply_log_user)
         # noinspection PyUnresolvedReferences
@@ -332,12 +310,6 @@ class Output(AbstractWidget):
         self.setup_changed()
         self.main_win.reload_settings()
 
-    def apply_append_caris_file(self):
-        # logger.debug("apply append caris file")
-        self.db.append_caris_file = self.append_caris_file.currentText() == "True"
-        self.setup_changed()
-        self.main_win.reload_settings()
-
     def apply_log_user(self):
         # logger.debug("apply log user")
         self.db.log_user = self.log_user.currentText() == "True"
@@ -370,12 +342,6 @@ class Output(AbstractWidget):
 
         # set the top label
         self.active_label.setText("<b>Current setup: %s [#%02d]</b>" % (self.db.setup_name, self.db.active_setup_id))
-
-        # append_caris_file
-        if self.db.append_caris_file:
-            self.append_caris_file.setCurrentIndex(0)  # True
-        else:
-            self.append_caris_file.setCurrentIndex(1)  # False
 
         # log_user
         if self.db.log_user:

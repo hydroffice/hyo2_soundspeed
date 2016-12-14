@@ -19,8 +19,10 @@ class Sonardyne(AbstractTextWriter):
         self.desc = "Sonardyne"
         self._ext.add('pro')
 
-    def write(self, ssp, data_path, data_file=None, data_append=False, project=''):
+    def write(self, ssp, data_path, data_file=None, project=''):
         logger.debug('*** %s ***: start' % self.driver)
+
+        self._project = project
 
         self.ssp = ssp
         self._write(data_path=data_path, data_file=data_file)
@@ -38,8 +40,8 @@ class Sonardyne(AbstractTextWriter):
         logger.debug('generating header')
         header = str()
         # row #0: title
-        if self.ssp.cur.meta.project:
-            header += "%s\n" % self.ssp.cur.meta.project
+        if self._project:
+            header += "%s\n" % self._project
         elif self.ssp.cur.meta.survey:
             header += "%s\n" % self.ssp.cur.meta.survey
         else:

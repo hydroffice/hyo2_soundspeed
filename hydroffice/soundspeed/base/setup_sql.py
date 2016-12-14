@@ -24,7 +24,6 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      use_sippican text NOT NULL DEFAULT "False",
      use_mvp text NOT NULL DEFAULT "False",
      /* output */
-     append_caris_file text NOT NULL DEFAULT "False",
      log_user text NOT NULL DEFAULT "False",
      log_server text NOT NULL DEFAULT "False",
      /* listeners - sis */
@@ -78,7 +77,6 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      CHECK (use_sippican IN ("True", "False")),
      CHECK (use_mvp IN ("True", "False")),
      /* output */
-     CHECK (append_caris_file IN ("True", "False")),
      CHECK (log_user IN ("True", "False")),
      CHECK (log_server IN ("True", "False")),
      /* listeners - sis */

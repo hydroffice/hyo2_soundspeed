@@ -33,7 +33,6 @@ class Setup(object):
         self.use_mvp = None
 
         # output
-        self.append_caris_file = None
         self.log_user = None
         self.log_server = None
         self.client_list = ClientList()
@@ -61,7 +60,6 @@ class Setup(object):
 
         # server
         self.server_source = None
-        self.server_append_caris_file = None
         self.server_apply_surface_sound_speed = None
         self.server_auto_export_on_send = None
 
@@ -115,7 +113,6 @@ class Setup(object):
         self.use_mvp = db.use_mvp
 
         # output
-        self.append_caris_file = db.append_caris_file
         self.log_user = db.log_user
         self.log_server = db.log_server
         # client list
@@ -197,7 +194,6 @@ class Setup(object):
             db.use_mvp = self.use_mvp
 
             # output
-            db.append_caris_file = self.append_caris_file
             db.log_user = self.log_user
             db.log_server = self.log_server
 
@@ -273,7 +269,6 @@ class Setup(object):
         msg += "      <use_sippican: %s>\n" % self.use_sippican
         msg += "      <use_mvp: %s>\n" % self.use_mvp
         msg += "    <output>\n"
-        msg += "      <append_caris_file: %s>\n" % self.append_caris_file
         msg += "      <log_user: %s>\n" % self.log_user
         msg += "      <log_server: %s>\n" % self.log_server
         msg += "      <clients>\n"
@@ -291,7 +286,6 @@ class Setup(object):
         msg += "      <mvp_listen_port: %s>\n" % self.mvp_listen_port
         msg += "    <server>\n"
         msg += "      <server_source: %s>\n" % self.server_source
-        msg += "      <server_append_caris_file: %s>\n" % self.server_append_caris_file
         msg += "      <server_apply_surface_sound_speed: %s>\n" % self.server_apply_surface_sound_speed
         msg += "      <server_auto_export_on_send: %s>\n" % self.server_auto_export_on_send
         msg += "    <current settings>\n"

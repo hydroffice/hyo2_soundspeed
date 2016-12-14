@@ -599,6 +599,9 @@ class SoundSpeedLibrary(object):
             else:
                 has_data_files = True
 
+        if data_path is None:
+            data_path = self.outputs_folder
+
         # create the outputs
         for i, name in enumerate(data_formats):
 
@@ -608,21 +611,16 @@ class SoundSpeedLibrary(object):
 
             idx = self.name_writers.index(name)
             writer = self.writers[idx]
-            data_append = False
-            if writer.name == 'caris':
-                if server_mode:
-                    data_append = self.setup.server_append_caris_file
-                else:
-                    data_append = self.setup.append_caris_file
             if writer.name == 'asvp':
                 self.prepare_sis(thin=True)
+
             if not has_data_files:  # we don't have the output file names
                 if len(data_formats) == 1 and name == 'ncei': # NCEI requires special filename convention
-                    writer.write(ssp=self.ssp, data_path=data_path, data_file='ncei', data_append=data_append, project=self.current_project)
+                    writer.write(ssp=self.ssp, data_path=data_path, data_file='ncei', project=self.current_project)
                 else:
-                    writer.write(ssp=self.ssp, data_path=data_path, data_append=data_append, project=self.current_project)
+                    writer.write(ssp=self.ssp, data_path=data_path, project=self.current_project)
             else:
-                writer.write(ssp=self.ssp, data_path=data_path, data_file=data_files[i], data_append=data_append, project=self.current_project)
+                writer.write(ssp=self.ssp, data_path=data_path, data_file=data_files[i], project=self.current_project)
 
         # take care of listeners
         if self.has_sippican_to_process():
