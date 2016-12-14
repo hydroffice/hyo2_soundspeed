@@ -23,7 +23,10 @@ class Caris(AbstractTextWriter):
     def write(self, ssp, data_path, data_file=None, project=''):
         logger.debug('*** %s ***: start' % self.driver)
 
+        self._project = project
         self.ssp = ssp
+        if data_file is None:
+            data_file = self._project
         self._write(data_path=data_path, data_file=data_file, append=True)
 
         self._write_header()
@@ -67,6 +70,7 @@ class Caris(AbstractTextWriter):
                                                                                        lat_min, lat_sec,
                                                                                        int(longitude),
                                                                                        lon_min, lon_sec)
+
         header += "Section " + date_string + " " + position_string + " Created by hydroffice.soundspeed\n"
         self.fod.io.write(header)
 
