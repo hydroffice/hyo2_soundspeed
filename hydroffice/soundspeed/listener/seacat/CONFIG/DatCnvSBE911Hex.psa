@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<Data_Conversion >
+  <Version value="5.37e" />
+  <ServerName value="Data Conversion" />
+  <InstrumentPath value="C:\Program Files\Sea-Bird\SBEDataProcessing-Win32\seasoft.con" />
+  <InstrumentMatch value="0" />
+  <InputDir value="C:\Program Files\Sea-Bird\SBEDataProcessing-Win32" />
+  <InputFileArray size="1" GrowBy="-1" >
+    <ArrayItem index="0" value="new.hex" />
+  </InputFileArray>
+  <OutputDir value="C:\Program Files\Sea-Bird\SBEDataProcessing-Win32" />
+  <NameAppend value="" />
+  <OutputFile value="new.cnv" />
+  <LastProcessed value="0" />
+  <ProcessScansToEnd value="1" />
+  <ScansToSkip value="0" />
+  <ScansToProcess value="1" />
+  <MergeHeaderFile value="0" />
+  <OutputFormat value="0" high="1" low="0" initialValue="0" />
+  <FromCast value="0" high="1" low="0" initialValue="0" />
+  <CreateFile value="0" high="2" low="0" initialValue="0" />
+  <ScanRangeSource value="3" high="3" low="0" initialValue="3" />
+  <ScanRangeOffset value="0.000000" />
+  <ScanRangeDuration value="2.000000" />
+  <CalcArray Size="3" >
+    <CalcArrayItem index="0" CalcID="65" >
+      <Calc UnitID="3" Ordinal="0" >
+        <FullName value="Pressure, Digiquartz [db]" />
+      </Calc>
+    </CalcArrayItem>
+    <CalcArrayItem index="1" CalcID="12" >
+      <Calc UnitID="58" Ordinal="0" >
+        <FullName value="Conductivity [S/m]" />
+      </Calc>
+    </CalcArrayItem>
+    <CalcArrayItem index="2" CalcID="81" >
+      <Calc UnitID="6" Ordinal="0" >
+        <FullName value="Temperature [ITS-90, deg C]" />
+      </Calc>
+    </CalcArrayItem>
+  </CalcArray>
+</Data_Conversion>

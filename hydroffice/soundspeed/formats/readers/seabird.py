@@ -9,6 +9,7 @@ from hydroffice.soundspeed.formats.readers.abstract import AbstractTextReader
 from hydroffice.soundspeed.profile.dicts import Dicts
 from hydroffice.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 
+from . import velocipy_readers
 
 class Seabird(AbstractTextReader):
     """Seabird reader -> CTD style
@@ -41,15 +42,21 @@ class Seabird(AbstractTextReader):
         self.cb = callbacks
 
         self.init_data()  # create a new empty profile list
-        self.ssp.append()  # append a new profile
+        HSTP=True
+        if HSTP:
+            
+            p = velocipy_readers.ScipyProfile.parseProfile(data_path)[0]
+            self.ssp.append_profile(p.ConvertToSoundSpeedProfile())
+        else:
+            self.ssp.append()  # append a new profile
 
         # initialize probe/sensor type
         self.ssp.cur.meta.sensor_type = Dicts.sensor_types['CTD']
         self.ssp.cur.meta.probe_type = Dicts.probe_types['SBE']
-
-        self._read(data_path=data_path)
-        self._parse_header()
-        self._parse_body()
+        if not HSTP:
+            self._read(data_path=data_path)
+            self._parse_header()
+            self._parse_body()
 
         self.fix()
         self.finalize()

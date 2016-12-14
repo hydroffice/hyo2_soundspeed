@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<Derive >
+  <Version value="5.37e" />
+  <ServerName value="Derive" />
+  <InstrumentPath value="C:\Program Files\Sea-Bird\SBEDataProcessing-Win32\seasoft.con" />
+  <InstrumentMatch value="0" />
+  <InputDir value="C:\Program Files\Sea-Bird\SBEDataProcessing-Win32" />
+  <InputFileArray size="1" GrowBy="-1" >
+    <ArrayItem index="0" value="new.cnv" />
+  </InputFileArray>
+  <OutputDir value="C:\Program Files\Sea-Bird\SBEDataProcessing-Win32" />
+  <NameAppend value="" />
+  <OutputFile value="new.cnv" />
+  <LastProcessed value="0" />
+  <CalcArray Size="3" >
+    <CalcArrayItem index="0" CalcID="70" >
+      <Calc UnitID="49" Ordinal="0" >
+        <FullName value="Salinity [PSU]" />
+      </Calc>
+    </CalcArrayItem>
+    <CalcArrayItem index="1" CalcID="15" >
+      <Calc UnitID="53" Ordinal="0" >
+        <FullName value="Density [sigma-theta, Kg/m^3]" />
+      </Calc>
+    </CalcArrayItem>
+    <CalcArrayItem index="2" CalcID="74" >
+      <Calc UnitID="33" Ordinal="0" >
+        <FullName value="Sound Velocity [Chen-Millero, m/s]" />
+      </Calc>
+    </CalcArrayItem>
+  </CalcArray>
+</Derive>

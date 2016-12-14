@@ -99,11 +99,11 @@ class QtCallbacks(AbstractCallbacks):
             else:
                 selection, _ = QtGui.QFileDialog.getOpenFileName(**dlg_options)
             if selection:
-                self._settings.setValue("import_folder", os.path.dirname(selection))
+                self._settings.setValue(key_name, os.path.dirname(selection))
         else:
             selection, _ = QtGui.QFileDialog.getOpenFileNames(**dlg_options)
             if selection:
-                self._settings.setValue("import_folder", os.path.dirname(selection[0]))
+                self._settings.setValue(key_name, os.path.dirname(selection[0]))
 
         if selection:
             logger.debug('user selection: %s' % selection)
@@ -119,7 +119,7 @@ class QtCallbacks(AbstractCallbacks):
         output_folder = QtGui.QFileDialog.getExistingDirectory(self._parent, caption=title,
                                                                dir=default_dir)
         if output_folder:
-            self._settings.setValue("export_folder", output_folder)
+            self._settings.setValue(key_name, output_folder)
             logger.debug('user selection: %s' % output_folder)
 
         return output_folder
