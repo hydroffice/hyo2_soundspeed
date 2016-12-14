@@ -24,7 +24,7 @@ class ClientList(object):
 
     def transmit_ssp(self, prj, server_mode=False):
 
-        prj.progress.start(text='Transmitting', is_disabled=server_mode)
+        prj.progress.start(text='Transmitting', is_disabled=server_mode, has_abortion=True)
 
         # loop through the client list
         success = True  # false if one tx has troubles
@@ -64,6 +64,11 @@ class ClientList(object):
                 time.sleep(1)
                 wait += 1
                 logger.debug("waiting for %s sec" % wait)
+
+                prj.progress.update()
+                if prj.progress.canceled:
+                    logger.info("canceled by user")
+                    wait = wait_max
 
             if prj.listeners.sis.ssp:
                 # The KM SVP datagrams have a bug in their time reporting and

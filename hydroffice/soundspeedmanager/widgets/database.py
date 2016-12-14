@@ -56,7 +56,7 @@ class Database(AbstractWidget):
         self.ssp_list.setSortingEnabled(True)
         self.ssp_list.setFocus()
         self.ssp_list.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.ssp_list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.ssp_list.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
         self.ssp_list.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         # noinspection PyUnresolvedReferences
         self.ssp_list.customContextMenuRequested.connect(self.make_context_menu)
@@ -131,13 +131,75 @@ class Database(AbstractWidget):
     def make_context_menu(self, pos):
         """Make a context menu to deal with profile specific actions"""
 
-        load_act = QtGui.QAction("Load", self, statusTip="Load a profile", triggered=self.load_profile)
-        delete_act = QtGui.QAction("Delete", self, statusTip="Delete a profile", triggered=self.delete_profile)
+        # check if any selection
+        rows = self.ssp_list.selectionModel().selectedRows()
+        if len(rows) == 0:
+            logger.debug('Not profile selected')
+            return
 
         menu = QtGui.QMenu(parent=self)
-        menu.addAction(load_act)
+
+        # load (only single selection)
+        if len(rows) == 1:
+            load_act = QtGui.QAction("Load", self, statusTip="Load a profile", triggered=self.load_profile)
+            menu.addAction(load_act)
+
+        delete_act = QtGui.QAction("Delete", self, statusTip="Delete a profile", triggered=self.delete_profile)
         menu.addAction(delete_act)
+
         menu.exec_(self.ssp_list.mapToGlobal(pos))
+
+    def load_profile(self):
+        logger.debug("user want to load a profile")
+
+        # check if any selection
+        rows = self.ssp_list.selectionModel().selectedRows()
+        if len(rows) != 1:
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.information(self, "Database", "You need to select a single profile before loading it!")
+            return
+
+        # the primary key is the first column (= 0)
+        pk = int(self.ssp_list.item(rows[0].row(), 0).text())
+        success = self.lib.load_profile(pk)
+        if not success:
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.warning(self, "Database", "Unable to load profile!", QtGui.QMessageBox.Ok)
+            return
+
+        if self.lib.has_ssp():
+            self.main_win.data_imported()
+            self.main_win.tabs.setCurrentIndex(0)
+
+    def delete_profile(self):
+        logger.debug("user want to delete a profile")
+
+        # check if any selection
+        rows = self.ssp_list.selectionModel().selectedRows()
+        if len(rows) == 0:
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.information(self, "Database", "You need to select a profile before deleting it!")
+            return
+
+        # ask if the user want to delete it
+        if len(rows) == 1:
+            pk = int(self.ssp_list.item(rows[0].row(), 0).text())
+            msg = "Do you really want to delete profile #%02d?" % pk
+        else:
+            msg = "Do you really want to delete %d profiles?" % len(rows)
+        # noinspection PyCallByClass
+        ret = QtGui.QMessageBox.warning(self, "Database", msg, QtGui.QMessageBox.Ok | QtGui.QMessageBox.No)
+        if ret == QtGui.QMessageBox.No:
+            return
+
+        # actually perform the removal
+        for row in rows:
+            pk = int(self.ssp_list.item(row.row(), 0).text())
+            success = self.lib.delete_db_profile(pk)
+            if not success:
+                QtGui.QMessageBox.critical(self, "Database", "Unable to remove the #%02d profile!" % pk)
+
+        self.main_win.data_removed()
 
     def new_project(self):
         logger.debug("user want to create a new project")
@@ -163,53 +225,6 @@ class Database(AbstractWidget):
         dlg.exec_()
 
         self.update_table()
-
-    def load_profile(self):
-        logger.debug("user want to load a profile")
-
-        # check if any selection
-        sel = self.ssp_list.selectedItems()
-        if len(sel) == 0:
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.information(self, "Database", "You need to select a profile before loading it!")
-            return
-
-        pk = int(sel[0].text())
-        success = self.lib.load_profile(pk)
-        if not success:
-            msg = "Unable to load profile!"
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.warning(self, "Database", msg, QtGui.QMessageBox.Ok)
-            return
-
-        if self.lib.has_ssp():
-            self.main_win.data_imported()
-            self.main_win.tabs.setCurrentIndex(0)
-
-    def delete_profile(self):
-        logger.debug("user want to delete a profile")
-
-        # check if any selection
-        sel = self.ssp_list.selectedItems()
-        if len(sel) == 0:
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.information(self, "Database", "You need to select a profile before deleting it!")
-            return
-
-        # ask if the user want to delete it
-        pk = int(sel[0].text())
-        msg = "Do you really want to delete profile #%02d?" % pk
-        # noinspection PyCallByClass
-        ret = QtGui.QMessageBox.warning(self, "Database", msg, QtGui.QMessageBox.Ok | QtGui.QMessageBox.No)
-        if ret == QtGui.QMessageBox.No:
-            return
-
-        success = self.lib.delete_db_profile(pk)
-        if success:
-            self.main_win.data_removed()
-        else:
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.critical(self, "Database", "Unable to remove the selected profile!")
 
     def project_folder(self):
         logger.debug("user want to open the project folder")

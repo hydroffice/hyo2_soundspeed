@@ -150,7 +150,7 @@ class Info(QtGui.QMainWindow):
         if not os.path.exists(pdf_path):
             logger.warning("unable to find offline manual at %s" % pdf_path)
             return
-        
+
         explore_folder(pdf_path)
 
     def load_license(self):

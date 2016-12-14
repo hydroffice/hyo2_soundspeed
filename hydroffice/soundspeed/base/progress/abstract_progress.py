@@ -24,6 +24,23 @@ class AbstractProgress(object):
         self._is_disabled = False
         self._is_canceled = False
 
+    @property
+    def value(self):
+        return self._value
+
+    @property
+    def min(self):
+        return self._min
+
+    @property
+    def max(self):
+        return self._max
+
+    @property
+    def range(self):
+        self._range = self._max - self._min
+        return self._range
+
     @abstractproperty
     def canceled(self):
         pass
@@ -34,7 +51,7 @@ class AbstractProgress(object):
         pass
 
     @abstractmethod
-    def update(self, value, text=None):
+    def update(self, value=None, text=None):
         pass
 
     @abstractmethod

@@ -55,17 +55,19 @@ class QtProgress(AbstractProgress):
 
         self._display()
 
-    def update(self, value, text=None):
+    def update(self, value=None, text=None):
         if self._is_disabled:
             return
 
-        if value < self._value:
-            raise RuntimeError('attempt to update current progress value (%d) with a smaller value (%d)'
-                               % (self._value, value))
-        if (value < self._min) or (value >= self._max):
-            raise RuntimeError('attempt to update current progress value (%d) outside valid range(%s %s)'
-                               % (value, self._min, self._max))
-        self._value = value
+        if value is not None:
+            if value < self._value:
+                raise RuntimeError('attempt to update current progress value (%d) with a smaller value (%d)'
+                                   % (self._value, value))
+            if (value < self._min) or (value >= self._max):
+                raise RuntimeError('attempt to update current progress value (%d) outside valid range(%s %s)'
+                                   % (value, self._min, self._max))
+            self._value = value
+
         if text is not None:
             self._text = text
 
@@ -100,4 +102,5 @@ class QtProgress(AbstractProgress):
         self._progress.setLabelText(self._text)
         self._progress.forceShow()
         self._progress.setValue(self._value)
+        # noinspection PyArgumentList
         self._qt_app.processEvents()

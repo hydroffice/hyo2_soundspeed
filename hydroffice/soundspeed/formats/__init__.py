@@ -55,21 +55,21 @@ from .writers.elac import Elac
 from .writers.hypack import Hypack
 from .writers.ixblue import Ixblue
 from .writers.ncei import Ncei
+from .writers.qps import Qps
 from .writers.sonardyne import Sonardyne
 from .writers.unb import Unb
-from .writers.qps import Qps
 
 writers = list()
-writers.append(Asvp())
 writers.append(Caris())
 writers.append(Csv())
 writers.append(Elac())
 writers.append(Hypack())
 writers.append(Ixblue())
+writers.append(Asvp())
 writers.append(Ncei())
+writers.append(Qps())
 writers.append(Sonardyne())
 writers.append(Unb())
-writers.append(Qps())
 
 name_writers = list()
 ext_writers = list()

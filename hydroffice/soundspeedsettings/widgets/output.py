@@ -321,14 +321,13 @@ class Output(AbstractWidget):
         logger.debug("delete client")
 
         # check if any selection
-        sel = self.client_list.selectedItems()
-        if len(sel) == 0:
+        rows = self.client_list.selectionModel().selectedRows()
+        if len(rows) == 0:
             # noinspection PyCallByClass
-            QtGui.QMessageBox.information(self, "Client deletion",
-                                          "You need to first select the client to delete!")
+            QtGui.QMessageBox.information(self, "Client deletion", "You need to first select the client to delete!")
             return
 
-        client_name = sel[1].text()
+        client_name = self.client_list.item(rows[0].row(), 1).text()
         self.db.delete_client(client_name)
         self.setup_changed()
         self.main_win.reload_settings()

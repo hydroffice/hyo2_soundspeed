@@ -176,14 +176,13 @@ class Main(AbstractWidget):
         logger.debug("clone setup")
 
         # check if any selection
-        sel = self.setup_list.selectedItems()
-        if len(sel) == 0:
+        rows = self.setup_list.selectionModel().selectedRows()
+        if len(rows) == 0:
             # noinspection PyCallByClass
-            QtGui.QMessageBox.information(self, "Setup cloning",
-                                          "You need to first select the setup to clone!")
+            QtGui.QMessageBox.information(self, "Setup cloning", "You need to first select the setup to clone!")
             return
 
-        original_setup_name = sel[0].text()
+        original_setup_name = self.setup_list.item(rows[0].row(), 0).text()
 
         while True:
             # noinspection PyCallByClass
@@ -207,15 +206,15 @@ class Main(AbstractWidget):
         logger.debug("rename setup")
 
         # check if any selection
-        sel = self.setup_list.selectedItems()
-        if len(sel) == 0:
+        rows = self.setup_list.selectionModel().selectedRows()
+        if len(rows) == 0:
             # noinspection PyCallByClass
             QtGui.QMessageBox.information(self, "Setup renaming",
                                           "You need to first select the setup to rename!")
             return
 
         # check if the selected setup is active
-        original_setup_name = sel[0].text()
+        original_setup_name = self.setup_list.item(rows[0].row(), 0).text()
         original_setup_id = self.db.setup_id_from_setup_name(original_setup_name)
         if original_setup_id == self.db.active_setup_id:
             # noinspection PyCallByClass
@@ -246,20 +245,18 @@ class Main(AbstractWidget):
         logger.debug("delete setup")
 
         # check if any selection
-        sel = self.setup_list.selectedItems()
-        if len(sel) == 0:
+        rows = self.setup_list.selectionModel().selectedRows()
+        if len(rows) == 0:
             # noinspection PyCallByClass
-            QtGui.QMessageBox.information(self, "Setup deletion",
-                                          "You need to first select the setup to delete!")
+            QtGui.QMessageBox.information(self, "Setup deletion", "You need to first select the setup to delete!")
             return
 
         # check if the selected setup is active
-        setup_name = sel[0].text()
+        setup_name = self.setup_list.item(rows[0].row(), 0).text()
         setup_id = self.db.setup_id_from_setup_name(setup_name)
         if setup_id == self.db.active_setup_id:
             # noinspection PyCallByClass
-            QtGui.QMessageBox.information(self, "Setup deletion",
-                                          "The setup \'%s\' is active!\n"
+            QtGui.QMessageBox.information(self, "Setup deletion", "The setup \'%s\' is active!\n"
                                           "You need to first activate another setup." % setup_name)
             return
 
@@ -270,15 +267,15 @@ class Main(AbstractWidget):
         logger.debug("activate setup")
 
         # check if any selection
-        sel = self.setup_list.selectedItems()
-        if len(sel) == 0:
+        rows = self.setup_list.selectionModel().selectedRows()
+        if len(rows) == 0:
             # noinspection PyCallByClass
             QtGui.QMessageBox.information(self, "Setup activation",
                                           "You need to first select the setup to activate!")
             return
 
         # check if the selected setup is active
-        setup_name = sel[0].text()
+        setup_name = self.setup_list.item(rows[0].row(), 0).text()
         setup_id = self.db.setup_id_from_setup_name(setup_name)
         if setup_id == self.db.active_setup_id:
             # noinspection PyCallByClass
