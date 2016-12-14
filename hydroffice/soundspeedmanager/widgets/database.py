@@ -164,11 +164,23 @@ class Database(AbstractWidget):
                                        triggered=self.export_single_profile)
             menu.addAction(export_act)
 
+            dqa_compare_ref_act = QtGui.QAction("DQA compare ref", self, statusTip="DQA compare with reference cast",
+                                                triggered=self.dqa_compare)
+            menu.addAction(dqa_compare_ref_act)
+
         else:  # multiple selection
 
             export_act = QtGui.QAction("Export", self, statusTip="Export multiple profiles",
                                        triggered=self.export_multi_profile)
             menu.addAction(export_act)
+
+            dqa_compare_two_act = QtGui.QAction("DQA compare two", self, statusTip="DQA compare with each other",
+                                                triggered=self.dqa_compare)
+            menu.addAction(dqa_compare_two_act)
+
+        dqa_surface_act = QtGui.QAction("DQA surface", self, statusTip="DQA surface sound speed comparison",
+                                        triggered=self.dqa_surface)
+        menu.addAction(dqa_surface_act)
 
         delete_act = QtGui.QAction("Delete", self, statusTip="Delete a profile", triggered=self.delete_profile)
         menu.addAction(delete_act)
@@ -275,6 +287,46 @@ class Database(AbstractWidget):
                 QtGui.QMessageBox.critical(self, "Database", "Unable to remove the #%02d profile!" % pk)
 
         self.main_win.data_removed()
+
+    def dqa_surface(self):
+        logger.debug("user want to do surface DQA")
+
+        speed = None
+        depth = None
+        SN = None
+        for row in self.ssp_list.selectionModel().selectedRows():
+            pk = int(self.ssp_list.item(row.row(), 0).text())
+            (dqa, diff, speed, depth, SN) = self.lib.dqa_surface(pk, speed, depth, SN)
+            if dqa is not None:
+                QtGui.QMessageBox.information(self, "Surface DQA", dqa)
+
+    def dqa_compare(self):
+        logger.debug("user want to do DQA comparison")
+
+        ret = None
+        rows = self.ssp_list.selectionModel().selectedRows()
+        if len(rows) == 1:
+            pk = int(self.ssp_list.item(rows[0].row(), 0).text())
+            if self.lib.ref is None:
+                QtGui.QMessageBox.information(self, "DQA compare with reference cast", "You should set reference cast first!")
+            else:
+                ret = self.lib.dqa_compare(pk)
+        elif len(rows) == 2:
+            pk = int(self.ssp_list.item(rows[0].row(), 0).text())
+            pk_ref = int(self.ssp_list.item(rows[1].row(), 0).text())
+            ret = self.lib.dqa_compare(pk, pk_ref)
+        else:
+            QtGui.QMessageBox.information(self, "DQA comparison", "You need to select 1 or 2 profiles to do DQA comparison!")
+
+        if ret is not None:
+            data_path = os.path.join(self.lib.outputs_folder, 'dqa')
+            if not os.path.exists(data_path):
+                os.makedirs(data_path)
+            data_path = os.path.join(data_path, '%s_%s_DQA.txt' %(self.lib.current_project, ret[4]))
+            with open(data_path, 'w') as f:
+                f.write('\n%s%s\n' %(ret[0], ret[2]))
+            msg = "Results written to\n%s\n\n%s%s\n\n%s" % (data_path, ret[0], ret[1], ret[2])
+            QtGui.QMessageBox.information(self, "DQA comparison results", msg)
 
     def new_project(self):
         logger.debug("user want to create a new project")

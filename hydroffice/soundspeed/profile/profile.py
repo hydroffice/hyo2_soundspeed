@@ -721,19 +721,64 @@ class Profile(object):
         if more:
             self.more.debug_plot()
 
+    def fit_parab(self, Yin, NSpread=3, ymetric='depth', xattr='speed'):
+        ''' NOTE! pass in a Y value and recieve an interpolated X, a bit backwards from normal naming 
+        Yin is the ymetric (depth/pressure) to get a fitted approximate value at.  
+        NSpread is how many points to use around the desired dept/pressure to use in polyfit 
+        ymetric and xattr will default the the profile.ymetric and profile.attribute if left as None.
+        Should add the ability to spline the data instead/in addition
+        http://docs.scipy.org/doc/scipy/reference/tutorial/interpolate.html
+        '''
+        layers = self._no_dupes_goodflags()
+        layers.sort(order=[ymetric]) 
+        y = layers[ymetric]
+        x = layers[xattr]
+        index = np.searchsorted(y, Yin)
+        I1 = index - NSpread if index - NSpread >= 0 else 0
+        I2 = index + NSpread # too large of index doesn't matter in python
+        y = y[I1:I2]
+        x = x[I1:I2]
+        return np.poly1d(np.polyfit(y, x, 2))(Yin)
+
+    def DQA_surface(self, x, y, SN='Unknown'):
+        ''' DQA Test using a given depth (pressure) and SV
+        x is the xattr quantity (normally sound speed)
+        y is the ymetric (normally depth or pressure)
+        SN is the serial number of the instrument that measured the passed in x,y
+        '''
+        x_cast = self.fit_parab(y)
+        DiffSV = np.absolute(x_cast - x)
+        DQAResults= '\n' + time.ctime()
+        DQAResults += "DAILY DQA - SURFACE SOUND SPEED COMPARISON\n\n" # Start building the Public result message
+        if DiffSV > 2:
+            DQAResults += " - TEST FAILED - Diff in sound speed > 2 m/sec\n"
+        else:
+            DQAResults += " - TEST PASSED - Diff in sound speed <= 2 m/sec\n"
+
+        # Record DQA results
+        DQAResults += '\n'
+        DQAResults += "Surface sound speed instrument Serial Number: %s\n" % SN
+        DQAResults += "Surface sound speed instrument depth (m): %.1f\n" % y
+        DQAResults += "Surface sound speed Instrument reading (m/sec): %.2f\n" % x
+        DQAResults += "Full sound speed profile: %s\n" % self.meta.original_path
+        DQAResults += "   Instrument: sensor-%s, probe-%s, sn-%s\n" % (self.meta.sensor, self.meta.probe, self.meta.sn)
+        DQAResults += "Profile sound speed at same depth (m/sec): %.1f\n" % x_cast
+        DQAResults += "Difference in sound speed (m/sec): %.2f\n" % DiffSV
+        return DQAResults, DiffSV
+
     def _no_dupes_goodflags(self, spacing = 0.1):
         '''Returns a new array with 'flag' values !=0 and the depths sorted and spaced by at least the spacing value
         '''
         #layers = copy.deepcopy(self.ssp) 
-        dtype = [(b'depth', '<f8'), (b'speed', '<f8'), (b'flag', '<f8')]
+        dtype = [(b'depth', '<f8'), (b'speed', '<f8')]
         data = []
-        #vi = np.equal(self.proc.flag, Dicts.flags['valid'])
         for count in range(self.proc.num_samples):
-            data.append((self.proc.depth[count], self.proc.speed[count], self.proc.flag[count]))
+            if self.proc.source[count] == Dicts.sources['raw'] and self.proc.flag[count] == Dicts.flags['valid']:
+                data.append((self.proc.depth[count], self.proc.speed[count]))
         layers = np.array(data, dtype=dtype)
         #if 'flag' in self.dtype.names:
         #    layers=scipy.compress(layers['flag']>=0, d)
-        layers.sort(order = ['depth']) #must sort before taking the differences
+        layers.sort(order=['depth']) #must sort before taking the differences
         depths = layers['depth']
         #TODO: should we use QC( ) here or just the first sample that passes the spacing check?  Depends on if averaging the other data fields is ok.
         ilist = [0]
@@ -771,7 +816,7 @@ class Profile(object):
             else:
                 tt = np.array(traveltimes)
             rays = SVEquations.RayTraceUsingParameters(tt, layers, params, bProject=bProject)
-            rays[:,0]+=draft
+            rays[:,0] += draft
             raypaths.append(Raypath(np.vstack((tt, rays.transpose())).transpose()))
         return raypaths
 
@@ -807,7 +852,7 @@ class Profile(object):
         
         details  = "SUMMARY OF RESULTS - COMPARE 2 CASTS   " 
         details += "SSManager, Version     %s\n\n" % ssp_version
-        details += "REFERENCE PROFILE:     %s\n" % self.meta.original_path 
+        details += "REFERENCE PROFILE:     %s\n" % self.meta.original_path
         details += "COMPARISON PROFILE:    %s\n\n" % prof.meta.original_path
         details += "REFERENCE INSTRUMENT:  sensor-%s, probe-%s, sn-%s\n" % (self.meta.sensor, self.meta.probe, self.meta.sn)
         details += "COMPARISON INSTRUMENT: sensor-%s, probe-%s, sn-%s\n\n" % (prof.meta.sensor, prof.meta.probe, prof.meta.sn)
@@ -845,4 +890,5 @@ class Profile(object):
             message  = "RESULTS OK.\n\n"
             message += "Percent depth difference is within recommended bounds."
             DQAResults += "COMPARE 2 FILES\n  RESULTS: PERCENT DEPTH DIFFERENCE OK\n"
-        return DQAResults, message, details, (max_diff, max_diff_depth)
+        return DQAResults, message, details, (max_diff, max_diff_depth), prof.meta.utc_time.strftime('%Y%m%d%H%M%S')
+

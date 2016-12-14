@@ -810,6 +810,43 @@ class SoundSpeedLibrary(object):
         db.disconnect()
         return ret
 
+    def dqa_surface(self, pk, speed=None, depth=None, SN=None):
+        ret =(None, None, None, None, None)
+        if not SN:
+            SN =self.cb.ask_text(title="Enter text", msg="Serial number of surface sound speed instrument")
+            if not SN:
+                SN = 'Unknown'
+        if depth is None:
+            depth = self.cb.ask_number(title="Enter number", msg="Depth of surface sound speed instrument (m)",
+                                       default=0, min_value=-10, max_value=10, decimals=1)
+            if depth is None:
+                logger.error("missing the depth of surface sound speed instrument")
+                return ret
+        if speed is None:
+            speed = self.cb.ask_number(title="Enter number", msg="Sound speed measurement of instrument (m/s)",
+                                       default=1500, min_value=1300, max_value=1700, decimals=1)
+            if speed is None:
+                logger.error("missing the sound speed measurement of instrument")
+                return ret
+        prof = self.db_retrieve_profile(pk).cur
+        dqa, diff = prof.DQA_surface(speed, depth, SN)
+        ret = (dqa, diff, speed, depth, SN)
+        return ret
+
+    def dqa_compare(self, pk, pk_ref=None, angle=None):
+        if angle is None:
+            angle = self.cb.ask_number(title="Enter number", msg="What launch angle should be checked (degrees)",
+                                       default=60, min_value=0, max_value=90, decimals=0)
+            if angle is None:
+                logger.error("missing the launch angle to be checked")
+                return None
+        prof = self.db_retrieve_profile(pk).cur
+        if pk_ref is None:
+            prof_ref = self.ref.cur
+        else:
+            prof_ref = self.db_retrieve_profile(pk_ref).cur
+        return prof_ref.DQA_compare(prof, angle)
+
     # plotting
 
     def raise_plot_window(self):
