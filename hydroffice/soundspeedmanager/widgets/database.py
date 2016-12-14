@@ -9,13 +9,14 @@ logger = logging.getLogger(__name__)
 
 from hydroffice.soundspeed.profile.dicts import Dicts
 from hydroffice.soundspeedmanager.widgets.widget import AbstractWidget
-from hydroffice.soundspeedmanager.dialogs.export_profiles_dialog import ExportProfilesDialog
 from hydroffice.soundspeedmanager.dialogs.plot_profiles_dialog import PlotProfilesDialog
 from hydroffice.soundspeedmanager.dialogs.project_new_dialog import ProjectNewDialog
 from hydroffice.soundspeedmanager.dialogs.project_rename_dialog import ProjectRenameDialog
 from hydroffice.soundspeedmanager.dialogs.project_switch_dialog import ProjectSwitchDialog
 from hydroffice.soundspeedmanager.dialogs.import_data_dialog import ImportDataDialog
 from hydroffice.soundspeedmanager.dialogs.export_single_profile_dialog import ExportSingleProfileDialog
+from hydroffice.soundspeedmanager.dialogs.export_multi_profile_dialog import ExportMultiProfileDialog
+from hydroffice.soundspeedmanager.dialogs.export_profile_metadata_dialog import ExportProfileMetadataDialog
 
 
 class Database(AbstractWidget):
@@ -113,16 +114,22 @@ class Database(AbstractWidget):
         self.product_btn_box = QtGui.QDialogButtonBox(QtCore.Qt.Vertical)
         bottom_vbox.addStretch()
         bottom_vbox.addWidget(self.product_btn_box)
+        # --- export profiles
+        btn = QtGui.QPushButton("Export profiles")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.export_profile_switch)
+        btn.setToolTip("Export profile data")
+        self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
         # --- plot profiles
         btn = QtGui.QPushButton("Plot profiles")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.plot_profiles)
         btn.setToolTip("Create plots with profiles")
         self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
-        # --- export profiles
+        # --- export metadata
         btn = QtGui.QPushButton("Export info")
         # noinspection PyUnresolvedReferences
-        btn.clicked.connect(self.export_profiles)
+        btn.clicked.connect(self.export_profile_metadata)
         btn.setToolTip("Export profile locations and metadata")
         self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
         # --- output folder
@@ -158,7 +165,10 @@ class Database(AbstractWidget):
             menu.addAction(export_act)
 
         else:  # multiple selection
-            pass
+
+            export_act = QtGui.QAction("Export", self, statusTip="Export multiple profiles",
+                                       triggered=self.export_multi_profile)
+            menu.addAction(export_act)
 
         delete_act = QtGui.QAction("Delete", self, statusTip="Delete a profile", triggered=self.delete_profile)
         menu.addAction(delete_act)
@@ -198,7 +208,7 @@ class Database(AbstractWidget):
         rows = self.ssp_list.selectionModel().selectedRows()
         if len(rows) != 1:
             # noinspection PyCallByClass
-            QtGui.QMessageBox.information(self, "Database", "You need to select a single profile before exporting it!")
+            QtGui.QMessageBox.information(self, "Database", "Select a single profile before exporting it!")
             return
 
         # the primary key is the first column (= 0)
@@ -215,6 +225,26 @@ class Database(AbstractWidget):
         # finally, we clear the just loaded data
         self.lib.clear_data()
         self.main_win.data_cleared()
+
+    def export_multi_profile(self):
+        logger.debug("user want to export multiple profiles")
+
+        self.lib.clear_data()
+        self.main_win.data_cleared()
+
+        # check if any selection
+        rows = self.ssp_list.selectionModel().selectedRows()
+        if len(rows) < 2:
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.information(self, "Database", "Select multiple profiles before exporting them!")
+            return
+
+        pks = list()
+        for row in rows:
+            pks.append(int(self.ssp_list.item(row.row(), 0).text()))
+
+        dlg = ExportMultiProfileDialog(main_win=self.main_win, lib=self.lib, pks=pks, parent=self)
+        dlg.exec_()
 
     def delete_profile(self):
         logger.debug("user want to delete a profile")
@@ -288,9 +318,19 @@ class Database(AbstractWidget):
         logger.debug("user want to open the output folder")
         self.lib.open_outputs_folder()
 
-    def export_profiles(self):
-        logger.debug("user want to export profiles")
-        dlg = ExportProfilesDialog(lib=self.lib, main_win=self.main_win, parent=self)
+    def export_profile_switch(self):
+        logger.debug("user want to export profile data")
+
+        # check if any selection
+        rows = self.ssp_list.selectionModel().selectedRows()
+        if len(rows) < 2:
+            self.export_single_profile()
+        else:
+            self.export_multi_profile()
+
+    def export_profile_metadata(self):
+        logger.debug("user want to export profile metadata")
+        dlg = ExportProfileMetadataDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
 
     def plot_profiles(self):

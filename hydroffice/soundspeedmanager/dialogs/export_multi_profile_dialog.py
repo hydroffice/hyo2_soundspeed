@@ -11,15 +11,22 @@ from hydroffice.soundspeed.base.helper import explore_folder
 from hydroffice.soundspeed.profile.dicts import Dicts
 
 
-class ExportSingleProfileDialog(AbstractDialog):
+class ExportMultiProfileDialog(AbstractDialog):
 
-    def __init__(self, main_win, lib, parent=None):
+    def __init__(self, main_win, lib, pks, parent=None):
         AbstractDialog.__init__(self, main_win=main_win, lib=lib, parent=parent)
+
+        # check the passed primary keys
+        if type(pks) is not list:
+            raise RuntimeError("The dialog takes a list of primary keys, not %s" % type(pks))
+        if len(pks) < 2:
+            raise RuntimeError("The dialog takes a list of at least 2 primary keys, not %s" % len(pks))
+        self._pks = pks
 
         # the list of selected writers passed to the library
         self.selected_writers = list()
 
-        self.setWindowTitle("Export single profile")
+        self.setWindowTitle("Export multiple profiles")
         self.setMinimumWidth(160)
 
         settings = QtCore.QSettings()
@@ -95,7 +102,7 @@ class ExportSingleProfileDialog(AbstractDialog):
         hbox = QtGui.QHBoxLayout()
         self.mainLayout.addLayout(hbox)
         hbox.addStretch()
-        btn = QtGui.QPushButton("Export profile")
+        btn = QtGui.QPushButton("Export profiles")
         btn.setMinimumHeight(32)
         hbox.addWidget(btn)
         # noinspection PyUnresolvedReferences
@@ -120,38 +127,12 @@ class ExportSingleProfileDialog(AbstractDialog):
                 self.selected_writers.remove(name)
 
     def on_export_profile_btn(self):
-        logger.debug("export profile clicked")
+        logger.debug("export profiles clicked")
 
         if len(self.selected_writers) == 0:
             msg = "Select output formats before data export!"
             QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
             return
-
-        # special case: synthetic profile and NCEI
-        for writer in self.selected_writers:
-            if writer != 'ncei':
-                continue
-
-            if self.lib.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']:
-                msg = "Attempt to export a synthetic profile in NCEI format!"
-                QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
-                return
-
-            if self.lib.current_project == 'default':
-                msg = "The 'default' project cannot be used for NCEI export.\n\n" \
-                      "Rename the project in the Database tab!"
-                QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
-                return
-
-            if not self.lib.ssp.cur.meta.survey or \
-                    not self.lib.ssp.cur.meta.vessel or \
-                    not self.lib.ssp.cur.meta.institution:
-                msg = "Survey, vessel, and institution metadata are mandatory for NCEI export.\n\n" \
-                      "To fix the issue:\n" \
-                      "- Load the profile (if not already loaded)\n" \
-                      "- Set the missing values using the Metadata button on the Editor tool bar\n"
-                QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
-                return
 
         settings = QtCore.QSettings()
 
@@ -170,47 +151,75 @@ class ExportSingleProfileDialog(AbstractDialog):
         settings.setValue("export_folder", output_folder)
         logger.debug('output folder: %s' % output_folder)
 
-        # ask user for basename
-        basenames = list()
-        # NCEI has special filename convention
-        if (len(self.selected_writers) == 1) and (self.selected_writers[0] == 'ncei'):
-
-            pass
-
-        else:
-
-            basename_msg = "Enter output basename (without extension):"
-            while True:
-                # noinspection PyCallByClass
-                basename, ok = QtGui.QInputDialog.getText(self, "Output basename", basename_msg,
-                                                          text=self.lib.cur_basename)
-                if not ok:
-                    return
-                for _ in self.selected_writers:
-                    basenames.append(basename)
-                break
-
         # actually do the export
-        self.progress.start()
-        try:
-            self.lib.export_data(data_path=output_folder, data_files=basenames,
-                                 data_formats=self.selected_writers)
-        except RuntimeError as e:
+        for pk in self._pks:
+
+            success = self.lib.load_profile(pk)
+            if not success:
+
+                # noinspection PyCallByClass
+                QtGui.QMessageBox.warning(self, "Database", "Unable to load profile #%02d!" % pk, QtGui.QMessageBox.Ok)
+                continue
+
+            # special case: synthetic profile and NCEI
+            skip_export = False
+            for writer in self.selected_writers:
+
+                if writer != 'ncei':
+                    continue
+
+                if self.lib.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']:
+
+                    msg = "Attempt to export a synthetic profile in NCEI format!"
+                    QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
+                    skip_export = True
+                    continue
+
+                if self.lib.current_project == 'default':
+
+                    msg = "The 'default' project cannot be used for NCEI export.\n\n" \
+                          "Rename the project in the Database tab!"
+                    QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
+                    skip_export = True
+                    continue
+
+                if not self.lib.ssp.cur.meta.survey or \
+                        not self.lib.ssp.cur.meta.vessel or \
+                        not self.lib.ssp.cur.meta.institution:
+
+                    msg = "Survey, vessel, and institution metadata are mandatory for NCEI export.\n\n" \
+                          "To fix the issue:\n" \
+                          "- Load the profile (if not already loaded)\n" \
+                          "- Set the missing values using the Metadata button on the Editor tool bar\n"
+                    QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
+                    skip_export = True
+                    continue
+
+            if skip_export:
+                continue
+
+            self.progress.start(text="Exporting profile #%02d" % pk)
+            try:
+                self.progress.update(value=60)
+                self.lib.export_data(data_path=output_folder, data_formats=self.selected_writers)
+
+            except RuntimeError as e:
+                self.progress.end()
+                msg = "Issue in exporting the data for profile #%02d.\nReason: %s" % (pk, e)
+                # noinspection PyCallByClass
+                QtGui.QMessageBox.critical(self, "Export error", msg, QtGui.QMessageBox.Ok)
+                continue
             self.progress.end()
-            msg = "Issue in exporting the data.\nReason: %s" % e
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.critical(self, "Export error", msg, QtGui.QMessageBox.Ok)
-            return
 
         # opening the output folder
         export_open_folder = self.openFolder.isChecked()
         settings.setValue("export_open_folder", export_open_folder)
         if export_open_folder:
+
             explore_folder(output_folder)  # open the output folder
-            self.progress.end()
 
         else:
-            self.progress.end()
+
             msg = "Profile successfully exported!"
             # noinspection PyCallByClass
             QtGui.QMessageBox.information(self, "Export profile", msg, QtGui.QMessageBox.Ok)
