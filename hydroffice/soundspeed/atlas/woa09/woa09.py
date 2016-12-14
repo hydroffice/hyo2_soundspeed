@@ -32,7 +32,7 @@ class Woa09(AbstractAtlas):
         self.s_monthly = None
         self.s_seasonal = None
         self.landsea = None
-        self.basin = None
+        # self.basin = None
 
         self.lat_step = None
         self.lon_step = None
@@ -107,8 +107,8 @@ class Woa09(AbstractAtlas):
             self.s_seasonal = Dataset(os.path.join(self.folder, "salinity_seasonal_1deg.nc"))
             landsea = np.genfromtxt((os.path.join(self.folder, "landsea.msk")))
             self.landsea = landsea.reshape((180, 360))
-            basin = np.genfromtxt((os.path.join(self.folder, "basin.msk")))
-            self.basin = basin.reshape((33, 180, 360))
+            # basin = np.genfromtxt((os.path.join(self.folder, "basin.msk")))
+            # self.basin = basin.reshape((33, 180, 360))
         except Exception as e:
             logger.error("issue in reading the netCDF data: %s" % e)
             return False
@@ -392,7 +392,7 @@ class Woa09(AbstractAtlas):
                 self.s_seasonal.close()
             self.s_seasonal = None
             self.landsea = None
-            self.basin = None
+            # self.basin = None
             self.lat_step = None
             self.lon_step = None
             self.lat_0 = None

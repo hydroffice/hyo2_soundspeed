@@ -15,6 +15,7 @@ logger.addHandler(ch)
 
 from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
 from hydroffice.soundspeedmanager.qt_callbacks import QtCallbacks
+from hydroffice.soundspeedmanager.qt_progress import QtProgress
 
 
 def main():
@@ -22,8 +23,7 @@ def main():
     mw = QtGui.QMainWindow()
     mw.show()
 
-    lib = SoundSpeedLibrary(qt_progress=QtGui.QProgressDialog)
-    lib.set_callbacks(QtCallbacks(mw))
+    lib = SoundSpeedLibrary(progress=QtProgress(parent=mw), callbacks=QtCallbacks(parent=mw))
 
     tests = [
         (43.026480, -70.318824, dt.utcnow()),  # offshore Portsmouth
@@ -39,11 +39,6 @@ def main():
     logger.info("has woa09: %s" % lib.has_woa09())
 
     # logger.info("load woa09: %s" % lib.atlases.woa09.load_grids())
-
-    # test for a few locations
-    for test in tests:
-        # just the ssp (there are also ssp_min and ssp_max)
-        logger.info("woa09 profiles:\n%s" % lib.atlases.woa09.query(lat=test[0], lon=test[1], datestamp=test[2]))
 
     # test user interaction: 3 profiles (avg, min, max)
     lib.retrieve_woa09()

@@ -37,7 +37,7 @@ class CliProgress(AbstractProgress):
         self._min = min_value
         self._max = max_value
         self._range = self._max - self._min
-        self._value = self._min + 0.1 * self._range
+        self._value = self._min
 
         self._is_canceled = False
 
@@ -51,7 +51,7 @@ class CliProgress(AbstractProgress):
             if value < self._value:
                 raise RuntimeError('attempt to update current progress value (%d) with a smaller value (%d)'
                                    % (self._value, value))
-            if (value < self._min) or (value >= self._max):
+            if (value < self._min) or (value > self._max):
                 raise RuntimeError('attempt to update current progress value (%d) outside valid range(%s %s)'
                                    % (value, self._min, self._max))
             self._value = value
@@ -70,7 +70,7 @@ class CliProgress(AbstractProgress):
         if tmp_value < self._value:
             raise RuntimeError('attempt to update current progress value (%d) with a smaller value (%d)'
                                % (self._value, tmp_value))
-        if (tmp_value < self._min) or (tmp_value >= self._max):
+        if (tmp_value < self._min) or (tmp_value > self._max):
             raise RuntimeError('attempt to update current progress value (%d) outside valid range(%s %s)'
                                % (tmp_value, self._min, self._max))
 

@@ -141,7 +141,7 @@ class Ftp(object):
         self.filesize = self.conn.size(file_src)
         if self.show_progress:
             if self.progress:
-                self.progress.start(text="Downloading", abortion=True)
+                self.progress.start(text="Downloading", has_abortion=True)
             else:
                 progress = ProgressBar(end_state=self.filesize, bar_width=50)
 
@@ -153,7 +153,7 @@ class Ftp(object):
                 self.chunk_count += len(chunk)
                 if self.show_progress:
                     if self.progress:
-                        if self.progress.was_canceled():
+                        if self.progress.canceled:
                             raise RuntimeError("download stopped by user")
                         pt = int((self.chunk_count / self.filesize) * 100.0)
                         self.progress.update(pt)
@@ -181,7 +181,7 @@ class Ftp(object):
                 self.file_nr = len(name_list)
                 if self.show_progress:
                     if self.progress:
-                        self.progress.start(text="Unzipping", abortion=True)
+                        self.progress.start(text="Unzipping", has_abortion=True)
                     else:
                         progress = ProgressBar(end_state=self.file_nr, bar_width=50)
 
@@ -192,7 +192,7 @@ class Ftp(object):
                     self.file_count += 1
                     if self.show_progress:
                         if self.progress:
-                            if self.progress.was_canceled():
+                            if self.progress.canceled:
                                 raise RuntimeError("unzip stopped by user")
                             pct = int((self.file_count / self.file_nr) * 100.0)
                             self.progress.update(pct)
