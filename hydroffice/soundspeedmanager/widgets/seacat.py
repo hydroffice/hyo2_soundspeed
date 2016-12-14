@@ -36,6 +36,8 @@ def get_setting_string(keyname, default=None):
     val = settings.value(keyname)
     if val is not None:
         val = str(val)
+    else:
+        val = default
     return val
 
 
