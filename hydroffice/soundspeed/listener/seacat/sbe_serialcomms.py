@@ -94,22 +94,14 @@ class SeacatComms(object):
                 if not bSuccess:
                     self.comlink.close()
                     if not quiet:
-                        try:
-                            wx.MessageBox("Did not get expected response from Seacat.  Is it connected?  Specified correct com port?",
-                                          "Error Connecting", wx.ICON_ERROR | wx.OK | wx.CENTER, parent)
-                        except wx.PyNoAppError:
-                            print("Did not get expected response from Seacat.  Is it connected?  Specified correct com port?")
+                        logger.error("Did not get expected response from Seacat.  Is it connected?  Specified correct com port?")
             if self.comlink.isOpen() and any([prompt in r for prompt in self.PROMPTS]):
                 # print('getting status')
                 self.original_baud = self.comlink.getBaudrate()
                 self.get_status()  # checks and caches a legit return so we can see what kind of seacat it is
         except serial.SerialException, e:
             traceback.print_exc()
-            try:
-                wx.MessageBox("Could not open port %s.\nIt's most likely either in use by another program or doesn't exist",
-                              "Error Opening Comm Port", wx.ICON_ERROR | wx.OK | wx.CENTER, parent)
-            except wx.PyNoAppError:
-                print("Could not open port %s.\nIt's most likely either in use by another program or doesn't exist")
+            logger.error("Could not open port %s.\nIt's most likely either in use by another program or doesn't exist")
             raise e
         except:
             traceback.print_exc()
