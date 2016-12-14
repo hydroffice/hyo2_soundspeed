@@ -87,6 +87,7 @@ class QtCallbacks(AbstractCallbacks):
     def ask_filename(self, saving=True, key_name=None, default_path=".",
                      title="Choose a path/filename", default_file="",
                      file_filter="All Files|*.*", multi_file=False):
+        '''key_name is used to save/restore the last directory a file was selected in'''
 
         # flt = "Format %s(*.%s);;All files (*.*)" % (desc, " *.".join(ext))
         dlg_options = {'parent': self._parent, 'caption': title, 'filter': file_filter}
@@ -98,11 +99,11 @@ class QtCallbacks(AbstractCallbacks):
                 selection, _ = QtGui.QFileDialog.getSaveFileName(**dlg_options)
             else:
                 selection, _ = QtGui.QFileDialog.getOpenFileName(**dlg_options)
-            if selection:
+            if selection and key_name:
                 self._settings.setValue(key_name, os.path.dirname(selection))
         else:
             selection, _ = QtGui.QFileDialog.getOpenFileNames(**dlg_options)
-            if selection:
+            if selection and key_name:
                 self._settings.setValue(key_name, os.path.dirname(selection[0]))
 
         if selection:
@@ -112,13 +113,15 @@ class QtCallbacks(AbstractCallbacks):
 
     def ask_directory(self, key_name=None, default_path=".",
                       title="Browse for folder", message=""):
-        """Ask a directory to the user."""
+        """Ask a directory to the user.
+        key_name is used to save/restore the last directory selected
+        """
 
         default_dir = self._settings.value(key_name) if key_name else ""
 
         output_folder = QtGui.QFileDialog.getExistingDirectory(self._parent, caption=title,
                                                                dir=default_dir)
-        if output_folder:
+        if output_folder and key_name:
             self._settings.setValue(key_name, output_folder)
             logger.debug('user selection: %s' % output_folder)
 
