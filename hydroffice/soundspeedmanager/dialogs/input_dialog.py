@@ -149,6 +149,7 @@ class InputDialog(AbstractDialog):
             QtGui.QMessageBox.warning(self, "Database", msg, QtGui.QMessageBox.Ok)
             return
 
+        # noinspection PyCallByClass
         sel, ok = QtGui.QInputDialog.getItem(self, 'Database', 'Select profile to load:', lst, 0, False)
         if not ok:
             return
@@ -156,8 +157,11 @@ class InputDialog(AbstractDialog):
         success = self.lib.load_profile(profiles[lst.index(sel)][0])
         if not success:
             msg = "Unable to load profile!"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Database", msg, QtGui.QMessageBox.Ok)
             return
+
+        self.accept()
 
     def on_click_woa09(self):
         """Retrieve WOA09 data"""

@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from PySide import QtGui
 from PySide import QtCore
 
+import os
 import logging
 logger = logging.getLogger(__name__)
 
@@ -150,6 +151,20 @@ class ExportMultiProfileDialog(AbstractDialog):
             output_folder = self.lib.outputs_folder
         settings.setValue("export_folder", output_folder)
         logger.debug('output folder: %s' % output_folder)
+
+        # Caris-specific check for file concatenation
+        for writer in self.selected_writers:
+
+            if writer == 'caris':
+                caris_path = os.path.join(output_folder, "caris", self.lib.current_project + ".svp")
+                if os.path.exists(caris_path):
+                    msg = "An existing Caris file is present in the output folder.\n\n" \
+                          "Do you want to remove it to avoid possible profile duplications?"
+                    ret = QtGui.QMessageBox.question(self, "Caris export", msg,
+                                                     QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+                    if ret == QtGui.QMessageBox.Yes:
+                        os.remove(caris_path)
+                break
 
         # actually do the export
         for pk in self._pks:

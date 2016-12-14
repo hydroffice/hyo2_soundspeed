@@ -1,12 +1,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from abc import ABCMeta, abstractmethod, abstractproperty
+from abc import ABCMeta, abstractmethod
 import os
 import logging
 
 logger = logging.getLogger(__name__)
 
-from ..base.geodesy import Geodesy
+from hydroffice.soundspeed.base.geodesy import Geodesy
 
 
 class AbstractAtlas(object):

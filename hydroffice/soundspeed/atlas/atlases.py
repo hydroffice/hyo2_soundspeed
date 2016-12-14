@@ -5,9 +5,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from .rtofs.rtofs import Rtofs
-from .woa09.woa09 import Woa09
-from .woa13.woa13 import Woa13
+from hydroffice.soundspeed.atlas.rtofs.rtofs import Rtofs
+from hydroffice.soundspeed.atlas.woa09.woa09 import Woa09
+from hydroffice.soundspeed.atlas.woa13.woa13 import Woa13
 
 
 class Atlases(object):
