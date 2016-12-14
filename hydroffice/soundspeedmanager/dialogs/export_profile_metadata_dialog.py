@@ -6,7 +6,7 @@ from PySide import QtCore
 import logging
 logger = logging.getLogger(__name__)
 
-from .dialog import AbstractDialog
+from hydroffice.soundspeedmanager.dialogs.dialog import AbstractDialog
 from hydroffice.soundspeed.base.gdal_aux import GdalAux
 
 

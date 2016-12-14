@@ -9,8 +9,8 @@ import time
 
 logger = logging.getLogger(__name__)
 
-from ..abstract import AbstractListener
-from ...formats.readers import sippican
+from hydroffice.soundspeed.listener.abstract import AbstractListener
+from hydroffice.soundspeed.formats.readers import sippican
 
 
 class Sippican(AbstractListener):

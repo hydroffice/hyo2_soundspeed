@@ -6,8 +6,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from ...base.helper import FileManager
-from ..abstract import AbstractFormat
+from hydroffice.soundspeed.base.helper import FileManager
+from hydroffice.soundspeed.formats.abstract import AbstractFormat
 
 
 class AbstractWriter(AbstractFormat):

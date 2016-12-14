@@ -28,8 +28,8 @@ from matplotlib.figure import Figure
 
 logger = logging.getLogger(__name__)
 
-from .widget import AbstractWidget
-from .navtoolbar import NavToolbar
+from hydroffice.soundspeedmanager.widgets.widget import AbstractWidget
+from hydroffice.soundspeedmanager.widgets.navtoolbar import NavToolbar
 
 
 class DataPlots(AbstractWidget):

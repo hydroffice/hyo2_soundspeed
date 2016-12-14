@@ -6,15 +6,15 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from .. import __version__ as ssp_version
-from .metadata import Metadata
-from .samples import Samples
-from .more import More
-from .dicts import Dicts
-from .oceanography import Oceanography as Oc
-from . import geostrophic_48
-from .svequations import SVEquations
-from .raypath import Raypath
+from hydroffice.soundspeed import __version__ as ssp_version
+from hydroffice.soundspeed.profile.metadata import Metadata
+from hydroffice.soundspeed.profile.samples import Samples
+from hydroffice.soundspeed.profile.more import More
+from hydroffice.soundspeed.profile.dicts import Dicts
+from hydroffice.soundspeed.profile.oceanography import Oceanography as Oc
+from hydroffice.soundspeed.profile import geostrophic_48
+from hydroffice.soundspeed.profile.svequations import SVEquations
+from hydroffice.soundspeed.profile.raypath import Raypath
 
 
 class Profile(object):

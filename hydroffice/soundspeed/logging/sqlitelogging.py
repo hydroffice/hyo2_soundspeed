@@ -5,8 +5,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from .sqlitehandler import SQLiteHandler
-from .filters import NotServerFilter, ServerFilter
+from hydroffice.soundspeed.logging.sqlitehandler import SQLiteHandler
+from hydroffice.soundspeed.logging.filters import NotServerFilter, ServerFilter
 
 
 class SqliteLogging(object):

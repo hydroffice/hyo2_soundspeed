@@ -4,11 +4,11 @@ import os
 import logging
 
 from PySide import QtGui
-from hydroffice.soundspeed.profile.dicts import Dicts
 
 logger = logging.getLogger(__name__)
 
-from .widget import AbstractWidget
+from hydroffice.soundspeed.profile.dicts import Dicts
+from hydroffice.soundspeedsettings.widgets.widget import AbstractWidget
 
 
 class Input(AbstractWidget):

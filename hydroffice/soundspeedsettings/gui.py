@@ -8,7 +8,7 @@ import logging
 log = logging.getLogger(__name__)
 
 from . import mainwin
-from hydroffice.soundspeed.project import Project
+from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
 
 
 def gui():
@@ -16,8 +16,8 @@ def gui():
 
     app = QtGui.QApplication(sys.argv)
 
-    prj = Project()
-    main = mainwin.MainWin(lib=prj)
+    lib = SoundSpeedLibrary()
+    main = mainwin.MainWin(lib=lib)
     main.show()
 
     sys.exit(app.exec_())

@@ -7,9 +7,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from .sis.sis import Sis
-from .sippican.sippican import Sippican
-from .mvp.mvp import Mvp
+from hydroffice.soundspeed.listener.sis.sis import Sis
+from hydroffice.soundspeed.listener.sippican.sippican import Sippican
+from hydroffice.soundspeed.listener.mvp.mvp import Mvp
 
 
 class Listeners(object):

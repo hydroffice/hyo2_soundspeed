@@ -1,15 +1,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import os
 import numpy as np
-import math
-import datetime
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-from .abstract import AbstractTextWriter
+from hydroffice.soundspeed.formats.writers.abstract import AbstractTextWriter
 
 
 class Hypack(AbstractTextWriter):

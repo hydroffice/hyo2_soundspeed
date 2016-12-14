@@ -6,9 +6,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from ..profile.dicts import Dicts
-from ..formats.writers.asvp import Asvp
-from ..formats.writers.calc import Calc
+from hydroffice.soundspeed.profile.dicts import Dicts
+from hydroffice.soundspeed.formats.writers.asvp import Asvp
+from hydroffice.soundspeed.formats.writers.calc import Calc
 
 
 class Client(object):

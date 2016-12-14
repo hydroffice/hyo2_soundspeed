@@ -9,13 +9,13 @@ from PySide import QtCore
 import logging
 logger = logging.getLogger(__name__)
 
-from . import __version__ as sss_version
-from . import __doc__ as sss_name
-from .widgets.main import Main
-from .widgets.general import General
-from .widgets.input import Input
-from .widgets.output import Output
-from .widgets.listeners import Listeners
+from hydroffice.soundspeedsettings import __version__ as sss_version
+from hydroffice.soundspeedsettings import __doc__ as sss_name
+from hydroffice.soundspeedsettings.widgets.main import Main
+from hydroffice.soundspeedsettings.widgets.general import General
+from hydroffice.soundspeedsettings.widgets.input import Input
+from hydroffice.soundspeedsettings.widgets.output import Output
+from hydroffice.soundspeedsettings.widgets.listeners import Listeners
 
 from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
 

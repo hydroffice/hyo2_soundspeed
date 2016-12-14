@@ -2,10 +2,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import os
 import numpy as np
-import logging
-
-logger = logging.getLogger(__name__)
-
 from matplotlib import rcParams
 rcParams.update(
     {
@@ -21,6 +17,9 @@ from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
 from mpl_toolkits.axes_grid1.inset_locator import mark_inset
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class PlotDb(object):

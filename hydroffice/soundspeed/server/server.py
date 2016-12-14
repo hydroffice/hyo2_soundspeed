@@ -1,13 +1,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import time
-import os
 from threading import Thread, Event
 import logging
 
 logger = logging.getLogger(__name__)
 
-from ..profile.dicts import Dicts
+from hydroffice.soundspeed.profile.dicts import Dicts
 
 
 class Server(Thread):

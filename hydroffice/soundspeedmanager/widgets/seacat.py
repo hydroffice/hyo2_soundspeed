@@ -7,7 +7,7 @@ from PySide import QtGui
 
 logger = logging.getLogger(__name__)
 
-from .widget import AbstractWidget
+from hydroffice.soundspeedmanager.widgets.widget import AbstractWidget
 
 
 class Seacat(AbstractWidget):

@@ -1,14 +1,14 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from osgeo import ogr
+
 import os
 import logging
 
 logger = logging.getLogger(__name__)
 
-from osgeo import gdal
-from osgeo import ogr
-from ..base.gdal_aux import GdalAux
-from ..profile.dicts import Dicts
+from hydroffice.soundspeed.base.gdal_aux import GdalAux
+from hydroffice.soundspeed.profile.dicts import Dicts
 
 
 class ExportDb(object):

@@ -2,13 +2,11 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import numpy as np
 import time
-from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
 
-from ..profile.dicts import Dicts
-from .client import Client
+from hydroffice.soundspeed.client.client import Client
 
 
 class ClientList(object):

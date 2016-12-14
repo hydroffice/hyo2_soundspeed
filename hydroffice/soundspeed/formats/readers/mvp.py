@@ -7,7 +7,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 from hydroffice.soundspeed.formats.readers.abstract import AbstractReader
 from hydroffice.soundspeed.profile.dicts import Dicts
 from hydroffice.soundspeed.base.callbacks.cli_callbacks import CliCallbacks

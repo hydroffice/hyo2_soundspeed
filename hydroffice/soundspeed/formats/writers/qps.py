@@ -7,8 +7,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from .abstract import AbstractTextWriter
-from ...profile.dicts import Dicts
+from hydroffice.soundspeed.formats.writers.abstract import AbstractTextWriter
+from hydroffice.soundspeed.profile.dicts import Dicts
 
 
 class Qps(AbstractTextWriter):

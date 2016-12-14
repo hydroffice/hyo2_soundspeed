@@ -7,7 +7,7 @@ from PySide import QtGui, QtCore
 
 logger = logging.getLogger(__name__)
 
-from .widget import AbstractWidget
+from hydroffice.soundspeedsettings.widgets.widget import AbstractWidget
 from hydroffice.soundspeed.profile.dicts import Dicts
 
 

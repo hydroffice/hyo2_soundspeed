@@ -6,7 +6,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from .dicts import Dicts
+from hydroffice.soundspeed.profile.dicts import Dicts
 
 
 class Metadata(object):

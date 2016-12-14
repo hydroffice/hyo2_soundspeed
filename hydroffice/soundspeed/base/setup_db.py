@@ -6,8 +6,8 @@ import sqlite3
 
 logger = logging.getLogger(__name__)
 
-from .basedb import BaseDb
-from .setup_sql import CREATE_SETTINGS, CREATE_SETTINGS_VIEW, CREATE_CLIENT_LIST
+from hydroffice.soundspeed.base.basedb import BaseDb
+from hydroffice.soundspeed.base.setup_sql import CREATE_SETTINGS, CREATE_SETTINGS_VIEW, CREATE_CLIENT_LIST
 
 
 class SetupDb(BaseDb):

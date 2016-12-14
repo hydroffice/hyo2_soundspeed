@@ -4,7 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from .profile import Profile
+from hydroffice.soundspeed.profile.profile import Profile
 
 
 class ProfileList(object):

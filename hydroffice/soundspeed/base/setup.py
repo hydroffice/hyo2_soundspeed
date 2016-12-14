@@ -4,10 +4,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from .setup_db import SetupDb
-from ..profile.dicts import Dicts
-from ..client.clientlist import ClientList
-from .helper import first_match
+from hydroffice.soundspeed.base.setup_db import SetupDb
+from hydroffice.soundspeed.profile.dicts import Dicts
+from hydroffice.soundspeed.client.clientlist import ClientList
+from hydroffice.soundspeed.base.helper import first_match
 
 
 class Setup(object):

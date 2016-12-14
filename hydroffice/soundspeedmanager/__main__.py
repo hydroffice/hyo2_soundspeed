@@ -11,6 +11,6 @@ ch.setFormatter(ch_formatter)
 logger.addHandler(ch)
 
 
-from . import gui
+from hydroffice.soundspeedmanager import gui
 
 gui.gui()

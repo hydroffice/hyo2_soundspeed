@@ -9,8 +9,8 @@ import struct
 
 logger = logging.getLogger(__name__)
 
-from ..abstract import AbstractListener
-from ...formats import km
+from hydroffice.soundspeed.listener.abstract import AbstractListener
+from hydroffice.soundspeed.formats import km
 
 
 class Sis(AbstractListener):

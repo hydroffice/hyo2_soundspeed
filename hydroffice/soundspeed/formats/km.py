@@ -8,7 +8,7 @@ import numpy as np
 
 log = logging.getLogger(__name__)
 
-from ..profile.dicts import Dicts
+from hydroffice.soundspeed.profile.dicts import Dicts
 
 
 class Km(object):

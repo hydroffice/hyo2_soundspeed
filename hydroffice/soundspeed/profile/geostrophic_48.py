@@ -5,9 +5,10 @@ from __future__ import division
 import numpy as np
 import gsw
 import logging
-from .oceanography import Oceanography as Oc
 
 logger = logging.getLogger(__name__)
+
+from hydroffice.soundspeed.profile.oceanography import Oceanography as Oc
 
 
 def geo_strf_dyn_height(SA,CT,p,p_ref):

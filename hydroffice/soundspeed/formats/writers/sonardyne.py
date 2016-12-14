@@ -5,10 +5,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from ... import __version__ as ssp_version
-from ... import __doc__ as ssp_name
-from .abstract import AbstractTextWriter
-from ...profile.dicts import Dicts
+from hydroffice.soundspeed import __version__ as ssp_version
+from hydroffice.soundspeed import __doc__ as ssp_name
+from hydroffice.soundspeed.formats.writers.abstract import AbstractTextWriter
+from hydroffice.soundspeed.profile.dicts import Dicts
 
 
 class Sonardyne(AbstractTextWriter):

@@ -9,8 +9,8 @@ from threading import Thread, Event
 
 logger = logging.getLogger(__name__)
 
-from ..abstract import AbstractListener
-from ...formats.readers import mvp
+from hydroffice.soundspeed.listener.abstract import AbstractListener
+from hydroffice.soundspeed.formats.readers import mvp
 
 
 class Mvp(AbstractListener):

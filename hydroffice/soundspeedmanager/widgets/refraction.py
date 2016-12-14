@@ -7,8 +7,8 @@ from PySide import QtGui
 
 logger = logging.getLogger(__name__)
 
-from .widget import AbstractWidget
-from .dataplots import DataPlots
+from hydroffice.soundspeedmanager.widgets.widget import AbstractWidget
+from hydroffice.soundspeedmanager.widgets.dataplots import DataPlots
 
 
 class Refraction(AbstractWidget):

@@ -5,7 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from ..profile.profilelist import ProfileList
+from hydroffice.soundspeed.profile.profilelist import ProfileList
 
 
 class AbstractFormat(object):
