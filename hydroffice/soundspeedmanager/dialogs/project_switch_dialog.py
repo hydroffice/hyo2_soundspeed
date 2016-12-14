@@ -10,7 +10,7 @@ from .dialog import AbstractDialog
 from hydroffice.soundspeed.base.gdal_aux import GdalAux
 
 
-class SwitchProjectDialog(AbstractDialog):
+class ProjectSwitchDialog(AbstractDialog):
 
     def __init__(self, main_win, lib, parent=None):
         AbstractDialog.__init__(self, main_win=main_win, lib=lib, parent=parent)

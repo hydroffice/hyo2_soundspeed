@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import time
 import os
 import copy
+import shutil
 import logging
 
 logger = logging.getLogger(__name__)
@@ -590,6 +591,7 @@ class SoundSpeedLibrary(object):
             raise RuntimeError("Data not loaded")
         if type(data_formats) is not list:
             raise RuntimeError("Passed %s in place of list" % type(data_formats))
+
         has_data_files = False
         if data_files is not None:
             if len(data_files) == 0:
@@ -637,6 +639,25 @@ class SoundSpeedLibrary(object):
     @current_project.setter
     def current_project(self, value):
         self.setup.current_project = value
+
+    def rename_current_project(self, name):
+        old_db_path = os.path.join(self.projects_folder, self.current_project + ".db")
+        if not os.path.exists(old_db_path):
+            raise RuntimeError("unable to locate the current project: %s" % old_db_path)
+
+        new_db_path = os.path.join(self.projects_folder, name + ".db")
+        if os.path.exists(new_db_path):
+            raise RuntimeError("the project already exists: %s" % new_db_path)
+
+        shutil.copy(old_db_path, new_db_path)
+        if not os.path.exists(new_db_path):
+            raise RuntimeError("unable to copy the project db: %s" % new_db_path)
+
+        os.remove(old_db_path)
+
+        self.current_project = name
+        self.save_settings_to_db()
+        self.reload_settings_from_db()
 
     def list_projects(self):
         """Return a list with all the available projects"""

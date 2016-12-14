@@ -11,8 +11,9 @@ from hydroffice.soundspeed.profile.dicts import Dicts
 from hydroffice.soundspeedmanager.widgets.widget import AbstractWidget
 from hydroffice.soundspeedmanager.dialogs.export_profiles_dialog import ExportProfilesDialog
 from hydroffice.soundspeedmanager.dialogs.plot_profiles_dialog import PlotProfilesDialog
-from hydroffice.soundspeedmanager.dialogs.new_project_dialog import NewProjectDialog
-from hydroffice.soundspeedmanager.dialogs.switch_project_dialog import SwitchProjectDialog
+from hydroffice.soundspeedmanager.dialogs.project_new_dialog import ProjectNewDialog
+from hydroffice.soundspeedmanager.dialogs.project_rename_dialog import ProjectRenameDialog
+from hydroffice.soundspeedmanager.dialogs.project_switch_dialog import ProjectSwitchDialog
 from hydroffice.soundspeedmanager.dialogs.import_data_dialog import ImportDataDialog
 
 
@@ -76,6 +77,12 @@ class Database(AbstractWidget):
         self.btn_new_project.clicked.connect(self.new_project)
         self.btn_new_project.setToolTip("Create a new project")
         self.manage_btn_box.addButton(self.btn_new_project, QtGui.QDialogButtonBox.ActionRole)
+        # --- rename project
+        self.btn_rename_project = QtGui.QPushButton("Rename project")
+        # noinspection PyUnresolvedReferences
+        self.btn_rename_project.clicked.connect(self.rename_project)
+        self.btn_rename_project.setToolTip("Rename the current project")
+        self.manage_btn_box.addButton(self.btn_rename_project, QtGui.QDialogButtonBox.ActionRole)
         # --- load project
         self.btn_load_project = QtGui.QPushButton("Switch project")
         # noinspection PyUnresolvedReferences
@@ -182,11 +189,9 @@ class Database(AbstractWidget):
     def export_single_profile(self):
         logger.debug("user want to export a single profile")
 
-        # TODO
-
-        # loaded_pk = None
-        # if self.lib.has_ssp():
-        #     self.lib.ssp.
+        # first, we clear the current data (if any)
+        self.lib.clear_data()
+        self.main_win.data_cleared()
 
         # # check if any selection
         # rows = self.ssp_list.selectionModel().selectedRows()
@@ -206,6 +211,10 @@ class Database(AbstractWidget):
         # if self.lib.has_ssp():
         #     self.main_win.data_imported()
         #     self.main_win.tabs.setCurrentIndex(0)
+
+        # finally, we clear the just loaded data
+        self.lib.clear_data()
+        self.main_win.data_cleared()
 
     def delete_profile(self):
         logger.debug("user want to delete a profile")
@@ -240,7 +249,16 @@ class Database(AbstractWidget):
     def new_project(self):
         logger.debug("user want to create a new project")
 
-        dlg = NewProjectDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        dlg = ProjectNewDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        success = dlg.exec_()
+
+        if success:
+            self.update_table()
+
+    def rename_project(self):
+        logger.debug("user want to rename a project")
+
+        dlg = ProjectRenameDialog(lib=self.lib, main_win=self.main_win, parent=self)
         success = dlg.exec_()
 
         if success:
@@ -249,7 +267,7 @@ class Database(AbstractWidget):
     def switch_project(self):
         logger.debug("user want to switch to another project")
 
-        dlg = SwitchProjectDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        dlg = ProjectSwitchDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
 
         self.update_table()

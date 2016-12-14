@@ -181,7 +181,6 @@ class Ncei(AbstractWriter):
         # SUGGESTED - Version identifier of the data file or product as assigned by the data creator. (ACDD)
         self.root_group.product_version = b'Created using HydrOffice %s v.%s' % (ssp_name, ssp_version)
 
-
     def _write_body(self):
         logger.debug('generating body')
 
@@ -271,7 +270,7 @@ class Ncei(AbstractWriter):
 
     def _miss_metadata(self):
         vi = self.ssp.cur.data_valid
-        msg = 'NCEI export error --'
+        msg = 'NCEI export error: '
         
         if self.ssp.cur.meta.sensor_type == Dicts.sensor_types['Unknown'] or \
                 self.ssp.cur.meta.sensor_type == Dicts.sensor_types['Synthetic']:
@@ -282,10 +281,9 @@ class Ncei(AbstractWriter):
                 self._is_empty(self.ssp.cur.data.conductivity[vi]) and self._is_empty(self.ssp.cur.data.sal[vi]):
             msg = '%s missing critical data' % msg
         elif self._project in ['', 'default']:
-            msg = '%s missing project name, cannot export NCEI file from default project' % msg
+            msg = '%s project name is not valid' % msg
         elif not self.ssp.cur.meta.survey or not self.ssp.cur.meta.vessel or not self.ssp.cur.meta.institution:
             msg = '%s missing survey, vessel, or institution' % msg
 
-        if msg != 'NCEI export error --':
+        if msg != 'NCEI export error: ':
             raise RuntimeError(msg)
-

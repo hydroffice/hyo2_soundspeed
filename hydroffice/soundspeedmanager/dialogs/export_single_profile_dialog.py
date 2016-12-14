@@ -56,7 +56,9 @@ class ExportSingleProfileDialog(AbstractDialog):
             btn_settings = settings.value("export_single_%s" % name)
             if btn_settings is None:
                 settings.setValue("export_single_%s" % name, False)
-            btn.setChecked(settings.value("export_single_%s" % name) == 'true')
+            if settings.value("export_single_%s" % name) == 'true':
+                btn.setChecked(True)
+                self.selected_writers.append(name)
 
             self.buttonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
 
@@ -94,7 +96,7 @@ class ExportSingleProfileDialog(AbstractDialog):
         self.mainLayout.addLayout(hbox)
         hbox.addStretch()
         btn = QtGui.QPushButton("Export profile")
-        btn.setMinimumHeight(36)
+        btn.setMinimumHeight(32)
         hbox.addWidget(btn)
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_export_profile_btn)
@@ -126,11 +128,27 @@ class ExportSingleProfileDialog(AbstractDialog):
             return
 
         # special case: synthetic profile and NCEI
-        if (self.selected_writers[0] == 'ncei') and \
-                (self.lib.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']):
-            msg = "Attempt to export a synthetic profile in NCEI format!"
-            QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
-            return
+        for writer in self.selected_writers:
+            if writer != 'ncei':
+                continue
+
+            if self.lib.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']:
+                msg = "Attempt to export a synthetic profile in NCEI format!"
+                QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
+                return
+
+            if self.lib.current_project == 'default':
+                msg = "The 'default' project cannot be used for NCEI export.\nRename the project in the Database tab!"
+                QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
+                return
+
+            if not self.lib.ssp.cur.meta.survey or \
+                    not self.lib.ssp.cur.meta.vessel or \
+                    not self.lib.ssp.cur.meta.institution:
+                msg = "Survey, vessel, and institution metadata are mandatory for NCEI export.\n" \
+                      "Set them using the Metadata button in the tool bar!"
+                QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
+                return
 
         settings = QtCore.QSettings()
 
@@ -177,6 +195,7 @@ class ExportSingleProfileDialog(AbstractDialog):
         except RuntimeError as e:
             self.progress.end()
             msg = "Issue in exporting the data.\nReason: %s" % e
+            # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Export error", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -190,6 +209,7 @@ class ExportSingleProfileDialog(AbstractDialog):
         else:
             self.progress.end()
             msg = "Profile successfully exported!"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.information(self, "Export profile", msg, QtGui.QMessageBox.Ok)
 
         self.accept()
