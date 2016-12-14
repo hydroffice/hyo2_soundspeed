@@ -15,6 +15,7 @@ from hydroffice.soundspeedmanager.dialogs.project_new_dialog import ProjectNewDi
 from hydroffice.soundspeedmanager.dialogs.project_rename_dialog import ProjectRenameDialog
 from hydroffice.soundspeedmanager.dialogs.project_switch_dialog import ProjectSwitchDialog
 from hydroffice.soundspeedmanager.dialogs.import_data_dialog import ImportDataDialog
+from hydroffice.soundspeedmanager.dialogs.export_single_profile_dialog import ExportSingleProfileDialog
 
 
 class Database(AbstractWidget):
@@ -193,24 +194,23 @@ class Database(AbstractWidget):
         self.lib.clear_data()
         self.main_win.data_cleared()
 
-        # # check if any selection
-        # rows = self.ssp_list.selectionModel().selectedRows()
-        # if len(rows) != 1:
-        #     # noinspection PyCallByClass
-        #     QtGui.QMessageBox.information(self, "Database", "You need to select a single profile before loading it!")
-        #     return
-        #
-        # # the primary key is the first column (= 0)
-        # pk = int(self.ssp_list.item(rows[0].row(), 0).text())
-        # success = self.lib.load_profile(pk)
-        # if not success:
-        #     # noinspection PyCallByClass
-        #     QtGui.QMessageBox.warning(self, "Database", "Unable to load profile!", QtGui.QMessageBox.Ok)
-        #     return
-        #
-        # if self.lib.has_ssp():
-        #     self.main_win.data_imported()
-        #     self.main_win.tabs.setCurrentIndex(0)
+        # check if any selection
+        rows = self.ssp_list.selectionModel().selectedRows()
+        if len(rows) != 1:
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.information(self, "Database", "You need to select a single profile before exporting it!")
+            return
+
+        # the primary key is the first column (= 0)
+        pk = int(self.ssp_list.item(rows[0].row(), 0).text())
+        success = self.lib.load_profile(pk)
+        if not success:
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.warning(self, "Database", "Unable to load profile!", QtGui.QMessageBox.Ok)
+            return
+
+        dlg = ExportSingleProfileDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        dlg.exec_()
 
         # finally, we clear the just loaded data
         self.lib.clear_data()

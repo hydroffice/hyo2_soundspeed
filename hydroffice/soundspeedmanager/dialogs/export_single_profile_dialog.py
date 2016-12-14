@@ -138,15 +138,18 @@ class ExportSingleProfileDialog(AbstractDialog):
                 return
 
             if self.lib.current_project == 'default':
-                msg = "The 'default' project cannot be used for NCEI export.\nRename the project in the Database tab!"
+                msg = "The 'default' project cannot be used for NCEI export.\n\n" \
+                      "Rename the project in the Database tab!"
                 QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
                 return
 
             if not self.lib.ssp.cur.meta.survey or \
                     not self.lib.ssp.cur.meta.vessel or \
                     not self.lib.ssp.cur.meta.institution:
-                msg = "Survey, vessel, and institution metadata are mandatory for NCEI export.\n" \
-                      "Set them using the Metadata button in the tool bar!"
+                msg = "Survey, vessel, and institution metadata are mandatory for NCEI export.\n\n" \
+                      "To fix the issue:\n" \
+                      "- Load the profile (if not already loaded)\n" \
+                      "- Set th missing values using the Metadata button on the Editor tool bar\n"
                 QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
                 return
 
