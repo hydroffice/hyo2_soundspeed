@@ -13,7 +13,7 @@ class CliCallbacks(AbstractCallbacks):
     """CLI-based callbacks"""
 
     def ask_number(self, title="", msg="Enter number", default=0.0,
-                   min_val=-2147483647.0, max_val=2147483647.0, decimals=7):
+                   min_value=-2147483647.0, max_value=2147483647.0, decimals=7):
         val = None
         while val is None:
             raw = raw_input(msg)
@@ -26,8 +26,8 @@ class CliCallbacks(AbstractCallbacks):
                 logger.info("invalid input: %s\n" % e)
                 continue
 
-            if (testval > max_val) or (testval < min_val):
-                logger.info("invalid value, use range [%f/%f]: %s" % (min_val, max_val, raw))
+            if (testval > max_value) or (testval < min_value):
+                logger.info("invalid value, use range [%f/%f]: %s" % (min_value, max_value, raw))
                 continue
             else:
                 val = testval
