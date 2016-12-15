@@ -1,5 +1,4 @@
 import numpy
-import scipy.optimize
 from numpy import power as pow
 import numpy as np
 from numpy import sin, cos, tan, arcsin, log, arctan, exp, sqrt
@@ -395,44 +394,6 @@ def DensityFromTSP(T, S, p0):
     
     return RSTO / (1.0 - p / KSTP) - 1000.0
 
-
-def DepthToPressure(depth, lat):
-    ''' depth is in meters, pressure returned in decibars.
-    lat is in degrees.
-    Either or both can be arrays (just match the size if both are arrays)
-
-    >>> SVEquations.DepthToPressure(9712.653, 30) #the sample from NODC code.
-    9999.9999242129834
-    >>> depth=numpy.ones([10])*1000.0*range(10)
-    >>> SVEquations.DepthToPressure(depth, 15)
-    array([    0.        ,  1008.32203899,  2021.48032684,  3039.40135824,
-            4062.01148971,  5089.23720577,  6121.00539268,  7157.24361862,
-            8197.88041997,  9242.84559266])
-    >>> depth=numpy.ones([10])*1000.0; lat = numpy.ones([10])*7*range(10)
-    >>> SVEquations.DepthToPressure(depth, lat)
-    array([ 1007.96468415,  1008.04389682,  1008.27689004,  1008.64999104,
-            1009.14127179,  1009.72179614,  1010.35728036,  1011.01008199,
-            1011.64141022,  1012.21363246])
-
-    VelocWin used code from NODC that tried to invert the depth/densities into pressure.
-    They were not happy with the results and added an iterative solver to make the answer match the 
-    result from FDEPTH.  We will just run fsolve on that directly and make the code more readable.
-    From VelocWin
-    ' Depth is converted to pressure using the gravity variation with Latitude cited in
-    ' Bulletin Geodesique, ANON, 1970. (see FDEPTH)
-    ' For Sippican XBT, HEADER(4)latitude at this point is in format dd mm.mmm N
-    ' For Remus AUV HEADER(4) latitude at this point is in decimal minutes.
-    '''
-    def FindDepth(p, lat, d):
-        return PressureToDepth(p, lat) - d
-    return scipy.optimize.fsolve(FindDepth, depth, (lat,depth))
-def SalinityFromTPSV(T, P, SV):
-    def FindSV(S, T, P, SV):
-        return ChenMillero(T, S, P) - SV
-    return scipy.optimize.fsolve(FindSV, SV*0, (T, P, SV))
-def SalinityFromTDSV(T, D, SV, lat):
-    P = DepthToPressure(D, lat)
-    return SalinityFromTPSV(T, P, SV)
 
 
 def Extend_Slope(prof, p, inner=False):

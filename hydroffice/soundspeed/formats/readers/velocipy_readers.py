@@ -52,6 +52,7 @@ from netCDF4 import Dataset, num2date
 
 from . import coordinates
 
+from hydroffice.soundspeed.profile.oceanography import Oceanography
 from . import sbe_tools as Tools
 from . import sbe_constants
 from . import velocipy_equations
@@ -1309,7 +1310,7 @@ Field5            :  Sound Velocity (m/s)
                 depths=p['depth']
             except:
                 raise DataFileError("No enough data (no pressure or depth with latitude) to compute SoundSpeed")
-            pressures = velocipy_equations.DepthToPressure(depths, lat)
+            pressures = Oceanography.d2p(depths, lat)
         if 'soundspeed' not in p.dtype.names:
             p=p.append_field('soundspeed',0.0)
         p['soundspeed'] = eq(p['temperature'], p['salinity'], pressures)
@@ -1601,7 +1602,7 @@ Field5            :  Sound Velocity (m/s)
         else:
             for i in range(len(rtn)):
                 depth, temperature, salinity = rtn[i]
-                soundspeed = velocipy_equations._ChenMillero(temperature, salinity, velocipy_equations.DepthToPressure(depth, lat))[0]
+                soundspeed = velocipy_equations._ChenMillero(temperature, salinity, Oceanography.d2p(depth, lat))[0]
                 rtn[i] = (depth, temperature, salinity, soundspeed, 0)
         p = ScipyProfile(numpy.array(rtn, dtype=numpy.dtype(dtype)), ymetric="depth", attribute="soundspeed", metadata=metadata)
         return p.QC()

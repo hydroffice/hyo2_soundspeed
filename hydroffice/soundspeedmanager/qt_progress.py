@@ -60,13 +60,14 @@ class QtProgress(AbstractProgress):
             return
 
         if value is not None:
-            if value < self._value:
+            new_percentage = ((value - self._min) / self._range) * 100
+            if new_percentage < self._value:
                 raise RuntimeError('attempt to update current progress value (%d) with a smaller value (%d)'
-                                   % (self._value, value))
+                                   % (self._value, new_percentage))
             if (value < self._min) or (value > self._max):
                 raise RuntimeError('attempt to update current progress value (%d) outside valid range(%s %s)'
                                    % (value, self._min, self._max))
-            self._value = ((value - self._min) / self._range) * 100
+            self._value = new_percentage
 
         if text is not None:
             self._text = text
@@ -77,8 +78,10 @@ class QtProgress(AbstractProgress):
         if self._is_disabled:
             return
 
-        tmp_value = self._value + quantum
+        old_value = ((self._value / 100) * self._range) + self._min
+        tmp_value = old_value + quantum
 
+        # I don't think this should be an error, if I want to run the progress backwards or perhaps undo/redo a step then I should be able to.
         if tmp_value < self._value:
             raise RuntimeError('attempt to update current progress value (%d) with a smaller value (%d)'
                                % (self._value, tmp_value))

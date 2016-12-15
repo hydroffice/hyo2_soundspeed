@@ -159,7 +159,7 @@ class Seacat(AbstractWidget):
         logger.debug('downloading last ...')
         output_path = self.lib.cb.ask_directory(key_name="Seacat/DownloadHex", title="Choose Directory to Store Seacat Files in")
         if output_path:
-            with AutoSeacat(get_last_comport(), self) as cat:  # using the with statement auto-closes port even if an exception is thrown
+            with AutoSeacat(progbar=self.progress) as cat:  # using the with statement auto-closes port even if an exception is thrown
                 if cat.isOpen():
                     self.com_label.setText(cat.get_com_str())
                     headers = cat.get_headers().items()
@@ -182,7 +182,7 @@ class Seacat(AbstractWidget):
         hexpath will default to the CATFILES user preference if it is not specified, it is where the downloaded HEX data files are stored
         '''
         # with ProgressProcess.MultiProgress([[0,100,"%.lf%% current cast downloaded"],[0,99,"%.lf%% casts finished"]]) as progbar:
-        paths = cat.download(hexpath, casts)
+        paths = cat.download(hexpath, casts, progbar=self.progress)
         failed = []
         succeeded = []
         if paths:
@@ -220,7 +220,7 @@ class Seacat(AbstractWidget):
     def on_status(self):
         '''Connects to seacat and shows the status message from the seacat to the user'''
         logger.debug('getting status ...')
-        with AutoSeacat() as cat:  # using the with statement auto-closes port even if an exception is thrown
+        with AutoSeacat(progbar=self.progress) as cat:  # using the with statement auto-closes port even if an exception is thrown
             if cat.isOpen():
                 self.com_label.setText(cat.get_com_str())
                 msg = cat.get_status() + '\n'
@@ -232,7 +232,7 @@ class Seacat(AbstractWidget):
     def on_headers(self):
         '''Connects to seacat and shows the header information to the user'''
         logger.debug('Showing header info from seacat ...')
-        with AutoSeacat() as cat:  # using the with statement auto-closes port even if an exception is thrown
+        with AutoSeacat(progbar=self.progress) as cat:  # using the with statement auto-closes port even if an exception is thrown
             if cat.isOpen():
                 self.com_label.setText(cat.get_com_str())
                 headers = cat.get_headers().items()
@@ -247,7 +247,7 @@ class Seacat(AbstractWidget):
     def on_settime(self):
         '''Set the clock with current CPU time on UTC'''
         logger.debug('setting clock to current UTC ...')
-        with AutoSeacat() as cat:  # using the with statement auto-closes port even if an exception is thrown
+        with AutoSeacat(progbar=self.progress) as cat:  # using the with statement auto-closes port even if an exception is thrown
             if cat.isOpen():
                 self.com_label.setText(cat.get_com_str())
                 try:
@@ -261,7 +261,7 @@ class Seacat(AbstractWidget):
     def on_precast(self):
         '''Precast setup checks (and resets seacat clock if more than 3 minutes off) and clears memory'''
         logger.debug('precast setup ...')
-        with AutoSeacat() as cat:  # using the with statement auto-closes port even if an exception is thrown
+        with AutoSeacat(progbar=self.progress) as cat:  # using the with statement auto-closes port even if an exception is thrown
             if cat.isOpen():
                 try:
                     dt_now = datetime.datetime.utcnow()
@@ -356,17 +356,22 @@ class Seacat(AbstractWidget):
 
 
 class AutoSeacat(object):
-    def __init__(self, port=None, label=None):
-        self.sbe = open_seacat(port)
+    def __init__(self, port=None, progbar=None):
+        self.sbe = open_seacat(port, progbar)
+        self.progbar = progbar
+        if progbar:
+            progbar.start(title="Seacat")
 
     def __enter__(self):
         return self.sbe
 
     def __exit__(self, *args, **kyargs):
         self.sbe.close()
+        if self.progbar:
+            self.progbar.end()
 
 
-def open_seacat(port=None):
+def open_seacat(port=None, progbar=None):
     # check for the last time this com port was opened
     if not port:
         port = get_last_comport()
@@ -374,7 +379,8 @@ def open_seacat(port=None):
     dbaud = int(get_setting_float("\\".join([COMPORT_SUBKEY, port, 'BAUD']), 0))
     dbits = int(get_setting_float("\\".join([COMPORT_SUBKEY, port, 'BITS']), 0))
     dparity = get_setting_string("\\".join([COMPORT_SUBKEY, port, 'PARITY']), '')
-    sbe = sbe_serialcomms.SeacatComms.open_seacat(port, dbaud, dbits, dparity)
+    reload(sbe_serialcomms)
+    sbe = sbe_serialcomms.SeacatComms.open_seacat(port, dbaud, dbits, dparity, progbar=progbar)
     if sbe.isOpen():
         set_setting("\\".join([COMPORT_SUBKEY, port, 'BAUD']), sbe.comlink.baudrate)
         set_setting("\\".join([COMPORT_SUBKEY, port, 'BITS']), sbe.comlink.bytesize)
