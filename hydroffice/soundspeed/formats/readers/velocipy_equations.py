@@ -1,10 +1,8 @@
-import scipy
+import numpy
 import scipy.optimize
 from numpy import power as pow
 import numpy as np
-from scipy.interpolate import interp1d
-from scipy.weave import ext_tools
-from scipy import sin, cos, tan, arcsin, log, arctan, exp, sqrt
+from numpy import sin, cos, tan, arcsin, log, arctan, exp, sqrt
 
 from . import sbe_constants as VelocConstants
 
@@ -99,18 +97,18 @@ def _ChenMillero(T, S, P):
   return Cw(T, P) + A(T, P) * S + B(T, P) * pow(S, 1.5) + D(T, P) * S * S
 
 def Cw(T, P):
-  T3 = scipy.power(T, 3)
-  T2 = scipy.power(T, 2)
-  T4 = scipy.power(T, 4)
+  T3 = numpy.power(T, 3)
+  T2 = numpy.power(T, 2)
+  T4 = numpy.power(T, 4)
   return (C00 + C01 * T + C02 * T2 + C03 * T3 + C04 * T4 + C05 * pow(T, 5)) + \
          (C10 + C11 * T + C12 * T2 + C13 * T3 + C14 * T4 ) * P + \
          (C20 + C21 * T + C22 * T2 + C23 * T3 + C24 * T4 ) * P * P + \
          (C30 + C31 * T + C32 * T2) * pow(P, 3)
 
 def A(T, P):
-  T3 = scipy.power(T, 3)
-  T2 = scipy.power(T, 2)
-  T4 = scipy.power(T, 4)
+  T3 = numpy.power(T, 3)
+  T2 = numpy.power(T, 2)
+  T4 = numpy.power(T, 4)
   return (A00 + A01 * T + A02 * T2 + A03 * T3 + A04 * T4 ) + \
          (A10 + A11 * T + A12 * T2 + A13 * T3 + A14 * T4 ) * P + \
          (A20 + A21 * T + A22 * T2 + A23 * T3) * P * P + \
@@ -147,7 +145,7 @@ def ChenMillero_VelocWin(T, S, PO):
       
     #' scale pressure to bars
     p = PO / 10#
-    sr = scipy.sqrt(S if S>0 else 0)
+    sr = numpy.sqrt(S if S>0 else 0)
     #' S**2 term
     D = 0.001727 - 0.0000079836 * p
     #' S**3/2 term
@@ -344,9 +342,9 @@ def DelGrosso(S, T, P):
     return C000 + CT + CS + CP + CSTP    
 
 def CSTP(S,T,P):
-    P2=scipy.power(P,2)
-    T2=scipy.power(T,2)
-    S2=scipy.power(S,2)
+    P2=numpy.power(P,2)
+    T2=numpy.power(T,2)
+    S2=numpy.power(S,2)
     return CTP*T*P + CTP2*T*P2 + CT2P2*T2*P2 + CT3P*T**3*P + CTP3*T*P**3 + \
            CST*S*T + CST2*S*T2 + CS2P2*S2*P2 + CSTP*S*T*P + CS2TP*S2*T*P  
 
@@ -390,10 +388,10 @@ def DensityFromTSP(T, S, p0):
     '''
     p = p0 * 0.1
 
-    T2 = scipy.power(T,2)
-    T3 = scipy.power(T,3)
-    T4 = scipy.power(T,4)
-    p2 = scipy.power(p,2)
+    T2 = numpy.power(T,2)
+    T3 = numpy.power(T,3)
+    T4 = numpy.power(T,4)
+    p2 = numpy.power(p,2)
     S1_5 = S**1.5
     
     RW = 999.842594 + 0.06793952 * T - 0.00909529 * T2 + \
@@ -428,12 +426,12 @@ def DepthToPressure(depth, lat):
 
     >>> SVEquations.DepthToPressure(9712.653, 30) #the sample from NODC code.
     9999.9999242129834
-    >>> depth=scipy.ones([10])*1000.0*range(10)
+    >>> depth=numpy.ones([10])*1000.0*range(10)
     >>> SVEquations.DepthToPressure(depth, 15)
     array([    0.        ,  1008.32203899,  2021.48032684,  3039.40135824,
             4062.01148971,  5089.23720577,  6121.00539268,  7157.24361862,
             8197.88041997,  9242.84559266])
-    >>> depth=scipy.ones([10])*1000.0; lat = scipy.ones([10])*7*range(10)
+    >>> depth=numpy.ones([10])*1000.0; lat = numpy.ones([10])*7*range(10)
     >>> SVEquations.DepthToPressure(depth, lat)
     array([ 1007.96468415,  1008.04389682,  1008.27689004,  1008.64999104,
             1009.14127179,  1009.72179614,  1010.35728036,  1011.01008199,
@@ -476,13 +474,13 @@ def Extend_Slope(prof, p, inner=False):
     Y = prof['salinity'] if inner else prof['temperature']
     #' RLB 9/2008 Adjustment for case of AUV processing, for which there
     #' is a possibility of duplicate max depth points.
-    dx = scipy.hstack(([1],scipy.diff(X)))
+    dx = numpy.hstack(([1],numpy.diff(X)))
     X = X.compress(dx>0)
     Y = Y.compress(dx>0)
     XM = X*0.0
-    HBC = scipy.zeros([11], scipy.float32)
-    CBC = scipy.zeros([11], scipy.float32)
-    H = scipy.zeros([11], scipy.float32)
+    HBC = numpy.zeros([11], numpy.float32)
+    CBC = numpy.zeros([11], numpy.float32)
+    H = numpy.zeros([11], numpy.float32)
     
     G = len(X) - 2                     # ' Index for next to last point is G
     
@@ -523,7 +521,7 @@ def Extend_Slope(prof, p, inner=False):
         #' has a slope closest to that between last two points in data set.
         for J in range(Hnum):
             CBC[J] = 500
-            if H[J] == Hmax: CBC[J] = scipy.absolute(XM[NumSlopes] - XM[J])
+            if H[J] == Hmax: CBC[J] = numpy.absolute(XM[NumSlopes] - XM[J])
 
         Ref = 500
         for J in range(Hnum):
@@ -539,7 +537,7 @@ def Extend_Slope(prof, p, inner=False):
 
 def PressureToDepthNew(p, LAT, prof=None, algo=1):
     '''This function mainly use as a backup function for AUV pressure to depth'''
-    X = scipy.sin(LAT * VelocConstants.DEG2RAD())**2
+    X = numpy.sin(LAT * VelocConstants.DEG2RAD())**2
     GR = 9.780318 * (1.0 + (5.2788e-3 + 2.36e-5 * X) * X)
     rval = (((-1.82e-15 * p + 2.279e-10) * p - 2.2512e-5) * p + 9.72659) * p / (GR + 1.092e-6 * p)
     
@@ -578,7 +576,7 @@ def PressureToDepthNew(p, LAT, prof=None, algo=1):
 
 def PressureToDepthTest(p, LAT, prof=None, algo=1, verbose=True, ii=0):
     '''This a testing function for EOS-80 standard'''
-    X = scipy.sin(LAT * VelocConstants.DEG2RAD())**2
+    X = numpy.sin(LAT * VelocConstants.DEG2RAD())**2
     #'* GR=Gravity variation with Latitude: ANON (1970) Bulletin Geodesique
     GR = 9.780318 * (1.0 + (5.2788e-3 + 2.36e-5 * X) * X)
     rval = (((-1.82e-15 * p + 2.279e-10) * p - 2.2512e-5) * p + 9.72659) * p / (GR + 1.092e-6 * p)
@@ -593,7 +591,7 @@ def PressureToDepthTest(p, LAT, prof=None, algo=1, verbose=True, ii=0):
         if 'pressure' in prof.dtype.names and 'temperature' in prof.dtype.names and 'salinity' in prof.dtype.names:
             prof = prof.mcopy() # Working on a deep copy
             if 'flag' in prof.dtype.names:
-                prof = scipy.compress(prof['flag']>=0, prof) # Get only the good points
+                prof = numpy.compress(prof['flag']>=0, prof) # Get only the good points
             condition = [True]
             pre_press = prof['pressure'][0]
             for press in prof['pressure'][1:]:
@@ -601,7 +599,7 @@ def PressureToDepthTest(p, LAT, prof=None, algo=1, verbose=True, ii=0):
                 if press > pre_press: pre_press = press
             ubd, lbd = 45, -5 # The upper bound of temperature and salinity, lower bound of temperature
             # Remove the out of order pressure, out of range pressure, temperature and salinity
-            prof = scipy.compress(np.all([condition, prof['pressure']>=0, prof['temperature']>=lbd, prof['temperature']<ubd, prof['salinity']>=0, prof['salinity']<ubd], axis=0), prof)
+            prof = numpy.compress(np.all([condition, prof['pressure']>=0, prof['temperature']>=lbd, prof['temperature']<ubd, prof['salinity']>=0, prof['salinity']<ubd], axis=0), prof)
             if len(prof['pressure']) < 2 or p < 0 or p > 3*prof['pressure'][-1]:
                 if verbose: print 'Pressure to depth warning: wrong pressure or no enough data in the profile. Assuming standard ocean.'
                 return rval
@@ -670,7 +668,7 @@ def PressureToDepth(p, LAT):
     ' Above for station ocean: T=0 Degree Celsius; S=35 (PSS-78)
     '*********************************************************************
     '''   
-    X = scipy.sin(LAT * VelocConstants.DEG2RAD())**2
+    X = numpy.sin(LAT * VelocConstants.DEG2RAD())**2
     #'* GR=Gravity variation with Latitude: ANON (1970) Bulletin Geodesique
     GR = 9.780318 * (1.0 + (5.2788e-3 + 2.36e-5 * X) * X) + 1.092e-6 * p
     rval = (((-1.82e-15 * p + 2.279e-10) * p - 2.2512e-5) * p + 9.72659) * p
@@ -701,262 +699,6 @@ Leroy and Parthiot (1998) give a table of corrections which are needed when the 
 http://lib.ioa.ac.cn/ScienceDB/JASA/jasa1998/pdfs/vol_103/iss_3/1346_1.pdf
 
 '''
-
-'''
-Raytrace from PeekXTF DLLs developed by Tom Eisler, Jack Riley, Barry Gallagher
-'''
-''' Build a weave extension to compute the ray trace faster
-http://www.scipy.org/PerformancePython
-
-def t(a=0.5):
-    import SVEquations; reload(SVEquations); 
-    SVEquations.build_SV(); 
-    import SV_ext; reload(SV_ext); 
-    p1=SVEquations.GetSVPLayerParameters_slow(a, frame.profile_list.profiles['081791929.ZZB']); 
-    p2=SVEquations.GetSVPLayerParameters_fast(a, frame.profile_list.profiles['081791929.ZZB'])
-    for i in range(len(p1)):
-        print p1[i]-p2[i]
-
-'''
-
-def build_SV():
-    """ Builds an extension module with SV computations.
-    """
-    mod = ext_tools.ext_module('SV_ext')
-    # this is effectively a type declaration so the compiler knows what the types are
-    #TriangleToNodes=NodeToTriangles=scipy.zeros([8,2],scipy.int32)
-    nLenLayers=10
-    LaunchAngleRadians = float(10.0)
-    arr={}
-    arr['double']=scipy.zeros([10,2], scipy.float64) #array to hold normal computed for each triangle
-    arr['float']=scipy.zeros([10,2], scipy.float32) #array to hold normal computed for each triangle
-    
-    for dtype in ['double']: #, 'float' -- only doubles for SV #loop the supported types for the xyz positions and normal vectors -- basically a macro or template
-        depth= deltadepth=speed= gradient= gamma= radius= totaltime= totalrange=arr[dtype] #set variables up as proper type for this incarnation
-        fib_code = """ 
-                        int SVPParams_dtype(double LaunchAngleRadians, int nLenLayers, //len(Layers)
-                                                 dtype *depth, dtype *speed, dtype *deltadepth, dtype *gradient, //input arrays 
-                                                 dtype *gamma, dtype *radius, dtype *totaltime, dtype *totalrange //output variables
-                                                )
-                        {
-                            int j;
-                        
-                            gamma[0]=LaunchAngleRadians;
-                            totaltime[0]=0;
-                            totalrange[0]=0;
-
-                            for(j=0; j<nLenLayers-1; j++){
-                                gamma[j+1]=asin((speed[j+1]/speed[j])*sin(gamma[j]));
-                                if(gamma[j]==0){ // nadir beam (could cause division by zero errors below)
-                                    radius[j]=0;
-                                    totaltime[j+1] =totaltime[j] +(deltadepth[j])/((speed[j+1]+speed[j])/2.0);
-                                    totalrange[j+1]=totalrange[j];
-                                }
-                                else if(gradient[j]==0){ 
-                                    radius[j]=0;
-                                    totaltime[j+1] =totaltime[j] +(deltadepth[j])/(speed[j]*cos(gamma[j]));
-                                    totalrange[j+1]=totalrange[j]+(deltadepth[j])*tan(gamma[j]);
-                                }
-                                else{
-                                    radius[j]=speed[j]/(gradient[j]*sin(gamma[j]));
-                                    totaltime[j+1]=totaltime[j]+log(tan(gamma[j+1]/2.0)/tan(gamma[j]/2.0))/gradient[j];
-                                    totalrange[j+1]=totalrange[j]+radius[j]*(cos(gamma[j])-cos(gamma[j+1]));
-                                }
-                            }
-                            return 0; //success
-                        }
-                """
-        ext_code = """
-                       return_val = SVPParams_dtype(LaunchAngleRadians,  nLenLayers,
-                                                depth, speed,  deltadepth, gradient, 
-                                                gamma, radius, totaltime, totalrange);
-                   """
-        fib = ext_tools.ext_function('SVPParameters_'+dtype,ext_code.replace('dtype', dtype),
-                                     [ 'LaunchAngleRadians',  'nLenLayers',
-                                                  'depth', 'speed',  'deltadepth', 'gradient', 
-                                                  'gamma', 'radius', 'totaltime', 'totalrange' ])
-        fib.customize.add_support_code(fib_code.replace('dtype', dtype))
-        mod.add_function(fib)
-
-    mod.compile() #compile for all the supported types of scipy arrays
-
-def GetSVPLayerParameters_fast(LaunchAngleRadians, Layers):
-    ''' Layers is either a record array with 'depth' and 'soundspeed' columns 
-        or is a scipy array with depth as first column and speed as second column
-        Should be sorted by depth first without repeating depths (will raise division by zero)
-        Assumes that the layers start at the transducer at Zero depth 
-    '''
-    #nLayers=len(Layers)
-    for a in ('gradient', 'gamma', 'radius', 'totaltime', 'totalrange'):
-        exec a+"= scipy.zeros(Layers.shape, scipy.float64)"
-    try: speed = Layers['soundspeed']
-    except: speed = [r[1] for r in Layers]
-    try: depth = Layers['depth']
-    except: depth = [r[0] for r in Layers]
-    speed = scipy.array(speed,  scipy.float64) #need double precision for this computation
-    depth = scipy.array(depth,  scipy.float64)
-    
-    depth[0] = 0.0 #assume zero for top layer -- say first two measurements were 1m and 2m respectively, we are making the first layer go from 0m to 2m.
-    
-    deltadepth = scipy.diff(depth)
-    gradient = scipy.diff(speed)/deltadepth
-
-    retval = SV_ext.SVPParameters_double(float(LaunchAngleRadians),  len(Layers),
-                                                  depth, speed,  deltadepth, gradient, 
-                                                  gamma, radius, totaltime, totalrange)
-    return gradient, gamma, radius, totaltime, totalrange
-    
-def GetSVPLayerParameters_slow(LaunchAngleRadians, Layers):
-    ''' Layers is either a record array with 'depth' and 'soundspeed' columns 
-        or is a scipy array with depth as first column and speed as second column
-        Should be sorted by depth first without repeating depths (will raise division by zero)
-        Assumes that the layers start at the transducer at Zero depth 
-    '''
-    #nLayers=len(Layers)
-    for a in ('gradient', 'gamma', 'radius', 'totaltime', 'totalrange'):
-        exec a+"= scipy.zeros(Layers.shape, scipy.float64)"
-    try: speed = Layers['soundspeed']
-    except: speed = [r[1] for r in Layers]
-    try: depth = Layers['depth']
-    except: depth = [r[0] for r in Layers]
-    speed = scipy.array(speed,  scipy.float64) #need double precision for this computation
-    depth = scipy.array(depth,  scipy.float64)
-    
-    depth[0] = 0.0 #assume zero for top layer -- say first two measurements were 1m and 2m respectively, we are making the first layer go from 0m to 2m.
-    
-    gamma[0]=LaunchAngleRadians
-    totaltime[0]=0
-    totalrange[0]=0
-
-    deltadepth = scipy.diff(depth)
-    gradient = scipy.diff(speed)/deltadepth
-    for j in range(len(Layers)-1):
-        gamma[j+1]=arcsin((speed[j+1]/speed[j])*sin(gamma[j]))
-        if(gamma[j]==0): #// nadir beam (could cause division by zero errors below)
-            radius[j]=0
-            totaltime[j+1] =totaltime[j] +(deltadepth[j])/((speed[j+1]+speed[j])/2.0)
-            totalrange[j+1]=totalrange[j]
-        elif(gradient[j]==0): 
-            radius[j]=0
-            totaltime[j+1] =totaltime[j] +(deltadepth[j])/(speed[j]*cos(gamma[j]))
-            totalrange[j+1]=totalrange[j]+(deltadepth[j])*tan(gamma[j])
-        else:
-            radius[j]=speed[j]/(gradient[j]*sin(gamma[j]))
-            totaltime[j+1]=totaltime[j]+log(tan(gamma[j+1]/2.0)/tan(gamma[j]/2.0))/gradient[j]
-            totalrange[j+1]=totalrange[j]+radius[j]*(cos(gamma[j])-cos(gamma[j+1]))
-    #Note the last radius doen't get computed but that isn't important
-    #we always want to be in the last layer, so we use the comptutations at the next to last layer
-    #and interpolate to the depth/time which is before the end of the last layer
-    return gradient, gamma, radius, totaltime, totalrange
-
-
-try:
-    import SV_ext #import the C (scipy.weave) extension, if possible
-    GetSVPLayerParameters = GetSVPLayerParameters_fast
-except ImportError:
-    try:
-        build_SV()
-        import SV_ext
-        GetSVPLayerParameters = GetSVPLayerParameters_fast
-    except:
-        GetSVPLayerParameters = GetSVPLayerParameters_slow
-
-
-def RayTraceUsingParameters(traveltimes, Layers, params, bProject=False):
-    ''' Traveltime must end within the measured layers (or returns false). To protect against failure, user can pad 
-        a final layer very deep with the same SV as the last true measurement.
-        
-        Layers is either a record array with 'depth' and 'soundspeed' columns 
-        or is a scipy array with depth as first column and speed as second column
-        Should be sorted by depth first without repeating depths (will raise division by zero)    
-        
-        Assumes that the layers start at the transducer at Zero depth     
-        Will return a scipy array of the depth,horizontal_distances where -1,-1 denotes an out of range traveltime
-        bProject should extend the cat to infinity, most useful for the scipy.optimize.fsolve that needs a continuous function
-    '''
-    nLayers=len(Layers)-1;
-    try: speed = Layers['soundspeed']
-    except: speed = [r[1] for r in Layers]
-    try: depth = Layers['depth'].copy()
-    except: depth = [r[0] for r in Layers]
-    depth[0] = 0.0 #assume zero for top layer -- say first two measurements were 1m and 2m respectively, we are making the first layer go from 0m to 2m.
-    
-    gradient, gamma, radius, totaltime, totalrange = params
-    try: len(traveltimes) #make sure we get a list of indices back to iterate on -- even if only one traveltime sent
-    except: traveltimes = [traveltimes]
-    nEndLayers = totaltime.searchsorted(traveltimes)-1
-    ret = scipy.zeros([len(traveltimes), 2])-1.0 #create an array where -1 denotes out of range
-    for ind, nEndLayer in enumerate(nEndLayers):
-        if nEndLayer == -1: nEndLayer=0
-        if nEndLayer < nLayers or bProject: #SVP deep enough
-            tau=traveltimes[ind]-totaltime[nEndLayer]
-            #Note the last radius doen't get computed but that isn't important
-            #we always want to be in the last layer, so we use the comptutations at the next to last layer
-            #and interpolate to the depth/time which is before the end of the last layer
-            if(radius[nEndLayer]==0):
-                if nEndLayer < nLayers:
-                    a1 = totaltime[nEndLayer]
-                    a2 = totaltime[nEndLayer+1]
-                    a3 = speed[nEndLayer]
-                    a4 = speed[nEndLayer+1]
-                    if isinstance(a1, scipy.ndarray):
-                        a1 = a1[0]
-                        a2 = a2[0]
-                        a3 = a3[0]
-                        a4 = a4[0]
-                    endspeed = scipy.interp(traveltimes[ind], [a1,a2], [a3,a4])
-                    #endspeed = scipy.interp(traveltimes[ind], [totaltime[nEndLayer],totaltime[nEndLayer+1]], [speed[nEndLayer],speed[nEndLayer+1]])
-                else: #projecting the last speed to infinite depth
-                    endspeed = speed[nEndLayer] 
-                avgspeed = (speed[nEndLayer]+endspeed)/2.0
-                finaldepth=avgspeed*tau*cos(gamma[nEndLayer])+depth[nEndLayer]
-                finalrange=avgspeed*tau*sin(gamma[nEndLayer])+totalrange[nEndLayer]
-            else:
-                finaldepth=radius[nEndLayer]*( sin(2*arctan(tan(gamma[nEndLayer]/2.0)*exp(gradient[nEndLayer]*tau)))-sin(gamma[nEndLayer])) + depth[nEndLayer]
-                finalrange=radius[nEndLayer]*(-cos(2*arctan(tan(gamma[nEndLayer]/2.0)*exp(gradient[nEndLayer]*tau)))+cos(gamma[nEndLayer])) + totalrange[nEndLayer]
-            #this would translate to acrosstrack, alongtrack components if we passed in pitch, roll, launchangle
-            #result[0]=finalrange*LaunchVector[0]/sqrt(LaunchVector[1]*LaunchVector[1]+LaunchVector[0]*LaunchVector[0])
-            #result[1]=finalrange*LaunchVector[1]/sqrt(LaunchVector[1]*LaunchVector[1]+LaunchVector[0]*LaunchVector[0])
-            #result[2]=finaldepth
-            if isinstance(finaldepth, scipy.ndarray):
-                finaldepth = finaldepth[0]
-                finalrange = finalrange[0]
-            ret[ind] = (finaldepth,finalrange)
-    return ret
-
-def RayTrace(LaunchAngleDeg, traveltimes, Layers, bProject = False):
-    ''' Traveltime must end within the measured layers (or returns false). To protect against failure, user can pad 
-     a final layer very deep with the same SV as the last true measurement.
-        
-        Layers is either a record array with 'depth' and 'soundspeed' columns 
-        or is a scipy array with depth as first column and speed as second column
-        Should be sorted by depth first without repeating depths (will raise division by zero)    
-        
-        Assumes that the layers start at the transducer at Zero depth
-        
-        To be most efficient for large data runs-- build a list of the Parameters based on launch angle and cache them.
-        Then call RayTraceUsingParameters directly using the cached parameters.
-        PeekXTF would do this with a 0.1 degree resolution for the parameters. 
-    '''
-    #LAngle=scipy.arccos(LaunchVector[2]) #if we were passing in a unit vector
-    LAngle=scipy.deg2rad(LaunchAngleDeg)
-    params = GetSVPLayerParameters(LAngle, Layers)
-    return RayTraceUsingParameters(traveltimes, Layers, params, bProject)
-
-def FindTravelTimeUsingParameters(Depths, Layers, params):
-    #params[1][0] = gamma[0] == launch angle in radians
-    def GetDepth(tt, Depths, Layers, params):
-        return RayTraceUsingParameters(tt, Layers, params, bProject=True)[:,0]-Depths #return the depth column
-    #guess at the initial time using 1500m/s 
-    return scipy.optimize.fsolve(GetDepth, (Depths/scipy.cos(params[1][0]))/1500.0, (Depths, Layers,params), xtol=0.0001)
-    
-def FindTravelTime(LaunchAngleDeg, Depths, Layers):
-    '''Depth is either a float or scipy array
-    Layers is a depth vs soundspeed profile or array 
-    '''
-    LAngle=scipy.deg2rad(LaunchAngleDeg)
-    params = GetSVPLayerParameters(LAngle, Layers)
-    return FindTravelTimeUsingParameters(Depths, Layers, params)
 
 
 def gsw_Hill_ratio_at_SP2(t):
@@ -1009,7 +751,7 @@ def gsw_Hill_ratio_at_SP2(t):
     %==========================================================================
     '''
     
-    SP2 = 2*(scipy.ones(t.shape))
+    SP2 = 2*(numpy.ones(t.shape))
     
     #%--------------------------------------------------------------------------
     #% Start of the calculation
@@ -1150,7 +892,7 @@ def SalinityFromConductivity(c, t, p):
 #    mp,np = p.shape
 #    
 #    if (mt == 1) and (nt == 1):        #      % t scalar - fill to size of C
-#        t = t*scipy.ones(C.shape)
+#        t = t*numpy.ones(C.shape)
 #    elif (nc == nt) and (mt == 1):   #      % t is row vector,
 #        t = t(ones(1,mc), :)          #    % copy down each column.
 #    elif (mc == mt) & (nt == 1):      #   % t is column vector,
@@ -1229,7 +971,7 @@ def SalinityFromConductivity(c, t, p):
     # Iocean was used to remove any measurements that aren't realistic --  not in water etc.
     # for now, we'll assume all measurements are good.
     # To add this functionality do a compress on C, t, p based on whatever criteria we'd want 
-    #[Iocean] = scipy.arange( find(~isnan(C + t + p))
+    #[Iocean] = numpy.arange( find(~isnan(C + t + p))
     
     t68 = t*1.00024;
     ft68 = (t68 - 15)/(1 + k*(t68 - 15))
@@ -1245,9 +987,9 @@ def SalinityFromConductivity(c, t, p):
     Rp = 1 + (p*(e1 + e2*p + e3*p*p)) / (1 + d1*t68 + d2*t68*t68 + (d3 + d4*t68)*R)
     Rt = R/(Rp*rt_lc)  
     
-    Rt[scipy.where(Rt < 0)] = scipy.nan
+    Rt[numpy.where(Rt < 0)] = numpy.nan
     
-    Rtx = scipy.sqrt(Rt)
+    Rtx = numpy.sqrt(Rt)
     
     #SP = NaN(C.shape);
     
@@ -1257,7 +999,7 @@ def SalinityFromConductivity(c, t, p):
     #% Hill et al. (1986) algorithm.  This algorithm is adjusted so that it is
     #% exactly equal to the PSS-78 algorithm at SP = 2.
     
-    if scipy.any(SP < 2):
+    if numpy.any(SP < 2):
         #[I2] = find(SP(Iocean) < 2);
         #make a copy of the temps and pass them to the Hill ratio 
         Hill_ratio = gsw_Hill_ratio_at_SP2(t[:]) 
@@ -1266,9 +1008,9 @@ def SalinityFromConductivity(c, t, p):
         part1 = 1 + x*(1.5 + x)
         part2 = 1 + sqrty*(1 + sqrty*(1 + sqrty))
         SP_Hill_raw = SP - a0/part1 - b0*ft68/part2
-        SP = scipy.where(SP<2, Hill_ratio*SP_Hill_raw, SP)
+        SP = numpy.where(SP<2, Hill_ratio*SP_Hill_raw, SP)
     
     #% This line ensures that SP is non-negative.
-    SP=scipy.maximum(SP, 0)
+    SP=numpy.maximum(SP, 0)
     
     return SP
