@@ -34,22 +34,30 @@ class Server(Thread):
 
         # server sources
         if self.prj.setup.server_source == 'RTOFS':  # RTOFS case
+
             if self.prj.use_rtofs():
                 logger.info("RTOFS-use check: OK")
+
             else:
                 logger.error("RTOFS-use check: KO")
                 self.prj.progress.end()
                 return False
+
         if self.prj.setup.server_source == 'WOA09':  # WOA09 case
+
             if self.prj.use_woa09():
                 logger.info("WOA09-use check: OK")
+
             else:
                 logger.error("WOA09-use check: KO")
                 self.prj.progress.end()
                 return False
+
         if self.prj.setup.server_source == 'WOA13':  # WOA09 case
+
             if self.prj.use_woa13():
                 logger.info("WOA13-use check: OK")
+
             else:
                 logger.error("WOA13-use check: KO")
                 self.prj.progress.end()
@@ -60,16 +68,20 @@ class Server(Thread):
             logger.error("SIS-use check: KO")
             self.prj.progress.end()
             return False
+
         # - navigation datagram
         if self.prj.listeners.sis.nav:
             logger.info("SIS NAV broadcast: OK")
+
         else:
             logger.error("SIS NAV broadcast: KO")
             self.prj.progress.end()
             return False
+
         # - depth datagram
         if self.prj.listeners.sis.xyz88:
             logger.info("SIS DEPTH broadcast: OK")
+
         else:
             logger.warning("SIS DEPTH broadcast: KO > SIS may warn about surface sound speed")
 
@@ -80,15 +92,18 @@ class Server(Thread):
         logger.info("Testing clients for reception-confirmation interaction")
         num_live_clients = 0
         for client in self.prj.setup.client_list.clients:
+
             if client.protocol != "SIS":
                 client.alive = False
                 continue
 
             client.request_profile_from_sis(self.prj)
+
             if self.prj.listeners.sis.ssp:
                 logger.info("Interaction test: OK")
                 client.alive = True
                 num_live_clients += 1
+
             else:
                 logger.warning("Interaction test: KO")
                 client.alive = False
@@ -99,6 +114,7 @@ class Server(Thread):
             logger.error("Unable to confirm interaction with any clients > The Server Mode is not available")
             self.prj.progress.end()
             return False
+
         else:
             logger.info("Interaction verified with %s client/clients" % num_live_clients)
 
@@ -132,7 +148,7 @@ class Server(Thread):
 
             self.check()
 
-            time.sleep(10)
+            time.sleep(3)
             count += 1
 
         logger.debug("%s end" % self.name)
@@ -169,6 +185,18 @@ class Server(Thread):
         draft = None
         tss_diff = 0.0
         if self.prj.setup.server_apply_surface_sound_speed:
+
+            if self.prj.listeners.sis.xyz88 is None:
+                logger.warning("Unable to retrieve xyz88 datagram > Waiting %s secs"
+                               % self.wait_time)
+                count = 0
+                while count < self.wait_time:
+                    time.sleep(1)
+                    count += 1
+                return
+
+            logger.debug('loc/timestamp: (%s %s)/%s' % (lat, lon, tm.strftime('%Y/%m/%d %H:%M')))
+
             if self.prj.listeners.sis.xyz88.sound_speed:
                 tss = self.prj.listeners.sis.xyz88.sound_speed
                 if self.tss_last:
@@ -190,16 +218,20 @@ class Server(Thread):
         # retrieve profile
         if self.prj.setup.server_source == 'RTOFS':  # RTOFS case
             self.prj.ssp = self.prj.atlases.rtofs.query(lat=lat, lon=lon, datestamp=tm, server_mode=True)
+
         elif self.prj.setup.server_source == 'WOA09':  # WOA09 case
             self.prj.ssp = self.prj.atlases.woa09.query(lat=lat, lon=lon, datestamp=tm, server_mode=True)
+
         elif self.prj.setup.server_source == 'WOA13':  # WOA09 case
             self.prj.ssp = self.prj.atlases.woa13.query(lat=lat, lon=lon, datestamp=tm, server_mode=True)
+
         else:
             raise RuntimeError('unable to understand server source: %s' % self.prj.setup.server_source)
 
         if not self.prj.has_ssp():
             logger.warning("Unable to retrieve a synthetic cast > Continue the loop")
             return
+
         logger.debug('Retrieve new synthetic profile')
 
         # apply tss (if required)
@@ -243,6 +275,6 @@ class Server(Thread):
         self.prj.setup.client_list.transmit_ssp(prj=self.prj, server_mode=True)
         if self.prj.setup.server_apply_surface_sound_speed:
             self.tss_last = tss  # store the tss for the next iteration
+
         self.lat_idx_last = lat_idx
         self.lon_idx_last = lon_idx
-

@@ -1308,11 +1308,23 @@ class SoundSpeedLibrary(object):
 
     # --- server
 
+    def server_is_alive(self):
+        return self.server.is_alive()
+
     def start_server(self):
         if not self.server.is_alive():
             self.server = Server(prj=self)
             self.server.start()
             time.sleep(0.1)
+        return self.server.is_alive()
+
+    def force_server(self):
+        if not self.server.is_alive():
+            raise RuntimeError("Server is not alive")
+
+        self.server.force_send.set()
+        self.server.check()
+
         return self.server.is_alive()
 
     def stop_server(self):

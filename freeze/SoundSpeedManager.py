@@ -3,19 +3,15 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import logging
 
 
-class SettingsFilter(logging.Filter):
+class SisParseFilter(logging.Filter):
     def filter(self, record):
-        # print(record.name, record.levelname)
-        if record.name.startswith('hydroffice.ssp.settings') and (record.levelname == "INFO"):
-            return False
-        return True
 
+        if (record.name == 'hydroffice.soundspeed.listener.sis.sis') and \
+                (record.funcName == "parse") and \
+                (record.levelname == "INFO"):
 
-class KmIOFilter(logging.Filter):
-    def filter(self, record):
-        # print(record.name, record.levelname)
-        if record.name.startswith('hydroffice.ssp.io.kmio'):
             return False
+
         return True
 
 
@@ -26,8 +22,7 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)  # change to WARNING to reduce verbosity, DEBUG for high verbosity
 ch_formatter = logging.Formatter('%(levelname)-9s %(name)s.%(funcName)s:%(lineno)d > %(message)s')
 ch.setFormatter(ch_formatter)
-ch.addFilter(SettingsFilter())
-ch.addFilter(KmIOFilter())
+ch.addFilter(SisParseFilter())
 logger.addHandler(ch)
 
 

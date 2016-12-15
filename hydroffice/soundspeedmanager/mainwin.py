@@ -124,7 +124,7 @@ class MainWin(QtGui.QMainWindow):
         self.tab_server = Server(lib=self.lib, main_win=self)
         idx = self.tabs.insertTab(3, self.tab_server,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'server.png')), "")
-        self.tabs.setTabToolTip(idx, "Server")
+        self.tabs.setTabToolTip(idx, "Synthetic Profile Server")
         # refraction
         self.tab_refraction = Refraction(lib=self.lib, main_win=self)
         idx = self.tabs.insertTab(4, self.tab_refraction,

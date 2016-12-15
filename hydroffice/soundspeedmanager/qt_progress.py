@@ -97,10 +97,12 @@ class QtProgress(AbstractProgress):
         self._text = 'Done!'
 
         self._display()
+        self._progress.setHidden(True)
 
     def _display(self):
+        # noinspection PyArgumentList
+        self._qt_app.processEvents()
+
         self._progress.setLabelText(self._text)
         self._progress.forceShow()
         self._progress.setValue(self._value)
-        # noinspection PyArgumentList
-        self._qt_app.processEvents()
