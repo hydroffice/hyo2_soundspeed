@@ -13,8 +13,8 @@ from hydroffice.soundspeed.profile.more import More
 from hydroffice.soundspeed.profile.dicts import Dicts
 from hydroffice.soundspeed.profile.oceanography import Oceanography as Oc
 from hydroffice.soundspeed.profile import geostrophic_48
-from hydroffice.soundspeed.profile.svequations import SVEquations
-from hydroffice.soundspeed.profile.raypath import Raypath
+from hydroffice.soundspeed.profile.ray_tracing.ray_tracing import RayTracing
+from hydroffice.soundspeed.profile.ray_tracing.ray_path import RayPath
 
 
 class Profile(object):
@@ -721,157 +721,98 @@ class Profile(object):
         if more:
             self.more.debug_plot()
 
-    def fit_parab(self, Yin, NSpread=3, ymetric='depth', xattr='speed'):
-        ''' NOTE! pass in a Y value and recieve an interpolated X, a bit backwards from normal naming 
-        Yin is the ymetric (depth/pressure) to get a fitted approximate value at.  
-        NSpread is how many points to use around the desired dept/pressure to use in polyfit 
-        ymetric and xattr will default the the profile.ymetric and profile.attribute if left as None.
-        Should add the ability to spline the data instead/in addition
-        http://docs.scipy.org/doc/scipy/reference/tutorial/interpolate.html
-        '''
-        layers = self._no_dupes_goodflags()
-        layers.sort(order=[ymetric]) 
-        y = layers[ymetric]
-        x = layers[xattr]
-        index = np.searchsorted(y, Yin)
-        I1 = index - NSpread if index - NSpread >= 0 else 0
-        I2 = index + NSpread # too large of index doesn't matter in python
-        y = y[I1:I2]
-        x = x[I1:I2]
-        return np.poly1d(np.polyfit(y, x, 2))(Yin)
+    def interpolate_proc_speed_at_depth(self, depth, points=3):
+        """ Return speed difference at the passed depth"""
 
-    def DQA_surface(self, x, y, SN='Unknown'):
-        ''' DQA Test using a given depth (pressure) and SV
-        x is the xattr quantity (normally sound speed)
-        y is the ymetric (normally depth or pressure)
-        SN is the serial number of the instrument that measured the passed in x,y
-        '''
-        x_cast = self.fit_parab(y)
-        DiffSV = np.absolute(x_cast - x)
-        DQAResults= '\n' + time.ctime()
-        DQAResults += "DAILY DQA - SURFACE SOUND SPEED COMPARISON\n\n" # Start building the Public result message
-        if DiffSV > 2:
-            DQAResults += " - TEST FAILED - Diff in sound speed > 2 m/sec\n"
-        else:
-            DQAResults += " - TEST PASSED - Diff in sound speed <= 2 m/sec\n"
+        # identify start/end of profile data to be used for interpolation
+        idx = np.searchsorted(self.proc.depth[self.proc_valid], depth)
+        start = (idx - points) if (idx - points >= 0) else 0
+        end = idx + points
 
-        # Record DQA results
-        DQAResults += '\n'
-        DQAResults += "Surface sound speed instrument Serial Number: %s\n" % SN
-        DQAResults += "Surface sound speed instrument depth (m): %.1f\n" % y
-        DQAResults += "Surface sound speed Instrument reading (m/sec): %.2f\n" % x
-        DQAResults += "Full sound speed profile: %s\n" % self.meta.original_path
-        DQAResults += "   Instrument: sensor-%s, probe-%s, sn-%s\n" % (self.meta.sensor, self.meta.probe, self.meta.sn)
-        DQAResults += "Profile sound speed at same depth (m/sec): %.1f\n" % x_cast
-        DQAResults += "Difference in sound speed (m/sec): %.2f\n" % DiffSV
-        return DQAResults, DiffSV
+        # calculate coefficients and interpolated speed
+        coefficients = np.polyfit(self.proc.depth[self.proc_valid][start:end],
+                                  self.proc.speed[self.proc_valid][start:end], 2)
+        cast_speed = np.poly1d(coefficients)(depth)
 
-    def _no_dupes_goodflags(self, spacing = 0.1):
-        '''Returns a new array with 'flag' values !=0 and the depths sorted and spaced by at least the spacing value
-        '''
-        #layers = copy.deepcopy(self.ssp) 
-        dtype = [(b'depth', '<f8'), (b'speed', '<f8')]
-        data = []
-        for count in range(self.proc.num_samples):
-            if self.proc.source[count] == Dicts.sources['raw'] and self.proc.flag[count] == Dicts.flags['valid']:
-                data.append((self.proc.depth[count], self.proc.speed[count]))
-        layers = np.array(data, dtype=dtype)
-        #if 'flag' in self.dtype.names:
-        #    layers=scipy.compress(layers['flag']>=0, d)
-        layers.sort(order=['depth']) #must sort before taking the differences
-        depths = layers['depth']
-        #TODO: should we use QC( ) here or just the first sample that passes the spacing check?  Depends on if averaging the other data fields is ok.
-        ilist = [0]
-        for i in range(len(layers)):
-            if depths[i]-depths[ilist[-1]] >= spacing:
-                ilist.append(i)
-        layers = layers.take(ilist)
-        #delta_depth = scipy.hstack(([spacing*2],scipy.diff(layers['depth']))) #add a true value for the first difference that
-        #layers = scipy.compress(delta_depth>=spacing, layers) #make sure duplicate depths not written
-        return layers
+        return cast_speed
 
-    def compute_raypaths(self, draft, thetas_deg, traveltimes=None, res=.005, bProject=False):
-        '''Performs a multiple raytraces.  
-        Returns a RayPath object for each launch angle (thetas_deg).
-        Will return points within the RayPath at each traveltime specified or 
-          will compute traveltimes needed to reach the end of the profile at each launch angle
-        Draft will be used as the starting point within the profile and be added to depths 
-        '''
+    def _compute_ray_paths(self, draft, thetas_deg, travel_times=None, res=.005, bProject=False):
+        """Returns a RayPath object for each launch angle."""
         if not draft or draft == 'Unknown':
             draft = 0.0
         else:
             draft = float(draft)
-        layers = self._no_dupes_goodflags() #Get the data so we can sort and remove stuff
-        layers['depth'] -= draft
-        zero_ind = layers['depth'].searchsorted(0.0, side='right')
-        if zero_ind > 0:
-            layers['depth'][zero_ind - 1] = 0.0 #set the depth for the first layer to zero (so it doesn't get cut off).  
-            #i.e. first layer goes from 0 to 5, draft ==2, that changes first layer to -2 to 3 which needs to be 0.0 to 3 so we don't cut off the sound velocity for the layer.
-        layers = layers.compress(layers['depth'] >= 0)
+
+        depths = self.proc.depth[self.proc_valid] - draft
+        speeds = self.proc.speed[self.proc_valid]
+
         raypaths = []
         for launch in thetas_deg:
-            params = SVEquations.GetSVPLayerParameters(np.deg2rad(launch), layers)
-            if traveltimes is None:
-                tt = np.arange(res, params[-2][-1], res) #make traveltimes to reach end of profile
+
+            params = RayTracing.get_svp_layer_parameters(np.deg2rad(launch), depths, speeds)
+            if travel_times is None:
+                tt = np.arange(res, params[-2][-1], res) # make traveltimes to reach end of profile
             else:
-                tt = np.array(traveltimes)
-            rays = SVEquations.RayTraceUsingParameters(tt, layers, params, bProject=bProject)
+                tt = np.array(travel_times)
+
+            rays = RayTracing.ray_trace(tt, depths, speeds, params, b_project=bProject)
             rays[:,0] += draft
-            raypaths.append(Raypath(np.vstack((tt, rays.transpose())).transpose()))
+
+            raypaths.append(RayPath(np.vstack((tt, rays.transpose())).transpose()))
+
         return raypaths
 
-    def DQA_compare(self, prof, angle):
-        DepMax = min(self.proc.depth.max(), prof.proc.depth.max())
-        # Generate the travel time table for the two profiles.
-        if DepMax < 30:  # Modify time increment for shallow casts 02/14/00
-            TTInc = 0.002
-        elif DepMax <= 400:
-            TTInc = 0.002  # Travel time increment in seconds.
-        elif DepMax <= 800:
-            TTInc = 0.005
+    def compare_profile(self, profile, angle):
+
+        dep_max = min(self.proc.depth.max(), profile.proc.depth.max())
+        if dep_max <= 400:
+            tt_inc = 0.002  # Travel time increment in seconds.
+        elif dep_max <= 800:
+            tt_inc = 0.005
         else:
-            TTInc = 0.01
+            tt_inc = 0.01
 
         draft1 = 0.0 # TODO
         draft2 = 0.0 # TODO
-
         draft = max(draft1, draft2)
-        ray1 = self.compute_raypaths(draft, [angle], res=TTInc)[0]
-        ray2 = prof.compute_raypaths(draft, [angle], res=TTInc)[0]
+
+        # Generate the travel time table for the two profiles.
+        ray1 = self._compute_ray_paths(draft, [angle], res=tt_inc)[0]
+        ray2 = profile._compute_ray_paths(draft, [angle], res=tt_inc)[0]
         
-        npts = min(len(ray1.data), len(ray2.data))
-        depth1 = ray1.data[:npts, 1]
-        depth2 = ray2.data[:npts, 1]
+        nr_points = min(len(ray1.data), len(ray2.data))
+        depth1 = ray1.data[:nr_points, 1]
+        depth2 = ray2.data[:nr_points, 1]
         delta_depth = depth2 - depth1
         larger_depths = np.maximum(depth1, depth2)
-        perc_diff = np.absolute(delta_depth / larger_depths) * 100.0
-        max_diff_index = perc_diff.argmax()
-        max_diff = perc_diff[max_diff_index]
+        pct_diff = np.absolute(delta_depth / larger_depths) * 100.0
+        max_diff_index = pct_diff.argmax()
+        max_diff = pct_diff[max_diff_index]
         max_diff_depth = larger_depths[max_diff_index]
-        
-        
+
         details  = "SUMMARY OF RESULTS - COMPARE 2 CASTS   " 
         details += "SSManager, Version     %s\n\n" % ssp_version
         details += "REFERENCE PROFILE:     %s\n" % self.meta.original_path
-        details += "COMPARISON PROFILE:    %s\n\n" % prof.meta.original_path
+        details += "COMPARISON PROFILE:    %s\n\n" % profile.meta.original_path
         details += "REFERENCE INSTRUMENT:  sensor-%s, probe-%s, sn-%s\n" % (self.meta.sensor, self.meta.probe, self.meta.sn)
-        details += "COMPARISON INSTRUMENT: sensor-%s, probe-%s, sn-%s\n\n" % (prof.meta.sensor, prof.meta.probe, prof.meta.sn)
-        #Space(10) & "SYSTEM: %s\n" & UserSystem & CRLF
+        details += "COMPARISON INSTRUMENT: sensor-%s, probe-%s, sn-%s\n\n" % (profile.meta.sensor, profile.meta.probe, profile.meta.sn)
+
         details += "DRAFT                               = %.2fm\n" % draft
-        details += "MAXIMUM COMMON DEPTH                = %.2f\n" % DepMax 
+        details += "MAXIMUM COMMON DEPTH                = %.2f\n" % dep_max
         details += "MAXIMUM DEPTH PERCENTAGE DIFFERENCE = %.2f%%\n" % max_diff
         details += "MAXIMUM PERCENTAGE DIFFERENCE AT    = %.2fm\n" % max_diff_depth
         details += "Max percentage diff line and last line of travel time table:\n"
         details += "Travel time, Avg Depth, Depth Diff, Pct Depth Diff, Avg Crosstrack, Crosstrack Diff, Pct Crosstrack Diff\n"
-        for ni in (max_diff_index, npts-1):
+        for ni in (max_diff_index, nr_points-1):
             diff_data = (ray1.data[ni,0], 
-                         np.average([ray1.data[ni,1], ray2.data[ni,1]]), np.absolute(delta_depth[ni]), perc_diff[ni], 
+                         np.average([ray1.data[ni,1], ray2.data[ni,1]]), np.absolute(delta_depth[ni]), pct_diff[ni],
                          np.average([ray1.data[ni,2], ray2.data[ni,2]]), np.absolute(ray1.data[ni,2]-ray2.data[ni,2]), 100.0*np.absolute(ray1.data[ni,2]-ray2.data[ni,2])/max(ray1.data[ni,2],ray2.data[ni,2]))
             details += "    %5.2fs ,   %6.2fm,   %5.2fm  ,     %5.2f%%    ,      %6.2fm  ,      %5.2fm    ,         %5.2f%%\n" % diff_data
  
-        DQAResults = '\n' + time.ctime() + '\n'
+        results = '\n' + time.ctime() + '\n'
+
         if max_diff > 0.25:
-            message  = "RESULTS INDICATE PROBLEM.\n\n"
+            message = "RESULTS INDICATE PROBLEM.\n\n"
             message += "The absolute value of percent depth difference exceeds the recommended amount (.25).\n\n"
             message += "If test was conducted to compare 2 casts for possible\n"
             message += "grouping into one representative cast, then\n"
@@ -885,10 +826,11 @@ class Profile(object):
             message += "instruments is not functioning properly.\n\n"
             message += "If the test was run to compare an XBT cast with\n"
             message += "the last CTD cast, then it is time to take a new CTD cast."
-            DQAResults += "COMPARE 2 FILES\n  RESULTS: PERCENT DEPTH DIFFERENCE TOO LARGE\n"
-        else:
-            message  = "RESULTS OK.\n\n"
-            message += "Percent depth difference is within recommended bounds."
-            DQAResults += "COMPARE 2 FILES\n  RESULTS: PERCENT DEPTH DIFFERENCE OK\n"
-        return DQAResults, message, details, (max_diff, max_diff_depth), prof.meta.utc_time.strftime('%Y%m%d%H%M%S')
+            results += "COMPARE 2 FILES\n  RESULTS: PERCENT DEPTH DIFFERENCE TOO LARGE\n"
 
+        else:
+            message = "RESULTS OK.\n\n"
+            message += "Percent depth difference is within recommended bounds."
+            results += "COMPARE 2 FILES\n  RESULTS: PERCENT DEPTH DIFFERENCE OK\n"
+
+        return results, message, details, (max_diff, max_diff_depth), profile.meta.utc_time.strftime('%Y%m%d%H%M%S')

@@ -37,11 +37,11 @@ class SoundSpeedLibrary(object):
 
         # callbacks
         if not issubclass(type(callbacks), AbstractCallbacks):
-                raise RuntimeError("invalid callbacks object")
+            raise RuntimeError("invalid callbacks object")
         self.cb = callbacks
         # progress bar
         if not issubclass(type(progress), AbstractProgress):
-                raise RuntimeError("invalid progress object")
+            raise RuntimeError("invalid progress object")
         self.progress = progress
 
         self.ssp = None  # current profile
@@ -208,7 +208,7 @@ class SoundSpeedLibrary(object):
         self._outputs_folder = os.path.join(self.data_folder, "outputs")
         if not os.path.exists(self._outputs_folder):  # create it if it does not exist
             os.makedirs(self._outputs_folder)
-        # logger.debug("outputs folder: %s" % self.projects_folder)
+            # logger.debug("outputs folder: %s" % self.projects_folder)
 
     # library data folder
 
@@ -617,7 +617,7 @@ class SoundSpeedLibrary(object):
                 self.prepare_sis(thin=True)
 
             if not has_data_files:  # we don't have the output file names
-                if len(data_formats) == 1 and name == 'ncei': # NCEI requires special filename convention
+                if len(data_formats) == 1 and name == 'ncei':  # NCEI requires special filename convention
                     writer.write(ssp=self.ssp, data_path=data_path, data_file='ncei', project=self.current_project)
                 else:
                     writer.write(ssp=self.ssp, data_path=data_path, project=self.current_project)
@@ -810,42 +810,68 @@ class SoundSpeedLibrary(object):
         db.disconnect()
         return ret
 
-    def dqa_surface(self, pk, speed=None, depth=None, SN=None):
-        ret =(None, None, None, None, None)
-        if not SN:
-            SN =self.cb.ask_text(title="Enter text", msg="Serial number of surface sound speed instrument")
-            if not SN:
-                SN = 'Unknown'
-        if depth is None:
-            depth = self.cb.ask_number(title="Enter number", msg="Depth of surface sound speed instrument (m)",
-                                       default=0, min_value=-10, max_value=10, decimals=1)
-            if depth is None:
-                logger.error("missing the depth of surface sound speed instrument")
-                return ret
-        if speed is None:
-            speed = self.cb.ask_number(title="Enter number", msg="Sound speed measurement of instrument (m/s)",
-                                       default=1500, min_value=1300, max_value=1700, decimals=1)
-            if speed is None:
-                logger.error("missing the sound speed measurement of instrument")
-                return ret
-        prof = self.db_retrieve_profile(pk).cur
-        dqa, diff = prof.DQA_surface(speed, depth, SN)
-        ret = (dqa, diff, speed, depth, SN)
-        return ret
+    def dqa_at_surface(self, pk):
+        """Check the sound speed difference between a point measure and the current profile"""
 
-    def dqa_compare(self, pk, pk_ref=None, angle=None):
+        sn = self.cb.ask_text(title="Enter text", msg="Serial number of surface sound speed instrument")
+        if not sn:
+            sn = 'Unknown'
+
+        surface_depth = self.cb.ask_number(title="Enter number", msg="Depth of surface sound speed instrument (m)",
+                                           default=0, min_value=-10, max_value=30, decimals=1)
+        if surface_depth is None:
+            logger.error("missing the depth of surface sensor")
+            return None
+
+        surface_speed = self.cb.ask_number(title="Enter number", msg="Sound speed measurement of instrument (m/s)",
+                                           default=1500, min_value=1300, max_value=1700, decimals=1)
+        if surface_speed is None:
+            logger.error("missing the sound speed of surface sensor")
+            return None
+
+        prof = self.db_retrieve_profile(pk).cur
+        cast_speed = prof.interpolate_proc_speed_at_depth(depth=surface_depth)
+        speed_diff = abs(cast_speed - surface_speed)
+
+        msg = "Surface sensor (S/N: %s): %.1f m/sec (at %.2f m)\n" % (sn, surface_speed, surface_depth)
+        msg += "Profile #%02d: %.1f (interpolated at %.2f m)\n" % (pk, cast_speed, surface_depth)
+        msg += "Resulting difference in sound speed (m/sec): %.2f\n\n" % speed_diff
+
+        if speed_diff > 2.0:
+            msg += "TEST FAILED (Diff. in sound speed > 2 m/sec)\n"
+        else:
+            msg += "TEST PASSED (Diff. in sound speed <= 2 m/sec)\n"
+
+        return msg
+
+    def dqa_full_profile(self, pk, pk_ref=None, angle=None):
+
         if angle is None:
-            angle = self.cb.ask_number(title="Enter number", msg="What launch angle should be checked (degrees)",
+            angle = self.cb.ask_number(title="Enter number", msg="What launch angle(deg) should be checked",
                                        default=60, min_value=0, max_value=90, decimals=0)
             if angle is None:
                 logger.error("missing the launch angle to be checked")
                 return None
-        prof = self.db_retrieve_profile(pk).cur
+
+        profile = self.db_retrieve_profile(pk).cur
+
         if pk_ref is None:
-            prof_ref = self.ref.cur
+            ref_profile = self.ref.cur
         else:
-            prof_ref = self.db_retrieve_profile(pk_ref).cur
-        return prof_ref.DQA_compare(prof, angle)
+            ref_profile = self.db_retrieve_profile(pk_ref).cur
+
+        ret = ref_profile.compare_profile(profile, angle)
+        if ret is None:
+            return None
+
+        data_path = os.path.join(self.outputs_folder, 'dqa')
+        if not os.path.exists(data_path):
+            os.makedirs(data_path)
+        data_path = os.path.join(data_path, '%s_%s_DQA.txt' % (self.current_project, ret[4]))
+        with open(data_path, 'w') as f:
+            f.write(b'\n%s%s\n' % (ret[0], ret[2]))
+        msg = "Results written to\n%s\n\n%s%s\n\n%s" % (data_path, ret[0], ret[1], ret[2])
+        return msg
 
     # plotting
 
