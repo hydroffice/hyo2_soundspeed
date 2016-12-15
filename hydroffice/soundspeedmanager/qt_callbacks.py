@@ -86,7 +86,7 @@ class QtCallbacks(AbstractCallbacks):
 
     def ask_filename(self, saving=True, key_name=None, default_path=".",
                      title="Choose a path/filename", default_file="",
-                     file_filter="All Files|*.*", multi_file=False):
+                     file_filter="All Files (*.*)", multi_file=False):
         '''key_name is used to save/restore the last directory a file was selected in'''
 
         # flt = "Format %s(*.%s);;All files (*.*)" % (desc, " *.".join(ext))

@@ -288,7 +288,7 @@ class Seacat(AbstractWidget):
                         raise Exception("datcnv not found - asking user to supply location")
             except:
                 seabird_utils_exe = self.lib.cb.ask_filename(saving=False, key_name="Seacat/DataCNV", title="Find the Seabird Data Processing executable",
-                                                             ffilter="DataCNVw.exe|datcnvw.exe")
+                                                             file_filter="DataCNVw.exe|datcnvw.exe")
                 # rcode, seabird_utils_dir = RegistryHelpers.GetDirFromUser(None, RegistryKey="UserSpecifiedSeabird", Title="Find the Seabird Data Processing executable",
                 #                               bLocalMachine=0, DefaultVal="", Message="Plese locate the seabird data processing directory.\nIt's probably under Program files(x86).")
         return seabird_utils_exe
@@ -309,7 +309,7 @@ class Seacat(AbstractWidget):
                 conname = sbe_serialcomms.get_confile_name(serial_num, loc)
                 if not conname:
                     conname = self.lib.cb.ask_filename(saving=False, key_name="Seacat/AlternateConFilePath", title="Find the config file for %s" % str(serial_num),
-                                                       ffilter="Seacat Config Files (*.con *.xmlcon)")
+                                                       file_filter="Seacat Config Files (*.con *.xmlcon)")
                     if conname:
                         matches_convention = sbe_serialcomms.get_confile_name(serial_num, os.path.dirname(conname))
                         if not matches_convention:
