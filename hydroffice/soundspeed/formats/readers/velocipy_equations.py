@@ -2,7 +2,7 @@ import numpy
 from numpy import power as pow
 import numpy as np
 
-from from hydroffice.soundspeed.formats.readers import sbe_constants
+from hydroffice.soundspeed.formats.readers import sbe_constants
 
 coefficients = '''
 C00 	1402.388 	A02 	7.166E-5

@@ -357,10 +357,10 @@ class Seacat(AbstractWidget):
 
 class AutoSeacat(object):
     def __init__(self, port=None, progbar=None):
-        self.sbe = open_seacat(port, progbar)
         self.progbar = progbar
         if progbar:
             progbar.start(title="Seacat")
+        self.sbe = open_seacat(port, progbar)
 
     def __enter__(self):
         return self.sbe
