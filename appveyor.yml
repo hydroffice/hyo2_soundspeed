@@ -46,7 +46,7 @@ build_script:
 
 test: off
 test_script:
-  - python setup.py test
+  - python -m unittest discover
 
 after_test:
   - "python setup.py bdist_wheel"
