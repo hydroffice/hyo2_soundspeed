@@ -59,7 +59,6 @@ from . import coordinates
 from . import sbe_tools as Tools
 from . import sbe_constants
 from . import velocipy_equations
-from . import velocipy_raypath as Raypath
 from ...listener.seacat import sbe_serialcomms as Seacat
 
 def parseNumbers(filename, dtype, sep, pre='', post='', ftype=''):
@@ -3381,125 +3380,6 @@ Field5            :  Sound Velocity (m/s)
                 for f in copy_fields: 
                     new_data[index][f] = pt[f]
             return ScipyProfile(new_data, **self.get_keyargs())
-    def ComputeRaypaths(self, draft, thetas_deg, traveltimes=None, res=.005, bProject=False):
-        '''Performs a multiple raytraces.  
-        Returns a RayPath object for each launch angle (thetas_deg).
-        Will return points within the RayPath at each traveltime specified or 
-          will compute traveltimes needed to reach the end of the profile at each launch angle
-        Draft will be used as the starting point within the profile and be added to depths 
-        '''
-        if not draft or draft == 'Unknown':
-            draft = 0.0
-        else:
-            draft = float(draft)
-        prof=self.NoDupes_GoodFlags() #Get the data so we can sort and remove stuff
-        prof['depth']-=draft
-        zero_ind = prof['depth'].searchsorted(0.0, side='right')
-        if zero_ind>0:
-            prof['depth'][zero_ind-1] = 0.0 #set the depth for the first layer to zero (so it doesn't get cut off).  
-            #i.e. first layer goes from 0 to 5, draft ==2, that changes first layer to -2 to 3 which needs to be 0.0 to 3 so we don't cut off the sound velocity for the layer.
-        prof=prof.compress(prof['depth']>=0)
-        raypaths = []
-        for launch in thetas_deg:
-            params = velocipy_equations.GetSVPLayerParameters(numpy.deg2rad(launch), prof)
-            if traveltimes==None:
-                tt = numpy.arange(res, params[-2][-1], res) #make traveltimes to reach end of profile
-            else: tt = numpy.array(traveltimes)
-            rays = velocipy_equations.RayTraceUsingParameters(tt, prof, params, bProject=bProject)
-            rays[:,0]+=draft
-            raypaths.append(Raypath.Raypath(numpy.vstack((tt, rays.transpose())).transpose()))
-        return raypaths
-    
-    def DQACompare(self, prof, angle):
-        DepMax = min(self['depth'].max(), prof['depth'].max())
-        #' Generate the travel time table for the two profiles.
-        if DepMax < 30:  #                ' Modify time increment for shallow casts 02/14/00
-            TTInc = 0.002
-        elif DepMax <= 400:
-            TTInc = 0.002  #                    'Travel time increment in seconds.
-        elif DepMax <= 800:
-            TTInc = 0.005
-        else:
-            TTInc = 0.01
-        try: draft1=float(self.metadata['Draft'])
-        except: draft1=0.0
-        try: draft2=float(prof.metadata['Draft'])
-        except: draft2=0.0
-        draft = max(draft1, draft2)
-        ray1 = self.ComputeRaypaths(draft, [angle], res=TTInc)[0]
-        ray2 = prof.ComputeRaypaths(draft, [angle], res=TTInc)[0]
-        
-        npts = min(len(ray1.data), len(ray2.data))
-        depth1 = ray1.data[:npts, 1]
-        depth2 = ray2.data[:npts, 1]
-        delta_depth = depth2-depth1
-        larger_depths = numpy.maximum(depth1, depth2)
-        perc_diff = numpy.absolute(delta_depth/larger_depths)*100.0
-        max_diff_index = perc_diff.argmax()
-        max_diff = perc_diff[max_diff_index]
-        max_diff_depth = larger_depths[max_diff_index]
-        
-        
-        details  = "SUMMARY OF RESULTS - COMPARE 2 CASTS   " 
-        details += "VELOCIPY, Version      %s\n\n" % sbe_constants.PydroVersion() 
-        details += "REFERENCE PROFILE:     %s\n"%self.metadata['Filename'] 
-        details += "COMPARISON PROFILE:    %s\n\n" %prof.metadata['Filename'] 
-        details += "REFERENCE INSTRUMENT:  %s\n"%self.metadata.get('Instrument','Unknown') 
-        details += "COMPARISON INSTRUMENT: %s\n\n"%prof.metadata.get('Instrument','Unknown')
-        #Space(10) & "SYSTEM: %s\n" & UserSystem & CRLF
-        details += "DRAFT                               = %.2fm\n"%draft
-        details += "MAXIMUM COMMON DEPTH                = %.2f\n"%DepMax 
-        details += "MAXIMUM DEPTH PERCENTAGE DIFFERENCE = %.2f%%\n"%max_diff
-        details += "MAXIMUM PERCENTAGE DIFFERENCE AT    = %.2fm\n"%max_diff_depth
-        details += "Max percentage diff line and last line of travel time table:\n"
-        details += "Travel time, Avg Depth, Depth Diff, Pct Depth Diff, Avg Crosstrack, Crosstrack Diff, Pct Crosstrack Diff\n"
-        for ni in (max_diff_index, npts-1):
-            diff_data = (ray1.data[ni,0], 
-                         numpy.average([ray1.data[ni,1], ray2.data[ni,1]]), numpy.absolute(delta_depth[ni]), perc_diff[ni], 
-                         numpy.average([ray1.data[ni,2], ray2.data[ni,2]]), numpy.absolute(ray1.data[ni,2]-ray2.data[ni,2]), 100.0*numpy.absolute(ray1.data[ni,2]-ray2.data[ni,2])/max(ray1.data[ni,2],ray2.data[ni,2]))
-            details += "    %5.2fs ,   %6.2fm,   %5.2fm  ,     %5.2f%%    ,      %6.2fm  ,      %5.2fm    ,         %5.2f%%\n"%diff_data
- 
-        DQAResults='\n'+time.ctime()+'\n'
-        if max_diff > 0.25:
-            message  = "RESULTS INDICATE PROBLEM.\n\n"
-            message += "The absolute value of percent depth difference exceeds the recommended amount (.25).\n\n"
-            message += "If test was conducted to compare 2 casts for possible\n"
-            message += "grouping into one representative cast, then\n"
-            message += "the 2 casts should NOT be grouped.\n\n"
-            message += "If test was run as part of a Data Quality Assurance for\n"
-            message += "2 simultaneous casts, then one or both of the instruments\n"
-            message += "used is functioning improperly.  Investigate further by\n"
-            message += "performing simultaneous casts of each of the instruments\n"
-            message += "with a third instrument.  Then rerun this procedure with\n"
-            message += "the 2 new pairs of casts to determine which one of the\n"
-            message += "instruments is not functioning properly.\n\n"
-            message += "If the test was run to compare an XBT cast with\n"
-            message += "the last CTD cast, then it is time to take a new CTD cast."
-            DQAResults += "COMPARE 2 FILES\n  RESULTS: PERCENT DEPTH DIFFERENCE TOO LARGE\n"
-        else:
-            message  = "RESULTS OK.\n\n"
-            message += "Percent depth difference is within recommended bounds."
-            DQAResults += "COMPARE 2 FILES\n  RESULTS: PERCENT DEPTH DIFFERENCE OK\n"
-        return DQAResults, message, details, (max_diff, max_diff_depth)
-
-    def FindDepthByPressure(self, deckpressure, depthpressure, caldata):
-        if set(['depth','pressure','density']).issubset(set(self.dtype.names)):
-            cal = ScipyProfile(caldata, names=['pin', 'pout'])
-            #' Get difference between pressure at least depth and
-            #' atmospheric pressure. Divide this difference by 1.4504
-            #' to convert from psia to decibars.
-            #' (Will use this value to get least depth).
-            pressure_predive = cal.FitParab(deckpressure, ymetric='pout', xattr='pin')
-            pressure_atdepth = cal.FitParab(depthpressure, ymetric='pout', xattr='pin')
-            pressure_calibrated = (pressure_atdepth - pressure_predive) / 1.4504
-            if pressure_calibrated>self['pressure'].max():
-                raise UserError( 'pressure was too large for the selected CTD\nCTD cast did not go deep enough')
-            elif pressure_calibrated<0:
-                raise UserError( 'pressure was negative -- invalid\n predive may be too large (should be from 13 to 16)')
-            else:
-                return self.FitParab(pressure_calibrated, 5, ymetric='pressure', xattr='depth')
-        else:
-            raise Exception('CTD did not have data for ALL of: depth,pressure,density \n  in fields:'+ str(self.dtype.names))
 # This defines whether everything that sources this file will use the python
 # dictionary-based Profile or the numpy.recarray based Profile
 # This should be "DictProfile" or "ScipyProfile"
