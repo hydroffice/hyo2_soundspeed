@@ -52,14 +52,37 @@ from numpy.ma import MaskedArray
 from numpy import array
 from netCDF4 import Dataset, stringtoarr, num2date
 
-from .velocipy_exceptions import UserError, MetadataException
-from . import velocipy_exceptions as MyExceptions
 from . import coordinates
 
 from . import sbe_tools as Tools
 from . import sbe_constants
 from . import velocipy_equations
 from ...listener.seacat import sbe_serialcomms as Seacat
+
+
+class UserError(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return str(self.value)
+
+
+class MetadataException(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return str(self.value)
+
+
+class DataFileError(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return str(self.value)
+
 
 def parseNumbers(filename, dtype, sep, pre='', post='', ftype=''):
     '''builds a regular expression based on dtype.names and the (regex ok) separator supplied
@@ -99,56 +122,6 @@ def is_increasing(l):
     '''
     truth = map(lambda x,y: x < y, l[:-1], l[1:])
     return truth == ( [True] * (len(l) - 1) )
-
-def CosineAvg(records, names, binsize, binwidth, WWmin, WWMul=.0025):
-    '''Cosine averaging used in VelocWin in multiple places.  In velocwin it was used on pressure vs density/velocity/pressure (creates and avg pressure value with the avg density/velocity)
-    This was only used on pressure and values greater than zero, but am generalizing it to be +/- in case we want it.
-    records is a numpy array, possibly a record array.
-    names is a list of the record fields or the column numbers to be used (e.g. records[names[0]]) 
-    binsize is the size of bins -- units are related to first name/column in records (records[names[0]])
-    binwidth is the number of bins to either side of the value to add to
-    WWmin is the minimum window width for the cos( ) function (relates to name[0])
-    WWMul is a scalar that allows the window width to grow (spreads the averaging) as the Z (name[0]) gets larger.
-    
-    CosineAvg(numpy.array([[1,2,3,4,5],[1,2,4,8,16]]), [0,1], 1, 4, 1.7, .0025) #Seacat
-    CosineAvg(numpy.array([[1,2,3,4,5],[1,2,4,8,16]]), [0,1], 0.1, 5, 0.3, .025) #SMLGauge
-    
-    For smoothing a time based signal (or evenly sampled) see the numpy cookbook for smoothing.
-    '''
-    Z = records[names[0]] #pressure typically
-    WW = numpy.maximum(numpy.absolute(Z*WWMul), WWmin) #The window widths per Z (pressure) value
-    maxZ, minZ = Z.max(), Z.min()
-    #store the bin value in the zeroth (storage[0]) column and weights in the last column (storage[-1])
-    storage = numpy.zeros([len(names)+2, 2*(binwidth+1)+(maxZ-minZ)/binsize]) #layout storage for summing each bin with extra on either side (remove the extra at the end)
-    #the extra space keeps exceptions from coming up based on array lengths.
-
-    for i in numpy.arange(len(storage[0])):
-        storage[0][i] = (i-binwidth)*binsize+minZ   
-    #init_weight = 2.69*numpy.arange(-binwidth, binwidth+1)
-    #print Z
-    for i, zv in enumerate(Z):
-        center_bin = int((zv-minZ)/binsize+.5)+binwidth
-        zdiff = zv-storage[0][center_bin-binwidth:center_bin+binwidth+1]
-        binweights = 1.0 + numpy.cos(2.69*zdiff/WW[i]) #' Insure that weight will be .1 at a window width from point I
-        binweights *= numpy.absolute(zdiff)<WW[i]
-        for c, name in enumerate(names):
-            #print c, name
-            #print storage[c+1][center_bin-binwidth:center_bin+binwidth+1].shape
-            #print (records[name][i]*binweights).shape
-            storage[c+1][center_bin-binwidth:center_bin+binwidth+1] += records[name][i]*binweights
-        #print binweights.shape, WW[i]
-        #print binweights
-        storage[-1][center_bin-binwidth:center_bin+binwidth+1] += binweights
-    for i in range(len(names)):
-        storage[i+1]/=storage[-1]
-    storage = storage[:, binwidth: -(binwidth+1)]  #slice off the end stuff for the binwidths
-    delta_depth = numpy.hstack(([1],numpy.diff(storage[1]))) #add a true value for the first difference that
-    storage = numpy.compress(delta_depth>=.00001, storage, axis=1) #make sure duplicate pressures not written
-    storage = numpy.compress(storage[-1]>0.1, storage, axis=1) #remove bins that didn't have enough weighting.
-    storage_rec = numpy.rec.fromarrays([storage[c+1] for c, name in enumerate(names)], names = [name for c, name in enumerate(names)])
-    return storage_rec
-
-
 
 #Identifier Input data    Data to be used                     Comment
 ssp_fmts_doc = '''
@@ -887,8 +860,6 @@ class ScipyProfile(numpy.recarray):
             p = Profile.parseOceanScienceASC(filename)
         elif extension[-1] == 'c': # Processed file from the MVP 100 (based on FA's files)
             p = Profile.parseCALCFile(filename)
-        elif extension in ('vpq', 'vpb') or extension[-1] in ('q', 'b'): #edited/unedited VelocWin file
-            p = Profile.parseVelocwinEditedFile(filename)
         elif extension == 'vpa' or extension[-1] == 'a': #Velocwin Archive with Pressure/Temp/Salinity profiles
             p = Profile.parseVelocwinNODCFile(filename)
         elif 'xbt' in filename.lower():
@@ -1017,18 +988,18 @@ class ScipyProfile(numpy.recarray):
                     dt = datetime.datetime(1,1,1).strptime(dt_match.group('full'), '%b %d %Y %H:%M:%S')
                     yr, mon, day = dt.year, dt.month, dt.day
                     hour, minute = dt.hour, dt.minute
-                
-                
+
             meta['timestamp'] = datetime.datetime(yr, mon, day, hour, minute)
-            meta['Time'] = "%02d:%02d"%(hour,minute)
-            meta['Year'] = '%4d'%yr
-            meta['Day'] = '%03d'%Tools.DayOfYear(mon, day, yr)
+            meta['Time'] = "%02d:%02d" % (hour, minute)
+            meta['Year'] = '%4d' % yr
+            meta['Day'] = '%03d' % Tools.DayOfYear(mon, day, yr)
             lat_m = sbe_constants.SEACAT_HEX_LATRE.search(header)
             if lat_m:
                 lon_m = sbe_constants.SEACAT_HEX_LONRE.search(header)
                 if lon_m:
                     coord = coordinates.Coordinate(lat_m.group('lat'), lon_m.group('lon'))
-                    if coord: meta.update(ScipyProfile.getMetaFromCoord(coord)) #blank Latitude/Longitude will return a None coord
+                    if coord:
+                        meta.update(ScipyProfile.getMetaFromCoord(coord))  # blank Latitude/Longitude will return a None coord
             m = sbe_constants.SeacatHex_SNRE.search(header)
             if m:
                 meta['SerialNum'] = m.group('SN')
@@ -1036,11 +1007,9 @@ class ScipyProfile(numpy.recarray):
             meta['samplerate'] = sbe_constants.SeacatCNV_INTERVALRE.search(header).group('interval')
             meta['ImportFormat'] = 'CNV'
             return meta
-    @staticmethod 
-    def parseSVPFile(filename):
-        s = open(filename).read()
-        metadata = {}
 
+    @staticmethod
+    def parseSVPFile(filename):
         # UNV/OMB svp file
         if ScipyProfile.isOmgSvpFile(filename):
             return ScipyProfile.parseOmgSvpFile(filename)
@@ -1048,48 +1017,12 @@ class ScipyProfile(numpy.recarray):
         # Caris concatenated SVP file
         elif ScipyProfile.isCarisSvpFile(filename):
             return ScipyProfile.parseCarisSvpFile(filename)
-    @staticmethod
-    def parseVelocwinEditedFile(filename):
-        '''edited/unedited VelocWin file'''
-        depth = []
-        speed = []
-        flag    = []
-        extension = filename.split('.')[-1].lower()
-        s = open(filename).read()
 
-        hdr, data = s.split('ENDHDR')
-        metadata = ScipyProfile.parseVelocwinMetadata(hdr)
-        fields=metadata.pop('_fields_')
-        if extension[-1] == 'b': fields = fields[:-1] # I think if it's an ??b file, all of the points are measured (i.e. flag of zero)
-        cols = []
-        for f in fields:
-            cols.append([])
-            
-        l = data.split()
-        l.reverse() #reverse the data and pop values from the end (which was the beginning)
-        while l:
-            try:
-                # (depth, speed, flag)
-                # flag values of 0,-1,1,2,3 correspond to 'good','bad',extrapolated
-                # by historical data,operator input,most probably slope.    As noted
-                # in ZoneCast's ModInputOutput.bas
-                for i in range(len(fields)):
-                    cols[i].append(float(l.pop()))
-            except IndexError:
-                break
-        if "flag" not in fields:  #make a list of OK flags the same length as the rest of the data
-            cols.append([ScipyProfile.FLAG_OK]*len(cols[0])) #create "good" flags
-            fields = list(fields)+['flag']
-        fields = tuple(fields)
-        metadata['filename'] = filename
-        metadata['ImportFormat'] = 'Q'
-        return ScipyProfile(cols, names=fields, ymetric="depth", attribute="soundspeed", metadata=metadata)
-    
     @staticmethod
     def parseZZDFile(filename):
         s = open(filename).read()
         hdr, data = s.split('M/S')
-        depth, speed, flag = [],[],[]
+        depth, speed, flag = [], [], []
         for line in data.splitlines():
             try:
                 d, s = line.split()
@@ -1099,7 +1032,7 @@ class ScipyProfile(numpy.recarray):
             speed.append(float(s))
             flag.append(0)
         hdr += 'M/S'
-        metadata = {} # FIXME: write the metadata parser for zzd
+        metadata = {}  # FIXME: write the metadata parser for zzd
         metadata['filename'] = filename
         metadata['ImportFormat'] = 'ZZD'
         a = array([depth, speed]).transpose()
@@ -1120,8 +1053,8 @@ class ScipyProfile(numpy.recarray):
             depths, speeds = [], []
 
             for line in section.splitlines():
-                if not metadata: # This will be the case on the first of every line
-                    metadata = ScipyProfile.parseSVPMetadata(line, filename=filename, version_string=version_string) 
+                if not metadata:  # This will be the case on the first of every line
+                    metadata = ScipyProfile.parseSVPMetadata(line, filename=filename, version_string=version_string)
                     metadata['filename'] = filename
                 else:
                     try:
@@ -1134,25 +1067,24 @@ class ScipyProfile(numpy.recarray):
                 p = ScipyProfile([depths, speeds], names=('depth', 'soundspeed'), ymetric="depth", attribute="soundspeed", metadata=metadata)
                 rv.append(p)
         return rv
-    
+
     @staticmethod
     def parseOceanScienceMetadata(s):
         '''For old data columns were not listed in the header and had a fixed format.  Okeanos Explorer downloaded a new
         driver which changed the format.  It now lists fields in the header and since I don't know if they are user configurable
         will load them dynamically similar to the Seacat data
         '''
-        meta={}
-        #lines = filedata.splitlines()[1:] #skip the header which is bad (is the download date or process date?)
+        meta = {}
+        # lines = filedata.splitlines()[1:] #skip the header which is bad (is the download date or process date?)
         latm = re.search(r'/*\*Lat (?P<lat>[\d/]+)', s)
         lonm = re.search(r'/*\*Lon (?P<lon>[\d/]+)', s)
-            
-        #location = coordinates.Coordinate(coordinates.LatStrToDec(latm.group('lat')), coordinates.LonStrToDec(lonm.group('lon')))
+
         try:
             location = coordinates.Coordinate(latm.group('lat'), lonm.group('lon'))
-            location.lon = -location.lon #force to West since it doesn't specify east/west in it's sample
+            location.lon = -location.lon  # force to West since it doesn't specify east/west in it's sample
             meta.update(ScipyProfile.getMetaFromCoord(location))
         except:
-            pass #newer format? -- or lat/lon is blank
+            pass  # newer format? -- or lat/lon is blank
 
         mDT = re.search(r'/*\*DeviceType=\s*(?P<TYPE>\w+)', s)
         mSN = re.search(r'/*\*SerialNumber=\s*(?P<SN>\w+)', s)
@@ -1160,9 +1092,8 @@ class ScipyProfile(numpy.recarray):
             meta['SerialNum'] = mSN.group('SN')
             meta['Instrument'] = mDT.group('TYPE') + ' (SN:'+mSN.group('SN')+')'
         else:
-            meta['Instrument']="Unknown" #new format isn't necessarily filling out serial number
+            meta['Instrument']="Unknown"  # new format isn't necessarily filling out serial number
 
-        
         m = re.search(r'''Cast\s+\d+\s+(?P<DATE>\d+\s+\w+\s+\d+\s+\d+:\d+:\d+)''', s, re.VERBOSE|re.DOTALL)
         if m: 
             #grab the date from the cast metadata and convert to datetime object
@@ -1173,24 +1104,23 @@ class ScipyProfile(numpy.recarray):
             m=re.search("(?P<yr>\d+)\s+(?P<mon>\d+)\s+(?P<day>\d+)\s+(?P<hour>\d+)\s+(?P<minute>\d+)", tm)
             #update the profile metadata with the interpreted time data 
             meta.update( ScipyProfile.getMetaFromTimeRE(m))
-        
         return meta
-    
+
     @staticmethod
     def parseOceanScienceASC(filename):
         '''OceanScience format from Nancy Foster example data.
         metadata lines start with an asterisk.
-        
+
         *scan# C[S/m]  T[degC]  P[dbar]
         1  0.00000 20.948    0.031
         2  0.00000 20.952    0.031
         3  0.00000 20.958    0.031
         '''
-        
+
         s = open(filename).read()
         meta = ScipyProfile.parseOceanScienceMetadata(s)
         meta['filename'] = filename
-        
+
         profile_data = parseNumbers(filename, 
                          [('index', numpy.int32), ('conductivity', numpy.float32), ('temperature',numpy.float32), ('pressure', numpy.float32)], 
                          r"[\s,]+", pre=r'^\s*', post=r'\s*$')
@@ -1212,7 +1142,7 @@ class ScipyProfile(numpy.recarray):
 
         try:
             p=p.ComputeSV()
-        except MyExceptions.DataFileError,e:
+        except DataFileError,e:
             print e
         
         return p
@@ -1364,7 +1294,7 @@ Field5            :  Sound Velocity (m/s)
         if p.metadata.get('assumed salinity',''): p['salinity']=float(p.metadata['assumed salinity'])
         try:
             p=p.ComputeSV()
-        except MyExceptions.DataFileError,e:
+        except DataFileError,e:
             print e
         return p
     def ComputeSV(self, eq=velocipy_equations.ChenMillero):
@@ -1380,7 +1310,7 @@ Field5            :  Sound Velocity (m/s)
                 lat = self.metadata['location'].lat
                 depths=p['depth']
             except:
-                raise MyExceptions.DataFileError("No enough data (no pressure or depth with latitude) to compute SoundSpeed")
+                raise DataFileError("No enough data (no pressure or depth with latitude) to compute SoundSpeed")
             pressures = velocipy_equations.DepthToPressure(depths, lat)
         if 'soundspeed' not in p.dtype.names:
             p=p.append_field('soundspeed',0.0)
@@ -3059,7 +2989,7 @@ Field5            :  Sound Velocity (m/s)
                     if m:
                         HipsSVPFile = file(HipsSVPFile, 'a') #open for append
                     else:
-                        raise MyExceptions.DataFileError(HipsSVPFile+" did not have SVP_VERSION in the first line of file -- may not be a Caris SVP file.  Data not written")
+                        raise DataFileError(HipsSVPFile+" did not have SVP_VERSION in the first line of file -- may not be a Caris SVP file.  Data not written")
                 else: #create a new file (needs header info) --  
                     self.WriteHipsFile(HipsSVPFile) # calls this function back with an open file object with header written
                     if sorted:

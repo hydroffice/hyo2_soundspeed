@@ -12,7 +12,15 @@ except ImportError:
         from ogr import Geometry, wkbPoint
     except ImportError:
         print 'ogr not found, OGRPoints can not be created'
-from .velocipy_exceptions import FormattingException
+
+
+class FormattingException(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return str(self.value)
+
 
 '''
 c=coordinates.Coordinate('32/42/15n',  '079/50/00w')
