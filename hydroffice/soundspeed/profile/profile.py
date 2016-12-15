@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import os
 import time
 import numpy as np
 import logging
@@ -93,6 +94,11 @@ class Profile(object):
     def proc_valid(self):
         """Return indices of valid proc samples"""
         return np.equal(self.proc.flag, Dicts.flags['valid'])
+
+    @property
+    def proc_dqa_valid(self):
+        """Return indices of DQA valid proc samples"""
+        return np.logical_and(self.proc_valid, np.equal(self.proc.source, Dicts.sources['raw']))
 
     @property
     def sis_valid(self):
@@ -725,26 +731,26 @@ class Profile(object):
         """ Return speed difference at the passed depth"""
 
         # identify start/end of profile data to be used for interpolation
-        idx = np.searchsorted(self.proc.depth[self.proc_valid], depth)
+        idx = np.searchsorted(self.proc.depth[self.proc_dqa_valid], depth)
         start = (idx - points) if (idx - points >= 0) else 0
         end = idx + points
 
         # calculate coefficients and interpolated speed
-        coefficients = np.polyfit(self.proc.depth[self.proc_valid][start:end],
-                                  self.proc.speed[self.proc_valid][start:end], 2)
+        coefficients = np.polyfit(self.proc.depth[self.proc_dqa_valid][start:end],
+                                  self.proc.speed[self.proc_dqa_valid][start:end], 2)
         cast_speed = np.poly1d(coefficients)(depth)
 
         return cast_speed
 
-    def _compute_ray_paths(self, draft, thetas_deg, travel_times=None, res=.005, bProject=False):
+    def _compute_ray_paths(self, draft, thetas_deg, travel_times=None, res=.005, b_project=False):
         """Returns a RayPath object for each launch angle."""
         if not draft or draft == 'Unknown':
             draft = 0.0
         else:
             draft = float(draft)
 
-        depths = self.proc.depth[self.proc_valid] - draft
-        speeds = self.proc.speed[self.proc_valid]
+        depths = self.proc.depth[self.proc_dqa_valid] - draft
+        speeds = self.proc.speed[self.proc_dqa_valid]
 
         raypaths = []
         for launch in thetas_deg:
@@ -755,7 +761,7 @@ class Profile(object):
             else:
                 tt = np.array(travel_times)
 
-            rays = RayTracing.ray_trace(tt, depths, speeds, params, b_project=bProject)
+            rays = RayTracing.ray_trace(tt, depths, speeds, params, b_project=b_project)
             rays[:,0] += draft
 
             raypaths.append(RayPath(np.vstack((tt, rays.transpose())).transpose()))
@@ -764,7 +770,7 @@ class Profile(object):
 
     def compare_profile(self, profile, angle):
 
-        dep_max = min(self.proc.depth.max(), profile.proc.depth.max())
+        dep_max = min(self.proc.depth[self.proc_dqa_valid].max(), profile.proc.depth[profile.proc_dqa_valid].max())
         if dep_max <= 400:
             tt_inc = 0.002  # Travel time increment in seconds.
         elif dep_max <= 800:
@@ -789,11 +795,15 @@ class Profile(object):
         max_diff_index = pct_diff.argmax()
         max_diff = pct_diff[max_diff_index]
         max_diff_depth = larger_depths[max_diff_index]
+        self_path = self.meta.original_path
+        self_path = self_path if os.path.exists(self_path) else os.path.basename(self_path)
+        profile_path = profile.meta.original_path
+        profile_path = profile_path if os.path.exists(profile_path) else os.path.basename(profile_path)
 
         details  = "SUMMARY OF RESULTS - COMPARE 2 CASTS   " 
         details += "SSManager, Version     %s\n\n" % ssp_version
-        details += "REFERENCE PROFILE:     %s\n" % self.meta.original_path
-        details += "COMPARISON PROFILE:    %s\n\n" % profile.meta.original_path
+        details += "REFERENCE PROFILE:     %s\n" % self_path
+        details += "COMPARISON PROFILE:    %s\n\n" % profile_path
         details += "REFERENCE INSTRUMENT:  sensor-%s, probe-%s, sn-%s\n" % (self.meta.sensor, self.meta.probe, self.meta.sn)
         details += "COMPARISON INSTRUMENT: sensor-%s, probe-%s, sn-%s\n\n" % (profile.meta.sensor, profile.meta.probe, profile.meta.sn)
 
