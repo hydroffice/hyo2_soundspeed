@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from abc import ABCMeta, abstractmethod
+import numpy as np
 import logging
 
 logger = logging.getLogger(__name__)
@@ -44,15 +45,18 @@ class AbstractReader(AbstractFormat):
 
         for profile in self.ssp.l:  # we may have multiple profiles
 
-            # select samples by casting direction
-            profile.reduce_up_down(self.s.ssp_up_or_down)
-
             # check if location is present
             if (profile.meta.latitude is None) or (profile.meta.longitude is None):
                 profile.meta.latitude, profile.meta.longitude = self.cb.ask_location()
                 if (profile.meta.latitude is None) or (profile.meta.longitude is None):
                     self.ssp.clear()
                     raise RuntimeError("missing geographic location required for database lookup")
+            # Calc depth data if needed since we are now guaranteed a lat/lon
+            if not np.count_nonzero(profile.data.depth) and np.count_nonzero(profile.data.pressure):
+                profile.calc_data_depth()
+
+            # select samples by casting direction
+            profile.reduce_up_down(self.s.ssp_up_or_down)
 
             # check if timestamp is present
             if profile.meta.utc_time is None:
