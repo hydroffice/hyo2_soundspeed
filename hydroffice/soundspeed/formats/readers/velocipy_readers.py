@@ -36,21 +36,19 @@ So to be most stringent in the parsing of data we have to loop the lines of the 
         Both corrections follow the same procedure as for XBTs.        
 '''
 
-import os, glob
-import datetime, time, calendar
+import os
+import datetime
+import time
 from warnings import warn
 from copy import deepcopy, copy
 from pprint import pformat
 import re
-import struct
 import urllib2
-import ast
-import subprocess
 
 import numpy
 from numpy.ma import MaskedArray
 from numpy import array
-from netCDF4 import Dataset, stringtoarr, num2date
+from netCDF4 import Dataset, num2date
 
 from . import coordinates
 
@@ -1789,15 +1787,6 @@ Field5            :  Sound Velocity (m/s)
         meta['location'] = location
         return meta
 
-    def updateLocationFromLatLon(self):
-        try:
-            lat = self.metadata['Latitude']
-            lon =  self.metadata['Longitude']
-        except KeyError, e:
-            raise MetadataException(str(e)) 
-        coord = coordinates.Coordinate(lat, lon)
-        if coord: 
-            self.metadata['location'] = coord
     def updateNameDate(self):
         self.metadata['Name_Date_SN'] = "CREATED ON " + self.metadata['ProcessDate'] + " BY " + self.metadata['UserName'].strip() 
     @staticmethod
@@ -2361,47 +2350,6 @@ Field5            :  Sound Velocity (m/s)
 
 
     @staticmethod
-    def parseVelocwinMetadata(s):
-        m={}
-        m['_fields_']=("depth", "soundspeed", "flag")
-        lines = s.splitlines()
-        try:
-            n_hdr = lines.index('ENDHDR') #if we were passed the whole file, find the endhdr
-        except ValueError: #entire string is header
-            n_hdr = len(lines)
-        is_python = False
-        for l in lines[:n_hdr]:
-            if 'python generated' in l.lower():
-                is_python=True
-                ver_number = int(re.search("\d+", l).group())
-                if ver_number>1: n_hdr-=1 #subtract one since the field names are on the last line
-        if is_python:
-            def translate(s):
-                return s.replace('<\\n>','\n').replace('<\\r>', '\r')
-            for l in lines[:n_hdr]:
-                if sbe_constants.XREFDELIM in l:
-                    k, v = l.strip().split(sbe_constants.XREFDELIM)
-                    m[k] = translate(v) #add to the metadata.  
-                    #timestamp and location will get overwritten with time/coord objects after parsing is finished
-            if ver_number>1:
-                l = lines[n_hdr]
-                m['_fields_'] = l.split(",")
-        else: #VelocWin file  -- Visual Basic generated file
-            for i in range(min(n_hdr, len(ScipyProfile.header_keys))): #get the standard headers, as many as exist
-                m[ScipyProfile.header_keys[i]]=lines[i]
-            for i in range(len(ScipyProfile.header_keys), n_hdr): #get any extra headers beyond the standard and give them integer keys
-                hd = lines[i]
-                m[str(i)] = hd 
-        m['timestamp'] = datetime.datetime.strptime("%s %s %s" % (m['Year'], m['Day'], m['Time']), "%Y %j %H:%M")
-        if m['Latitude']=='Unknown' or m['Longitude']=='Unknown':
-            m['location'] = coordinates.Coordinate(0.0, 0.0)
-        else:
-            m['location'] = coordinates.Coordinate(m['Latitude'], m['Longitude'])
-        m['ImportFormat'] = 'Q'
-
-        return m
-
-    @staticmethod
     def parseSVPMetadata(s, version_string="", filename=""):
         try: # This will work if it's the full header
             version_string, filename, _, date, time, lat, lon = s.split()
@@ -2471,289 +2419,6 @@ Field5            :  Sound Velocity (m/s)
         fread.close()
         p = ScipyProfile(d, names=fields, ymetric="depth", attribute="soundspeed", metadata = meta)
         return p
-        
-    def WriteNODCFile(self, filename, bDebug=False):
-        '''   
-        ' NOTES: Data are obtained from the Sea-Bird converted CNV data file.
-        '        Pressure, temperature, salinity are averaged,
-        '        reducing the number of points to not more than 4000.  Next parabolic
-        '        fitting is done to obtain data at 1-decibar intervals.
-        
-        ' Algorithms (averaging/parabolic fitting): Dr. Lloyd Huff 3/28/1989
-        '''
-        ''' Communication with NODC -- their preferred format is netCDF as seen below. 
-        
-        Here are some useful links regarding CF compliance.
-
-        The main link to CF metadata:
-        http://cf-pcmdi.llnl.gov/
-        
-        There are two links on that page which are very useful (under Quick Links):
-        CF Conventions Document (v1.4)
-        CF Standard Name Table
-        
-        and the CF Compliance Checker once you start creating them.
-        
-        Examples of it's implementation can be found at:
-        http://www.unidata.ucar.edu/software/netcdf/examples/files.html
-        
-        There are five files you can review under the netCDF column.
-        
-        Let me know if you have any questions.
-        
-        Regards,
-        Chris
-        
-        -- 
-        Chris Paver, Oceanographer
-        NOAA/NODC E/OC1
-        1315 East-West Hwy
-        Silver Spring MD 20910
-        Phone:  301-713-3272 ext. 118
-        Fax:  301-713-3302
-        http://www.nodc.noaa.gov/ 
-        '''
-        #raise Exception('Need to perform NodcCre QC/averaging checks')
-        #f.write("DATA COLLECTOR: "+
-        #        self.metadata['Ship'].replace("NRT", 'NOAA NAVIGATION RESPONSE TEAM').replace("(SHIP)", 'NOAA SHIP').replace("OTHER", 'SHIP')+'\n')
-        #f.write("PROJECT: " +self.metadata['Project']+'\n')
-        #f.write("SURVEY: " + self.metadata['Survey']+'\n')
-        #f.write("INSTRUMENT: PROFILER "+self.metadata['Instrument']+'\n') #TODO: remove calibration date??
-        #If InStr(HEADER(6), "CD") > 0 Then           ' check for calibration date
-
-        bDigibarT = False
-        title = 'Sound speed'
-        iFormat = ''
-        if self.metadata.has_key('ImportFormat'):
-            iFormat = str(self.metadata['ImportFormat'])
-            if iFormat in ['WOA', 'RTOFS', 'HYCOM']:
-                if bDebug:
-                    self.metadata['Ship'] = iFormat
-                else:
-                    print 'Could not export %s profile to NODC file\r' %iFormat
-                    return ''
-            elif iFormat == 'CSV':
-                bDigibarT = True
-                title = 'Digibar'
-            elif iFormat == 'NC4':
-                if self.metadata.has_key('Instrument') and self.metadata['Instrument'].lower().startswith('digibar'):
-                    bDigibarT = True
-                    title = 'Digibar'
-                else:
-                    title = self.metadata['Format']
-            elif iFormat == 'CastAway' or iFormat == 'RAW_MVP':
-                title = iFormat
-            elif iFormat == 'CALC':
-                title = 'MVP'
-            elif iFormat == '0mg':
-                title = 'OMG svp'
-            elif iFormat == 'XBT' or iFormat == 'XSV':
-                title = 'Sippican %s' %iFormat
-            elif iFormat == 'CNV':
-                title = 'CTD'
-        if not self.metadata.has_key('Project') or not self.metadata.has_key('Survey') or not self.metadata.has_key('Instrument') or not self.metadata.has_key('Ship') \
-            or not self.metadata['Project'] or not self.metadata['Survey'] or not self.metadata['Instrument'] or not self.metadata['Ship']:
-            print 'Failed exporting %s to NODC file. Missing project, survey, instrument, or ship (NOAA Unit) info. Try to enter, apply, and export again.' %os.path.basename(filename)
-            return ''
-        if title.endswith('ound speed') and self.metadata.has_key('Instrument') and self.metadata['Instrument'].startswith('SBE'):
-            title = 'CTD'
-        epoch = int(calendar.timegm(time.strptime(str(self.metadata['timestamp']), '%Y-%m-%d %H:%M:%S')))
-        ship_code = self.metadata['Ship'][:2] if self.metadata.has_key('Ship') else 'ZZ'
-        fn_new = '%s_%s.nc' %(self.metadata['timestamp'].strftime('%Y%m%d%H%M'), ship_code)
-        fn = filename.split('\\')[-1]
-        filename = filename.replace(fn, fn_new)
-        profile_id_str = fn_new[:-3]
-        NUMCHARS = 40
-        if len(profile_id_str) > NUMCHARS:
-            NUMCHARS = len(profile_id_str)
-        d=self.mcopy()
-        if 'flag' in self.dtype.names:
-            d = numpy.compress(d['flag']<=0, d)
-        rootgrp = Dataset(filename, 'w', format='NETCDF4')
-        rootgrp.createDimension('z', len(d))
-        rootgrp.createDimension('profile', 1)
-        rootgrp.createDimension('NUMCHARS', NUMCHARS)
-
-        profile_id = rootgrp.createVariable('profile','S1',('profile','NUMCHARS',))  
-        time2 = rootgrp.createVariable('time','i4',('profile',))        
-        lat = rootgrp.createVariable('lat','f8',('profile',))
-        lon = rootgrp.createVariable('lon','f8',('profile',))
-        z = rootgrp.createVariable('depth','f4',('profile','z',))
-        profile_id.long_name = 'Unique identifier for each profile'
-        profile_id.cf_role = 'profile_id'
-        time2.standard_name = 'time'
-        time2.long_name = 'time'
-        time2.units = 'seconds since 1970-01-01 00:00:00'
-        time2.axis = 'T'
-        lat.standard_name = 'latitude'
-        lat.long_name = 'latitude'
-        lat.units = 'degrees_north'
-        lat.axis = 'Y'
-        lon.standard_name = 'longitude'
-        lon.long_name = 'longitude'
-        lon.units = 'degrees_east'
-        lon.axis = 'X'
-        z.standard_name = 'altitude'
-        z.long_name = 'depth_below_sea_level'
-        z.units = 'm'
-        z.axis = 'Z'
-        z.positive = 'down'
-
-        profile_id[:] = stringtoarr(profile_id_str, NUMCHARS)
-        time2[:] = epoch
-        lat[:] = self.metadata['location'].lat
-        lon[:] = self.metadata['location'].lon
-        if 'depth' in self.dtype.names:
-            z[:] = d['depth']
-
-        units = {}
-        # try to get units and names from the profile
-        try:
-            for item in self.metadata['columns']:
-                (i, name, unit) = item
-                unit = unit.strip()
-                if len(unit) > 0 and unit[0] == '[':
-                    unit = unit[1:-1]
-                unit = unit.strip(',')
-                unit = unit.strip()
-                units[name.lower()] = (unit, name)
-        except:
-            try:
-                for item in ast.literal_eval(self.metadata['columns']):
-                    (i, name, unit) = item
-                    unit = unit.strip()
-                    if len(unit) > 0 and unit[0] == '[':
-                        unit = unit[1:-1]
-                    unit = unit.strip(',')
-                    unit = unit.strip()
-                    units[name.lower()] = (unit, name)
-            except:
-                pass
-
-        units['pressure'] = ('dbar', 'Pressure')
-        units['conductivity'] = ('S/m', 'Conductivity')
-        units['salinity'] = ('1e-3', 'Salinity')
-        units['density'] = ('kg m-3', 'Density')
-        units['temperature'] = ('degree_C', 'Temperature')
-        units['soundspeed'] = ('m/s', 'Sound_Speed')
-        units['flag'] = (None, 'Quality Flag')
-        standard_names = {}
-        standard_names['temperature'] = 'sea_water_temperature'
-        standard_names['salinity'] = 'sea_water_salinity'
-        if title == 'CTD':
-            # TODO make sure all density of CTD is sigma_theta
-            standard_names['density'] = 'sea_water_sigma_theta'
-        elif iFormat == 'CastAway' or title.startswith('CastAway'):
-            standard_names['density'] = 'sea_water_density'
-            units['conductivity'] = ('MicroSiemens/cm', 'Conductivity')
-            units['conductance'] = ('MicroSiemens/cm', 'Conductance')
-
-        for name in self.dtype.names:
-            if name not in ['depth', 'time']:
-                if name == 'temperature' and (bDigibarT or d[name].min()==d[name].max()):
-                    continue # Exclude Digibar or dummy temperature
-                elif name == 'salinity' and d[name].min()==d[name].max():
-                    continue # Exclude dummy salinity
-                elif name == 'flag':
-                    var = rootgrp.createVariable(name,'i4',('profile','z',))
-                else:
-                    var = rootgrp.createVariable(name,'f4',('profile','z',))
-                if standard_names.has_key(name):
-                    var.standard_name = standard_names[name]
-                if units.has_key(name):
-                    var.long_name = units[name][1]
-                    if units[name][0]:
-                        var.units = units[name][0]
-                    if name == 'flag':
-                        var.flag_values = -1, 0, 1, 2, 3, 4, 5, 6
-                        var.flag_meanings = 'bad_point good_point extrapolated_using_historical_depth extrapolated_linearly ' \
-                            'extrapolated_using_the_most_probable_slope extrapolated_manually moved_point extrapolated_by_appending_the_last_measured_point'
-                else:
-                    var.long_name = name
-                    if name == 'bin_count':
-                        var.comment = 'The number of measurements at the depth'
-                var[:] = d[name]
-
-        
-        rootgrp.standard_name_vocabulary = 'CF-1.6'
-        rootgrp.featureType = 'profile'
-        rootgrp.cdm_data_type ='profile'
-        rootgrp.Conventions = 'CF-1.6'
-        rootgrp.title = '%s data file' %title
-        rootgrp.date_created = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
-        if self.metadata.has_key('Ship'):
-            rootgrp.ship = \
-                str(self.metadata['Ship'].replace("NRT", 'NOAA NAVIGATION RESPONSE TEAM').replace("(SHIP)", 'NOAA SHIP').replace("OTHER", 'SHIP'))
-        if self.metadata.has_key('Draft'):
-            #rootgrp.draft = '%sm' %self.metadata['Draft']
-            rootgrp.draft = str(self.metadata['Draft'])
-        if self.metadata.has_key('samplerate'):
-            rootgrp.samplerate = str(self.metadata['samplerate'])
-        if iFormat == 'CastAway':
-            rootgrp.instrument = 'CastAway'
-            if self.metadata.has_key('Instrument'):
-                rootgrp.instrument_sn = str(self.metadata['Instrument'])
-        else:
-            if self.metadata.has_key('Instrument'):
-                rootgrp.instrument = str(self.metadata['Instrument'])
-            if self.metadata.has_key('instrument_sn'):
-                rootgrp.instrument_sn = str(self.metadata['instrument_sn'])
-        if self.metadata.has_key('UserName'):
-            rootgrp.creator = str(self.metadata['UserName'])
-        rootgrp.creator_institution = 'NOAA Office of Coast Survey'
-        if self.metadata.has_key('Project'):
-            rootgrp.project = str(self.metadata['Project'])
-        if self.metadata.has_key('Survey'):
-            rootgrp.survey = str(self.metadata['Survey'])
-        rootgrp.software_version = '2015-08-27'
-        rootgrp.close()
-        print '%s\r' %filename
-        return filename
-
-    def WriteVELFile(self, filename):
-        d = self.mcopy()
-        if 'flag' in self.dtype.names:
-            d = numpy.compress(d['flag']>=0, d)
-        with open(filename, 'w') as f:
-            f.write('FTP NEW 2\n')
-            for i in range(len(d['depth'])):
-                f.write('%.1f %.1f\n' %(d['depth'][i], d['soundspeed'][i]))
-        print filename
-    def WriteBSVPFile(self, filename):
-        if os.path.splitext(self.metadata['Filename'])[1] != os.path.splitext(self.metadata['filename'])[1]:
-            profile = os.path.splitext(self.metadata['Filename'])[1][len(os.path.splitext(self.metadata['filename'])[1]):]
-            filename = filename.replace('.bsvp', '%s.bsvp'%profile)
-            #filename = os.path.join(os.path.dirname(filename), os.path.splitext(self.metadata['Filename'])[0] + '%s.bsvp'%profile)
-        iFormat = self.metadata['ImportFormat'] if self.metadata.has_key('ImportFormat') else ''
-        epoch = int(calendar.timegm(time.strptime(str(self.metadata['timestamp']), '%Y-%m-%d %H:%M:%S')))
-        d = self.mcopy()
-        #if 'flag' in self.dtype.names:
-        #    d = numpy.compress(d['flag']>=0, d)
-        condition = [True]
-        pre_depth = d['depth'][0]
-        for depth in d['depth'][1:]:
-            condition.append(depth > pre_depth)
-            if depth > pre_depth: pre_depth = depth
-        d = numpy.compress(condition, d)
-        with open(filename, 'wb') as f:
-            data = struct.pack('dddi', epoch, self.metadata['location'].lat, self.metadata['location'].lon, len(d['depth']))
-            #f.write('%i %.5f %.5f %i\n' %(epoch, self.metadata['location'].lat, self.metadata['location'].lon, len(d['depth'])))
-            f.write(data)
-            for i in range(len(d['depth'])):
-                temperature = d['temperature'][i] if 'temperature' in self.dtype.names else 0
-                salinity = d['salinity'][i] if 'salinity' in self.dtype.names else 0
-                pressure = d['pressure'][i] if 'pressure' in self.dtype.names else 0
-                conductivity = d['conductivity'][i] if 'conductivity' in self.dtype.names else 0
-                flag = d['flag'][i] if 'flag' in self.dtype.names else 0
-                flags = 2 if iFormat in ['WOA', 'RTOFS', 'HYCOM'] else 1
-                if flag < 0:
-                    flags += 256 # bit 8 (start from 0)
-                elif flag > 0:
-                    flags += 131072 # bit 17
-                data = struct.pack('iffffffI', i, d['depth'][i], d['soundspeed'][i], temperature, salinity, pressure, conductivity, flags)
-                #f.write('%i %.1f %.1f %.1f %.1f %.1f %.1f %i\n' %(i, d['depth'][i], d['soundspeed'][i], temperature, salinity, pressure, conductivity, flags))
-                f.write(data)
-        print filename
 
 #     def WriteSimradFiles(self, path, basefname='', fmt='', default_id=0, depth = 0):
 #         ''' 
@@ -3140,15 +2805,12 @@ Field5            :  Sound Velocity (m/s)
 
     def ExtendSlope(self):
         '''
-        
         ' Compute the most probable slope for a given cast and use it
         ' to extend the cast down by 30%.
-        
         ' PROGRAMMER: Dr. Lloyd Huff                     DATE: 2/25/88
-        
         ' Modified 9/2008 to avoid division by zero.
         '''
-        
+
         X = self['depth'].compress(self['flag']>=0) #' Get only the good points
         Y = self['soundspeed'].compress(self['flag']>=0)
         #' RLB 9/2008 Adjustment for case of AUV processing, for which there
@@ -3223,56 +2885,7 @@ Field5            :  Sound Velocity (m/s)
 #        profile_data = p[1:-1]
 #        p= ScipyProfile(profile_data, names=n, ymetric="pressure", attribute="temperature", metadata=metadata)
 #        return p
-    def FitParab(self, Yin, NSpread=3, ymetric=None, xattr=None):
-        ''' NOTE! pass in a Y value and recieve an interpolated X, a bit backwards from normal naming 
-        Yin is the ymetric (depth/pressure) to get a fitted approximate value at.  
-        NSpread is how many points to use around the desired dept/pressure to use in polyfit 
-        ymetric and xattr will default the the profile.ymetric and profile.attribute if left as None
-        
-        Should add the ability to spline the data instead/in addition
-        http://docs.numpy.org/doc/numpy/reference/tutorial/interpolate.html
-        
-        '''
-        if ymetric is None: ymetric = self.ymetric
-        if xattr==None: xattr = self.attribute
-        d = self.NoDupes_GoodFlags()
-#        indices = self.argsort(order=[ymetric]) #don't resort the original data 
-#        y = self[ymetric].take(indices)
-#        x = self[xattr].take(indices)
-        d.sort(order=[ymetric]) 
-        y = d[ymetric]
-        x = d[xattr]
-        index = numpy.searchsorted(y, Yin)
-        I1 = index-NSpread if index-NSpread>=0 else 0
-        I2 = index+NSpread #too large of index doesn't matter in python
-        y=y[I1:I2]
-        x=x[I1:I2]
-        return numpy.poly1d(numpy.polyfit(y,x,2))(Yin)
-    def DQA(self, x,y, SN='Unknown'):
-        ''' DQA Test using a given depth (pressure) and SV
-        x is the xattr quantity (normally sound speed)
-        y is the ymetric (normally depth or pressure)
-        SN is the serial number of the instrument that measured the passed in x,y
-        '''
-        x_cast = self.FitParab(y)
-        DiffSV = numpy.absolute(x_cast - x)
-        DQAResults='\n'+time.ctime()
-        DQAResults += "DAILY DQA - SURFACE SOUND SPEED COMPARISON\n\n" #' Start building the Public result message
-        if DiffSV > 2:
-            DQAResults = DQAResults + " - TEST FAILED - Diff in sound speed > 2 m/sec\n"
-        else:
-            DQAResults = DQAResults + " - TEST PASSED - Diff in sound speed <= 2 m/sec\n"
-         
-        # ' Record DQA results
-        DQAResults+='\n'
-        DQAResults+="Surface sound speed instrument Serial Number: " +SN+'\n'
-        DQAResults+="Surface sound speed instrument %s (m): %.1f\n"%(self.ymetric, y) #depth 
-        DQAResults+="Surface sound speed Instrument reading (m/sec): %.2f\n"%x
-        DQAResults+="Full sound speed profile: " + self.metadata['Filename']+'\n'
-        DQAResults+="   Instrument: " + self.metadata['Instrument']+'\n'
-        DQAResults+="Profile sound speed at same depth (m/sec): %.1f\n"%x_cast
-        DQAResults+="Difference in sound speed (m/sec): %.2f\n"%DiffSV
-        return DQAResults, DiffSV
+
     def AppendProfile(self, p):
         p1 = self.copy() #don't mess with the original arrays
         p2 = p.copy()
@@ -3290,6 +2903,7 @@ Field5            :  Sound Velocity (m/s)
                 new_data[index][f] = pt[f]
             new_data[index]['flag'] = ScipyProfile.FLAG_EXT_APPEND 
         return ScipyProfile(new_data, **self.get_keyargs())
+
     def AppendProfileNew(self, p):
         if self[self.ymetric][-1] >= p[self.ymetric][-1]:
             print self[self.ymetric][-1], p[self.ymetric][-1]
