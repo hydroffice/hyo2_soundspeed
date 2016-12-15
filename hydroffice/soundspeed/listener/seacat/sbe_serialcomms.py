@@ -18,9 +18,9 @@ except:
 
 import serial  # for serial/usb port communication with SBE instruments
 
-from ...formats.readers import sbe_constants
-from ...formats.readers import sbe_tools as Tools
-from ... import __version__ as ssm_version
+from hydroffice.soundspeed.formats.readers import sbe_constants
+from hydroffice.soundspeed.formats.readers import sbe_tools as Tools
+from hydroffice.soundspeedmanager import __version__ as ssm_version
 
 import logging
 
@@ -67,10 +67,8 @@ class SeacatComms(object):
             self.comlink = UTF8Serial(port, baud, bytesize=bytesize, parity=parity, stopbits=stopbits, timeout=timeout)
             # serial module expects utf8 characters
             if progbar:
-                progbar.Update(0, newmax=len(self.SUPPORTED_BAUDS) + 1, bartxt="Trying %d" % baud)
+                progbar.start(title="Communicating with Seacat", max_value=len(self.SUPPORTED_BAUDS) + 1, text="Trying %d" % baud)
             r = self.wake()
-            if progbar:
-                progbar.Update(1, newmax=len(self.SUPPORTED_BAUDS) + 1, bartxt="Trying %d" % baud)
             if not any([prompt in r for prompt in self.PROMPTS]):
                 # print('prompt is:', self.PROMPTS)
                 # print('r=', r)
@@ -78,14 +76,14 @@ class SeacatComms(object):
                 bSuccess = False
                 if scanbauds:
                     if progbar:
-                        progbar.Update(1, newmax=len(self.SUPPORTED_BAUDS) + 1, bartxt="Scanning " + str(self.SUPPORTED_BAUDS))
+                        progbar.update(1, text="Scanning " + str(self.SUPPORTED_BAUDS))
                     print('Going to scan bauds:', self.SUPPORTED_BAUDS)
                     for bi, baud in enumerate(self.SUPPORTED_BAUDS):
                         print('Trying ', baud)
                         self.comlink.setBaudrate(baud)
                         r = self.wake()
                         if progbar:
-                            progbar.Update(bi + 2, newmax=len(self.SUPPORTED_BAUDS) + 1, bartxt="Baud= " + str(baud))
+                            progbar.update(value=bi + 2, text="Baud= " + str(baud))
                         # print('looking for '+str(self.PROMPTS)+' in ', r)
                         if any([prompt == r[-len(prompt):] for prompt in self.PROMPTS]):
                             bSuccess = True
@@ -109,8 +107,8 @@ class SeacatComms(object):
                 self.comlink.close()  # in case there is an exception after we open the comlink
             except:
                 pass
-
-        pass
+        if progbar:
+            progbar.end()
 
     def get_com_str(self):
         return self.comlink.port + ": " + ", ".join([str(self.comlink.baudrate), str(self.comlink.parity), str(self.comlink.bytesize), str(self.comlink.stopbits)])
@@ -123,7 +121,7 @@ class SeacatComms(object):
         return ps
 
     @staticmethod
-    def open_seacat(port, dbaud, dbits, dparity, parent=None, ProgressProcess=None):  # try and figure out what Seacat it is on the port
+    def open_seacat(port, dbaud, dbits, dparity, parent=None, progbar=None):  # try and figure out what Seacat it is on the port
         # 19plus and 19plusV2 use the default 8,N,1 while the Original SBE19 uses 7,E,1
         if dbaud and dbits and dparity:  # if it was opened before then try those settings
             cat = SeacatComms(port, baud=dbaud, bytesize=dbits, parity=dparity, quiet=True, scanbauds=False, prompts=["S>", '<Executed/>', "low battery voltage !!!"])  # check for SBE19
@@ -132,14 +130,13 @@ class SeacatComms(object):
         else:
             cat = None
         if not cat or not cat.isOpen():
-                # with ProgressProcess.SingleProgress(0, 100, 'Scanning for SBE19') as progbar:
-                if ProgressProcess:
-                    ProgressProcess.Update(0, barcaption='Scanning for SBE19')
-                cat = SeacatComms(port, bytesize=serial.SEVENBITS, parity=serial.PARITY_EVEN, quiet=True, progbar=ProgressProcess)  # check for SBE19
+                if progbar:
+                    progbar.start(title='Scanning for SBE19')
+                cat = SeacatComms(port, bytesize=serial.SEVENBITS, parity=serial.PARITY_EVEN, quiet=True, progbar=progbar)  # check for SBE19
                 if not cat.isOpen():
-                    if ProgressProcess:
-                        ProgressProcess.Update(0, barcaption='Scanning for SBE19 Plus, V2')
-                    cat = SeacatComms(port, quiet=True, progbar=ProgressProcess, prompts=["S>", '<Executed/>'])  # find 19plus, V2
+                    if progbar:
+                        progbar.start(title='Scanning for SBE19 Plus, V2')
+                    cat = SeacatComms(port, quiet=True, progbar=progbar, prompts=["S>", '<Executed/>'])  # find 19plus, V2
         sbe = cat
         if cat.isOpen():
             status = cat.get_status()
@@ -172,7 +169,7 @@ class SeacatComms(object):
     def close(self):
         self.comlink.close()
 
-    def send_command(self, cmd, maxwait=3.0, progbar=None, quiet=False):
+    def send_command(self, cmd, maxwait=3.0, quiet=False):
         '''  set cmd==None to just execute a wake call.
         import Seacat; c = Seacat.SBE19PlusV2Comm('COM1', self)
         reload(Seacat); c.__class__ = Seacat.SBE19PlusV2Comm
@@ -184,9 +181,9 @@ class SeacatComms(object):
             self.get_response(3.0, quiet=True)  # Seacats takes between 0.5 an 2.5 seconds to wake up.
             self.comlink.write(cmd + '\r')  # send our command and then get the repsonse
             print('sending command "%s"' % cmd)
-        return self.get_response(maxwait, progbar, quiet=quiet)
+        return self.get_response(maxwait, quiet=quiet)
 
-    def get_response(self, maxwait, progbar=None, quiet=False):
+    def get_response(self, maxwait, quiet=False):
         response = ''
         bFinished = False
         # tic = time.time()
@@ -203,8 +200,6 @@ class SeacatComms(object):
             if len(r) == 0:
                 wait_time += self.comlink.getTimeout()
             else:
-                if progbar:
-                    progbar.Update([[response.count('\n')]])
                 wait_time = 0.0  # restart the clock
 
         if bFinished:
@@ -314,7 +309,7 @@ class SeacatComms(object):
             raise ValueError("There is a bad cast number in the request %s.  Number of casts in the Seabird device = %s" % (str(cast_numbers), str(casts_in_device)))
         ret = {}
         if progbar:
-            progbar.Update([[], [0, 'Downloading %d Casts' % len(cast_numbers), '', len(cast_numbers)]])
+            progbar.start(min_value=0, max_value=len(cast_numbers), title='Downloading', text="Download %d casts" % len(cast_numbers))
         for index, n in enumerate(cast_numbers):
             m = re.search("samples\s*(?P<start>\d+)\s*to\s*(?P<end>\d+)", h[n])
             if m:
@@ -323,10 +318,10 @@ class SeacatComms(object):
                 logger.info("couldn't read the header -- corrupt or unsupported format\n")
                 expected_lines = -1
             if progbar:
-                progbar.Update([[0, '', '', max(expected_lines, 1)], [index]])
+                progbar.update(value=index, text="Downloaded %d of %d casts" % (index, len(cast_numbers)))
             ret[n] = []
             for t in range(self.num_trys):
-                r = self.send_command(cast_command + str(n), progbar=progbar)  # split into list of casts
+                r = self.send_command(cast_command + str(n))  # split into list of casts
                 if self.check_message(r):
                     lines = r.splitlines()[nhead:-nfoot]
                     if expected_lines < 0 or len(lines) == expected_lines:
@@ -363,7 +358,7 @@ class SeacatComms(object):
         headers = self.get_headers()
         written = []
         if progbar:
-            progbar.update([[1, 'Done downloading samples -- now saving to disk', '', 1], [1, '', '', 1]])  # force to 100%
+            progbar.update(value=progbar.max, text='Done downloading samples -- now saving to disk')  # force to 100%
         for n in cast_numbers:
             if len(casts[n]) > 1:
                 fname = os.path.join(path, "%04d_%03d_%02d%02d%02d.HEX" % (self.get_cast_time(n)))
@@ -481,7 +476,7 @@ class SBE19Comm(SeacatComms):
 
     def get_casts(self, cast_numbers=[0], progbar=None):
         if progbar:
-            progbar.Update([[], [0, 'Downloading headers', '', len(cast_numbers)]])
+            progbar.start(title="Download", text='Downloading headers', max_value=len(cast_numbers))
         print(self.firmware_major)
         if self.firmware_major >= 3:
             # orig_baud = self.comlink.getBaudrate()
@@ -673,7 +668,7 @@ class SBE19PlusComm(SeacatComms):
 
     def get_casts(self, cast_numbers=[1], progbar=None):
         if progbar:
-            progbar.Update([[], [0, 'Changing baud and downloading headers', '', len(cast_numbers)]])
+            progbar.start(text='Changing baud and downloading headers', max_value=len(cast_numbers))
 
         orig_baud = self.comlink.getBaudrate()
         self.set_baud(max(self.SUPPORTED_BAUDS))

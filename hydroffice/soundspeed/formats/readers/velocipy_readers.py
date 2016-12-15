@@ -50,13 +50,12 @@ from numpy.ma import MaskedArray
 from numpy import array
 from netCDF4 import Dataset, num2date
 
-from . import coordinates
-
 from hydroffice.soundspeed.profile.oceanography import Oceanography
-from . import sbe_tools as Tools
-from . import sbe_constants
-from . import velocipy_equations
-from ...listener.seacat import sbe_serialcomms as Seacat
+from hydroffice.soundspeed.formats.readers import coordinates
+from hydroffice.soundspeed.formats.readers import sbe_tools as Tools
+from hydroffice.soundspeed.formats.readers import sbe_constants
+from hydroffice.soundspeed.formats.readers import velocipy_equations
+from hydroffice.soundspeed.listener.seacat import sbe_serialcomms as Seacat
 
 
 class UserError(Exception):

@@ -1,9 +1,8 @@
 import numpy
 from numpy import power as pow
 import numpy as np
-from numpy import sin, cos, tan, arcsin, log, arctan, exp, sqrt
 
-from . import sbe_constants as VelocConstants
+from from hydroffice.soundspeed.formats.readers import sbe_constants
 
 coefficients = '''
 C00 	1402.388 	A02 	7.166E-5
@@ -490,7 +489,7 @@ def PressureToDepth(p, LAT):
     ' Above for station ocean: T=0 Degree Celsius; S=35 (PSS-78)
     '*********************************************************************
     '''   
-    X = numpy.sin(LAT * VelocConstants.DEG2RAD())**2
+    X = numpy.sin(LAT * sbe_constants.DEG2RAD())**2
     #'* GR=Gravity variation with Latitude: ANON (1970) Bulletin Geodesique
     GR = 9.780318 * (1.0 + (5.2788e-3 + 2.36e-5 * X) * X) + 1.092e-6 * p
     rval = (((-1.82e-15 * p + 2.279e-10) * p - 2.2512e-5) * p + 9.72659) * p
