@@ -13,10 +13,15 @@ ch_formatter = logging.Formatter('%(levelname)-9s %(name)s.%(funcName)s:%(lineno
 ch.setFormatter(ch_formatter)
 logger.addHandler(ch)
 
-from hydroffice.soundspeed.base.gdal_aux import GdalAux, python_path, check_gdal_data
+from hydroffice.soundspeed.base.gdal_aux import GdalAux
+
+from osgeo import gdal
 
 
 class TestSoundSpeedGdalAux(unittest.TestCase):
+
+    gdal_version = int(gdal.__version__.split('.')[0])
+    is_windows = sys.platform.startswith("win")
 
     def setUp(self):
         pass
@@ -24,15 +29,20 @@ class TestSoundSpeedGdalAux(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_return_correct_python_path(self):
-        import sys
-        self.assertEqual(python_path(), sys.prefix)
+    @unittest.skipUnless(is_windows and (gdal_version == 1), "only GDAL 1.x on Windows")
+    def test_push_gdal_error_handler(self):
+        GdalAux.push_gdal_error_handler()
 
-    @unittest.skipUnless(sys.platform.startswith("win"), "only works with GDAL < 2.0 on Windows")
+        self.assertTrue(GdalAux.error_loaded)
+
+    @unittest.skipUnless(is_windows and (gdal_version == 1), "only GDAL 1.x on Windows")
     def test_check_gdal_data(self):
-        check_gdal_data()
+        GdalAux.check_gdal_data()
 
-    @unittest.skipUnless(sys.platform.startswith("win"), "only works with GDAL < 2.0 on Windows")
+        self.assertTrue(GdalAux.data_fixed)
+        self.assertTrue(GdalAux.error_loaded)
+
+    @unittest.skipUnless(is_windows and (gdal_version == 1), "only GDAL 1.x on Windows")
     def test_use_of_Gdal_aux(self):
         aux = GdalAux()
 

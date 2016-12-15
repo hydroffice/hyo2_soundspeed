@@ -1,68 +1,23 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from osgeo import gdal
+from osgeo import ogr
+from osgeo import osr
+
 import os
-import sys
 import logging
 
 logger = logging.getLogger(__name__)
 
-try:
-    from osgeo import gdal
-except ImportError as e:
-    raise ImportError("Unable to load `osgeo.gdal` module: %s" % e)
-
-try:
-    from osgeo import ogr
-except ImportError as e:
-    raise ImportError("Unable to load `osgeo.ogr` module: %s" % e)
-
-try:
-    from osgeo import osr
-except ImportError as e:
-    raise ImportError("Unable to load `osgeo.osr` module: %s" % e)
-
-
-def python_path():
-    """ Return the python site-specific directory prefix (the temporary folder for PyInstaller) """
-
-    # required by PyInstaller single-file mode
-    if hasattr(sys, '_MEIPASS'):
-        return sys._MEIPASS
-
-    # check if in a virtual environment
-    if hasattr(sys, 'real_prefix'):
-        return sys.real_prefix
-
-    return sys.prefix
-
-
-def check_gdal_data():
-    """ Check the correctness of os env GDAL_DATA """
-
-    # if 'GDAL_DATA' in os.environ:
-    #     logger.debug("original GDAL_DATA = %s" % os.environ['GDAL_DATA'])
-
-    gdal_data_path1 = os.path.join(os.path.dirname(gdal.__file__), 'data', 'gdal')
-    # logger.debug("checking GDAL_DATA as %s" % gdal_data_path)
-    if os.path.exists(gdal_data_path1):
-        os.environ['GDAL_DATA'] = gdal_data_path1
-        logger.debug("resulting GDAL_DATA = %s" % os.environ['GDAL_DATA'])
-        return
-
-    # conda specific
-    gdal_data_path2 = os.path.join(python_path(), 'Library', 'data')
-    if os.path.exists(gdal_data_path2):
-        os.environ['GDAL_DATA'] = gdal_data_path2
-        logger.debug("resulting GDAL_DATA = %s" % os.environ['GDAL_DATA'])
-        return
-
-    # TODO: add mmore cases to find GDAL_DATA
-
-    raise RuntimeError("Unable to locate GDAL data at %s or %s" % (gdal_data_path1, gdal_data_path2))
+from hydroffice.soundspeed.base.helper import python_path
 
 
 class GdalAux(object):
     """ Auxiliary class to manage GDAL stuff """
+
+    error_loaded = False
+    data_fixed = False
+
     ogr_formats = {
         b'ESRI Shapefile': 0,
         b'KML': 1,
@@ -77,17 +32,22 @@ class GdalAux(object):
 
     def __init__(self):
         logger.debug("gdal version: %s" % gdal.VersionInfo(b'VERSION_NUM'))
-        self.push_gdal_error_handler()
+        if not self.error_loaded:
+            self.check_gdal_data()
 
     @classmethod
     def get_ogr_driver(cls, ogr_format):
+
         try:
             driver_name = [key for key, value in GdalAux.ogr_formats.items() if value == ogr_format][0]
+
         except IndexError:
             raise RuntimeError("Unknown ogr format: %s" % ogr_format)
+
         drv = ogr.GetDriverByName(driver_name)
         if drv is None:
             raise RuntimeError("Ogr failure > %s driver not available" % driver_name)
+
         return drv
 
     @classmethod
@@ -120,10 +80,12 @@ class GdalAux(object):
     @staticmethod
     def list_ogr_drivers():
         """ Provide a list with all the available OGR drivers """
+
         cnt = ogr.GetDriverCount()
         driver_list = []
 
         for i in range(cnt):
+
             driver = ogr.GetDriver(i)
             driver_name = driver.GetName()
             if driver_name not in driver_list:
@@ -132,19 +94,13 @@ class GdalAux(object):
         driver_list.sort()  # Sorting the messy list of ogr drivers
 
         for i in range(len(driver_list)):
+
             print("%3s: %25s" % (i, driver_list[i]))
 
-    @staticmethod
-    def push_gdal_error_handler():
-        """ Install GDAL error handler """
-        gdal.PushErrorHandler(GdalAux.gdal_error_handler)
+    @classmethod
+    def gdal_error_handler(cls, err_class, err_num, err_msg):
+        """GDAL Error Handler, to test it: gdal.Error(1, 2, b'test error')"""
 
-    @staticmethod
-    def gdal_error_handler(err_class, err_num, err_msg):
-        """ GDAL Error Handler
-
-        To test it: gdal.Error(1, 2, b'test error')
-        """
         err_type = {
             gdal.CE_None: 'None',
             gdal.CE_Debug: 'Debug',
@@ -154,4 +110,54 @@ class GdalAux(object):
         }
         err_msg = err_msg.replace('\n', ' ')
         err_class = err_type.get(err_class, 'None')
+
         raise RuntimeError("%s: gdal error %s > %s" % (err_class, err_num, err_msg))
+
+    @classmethod
+    def push_gdal_error_handler(cls):
+        """ Install GDAL error handler """
+
+        gdal.PushErrorHandler(cls.gdal_error_handler)
+
+        gdal.UseExceptions()
+        ogr.UseExceptions()
+        osr.UseExceptions()
+
+        cls.error_loaded = True
+
+    @classmethod
+    def check_gdal_data(cls):
+        """ Check the correctness of os env GDAL_DATA """
+
+        if cls.data_fixed:
+            return
+
+        if 'GDAL_DATA' in os.environ:
+
+            logger.debug("unset original GDAL_DATA = %s" % os.environ['GDAL_DATA'])
+            del os.environ['GDAL_DATA']
+
+        gdal_data_path1 = os.path.join(os.path.dirname(gdal.__file__), 'data', 'gdal')
+        gcs_csv_path1 = os.path.join(gdal_data_path1, 'gcs.csv')
+        if os.path.exists(gcs_csv_path1):
+
+            gdal.SetConfigOption(b'GDAL_DATA', gdal_data_path1.encode('utf-8'))
+            logger.debug("resulting GDAL_DATA = %s" % gdal.GetConfigOption(b'GDAL_DATA'))
+            cls.data_fixed = True
+            cls.push_gdal_error_handler()
+            return
+
+        # anaconda specific
+        gdal_data_path2 = os.path.join(python_path(), 'Library', 'data')
+        gcs_csv_path2 = os.path.join(gdal_data_path2, 'gcs.csv')
+        if os.path.exists(gcs_csv_path2):
+
+            gdal.SetConfigOption(b'GDAL_DATA', gdal_data_path2.encode('utf-8'))
+            logger.debug("resulting GDAL_DATA = %s" % gdal.GetConfigOption(b'GDAL_DATA'))
+            cls.data_fixed = True
+            cls.push_gdal_error_handler()
+            return
+
+        # TODO: add more cases to find GDAL_DATA
+
+        raise RuntimeError("Unable to locate GDAL data at %s or %s" % (gdal_data_path1, gdal_data_path2))

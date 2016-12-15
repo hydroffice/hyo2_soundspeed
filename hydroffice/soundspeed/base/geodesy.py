@@ -1,13 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import math
-import sys
-import os
-import logging
-
 import numpy as np
-
-log = logging.getLogger(__name__)
 
 try:
     from osgeo import gdal
@@ -29,7 +22,12 @@ try:
 except ImportError as e:
     raise ImportError("Unable to load `pyproj.Geod` module: %s" % e)
 
-# from . import gdal_aux
+import math
+import logging
+
+logger = logging.getLogger(__name__)
+
+from hydroffice.soundspeed.base.gdal_aux import GdalAux
 
 
 wkt_3857 = "PROJCS[\"WGS 84 / Pseudo-Mercator\",GEOGCS[\"Popular Visualisation CRS\"," \
@@ -40,59 +38,6 @@ wkt_3857 = "PROJCS[\"WGS 84 / Pseudo-Mercator\",GEOGCS[\"Popular Visualisation C
            "AUTHORITY[\"EPSG\",\"9001\"]],PROJECTION[\"Mercator_1SP\"],PARAMETER[\"central_meridian\",0]," \
            "PARAMETER[\"scale_factor\",1],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0]," \
            "AUTHORITY[\"EPSG\",\"3785\"],AXIS[\"X\",EAST],AXIS[\"Y\",NORTH]]"
-
-
-def python_path():
-    """
-    Return the python site-specific directory prefix (the temporary folder for PyInstaller)
-    """
-    if hasattr(sys, '_MEIPASS'):  # required by PyInstaller single-file mode
-        return sys._MEIPASS
-    else:
-        if hasattr(sys, 'real_prefix'):  # check if in a virtual environment
-            return sys.real_prefix
-        else:
-            return sys.prefix
-
-
-def gdal_error_handler(err_class, err_num, err_msg):
-    """ GDAL Error Handler
-
-    To test it: gdal.Error(1, 2, b'test error')
-    """
-    err_type = {
-        gdal.CE_None: 'None',
-        gdal.CE_Debug: 'Debug',
-        gdal.CE_Warning: 'Warning',
-        gdal.CE_Failure: 'Failure',
-        gdal.CE_Fatal: 'Fatal'
-    }
-    err_msg = err_msg.replace('\n', ' ')
-    err_class = err_type.get(err_class, 'None')
-    raise RuntimeError("%s: gdal error %s > %s" % (err_class, err_num, err_msg))
-
-
-def check_gdal_data():
-    """ Check the correctness of os env GDAL_DATA """
-
-    # if 'GDAL_DATA' in os.environ:
-    #     log.debug("original GDAL_DATA = %s" % os.environ['GDAL_DATA'])
-
-    gdal_data_path = os.path.join(os.path.dirname(gdal.__file__), 'data', 'gdal')
-    # log.debug("checking GDAL_DATA as %s" % gdal_data_path)
-
-    if os.path.exists(gdal_data_path):
-        os.environ['GDAL_DATA'] = gdal_data_path
-
-    else:
-        # conda specific
-        gdal_data_path = os.path.join(python_path(), 'Library', 'data')
-        if os.path.exists(gdal_data_path):
-            os.environ['GDAL_DATA'] = gdal_data_path
-        else:
-            raise RuntimeError("Unable to locate GDAL data at %s" % gdal_data_path)
-
-    # log.debug("resulting GDAL_DATA = %s" % os.environ['GDAL_DATA'])
 
 
 class Geodesy(object):
@@ -123,22 +68,28 @@ class Geodesy(object):
         return math.radians(degrees)
 
     @classmethod
-    def _arc_minutes(cls, degrees=0.0, radians=0.0, arcseconds=0.0):
+    def _arc_minutes(cls, degrees=0.0, radians=0.0, arc_seconds=0.0):
+
         if radians:
             degrees += math.degrees(radians)
-        if arcseconds:
-            degrees += arcseconds / cls._arc_seconds(degrees=1.)
+
+        if arc_seconds:
+            degrees += arc_seconds / cls._arc_seconds(degrees=1.)
+
         return degrees * 60.0
 
     @classmethod
-    def _arc_seconds(cls, degrees=0.0, radians=0.0, arcminutes=0.0):
+    def _arc_seconds(cls, degrees=0.0, radians=0.0, arc_minutes=0.0):
         """
         TODO docs.
         """
+
         if radians:
             degrees += math.degrees(radians)
-        if arcminutes:
-            degrees += arcminutes / cls._arc_minutes(degrees=1.0)
+
+        if arc_minutes:
+            degrees += arc_minutes / cls._arc_minutes(degrees=1.0)
+
         return degrees * 3600.0
 
     @classmethod
@@ -148,6 +99,7 @@ class Geodesy(object):
         Args:
             radians:        Radians
         """
+
         return math.degrees(radians)
 
     @classmethod
@@ -159,11 +111,13 @@ class Geodesy(object):
             minutes:        Minutes
             seconds:        Seconds
         """
+
         return cls.degrees(cls.radians(degrees, minutes, seconds))
 
     @classmethod
     def dd2dms(cls, dd):
         """ Convert degree format from DD to DMS """
+
         toggle = False
         if dd < 0.0:
             dd *= -1
@@ -185,6 +139,7 @@ class Geodesy(object):
         Returns:
             list:           Degrees, Minutes
         """
+
         toggle = False
         if dd < 0.0:
             dd *= -1
@@ -209,7 +164,7 @@ class Geodesy(object):
             list:               X, Y
         """
 
-        gdal.PushErrorHandler(gdal_error_handler)
+        GdalAux.check_gdal_data()
 
         osr_inputs = osr.SpatialReference()
         osr_inputs.ImportFromEPSG(epsg_inputs)
@@ -230,7 +185,9 @@ class Geodesy(object):
 
     def __init__(self):
         """ Initialization """
-        check_gdal_data()
+
+        GdalAux.check_gdal_data()
+
         self.geo = Geod(ellps='WGS84')
 
     @classmethod
