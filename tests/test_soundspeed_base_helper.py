@@ -61,6 +61,17 @@ class TestSoundSpeedBaseHelper(unittest.TestCase):
     def test_explore_folder_with_fake_path(self):
         self.assertFalse(helper.explore_folder('z:/fake/path'))
 
+    def test_first_match(self):
+        test_dict = {
+            "a": 0,
+            "b": 1,
+            "c": 3
+        }
+        self.assertEqual(helper.first_match(test_dict, 1), "b")
+
+    def test_python_path(self):
+        self.assertTrue(os.path.exists(helper.python_path()))
+
 
 def suite():
     s = unittest.TestSuite()

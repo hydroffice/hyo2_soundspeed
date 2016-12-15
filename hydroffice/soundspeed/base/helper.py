@@ -193,3 +193,20 @@ def first_match(dct, val):
         return values[0]
     else:
         raise RuntimeError("unknown value %s in dict: %s" % (val, dct))
+
+
+def python_path():
+    """ Return the python site-specific directory prefix (PyInstaller-aware) """
+
+    # required by PyInstaller
+    if hasattr(sys, '_MEIPASS'):
+        import win32api
+        sys_prefix = win32api.GetLongPathName(sys._MEIPASS)
+        logger.debug("using _MEIPASS: %s" % sys_prefix)
+        return sys_prefix
+
+    # check if in a virtual environment
+    if hasattr(sys, 'real_prefix'):
+        return sys.real_prefix
+
+    return sys.prefix
