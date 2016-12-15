@@ -45,8 +45,8 @@ class QtProgress(AbstractProgress):
         self._value = self._min
 
         self._is_canceled = False
-
-        self._progress = QtGui.QProgressDialog(self._parent)
+        if self._progress is None:
+            self._progress = QtGui.QProgressDialog(self._parent)
         self._progress.setWindowTitle(title)
         self._progress.setWindowModality(QtCore.Qt.WindowModal)
         if not has_abortion:
