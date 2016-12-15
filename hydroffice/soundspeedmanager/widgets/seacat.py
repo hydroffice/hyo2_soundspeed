@@ -291,7 +291,7 @@ class Seacat(AbstractWidget):
                     if ret == QMessageBox.Yes:
                         if bSetTime:
                             cat.set_datetime(datetime.datetime.utcnow())
-                        cat.InitLogging()
+                        cat.init_logging()
                 except:
                     traceback.print_exc()
 
@@ -359,7 +359,7 @@ class AutoSeacat(object):
     def __init__(self, port=None, progbar=None):
         self.progbar = progbar
         if progbar:
-            progbar.start(title="Seacat")
+            progbar.start(title="Seacat", text="Waking up seacat")
         self.sbe = open_seacat(port, progbar)
 
     def __enter__(self):
@@ -379,7 +379,6 @@ def open_seacat(port=None, progbar=None):
     dbaud = int(get_setting_float("\\".join([COMPORT_SUBKEY, port, 'BAUD']), 0))
     dbits = int(get_setting_float("\\".join([COMPORT_SUBKEY, port, 'BITS']), 0))
     dparity = get_setting_string("\\".join([COMPORT_SUBKEY, port, 'PARITY']), '')
-    reload(sbe_serialcomms)
     sbe = sbe_serialcomms.SeacatComms.open_seacat(port, dbaud, dbits, dparity, progbar=progbar)
     if sbe.isOpen():
         set_setting("\\".join([COMPORT_SUBKEY, port, 'BAUD']), sbe.comlink.baudrate)
