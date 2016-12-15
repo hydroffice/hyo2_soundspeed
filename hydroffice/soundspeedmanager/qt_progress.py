@@ -66,7 +66,7 @@ class QtProgress(AbstractProgress):
             if (value < self._min) or (value > self._max):
                 raise RuntimeError('attempt to update current progress value (%d) outside valid range(%s %s)'
                                    % (value, self._min, self._max))
-            self._value = value
+            self._value = ((value - self._min) / self._range) * 100
 
         if text is not None:
             self._text = text
@@ -86,7 +86,7 @@ class QtProgress(AbstractProgress):
             raise RuntimeError('attempt to update current progress value (%d) outside valid range(%s %s)'
                                % (tmp_value, self._min, self._max))
 
-        self._value = tmp_value
+        self._value = ((tmp_value - self._min) / self._range) * 100
         if text is not None:
             self._text = text
 

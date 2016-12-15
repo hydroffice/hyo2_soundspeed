@@ -78,6 +78,34 @@ class Seacat(AbstractWidget):
         self.main_layout = QtGui.QVBoxLayout()
         self.frame.setLayout(self.main_layout)
 
+        # info box
+        hbox = QtGui.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        hbox.addStretch()
+        self.group_box = QtGui.QGroupBox("SeaCAT")
+        self.group_box.setMaximumHeight(120)
+        hbox.addWidget(self.group_box)
+        hbox.addStretch()
+
+        # image and text
+        group_layout = QtGui.QHBoxLayout()
+        self.group_box.setLayout(group_layout)
+        # - image
+        img_label = QtGui.QLabel()
+        img = QtGui.QImage(os.path.join(self.media, 'seacat.png'))
+        if img.isNull():
+            raise RuntimeError("unable to open seacat image")
+        img_label.setPixmap(QtGui.QPixmap.fromImage(img))
+        group_layout.addWidget(img_label)
+        # - text
+        info_label = QtGui.QLabel(
+            "This tool allows to directly interact with a SeaCAT instrument.\n\n"
+            "The tool communicates by serial port with the sensor and makes\n"
+            "possible to directly download the collected profiles."
+        )
+        info_label.setStyleSheet("color: #96A8A8;")
+        info_label.setWordWrap(True)
+        group_layout.addWidget(info_label)
 
         hbox4 = QtGui.QHBoxLayout()
         self.main_layout.addLayout(hbox4)

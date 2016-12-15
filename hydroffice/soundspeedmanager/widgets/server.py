@@ -39,14 +39,15 @@ class Server(AbstractWidget):
         img_label = QtGui.QLabel()
         img = QtGui.QImage(os.path.join(self.media, 'server.png'))
         if img.isNull():
-            raise RuntimeError("unable to open server image")
+            raise RuntimeError("unable to open refraction image")
         img_label.setPixmap(QtGui.QPixmap.fromImage(img))
         group_layout.addWidget(img_label)
         # - text
-        info_label = QtGui.QLabel("This tool delivers WOA/RTOFS-derived synthetic profiles to one or more network\n"
-                                  "clients in a continuous manner, enabling opportunistic mapping while underway.\n\n"
-                                  "Given the uncertainty of such an approach, this mode is expected to ONLY be used\n"
-                                  "in transit, capturing the position from SIS to lookup into the oceanographic atlas.")
+        info_label = QtGui.QLabel(
+            "This experimental tool allows to evaluate the impact of applying a sound speed delta.\n\n"
+            "The tools calculates the refraction corrections and plots the swath data based on\n"
+            "the derived sound speed profile, then the user can decide to use the resulting profile."
+        )
         info_label.setStyleSheet("color: #96A8A8;")
         info_label.setWordWrap(True)
         group_layout.addWidget(info_label)
