@@ -106,6 +106,7 @@ class TestSoundSpeedGeodesy(unittest.TestCase):
         dist = Geodesy.haversine(long_1=-70.9395, lat_1=43.13555, long_2=14.9, lat_2=36.783333)
         self.assertTrue((dist - 7020851.6) < 0.1)
 
+    @unittest.skipUnless(is_windows and (gdal_version == 1), "only GDAL 1.x on Windows")
     def test_distance(self):
                 # data retrieved from: http://geographiclib.sourceforge.net/cgi-bin/GeodSolve
         # ref: C. F. F. Karney, Algorithms for geodesics, J. Geodesy 87, 43–55 (2013); DOI: 10.1007/s00190-012-0578-z
