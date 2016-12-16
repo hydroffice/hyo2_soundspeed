@@ -41,7 +41,7 @@ class MainWin(QtGui.QMainWindow):
         self.setWindowTitle('%s v.%s' % (self.name, self.version))
         # noinspection PyArgumentList
         _app = QtCore.QCoreApplication.instance()
-        _app.setApplicationName('%s v.%s' % (self.name, self.version))
+        _app.setApplicationName('%s' % self.name)
         _app.setOrganizationName("HydrOffice")
         _app.setOrganizationDomain("hydroffice.org")
 

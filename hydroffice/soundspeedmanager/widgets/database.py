@@ -318,8 +318,6 @@ class Database(AbstractWidget):
     def dqa_full_profile(self):
         logger.debug("user want to do a profile DQA")
 
-        msg = None
-
         rows = self.ssp_list.selectionModel().selectedRows()
         if len(rows) == 1:
             pk = int(self.ssp_list.item(rows[0].row(), 0).text())
