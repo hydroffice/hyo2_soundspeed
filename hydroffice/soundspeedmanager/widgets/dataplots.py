@@ -436,33 +436,21 @@ class DataPlots(AbstractWidget):
     def update_limits(self):
 
         if self.lib.has_ssp():
-            max_proc_value = self.lib.cur.proc.depth[self.vi].max()
-            max_depth = max(30 + max_proc_value, 1.1 * max_proc_value)
-            min_depth = -0.05 * max_proc_value
+
+            max_proc_depth = self.lib.cur.proc.depth[self.vi].max()
+            mean_sis_depth = 0
+            if self.lib.use_sis():
+                if self.lib.listeners.sis.xyz88:
+                    if self.lib.listeners.sis.xyz88.mean_depth:
+                        mean_sis_depth = self.lib.listeners.sis.xyz88.mean_depth
+            max_proc_sis_depth = max(max_proc_depth, mean_sis_depth)
+
+            max_depth = max(30 + max_proc_sis_depth, 1.1 * max_proc_sis_depth)
+            min_depth = -0.05 * max_proc_sis_depth
             if min_depth > 0:
                 min_depth = -5
+
             self.speed_ax.set_ylim([max_depth, min_depth])
-
-        if self.lib.use_sis():  # in case of SIS enabled
-            if self.lib.listeners.sis.xyz88:
-
-                # y-limits
-                y_limits = self.speed_ax.get_ylim()
-                mean_depth = self.lib.listeners.sis.xyz88.mean_depth
-                if not mean_depth:
-                    mean_depth = 0
-                if mean_depth <= y_limits[0]:
-                    mean_depth = y_limits[0]
-                max_depth = 1.1 * mean_depth
-                min_depth = -0.05 * mean_depth
-                if min_depth > 0:
-                    min_depth = -5
-                self.speed_ax.set_ylim([max_depth, min_depth])
-
-                # x-limits
-                # x_limits = self.speed_ax.get_xlim()
-                # print(y_limits, x_limits)
-                # TODO
 
         self.c.draw()
 

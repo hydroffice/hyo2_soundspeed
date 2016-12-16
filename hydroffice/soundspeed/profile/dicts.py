@@ -162,3 +162,7 @@ class Dicts(object):
         ('decibar', 'dbar'),
         ('meter', 'm'),
     ])
+
+    proc_infos = OrderedDict([
+        ('EXT_WOA09', ''),
+    ])

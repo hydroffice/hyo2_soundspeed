@@ -757,7 +757,7 @@ class Profile(object):
 
             params = RayTracing.get_svp_layer_parameters(np.deg2rad(launch), depths, speeds)
             if travel_times is None:
-                tt = np.arange(res, params[-2][-1], res) # make traveltimes to reach end of profile
+                tt = np.arange(res, params[-2][-1], res) # make travel_times to reach end of profile
             else:
                 tt = np.array(travel_times)
 
