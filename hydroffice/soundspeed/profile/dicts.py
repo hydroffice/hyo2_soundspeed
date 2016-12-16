@@ -14,10 +14,12 @@ class Dicts(object):
         values = [key for key, value in dct.items() if value == val]
         if len(values) != 0:
             return values[0]
+
         else:
             raise RuntimeError("unknown value %s in dict: %s" % (val, dct))
 
     probe_types = OrderedDict([
+
         ('Unknown', 0),
         ('RTOFS', 1),
         ('WOA09', 2),
@@ -58,9 +60,11 @@ class Dicts(object):
         ('RapidSVT', 308),
 
         ('Future', 999),
+
     ])
 
     sensor_types = OrderedDict([
+
         ('Unknown', 0),
         ('Synthetic', 1),
         ('SVP', 2),
@@ -72,22 +76,28 @@ class Dicts(object):
         ('MVP', 8),
 
         ('Future', 999),
+
     ])
 
     ssp_directions = OrderedDict([
+
         ('up', 0),
         ('down', 1)
+
     ])
 
     flags = OrderedDict([
+
         ('valid', 0),
         ('direction', 1),
         ('user', 2),
         ('thin', 3),
         ('sis', 4),
+
     ])
 
     sources = OrderedDict([
+
         ('raw', 0),
         ('user', 1),
         ('tss', 2),
@@ -97,45 +107,59 @@ class Dicts(object):
         ('ref_ext', 6),
         ('interp', 7),
         ('sis', 8),
+
     ])
 
     booleans = OrderedDict([
+
         (True, 0),
         (False, 1)
+
     ])
 
     clients = OrderedDict([
+
         ("SIS", 0),
         ("HYPACK", 1),
         ("PDS2000", 2),
         ("QINSY", 3)
+
     ])
 
     atlases = OrderedDict([
+
         ("WOA09", 0),
         ("WOA13", 1),
         ("RTOFS", 2),
         ("ref", 3),
+
     ])
 
     server_sources = OrderedDict([
+
         ("WOA09", 0),
         ("WOA13", 1),
         ("RTOFS", 2),
+
     ])
 
     mvp_protocols = OrderedDict([
+
         ("NAVO_ISS60", 0),
         ("UNDEFINED", 1),
+
     ])
 
     mvp_formats = OrderedDict([
+
         ("S12", 0),
         ("CALC", 1),
         ("ASVP", 2)
+
     ])
 
     mvp_instruments = OrderedDict([
+
         ("AML_uSVP", 0),
         ("AML_uSVPT", 1),
         ("AML_Smart_SVP", 2),
@@ -144,9 +168,11 @@ class Dicts(object):
         ("Valeport_SVPT", 5),
         ("SBE_911+", 6),
         ("SBE_49", 7),
+
     ])
 
     kng_formats = OrderedDict([
+
         ('ASVP', 0),
         ('S00', 1),
         ('S01', 2),
@@ -155,14 +181,43 @@ class Dicts(object):
         ('S02', 5),
         ('S12', 6),
         ('S22', 7),
+
     ])
 
     uom_symbols = OrderedDict([
+
         ('unknown', 'NA'),
         ('decibar', 'dbar'),
         ('meter', 'm'),
+
     ])
 
-    proc_infos = OrderedDict([
-        ('EXT_WOA09', ''),
+    proc_import_infos = OrderedDict([
+
+        ('CALC_SAL', 'calc.salinity'),
+        ('CALC_DEP', 'calc.depth'),
+        ('CALC_SPD', 'calc.speed'),
+
     ])
+
+    proc_user_infos = OrderedDict([
+
+        ('EXT_WOA09', 'ext.from WOA09'),
+        ('EXT_WOA13', 'ext.from WOA13'),
+        ('EXT_RTOFS', 'ext.from RTOFS'),
+        ('EXT_REF', 'ext.from ref'),
+
+        ('REP_SAL_WOA09', 'sal.from WOA09'),
+        ('REP_SAL_WOA13', 'sal.from WOA13'),
+        ('REP_SAL_RTOFS', 'sal.from RTOFS'),
+        ('REP_SAL_REF', 'sal.from ref'),
+
+        ('REP_TEMP_SAL_WOA09', 'temp./sal.from WOA09'),
+        ('REP_TEMP_SAL_WOA13', 'temp./sal.from WOA13'),
+        ('REP_TEMP_SAL_RTOFS', 'temp./sal.from RTOFS'),
+        ('REP_TEMP_SAL_REF', 'temp./sal.from ref'),
+
+        ('RECALC_SPD', 'recalc.speed'),
+        ('ADD_TSS', 'added tss'),
+    ])
+

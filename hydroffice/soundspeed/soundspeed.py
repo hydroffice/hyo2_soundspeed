@@ -948,7 +948,7 @@ class SoundSpeedLibrary(object):
                 return False
             if not self.cur.replace_proc_sal(self.ref):
                 return False
-            self.cur.modify_proc_info('sal.from ref')
+            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_REF'])
 
         elif self.setup.ssp_salinity_source == Dicts.atlases['RTOFS']:
             if not self.has_rtofs():
@@ -956,7 +956,7 @@ class SoundSpeedLibrary(object):
                 return False
             if not self.cur.replace_proc_sal(self.cur.rtofs):
                 return False
-            self.cur.modify_proc_info('sal.from RTOFS')
+            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_RTOFS'])
 
         elif self.setup.ssp_salinity_source == Dicts.atlases['WOA09']:
             if not self.has_woa09():
@@ -964,7 +964,7 @@ class SoundSpeedLibrary(object):
                 return False
             if not self.cur.replace_proc_sal(self.cur.woa09):
                 return False
-            self.cur.modify_proc_info('sal.from WOA09')
+            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_WOA09'])
 
         elif self.setup.ssp_salinity_source == Dicts.atlases['WOA13']:
             if not self.has_woa13():
@@ -972,7 +972,7 @@ class SoundSpeedLibrary(object):
                 return False
             if not self.cur.replace_proc_sal(self.cur.woa13):
                 return False
-            self.cur.modify_proc_info('sal.from WOA13')
+            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_WOA13'])
 
         else:
             logger.warning("unknown atlases: %s" % self.setup.ssp_salinity_source)
@@ -994,7 +994,7 @@ class SoundSpeedLibrary(object):
                 return False
             if not self.cur.replace_proc_temp_sal(self.ref):
                 return False
-            self.cur.modify_proc_info('temp./sal.from ref')
+            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_REF'])
 
         elif self.setup.ssp_temp_sal_source == Dicts.atlases['RTOFS']:
             if not self.has_rtofs():
@@ -1002,7 +1002,7 @@ class SoundSpeedLibrary(object):
                 return False
             if not self.cur.replace_proc_temp_sal(self.cur.rtofs):
                 return False
-            self.cur.modify_proc_info('temp./sal.from RTOFS')
+            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_RTOFS'])
 
         elif self.setup.ssp_temp_sal_source == Dicts.atlases['WOA09']:
             if not self.has_woa09():
@@ -1010,7 +1010,7 @@ class SoundSpeedLibrary(object):
                 return False
             if not self.cur.replace_proc_temp_sal(self.cur.woa09):
                 return False
-            self.cur.modify_proc_info('temp./sal.from WOA09')
+            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_WOA09'])
 
         elif self.setup.ssp_temp_sal_source == Dicts.atlases['WOA13']:
             if not self.has_woa13():
@@ -1018,7 +1018,7 @@ class SoundSpeedLibrary(object):
                 return False
             if not self.cur.replace_proc_temp_sal(self.cur.woa13):
                 return False
-            self.cur.modify_proc_info('temp./sal.from WOA13')
+            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_WOA13'])
 
         else:
             logger.warning("unknown atlases: %s" % self.setup.ssp_temp_sal_source)
@@ -1059,7 +1059,7 @@ class SoundSpeedLibrary(object):
             return False
 
         self.cur.insert_proc_speed(depth=tss_depth, speed=tss_value, src=Dicts.sources['tss'])
-        self.cur.modify_proc_info('added tss')
+        self.cur.modify_proc_info(Dicts.proc_user_infos['ADD_TSS'])
         return True
 
     def extend_profile(self):
@@ -1073,7 +1073,6 @@ class SoundSpeedLibrary(object):
                 return False
             if not self.cur.extend_profile(self.ref, ext_type=Dicts.sources['ref_ext']):
                 return False
-            self.cur.modify_proc_info('ext.from ref')
 
         elif self.setup.ssp_extension_source == Dicts.atlases['RTOFS']:
             if not self.has_rtofs():
@@ -1081,7 +1080,6 @@ class SoundSpeedLibrary(object):
                 return False
             if not self.cur.extend_profile(self.cur.rtofs, ext_type=Dicts.sources['rtofs_ext']):
                 return False
-            self.cur.modify_proc_info('ext.from RTOFS')
 
         elif self.setup.ssp_extension_source == Dicts.atlases['WOA09']:
             if not self.has_woa09():
@@ -1089,7 +1087,6 @@ class SoundSpeedLibrary(object):
                 return False
             if not self.cur.extend_profile(self.cur.woa09, ext_type=Dicts.sources['woa09_ext']):
                 return False
-            self.cur.modify_proc_info('ext.from WOA09')
 
         elif self.setup.ssp_extension_source == Dicts.atlases['WOA13']:
             if not self.has_woa13():
@@ -1097,7 +1094,6 @@ class SoundSpeedLibrary(object):
                 return False
             if not self.cur.extend_profile(self.cur.woa13, ext_type=Dicts.sources['woa13_ext']):
                 return False
-            self.cur.modify_proc_info('ext.from WOA13')
 
         else:
             logger.warning("unknown atlases: %s" % self.setup.ssp_extension_source)
@@ -1178,6 +1174,7 @@ class SoundSpeedLibrary(object):
             for profile in self.ssp.l:  # we may have multiple profiles
                 profile.clone_data_to_proc()
                 profile.init_sis()  # initialize to zero
+                profile.remove_user_proc_info()  # remove the token that are added by user actions
 
     # --- plot data
 

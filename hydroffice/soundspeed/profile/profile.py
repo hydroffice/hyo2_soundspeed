@@ -147,7 +147,7 @@ class Profile(object):
         for count in range(self.data.num_samples):
             self.data.sal[count] = Oc.sal(d=self.data.depth[count], speed=self.data.speed[count],
                                           t=self.data.temp[count], lat=latitude)
-        self.modify_proc_info('calc.salinity')
+        self.modify_proc_info(Dicts.proc_import_infos['CALC_SAL'])
 
     def calc_data_depth(self):
         """Helper method to calculate depth from pressure (in dBar)"""
@@ -163,7 +163,7 @@ class Profile(object):
 #         for count in range(self.data.num_samples):
 #             self.data.depth[count] = Oc.p2d(p=self.data.pressure[count], lat=latitude, prof=self)
 
-        self.modify_proc_info('calc.depth')
+        self.modify_proc_info(Dicts.proc_import_infos['CALC_DEP'])
 
     def calc_data_speed(self):
         """Helper method to calculate sound speed"""
@@ -179,7 +179,7 @@ class Profile(object):
                                               self.data.temp[count],
                                               self.data.sal[count],
                                               latitude)
-        self.modify_proc_info("calc.speed")
+            self.modify_proc_info(Dicts.proc_import_infos['CALC_SPD'])
 
     def calc_proc_speed(self):
         """Helper method to calculate processed sound speed"""
@@ -195,7 +195,7 @@ class Profile(object):
                                               self.proc.temp[count],
                                               self.proc.sal[count],
                                               latitude)
-        self.modify_proc_info("calc.speed")
+        self.modify_proc_info(Dicts.proc_user_infos['RECALC_SPD'])
 
     def calc_attenuation(self, frequency, ph):
         """Helper method to calculation attenuation [unused]"""
@@ -528,17 +528,60 @@ class Profile(object):
                                     extender.cur.proc.flag[ext_vi][ind2:]])
         self.proc.num_samples = self.proc.depth.size
 
+        # update processing info
+        if ext_type == Dicts.sources['ref']:
+            self.modify_proc_info(Dicts.proc_user_infos['EXT_REF'])
+
+        elif ext_type == Dicts.sources['RTOFS']:
+            self.modify_proc_info(Dicts.proc_user_infos['EXT_RTOFS'])
+
+        elif ext_type == Dicts.sources['WOA09']:
+            self.modify_proc_info(Dicts.proc_user_infos['EXT_WOA09'])
+
+        elif ext_type == Dicts.sources['WOA13']:
+            self.modify_proc_info(Dicts.proc_user_infos['EXT_WOA13'])
+
+        else:
+            logger.warning("unknown atlases: %s" % ext_type)
+            return False
+
         return True
 
     def modify_proc_info(self, info):
+
+        if info not in Dicts.proc_user_infos.values():
+            if info not in Dicts.proc_import_infos.values():
+                raise RuntimeError("invalid processing info: %s" % info)
+
         # if empty, add the info
         if not self.meta.proc_info:
             self.meta.proc_info = info
             return
+
         # check if it is already present
         tokens = self.meta.proc_info.split(';')
         if info not in tokens:
             self.meta.proc_info += ';%s' % info
+
+    def remove_user_proc_info(self):
+
+        # if empty, nothing to do
+        if not self.meta.proc_info:
+            return
+
+        # check if it is already present
+        tokens = self.meta.proc_info.split(';')
+        self.meta.proc_info = None
+        for i, token in enumerate(tokens):
+
+            if token in Dicts.proc_import_infos.values():
+
+                if self.meta.proc_info is None:
+                    self.meta.proc_info = '%s' % token
+
+                else:
+                    self.meta.proc_info += ';%s' % token
+
 
     def clone_data_to_proc(self):
         """Clone the raw data samples into proc samples
