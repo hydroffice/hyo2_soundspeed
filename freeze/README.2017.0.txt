@@ -5,8 +5,8 @@ Sound Speed Manager 2017.0 - Installation Notes
 2. Run "SoundSpeedManager.2017.0.exe" from within the folder. At first run, the application asks to download the WOA database (1.5 GB). Click "NO" and close the application (since we will manually copy the WOA09 database).
 
 3. Manually copy the folder "Atlases" (that has the full world-coverage WOA09 database) to: 
-- "C:/Documents and Settings/<user>/HydrOffice/Sound Speed 3.0.0" (WinXP), or
-- "C:/Users/<user>/HydrOffice/Sound Speed 3.0.0" (newer Windows OS)
+- "C:/Documents and Settings/<user>/HydrOffice/Sound Speed" (WinXP), or
+- "C:/Users/<user>/HydrOffice/Sound Speed" (newer Windows OS)
 
 
 [Optional steps] 

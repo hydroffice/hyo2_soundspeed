@@ -38,6 +38,7 @@ def collect_pkg_data(package, include_py_files=False, subdir=None):
 
 pkg_data = collect_pkg_data('hydroffice.soundspeedmanager')
 pkg_data_2 = collect_pkg_data('hydroffice.soundspeedsettings')
+pkg_data_3 = collect_pkg_data('gsw.utilities')
 
 icon_file = 'freeze\SoundSpeedManager.ico'
 if is_darwin:
@@ -70,6 +71,7 @@ coll = COLLECT(exe,
                a.datas,
                pkg_data,
                pkg_data_2,
+               pkg_data_3,
                strip=None,
                upx=True,
                name='SoundSpeedManager.2017.0.rc1')
