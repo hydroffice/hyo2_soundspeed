@@ -436,8 +436,9 @@ class DataPlots(AbstractWidget):
     def update_limits(self):
 
         if self.lib.has_ssp():
-            max_depth = 1.05 * self.lib.cur.proc.depth[self.vi].max()
-            min_depth = -0.05 * self.lib.cur.proc.depth[self.vi].max()
+            max_proc_value = self.lib.cur.proc.depth[self.vi].max()
+            max_depth = max(30 + max_proc_value, 1.1 * max_proc_value)
+            min_depth = -0.05 * max_proc_value
             if min_depth > 0:
                 min_depth = -5
             self.speed_ax.set_ylim([max_depth, min_depth])
@@ -452,7 +453,7 @@ class DataPlots(AbstractWidget):
                     mean_depth = 0
                 if mean_depth <= y_limits[0]:
                     mean_depth = y_limits[0]
-                max_depth = 1.05 * mean_depth
+                max_depth = 1.1 * mean_depth
                 min_depth = -0.05 * mean_depth
                 if min_depth > 0:
                     min_depth = -5
