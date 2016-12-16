@@ -207,6 +207,7 @@ class Editor(AbstractWidget):
             return
 
         self.dataplots.update_data()
+        self.dataplots.update_limits()
 
     def on_preview_thinning(self):
         logger.debug('user wants to preview thinning')

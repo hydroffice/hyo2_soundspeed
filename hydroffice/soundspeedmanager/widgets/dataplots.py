@@ -368,28 +368,7 @@ class DataPlots(AbstractWidget):
             self.is_drawn = True
 
         self._draw_grid()
-
-        # limits
-        if self.lib.use_sis():  # in case of SIS enabled
-            if self.lib.listeners.sis.xyz88:
-                y_limits = self.speed_ax.get_ylim()
-                x_limits = self.speed_ax.get_xlim()
-                # print(y_limits, x_limits)
-                # y-limits
-                mean_depth = self.lib.listeners.sis.xyz88.mean_depth
-                if mean_depth:
-                    mean_depth *= 0.1
-                else:
-                    mean_depth = 0
-                if mean_depth > y_limits[0]:
-                    max_depth = mean_depth
-                else:
-                    max_depth = y_limits[0]
-                self.speed_ax.set_ylim([max_depth, -30])
-                # x-limits
-                # TODO
-
-        self.c.draw()
+        self.update_limits()
 
     def update_data(self):
         """Update plot"""
@@ -453,6 +432,38 @@ class DataPlots(AbstractWidget):
                 self.speed_seafloor.set_ydata([mean_depth, ])
             else:
                 self.speed_seafloor.set_ydata(None)
+
+    def update_limits(self):
+
+        if self.lib.has_ssp():
+            max_depth = 1.05 * self.lib.cur.proc.depth[self.vi].max()
+            min_depth = -0.05 * self.lib.cur.proc.depth[self.vi].max()
+            if min_depth > 0:
+                min_depth = -5
+            self.speed_ax.set_ylim([max_depth, min_depth])
+
+        if self.lib.use_sis():  # in case of SIS enabled
+            if self.lib.listeners.sis.xyz88:
+
+                # y-limits
+                y_limits = self.speed_ax.get_ylim()
+                mean_depth = self.lib.listeners.sis.xyz88.mean_depth
+                if not mean_depth:
+                    mean_depth = 0
+                if mean_depth <= y_limits[0]:
+                    mean_depth = y_limits[0]
+                max_depth = 1.05 * mean_depth
+                min_depth = -0.05 * mean_depth
+                if min_depth > 0:
+                    min_depth = -5
+                self.speed_ax.set_ylim([max_depth, min_depth])
+
+                # x-limits
+                # x_limits = self.speed_ax.get_xlim()
+                # print(y_limits, x_limits)
+                # TODO
+
+        self.c.draw()
 
     def redraw(self):
         """Redraw the canvases, update the locators"""
