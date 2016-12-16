@@ -56,6 +56,8 @@ class Dicts(object):
         ('MIDAS SVX2 6000', 306),
         ('MiniSVP', 307),
         ('RapidSVT', 308),
+
+        ('Future', 999),
     ])
 
     sensor_types = OrderedDict([
@@ -68,6 +70,8 @@ class Dicts(object):
         ('XCTD', 6),
         ('SVPT', 7),
         ('MVP', 8),
+
+        ('Future', 999),
     ])
 
     ssp_directions = OrderedDict([

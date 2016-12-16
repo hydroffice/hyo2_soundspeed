@@ -211,8 +211,16 @@ class Database(AbstractWidget):
             QtGui.QMessageBox.information(self, "Database", "You need to select a single profile before loading it!")
             return
 
+        if (self.ssp_list.item(rows[0].row(), 3).text() == "Future") or \
+                (self.ssp_list.item(rows[0].row(), 4).text() == "Future"):
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.information(self, "Database",
+                                          "You cannot load the selected profile from the database!\n\n"
+                                          "If you need to access it, update to a newer version of Sound Speed Manager.")
+            return
+
         # the primary key is the first column (= 0)
-        pk = int(self.ssp_list.item(rows[0].row(), 0).text())
+        pk = int()
         success = self.lib.load_profile(pk)
         if not success:
             # noinspection PyCallByClass
@@ -432,16 +440,29 @@ class Database(AbstractWidget):
 
         for i, ssp in enumerate(lst):
             for j, field in enumerate(ssp):
+
                 if j == 3:
-                    field = '%s' % Dicts.first_match(Dicts.sensor_types, int(field))
+                    label = '%s' % Dicts.first_match(Dicts.sensor_types, int(field))
                     # logger.debug('%s' % Dicts.first_match(Dicts.sensor_types, int(field)))
+
                 elif j == 4:
-                    field = '%s' % Dicts.first_match(Dicts.probe_types, int(field))
+                    label = '%s' % Dicts.first_match(Dicts.probe_types, int(field))
                     # logger.debug('%s' % Dicts.first_match(Dicts.probe_types, int(field)))
-                item = QtGui.QTableWidgetItem("%s" % field)
+
+                else:
+                    label = field
+
+                item = QtGui.QTableWidgetItem("%s" % label)
+
+                if (j == 3) and (int(field) == Dicts.sensor_types['Future']):
+                    item.setForeground(QtGui.QColor(200, 100, 100))
+
+                elif (j == 4) and (int(field) == Dicts.sensor_types['Future']):
+                    item.setForeground(QtGui.QColor(200, 100, 100))
 
                 item.setTextAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignHCenter)
                 item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
+
                 self.ssp_list.setItem(i, j, item)
 
         self.ssp_list.resizeColumnsToContents()

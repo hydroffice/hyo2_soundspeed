@@ -17,6 +17,7 @@ from hydroffice.soundspeed.db.point import Point, convert_point, adapt_point
 from hydroffice.soundspeed.db.plot import PlotDb
 from hydroffice.soundspeed.db.export import ExportDb
 from hydroffice.soundspeed.profile.profilelist import ProfileList
+from hydroffice.soundspeed.profile.dicts import Dicts
 
 
 class ProjectDb(object):
@@ -576,11 +577,22 @@ class ProjectDb(object):
         try:
             with self.conn:
                 for row in sql:
+
+                    # special handling in case of unknown future sensor type
+                    sensor_type = row[b'sensor_type']
+                    if sensor_type not in Dicts.sensor_types.values():
+                        sensor_type = Dicts.sensor_types['Future']
+
+                    # special handling in case of unknown future probe type
+                    probe_type = row[b'probe_type']
+                    if probe_type not in Dicts.probe_types.values():
+                        probe_type = Dicts.probe_types['Future']
+
                     ssp_list.append((row[b'pk'],  # 0
                                      row[b'cast_datetime'],  # 1
                                      row[b'cast_position'],  # 2
-                                     row[b'sensor_type'],  # 3
-                                     row[b'probe_type'],  # 4
+                                     sensor_type,  # 3
+                                     probe_type,  # 4
                                      row[b'original_path'],  # 5
                                      row[b'institution'],  # 6
                                      row[b'survey'],  # 7
@@ -628,8 +640,17 @@ class ProjectDb(object):
                 # ssp metadata
                 # noinspection SqlResolve
                 ssp_meta = self.conn.execute("SELECT * FROM ssp WHERE pk=?", (pk, )).fetchone()
+
+                # special handling in case of unknown future sensor type
                 ssp.cur.meta.sensor_type = ssp_meta[b'sensor_type']
+                if ssp.cur.meta.sensor_type not in Dicts.sensor_types.values():
+                    ssp.cur.meta.sensor_type = Dicts.sensor_types['Future']
+
+                # special handling in case of unknown future probe type
                 ssp.cur.meta.probe_type = ssp_meta[b'probe_type']
+                if ssp.cur.meta.probe_type not in Dicts.probe_types.values():
+                    ssp.cur.meta.probe_type = Dicts.probe_types['Future']
+
                 ssp.cur.meta.original_path = ssp_meta[b'original_path']
                 ssp.cur.meta.institution = ssp_meta[b'institution']
                 ssp.cur.meta.survey = ssp_meta[b'survey']
