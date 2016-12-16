@@ -1,13 +1,13 @@
 .. _server_mode:
 
-***********
-Server Mode
-***********
+*****************************
+Synthetic Profile Server Mode
+*****************************
 
 .. index::
    single: mode; server
 
-The *Server mode* is meant for transits during which perhaps one XBT per day might be thrown.
+The *Synthetic Profile Server mode* is meant for transits during which perhaps one XBT per day might be thrown.
 For much of the world oceans, using the WOA is a reasonable substitute for *in situ* measurements
 (*Beaudoin et al., 2011*).
 

@@ -40,7 +40,7 @@ Operation modes
 Currently, the hydro-package can operate in two mutually exclusive operation modes:
 
 1.	*Operator Mode*
-2.	*Server Mode*
+2.	*Synthetic Profile Server Mode*
 
 The :ref:`operator_mode` represents the primary mode, and it is used to convert data from different source formats,
 to graphically edit them, and to export/send the resulting profiles for use by underwater acoustic systems.
