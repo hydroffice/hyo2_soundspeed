@@ -15,7 +15,7 @@ class MetadataDialog(AbstractDialog):
     def __init__(self, main_win, lib, parent=None):
         AbstractDialog.__init__(self, main_win=main_win, lib=lib, parent=parent)
 
-        self.setWindowTitle("Metadata")
+        self.setWindowTitle("Profile metadata")
         self.setMinimumWidth(550)
 
         lbl_width = 90
@@ -153,6 +153,22 @@ class MetadataDialog(AbstractDialog):
         self.sn.setAutoFillBackground(True)
         # noinspection PyUnresolvedReferences
         self.sn.textChanged.connect(self.changed_sn)
+
+        # comments
+        hbox = QtGui.QHBoxLayout()
+        self.mainLayout.addLayout(hbox)
+        label = QtGui.QLabel("Comments:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        self.comments = QtGui.QTextEdit()
+        self.comments.setMinimumHeight(24)
+        self.comments.setMaximumHeight(60)
+        self.comments.setDisabled(True)
+        self.comments.setText("%s" % self.lib.cur.meta.comments)
+        hbox.addWidget(self.comments)
+        self.comments.setAutoFillBackground(True)
+        # noinspection PyUnresolvedReferences
+        self.comments.textChanged.connect(self.changed_comments)
 
         # pressure uom
         hbox = QtGui.QHBoxLayout()
@@ -292,6 +308,9 @@ class MetadataDialog(AbstractDialog):
     def changed_sn(self):
         self.sn.setStyleSheet("background-color: rgba(255,255,153, 255);")
 
+    def changed_comments(self):
+        self.comments.setStyleSheet("background-color: rgba(255,255,153, 255);")
+
     def changed_pressure_uom(self):
         self.pressure_uom.setStyleSheet("background-color: rgba(255,255,153, 255);")
 
@@ -319,6 +338,7 @@ class MetadataDialog(AbstractDialog):
             self.survey.setEnabled(True)
             self.vessel.setEnabled(True)
             self.sn.setEnabled(True)
+            self.comments.setEnabled(True)
 #             self.pressure_uom.setEnabled(True)
 #             self.depth_uom.setEnabled(True)
 #             self.speed_uom.setEnabled(True)
@@ -333,6 +353,7 @@ class MetadataDialog(AbstractDialog):
             self.survey.setDisabled(True)
             self.vessel.setDisabled(True)
             self.sn.setDisabled(True)
+            self.comments.setDisabled(True)
             self.pressure_uom.setDisabled(True)
             self.depth_uom.setDisabled(True)
             self.speed_uom.setDisabled(True)
@@ -355,6 +376,7 @@ class MetadataDialog(AbstractDialog):
             self.lib.cur.meta.survey = self.survey.text()
             self.lib.cur.meta.vessel = self.vessel.text()
             self.lib.cur.meta.sn = self.sn.text()
+            self.lib.cur.meta.comments = self.comments.toPlainText()
             self.lib.cur.meta.pressure_uom = self.pressure_uom.text()
             self.lib.cur.meta.depth_uom = self.depth_uom.text()
             self.lib.cur.meta.speed_uom = self.speed_uom.text()
@@ -385,6 +407,7 @@ class MetadataDialog(AbstractDialog):
         self.survey.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
         self.vessel.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
         self.sn.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
+        self.comments.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
         self.pressure_uom.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
         self.depth_uom.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
         self.speed_uom.setStyleSheet("background-color: rgba(255, 255, 255, 255);")

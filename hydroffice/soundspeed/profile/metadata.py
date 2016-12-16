@@ -23,6 +23,7 @@ class Metadata(object):
         self._sn = str()  # serial number
         self.proc_time = None  # last processing time
         self.proc_info = str()  # info about processing
+        self.comments = str()
         self.pressure_uom = 'dbar'
         self.depth_uom = 'm'
         self.speed_uom = 'm/s'
@@ -87,6 +88,7 @@ class Metadata(object):
         msg += "    <sn:%s>\n" % self.sn
         msg += "    <proc_time:%s>\n" % self.proc_time
         msg += "    <proc_info:%s>\n" % self.proc_info
+        msg += "    <comments:%s>\n" % self.comments
         msg += "    <pressure_uom:%s>\n" % self.pressure_uom
         msg += "    <depth_uom:%s>\n" % self.depth_uom
         msg += "    <speed_uom:%s>\n" % self.speed_uom

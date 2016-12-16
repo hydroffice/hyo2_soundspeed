@@ -174,6 +174,7 @@ class ProjectDb(object):
                                      sn text,
                                      proc_time timestamp,
                                      proc_info text,
+                                     comments text,
                                      pressure_uom text,
                                      depth_uom text,
                                      speed_uom text,
@@ -244,6 +245,7 @@ class ProjectDb(object):
                                         sn,
                                         proc_time,
                                         proc_info,
+                                        comments,
                                         pressure_uom,
                                         depth_uom,
                                         speed_uom,
@@ -411,7 +413,7 @@ class ProjectDb(object):
         try:
             # noinspection SqlResolve
             self.conn.execute("""
-                              INSERT INTO ssp VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                              INSERT INTO ssp VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                               """, (self.tmp_ssp_pk,
                                     self.tmp_data.meta.sensor_type,
                                     self.tmp_data.meta.probe_type,
@@ -422,6 +424,7 @@ class ProjectDb(object):
                                     self.tmp_data.meta.sn,
                                     self.tmp_data.meta.proc_time,
                                     self.tmp_data.meta.proc_info,
+                                    self.tmp_data.meta.comments,
                                     self.tmp_data.meta.pressure_uom,
                                     self.tmp_data.meta.depth_uom,
                                     self.tmp_data.meta.speed_uom,
@@ -600,12 +603,13 @@ class ProjectDb(object):
                                      row[b'sn'],  # 9
                                      row[b'proc_time'],  # 10
                                      row[b'proc_info'],  # 11
-                                     row[b'pressure_uom'],  # 12
-                                     row[b'depth_uom'],  # 13
-                                     row[b'speed_uom'],  # 14
-                                     row[b'temperature_uom'],  # 15
-                                     row[b'conductivity_uom'],  # 16
-                                     row[b'salinity_uom'],  # 17
+                                     row[b'comments'],  # 12
+                                     row[b'pressure_uom'],  # 13
+                                     row[b'depth_uom'],  # 14
+                                     row[b'speed_uom'],  # 15
+                                     row[b'temperature_uom'],  # 16
+                                     row[b'conductivity_uom'],  # 17
+                                     row[b'salinity_uom'],  # 18
                                      ))
             return ssp_list
 
@@ -658,6 +662,7 @@ class ProjectDb(object):
                 ssp.cur.meta.sn = ssp_meta[b'sn']
                 ssp.cur.meta.proc_time = ssp_meta[b'proc_time']
                 ssp.cur.meta.proc_info = ssp_meta[b'proc_info']
+                ssp.cur.meta.comments = ssp_meta[b'comments']
 
                 ssp.cur.meta.pressure_uom = ssp_meta[b'pressure_uom']
                 ssp.cur.meta.depth_uom = ssp_meta[b'depth_uom']

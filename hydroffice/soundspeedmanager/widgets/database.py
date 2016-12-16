@@ -220,7 +220,7 @@ class Database(AbstractWidget):
             return
 
         # the primary key is the first column (= 0)
-        pk = int()
+        pk = int(self.ssp_list.item(rows[0].row(), 0).text())
         success = self.lib.load_profile(pk)
         if not success:
             # noinspection PyCallByClass
@@ -425,12 +425,12 @@ class Database(AbstractWidget):
 
         # prepare the table
         self.ssp_list.clear()
-        self.ssp_list.setColumnCount(18)
+        self.ssp_list.setColumnCount(19)
         self.ssp_list.setHorizontalHeaderLabels(['id', 'time', 'location',
                                                  'sensor', 'probe', 'original path',
                                                  'institution',
                                                  'survey', 'vessel', 'sn',
-                                                 'processing time', 'processing info',
+                                                 'processing time', 'processing info', 'comments',
                                                  'pressure uom', 'depth uom', 'speed uom',
                                                  'temperature uom', 'conductivity uom', 'salinity uom',
                                                  ])
