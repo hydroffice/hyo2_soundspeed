@@ -752,7 +752,7 @@ class NavToolbar(NavigationToolbar2QT):
         # remove flagging area
         self.remove_rubberband()
 
-        if not self._xypress:
+        if not self._xypress or not event.inaxes:
             return
 
         # retrieve valid initial and ending points
