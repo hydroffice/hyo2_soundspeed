@@ -830,6 +830,8 @@ class Profile(object):
         ray2 = profile._compute_ray_paths(draft, [angle], res=tt_inc)[0]
         
         nr_points = min(len(ray1.data), len(ray2.data))
+        if(nr_points == 0):
+            raise RuntimeError("One of the two profiles is too shallow!")
         depth1 = ray1.data[:nr_points, 1]
         depth2 = ray2.data[:nr_points, 1]
         delta_depth = depth2 - depth1

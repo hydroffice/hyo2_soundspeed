@@ -334,12 +334,20 @@ class Database(AbstractWidget):
                                               "You should set reference cast first!")
                 return
             else:
-                msg = self.lib.dqa_full_profile(pk)
+                try:
+                    msg = self.lib.dqa_full_profile(pk)
+                except RuntimeError as e:
+                    QtGui.QMessageBox.critical(self, "DQA error",
+                                               "%s" % e)
 
         elif len(rows) == 2:
             pk = int(self.ssp_list.item(rows[0].row(), 0).text())
             pk_ref = int(self.ssp_list.item(rows[1].row(), 0).text())
-            msg = self.lib.dqa_full_profile(pk, pk_ref)
+            try:
+                msg = self.lib.dqa_full_profile(pk, pk_ref)
+            except RuntimeError as e:
+                QtGui.QMessageBox.critical(self, "DQA error",
+                                           "%s" % e)
 
         else:
             # noinspection PyCallByClass
