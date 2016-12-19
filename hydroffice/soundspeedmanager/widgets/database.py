@@ -339,6 +339,7 @@ class Database(AbstractWidget):
                 except RuntimeError as e:
                     QtGui.QMessageBox.critical(self, "DQA error",
                                                "%s" % e)
+                    return 
 
         elif len(rows) == 2:
             pk = int(self.ssp_list.item(rows[0].row(), 0).text())
@@ -348,6 +349,7 @@ class Database(AbstractWidget):
             except RuntimeError as e:
                 QtGui.QMessageBox.critical(self, "DQA error",
                                            "%s" % e)
+                return
 
         else:
             # noinspection PyCallByClass
