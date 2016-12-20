@@ -1,22 +1,20 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import threading
-import urllib2
 import os
+import urllib2
 import logging
 
 from PySide import QtCore
 from PySide import QtGui
 from PySide import QtWebKit
-from PySide import QtNetwork
 
 logger = logging.getLogger(__name__)
 
-from hydroffice.qc.common.helper import Helper
+from hydroffice.soundspeed.base.helper import explore_folder
 
 
 class DownloadThread(threading.Thread):
-
     def __init__(self, url, tmp_file_name, downloading_window):
         threading.Thread.__init__(self)
         self.url = url
@@ -73,9 +71,8 @@ class DownloadingWindow(QtGui.QDialog):
 
 
 class Info(QtGui.QMainWindow):
-
-    here = os.path.abspath(os.path.dirname(__file__))  # to be overloaded
-    media = os.path.join(here, os.pardir, "media")
+    here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
+    media = os.path.join(here, os.pardir, 'media')
     pdf = os.path.join(here, os.pardir, 'pdf')
 
     def __init__(self, default_url="http://www.hydroffice.org"):
@@ -83,7 +80,7 @@ class Info(QtGui.QMainWindow):
         self.default_url = default_url
 
         self.toolbar = self.addToolBar('Shortcuts')
-        self.toolbar.setIconSize(QtCore.QSize(48, 48))
+        self.toolbar.setIconSize(QtCore.QSize(42, 42))
         # default
         home_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'home.png')), 'Home page', self)
         home_action.setShortcut('Alt+H')
@@ -118,7 +115,6 @@ class Info(QtGui.QMainWindow):
 
         # separator
         self.toolbar.addSeparator()
-
         # HydrOffice.org
         hyo_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'hyo.png')), 'HydrOffice.org', self)
         hyo_action.setShortcut('Ctrl+H')
@@ -187,13 +183,15 @@ class Info(QtGui.QMainWindow):
         vbox.addWidget(text0)
         text0.setText("""
         <b>Comments and feature requests:</b><br>
-        Matt Wilson  <a href=\"mailto:matthew.wilson@noaa.gov?Subject=Hydroffice%20QCTools\">matthew.wilson@noaa.gov</a><br>
-        Brian Calder  <a href=\"mailto:brc@ccom.unh.edu?Subject=Hydroffice%20QCTools\">brc@ccom.unh.edu</a><br>
-        Giuseppe Masetti  <a href=\"mailto:gmasetti@ccom.unh.edu?Subject=Hydroffice%20QCTools\">gmasetti@ccom.unh.edu</a><br>
-        Jack Riley  <a href=\"mailto:jack.riley@noaa.gov?Subject=Hydroffice%20QCTools\">jack.riley@noaa.gov</a><br>
+        Giuseppe Masetti  <a href=\"mailto:gmasetti@ccom.unh.edu?Subject=Hydroffice%20SoundSpeed\">gmasetti@ccom.unh.edu</a><br>
+        Barry Gallagher  <a href=\"mailto:barry.gallagher@noaa.gov?Subject=Hydroffice%20SoundSpeed\">barry.gallagher@noaa.gov</a><br>
+        Brian Calder  <a href=\"mailto:brc@ccom.unh.edu?Subject=Hydroffice%20SoundSpeed\">brc@ccom.unh.edu</a><br>
+        Chen Zhang  <a href=\"mailto:chen.zhang@noaa.gov?Subject=Hydroffice%20SoundSpeed\">chen.zhang@noaa.gov</a><br>
+        Matt Wilson  <a href=\"mailto:matthew.wilson@noaa.gov?Subject=Hydroffice%20SoundSpeed\">matthew.wilson@noaa.gov</a><br>
+        Jack Riley  <a href=\"mailto:jack.riley@noaa.gov?Subject=Hydroffice%20SoundSpeed\">jack.riley@noaa.gov</a><br>
         <br>
         <b>Bugs and support:</b><br>
-        <a href=\"mailto:hydroffice.qctools@ccom.unh.edu?Subject=Hydroffice%20QCTools\">hydroffice.qctools@ccom.unh.edu</a>
+        <a href=\"mailto:hydroffice.soundspeed@ccom.unh.edu?Subject=Hydroffice%20SoundSpeed\">hydroffice.soundspeed@ccom.unh.edu</a>
         """)
 
         # load default
@@ -230,25 +228,25 @@ class Info(QtGui.QMainWindow):
         self.web.load(QtCore.QUrl(self.default_url))
 
     def load_online_docs(self):
-        url = 'https://www.hydroffice.org/manuals/qctools/index.html'
+        url = 'https://www.hydroffice.org/manuals/soundspeed/index.html'
         self.url_input.setText(url)
         self.web.load(QtCore.QUrl(url))
 
     def load_offline_docs(self):
-        pdf_path = os.path.join(self.pdf, "QCTools.pdf")
+        pdf_path = os.path.join(self.pdf, "SoundSpeedManager.pdf")
         if not os.path.exists(pdf_path):
             logger.warning("unable to find offline manual at %s" % pdf_path)
             return
 
-        Helper.explore_folder(pdf_path)
+        explore_folder(pdf_path)
 
     def load_license(self):
-        url = 'http://www.hydroffice.org/license/'
+        url = 'https://www.hydroffice.org/license_lgpl21/'
         self.url_input.setText(url)
         self.web.load(QtCore.QUrl(url))
 
     def load_hydroffice_org(self):
-        url = 'http://www.hydroffice.org'
+        url = 'https://www.hydroffice.org'
         self.url_input.setText(url)
         self.web.load(QtCore.QUrl(url))
 
@@ -276,7 +274,6 @@ class UrlInput(QtGui.QLineEdit):
         super(UrlInput, self).__init__()
         self.browser = browser
         self.setText(default_url)
-        # noinspection PyUnresolvedReferences
         self.returnPressed.connect(self.return_pressed)
 
     def return_pressed(self):
