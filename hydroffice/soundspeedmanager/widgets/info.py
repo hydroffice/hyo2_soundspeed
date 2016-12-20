@@ -1,6 +1,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import threading
 import os
+import urllib2
 import logging
 
 from PySide import QtCore
@@ -10,6 +12,63 @@ from PySide import QtWebKit
 logger = logging.getLogger(__name__)
 
 from hydroffice.soundspeed.base.helper import explore_folder
+
+
+class DownloadThread(threading.Thread):
+
+    def __init__(self, url, tmp_file_name, downloading_window):
+        threading.Thread.__init__(self)
+        self.url = url
+        self.tmp_file_name = tmp_file_name
+        self.downloading_window = downloading_window
+
+    def run(self):
+        u = urllib2.urlopen(self.url)
+        meta = u.info()
+        file_size = int(meta.getheaders('Content-Length')[0])
+
+        f = open(self.tmp_file_name, 'wb')
+
+        downloaded_bytes = 0
+        block_size = 1024 * 8
+        while True:
+
+            buf = u.read(block_size)
+            if not buf:
+                break
+
+            f.write(buf)
+            downloaded_bytes += block_size
+            self.downloading_window.set_progress(float(downloaded_bytes) / file_size * 100)
+
+        f.close()
+        self.downloading_window.close()
+
+        return
+
+
+class DownloadingWindow(QtGui.QDialog):
+    def __init__(self, parent):
+        super(DownloadingWindow, self).__init__(parent)
+        self.setWindowTitle("File download")
+
+        vbox = QtGui.QVBoxLayout()
+        self.label = QtGui.QLabel('Downloading..')
+        self.label.setAlignment(QtCore.Qt.AlignCenter)
+        vbox.addWidget(self.label)
+
+        self.progress_bar = QtGui.QProgressBar()
+        self.progress_bar.setAlignment(QtCore.Qt.AlignCenter)
+        vbox.addWidget(self.progress_bar)
+
+        self.setLayout(vbox)
+
+        self.setGeometry(300, 300, 300, 50)
+
+    def set_progress(self, value):
+        if value > 100:
+            value = 100
+        self.progress_bar.setValue(value)
 
 
 class Info(QtGui.QMainWindow):
@@ -90,6 +149,10 @@ class Info(QtGui.QMainWindow):
 
         # Create the web widget and the url field
         self.web = QtWebKit.QWebView(self)
+        self.web.settings().setAttribute(QtWebKit.QWebSettings.PluginsEnabled, True)
+        self.web.page().setLinkDelegationPolicy(QtWebKit.QWebPage.DelegateExternalLinks)
+        # noinspection PyUnresolvedReferences
+        self.web.linkClicked.connect(self.handle_click)
         hbox = QtGui.QHBoxLayout()
         go_to_label = QtGui.QLabel('Go to:')
         hbox.addWidget(go_to_label)
@@ -136,6 +199,32 @@ class Info(QtGui.QMainWindow):
         # load default
         self.load_default()
 
+    def handle_click(self, url):
+        if not url.isValid():
+            logger.warning("url is not valid!")
+            return
+
+        url_string = url.toString()
+        if os.path.splitext(url_string)[1] in [".zip", ".rar", ".pdf", ".txt"]:
+            logger.debug("zip: %s" % url_string)
+            self.download(url)
+            return
+
+        logger.debug("url: %s" % url)
+        self.web.load(url)
+
+    def download(self, url):
+        logger.debug("download")
+
+        # noinspection PyCallByClass
+        destination, _ = QtGui.QFileDialog.getSaveFileName(self, "Save file", os.path.basename(url.toString()))
+        if not destination:
+            return
+
+        dw = DownloadingWindow(self)
+        dw.show()
+        DownloadThread(url.toString(), destination, dw).start()
+        
     def load_default(self):
         self.url_input.setText(self.default_url)
         self.web.load(QtCore.QUrl(self.default_url))
