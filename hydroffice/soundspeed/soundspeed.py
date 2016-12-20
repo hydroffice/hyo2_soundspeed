@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import numpy as np
 import time
 import os
 import copy
@@ -772,6 +773,55 @@ class SoundSpeedLibrary(object):
         lst = db.timestamp_list()
         db.disconnect()
         return lst
+
+    def profile_stats(self):
+        msg = str()
+        if not self.has_ssp():
+            return "Profile not loaded"
+
+        if self.cur.proc.depth[self.cur.proc_valid].size == 0:
+            return "Empty profile"
+
+        msg += "<pre><b>Nr. of Samples</b>: %d</pre>" % self.cur.proc.depth[self.cur.proc_valid].size
+
+        msg += "<pre>        <b>Depth</b>     <b>Sound Speed</b>    <b>Temperature</b>   <b>Salinity</b></pre>"
+        msg += "<pre><b>min</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
+               % (
+                   self.cur.proc.depth[self.cur.proc_valid].min(), self.cur.meta.depth_uom,
+                   self.cur.proc.speed[self.cur.proc_valid].min(), self.cur.meta.speed_uom,
+                   self.cur.proc.temp[self.cur.proc_valid].min(), self.cur.meta.temperature_uom,
+                   self.cur.proc.sal[self.cur.proc_valid].min(), self.cur.meta.salinity_uom
+               )
+        msg += "<pre><b>max</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
+               % (
+                   self.cur.proc.depth[self.cur.proc_valid].max(), self.cur.meta.depth_uom,
+                   self.cur.proc.speed[self.cur.proc_valid].max(), self.cur.meta.speed_uom,
+                   self.cur.proc.temp[self.cur.proc_valid].max(), self.cur.meta.temperature_uom,
+                   self.cur.proc.sal[self.cur.proc_valid].max(), self.cur.meta.salinity_uom
+               )
+        msg += "<pre><b>med</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
+               % (
+                   np.median(self.cur.proc.depth[self.cur.proc_valid]), self.cur.meta.depth_uom,
+                   np.median(self.cur.proc.speed[self.cur.proc_valid]), self.cur.meta.speed_uom,
+                   np.median(self.cur.proc.temp[self.cur.proc_valid]), self.cur.meta.temperature_uom,
+                   np.median(self.cur.proc.sal[self.cur.proc_valid]), self.cur.meta.salinity_uom
+               )
+        msg += "<pre><b>avg</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
+               % (
+                   np.average(self.cur.proc.depth[self.cur.proc_valid]), self.cur.meta.depth_uom,
+                   np.average(self.cur.proc.speed[self.cur.proc_valid]), self.cur.meta.speed_uom,
+                   np.average(self.cur.proc.temp[self.cur.proc_valid]), self.cur.meta.temperature_uom,
+                   np.average(self.cur.proc.sal[self.cur.proc_valid]), self.cur.meta.salinity_uom
+               )
+        msg += "<pre><b>std</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
+               % (
+                   self.cur.proc.depth[self.cur.proc_valid].std(), self.cur.meta.depth_uom,
+                   self.cur.proc.speed[self.cur.proc_valid].std(), self.cur.meta.speed_uom,
+                   self.cur.proc.temp[self.cur.proc_valid].std(), self.cur.meta.temperature_uom,
+                   self.cur.proc.sal[self.cur.proc_valid].std(), self.cur.meta.salinity_uom
+               )
+
+        return msg
 
     def load_profile(self, pk):
         ssp = self.db_retrieve_profile(pk)

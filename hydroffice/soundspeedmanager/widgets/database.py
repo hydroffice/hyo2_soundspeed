@@ -157,22 +157,27 @@ class Database(AbstractWidget):
         # single selection
         if len(rows) == 1:
 
-            load_act = QtGui.QAction("Load profile", self, statusTip="Load a profile", triggered=self.load_profile)
-            menu.addAction(load_act)
+            stats_act = QtGui.QAction("Profile stats", self, statusTip="Get some statistical info about the profile",
+                                      triggered=self.stats_profile)
+            menu.addAction(stats_act)
 
             menu.addMenu(qa_menu)
             dqa_compare_ref_act = QtGui.QAction("DQA (with reference)", self,
                                                 statusTip="Assess data quality by comparison with the reference cast",
                                                 triggered=self.dqa_full_profile)
             qa_menu.addAction(dqa_compare_ref_act)
+            dqa_at_surface_act = QtGui.QAction("DQA (at surface)", self, statusTip="DQA with surface sound speed",
+                                               triggered=self.dqa_at_surface)
+            qa_menu.addAction(dqa_at_surface_act)
+
+            menu.addSeparator()
+
+            load_act = QtGui.QAction("Load profile", self, statusTip="Load a profile", triggered=self.load_profile)
+            menu.addAction(load_act)
 
             export_act = QtGui.QAction("Export profile", self, statusTip="Export a single profile",
                                        triggered=self.export_single_profile)
             menu.addAction(export_act)
-
-            dqa_at_surface_act = QtGui.QAction("DQA (at surface)", self, statusTip="DQA with surface sound speed",
-                                               triggered=self.dqa_at_surface)
-            qa_menu.addAction(dqa_at_surface_act)
 
             delete_act = QtGui.QAction("Delete profile", self, statusTip="Delete selected profile",
                                        triggered=self.delete_profile)
@@ -187,13 +192,15 @@ class Database(AbstractWidget):
                                                     triggered=self.dqa_full_profile)
                 qa_menu.addAction(dqa_compare_two_act)
 
-            export_act = QtGui.QAction("Export profiles", self, statusTip="Export multiple profiles",
-                                       triggered=self.export_multi_profile)
-            menu.addAction(export_act)
-
             dqa_at_surface_act = QtGui.QAction("DQA (at surface)", self, statusTip="DQA with surface sound speed",
                                                triggered=self.dqa_at_surface)
             qa_menu.addAction(dqa_at_surface_act)
+
+            menu.addSeparator()
+
+            export_act = QtGui.QAction("Export profiles", self, statusTip="Export multiple profiles",
+                                       triggered=self.export_multi_profile)
+            menu.addAction(export_act)
 
             delete_act = QtGui.QAction("Delete profiles", self, statusTip="Delete selected profiles",
                                        triggered=self.delete_profile)
@@ -230,6 +237,37 @@ class Database(AbstractWidget):
         if self.lib.has_ssp():
             self.main_win.data_imported()
             self.main_win.tabs.setCurrentIndex(0)
+
+    def stats_profile(self):
+        logger.debug("user want soma stats on a single profile")
+
+        # first, we clear the current data (if any)
+        self.lib.clear_data()
+        self.main_win.data_cleared()
+
+        # check if any selection
+        rows = self.ssp_list.selectionModel().selectedRows()
+        if len(rows) != 1:
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.information(self, "Database", "Select a single profile before exporting it!")
+            return
+
+        # the primary key is the first column (= 0)
+        pk = int(self.ssp_list.item(rows[0].row(), 0).text())
+        success = self.lib.load_profile(pk)
+        if not success:
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.warning(self, "Database", "Unable to load profile!", QtGui.QMessageBox.Ok).setFont(QtGui.QFont.Monospace)
+            return
+
+        msg = self.lib.profile_stats()
+        if msg is not None:
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.information(self, "Profile Statistical Info", msg)
+
+        # finally, we clear the just loaded data
+        self.lib.clear_data()
+        self.main_win.data_cleared()
 
     def export_single_profile(self):
         logger.debug("user want to export a single profile")
@@ -339,7 +377,7 @@ class Database(AbstractWidget):
                 except RuntimeError as e:
                     QtGui.QMessageBox.critical(self, "DQA error",
                                                "%s" % e)
-                    return 
+                    return
 
         elif len(rows) == 2:
             pk = int(self.ssp_list.item(rows[0].row(), 0).text())
