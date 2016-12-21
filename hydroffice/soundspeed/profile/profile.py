@@ -830,16 +830,20 @@ class Profile(object):
         ray2 = profile._compute_ray_paths(draft, [angle], res=tt_inc)[0]
         
         nr_points = min(len(ray1.data), len(ray2.data))
-        if(nr_points == 0):
+        if nr_points == 0:
             raise RuntimeError("One of the two profiles is too shallow!")
+
         depth1 = ray1.data[:nr_points, 1]
         depth2 = ray2.data[:nr_points, 1]
         delta_depth = depth2 - depth1
         larger_depths = np.maximum(depth1, depth2)
         pct_diff = np.absolute(delta_depth / larger_depths) * 100.0
+        # noinspection PyUnresolvedReferences
         max_diff_index = pct_diff.argmax()
+        # noinspection PyUnresolvedReferences
         max_diff = pct_diff[max_diff_index]
         max_diff_depth = larger_depths[max_diff_index]
+
         self_path = self.meta.original_path
         self_path = self_path if os.path.exists(self_path) else os.path.basename(self_path)
         profile_path = profile.meta.original_path

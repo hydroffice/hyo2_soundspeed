@@ -799,6 +799,7 @@ class SoundSpeedLibrary(object):
                    self.cur.proc.temp[self.cur.proc_valid].max(), self.cur.meta.temperature_uom,
                    self.cur.proc.sal[self.cur.proc_valid].max(), self.cur.meta.salinity_uom
                )
+        # noinspection PyStringFormat
         msg += "<pre><b>med</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
                    np.median(self.cur.proc.depth[self.cur.proc_valid]), self.cur.meta.depth_uom,
@@ -883,14 +884,14 @@ class SoundSpeedLibrary(object):
         cast_speed = prof.interpolate_proc_speed_at_depth(depth=surface_depth)
         speed_diff = abs(cast_speed - surface_speed)
 
-        msg = "Surface sensor (S/N: %s): %.1f m/sec (at %.2f m)\n" % (sn, surface_speed, surface_depth)
-        msg += "Profile #%02d: %.1f (interpolated at %.2f m)\n" % (pk, cast_speed, surface_depth)
-        msg += "Resulting difference in sound speed (m/sec): %.2f\n\n" % speed_diff
+        msg = "<pre><b>Surface sensor</b> (S/N: %s):  \t%.1f m/sec (at %.2f m)</pre>" % (sn, surface_speed, surface_depth)
+        msg += "<pre><b>Profile</b> (#%02d):           \t%.1f m/sec (interpolated at %.2f m)  </pre>" % (pk, cast_speed, surface_depth)
+        msg += "<pre><b>Difference in sound speed</b>: \t%.2f m/sec </pre>" % speed_diff
 
         if speed_diff > 2.0:
-            msg += "TEST FAILED (Diff. in sound speed > 2 m/sec)\n"
+            msg += "<pre><b>TEST FAILED</b>:             \tDiff. in sound speed > 2 m/sec  </pre>\n"
         else:
-            msg += "TEST PASSED (Diff. in sound speed <= 2 m/sec)\n"
+            msg += "<pre><b>TEST PASSED</b>:             \tDiff. in sound speed <= 2 m/sec </pre>\n"
 
         return msg
 
