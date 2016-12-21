@@ -917,8 +917,8 @@ class SoundSpeedLibrary(object):
         data_path = os.path.join(self.outputs_folder, 'dqa')
         if not os.path.exists(data_path):
             os.makedirs(data_path)
-        data_path = os.path.join(data_path, '%s_%s_DQA.txt' % (self.current_project, ret[4]))
-        with open(data_path, 'w') as f:
+        data_path = os.path.join(data_path, '%s.DQA.txt' % self.current_project)
+        with open(data_path, 'a') as f:
             f.write(b'\n%s%s\n' % (ret[0], ret[2]))
         msg = "Results written to\n%s\n\n%s%s\n\n%s" % (data_path, ret[0], ret[1], ret[2])
         return msg
