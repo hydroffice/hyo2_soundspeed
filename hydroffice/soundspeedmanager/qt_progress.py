@@ -42,7 +42,7 @@ class QtProgress(AbstractProgress):
         self._min = min_value
         self._max = max_value
         self._range = self._max - self._min
-        self._value = self._min
+        self._value = 0
 
         self._is_canceled = False
         if self._progress is None:
