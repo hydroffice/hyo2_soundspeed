@@ -582,7 +582,6 @@ class Profile(object):
                 else:
                     self.meta.proc_info += ';%s' % token
 
-
     def clone_data_to_proc(self):
         """Clone the raw data samples into proc samples
 
@@ -785,7 +784,7 @@ class Profile(object):
 
         return cast_speed
 
-    def _compute_ray_paths(self, draft, thetas_deg, travel_times=None, res=.005, b_project=False):
+    def compute_ray_paths(self, draft, thetas_deg, travel_times=None, res=.005, b_project=False):
         """Returns a RayPath object for each launch angle."""
         if not draft or draft == 'Unknown':
             draft = 0.0
@@ -795,21 +794,21 @@ class Profile(object):
         depths = self.proc.depth[self.proc_dqa_valid] - draft
         speeds = self.proc.speed[self.proc_dqa_valid]
 
-        raypaths = []
+        ray_paths = []
         for launch in thetas_deg:
 
             params = RayTracing.get_svp_layer_parameters(np.deg2rad(launch), depths, speeds)
             if travel_times is None:
-                tt = np.arange(res, params[-2][-1], res) # make travel_times to reach end of profile
+                tt = np.arange(res, params[-2][-1], res)  # make travel_times to reach end of profile
             else:
                 tt = np.array(travel_times)
 
             rays = RayTracing.ray_trace(tt, depths, speeds, params, b_project=b_project)
-            rays[:,0] += draft
+            rays[:, 0] += draft
 
-            raypaths.append(RayPath(np.vstack((tt, rays.transpose())).transpose()))
+            ray_paths.append(RayPath(np.vstack((tt, rays.transpose())).transpose()))
 
-        return raypaths
+        return ray_paths
 
     def compare_profile(self, profile, angle):
 
@@ -821,13 +820,13 @@ class Profile(object):
         else:
             tt_inc = 0.01
 
-        draft1 = 0.0 # TODO
-        draft2 = 0.0 # TODO
+        draft1 = 0.0  # TODO
+        draft2 = 0.0  # TODO
         draft = max(draft1, draft2)
 
         # Generate the travel time table for the two profiles.
-        ray1 = self._compute_ray_paths(draft, [angle], res=tt_inc)[0]
-        ray2 = profile._compute_ray_paths(draft, [angle], res=tt_inc)[0]
+        ray1 = self.compute_ray_paths(draft, [angle], res=tt_inc)[0]
+        ray2 = profile.compute_ray_paths(draft, [angle], res=tt_inc)[0]
         
         nr_points = min(len(ray1.data), len(ray2.data))
         if nr_points == 0:
@@ -849,7 +848,7 @@ class Profile(object):
         profile_path = profile.meta.original_path
         profile_path = profile_path if os.path.exists(profile_path) else os.path.basename(profile_path)
 
-        details  = "SUMMARY OF RESULTS - COMPARE 2 CASTS   " 
+        details = "SUMMARY OF RESULTS - COMPARE 2 CASTS   "
         details += "SSManager, Version     %s\n\n" % ssp_version
         details += "REFERENCE PROFILE:     %s\n" % self_path
         details += "COMPARISON PROFILE:    %s\n\n" % profile_path

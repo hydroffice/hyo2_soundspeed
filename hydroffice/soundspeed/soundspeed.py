@@ -928,7 +928,7 @@ class SoundSpeedLibrary(object):
 
     def raise_plot_window(self):
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
-        ret = db.plot.raise_window()
+        _ = db.plot.raise_window()
         db.disconnect()
 
     def map_db_profiles(self):
