@@ -141,47 +141,55 @@ class DataPlots(AbstractWidget):
             self.speed_woa09, = self.speed_ax.plot(self.lib.cur.woa09.l[0].proc.speed,
                                                    self.lib.cur.woa09.l[0].proc.depth,
                                                    color=self.woa09_color,
-                                                   linestyle='--'
+                                                   linestyle='--',
+                                                   label='WOA09 avg'
                                                    )
             if len(self.lib.cur.woa09.l) == 3:
                 self.speed_woa09_min, = self.speed_ax.plot(self.lib.cur.woa09.l[1].proc.speed,
                                                            self.lib.cur.woa09.l[1].proc.depth,
                                                            color=self.woa09_color,
-                                                           linestyle=':'
+                                                           linestyle=':',
+                                                           label='WOA09 min'
                                                            )
                 self.speed_woa09_max, = self.speed_ax.plot(self.lib.cur.woa09.l[2].proc.speed,
                                                            self.lib.cur.woa09.l[2].proc.depth,
                                                            color=self.woa09_color,
-                                                           linestyle=':'
+                                                           linestyle=':',
+                                                           label='WOA09 max'
                                                            )
         if self.lib.cur.woa13:
             self.speed_woa13, = self.speed_ax.plot(self.lib.cur.woa13.l[0].proc.speed,
                                                    self.lib.cur.woa13.l[0].proc.depth,
                                                    color=self.woa13_color,
-                                                   linestyle='--'
+                                                   linestyle='--',
+                                                   label='WOA13 avg'
                                                    )
             if len(self.lib.cur.woa13.l) == 3:
                 self.speed_woa13_min, = self.speed_ax.plot(self.lib.cur.woa13.l[1].proc.speed,
                                                            self.lib.cur.woa13.l[1].proc.depth,
                                                            color=self.woa13_color,
-                                                           linestyle=':'
+                                                           linestyle=':',
+                                                           label='WOA13 min'
                                                            )
                 self.speed_woa13_max, = self.speed_ax.plot(self.lib.cur.woa13.l[2].proc.speed,
                                                            self.lib.cur.woa13.l[2].proc.depth,
                                                            color=self.woa13_color,
-                                                           linestyle=':'
+                                                           linestyle=':',
+                                                           label='WOA13 max'
                                                            )
         if self.lib.cur.rtofs:
             self.speed_rtofs, = self.speed_ax.plot(self.lib.cur.rtofs.l[0].proc.speed,
                                                    self.lib.cur.rtofs.l[0].proc.depth,
                                                    color=self.rtofs_color,
-                                                   linestyle='--'
+                                                   linestyle='--',
+                                                   label='RTOFS'
                                                    )
         if self.lib.has_ref():
             self.speed_ref, = self.speed_ax.plot(self.lib.ref.l[0].proc.speed,
                                                  self.lib.ref.l[0].proc.depth,
                                                  color=self.ref_color,
-                                                 linestyle='--'
+                                                 linestyle='--',
+                                                 label='ref'
                                                  )
         self.speed_invalid, = self.speed_ax.plot(self.lib.cur.proc.speed[self.ii],
                                                  self.lib.cur.proc.depth[self.ii],
@@ -191,11 +199,13 @@ class DataPlots(AbstractWidget):
                                                  marker='.',
                                                  alpha=0.8,
                                                  ms=4,
-                                                 picker=3)
+                                                 picker=3,
+                                                 label='flagged')
         self.speed_valid, = self.speed_ax.plot(self.lib.cur.proc.speed[self.vi],
                                                self.lib.cur.proc.depth[self.vi],
                                                color=self.valid_color,
-                                               picker=3)
+                                               picker=3,
+                                               label='valid')
         self.speed_sis, = self.speed_ax.plot(self.lib.cur.sis.speed[self.svi],
                                              self.lib.cur.sis.depth[self.svi],
                                              markerfacecolor=self.sis_color,
@@ -204,10 +214,23 @@ class DataPlots(AbstractWidget):
                                              linestyle='None',
                                              alpha=0.8,
                                              ms=4,
-                                             picker=3)
-        self.speed_draft = self.speed_ax.axhline(y=None, linewidth=1.5, color=self.draft_color, linestyle=':')
-        self.speed_sensor = self.speed_ax.axvline(x=None, linewidth=1.5, color=self.sensor_color, linestyle=':')
-        self.speed_seafloor = self.speed_ax.axhline(y=None, linewidth=1.5, color=self.seafloor_color, linestyle=':')
+                                             picker=3,
+                                             label='SIS')
+        self.speed_draft = self.speed_ax.axhline(y=None,
+                                                 linewidth=1.5,
+                                                 color=self.draft_color,
+                                                 linestyle=':',
+                                                 label='draft')
+        self.speed_sensor = self.speed_ax.axvline(x=None,
+                                                  linewidth=1.5,
+                                                  color=self.sensor_color,
+                                                  linestyle=':',
+                                                  label='tss')
+        self.speed_seafloor = self.speed_ax.axhline(y=None,
+                                                    linewidth=1.5,
+                                                    color=self.seafloor_color,
+                                                    linestyle=':',
+                                                    label='depth')
         self.speed_ax.set_label("speed")
 
     def _draw_temp(self):
@@ -217,47 +240,55 @@ class DataPlots(AbstractWidget):
             self.temp_woa09, = self.temp_ax.plot(self.lib.cur.woa09.l[0].proc.temp,
                                                  self.lib.cur.woa09.l[0].proc.depth,
                                                  color=self.woa09_color,
-                                                 linestyle='--'
+                                                 linestyle='--',
+                                                 label='WOA09 avg'
                                                  )
             if len(self.lib.cur.woa09.l) == 3:
                 self.temp_woa09_min, = self.temp_ax.plot(self.lib.cur.woa09.l[1].proc.temp,
                                                          self.lib.cur.woa09.l[1].proc.depth,
                                                          color=self.woa09_color,
-                                                         linestyle=':'
+                                                         linestyle=':',
+                                                         label='WOA09 min'
                                                          )
                 self.temp_woa09_max, = self.temp_ax.plot(self.lib.cur.woa09.l[2].proc.temp,
                                                          self.lib.cur.woa09.l[2].proc.depth,
                                                          color=self.woa09_color,
-                                                         linestyle=':'
+                                                         linestyle=':',
+                                                         label='WOA09 max'
                                                          )
         if self.lib.cur.woa13:
             self.temp_woa13, = self.temp_ax.plot(self.lib.cur.woa13.l[0].proc.temp,
                                                  self.lib.cur.woa13.l[0].proc.depth,
                                                  color=self.woa13_color,
-                                                 linestyle='--'
+                                                 linestyle='--',
+                                                 label='WOA13 avg'
                                                  )
             if len(self.lib.cur.woa13.l) == 3:
                 self.temp_woa13_min, = self.temp_ax.plot(self.lib.cur.woa13.l[1].proc.temp,
                                                          self.lib.cur.woa13.l[1].proc.depth,
                                                          color=self.woa13_color,
-                                                         linestyle=':'
+                                                         linestyle=':',
+                                                         label='WOA13 min'
                                                          )
                 self.temp_woa13_max, = self.temp_ax.plot(self.lib.cur.woa13.l[2].proc.temp,
                                                          self.lib.cur.woa13.l[2].proc.depth,
                                                          color=self.woa13_color,
-                                                         linestyle=':'
+                                                         linestyle=':',
+                                                         label='WOA13 max'
                                                          )
         if self.lib.cur.rtofs:
             self.temp_rtofs, = self.temp_ax.plot(self.lib.cur.rtofs.l[0].proc.temp,
                                                  self.lib.cur.rtofs.l[0].proc.depth,
                                                  color=self.rtofs_color,
-                                                 linestyle='--'
+                                                 linestyle='--',
+                                                 label='RTOFS'
                                                  )
         if self.lib.has_ref():
             self.temp_ref, = self.temp_ax.plot(self.lib.ref.l[0].proc.temp,
                                                self.lib.ref.l[0].proc.depth,
                                                color=self.ref_color,
-                                               linestyle='--'
+                                               linestyle='--',
+                                               label='ref'
                                                )
         self.temp_invalid, = self.temp_ax.plot(self.lib.cur.proc.temp[self.ii],
                                                self.lib.cur.proc.depth[self.ii],
@@ -267,11 +298,13 @@ class DataPlots(AbstractWidget):
                                                marker='.',
                                                alpha=0.8,
                                                ms=4,
-                                               picker=3)
+                                               picker=3,
+                                               label='flagged')
         self.temp_valid, = self.temp_ax.plot(self.lib.cur.proc.temp[self.vi],
                                              self.lib.cur.proc.depth[self.vi],
                                              color=self.valid_color,
-                                             picker=3)
+                                             picker=3,
+                                             label='valid')
         self.temp_ax.set_label("temp")
         # hide y-labels
         [label.set_visible(False) for label in self.temp_ax.get_yticklabels()]
@@ -283,47 +316,55 @@ class DataPlots(AbstractWidget):
             self.sal_woa09, = self.sal_ax.plot(self.lib.cur.woa09.l[0].proc.sal,
                                                self.lib.cur.woa09.l[0].proc.depth,
                                                color=self.woa09_color,
-                                               linestyle='--'
+                                               linestyle='--',
+                                               label='WOA09 avg'
                                                )
             if len(self.lib.cur.woa09.l) == 3:
                 self.sal_woa09_min, = self.sal_ax.plot(self.lib.cur.woa09.l[1].proc.sal,
                                                        self.lib.cur.woa09.l[1].proc.depth,
                                                        color=self.woa09_color,
-                                                       linestyle=':'
+                                                       linestyle=':',
+                                                       label='WOA09 min'
                                                        )
                 self.sal_woa09_max, = self.sal_ax.plot(self.lib.cur.woa09.l[2].proc.sal,
                                                        self.lib.cur.woa09.l[2].proc.depth,
                                                        color=self.woa09_color,
-                                                       linestyle=':'
+                                                       linestyle=':',
+                                                       label='WOA09 max'
                                                        )
         if self.lib.cur.woa13:
             self.sal_woa13, = self.sal_ax.plot(self.lib.cur.woa13.l[0].proc.sal,
                                                self.lib.cur.woa13.l[0].proc.depth,
                                                color=self.woa13_color,
-                                               linestyle='--'
+                                               linestyle='--',
+                                               label='WOA13 avg'
                                                )
             if len(self.lib.cur.woa13.l) == 3:
                 self.sal_woa13_min, = self.sal_ax.plot(self.lib.cur.woa13.l[1].proc.sal,
                                                        self.lib.cur.woa13.l[1].proc.depth,
                                                        color=self.woa13_color,
-                                                       linestyle=':'
+                                                       linestyle=':',
+                                                       label='WOA13 min'
                                                        )
                 self.sal_woa13_max, = self.sal_ax.plot(self.lib.cur.woa13.l[2].proc.sal,
                                                        self.lib.cur.woa13.l[2].proc.depth,
                                                        color=self.woa13_color,
-                                                       linestyle=':'
+                                                       linestyle=':',
+                                                       label='WOA13 max'
                                                        )
         if self.lib.cur.rtofs:
             self.sal_rtofs, = self.sal_ax.plot(self.lib.cur.rtofs.l[0].proc.sal,
                                                self.lib.cur.rtofs.l[0].proc.depth,
                                                color=self.rtofs_color,
-                                               linestyle='--'
+                                               linestyle='--',
+                                               label='RTOFS'
                                                )
         if self.lib.has_ref():
             self.sal_ref, = self.sal_ax.plot(self.lib.ref.l[0].proc.sal,
                                              self.lib.ref.l[0].proc.depth,
                                              color=self.ref_color,
-                                             linestyle='--'
+                                             linestyle='--',
+                                             label='ref'
                                              )
         self.sal_invalid, = self.sal_ax.plot(self.lib.cur.proc.sal[self.ii],
                                              self.lib.cur.proc.depth[self.ii],
@@ -333,11 +374,13 @@ class DataPlots(AbstractWidget):
                                              marker='.',
                                              alpha=0.8,
                                              ms=4,
-                                             picker=3)
+                                             picker=3,
+                                             label='flagged')
         self.sal_valid, = self.sal_ax.plot(self.lib.cur.proc.sal[self.vi],
                                            self.lib.cur.proc.depth[self.vi],
                                            color=self.valid_color,
-                                           picker=3)
+                                           picker=3,
+                                           label='valid')
         self.sal_ax.set_label("sal")
         # hide y-labels
         [label.set_visible(False) for label in self.sal_ax.get_yticklabels()]
@@ -457,18 +500,22 @@ class DataPlots(AbstractWidget):
     def redraw(self):
         """Redraw the canvases, update the locators"""
         for a in self.c.figure.get_axes():
+
             xaxis = getattr(a, 'xaxis', None)
             yaxis = getattr(a, 'yaxis', None)
             locators = []
+
             if xaxis is not None:
                 locators.append(xaxis.get_major_locator())
                 locators.append(xaxis.get_minor_locator())
+
             if yaxis is not None:
                 locators.append(yaxis.get_major_locator())
                 locators.append(yaxis.get_minor_locator())
 
             for loc in locators:
                 loc.refresh()
+
         self.c.draw_idle()
 
     def update_validity_indices(self):
@@ -483,4 +530,4 @@ class DataPlots(AbstractWidget):
 
     def reset(self):
         if not self.server_mode:
-         self.nav.reset()
+            self.nav.reset()

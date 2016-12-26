@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from matplotlib.backends.qt_compat import QtCore, QtGui, QtWidgets, _getSaveFileName, __version__
+from matplotlib.backends.qt_compat import QtCore, QtGui, QtWidgets
 
 import numpy as np
 import os
@@ -32,6 +32,7 @@ class NavToolbar(NavigationToolbar2QT):
     media = os.path.join(here, os.pardir, 'media')
 
     def __init__(self, canvas, parent, plot_win, prj, coordinates=True):
+
         self.plot_win = plot_win
         self.prj = prj
         self.grid_action = None
@@ -127,6 +128,11 @@ class NavToolbar(NavigationToolbar2QT):
                 self.grid_action.setCheckable(True)
                 self.grid_action.setChecked(True)
                 self._actions['grid'] = self.grid_action
+                self.legend_action = self.addAction(self._icon("plot_legend.png"), 'Legend', self.legend_plot)
+                self.legend_action.setToolTip('Toggle legends')
+                self.legend_action.setCheckable(True)
+                self.legend_action.setChecked(False)
+                self._actions['legend'] = self.legend_action
                 subplots_action = self.addAction(self._icon('subplots.png'), 'Subplots', self.configure_subplots)
                 subplots_action.setToolTip('Configure subplots')
                 self._actions['subplots'] = subplots_action
@@ -1037,6 +1043,17 @@ class NavToolbar(NavigationToolbar2QT):
         grid_flag = self.grid_action.isChecked()
         for a in self.canvas.figure.get_axes():
             a.grid(grid_flag)
+        self.dynamic_update()
+
+    def legend_plot(self):
+        legend_flag = self.legend_action.isChecked()
+        logger.debug("plot legend: %s" % legend_flag)
+        if legend_flag:
+            for a in self.canvas.figure.get_axes():
+                a.legend(loc='lower left')
+        else:
+            for a in self.canvas.figure.get_axes():
+                a.legend_.remove()
         self.dynamic_update()
 
     def flagged_plot(self):
