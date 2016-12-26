@@ -29,12 +29,14 @@ class Server(AbstractWidget):
         hbox.addStretch()
         self.group_box = QtGui.QGroupBox("Synthetic Profile Server")
         self.group_box.setMaximumHeight(120)
+        self.group_box.setFixedWidth(500)
         hbox.addWidget(self.group_box)
         hbox.addStretch()
 
         # image and text
         group_layout = QtGui.QHBoxLayout()
         self.group_box.setLayout(group_layout)
+        group_layout.addStretch()
         # - image
         img_label = QtGui.QLabel()
         img = QtGui.QImage(os.path.join(self.media, 'server.png'))
@@ -52,6 +54,7 @@ class Server(AbstractWidget):
         info_label.setStyleSheet("color: #96A8A8;")
         info_label.setWordWrap(True)
         group_layout.addWidget(info_label)
+        group_layout.addStretch()
 
         # - buttons
         hbox = QtGui.QHBoxLayout()
