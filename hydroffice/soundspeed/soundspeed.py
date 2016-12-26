@@ -782,40 +782,47 @@ class SoundSpeedLibrary(object):
         if self.cur.proc.depth[self.cur.proc_valid].size == 0:
             return "Empty profile"
 
-        msg += "<pre><b>Nr. of Samples</b>: %d</pre>" % self.cur.proc.depth[self.cur.proc_valid].size
+        pre = "<pre style='margin:3px;'>"
 
-        msg += "<pre>        <b>Depth</b>     <b>Sound Speed</b>    <b>Temperature</b>   <b>Salinity</b></pre>"
-        msg += "<pre><b>min</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
+        msg += "%s<b>Nr. of Samples</b>: %d</pre>" % (pre, self.cur.proc.depth[self.cur.proc_valid].size)
+
+        msg += "%s        <b>Depth</b>     <b>Sound Speed</b>    <b>Temperature</b>   <b>Salinity</b></pre>" % pre
+        msg += "%s<b>min</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
+                   pre,
                    self.cur.proc.depth[self.cur.proc_valid].min(), self.cur.meta.depth_uom,
                    self.cur.proc.speed[self.cur.proc_valid].min(), self.cur.meta.speed_uom,
                    self.cur.proc.temp[self.cur.proc_valid].min(), self.cur.meta.temperature_uom,
-                   self.cur.proc.sal[self.cur.proc_valid].min(), self.cur.meta.salinity_uom
+                   self.cur.proc.sal[self.cur.proc_valid].min(), self.cur.meta.salinity_uom,
                )
-        msg += "<pre><b>max</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
+        msg += "%s<b>max</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
+                   pre,
                    self.cur.proc.depth[self.cur.proc_valid].max(), self.cur.meta.depth_uom,
                    self.cur.proc.speed[self.cur.proc_valid].max(), self.cur.meta.speed_uom,
                    self.cur.proc.temp[self.cur.proc_valid].max(), self.cur.meta.temperature_uom,
                    self.cur.proc.sal[self.cur.proc_valid].max(), self.cur.meta.salinity_uom
                )
         # noinspection PyStringFormat
-        msg += "<pre><b>med</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
+        msg += "%s<b>med</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
+                   pre,
                    np.median(self.cur.proc.depth[self.cur.proc_valid]), self.cur.meta.depth_uom,
                    np.median(self.cur.proc.speed[self.cur.proc_valid]), self.cur.meta.speed_uom,
                    np.median(self.cur.proc.temp[self.cur.proc_valid]), self.cur.meta.temperature_uom,
                    np.median(self.cur.proc.sal[self.cur.proc_valid]), self.cur.meta.salinity_uom
                )
-        msg += "<pre><b>avg</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
+        msg += "%s<b>avg</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
+                   pre,
                    np.average(self.cur.proc.depth[self.cur.proc_valid]), self.cur.meta.depth_uom,
                    np.average(self.cur.proc.speed[self.cur.proc_valid]), self.cur.meta.speed_uom,
                    np.average(self.cur.proc.temp[self.cur.proc_valid]), self.cur.meta.temperature_uom,
                    np.average(self.cur.proc.sal[self.cur.proc_valid]), self.cur.meta.salinity_uom
                )
-        msg += "<pre><b>std</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
+        msg += "%s<b>std</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
+                   pre,
                    self.cur.proc.depth[self.cur.proc_valid].std(), self.cur.meta.depth_uom,
                    self.cur.proc.speed[self.cur.proc_valid].std(), self.cur.meta.speed_uom,
                    self.cur.proc.temp[self.cur.proc_valid].std(), self.cur.meta.temperature_uom,
@@ -824,7 +831,7 @@ class SoundSpeedLibrary(object):
 
         return msg
 
-    def load_profile(self, pk):
+    def load_profile(self, pk, skip_atlas=False):
         ssp = self.db_retrieve_profile(pk)
         if not ssp:
             return False
@@ -833,17 +840,17 @@ class SoundSpeedLibrary(object):
         self.ssp = ssp
 
         # retrieve atlases data for each retrieved profile
-        if self.use_woa09() and self.has_woa09():
+        if self.use_woa09() and self.has_woa09() and not skip_atlas:
             self.ssp.cur.woa09 = self.atlases.woa09.query(lat=self.ssp.cur.meta.latitude,
                                                           lon=self.ssp.cur.meta.longitude,
                                                           datestamp=self.ssp.cur.meta.utc_time)
 
-        if self.use_woa13() and self.has_woa13():
+        if self.use_woa13() and self.has_woa13() and not skip_atlas:
             self.ssp.cur.woa13 = self.atlases.woa13.query(lat=self.ssp.cur.meta.latitude,
                                                           lon=self.ssp.cur.meta.longitude,
                                                           datestamp=self.ssp.cur.meta.utc_time)
 
-        if self.use_rtofs():
+        if self.use_rtofs() and not skip_atlas:
             try:
                 self.ssp.cur.rtofs = self.atlases.rtofs.query(lat=self.ssp.cur.meta.latitude,
                                                               lon=self.ssp.cur.meta.longitude,
@@ -884,14 +891,29 @@ class SoundSpeedLibrary(object):
         cast_speed = prof.interpolate_proc_speed_at_depth(depth=surface_depth)
         speed_diff = abs(cast_speed - surface_speed)
 
-        msg = "<pre><b>Surface sensor</b> (S/N: %s):  \t%.1f m/sec (at %.2f m)</pre>" % (sn, surface_speed, surface_depth)
-        msg += "<pre><b>Profile</b> (#%02d):           \t%.1f m/sec (interpolated at %.2f m)  </pre>" % (pk, cast_speed, surface_depth)
-        msg += "<pre><b>Difference in sound speed</b>: \t%.2f m/sec </pre>" % speed_diff
+        pre = "<pre style='margin:3px;'>"
+
+        first = "<b>Surface sensor</b> (S/N: %s):" % sn
+        second = "%.1f m/sec (at %.2f m)" % (surface_speed, surface_depth)
+        msg = "%s%-42s %-36s</pre>" % (pre, first, second)
+
+        first = "<b>Profile</b> (#%02d):" % pk
+        second = "%.1f m/sec (interpolated at %.2f m)" % (cast_speed, surface_depth)
+        msg += "%s%-42s %-36s</pre>" % (pre, first, second)
+
+        first = "<b>Difference in sound speed</b>:"
+        second = "%.2f m/sec" % speed_diff
+        msg += "%s%-42s %-36s</pre>" % (pre, first, second)
 
         if speed_diff > 2.0:
-            msg += "<pre><b>TEST FAILED</b>:             \tDiff. in sound speed > 2 m/sec  </pre>\n"
+            first = "<b>TEST FAILED</b>:"
+            second = "Diff. in sound speed > 2 m/sec"
+
         else:
-            msg += "<pre><b>TEST PASSED</b>:             \tDiff. in sound speed <= 2 m/sec </pre>\n"
+            first = "<b>TEST PASSED</b>:"
+            second = "Diff. in sound speed <= 2 m/sec"
+
+        msg += "%s%-42s %-36s</pre>" % (pre, first, second)
 
         return msg
 
@@ -911,18 +933,7 @@ class SoundSpeedLibrary(object):
         else:
             ref_profile = self.db_retrieve_profile(pk_ref).cur
 
-        ret = ref_profile.compare_profile(profile, angle)
-        if ret is None:
-            return None
-
-        data_path = os.path.join(self.outputs_folder, 'dqa')
-        if not os.path.exists(data_path):
-            os.makedirs(data_path)
-        data_path = os.path.join(data_path, '%s.DQA.txt' % self.current_project)
-        with open(data_path, 'a') as f:
-            f.write(b'\n%s%s\n' % (ret[0], ret[2]))
-        msg = "Results written to\n%s\n\n%s%s\n\n%s" % (data_path, ret[0], ret[1], ret[2])
-        return msg
+        return ref_profile.compare_profile(profile, angle)
 
     # plotting
 

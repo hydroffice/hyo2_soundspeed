@@ -17,6 +17,7 @@ from hydroffice.soundspeedmanager.dialogs.import_data_dialog import ImportDataDi
 from hydroffice.soundspeedmanager.dialogs.export_single_profile_dialog import ExportSingleProfileDialog
 from hydroffice.soundspeedmanager.dialogs.export_multi_profile_dialog import ExportMultiProfileDialog
 from hydroffice.soundspeedmanager.dialogs.export_profile_metadata_dialog import ExportProfileMetadataDialog
+from hydroffice.soundspeedmanager.dialogs.text_editor_dialog import TextEditorDialog
 
 
 class Database(AbstractWidget):
@@ -239,7 +240,7 @@ class Database(AbstractWidget):
             self.main_win.tabs.setCurrentIndex(0)
 
     def stats_profile(self):
-        logger.debug("user want soma stats on a single profile")
+        logger.debug("user wants some stats on a single profile")
 
         # first, we clear the current data (if any)
         self.lib.clear_data()
@@ -254,16 +255,18 @@ class Database(AbstractWidget):
 
         # the primary key is the first column (= 0)
         pk = int(self.ssp_list.item(rows[0].row(), 0).text())
-        success = self.lib.load_profile(pk)
+        success = self.lib.load_profile(pk, skip_atlas=True)
         if not success:
             # noinspection PyCallByClass
-            QtGui.QMessageBox.warning(self, "Database", "Unable to load profile!", QtGui.QMessageBox.Ok).setFont(QtGui.QFont.Monospace)
+            QtGui.QMessageBox.warning(self, "Database", "Unable to load profile!", QtGui.QMessageBox.Ok)
             return
 
         msg = self.lib.profile_stats()
         if msg is not None:
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.information(self, "Profile Statistical Info", msg)
+            basename = "%s_%03d_stats" % (self.lib.current_project, pk)
+            dlg = TextEditorDialog(title="Profile Statistical Info", basename=basename, body=msg,
+                                   main_win=self, lib=self.lib, parent=self)
+            dlg.exec_()
 
         # finally, we clear the just loaded data
         self.lib.clear_data()
@@ -358,16 +361,20 @@ class Database(AbstractWidget):
 
             msg = self.lib.dqa_at_surface(pk)
             if msg is not None:
-                # noinspection PyCallByClass
-                QtGui.QMessageBox.information(self, "Surface DQA", msg)
+                basename = "%s_%03d_dqa_surface" % (self.lib.current_project, pk)
+                dlg = TextEditorDialog(title="Surface DQA", basename=basename, body=msg,
+                                       main_win=self, lib=self.lib, parent=self)
+                dlg.exec_()
 
     def dqa_full_profile(self):
         logger.debug("user want to do a profile DQA")
 
         rows = self.ssp_list.selectionModel().selectedRows()
         if len(rows) == 1:
+
             pk = int(self.ssp_list.item(rows[0].row(), 0).text())
             if self.lib.ref is None:
+                # noinspection PyCallByClass
                 QtGui.QMessageBox.information(self, "DQA compare with reference cast",
                                               "You should set reference cast first!")
                 return
@@ -375,29 +382,36 @@ class Database(AbstractWidget):
                 try:
                     msg = self.lib.dqa_full_profile(pk)
                 except RuntimeError as e:
+                    # noinspection PyCallByClass
                     QtGui.QMessageBox.critical(self, "DQA error",
                                                "%s" % e)
                     return
 
         elif len(rows) == 2:
+
             pk = int(self.ssp_list.item(rows[0].row(), 0).text())
             pk_ref = int(self.ssp_list.item(rows[1].row(), 0).text())
             try:
                 msg = self.lib.dqa_full_profile(pk, pk_ref)
+
             except RuntimeError as e:
+                # noinspection PyCallByClass
                 QtGui.QMessageBox.critical(self, "DQA error",
                                            "%s" % e)
                 return
 
         else:
+
             # noinspection PyCallByClass
             QtGui.QMessageBox.information(self, "DQA comparison",
                                           "You need to select 1 or 2 profiles to do DQA comparison!")
             return
 
         if msg is not None:
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.information(self, "Profile DQA", msg)
+            basename = "%s_dqa" % self.lib.current_project
+            dlg = TextEditorDialog(title="Profile DQA", basename=basename, body=msg, init_size=QtCore.QSize(800, 800),
+                                   main_win=self, lib=self.lib, parent=self)
+            dlg.exec_()
 
     def new_project(self):
         logger.debug("user want to create a new project")

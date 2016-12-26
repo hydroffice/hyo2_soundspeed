@@ -7,7 +7,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from hydroffice.soundspeed import __version__ as ssp_version
+from hydroffice.soundspeed import __version__ as soundspeed_version
 from hydroffice.soundspeed.profile.metadata import Metadata
 from hydroffice.soundspeed.profile.samples import Samples
 from hydroffice.soundspeed.profile.more import More
@@ -843,52 +843,74 @@ class Profile(object):
         max_diff = pct_diff[max_diff_index]
         max_diff_depth = larger_depths[max_diff_index]
 
+        # create output message
+
+        p1 = "<pre style='margin:1px;'>"
+        p2 = "</pre>"
+
         self_path = self.meta.original_path
         self_path = self_path if os.path.exists(self_path) else os.path.basename(self_path)
         profile_path = profile.meta.original_path
         profile_path = profile_path if os.path.exists(profile_path) else os.path.basename(profile_path)
 
-        details = "SUMMARY OF RESULTS - COMPARE 2 CASTS   "
-        details += "SSManager, Version     %s\n\n" % ssp_version
-        details += "REFERENCE PROFILE:     %s\n" % self_path
-        details += "COMPARISON PROFILE:    %s\n\n" % profile_path
-        details += "REFERENCE INSTRUMENT:  sensor-%s, probe-%s, sn-%s\n" % (self.meta.sensor, self.meta.probe, self.meta.sn)
-        details += "COMPARISON INSTRUMENT: sensor-%s, probe-%s, sn-%s\n\n" % (profile.meta.sensor, profile.meta.probe, profile.meta.sn)
+        msg = "%s<b>SUMMARY OF RESULTS - COMPARE 2 CASTS</b>%s<br>" % (p1, p2)
 
-        details += "DRAFT                               = %.2fm\n" % draft
-        details += "MAXIMUM COMMON DEPTH                = %.2f\n" % dep_max
-        details += "MAXIMUM DEPTH PERCENTAGE DIFFERENCE = %.2f%%\n" % max_diff
-        details += "MAXIMUM PERCENTAGE DIFFERENCE AT    = %.2fm\n" % max_diff_depth
-        details += "Max percentage diff line and last line of travel time table:\n"
-        details += "Travel time, Avg Depth, Depth Diff, Pct Depth Diff, Avg Crosstrack, Crosstrack Diff, Pct Crosstrack Diff\n"
-        for ni in (max_diff_index, nr_points-1):
-            diff_data = (ray1.data[ni,0], 
-                         np.average([ray1.data[ni,1], ray2.data[ni,1]]), np.absolute(delta_depth[ni]), pct_diff[ni],
-                         np.average([ray1.data[ni,2], ray2.data[ni,2]]), np.absolute(ray1.data[ni,2]-ray2.data[ni,2]), 100.0*np.absolute(ray1.data[ni,2]-ray2.data[ni,2])/max(ray1.data[ni,2],ray2.data[ni,2]))
-            details += "    %5.2fs ,   %6.2fm,   %5.2fm  ,     %5.2f%%    ,      %6.2fm  ,      %5.2fm    ,         %5.2f%%\n" % diff_data
- 
-        results = '\n' + time.ctime() + '\n'
+        msg += "%s<b>Sound Speed library</b>:                 %s%s" % (p1, soundspeed_version, p2)
+        msg += "%s<b>Reference profile</b>:                   %s%s" % (p1, self_path, p2)
+        msg += "%s<b>Comparison profile</b>:                  %s%s" % (p1, profile_path, p2)
+        msg += "%s<b>Reference instrument</b>:                sensor-%s, probe-%s%s%s" \
+               % (p1, self.meta.sensor, self.meta.probe, ", sn-%s" % self.meta.sn if self.meta.sn else "", p2)
+        msg += "%s<b>Comparison instrument</b>:               sensor-%s, probe-%s%s%s<br>" \
+               % (p1, profile.meta.sensor, profile.meta.probe, ", sn-%s" % profile.meta.sn if profile.meta.sn else "",
+                  p2)
+
+        msg += "%s<b>Draft</b>:                               %.2f m%s" % (p1, draft, p2)
+        msg += "%s<b>Maximum Common Depth</b>:                %.2f m%s" % (p1, dep_max, p2)
+        msg += "%s<b>Maximum Depth Percentage Difference</b>: %.2f%%%s" % (p1, max_diff, p2)
+        msg += "%s<b>Maximum Percentage Difference at</b>:    %.2f m%s<br>" % (p1, max_diff_depth, p2)
+
+        msg += "%s<b>Max percentage diff. line and last line of travel time table</b>:%s" % (p1, p2)
+
+        msg += "%sTravel time, Avg Depth, Depth Diff, Pct Depth Diff, Avg Crosstrack, Crosstrack Diff, " \
+               "Pct Crosstrack Diff%s" % (p1, p2)
+        for ni in (max_diff_index, nr_points - 1):
+            msg += "%s%9.2f s,%8.2f m,%9.2f m,%14.2f%%,%13.2f m,%14.2f m,%19.2f%%%s" \
+                   % (
+                       p1,
+                       ray1.data[ni, 0],  # travel time
+                       np.average([ray1.data[ni, 1], ray2.data[ni, 1]]),  # avg. depth
+                       np.absolute(delta_depth[ni]),  # depth diff.
+                       pct_diff[ni],  # pct. depth diff.
+                       np.average([ray1.data[ni, 2], ray2.data[ni, 2]]),  # avg. cross-track
+                       np.absolute(ray1.data[ni, 2] - ray2.data[ni, 2]),  # cross-track diff.
+                       100.0 * np.absolute(ray1.data[ni, 2] - ray2.data[ni, 2]) /
+                       max(ray1.data[ni, 2], ray2.data[ni, 2]),  # pct. cross-track diff.
+                       p2
+                   )
+
+        msg += '<br>%s%s%s<br>' % (p1, time.ctime(), p2)
 
         if max_diff > 0.25:
-            message = "RESULTS INDICATE PROBLEM.\n\n"
-            message += "The absolute value of percent depth difference exceeds the recommended amount (.25).\n\n"
-            message += "If test was conducted to compare 2 casts for possible\n"
-            message += "grouping into one representative cast, then\n"
-            message += "the 2 casts should NOT be grouped.\n\n"
-            message += "If test was run as part of a Data Quality Assurance for\n"
-            message += "2 simultaneous casts, then one or both of the instruments\n"
-            message += "used is functioning improperly.  Investigate further by\n"
-            message += "performing simultaneous casts of each of the instruments\n"
-            message += "with a third instrument.  Then rerun this procedure with\n"
-            message += "the 2 new pairs of casts to determine which one of the\n"
-            message += "instruments is not functioning properly.\n\n"
-            message += "If the test was run to compare an XBT cast with\n"
-            message += "the last CTD cast, then it is time to take a new CTD cast."
-            results += "COMPARE 2 FILES\n  RESULTS: PERCENT DEPTH DIFFERENCE TOO LARGE\n"
+            msg += "%s<b>RESULTS INDICATE PROBLEM.</b>%s" % (p1, p2)
+            msg += "%sThe absolute value of percent depth difference exceeds the recommended amount (.25).%s" % (p1, p2)
+            msg += "%sIf test was conducted to compare 2 casts for possible grouping into one representative%s" \
+                   % (p1, p2)
+            msg += "%scast, then the 2 casts should NOT be grouped.%s" % (p1, p2)
+            msg += "%sIf test was run as part of a Data Quality Assurance for 2 simultaneous casts, then one%s" \
+                   % (p1, p2)
+            msg += "%sor both of the instruments used is functioning improperly. Investigate further by%s" % (p1, p2)
+            msg += "%sperforming simultaneous casts of each of the instruments with a third instrument.%s" % (p1, p2)
+            msg += "%sThen rerun this procedure with the 2 new pairs of casts to determine which one of%s" % (p1, p2)
+            msg += "%sthe instruments is not functioning properly.%s" % (p1, p2)
+            msg += "%sIf the test was run to compare an XBT cast with the last CTD cast, then it is time%s" % (p1, p2)
+            msg += "%sto take a new CTD cast.%s<br>" % (p1, p2)
+
+            msg += "%s<b>RESULTS</b>: PERCENT DEPTH DIFFERENCE TOO LARGE%s" % (p1, p2)
 
         else:
-            message = "RESULTS OK.\n\n"
-            message += "Percent depth difference is within recommended bounds."
-            results += "COMPARE 2 FILES\n  RESULTS: PERCENT DEPTH DIFFERENCE OK\n"
+            msg += "%s<b>RESULTS OK.</b>%s" % (p1, p2)
+            msg += "%sPercent depth difference is within recommended bounds.%s<br>" % (p1, p2)
 
-        return results, message, details, (max_diff, max_diff_depth), profile.meta.utc_time.strftime('%Y%m%d%H%M%S')
+            msg += "%s<b>RESULTS</b>: PERCENT DEPTH DIFFERENCE OK%s" % (p1, p2)
+
+        return msg
