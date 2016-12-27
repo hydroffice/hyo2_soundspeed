@@ -18,6 +18,7 @@ from hydroffice.soundspeedmanager.dialogs.export_single_profile_dialog import Ex
 from hydroffice.soundspeedmanager.dialogs.export_multi_profile_dialog import ExportMultiProfileDialog
 from hydroffice.soundspeedmanager.dialogs.export_profile_metadata_dialog import ExportProfileMetadataDialog
 from hydroffice.soundspeedmanager.dialogs.text_editor_dialog import TextEditorDialog
+from hydroffice.soundspeedmanager.dialogs.metadata_dialog import MetadataDialog
 
 
 class Database(AbstractWidget):
@@ -159,13 +160,20 @@ class Database(AbstractWidget):
 
         menu = QtGui.QMenu(parent=self)
         qa_menu = QtGui.QMenu('Check quality', self)
+        qa_menu.setIcon(QtGui.QIcon(os.path.join(self.media, 'qa.png')))
 
         # single selection
         if len(rows) == 1:
 
-            stats_act = QtGui.QAction("Profile stats", self, statusTip="Get some statistical info about the profile",
+            stats_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'stats.png')),
+                                      "Profile stats", self, statusTip="Get some statistical info about the profile",
                                       triggered=self.stats_profile)
             menu.addAction(stats_act)
+
+            metadata_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata_profile.png')),
+                                         "Metadata info", self, statusTip="View/edit the profile metadata",
+                                         triggered=self.metadata_profile)
+            menu.addAction(metadata_act)
 
             menu.addMenu(qa_menu)
             dqa_compare_ref_act = QtGui.QAction("DQA (with reference)", self,
@@ -178,14 +186,17 @@ class Database(AbstractWidget):
 
             menu.addSeparator()
 
-            load_act = QtGui.QAction("Load profile", self, statusTip="Load a profile", triggered=self.load_profile)
+            load_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'load_profile.png')),
+                                     "Load profile", self, statusTip="Load a profile", triggered=self.load_profile)
             menu.addAction(load_act)
 
-            export_act = QtGui.QAction("Export profile", self, statusTip="Export a single profile",
+            export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export_profile.png')),
+                                       "Export profile", self, statusTip="Export a single profile",
                                        triggered=self.export_single_profile)
             menu.addAction(export_act)
 
-            delete_act = QtGui.QAction("Delete profile", self, statusTip="Delete selected profile",
+            delete_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'delete.png')),
+                                       "Delete profile", self, statusTip="Delete selected profile",
                                        triggered=self.delete_profile)
             menu.addAction(delete_act)
 
@@ -204,11 +215,13 @@ class Database(AbstractWidget):
 
             menu.addSeparator()
 
-            export_act = QtGui.QAction("Export profiles", self, statusTip="Export multiple profiles",
+            export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export_profile.png')),
+                                       "Export profiles", self, statusTip="Export multiple profiles",
                                        triggered=self.export_multi_profile)
             menu.addAction(export_act)
 
-            delete_act = QtGui.QAction("Delete profiles", self, statusTip="Delete selected profiles",
+            delete_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'delete.png')),
+                                       "Delete profiles", self, statusTip="Delete selected profiles",
                                        triggered=self.delete_profile)
             menu.addAction(delete_act)
 
@@ -271,6 +284,37 @@ class Database(AbstractWidget):
             basename = "%s_%03d_stats" % (self.lib.current_project, pk)
             dlg = TextEditorDialog(title="Profile Statistical Info", basename=basename, body=msg,
                                    main_win=self, lib=self.lib, parent=self)
+            dlg.exec_()
+
+        # finally, we clear the just loaded data
+        self.lib.clear_data()
+        self.main_win.data_cleared()
+
+    def metadata_profile(self):
+        logger.debug("user wants view the profile metadata")
+
+        # first, we clear the current data (if any)
+        self.lib.clear_data()
+        self.main_win.data_cleared()
+
+        # check if any selection
+        rows = self.ssp_list.selectionModel().selectedRows()
+        if len(rows) != 1:
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.information(self, "Database", "Select a single profile before exporting it!")
+            return
+
+        # the primary key is the first column (= 0)
+        pk = int(self.ssp_list.item(rows[0].row(), 0).text())
+        success = self.lib.load_profile(pk, skip_atlas=True)
+        if not success:
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.warning(self, "Database", "Unable to load profile!", QtGui.QMessageBox.Ok)
+            return
+
+        msg = self.lib.profile_stats()
+        if msg is not None:
+            dlg = MetadataDialog(lib=self.lib, main_win=self.main_win, parent=self)
             dlg.exec_()
 
         # finally, we clear the just loaded data
