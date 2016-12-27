@@ -16,6 +16,7 @@ from hydroffice.soundspeedmanager.dialogs.project_switch_dialog import ProjectSw
 from hydroffice.soundspeedmanager.dialogs.import_data_dialog import ImportDataDialog
 from hydroffice.soundspeedmanager.dialogs.export_single_profile_dialog import ExportSingleProfileDialog
 from hydroffice.soundspeedmanager.dialogs.export_multi_profile_dialog import ExportMultiProfileDialog
+from hydroffice.soundspeedmanager.dialogs.plot_multi_profile_dialog import PlotMultiProfileDialog
 from hydroffice.soundspeedmanager.dialogs.export_profile_metadata_dialog import ExportProfileMetadataDialog
 from hydroffice.soundspeedmanager.dialogs.text_editor_dialog import TextEditorDialog
 from hydroffice.soundspeedmanager.dialogs.metadata_dialog import MetadataDialog
@@ -213,6 +214,11 @@ class Database(AbstractWidget):
                                                triggered=self.dqa_at_surface)
             qa_menu.addAction(dqa_at_surface_act)
 
+            plot_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'plot_comparison.png')),
+                                     "Comparison plot", self, statusTip="Plot profiles for comparison",
+                                     triggered=self.plot_comparison)
+            menu.addAction(plot_act)
+
             menu.addSeparator()
 
             export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export_profile.png')),
@@ -349,6 +355,27 @@ class Database(AbstractWidget):
         # finally, we clear the just loaded data
         self.lib.clear_data()
         self.main_win.data_cleared()
+
+    def plot_comparison(self):
+        logger.debug("user want to plot multiple profiles for comparison")
+
+        self.lib.clear_data()
+        self.main_win.data_cleared()
+
+        # check if any selection
+        rows = self.ssp_list.selectionModel().selectedRows()
+        if len(rows) < 2:
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.information(self, "Database", "Select multiple profiles before plotting them!")
+            return
+
+        pks = list()
+        for row in rows:
+            pks.append(int(self.ssp_list.item(row.row(), 0).text()))
+
+        dlg = PlotMultiProfileDialog(main_win=self.main_win, lib=self.lib, pks=pks, parent=self)
+        dlg.exec_()
+        dlg.raise_window()
 
     def export_multi_profile(self):
         logger.debug("user want to export multiple profiles")
