@@ -68,71 +68,76 @@ class Database(AbstractWidget):
         # - RIGHT COLUMN
         right_vbox = QtGui.QVBoxLayout()
         hbox.addLayout(right_vbox)
-        # -- manage button box
-        self.manage_btn_box = QtGui.QDialogButtonBox(QtCore.Qt.Vertical)
-        right_vbox.addWidget(self.manage_btn_box)
-        right_vbox.addStretch()
 
-        # --- new project
+        # -- project box
+        self.project_box = QtGui.QGroupBox("Project")
+        right_vbox.addWidget(self.project_box)
+        # --- manage button box
+        project_vbox = QtGui.QVBoxLayout()
+        self.project_box.setLayout(project_vbox)
+        self.manage_btn_box = QtGui.QDialogButtonBox(QtCore.Qt.Vertical)
+        project_vbox.addWidget(self.manage_btn_box)
+        # ---- new project
         self.btn_new_project = QtGui.QPushButton("New project")
         # noinspection PyUnresolvedReferences
         self.btn_new_project.clicked.connect(self.new_project)
         self.btn_new_project.setToolTip("Create a new project")
         self.manage_btn_box.addButton(self.btn_new_project, QtGui.QDialogButtonBox.ActionRole)
-        # --- rename project
+        # ---- rename project
         self.btn_rename_project = QtGui.QPushButton("Rename project")
         # noinspection PyUnresolvedReferences
         self.btn_rename_project.clicked.connect(self.rename_project)
         self.btn_rename_project.setToolTip("Rename the current project")
         self.manage_btn_box.addButton(self.btn_rename_project, QtGui.QDialogButtonBox.ActionRole)
-        # --- load project
+        # ---- load project
         self.btn_load_project = QtGui.QPushButton("Switch project")
         # noinspection PyUnresolvedReferences
         self.btn_load_project.clicked.connect(self.switch_project)
         self.btn_load_project.setToolTip("Switch to another existing project")
         self.manage_btn_box.addButton(self.btn_load_project, QtGui.QDialogButtonBox.ActionRole)
-        # --- import profiles
+        # ---- import data
         self.btn_import_data = QtGui.QPushButton("Import data")
         # noinspection PyUnresolvedReferences
         self.btn_import_data.clicked.connect(self.import_data)
         self.btn_import_data.setToolTip("Import data from another project")
         self.manage_btn_box.addButton(self.btn_import_data, QtGui.QDialogButtonBox.ActionRole)
-        # --- project folder
-        self.btn_project_folder = QtGui.QPushButton("Project folder")
+        # ---- project folder
+        self.btn_project_folder = QtGui.QPushButton("Open folder")
         # noinspection PyUnresolvedReferences
         self.btn_project_folder.clicked.connect(self.project_folder)
         self.btn_project_folder.setToolTip("Open the project folder")
         self.manage_btn_box.addButton(self.btn_project_folder, QtGui.QDialogButtonBox.ActionRole)
 
-        self.main_layout.addSpacing(8)
+        right_vbox.addStretch()
+        right_vbox.addStretch()
 
-        # - bottom
-        bottom_vbox = QtGui.QVBoxLayout()
-        right_vbox.addLayout(bottom_vbox)
-
-        # -- products button box
+        # -- profiles box
+        self.profiles_box = QtGui.QGroupBox("Profiles")
+        right_vbox.addWidget(self.profiles_box)
+        # --- manage button box
+        profiles_vbox = QtGui.QVBoxLayout()
+        self.profiles_box.setLayout(profiles_vbox)
         self.product_btn_box = QtGui.QDialogButtonBox(QtCore.Qt.Vertical)
-        bottom_vbox.addStretch()
-        bottom_vbox.addWidget(self.product_btn_box)
-        # --- export profiles
+        profiles_vbox.addWidget(self.product_btn_box)
+        # ---- export profiles
         btn = QtGui.QPushButton("Export profiles")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.export_profile_switch)
         btn.setToolTip("Export profile data")
         self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
-        # --- plot profiles
-        btn = QtGui.QPushButton("Plot profiles")
+        # ---- plot profiles
+        btn = QtGui.QPushButton("Make plots")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.plot_profiles)
-        btn.setToolTip("Create plots with profiles")
+        btn.setToolTip("Create plots with all the profiles")
         self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
-        # --- export metadata
+        # ---- export metadata
         btn = QtGui.QPushButton("Export info")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.export_profile_metadata)
         btn.setToolTip("Export profile locations and metadata")
         self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
-        # --- output folder
+        # ---- output folder
         btn = QtGui.QPushButton("Output folder")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.output_folder)

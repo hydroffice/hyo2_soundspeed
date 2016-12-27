@@ -973,7 +973,8 @@ class SoundSpeedLibrary(object):
     def plot_daily_db_profiles(self):
         """Plot the profile on the db by day"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
-        success = db.plot.daily_plots(output_folder=self.outputs_folder, save_fig=False)
+        success = db.plot.daily_plots(project_name=self.current_project,
+                                      output_folder=self.outputs_folder, save_fig=False)
         db.disconnect()
         return success
 
