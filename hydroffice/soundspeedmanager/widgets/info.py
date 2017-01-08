@@ -147,7 +147,8 @@ class Info(QtGui.QMainWindow):
 
         # Create the web widget and the url field
         self.web = QtWebKit.QWebView(self)
-        self.web.settings().setAttribute(QtWebKit.QWebSettings.PluginsEnabled, True)
+        # commented out since it might make the app hangs when VLC is installed
+        # self.web.settings().setAttribute(QtWebKit.QWebSettings.PluginsEnabled, True)
         self.web.page().setLinkDelegationPolicy(QtWebKit.QWebPage.DelegateExternalLinks)
         # noinspection PyUnresolvedReferences
         self.web.linkClicked.connect(self.handle_click)
