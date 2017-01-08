@@ -169,7 +169,7 @@ class ExportMultiProfileDialog(AbstractDialog):
         # actually do the export
         for pk in self._pks:
 
-            success = self.lib.load_profile(pk)
+            success = self.lib.load_profile(pk, skip_atlas=True)
             if not success:
 
                 # noinspection PyCallByClass
