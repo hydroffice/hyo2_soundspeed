@@ -217,5 +217,5 @@ def is_pydro():
         import HSTB
         return True
 
-    except Exception as e:
+    except Exception:
         return False

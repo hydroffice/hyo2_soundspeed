@@ -9,42 +9,7 @@ logger = logging.getLogger(__name__)
 
 from hydroffice.soundspeed.profile.dicts import Dicts
 from hydroffice.soundspeedsettings.widgets.widget import AbstractWidget
-
-vessel_list = [
-    "RA Rainier (ship)",
-    "R3 Rainier - Launch 2803",
-    "R4 Rainier - Launch 2801",
-    "R5 Rainier - Launch 2802",
-    "R6 Rainier - Launch 2804",
-    "TJ Thomas Jefferson (ship)",
-    "T1 Thomas Jefferson - Launch 3101",
-    "T2 Thomas Jefferson - Launch 3102",
-    "BH Bay Hydro II",
-    "N1 NRT-1  Gulf",
-    "N2 NRT-2  Atlantic",
-    "N3 NRT-3  Pacific",
-    "N4 NRT-4  Great Lakes",
-    "N5 NRT-5  New York",
-    "N6 NRT-6  San Francisco",
-    "N7 NRT-7  Middle Atlantic",
-    "FH Ferdinand R. Hassler (Ship)",
-    "FA Fairweather (Ship)",
-    "F5 Fairweather - Launch 2805",
-    "F6 Fairweather - Launch 2806",
-    "F7 Fairweather - Launch 2807",
-    "F8 Fairwaether - Launch 2808",
-    "AR MCArthur",
-    "NF Nancy Foster",
-    "HI Hi'Ialakai",
-    "GM Gloria Michelle",
-    "EX Okeanos Explorer",
-    "ZZ Other"
-]
-
-institution_list = [
-    "NOAA Office of Coast Survey",
-    "UNH CCOM/JHC"
-]
+from hydroffice.soundspeed.base.setup_db import vessel_list, institution_list
 
 
 class General(AbstractWidget):
