@@ -5,6 +5,13 @@ Requirements
 .. index:: requirements
 .. index:: dependencies
 
+.. role:: bash(code)
+   :language: bash
+
+.. note::
+    If you download the frozen application (`from the download page <https://www.hydroffice.org/soundspeed/main>`_),
+    you don't need to care about dependencies (and may just skip this section).
+
 If you decide to install the package in a Python environment, the dependencies are:
 
 * `basemap <https://github.com/matplotlib/basemap>`_
@@ -17,6 +24,10 @@ If you decide to install the package in a Python environment, the dependencies a
 * `pyseriale <https://github.com/pyserial/pyserial>`_
 * `PySide <https://github.com/PySide/PySide>`_ *(only for the application)*
 
+If you want to install the last stable version (from PyPI):
 
-If you download the frozen application (`download page <https://www.hydroffice.org/soundspeed/main>`_),
-you don't need to care about dependencies.
+* :bash:`pip install hydroffice.soundspeed`
+
+Or, if you prefer the last bleeding edge code:
+
+* :bash:`pip install https://github.com/hydroffice/hyo_soundspeed/archive/master.zip`

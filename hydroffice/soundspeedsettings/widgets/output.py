@@ -305,7 +305,7 @@ class Output(AbstractWidget):
             QtGui.QMessageBox.information(self, "Client deletion", "You need to first select the client to delete!")
             return
 
-        client_name = self.client_list.item(rows[0].row(), 1).text()
+        client_name = self.client_list.item(rows[0].row(), 0).text()
         self.db.delete_client(client_name)
         self.setup_changed()
         self.main_win.reload_settings()

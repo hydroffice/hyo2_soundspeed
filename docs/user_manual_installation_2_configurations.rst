@@ -6,7 +6,7 @@ Configurations
 Suggested configurations
 ========================
 
-.. index:: install; configurations
+.. index:: configurations
 
 Given its specific aim, *Sound Speed Manager* is usually installed to run in one of two configurations:
 
@@ -14,8 +14,11 @@ On the machine used for sound speed profile acquisition
 -------------------------------------------------------
 
 This represents a quite common choice since many of the operations accomplished in the software are typically done
-immediately after acquisition of a cast. If the machine is on the same network as the multibeam acquisition workstation,
+immediately after acquisition of a cast.
+
+If the machine is on the same network as the multibeam acquisition workstation,
 the processed profile can be directly delivered via network.
+
 When this is not possible, the package can export the processed data to files that can then be manually uploaded
 to the multibeam workstation.
 
@@ -23,26 +26,42 @@ to the multibeam workstation.
 On the multibeam acquisition workstation
 ----------------------------------------
 
-This configuration is particularly useful when it is anticipated that the software will run in Server Mode.
-In fact, it is important that multibeam watch standers are able to monitor the server and to disable it
+This configuration is particularly useful when it is anticipated that the software will run in *Server Mode*.
+In fact, it is important that multibeam watch standers are able to monitor the server, and to disable it
 in the event that a measured profile is to be uploaded.
 
 
 Upgrading
 =========
 
-You will need to migrate specific configuration settings from your previous installation over
-into the new configuration file. The migration of configuration settings is currently done manually.
+.. index:: upgrade;
+
+It is possible to copy configuration settings from a previous installation.
+When a new installation is performed, the user is prompted to select existing configuration settings (if any).
+
+.. figure:: ./_static/existing_setup.png
+    :width: 470px
+    :align: center
+    :height: 122px
+    :alt: alternate text
+    :figclass: align-center
+
+    Select the desired setup and click on the *OK* button to copy an existing setup.
 
 Space requirements
 ==================
 
-Approximately 500MB of additional disk space is required for the WOA09 db set optionally required
+.. index:: WOA; WOA09
+
+Approximately 500 MB of additional disk space is required for the WOA09 db set optionally required
 (but warmly suggested) by this hydro-package. If not available, the package will attempt to download it.
+
 Alternatively, it is also possible to manually download, unpack the WOA09 data set, and modify the configuration file
 to point to the correct path (see :ref:`package_configuration`).
 
-The WOA13 db provides a much better spatial resolution, but this comes with a much larger data size.
+.. index:: WOA; WOA13
+
+Among other improvements, the WOA13 db provides a much better spatial resolution, but this comes with a much larger data size (~18 GB).
 
 .. note:: If a previous version of the application was installed, *Sound Speed Manager* will try to localize already installed
    WOA databases (WOA09 or WOA13).
@@ -52,11 +71,27 @@ The WOA13 db provides a much better spatial resolution, but this comes with a mu
 Package configuration
 =====================
 
-In the *Sound Speed* data folder, you can find a configuration file: ``settings.db``.
+.. index:: configurations
+
+In the *Sound Speed* release data folder, you can find a configuration file: ``setup.db``.
+
 This SQLite database file has to be modified to reflect the chosen software deployment and environment-specific
 configuration settings (e.g., the SIS IP address and ports).
 
-Use the *Settings* tab to modify the available configuration options.
+Use the *Setup* tab to view the available configuration options in the database.
+If you want to modify them, click on the 'Lock/Unlock' button.
+
+.. figure:: ./_static/setup_tab.png
+    :width: 600px
+    :align: center
+    :height: 412px
+    :alt: alternate text
+    :figclass: align-center
+
+    You will be asked to confirm that you want to modify the setup.
+
+
+.. index:: RTOFS
 
 .. warning:: If you want to use the RTOFS data, Internet (and the port 9090) must be accessible from the machine in use.
 
@@ -64,7 +99,7 @@ Use the *Settings* tab to modify the available configuration options.
 Sound Speed Manager - SIS interaction
 =====================================
 
-.. index:: interaction;
+.. index:: SIS
 
 In order to automatically interact with *Kongsberg SIS*, some initial configuration are required on the *SIS* side
 to make it to broadcast a specific subset of datagrams that can then be interpreted by the *SSP* hydro-package
@@ -79,7 +114,7 @@ to make it to broadcast a specific subset of datagrams that can then be interpre
   * The surface sound speed (used in beam forming and steering) and the transducer draft (both used when augmenting SSPs with the measured surface sound speed value).
   * The depth (to estimate the approximate water depth). This is used in the sound speed, temperature and salinity plots to help the user appreciate the minimal depth to which the profiles should be extended.
 
-*Kongsberg SIS* can be configured to broadcast datagrams in different ways:
+*Kongsberg SIS* can be configured to broadcast datagrams in three different ways as discussed in the next sections.
 
 .. _method_1:
 
@@ -179,7 +214,7 @@ The setup of this method is summarized as follows:
 Sound Speed Manager side
 ------------------------
 
-The parameters, present in *settings.db*, can be modified using the *Settings* tab.
+The parameters, present in *setup.db*, can be modified using the *Setup* tab.
 
 .. figure:: ./_static/settings0.png
     :width: 600px
@@ -188,9 +223,9 @@ The parameters, present in *settings.db*, can be modified using the *Settings* t
     :alt: Settings tab
     :figclass: align-center
 
-    The *Settings* tab, in red, can be used to inspect/modify the package settings.
+    The *Setup* tab, in red, can be used to inspect/modify the package settings.
 
-By default, the *Settings* tab is in read-only mode. To be able to modify the package settings, you need to unlock it.
+By default, the *Setup* tab is in read-only mode. To be able to modify the package settings, you need to unlock it.
 
 .. figure:: ./_static/settings1.png
     :width: 600px
@@ -199,10 +234,10 @@ By default, the *Settings* tab is in read-only mode. To be able to modify the pa
     :alt: unlocking the Settings tab
     :figclass: align-center
 
-    The *Settings* tab must be unlocked for settings modifications.
+    The *Setup* tab must be unlocked for settings modifications.
 
-Once unlocked, you can add a settings profile, or you may want to modify one of the existing ones. For the interaction
-with *SIS*, you need to access the *Output* sub-tab and the *SIS* sub-tab.
+Once unlocked, you can add a new setup, or you may want to modify one of the existing ones. For the interaction
+with *SIS*, you need to access the *Output* sub-tab and the *Listeners* sub-tab.
 
 In the *Output* sub-tab, you have to add a client to the *client list* you need to specify:
 
@@ -220,7 +255,7 @@ In the *Output* sub-tab, you have to add a client to the *client list* you need 
 
     The *Client list*, in red, is used to add the *SIS* client information.
 
-In the *SIS* sub-tab, The *List port* entry provides the port to which *SIS* has been configured to broadcast datagrams.
+In the *Listeners* sub-tab, the *Listen port* entry, in red, provides the port to which *SIS* has been configured to broadcast datagrams.
 This should match the port address selected in the previous methods. For instance, ``16103``.
 
 .. figure:: ./_static/settings3.png
@@ -235,5 +270,12 @@ This should match the port address selected in the previous methods. For instanc
 If both *SIS* and *Sound Speed Manager* sides have been properly configured, *Sound Speed Manager* will show (in the right side
 of the lower window statusbar) the date, geographic position, surface sound speed and average depth (when *SIS* is pinging).
 
-.. note:: The surface sound speed and depth will only update if the echosounder is pinging (since the surface sound speed information can only be extracted when *SSP* receives the depth datagram).
+.. figure:: ./_static/settings4.png
+    :width: 600px
+    :align: center
+    :height: 440px
+    :alt: SIS pinging
+    :figclass: align-center
+
+.. note:: The surface sound speed and depth will only update if the echosounder is pinging (since the surface sound speed information can only be extracted when *Sound Speed Manager* receives the depth datagram).
 
