@@ -141,10 +141,10 @@ class TextEditorDialog(AbstractDialog):
         append = False
         if os.path.exists(selection):
 
-            msg = "Do you want to append to the existing file? Select 'No' to overwrite."
+            msg = "Do you want to append to the existing file?"
             # noinspection PyCallByClass
             ret = QtGui.QMessageBox.warning(self, "File exists", msg,
-                                            QtGui.QMessageBox.Yes|QtGui.QMessageBox.No|QtGui.QMessageBox.Cancel)
+                                            QtGui.QMessageBox.Yes|QtGui.QMessageBox.Cancel)
             if ret == QtGui.QMessageBox.Cancel:
                 return
             elif ret == QtGui.QMessageBox.Yes:
