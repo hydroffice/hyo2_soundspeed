@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 from hydroffice.soundspeedmanager import __version__ as ssm_version
 from hydroffice.soundspeedmanager import __doc__ as ssm_name
 from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
+from hydroffice.soundspeed.base.helper import is_pydro
 from hydroffice.soundspeedmanager.qt_progress import QtProgress
 from hydroffice.soundspeedmanager.qt_callbacks import QtCallbacks
 from hydroffice.soundspeedmanager.widgets.editor import Editor
@@ -136,7 +137,10 @@ class MainWin(QtGui.QMainWindow):
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'settings.png')), "")
         self.tabs.setTabToolTip(idx, "Setup")
         # info
-        self.tab_info = Info(default_url='https://www.hydroffice.org/soundspeed/2017_0_0rc2')
+        versioned_url = 'https://www.hydroffice.org/soundspeed/%s' % (ssm_version.replace('.', '_'), )
+        if is_pydro():
+            versioned_url += "_pydro"
+        self.tab_info = Info(default_url=versioned_url)
         idx = self.tabs.insertTab(6, self.tab_info,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'info.png')), "")
         self.tabs.setTabToolTip(idx, "Info")

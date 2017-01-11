@@ -210,3 +210,12 @@ def python_path():
         return sys.real_prefix
 
     return sys.prefix
+
+
+def is_pydro():
+    try:
+        import HSTB
+        return True
+
+    except Exception as e:
+        return False

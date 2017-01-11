@@ -11,7 +11,7 @@ from PySide import QtGui
 from hydroffice.soundspeedmanager.qt_progress import QtProgress
 
 
-class TestStormFixQtProgress(unittest.TestCase):
+class TestSoundSpeedManagerQtProgress(unittest.TestCase):
 
     app = QtGui.QApplication([])
 
@@ -175,5 +175,5 @@ class TestStormFixQtProgress(unittest.TestCase):
 
 def suite():
     s = unittest.TestSuite()
-    s.addTests(unittest.TestLoader().loadTestsFromTestCase(TestStormFixQtProgress))
+    s.addTests(unittest.TestLoader().loadTestsFromTestCase(TestSoundSpeedManagerQtProgress))
     return s

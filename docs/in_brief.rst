@@ -26,7 +26,7 @@ speed profiles (SSP) for underwater acoustic systems:
 * *SSP Manager*, an application developed at the `Center for Coastal and Ocean Mapping (CCOM, UNH) <http://ccom.unh.edu/>`_
   as part of the HydrOffice framework.
 
-In the integration of all these implementations to the current hydro-package several improvements have been
+In the integration of all these implementations to the current package several improvements have been
 introduced to enhance code maintainability, as well as to also to support Python 3 (from the original Python 2 only
 implementation) and to store the collected data for further processing and analysis.
 
@@ -66,6 +66,7 @@ Currently implemented features
   * Idronaut (.txt)
   * ISS Fugro (.svp, .v*, .d*)
   * Kongsberg Maritime (.asvp)
+  * SAIV (.txt)
   * Seabird (.cnv)
   * Sippican XBT, XSV, and XCTD (.EDF)
   * Sonardyne (.pro)
@@ -77,6 +78,7 @@ Currently implemented features
 
 * Network reception of data from:
 
+  * Kongsberg Maritime SIS
   * Sippican systems
   * Moving Vessel Profiler (MVP) systems
 
@@ -89,7 +91,7 @@ Currently implemented features
   * Vertical extrapolation of measured profiles
   * Creation of synthetic sound speed profiles from the model of choice
 
-* Augmentation of sound speed profile surface layer with measured surface sound speed (from Kongsberg SIS only)
+* Augmentation of sound speed profile surface layer with measured surface sound speed (from Kongsberg SIS or manually)
 
 * Designation of a reference profile, for example from a deep CTD, for use in tasks such as:
 
@@ -106,6 +108,7 @@ Currently implemented features
   * IXBLUE (.txt)
   * Kongsberg Maritime (.asvp)
   * NCEI (.nc)
+  * QPS (.bsvp)
   * Sonardyne (.pro)
   * University of New Brunswick (.unb)
 
@@ -120,4 +123,4 @@ Currently implemented features
 
 .. index:: transmission; supported protocols
 
-* Persistent storage of collected SSP data
+* Persistent storage of collected SSP data in a SQLite database

@@ -72,6 +72,9 @@ class TestSoundSpeedBaseHelper(unittest.TestCase):
     def test_python_path(self):
         self.assertTrue(os.path.exists(helper.python_path()))
 
+    def test_is_pydro(self):
+        self.assertEqual(type(helper.is_pydro()), bool)
+
 
 def suite():
     s = unittest.TestSuite()
