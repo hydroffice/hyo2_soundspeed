@@ -31,9 +31,17 @@ class GdalAux(object):
     }
 
     def __init__(self):
-        logger.debug("gdal version: %s" % gdal.VersionInfo(b'VERSION_NUM'))
+        logger.debug("gdal 2: %s [%s]" % (self.is_gdal_2(), self.current_gdal_version()))
         if not self.error_loaded:
             self.check_gdal_data()
+
+    @classmethod
+    def current_gdal_version(cls):
+        return int(gdal.VersionInfo(b'VERSION_NUM'))
+
+    @classmethod
+    def is_gdal_2(cls):
+        return cls.current_gdal_version() >= 2000000
 
     @classmethod
     def get_ogr_driver(cls, ogr_format):
@@ -54,6 +62,7 @@ class GdalAux(object):
     def create_ogr_data_source(cls, ogr_format, output_path, epsg=4326):
         drv = cls.get_ogr_driver(ogr_format)
         output_file = output_path + cls.ogr_exts[drv.GetName()]
+        logger.debug("output: %s" % output_file)
         if os.path.exists(output_file):
             drv.DeleteDataSource(output_file)
 
@@ -73,7 +82,7 @@ class GdalAux(object):
         spatial_ref.ImportFromEPSG(epsg)
 
         spatial_ref.MorphToESRI()
-        fid = open(output_path + '.lib', 'w')
+        fid = open(output_path + '.prj', 'w')
         fid.write(spatial_ref.ExportToWkt())
         fid.close()
 
