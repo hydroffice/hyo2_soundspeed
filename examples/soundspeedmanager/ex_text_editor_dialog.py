@@ -34,7 +34,7 @@ def main():
     dlg = TextEditorDialog(title="Text", basename="test", body=body, main_win=mw, lib=lib, parent=None)
     dlg.exec_()
 
-    app.exec_()
+    # app.exec_()
 
 if __name__ == "__main__":
     main()

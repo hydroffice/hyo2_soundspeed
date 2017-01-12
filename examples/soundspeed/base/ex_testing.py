@@ -33,6 +33,30 @@ def main():
     print("test output folder: %s" % testing.output_data_folder())
     # helper.explore_folder(testing.output_data_folder())
 
+    # - aux methods
+    print("\npairing readers and folders (no filters):")
+    pair_dict = testing.pair_readers_and_folders(folders=testing.input_data_sub_folders())
+    for fmt in pair_dict:
+        print("- %s: %s" % (fmt, pair_dict[fmt]))
+
+    print("\npairing readers and folders (with valeport filter):")
+    filters = ["valeport", ]
+    pair_dict = testing.pair_readers_and_folders(folders=testing.input_data_sub_folders(),
+                                                 inclusive_filters=filters)
+    for fmt in pair_dict:
+        print("- %s: %s" % (fmt, pair_dict[fmt]))
+
+    print("\ngetting dict of files and readers:")
+    files_dict = testing.dict_test_files(data_folder=testing.input_data_folder(),
+                                         pairs=pair_dict)
+    for fid in files_dict:
+        print("- %s: %s" % (fid, files_dict[fid]))
+
+    print("\ngetting dict of input files and readers:")
+    input_dict = testing.input_dict_test_files()
+    for fid in input_dict:
+        print("- %s: %s" % (fid, input_dict[fid]))
+
 
 if __name__ == "__main__":
     main()

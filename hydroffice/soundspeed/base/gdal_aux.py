@@ -64,7 +64,7 @@ class GdalAux(object):
         output_file = output_path + cls.ogr_exts[drv.GetName()]
         logger.debug("output: %s" % output_file)
         if os.path.exists(output_file):
-            drv.DeleteDataSource(output_file)
+            os.remove(output_file)
 
         ds = drv.CreateDataSource(output_file)
         if ds is None:

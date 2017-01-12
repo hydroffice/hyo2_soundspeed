@@ -67,6 +67,3 @@ def suite():
     s = unittest.TestSuite()
     s.addTests(unittest.TestLoader().loadTestsFromTestCase(TestSoundSpeedDb))
     return s
-
-# if __name__ == '__main__':
-#    unittest.main()

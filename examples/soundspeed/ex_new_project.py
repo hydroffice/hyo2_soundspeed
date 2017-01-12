@@ -1,8 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import time
-from PySide import QtGui
-
 # logging settings
 import logging
 logger = logging.getLogger()
@@ -13,25 +10,24 @@ ch_formatter = logging.Formatter('%(levelname)-9s %(name)s.%(funcName)s:%(lineno
 ch.setFormatter(ch_formatter)
 logger.addHandler(ch)
 
-from hydroffice.soundspeedmanager.qt_progress import QtProgress
+from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
 
-app = QtGui.QApplication([])
 
-widget = QtGui.QWidget()
-widget.show()
+def main():
+    # initialize the library
+    lib = SoundSpeedLibrary()
 
-progress = QtProgress(parent=widget)
+    prj_list = lib.list_projects()
+    print("projects: %s" % len(prj_list))
+    for prj in prj_list:
+        print('- %s' % prj)
 
-progress.start(title='Test Bar', text='Doing stuff')
+    lib.setup.current_project = "test"
 
-time.sleep(1.)
+    ssp_list = lib.db_list_profiles()
+    print('profiles in db: %d' % len(ssp_list))
 
-progress.update(value=30, text='Updating')
+    lib.close()
 
-time.sleep(1.)
-
-print("canceled? %s" % progress.canceled)
-
-progress.end()
-
-app.exec_()
+if __name__ == "__main__":
+    main()

@@ -60,6 +60,8 @@ class TestSoundSpeedGdalAux(unittest.TestCase):
 
     @unittest.skipUnless(is_windows, "only on Windows")
     def test_use_of_Gdal_aux(self):
+        from hydroffice.soundspeed.base.testing import output_data_folder
+
         aux = GdalAux()
 
         for fmt in aux.ogr_formats:
@@ -69,8 +71,7 @@ class TestSoundSpeedGdalAux(unittest.TestCase):
             self.assertEqual(drv.name, fmt)
 
             # create a file
-            data_folder = os.path.abspath(os.curdir)
-            output_path = os.path.join(data_folder, 'dummy')
+            output_path = os.path.join(output_data_folder(), 'test_gdal_aux')
             src = aux.create_ogr_data_source(ogr_format=GdalAux.ogr_formats[fmt], output_path=output_path)
             self.assertNotEqual(src, None)
 
