@@ -9,8 +9,10 @@ class TestSoundSpeedNewProject(unittest.TestCase):
         from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
 
         lib = SoundSpeedLibrary()
-        prj_list = lib.list_projects()
+        ssp_list = lib.db_list_profiles()
+        self.assertGreaterEqual(len(ssp_list), 0)
 
+        prj_list = lib.list_projects()
         self.assertGreaterEqual(len(prj_list), 1)
 
         lib.close()
@@ -19,10 +21,20 @@ class TestSoundSpeedNewProject(unittest.TestCase):
         from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
 
         lib = SoundSpeedLibrary()
-        lib.setup.current_project = "test"
-        prj_list = lib.list_projects()
+        ssp_list = lib.db_list_profiles()
+        self.assertGreaterEqual(len(ssp_list), 0)
 
+        lib.current_project = "zzz"
+        ssp_list = lib.db_list_profiles()
+        self.assertGreaterEqual(len(ssp_list), 0)
+
+        prj_list = lib.list_projects()
         self.assertGreaterEqual(len(prj_list), 2)
+
+        lib.current_project = prj_list[0]
+        lib.remove_project("zzz")
+        prj_list = lib.list_projects()
+        self.assertGreaterEqual(len(prj_list), 1)
 
         lib.close()
 

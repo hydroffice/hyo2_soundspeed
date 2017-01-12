@@ -660,6 +660,16 @@ class SoundSpeedLibrary(object):
         self.save_settings_to_db()
         self.reload_settings_from_db()
 
+    def remove_project(self, name):
+        if name == self.current_project:
+            raise RuntimeError("unable to remove the current project: %s" % self.current_project)
+
+        db_path = os.path.join(self.projects_folder, name + ".db")
+        if not os.path.exists(db_path):
+            raise RuntimeError("unable to locate the project to delete: %s" % db_path)
+
+        os.remove(db_path)
+
     def list_projects(self):
         """Return a list with all the available projects"""
         prj_list = list()

@@ -22,7 +22,7 @@ def main():
     for prj in prj_list:
         print('- %s' % prj)
 
-    lib.setup.current_project = "test"
+    lib.current_project = "test2"
 
     ssp_list = lib.db_list_profiles()
     print('profiles in db: %d' % len(ssp_list))
