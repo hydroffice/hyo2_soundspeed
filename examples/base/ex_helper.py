@@ -1,5 +1,3 @@
-from hydroffice.soundspeed.logging.sqlitelogging import SqliteLogging
-
 import os
 import logging
 logger = logging.getLogger()

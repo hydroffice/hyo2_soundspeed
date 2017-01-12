@@ -15,6 +15,15 @@ Given that transit data are usually a lower priority, this mode supports continu
 that are refraction corrected, using the mean temperature and salinity profiles provided by oceanographic models.
 This mode should not be used if SSPs are going to be collected on a regular basis.
 
+.. figure:: ./_static/server_tab0.png
+    :width: 600px
+    :align: center
+    :height: 460px
+    :alt: server tab
+    :figclass: align-center
+
+    The *Synthetic Profile Server* tab provides the controls to manage the *Server* mode.
+
 A preliminary requirement to run the *Server Mode* is that position and surface sound speed are received from *SIS*.
 This can be checked by looking in the status bar.
 

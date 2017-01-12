@@ -23,10 +23,6 @@ Just once for each project, you can create the documentation template as follows
 Generate the documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To update the API documentation:
-
-* ``sphinx-apidoc -f -o docs/api hydroffice``
-
 To create the html
 
 * ``make html``

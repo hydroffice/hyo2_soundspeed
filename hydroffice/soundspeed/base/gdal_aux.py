@@ -158,6 +158,17 @@ class GdalAux(object):
             cls.push_gdal_error_handler()
             return
 
+        # anaconda specific
+        gdal_data_path3 = os.path.join(python_path(), 'Library', 'share', 'gdal')
+        gcs_csv_path3 = os.path.join(gdal_data_path3, 'gcs.csv')
+        if os.path.exists(gcs_csv_path3):
+
+            gdal.SetConfigOption(b'GDAL_DATA', gdal_data_path3.encode('utf-8'))
+            logger.debug("resulting GDAL_DATA = %s" % gdal.GetConfigOption(b'GDAL_DATA'))
+            cls.data_fixed = True
+            cls.push_gdal_error_handler()
+            return
+
         # TODO: add more cases to find GDAL_DATA
 
         raise RuntimeError("Unable to locate GDAL data at %s or %s" % (gdal_data_path1, gdal_data_path2))

@@ -50,7 +50,7 @@ Synthetic cast values derived from atlases
 ==========================================
 
 The cast extrapolation algorithm vertically extends temperature and salinity profiles as deep as possible
-using the estimates immediately local to the area of the cast in either WOA09 or RTOFS.
+using the estimates immediately local to the area of the cast in either WOA or RTOFS.
 
 
 WOA09-based profiles

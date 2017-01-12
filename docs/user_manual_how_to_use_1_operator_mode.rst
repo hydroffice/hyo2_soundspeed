@@ -7,6 +7,9 @@ Operator Mode
 .. index::
    single: mode; operator
 
+
+.. _data_import:
+
 Data import
 ===========
 
@@ -25,9 +28,9 @@ From the *Editor* tab, select *Import data* and choose the desired import file t
     Click on the *Import data* button in the *Editor* tab to start the import process.
 
 .. figure:: ./_static/editor_tab1.png
-    :width: 160px
+    :width: 300px
     :align: center
-    :height: 380px
+    :height: 300px
     :alt: alternate text
     :figclass: align-center
 
@@ -39,7 +42,7 @@ for *Sippican* files).
 .. figure:: ./_static/editor_tab2.png
     :width: 500px
     :align: center
-    :height: 360px
+    :height: 420px
     :alt: alternate text
     :figclass: align-center
 
@@ -51,9 +54,9 @@ After the selection of the desired file, the window shows panels with the sound 
 salinity profiles drawn in solid blue (left to right, respectively, in the following figure).
 
 .. figure:: ./_static/editor_tab3.png
-    :width: 600px
+    :width: 640px
     :align: center
-    :height: 460px
+    :height: 490px
     :alt: alternate text
     :figclass: align-center
 
@@ -91,9 +94,9 @@ Zooming back out to the full view is accomplished by choosing *Reset view* from 
 The *Hide flagged* option in the plotting toolbar will toggle the display of flagged points.
 
 .. figure:: ./_static/editor_tab4.png
-    :width: 600px
+    :width: 640px
     :align: center
-    :height: 400px
+    :height: 490px
     :alt: data editing
     :figclass: align-center
 
@@ -127,7 +130,7 @@ with each of the temperature observations in the measured XBT profile.
 .. figure:: ./_static/editor_tab5.png
     :width: 600px
     :align: center
-    :height: 100px
+    :height: 90px
     :alt: data editing
     :figclass: align-center
 
@@ -149,7 +152,7 @@ when an XSV cast is loaded).
 .. figure:: ./_static/editor_tab6.png
     :width: 600px
     :align: center
-    :height: 100px
+    :height: 90px
     :alt: data editing
     :figclass: align-center
 
@@ -186,7 +189,7 @@ This operation can be achieved by selecting *Retrieve Surface Sound Speed* from 
 .. figure:: ./_static/editor_tab7.png
     :width: 600px
     :align: center
-    :height: 400px
+    :height: 90px
     :alt: data editing
     :figclass: align-center
 
@@ -201,7 +204,8 @@ It should be noted that this is done internally in SIS during their ray tracing 
 regardless of this external processing stage: “transducer depth sound speed is used as the initial entry
 in the sound speed profile used in the ray tracing calculations” (*Kongsberg, 2012*).
 
-Using this package method, keeps the system from warning against discrepancies based on
+Using this package method, keeps the system from warning against discrepancies based on:
+
 * The uncertainty in XBT temperature measurements (± 0.1°C, roughly equivalent to ± 0.4 m/s)
 * Inadequate choice of salinity in the Sippican acquisition system
 * Deviations of true salinity from the mean surface salinity in the WOA/RTOFS.
@@ -304,8 +308,16 @@ In particular, each profile may contain three types of stored data:
 2. The processed samples (with flags to identify the various different source of data).
 3. An optional SIS profile (that represents the result of the thinning process required by *Kongsberg SIS*).
 
-Additional functions to export in several formats (csv, kml, shapefile) and to plot the metadata and the spatial
-information for the stored SSP data set.
+Once stored in the database, the *Database* tab provides analysis functions and tools to manage the collected profiles.
+
+.. figure:: ./_static/database_tab0.png
+    :width: 600px
+    :align: center
+    :height: 400px
+    :alt: data storage
+    :figclass: align-center
+
+For instance, it is possible to export the profile metadata in several geographic formats (csv, kml, shapefile).
 
 .. index:: csv
 .. index:: kml
@@ -316,7 +328,7 @@ information for the stored SSP data set.
 .. figure:: ./_static/kml_export.png
     :width: 600px
     :align: center
-    :height: 400px
+    :height: 500px
     :alt: alternate text
     :figclass: align-center
 
@@ -355,16 +367,16 @@ Create a WOA or RTOFS profile
 .. index:: RTOFS, synthetic profile
 
 It is possible to upload a single WOA or RTOFS profile to *SIS*.
-This can be done by first select WOA09 atlas or RTOFS atlas under the *Retrieve data* in the *Editor* toolbar.
+This can be done by first select WOA09 atlas or RTOFS atlas under the *Input data* button in the *Editor* toolbar.
 
 .. figure:: ./_static/editor_tab12.png
-    :width: 600px
+    :width: 360px
     :align: center
-    :height: 100px
+    :height: 360px
     :alt: data storage
     :figclass: align-center
 
-    The *Retrieve data* button in the *Editor* toolbar.
+    The *Input data* button in the *Editor* toolbar.
 
 This will trigger a series of question dialogs that will determine use of the SIS date/position input
 for the query position or an user provided input. After that, a surface sound speed can be applied,
@@ -379,7 +391,7 @@ Request profile from SIS
 
 .. index:: SIS, profile
 
-The *Retrieve data* in the *Editor* toolbar can also be used to retrieve the cast currently being used by *SIS* and
+The *Input data* in the *Editor* toolbar can also be used to retrieve the cast currently being used by *SIS* and
 use it to create a new profile.
 
 This is only possible if the package is receiving data transmissions from *SIS*.
@@ -408,7 +420,7 @@ There are several scenarios where a CTD profile can be used as a reference cast 
 * To augment SVP/XSV casts with temperature and salinity profiles to improve seafloor backscatter attenuation corrections
 * Since CTD cast typically sample much deeper than most XBT probes, to provide an improved vertical extrapolation to the XBT cast.
 
-To establish a reference cast, the desired cast is imported using the same mechanism described in *Data import*.
+To establish a reference cast, the desired cast is imported using the same mechanism described in :ref:`data_import`.
 After that the profile is verified, edited and perhaps extended further in depth using an oceanographic database,
 it is set as the reference profile by selecting "Reference cast" in the *Editor* toolbar.
 
@@ -421,28 +433,37 @@ it is set as the reference profile by selecting "Reference cast" in the *Editor*
 
     The *Reference cast* button in the *Editor* toolbar.
 
-.. Once a profile is set as the reference cast, the reference profile is drawn in yellow.
-    This cast is retained in memory as the currently loaded cast to allow for additional operations,
-    such as exporting or transmission to a sounder. The reference profile can be cleared from memory at any time
-    via the *Clear reference cast* option under the *Tools* menu.
-    Further extensions and augmentations will then use WOA/RTOFS.
+Once a profile is set as the reference cast, the reference profile is drawn in orange.
+This cast is retained in memory as the currently loaded cast to allow for additional operations,
+such as exporting or transmission to a sounder. The reference profile can be cleared from memory at any time
+via the *Clear reference cast* option under the *Reference cast* menu.
+Further extensions and augmentations will then use WOA/RTOFS.
 
-.. The reference cast can be reimported into memory by choosing *Edit reference cast* from the *Tools* menu.
-    This will load a copy of the reference cast into memory for further manipulation.
-    If desired, the edited version can then be set as the new reference cast and will replace the previous version.
-    Prior to setting a cast as the reference cast, it is advisable to export it such that future sessions
-    do not need to repeat any reference cast processing. To do this, choose Export from the File menu,
-    and select the .UNB format (since it is a format that can be both exported and imported).
+.. figure:: ./_static/editor_tab14.png
+    :width: 300px
+    :align: center
+    :height: 160px
+    :alt: reference cast
+    :figclass: align-center
+
+The reference cast can be reimported into memory by choosing *Reload reference cast as current profile* from the *Reference cast* menu.
+This will load a copy of the reference cast into memory for further manipulation.
+If desired, the edited version can then be set as the new reference cast and will replace the previous version.
+Prior to setting a cast as the reference cast, it is advisable to store it in database such that future sessions
+do not need to repeat any reference cast processing.
 
 Refraction monitor
 ------------------
+
+.. note::
+    This plugin is currently disabled.
 
 An experimental feature has been set up to allow the user to establish the impact
 of their currently loaded sound speed profile on the refraction correction by plotting swath data
 with the new sound speed profile applied prior to sending the profile to the multibeam echosounder.
 
-.. This provides a preview of the effect of the new sound speed profile allowing appropriate action
-    if the results are not as expected without introducing artifacts into the multibeam data stream.
+This provides a preview of the effect of the new sound speed profile allowing appropriate action
+if the results are not as expected without introducing artifacts into the multibeam data stream.
 
 .. Figure – Refraction monitor showing the effects of new sound speed profile before its application, as well as the application of a bias using the Profile Correction slider (at the bottom)
 
@@ -471,11 +492,11 @@ Network data reception
 The package is configurable to listen on specified ports for UDP input of sound speed cast data.
 Currently supported systems are *MVP* and *Sippican*. See :ref:`app_b_connection_settings` for more on how
 to configure these systems. The port numbers associated with various data sources can be changed
-in the ``settings.db`` file.
+in the ``setup.db`` file using the *Setup* tab.
 
 Upon reception of a network cast, the display panels will be colored red to indicate that operator intervention
 is required in order to further process the data and deliver it to the multibeam acquisition system.
-Once the cast has been processed and delivered, the panel color-coding will return to the normal white background.
+Once the cast has been processed and delivered, the statusbar color-coding will return to the normal background.
 
 If the *Server mode* happened to have been running at the moment of reception, it will be stopped and
 the received cast will be displayed as described above.

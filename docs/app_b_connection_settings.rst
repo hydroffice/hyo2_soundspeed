@@ -9,6 +9,7 @@ Settings for data reception
 
 Moving Vessel Profiler
 ----------------------
+
 The MVP controller interface can be configured to transmit data via UDP using a variety of data format
 and transmission protocols (:ref:`mvp_configuration_fig`).
 
@@ -33,10 +34,11 @@ The file format can be adjusted to accommodate a CTD with the ``S12`` format or 
 with the ``CALC`` or ``ASVP`` formats (Box C).
 
 Note that the transmission protocol and file format must be configured in both the MVP controller interface and
-in the *SSP* package configuration file.
+in the *Listeners* sub-tab of the *Setup* tab.
+
 Boxes D and E refer to raw instrument transmission settings that are configurable for future use.
 Since casts received from an MVP system do not have a filename embedded in the data stream,
-the *SSP* package will name casts received using the following convention: ``YYYYMMDD_HHMMSS_MVP``.
+the *Sound Speed* package will name casts received using the following convention: ``YYYYMMDD_HHMMSS_MVP``.
 The date/time stamp embedded in the filename will be the time of the cast.
 
 
@@ -49,20 +51,20 @@ to log data from various systems. The expected data format is the Sippican nativ
 
 Note that a single Sippican data file can sometimes exceed the maximum buffer size for UDP packet transmissions.
 If software is written to transmit Sippican data files via UDP, this limitation should be kept in mind.
-The SSP package currently only accepts transfer of a single UDP packet thus transmission software may need
+The *Sound Speed* package currently only accepts transfer of a single UDP packet thus transmission software may need
 to reduce the data by thinning the profile. Received profiles will use the filename embedded in the .EDF.
 
 
 Settings for data transmission
 ==============================
 
-The *SSP* package can be configured to transmit data to a number of systems by selecting the *Send Profile* option
-under the *Tools* menu.
+The *Sound Speed* package can be configured to transmit data to a number of systems by selecting the *Transmit data* button
+in the *Editor* tab.
 
-For installations with multiple clients, the *SSP* package will deliver the cast sequentially to all clients.
+For installations with multiple clients, the *Sound Speed* package will deliver the cast sequentially to all clients.
 Failure on transmission to one client will not interfere with other clients though it will slow down
 the transmission sequence through all clients for any clients who are timing out on confirmation of reception
-as the *SSP* package will wait up to 1 minute for confirmation.
+as the *Sound Speed* package will wait up to the 'RX timeout' value defined in the setup (default: 20 seconds) for confirmation.
 
 .. note:: Server mode will only currently work with the *SIS* transmission protocol.
 
@@ -83,7 +85,7 @@ The following indications are useful for monitoring reception of sound speed pro
 Although *SIS* always will allow incoming sound speed transmissions, it has several restrictions
 that must be observed in order for the data to be accepted (see *Kongsberg manual*).
 As this particular transmission protocol is used by other acquisition systems, it is worth describing in detail
-what the SSP package does to the cast data to satisfy the input criteria for *SIS*.
+what the *Sound Speed* package does to the cast data to satisfy the input criteria for *SIS*.
 
 The transmission procedure used by the SSP package will format the temperature and salinity profiles
 into the Kongsberg Maritime format. Since the WOA09/RTOFS grids only extend to a maximum depth of 5,500 m,
@@ -97,25 +99,25 @@ until the number of points in the profile falls below the maximum allowed by *SI
 
 By default, the cast header is formatted to instruct *SIS* to accept the profile for immediate application
 without launching the *Kongsberg SVP Editor*. This behavior can be changed through the configuration file
-by setting ``sis_auto_apply_manual_casts=False``. In this case, *SIS* will accept the cast
+by setting *Auto apply profile* to *False* (in the *Setup* tab). In this case, *SIS* will accept the cast
 but will then launch its own editor interface and user interaction will be required on the *SIS* computer
 in order to have the cast applied to the multibeam system.
 
 Once the cast has been prepared for transmission, it is sent to *SIS* via UDP transmission over the network.
 If *SIS* receives the profile and accepts it, it will rebroadcast the SVP datagram.
-The SSP package waits for this rebroadcast to ensure reception of the cast. The profile that was re-broadcasted
+The *Sound Speed* package waits for this rebroadcast to ensure reception of the cast. The profile that was re-broadcasted
 from SIS is compared against that which was sent. If they match, then the transmission is considered successful.
 If there is a discrepancy, or if no rebroadcast profile is received, the user is notified that reception
 could not be confirmed. The lower left status bar notifies the user of the various stages of this verification process.
 
 In deep water, the rebroadcast event may take several seconds to occur and the software will wait up
-to a user-defined amount of time (e.g., 30 seconds) for reception of the rebroadcasted SVP.
+to a user-defined amount of time (e.g., 20 seconds) for reception of the re-broadcasted SVP.
 All other package functionalities are suspended during this wait period.
 
 Hypack
 ------
 
-The SSP package can transmit data to *HYPACK* using *HYPACK*'s driver
+The *Sound Speed* package can transmit data to *HYPACK* using *HYPACK*'s driver
 for Moving Vessel Profiler (MVP) systems (``MVP.dll``). Next figures provide a guidance on how to configure
 a Hypack project to receive data from SSP package.
 
@@ -317,7 +319,7 @@ not currently known thus the user should confirm reception in the acquisition sy
 PDS2000
 -------
 
-PDS2000 accepts the same SVP transmission protocol as SIS, but  a method to verify reception of the cast is
+PDS2000 accepts the same SVP transmission protocol as SIS, but a method to verify reception of the cast is
 not currently known thus the user must confirm reception in the acquisition system.
 
 .. _pds_1_fig:
@@ -396,4 +398,3 @@ not currently known thus the user must confirm reception in the acquisition syst
     :figclass: align-center
 
     While running PDS2000 in acquisition mode, you can verify reception in the Status displays and the “Raw Data” displays. Check the date, time, latitude, longitude against what you sent from SSP package.
-
