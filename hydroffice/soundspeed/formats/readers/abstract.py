@@ -51,12 +51,17 @@ class AbstractReader(AbstractFormat):
                 if (profile.meta.latitude is None) or (profile.meta.longitude is None):
                     self.ssp.clear()
                     raise RuntimeError("missing geographic location required for database lookup")
+
             # Calc depth data if needed since we are now guaranteed a lat/lon
             if not np.count_nonzero(profile.data.depth) and np.count_nonzero(profile.data.pressure):
+                # first select samples by casting direction but using pressure
+                profile.reduce_up_down(self.s.ssp_up_or_down, use_pressure=True)
+
                 profile.calc_data_depth()
 
-            # select samples by casting direction
-            profile.reduce_up_down(self.s.ssp_up_or_down)
+            else:
+                # select samples by casting direction
+                profile.reduce_up_down(self.s.ssp_up_or_down)
 
             # check if timestamp is present
             if profile.meta.utc_time is None:

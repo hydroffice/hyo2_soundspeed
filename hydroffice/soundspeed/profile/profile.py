@@ -13,7 +13,6 @@ from hydroffice.soundspeed.profile.samples import Samples
 from hydroffice.soundspeed.profile.more import More
 from hydroffice.soundspeed.profile.dicts import Dicts
 from hydroffice.soundspeed.profile.oceanography import Oceanography as Oc
-from hydroffice.soundspeed.profile import geostrophic_48
 from hydroffice.soundspeed.profile.ray_tracing.ray_tracing import RayTracing
 from hydroffice.soundspeed.profile.ray_tracing.ray_path import RayPath
 
@@ -115,25 +114,57 @@ class Profile(object):
         """Return indices of invalid data for direction"""
         return np.equal(self.proc.flag, Dicts.flags['direction'])  # numpy 1.10.4 if a warning
 
-    def reduce_up_down(self, ssp_direction):
+    def reduce_up_down(self, ssp_direction, use_pressure=False):
         """Reduce the raw data samples based on the passed direction"""
         if self.data.num_samples == 0:  # skipping if there are no data
             return
 
         # identify max depth
-        max_depth = self.data.depth[self.data_valid].max()  # max depth
-        logger.debug("reduce up/down > max depth: %s" % max_depth)
+        if use_pressure:
+            max_value = self.data.pressure[self.data_valid].max()  # max pressure
+            logger.debug("reduce up/down > max pressure: %s" % max_value)
+
+        else:
+            max_value = self.data.depth[self.data_valid].max()  # max depth
+            logger.debug("reduce up/down > max depth: %s" % max_value)
 
         # loop through the sample using max depth as turning point
-        max_depth_reached = False
+        max_reached = False
+        last_value = None
         for i in range(self.data.num_samples):
 
-            if (ssp_direction == Dicts.ssp_directions['up'] and not max_depth_reached) \
-                    or (ssp_direction == Dicts.ssp_directions['down'] and max_depth_reached):
+            if use_pressure:
+                value = self.data.pressure[i]
+            else:
+                value = self.data.depth[i]
+
+            if (ssp_direction == Dicts.ssp_directions['up'] and not max_reached) \
+                    or (ssp_direction == Dicts.ssp_directions['down'] and max_reached):
                 self.data.flag[i] = Dicts.flags['direction']  # set invalid for direction
 
-            if self.data.depth[i] == max_depth:
-                max_depth_reached = True
+            elif ssp_direction == Dicts.ssp_directions['down'] and not max_reached:
+
+                if i != 0:
+                    if value <= last_value:
+                        # print(last_value, value)
+                        self.data.flag[i] = Dicts.flags['direction']  # set invalid for direction
+                    else:
+                        last_value = value
+                else:
+                    last_value = value
+
+            elif ssp_direction == Dicts.ssp_directions['up'] and max_reached:
+
+                if i != 0:
+                    if value >= last_value:
+                        self.data.flag[i] = Dicts.flags['direction']  # set invalid for direction
+                    else:
+                        last_value = value
+                else:
+                    last_value = value
+
+            if value == max_value:
+                max_reached = True
 
     def calc_salinity(self):
         """Helper method to calculate salinity from depth, sound speed and temperature"""
@@ -149,20 +180,53 @@ class Profile(object):
                                           t=self.data.temp[count], lat=latitude)
         self.modify_proc_info(Dicts.proc_import_infos['CALC_SAL'])
 
+    def calc_dyn_height(self):
+        """Helper method to calculate the dynamic height"""
+        if not self.meta.latitude:
+            latitude = 30.0
+            logger.warning("using default latitude: %s" % latitude)
+        else:
+            latitude = self.meta.latitude
+
+        if not self.meta.longitude:
+            longitude = -70.0
+            logger.warning("using default longitude: %s" % longitude)
+        else:
+            longitude = self.meta.longitude
+
+        try:
+            # print(self.data_valid)
+            sa = Oc.sal2sa(sal=self.data.sal[self.data_valid],
+                           p=self.data.pressure[self.data_valid],
+                           lon=longitude, lat=latitude)
+            ct = Oc.t2ct(sa=sa,
+                         t=self.data.temp[self.data_valid],
+                         p=self.data.pressure[self.data_valid])
+            dh = Oc.geo_strf_dyn_height(sa=sa, ct=ct, p=self.data.pressure[self.data_valid], p_ref=0)
+
+            for val in dh:
+                if np.isnan(val):
+                    raise RuntimeError("nan in geo_strf_dyn_height")
+
+            return dh
+
+        except Exception as e:
+            logger.warning("issue: %s" % e)
+            return None
+
     def calc_data_depth(self):
         """Helper method to calculate depth from pressure (in dBar)"""
-        # logger.debug("calculate depth from pressure")
-        geostrophic_48.d_from_p(self)
-#         if not self.meta.latitude:
-#             latitude = 30.0
-#             logger.warning("using default latitude: %s" % latitude)
-#         else:
-#             latitude = self.meta.latitude
-# 
-#         self.data.depth = self.data.pressure.copy()
-#         for count in range(self.data.num_samples):
-#             self.data.depth[count] = Oc.p2d(p=self.data.pressure[count], lat=latitude, prof=self)
+        dyn_height = self.calc_dyn_height()
 
+        if not self.meta.latitude:
+            latitude = 30.0
+            logger.warning("using default latitude: %s" % latitude)
+        else:
+            latitude = self.meta.latitude
+
+        self.data.depth = np.zeros_like(self.data.pressure)
+        self.data.depth[self.data_valid] = Oc.p2d(p=self.data.pressure[self.data_valid], lat=latitude,
+                                                  dyn_height=dyn_height, debug=True)
         self.modify_proc_info(Dicts.proc_import_infos['CALC_DEP'])
 
     def calc_data_speed(self):

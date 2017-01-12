@@ -216,8 +216,8 @@ class Valeport(AbstractTextReader):
 
         self.ssp.cur.data_resize(count)
 
-        if not self.minisvp_has_depth:
-            self.ssp.cur.calc_data_depth()
+        # if not self.minisvp_has_depth:
+        #     self.ssp.cur.calc_data_depth()
 
     def _midas_body(self):
 

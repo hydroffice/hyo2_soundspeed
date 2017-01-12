@@ -1,15 +1,12 @@
 import os
 import numpy as np
+
+from hydroffice.soundspeed.logging import test_logging
+
 import logging
 logger = logging.getLogger()
-logger.setLevel(logging.NOTSET)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)  # change to WARNING to reduce verbosity, DEBUG for high verbosity
-ch_formatter = logging.Formatter('%(levelname)-9s %(name)s.%(funcName)s:%(lineno)d > %(message)s')
-ch.setFormatter(ch_formatter)
-logger.addHandler(ch)
 
-from hydroffice.soundspeed.profile import geostrophic_48
+from hydroffice.soundspeed.profile.oceanography import geo_strf_dyn_height
 
 # gold ref using the matlab script: generate_gsw_trusted_values.m and GSW 3.05
 
@@ -25,7 +22,7 @@ p_ref = 1000.0
 # golden reference values
 gold_ref = np.array([17.0392, 14.6659, 10.9129, 7.5679, 3.3935, 0])
 
-calc_out = geostrophic_48.geo_strf_dyn_height(SA=sa, CT=ct, p=p, p_ref=p_ref)
+calc_out = geo_strf_dyn_height(sa=sa, ct=ct, p=p, p_ref=p_ref)
 print("@1000")
 print("gold: %s" % gold_ref)
 print("calc: %s" % calc_out)
@@ -43,7 +40,7 @@ p_ref = 500.0
 # golden reference values
 gold_ref = np.array([12.5588, 10.1854, 6.4324, 3.0875, -1.0869, -4.4804])
 
-calc_out = geostrophic_48.geo_strf_dyn_height(SA=sa, CT=ct, p=p, p_ref=p_ref)
+calc_out = geo_strf_dyn_height(sa=sa, ct=ct, p=p, p_ref=p_ref)
 print("\n@500")
 print("gold: %s" % gold_ref)
 print("calc: %s" % calc_out)
@@ -61,7 +58,7 @@ p_ref = 0.0
 # golden reference values
 gold_ref = np.array([-0.6008, -2.9742, -6.7272, -10.0721, -14.2465, -17.6400])
 
-calc_out = geostrophic_48.geo_strf_dyn_height(SA=sa, CT=ct, p=p, p_ref=p_ref)
+calc_out = geo_strf_dyn_height(sa=sa, ct=ct, p=p, p_ref=p_ref)
 print("\n@0")
 print("gold: %s" % gold_ref)
 print("calc: %s" % calc_out)

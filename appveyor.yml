@@ -9,6 +9,9 @@ environment:
     - PYTHON_VERSION: 2.7
       PYTHON_ARCH: x86
       MINICONDA: C:\Miniconda
+    - PYTHON_VERSION: 2.7
+      PYTHON_ARCH: x64
+      MINICONDA: C:\Miniconda-x64
     - PYTHON_VERSION: 3.5
       PYTHON_ARCH: x64
       MINICONDA: C:\Miniconda3-x64

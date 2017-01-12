@@ -172,5 +172,5 @@ class Saiv(AbstractTextReader):
 
             count += 1
 
-        self.ssp.cur.calc_data_depth()
+        # self.ssp.cur.calc_data_depth()
         self.ssp.cur.data_resize(count)

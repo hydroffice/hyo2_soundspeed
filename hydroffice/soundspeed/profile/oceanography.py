@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import math
 import numpy as np
+import gsw
 import logging
 
 logger = logging.getLogger(__name__)
@@ -24,8 +25,34 @@ class Oceanography(object):
       J. Acoust. Soc. Am. 103(3) pp 1346-1352
     """
 
+    # ### PRESSURE/DEPTH METHODS ###
+
     @classmethod
-    def p2d(cls, p, lat=30.0):
+    def p2d(cls, p, lat=30.0, dyn_height=None, debug=False):
+        """Convert pressure to depth"""
+        try:
+            return cls.p2d_gsw(p=p, lat=lat, dyn_height=dyn_height)
+
+        except Exception as e:
+            if debug:
+                logger.info("using backup: %s" % e)
+            return cls.p2d_backup(p=p, lat=lat)
+
+    @classmethod
+    def p2d_gsw(cls, p, lat, dyn_height):
+        if dyn_height is None:
+            return -gsw.conversions.z_from_p(p=p, lat=lat)
+
+        depth = -gsw.conversions.z_from_p(p=p, lat=lat, geo_strf_dyn_height=dyn_height)
+        for val in depth:
+            if np.isnan(val):
+                logger.info("nan in gsw.conversions.z_from_p with dyn_heigt")
+                return -gsw.conversions.z_from_p(p=p, lat=lat)
+
+        return depth
+
+    @classmethod
+    def p2d_backup(cls, p, lat):
         """Convert pressure to depth
 
         If the latitude is not passed, a default value of 30.0 is used.
@@ -52,7 +79,31 @@ class Oceanography(object):
         return d / g
 
     @classmethod
-    def d2p(cls, d, lat=30.0):
+    def d2p(cls, d, lat=30.0, dyn_height=None, debug=False):
+        """Convert pressure to depth"""
+        try:
+            return cls.d2p_gsw(d=d, lat=lat, dyn_height=dyn_height)
+
+        except RuntimeError:
+            if debug:
+                logger.info("using backup")
+            return cls.d2p_backup(d=d, lat=lat)
+
+    @classmethod
+    def d2p_gsw(cls, d, lat, dyn_height):
+        if dyn_height is None:
+            return -gsw.conversions.p_from_z(z=d, lat=lat)
+
+        pressure = -gsw.conversions.p_from_z(z=d, lat=lat, geo_strf_dyn_height=dyn_height)
+        for val in pressure:
+            if np.isnan(val):
+                logger.info("nan in gsw.conversions.p_from_z with dyn_height")
+                return -gsw.conversions.p_from_z(d=d, lat=lat)
+
+        return pressure
+
+    @classmethod
+    def d2p_backup(cls, d, lat):
         """Convert depth to pressure
 
         ref: Leroy and Parthiot(1998)
@@ -80,6 +131,8 @@ class Oceanography(object):
 
         return 100.0 * hlat  # from MPa to decibar
 
+    # ### SPEED METHODS ###
+
     @classmethod
     def speed(cls, d, t, s, lat=30):
         """ Calculate sound speed from depth, temperature, and salinity
@@ -97,7 +150,7 @@ class Oceanography(object):
         Returns: sound speed in m/s
         """
 
-        p = cls.d2p(d, lat) / 10  # pressure in bar
+        p = cls.d2p_backup(d, lat) / 10  # pressure in bar
 
         c00 = 1402.388
         c01 = 5.03830
@@ -237,7 +290,7 @@ class Oceanography(object):
 
         return a0 + (a1 + (a2 + a3 * t) * t) * t + (b0 + b1 * t) * (s - 35) \
                + ((c0 + (c1 + (c2 + c3 * t) * t) * t)
-               + (d0 + d1 * t) * (s - 35)) * p \
+                  + (d0 + d1 * t) * (s - 35)) * p \
                + (e0 + (e1 + e2 * t) * t) * p * p
 
     @classmethod
@@ -248,8 +301,8 @@ class Oceanography(object):
 
         Args:
             s: salinity in PSU ppt
-            t0: temperature
-            p0: pressure
+            t: temperature
+            p: pressure
             pr: reference pressure
 
         Returns: theta, potential temperature in deg C
@@ -280,8 +333,8 @@ class Oceanography(object):
 
         Args:
             s: salinity in PSU ppt
-            t0: temperature
-            p0: pressure
+            t: temperature
+            p: pressure
             pr: reference pressure
 
         Returns: in-situ temperature in deg C
@@ -377,7 +430,7 @@ class Oceanography(object):
 
         rtx = np.sqrt(cr)
         dt = t - 15
-        ds = (dt / (1 + k * dt) ) * ( b0 + (b1 + (b2+ (b3 + (b4 + b5 * rtx) * rtx) * rtx) * rtx) * rtx)
+        ds = (dt / (1 + k * dt)) * (b0 + (b1 + (b2 + (b3 + (b4 + b5 * rtx) * rtx) * rtx) * rtx) * rtx)
 
         return a0 + (a1 + (a2 + (a3 + (a4 + a5 * rtx) * rtx) * rtx) * rtx) * rtx + ds
 
@@ -461,3 +514,177 @@ class Oceanography(object):
         h2o = a3 * p3 * f * f
 
         return boric + mgso4 + h2o
+
+    @classmethod
+    def sal2sa(cls, sal, p, lon, lat):
+        return gsw.conversions.SA_from_SP(SP=sal, p=p, lon=lon, lat=lat)
+
+    @classmethod
+    def t2ct(cls, sa, t, p):
+        return gsw.conversions.CT_from_t(SA=sa, t=t, p=p)
+
+    @classmethod
+    def geo_strf_dyn_height(cls, sa, ct, p, p_ref):
+        """ Calculates dynamic height anomaly.
+
+        Converted from gsw_geo_strf_dyn_height.c by C.Z. HSTB in Nov 2015
+        """
+
+        def p_sequence(p1, p2, i_max_dp, p_seq):
+            d_p = p2 - p1
+            n = int(np.ceil(d_p / i_max_dp))
+            pstep = d_p / n if n != 0 else 0
+
+            n_ps = n
+            for j in xrange(n):
+                p_seq[j] = p1 + pstep * (j + 1)
+
+            return n_ps
+
+        max_dp_i = 1.0
+        nz = len(sa)
+        dp = p[1:nz] - p[0:nz - 1]
+        dp_min = np.min(dp)
+        dp_max = np.max(dp)
+        if dp_min <= 0 or np.min(p) < 0:
+            print(dp)
+            logger.warning("dp_min: %s, p min: %d" % (dp_min, np.min(p)))
+            raise RuntimeError('pressure must be monotonic and non negative')
+        p_min = p[0]
+        p_max = p[-1]
+        if p_ref > p_max:
+            raise RuntimeError('the reference pressure p_ref is deeper than all bottles')
+
+        # Determine if there is a "bottle" at exactly p_ref
+        ip_ref = -1
+        for i in xrange(nz):
+            if p[i] == p_ref:
+                ip_ref = i
+                break
+
+        dyn_height = np.zeros(nz)
+        if (dp_max <= max_dp_i) and (p[0] == 0.0) and (ip_ref >= 0):
+
+            # vertical resolution is good (bottle gap is no larger than max_dp_i)
+            # & the vertical profile begins at the surface (i.e. at p = 0 dbar)
+            # & the profile contains a "bottle" at exactly p_ref.
+            # "geo_strf_dyn_height0" is the dynamic height anomaly with respect to p_ref = 0 (the surface).
+            b = gsw.density_enthalpy_48.specvol_anom(sa, ct, p)
+            geo_strf_dyn_height0 = np.zeros(nz)
+
+            for i in range(nz)[1:]:
+                b_av = 0.5 * (b[i] + b[i - 1])
+                geo_strf_dyn_height0[i] = b_av * dp[i - 1] * 1e4
+
+            for i in range(nz)[1:]:  # cumulative sum
+                geo_strf_dyn_height0[i] = geo_strf_dyn_height0[i - 1] - geo_strf_dyn_height0[i]
+
+            for i in xrange(nz):
+                dyn_height[i] = geo_strf_dyn_height0[i] - geo_strf_dyn_height0[ip_ref]
+
+        else:
+            # Test if there are vertical gaps between adjacent "bottles" which are
+            # greater than max_dp_i, and that there is a "bottle" exactly at the
+            # reference pressure.
+            ii_data = np.zeros(nz + 1)
+            i_bpr = 0 # initialize
+            if (dp_max <= max_dp_i) and (ip_ref >= 0):
+
+                # Vertical resolution is already good (no larger than max_dp_i), and
+                # there is a "bottle" at exactly p_ref.
+                if p_min > 0.0:
+                    # resolution is fine and there is a bottle at p_ref, but
+                    # there is not a bottle at p = 0. So add an extra bottle.
+                    sa_i = np.concatenate([[sa[0]], sa])
+                    ct_i = np.concatenate([[ct[0]], ct])
+                    p_i = np.concatenate([[0], p])
+                    i_bpr = ip_ref + 1
+
+                else:
+                    # resolution is fine, there is a bottle at p_ref, and
+                    # there is a bottle at p = 0
+                    sa_i = sa
+                    ct_i = ct
+                    p_i = p
+                    i_bpr = ip_ref
+
+                p_cnt = len(p_i)
+                for i in xrange(p_cnt):
+                    ii_data[i] = i
+            else:
+                # interpolation is needed.
+                np_max = len(p) + 2 * int(p[-1] / max_dp_i + 0.5)
+                p_i = np.zeros(np_max)
+
+                if p_min > 0.0:
+
+                    # there is not a bottle at p = 0.
+                    if p_ref < p_min:
+                        # p_ref is shallower than the minimum bottle pressure.
+                        p_i[0] = 0.0
+                        nps = p_sequence(p_i[0], p_ref, max_dp_i, p_i[1:])
+                        i_bpr = p_cnt = nps
+                        p_cnt += 1
+                        nps = p_sequence(p_ref, p_min, max_dp_i, p_i[p_cnt:])
+                        p_cnt += nps
+
+                    else:
+                        # p_ref is deeper than the minimum bottle pressure.
+                        p_i[0] = 0.0
+                        p_i[1] = p_min
+                        p_cnt = 2
+
+                else:
+                    # there is a bottle at p = 0.
+                    p_i[0] = p_min
+                    p_cnt = 1
+
+                for i_bottle in xrange(nz - 1):
+
+                    ii_data[i_bottle] = p_cnt - 1
+                    if p[i_bottle] == p_ref:
+                        i_bpr = p_cnt - 1
+
+                    if p[i_bottle] < p_ref < p[i_bottle + 1]:
+                        # ... reference pressure is spanned by bottle pairs -
+                        # need to include p_ref as an interpolated pressure.
+                        nps = p_sequence(p[i_bottle], p_ref, max_dp_i, p_i[p_cnt:])
+                        p_cnt += nps
+                        i_bpr = p_cnt - 1
+                        nps = p_sequence(p_ref, p[i_bottle + 1], max_dp_i, p_i[p_cnt:])
+                        p_cnt += nps
+
+                    else:
+                        # ... reference pressure is not spanned by bottle pairs.
+                        nps = p_sequence(p[i_bottle], p[i_bottle + 1], max_dp_i, p_i[p_cnt:])
+                        p_cnt += nps
+
+                ii_data[nz - 1] = p_cnt - 1
+                if p[nz - 1] == p_ref:
+                    i_bpr = p_cnt - 1
+
+                p_i = p_i[:p_cnt]
+                p_i[-1] = p[-1]
+                if p[0] <= 0:
+                    sa_i, ct_i = gsw.library.interp_SA_CT(sa, ct, p, p_i)
+
+                else:
+                    sa_i, ct_i = gsw.library.interp_SA_CT(np.concatenate([[sa[0]], sa]), np.concatenate([[ct[0]], ct]),
+                                                          np.concatenate([[0], p]), p_i)
+                    # return Si[:p_cnt], Ti[:p_cnt], p_i[:p_cnt]
+            b = gsw.density_enthalpy_48.specvol_anom(sa_i, ct_i, p_i)
+            # "geo_strf_dyn_height0" is the dynamic height anomaly with respect to p_ref = 0 (the surface).
+            geo_strf_dyn_height0 = np.zeros(p_cnt)
+
+            for i in range(p_cnt)[1:]:
+                b_av = 0.5 * (b[i] + b[i - 1])
+                dp_i = p_i[i] - p_i[i - 1]
+                geo_strf_dyn_height0[i] = b_av * dp_i
+
+            for i in range(p_cnt)[1:]:  # cumulative sum
+                geo_strf_dyn_height0[i] = geo_strf_dyn_height0[i - 1] - geo_strf_dyn_height0[i]
+
+            for i in xrange(nz):
+                dyn_height[i] = (geo_strf_dyn_height0[int(ii_data[i])] - geo_strf_dyn_height0[i_bpr]) * 1e4
+
+        return dyn_height
