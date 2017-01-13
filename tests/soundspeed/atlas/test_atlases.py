@@ -11,19 +11,18 @@ from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
 class TestSoundSpeedAtlasAtlases(unittest.TestCase):
 
     def setUp(self):
-        self.curdir = os.path.abspath(os.path.dirname(__file__))
+        self.cur_dir = os.path.abspath(os.path.dirname(__file__))
 
     def tearDown(self):
-        dir_items = os.listdir(self.curdir)
+        dir_items = os.listdir(self.cur_dir)
         for item in dir_items:
             if item.split('.')[-1] == 'db':
-                os.remove(os.path.join(self.curdir, item))
+                os.remove(os.path.join(self.cur_dir, item))
             if item == 'atlases':
-                shutil.rmtree(os.path.join(self.curdir, item))
+                shutil.rmtree(os.path.join(self.cur_dir, item))
 
-    @unittest.expectedFailure
     def test_creation_of_Atlases(self):
-        lib = SoundSpeedLibrary(data_folder=self.curdir)
+        lib = SoundSpeedLibrary(data_folder=self.cur_dir)
         atl = atlases.Atlases(prj=lib)
 
         self.assertTrue("atlases" in atl.rtofs_folder)

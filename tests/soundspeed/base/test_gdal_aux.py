@@ -20,36 +20,30 @@ class TestSoundSpeedGdalAux(unittest.TestCase):
     def tearDown(self):
         pass
 
-    @unittest.skipUnless(is_windows, "only on Windows")
     def test_list_ogr_drivers(self):
         GdalAux.list_ogr_drivers()
 
-    @unittest.skipUnless(is_windows, "only on Windows")
     def test_current_gdal_version(self):
         version = GdalAux.current_gdal_version()
 
         self.assertEqual(type(version), int)
 
-    @unittest.skipUnless(is_windows, "only on Windows")
     def test_is_gdal_2(self):
         flag = GdalAux.is_gdal_2()
 
         self.assertEqual(type(flag), bool)
 
-    @unittest.skipUnless(is_windows, "only on Windows")
     def test_push_gdal_error_handler(self):
         GdalAux.push_gdal_error_handler()
 
         self.assertTrue(GdalAux.error_loaded)
 
-    @unittest.skipUnless(is_windows, "only on Windows")
     def test_check_gdal_data(self):
         GdalAux.check_gdal_data()
 
         self.assertTrue(GdalAux.data_fixed)
         self.assertTrue(GdalAux.error_loaded)
 
-    @unittest.skipUnless(is_windows, "only on Windows")
     def test_use_of_Gdal_aux(self):
         from hydroffice.soundspeed.base.testing import output_data_folder
 
