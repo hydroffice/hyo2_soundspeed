@@ -23,5 +23,5 @@ logger.info("GSW: Depth: %.3f <> %.3f" % (calc_d, trusted_fof_d))
 calc_p = Oc.d2p_backup(d=calc_d, lat=trusted_fof_lat)
 logger.info("Backup: Pressure: %.3f <> %.3f" % (calc_p, trusted_fof_p))
 
-calc_p = Oc.d2p_gsw(d=calc_d, lat=trusted_fof_lat, dyn_height=None)
+calc_p = Oc.d2p_gsw(d=trusted_fof_d, lat=trusted_fof_lat, dyn_height=None)
 logger.info("GSW: Pressure: %.3f <> %.3f" % (calc_p, trusted_fof_p))

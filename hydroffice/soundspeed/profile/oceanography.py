@@ -40,13 +40,17 @@ class Oceanography(object):
 
     @classmethod
     def p2d_gsw(cls, p, lat, dyn_height):
+
+        if not isinstance(p, np.ndarray):
+            p = np.array(p, ndmin=1, copy=False)
+
         if dyn_height is None:
             return -gsw.conversions.z_from_p(p=p, lat=lat)
 
         depth = -gsw.conversions.z_from_p(p=p, lat=lat, geo_strf_dyn_height=dyn_height)
         for val in depth:
             if np.isnan(val):
-                logger.info("nan in gsw.conversions.z_from_p with dyn_heigt")
+                logger.info("nan in gsw.conversions.z_from_p with dyn_height")
                 return -gsw.conversions.z_from_p(p=p, lat=lat)
 
         return depth
@@ -91,6 +95,10 @@ class Oceanography(object):
 
     @classmethod
     def d2p_gsw(cls, d, lat, dyn_height):
+
+        if not isinstance(d, np.ndarray):
+            d = np.array(d, ndmin=1, copy=False)
+
         if dyn_height is None:
             return -gsw.conversions.p_from_z(z=d, lat=lat)
 
