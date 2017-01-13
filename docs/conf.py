@@ -195,7 +195,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   ('index', 'HydrOfficeSoundSpeedManager.tex', u'Sound Speed Manager Documentation',
-   u'CCOM/JHC,UNH - CSDL,NOAA', 'manual'),
+   u'CCOM/JHC,UNH & CSDL,NOAA', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
