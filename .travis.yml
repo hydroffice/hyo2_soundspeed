@@ -52,7 +52,7 @@ before_install:
 
 install:
   - conda config --add channels conda-forge
-  - conda install -q numpy basemap pyside=1.2.2 matplotlib netCDF4 libnetcdf gdal libgdal pyproj krb5 pyserial pillow
+  - conda install -q numpy basemap pyside matplotlib netCDF4 libnetcdf gdal libgdal pyproj krb5 pyserial pillow
   - pip install https://github.com/TEOS-10/python-gsw/archive/master.zip
   - pip install --no-deps -e .
 
