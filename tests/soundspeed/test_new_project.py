@@ -31,7 +31,7 @@ class TestSoundSpeedNewProject(unittest.TestCase):
         prj_list = lib.list_projects()
         self.assertGreaterEqual(len(prj_list), 2)
 
-        lib.current_project = prj_list[0]
+        lib.current_project = "aaa"
         lib.remove_project("zzz")
         prj_list = lib.list_projects()
         self.assertGreaterEqual(len(prj_list), 1)
