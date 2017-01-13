@@ -239,11 +239,11 @@ class General(AbstractWidget):
 
         # methods
         # noinspection PyUnresolvedReferences
-        self.default_institution.textChanged.connect(self.apply_default_institution)
+        self.default_institution.editTextChanged.connect(self.apply_default_institution)
         # noinspection PyUnresolvedReferences
         self.default_survey.textChanged.connect(self.apply_default_survey)
         # noinspection PyUnresolvedReferences
-        self.default_vessel.textChanged.connect(self.apply_default_vessel)
+        self.default_vessel.editTextChanged.connect(self.apply_default_vessel)
         # noinspection PyUnresolvedReferences
         self.projects_folder.textChanged.connect(self.apply_custom_folders)
         # noinspection PyUnresolvedReferences

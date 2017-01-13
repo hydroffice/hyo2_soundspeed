@@ -191,5 +191,5 @@ class GdalAux(object):
 
         # TODO: add more cases to find GDAL_DATA
 
-        raise RuntimeError("Unable to locate GDAL data at:\n- %s\n- %s\n- %s"
-                           % (gdal_data_path1, gdal_data_path2, gdal_data_path3))
+        raise RuntimeError("Unable to locate GDAL data at:\n- %s\n- %s\n- %s\n- %s"
+                           % (gdal_data_path1, gdal_data_path2, gdal_data_path3, gdal_data_path4))

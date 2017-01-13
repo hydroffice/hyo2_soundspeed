@@ -51,10 +51,11 @@ before_install:
   - source activate test-environment
 
 install:
-  - conda config --add channels hydroffice
-  - conda config --add channels SciTools
-  - conda config --add channels IOOS
-  - conda install -q numpy basemap pyside matplotlib netCDF4 libnetcdf gdal==1.11.2 libgdal==1.11.2 pyproj krb5 pyserial pillow
+  - conda config --add channels conda-forge
+  # - conda config --add channels hydroffice
+  # - conda config --add channels SciTools
+  # - conda config --add channels IOOS
+  - conda install -q numpy basemap pyside=1.2.2 matplotlib netCDF4 libnetcdf gdal libgdal pyproj krb5 pyserial pillow
   - pip install https://github.com/TEOS-10/python-gsw/archive/master.zip
   - pip install --no-deps -e .
 
