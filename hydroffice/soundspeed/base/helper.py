@@ -129,7 +129,7 @@ def info_libs():
         netcdf4_version = None
 
     vrs = netcdf4_version
-    msg += "netCDF4: %s\n" % vrs
+    msg += "netCDF4: %s" % vrs
 
     return msg
 
@@ -156,7 +156,7 @@ def is_darwin():
 
 def is_linux():
     """ Check if the current OS is Linux """
-    return sys.platform == 'linux'
+    return sys.platform in ['linux', 'linux2']
 
 
 def explore_folder(path):
