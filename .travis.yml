@@ -20,7 +20,11 @@ matrix:
 
 before_script:
   - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    ""
+  else
+    "sh -e /etc/init.d/xvfb start"
+  fi
   - sleep 3  # give xvfb some time to start
 
 before_install:
@@ -51,9 +55,19 @@ before_install:
   - source activate test-environment
 
 install:
-  - conda config --add channels conda-forge
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    ""
+  else
+    conda config --add channels conda-forge
+  fi
   - conda install -q numpy basemap pyside matplotlib netCDF4 libnetcdf gdal libgdal pyproj krb5 pyserial pillow
   - pip install https://github.com/TEOS-10/python-gsw/archive/master.zip
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      conda install -c conda-forge pyside
+    fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      conda install jpeg=8
+    fi
   - pip install --no-deps -e .
 
 script:
