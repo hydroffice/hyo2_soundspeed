@@ -20,9 +20,7 @@ matrix:
 
 before_script:
   - "export DISPLAY=:99.0"
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    "sh -e /etc/init.d/xvfb start";
-    fi
+  - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then "sh -e /etc/init.d/xvfb start"; fi
   - sleep 3  # give xvfb some time to start
 
 before_install:
@@ -53,17 +51,11 @@ before_install:
   - source activate test-environment
 
 install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    conda config --add channels conda-forge;
-    fi
+  - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then conda config --add channels conda-forge; fi
   - conda install -q numpy basemap pyside matplotlib netCDF4 libnetcdf gdal libgdal pyproj krb5 pyserial pillow
   - pip install https://github.com/TEOS-10/python-gsw/archive/master.zip
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      conda install -c conda-forge pyside;
-    fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      conda install jpeg=8;
-    fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then conda install -c conda-forge pyside; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then conda install jpeg=8; fi
   - pip install --no-deps -e .
 
 script:
@@ -72,6 +64,4 @@ script:
 after_script:
   # If tests are successful, create a source distribution.
   # - python setup.py sdist
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      python setup.py bdist_wheel;
-    fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python setup.py bdist_wheel; fi
