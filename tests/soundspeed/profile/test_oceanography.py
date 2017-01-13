@@ -16,13 +16,13 @@ class TestSoundSpeedOceanography(unittest.TestCase):
         pass
 
     def test_p2d_gsw(self):
-        # check values from Fofonoff and Millard(1983)
-        trusted_fof_d = 9712.653  # m
-        trusted_fof_p = 10000  # dBar
-        trusted_fof_lat = 30.0
+        # check values from generate_gsw_trusted_values
+        trusted_gsw_d = 9713.7  # m
+        trusted_gsw_p = 10000  # dBar
+        trusted_gsw_lat = 30.0
 
-        calc_d = Oc.p2d_gsw(p=trusted_fof_p, lat=trusted_fof_lat, dyn_height=None)
-        self.assertLessEqual(abs(calc_d - trusted_fof_d), 10)
+        calc_d = Oc.p2d_gsw(p=trusted_gsw_p, lat=trusted_gsw_lat, dyn_height=None)
+        self.assertAlmostEqual(calc_d, trusted_gsw_d, places=1)
 
     def test_p2d_backup(self):
         # check values from Fofonoff and Millard(1983)
@@ -34,13 +34,13 @@ class TestSoundSpeedOceanography(unittest.TestCase):
         self.assertAlmostEqual(calc_d, trusted_fof_d, places=1)
 
     def test_d2p_gsw(self):
-        # check values from Fofonoff and Millard(1983)
-        trusted_fof_d = 9712.653  # m
-        trusted_fof_p = 10000  # dBar
-        trusted_fof_lat = 30.0
+        # check values from generate_gsw_trusted_values
+        trusted_gsw_d = 9713.7  # m
+        trusted_gsw_p = 10000  # dBar
+        trusted_gsw_lat = 30.0
 
-        calc_p = Oc.d2p_gsw(d=trusted_fof_d, lat=trusted_fof_lat, dyn_height=None)
-        self.assertLessEqual(abs(calc_p - trusted_fof_p), 1000)
+        calc_p = Oc.d2p_gsw(d=trusted_gsw_d, lat=trusted_gsw_lat, dyn_height=None)
+        self.assertAlmostEqual(calc_p, trusted_gsw_p, places=1)
 
     def test_d2p_backup(self):
         # check values from Fofonoff and Millard(1983)

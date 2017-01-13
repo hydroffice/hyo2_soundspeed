@@ -100,13 +100,13 @@ class Oceanography(object):
             d = np.array(d, ndmin=1, copy=False)
 
         if dyn_height is None:
-            return -gsw.conversions.p_from_z(z=d, lat=lat)
+            return gsw.conversions.p_from_z(z=-d, lat=lat)
 
-        pressure = -gsw.conversions.p_from_z(z=d, lat=lat, geo_strf_dyn_height=dyn_height)
+        pressure = gsw.conversions.p_from_z(z=-d, lat=lat, geo_strf_dyn_height=dyn_height)
         for val in pressure:
             if np.isnan(val):
                 logger.info("nan in gsw.conversions.p_from_z with dyn_height")
-                return -gsw.conversions.p_from_z(d=d, lat=lat)
+                return gsw.conversions.p_from_z(z=-d, lat=lat)
 
         return pressure
 
