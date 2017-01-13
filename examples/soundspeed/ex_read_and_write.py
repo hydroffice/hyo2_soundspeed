@@ -7,93 +7,42 @@ from hydroffice.soundspeed.logging import test_logging
 import logging
 logger = logging.getLogger()
 
-from hydroffice.soundspeed.project import Project
-from hydroffice.soundspeed.base.callbacks import TestCallbacks
-from hydroffice.soundspeed.base import helper
-
-
-def pair_reader_and_folder(folders, readers):
-    """Create pair of folder and reader"""
-
-    pairs = dict()
-
-    for folder in folders:
-
-        for reader in readers:
-
-            if reader.name.lower() != 'turo':  # reader filter
-                continue
-            if reader.name.lower() != folder.lower():  # skip not matching readers
-                continue
-            pairs[folder] = reader
-
-    logger.info('pairs: %s' % pairs)
-    return pairs
-
-
-def list_test_files(data_input, pairs):
-    """Create a dictionary of test file and reader to use with"""
-    tests = dict()
-
-    for folder in pairs.keys():
-
-        reader = pairs[folder]
-        reader_folder = os.path.join(data_input, folder)
-
-        for root, dirs, files in os.walk(reader_folder):
-
-            for file in files:
-
-                # check the extension
-                ext = file.split('.')[-1].lower()
-                if ext not in reader.ext:
-                    continue
-
-                tests[os.path.join(root, file)] = reader
-
-    logger.info("tests (%d): %s" % (len(tests), tests))
-    return tests
+from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
+from hydroffice.soundspeed.base.callbacks.test_callbacks import TestCallbacks
+from hydroffice.soundspeed.base import testing
 
 
 def main():
-    # create a project
-    prj = Project()
-    # lib.activate_server_logger(True)
-    # logger.info(lib)
-    # lib.open_data_folder()
+    # create a project with test-callbacks
+    lib = SoundSpeedLibrary(callbacks=TestCallbacks())
 
-    # set callbacks
-    prj.set_callbacks(TestCallbacks())
-    # logger.info("test ask date: %s" % lib.cb.ask_date())
-    # logger.info("test ask location: %s, %s" % lib.cb.ask_location())
+    # set the current project name
+    lib.setup.current_project = 'test'
 
     # retrieve data input/output folders
-    data_input = helper.get_testing_input_folder()
+    data_input = testing.input_data_folder()
     logger.info('input folder: %s' % data_input)
-    data_output = helper.get_testing_output_folder()
+    data_output = testing.output_data_folder()
     logger.info('output folder: %s' % data_output)
 
     # test readers/writers
     logger.info('test: *** START ***')
-    data_sub_folders = helper.get_testing_input_subfolders()
-    pairs = pair_reader_and_folder(folders=data_sub_folders, readers=prj.readers)
-    tests = list_test_files(data_input=data_input, pairs=pairs)
-    for idx, test in enumerate(tests.keys()):
-        # if idx > 0:
-        #     break
-        logger.info("test: * New profile #%03d *" % idx)
+    filters = ["valeport", ]
+    formats = ["caris", "csv", "elac", "hypack", "ixblue", "asvp", "qps", "sonardyne", "unb", ]
+    tests = testing.input_dict_test_files(inclusive_filters=filters)
+    # print(tests)
+
+    # import each identified file
+    for idx, testfile in enumerate(tests.keys()):
+
+        logger.info("test: * New profile: #%03d *" % idx)
 
         # import
-        prj.import_data(data_path=test, data_format=tests[test].name)
-        # print(lib.cur)
-        # lib.plot_ssp(more=True, show=False)
+        lib.import_data(data_path=testfile, data_format=tests[testfile].name)
 
         # export
         # lib.export_data(data_path=data_output, data_formats=lib.name_writers)
-        prj.export_data(data_path=data_output, data_formats=["ncei", ])
-
-    from matplotlib import pyplot as plt
-    plt.show()
+        lib.export_data(data_path=data_output, data_formats=formats)
 
     logger.info('test: *** END ***')
 

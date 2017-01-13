@@ -54,7 +54,7 @@ class ExportDb(object):
         if lyr.CreateField(field) != 0:
             raise RuntimeError("Creating field failed.")
 
-        field = ogr.FieldDefn(b'institution', ogr.OFTString)
+        field = ogr.FieldDefn(b'agency', ogr.OFTString)
         field.SetWidth(254)
         if lyr.CreateField(field) != 0:
             raise RuntimeError("Creating field failed.")
@@ -116,7 +116,7 @@ class ExportDb(object):
             ft.SetField(b'probe', Dicts.first_match(Dicts.probe_types, row[4]).encode())
             ft.SetField(b'path', row[5].encode())
             if row[6]:
-                ft.SetField(b'institution', row[6].encode())
+                ft.SetField(b'agency', row[6].encode())
             if row[7]:
                 ft.SetField(b'survey', row[7].encode())
             if row[8]:
@@ -129,7 +129,12 @@ class ExportDb(object):
             pt = ogr.Geometry(ogr.wkbPoint)
             pt.SetPoint_2D(0, row[2].x, row[2].y)
 
-            ft.SetGeometry(pt)
+            try:
+                ft.SetGeometry(pt)
+
+            except Exception as e:
+                RuntimeError("%s > pt: %s, %s" % (e, row[2].x, row[2].y))
+
             if lyr.CreateFeature(ft) != 0:
                 raise RuntimeError("Unable to create feature")
             ft.Destroy()

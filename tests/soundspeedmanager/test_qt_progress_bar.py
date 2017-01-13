@@ -2,9 +2,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import unittest
 import sys
-import logging
-
-logger = logging.getLogger(__name__)
 
 import time
 from PySide import QtGui

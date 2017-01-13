@@ -10,54 +10,6 @@ from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
 from hydroffice.soundspeed.base.gdal_aux import GdalAux
 
 
-def pair_reader_and_folder(folders, readers):
-    """Create pair of folder and reader"""
-
-    pairs = dict()
-
-    for folder in folders:
-
-        folder = folder.split(os.sep)[-1]
-        # logger.debug('pairing folder: %s' % folder)
-
-        for reader in readers:
-
-            if reader.name.lower() != 'valeport':  # READER FILTER
-                continue
-
-            if reader.name.lower() != folder.lower():  # skip not matching readers
-                continue
-
-            pairs[folder] = reader
-
-    logger.info('pairs: %s' % pairs)
-    return pairs
-
-
-def list_test_files(data_input, pairs):
-    """Create a dictionary of test file and reader to use with"""
-    tests = dict()
-
-    for folder in pairs.keys():
-
-        reader = pairs[folder]
-        reader_folder = os.path.join(data_input, folder)
-
-        for root, dirs, files in os.walk(reader_folder):
-
-            for filename in files:
-
-                # check the extension
-                ext = filename.split('.')[-1].lower()
-                if ext not in reader.ext:
-                    continue
-
-                tests[os.path.join(root, filename)] = reader
-
-    logger.info("tests (%d): %s" % (len(tests), tests))
-    return tests
-
-
 def main():
     # create a project
     lib = SoundSpeedLibrary()

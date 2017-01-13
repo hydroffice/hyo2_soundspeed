@@ -3,16 +3,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import unittest
 import sys
-import os
-import logging
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.NOTSET)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)  # change to WARNING to reduce verbosity, DEBUG for high verbosity
-ch_formatter = logging.Formatter('%(levelname)-9s %(name)s.%(funcName)s:%(lineno)d > %(message)s')
-ch.setFormatter(ch_formatter)
-logger.addHandler(ch)
 
 from hydroffice.soundspeed.base.geodesy import Geodesy
 
@@ -106,7 +96,6 @@ class TestSoundSpeedGeodesy(unittest.TestCase):
         dist = Geodesy.haversine(long_1=-70.9395, lat_1=43.13555, long_2=14.9, lat_2=36.783333)
         self.assertTrue((dist - 7020851.6) < 0.1)
 
-    @unittest.skipUnless(is_windows and (gdal_version == 1), "only GDAL 1.x on Windows")
     def test_distance(self):
                 # data retrieved from: http://geographiclib.sourceforge.net/cgi-bin/GeodSolve
         # ref: C. F. F. Karney, Algorithms for geodesics, J. Geodesy 87, 43–55 (2013); DOI: 10.1007/s00190-012-0578-z
@@ -119,7 +108,6 @@ class TestSoundSpeedGeodesy(unittest.TestCase):
         dist = g.distance(long_1=long_1, lat_1=lat_1, long_2=long_2, lat_2=lat_2)
         self.assertTrue((dist - 7037989.518) < 0.001)
 
-    @unittest.skipUnless(is_windows and (gdal_version == 1), "only GDAL 1.x on Windows")
     def test_forward(self):
         # data retrieved from: http://geographiclib.sourceforge.net/cgi-bin/GeodSolve
         # ref: C. F. F. Karney, Algorithms for geodesics, J. Geodesy 87, 43–55 (2013); DOI: 10.1007/s00190-012-0578-z
