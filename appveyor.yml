@@ -39,6 +39,7 @@ install:
   - "conda config --add channels hydroffice"
   - "conda config --add channels SciTools"
   - "conda config --add channels IOOS"
+  - "conda config --add channels conda-forge"
   - "activate test-environment"
   - "pip install wheel"
 
@@ -46,7 +47,7 @@ install:
   - "python --version"
 
   # Install dependencies
-  - conda install -q numpy basemap pyside matplotlib netCDF4 gdal==1.11.2 libgdal==1.11.2 pyproj pyserial
+  - conda install -q numpy basemap pyside matplotlib netCDF4 gdal pyproj pyserial pillow
   - pip install https://github.com/TEOS-10/python-gsw/archive/master.zip
 
 build: off

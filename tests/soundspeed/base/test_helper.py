@@ -53,12 +53,20 @@ class TestSoundSpeedBaseHelper(unittest.TestCase):
         self.assertFalse(helper.explore_folder('z:/fake/path'))
 
     def test_first_match(self):
-        test_dict = {
-            "a": 0,
-            "b": 1,
-            "c": 3
+
+        # fake dict
+        a_dict = {
+            "a": 1,
+            "b": 99,
+            "c": 1,
         }
-        self.assertEqual(helper.first_match(test_dict, 1), "b")
+
+        # test if it gives back the first matching key
+        self.assertEqual(helper.first_match(a_dict, 1), "a")
+
+        # test if it raises with a not-existing value
+        with self.assertRaises(RuntimeError):
+            helper.first_match(a_dict, 2)
 
     def test_python_path(self):
         self.assertTrue(os.path.exists(helper.python_path()))
