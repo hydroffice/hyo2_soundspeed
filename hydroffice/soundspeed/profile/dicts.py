@@ -219,5 +219,7 @@ class Dicts(object):
 
         ('RECALC_SPD', 'recalc.speed'),
         ('ADD_TSS', 'added tss'),
+
+        ('PLOTTED', 'plotted'),
     ])
 

@@ -16,6 +16,7 @@ from hydroffice.soundspeedmanager.dialogs.project_switch_dialog import ProjectSw
 from hydroffice.soundspeedmanager.dialogs.import_data_dialog import ImportDataDialog
 from hydroffice.soundspeedmanager.dialogs.export_single_profile_dialog import ExportSingleProfileDialog
 from hydroffice.soundspeedmanager.dialogs.export_multi_profile_dialog import ExportMultiProfileDialog
+from hydroffice.soundspeedmanager.dialogs.import_multi_profile_dialog import ImportMultiProfileDialog
 from hydroffice.soundspeedmanager.dialogs.plot_multi_profile_dialog import PlotMultiProfileDialog
 from hydroffice.soundspeedmanager.dialogs.export_profile_metadata_dialog import ExportProfileMetadataDialog
 from hydroffice.soundspeedmanager.dialogs.text_editor_dialog import TextEditorDialog
@@ -121,6 +122,12 @@ class Database(AbstractWidget):
         self.profiles_box.setLayout(profiles_vbox)
         self.product_btn_box = QtGui.QDialogButtonBox(QtCore.Qt.Vertical)
         profiles_vbox.addWidget(self.product_btn_box)
+        # ---- import profiles
+        btn = QtGui.QPushButton("Import profiles")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.import_profiles)
+        btn.setToolTip("Import multiple profiles")
+        self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
         # ---- export profiles
         btn = QtGui.QPushButton("Export profiles")
         # noinspection PyUnresolvedReferences
@@ -531,6 +538,24 @@ class Database(AbstractWidget):
         logger.debug("user want to open the output folder")
         self.lib.open_outputs_folder()
 
+    def import_profiles(self):
+        logger.debug("user want to import multiple profiles")
+
+        # noinspection PyCallByClass
+        QtGui.QMessageBox.warning(self, "Warning about multi-profile import",
+                                  "The multi-profile dialog allows you to directly\n"
+                                  "import profiles into the database, BUT skipping\n"
+                                  "all the processing steps and the visual inspection!\n"
+                                  "\n"
+                                  "For your convenience, all the imported profiles are\n"
+                                  "highlighted in red until loaded for visual inspection\n"
+                                  "and saved back into the database.")
+
+        dlg = ImportMultiProfileDialog(main_win=self.main_win, lib=self.lib, parent=self)
+        dlg.exec_()
+
+        self.update_table()
+
     def export_profile_switch(self):
         logger.debug("user want to export profile data")
 
@@ -577,6 +602,12 @@ class Database(AbstractWidget):
         self.ssp_list.setRowCount(len(lst))
 
         for i, ssp in enumerate(lst):
+
+            processed = True
+            tokens = ssp[11].split(";")
+            if Dicts.proc_user_infos['PLOTTED'] not in tokens:
+                processed = False
+
             for j, field in enumerate(ssp):
 
                 if j == 3:
@@ -597,6 +628,9 @@ class Database(AbstractWidget):
 
                 elif (j == 4) and (int(field) == Dicts.sensor_types['Future']):
                     item.setForeground(QtGui.QColor(200, 100, 100))
+
+                if not processed:
+                    item.setBackground(QtGui.QColor(200, 100, 100, 50))
 
                 item.setTextAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignHCenter)
                 item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)

@@ -436,7 +436,7 @@ class SoundSpeedLibrary(object):
 
     # --- import data
 
-    def import_data(self, data_path, data_format):
+    def import_data(self, data_path, data_format, skip_atlas=False):
         """Import data using a specific format name"""
 
         # identify reader to use
@@ -455,15 +455,15 @@ class SoundSpeedLibrary(object):
         # retrieve atlases data for each retrieved profile
         for pr in self.ssp.l:
 
-            if self.use_woa09() and self.has_woa09():
+            if self.use_woa09() and self.has_woa09() and not skip_atlas:
                 pr.woa09 = self.atlases.woa09.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
                                                     datestamp=pr.meta.utc_time)
 
-            if self.use_woa13() and self.has_woa13():
+            if self.use_woa13() and self.has_woa13() and not skip_atlas:
                 pr.woa13 = self.atlases.woa13.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
                                                     datestamp=pr.meta.utc_time)
 
-            if self.use_rtofs():
+            if self.use_rtofs() and not skip_atlas:
                 try:
                     pr.rtofs = self.atlases.rtofs.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
                                                         datestamp=pr.meta.utc_time)
@@ -1134,6 +1134,9 @@ class SoundSpeedLibrary(object):
         self.cur.insert_proc_speed(depth=tss_depth, speed=tss_value, src=Dicts.sources['tss'])
         self.cur.modify_proc_info(Dicts.proc_user_infos['ADD_TSS'])
         return True
+
+    def cur_plotted(self):
+        self.cur.modify_proc_info(Dicts.proc_user_infos['PLOTTED'])
 
     def extend_profile(self):
         if not self.has_ssp():

@@ -8,7 +8,7 @@ from PySide import QtGui, QtCore
 logger = logging.getLogger(__name__)
 
 from hydroffice.soundspeedmanager.widgets.widget import AbstractWidget
-from hydroffice.soundspeedmanager.dialogs.input_dialog import InputDialog
+from hydroffice.soundspeedmanager.dialogs.import_single_profile_dialog import ImportSingleProfileDialog
 from hydroffice.soundspeedmanager.dialogs.reference_dialog import ReferenceDialog
 from hydroffice.soundspeedmanager.dialogs.spreadsheet_dialog import SpreadSheetDialog
 from hydroffice.soundspeedmanager.dialogs.metadata_dialog import MetadataDialog
@@ -134,7 +134,7 @@ class Editor(AbstractWidget):
     def on_input_data(self):
         """Import a data file"""
         logger.debug('user wants to input data')
-        dlg = InputDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        dlg = ImportSingleProfileDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
         if self.lib.has_ssp():
             self.main_win.data_imported()
@@ -328,6 +328,8 @@ class Editor(AbstractWidget):
         self.dataplots.reset()
         self.dataplots.on_draw()
         self.dataplots.setVisible(True)
+
+        self.lib.cur_plotted()
 
     def server_started(self):
         self.setDisabled(True)

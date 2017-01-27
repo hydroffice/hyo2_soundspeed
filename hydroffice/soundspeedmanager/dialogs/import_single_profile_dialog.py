@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 from hydroffice.soundspeedmanager.dialogs.dialog import AbstractDialog
 
 
-class InputDialog(AbstractDialog):
+class ImportSingleProfileDialog(AbstractDialog):
 
     def __init__(self, main_win, lib, parent=None):
         AbstractDialog.__init__(self, main_win=main_win, lib=lib, parent=parent)
@@ -117,6 +117,7 @@ class InputDialog(AbstractDialog):
         # ask the file path to the user
         flt = "Format %s(*.%s);;All files (*.*)" % (desc, " *.".join(ext))
         settings = QtCore.QSettings()
+        # noinspection PyCallByClass
         selection, _ = QtGui.QFileDialog.getOpenFileName(self, "Load data file",
                                                          settings.value("import_folder"),
                                                          flt)
@@ -132,6 +133,7 @@ class InputDialog(AbstractDialog):
         except RuntimeError as e:
             self.progress.end()
             msg = "Issue in importing the data:\n\n> %s" % e
+            # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Import error", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -146,6 +148,7 @@ class InputDialog(AbstractDialog):
         lst = ["#%03d: %s" % (p[0], p[1]) for p in profiles]
         if len(lst) == 0:
             msg = "Store data before import!"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Database", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -170,6 +173,7 @@ class InputDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = "Issue in importing the data:\n\n> %s" % e
+            # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -182,6 +186,7 @@ class InputDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = "Issue in importing the data:\n\n> %s" % e
+            # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -194,6 +199,7 @@ class InputDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = "Issue in importing the data:\n\n> %s" % e
+            # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -203,6 +209,7 @@ class InputDialog(AbstractDialog):
         """Retrieve SIS data"""
         if not self.lib.use_sis():
             msg = "The SIS listening is not activated!\n\nGo to Settings/Input/Listen SIS"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -211,6 +218,7 @@ class InputDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = "Issue in retrieving data from SIS:\n\n%s" % e
+            # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
             return
 
