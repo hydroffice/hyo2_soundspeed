@@ -71,6 +71,8 @@ class General(AbstractWidget):
         validator = QtGui.QRegExpValidator(rex)
         self.current_project.setValidator(validator)
         self.current_project.setReadOnly(True)
+        self.current_project.setStyleSheet("QLineEdit { color: #666666 }")
+        self.current_project.setToolTip("Go to the 'Main' tab if you want to change the current project")
         hbox.addWidget(self.current_project)
 
         # - path to projects
