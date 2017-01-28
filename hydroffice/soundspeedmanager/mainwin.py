@@ -3,6 +3,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import math
 import os
 import sys
+import ssl
+import urllib2
 
 from PySide import QtGui
 from PySide import QtCore
@@ -149,9 +151,13 @@ class MainWin(QtGui.QMainWindow):
         self.statusBar().setStyleSheet("QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;}")
         self.status_bar_normal_style = self.statusBar().styleSheet()
         self.statusBar().showMessage("%s" % ssm_version, 2000)
+        self.releaseInfo = QtGui.QLabel()
+        self.statusBar().addPermanentWidget(self.releaseInfo)
+        self.releaseInfo.setStyleSheet("QLabel{color:rgba(0,0,0,128);font-size: 8pt;}")
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.update_gui)
         timer.start(1500)
+        self.timer_execs = 0
 
         self.data_cleared()
         self.tabs.blockSignals(False)
@@ -381,7 +387,53 @@ class MainWin(QtGui.QMainWindow):
         self.tab_setup.server_stopped()
         self.statusBar().setStyleSheet(self.status_bar_normal_style)
 
+    def _check_latest_release(self):
+        tokens = list()
+
+        new_release = False
+        new_bugfix = False
+        latest_version = None
+        try:
+            response = urllib2.urlopen('https://www.hydroffice.org/latest/soundspeedmanager.txt', timeout=1)
+            latest_version = response.read().split()[0]
+
+            cur_maj, cur_min, cur_fix = ssm_version.split('.')
+            lat_maj, lat_min, lat_fix = latest_version.split('.')
+
+            if int(lat_maj) > int(cur_maj):
+                new_release = True
+
+            elif (int(lat_maj) == int(cur_maj)) and (int(lat_min) > int(cur_min)):
+                new_release = True
+
+            elif (int(lat_maj) == int(cur_maj)) and (int(lat_min) == int(cur_min)) and (int(lat_fix) > int(cur_fix)):
+                new_bugfix = True
+
+        except (urllib2.URLError, ssl.SSLError) as e:
+            logger.info("unable to check latest release")
+
+        if new_release:
+            logger.info("new release available: %s" % latest_version)
+            self.releaseInfo.setText("New release available: %s" % latest_version)
+            self.releaseInfo.setStyleSheet("QLabel{background-color:rgba(255,0,0,128);"
+                                           "color:rgba(0,0,0,128);"
+                                           "font-size: 8pt;}")
+
+        elif new_bugfix:
+            logger.info("new bugfix available: %s" % latest_version)
+            self.releaseInfo.setText("New bugfix available: %s" % latest_version)
+            self.releaseInfo.setStyleSheet("QLabel{background-color:rgba(255,255,0,128);"
+                                           "color:rgba(0,0,0,128);"
+                                           "font-size: 8pt;}")
+
     def update_gui(self):
+
+        if self.timer_execs % 5 == 0:
+            logger.debug("timer executions: %d" % self.timer_execs)
+            self._check_latest_release()
+
+        self.timer_execs += 1
+
         if self.lib.setup.noaa_tools:
             self.tab_seacat.setEnabled(True)
         else:
