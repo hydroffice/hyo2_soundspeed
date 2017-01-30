@@ -63,6 +63,10 @@ class AbstractReader(AbstractFormat):
                 # select samples by casting direction
                 profile.reduce_up_down(self.s.ssp_up_or_down)
 
+            # Calc speed if needed (must have temp+salinity) since we are now guaranteed depth.
+            if not np.count_nonzero(profile.data.speed) and np.count_nonzero(profile.data.temp) and np.count_nonzero(profile.data.sal):
+                profile.calc_data_speed()
+
             # check if timestamp is present
             if profile.meta.utc_time is None:
                 profile.meta.utc_time = self.cb.ask_date()

@@ -283,7 +283,7 @@ class Profile(object):
                                               self.data.temp[count],
                                               self.data.sal[count],
                                               latitude)
-            self.modify_proc_info(Dicts.proc_import_infos['CALC_SPD'])
+        self.modify_proc_info(Dicts.proc_import_infos['CALC_SPD'])
 
     def calc_proc_speed(self):
         """Helper method to calculate processed sound speed"""
