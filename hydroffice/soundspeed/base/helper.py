@@ -214,8 +214,16 @@ def python_path():
 
 def is_pydro():
     try:
+        # noinspection PyUnresolvedReferences
         import HSTB
         return True
 
     except Exception:
-        return False
+
+        try:
+            # noinspection PyUnresolvedReferences
+            import HSTP
+            return True
+
+        except Exception:
+            return False
