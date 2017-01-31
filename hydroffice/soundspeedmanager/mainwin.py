@@ -429,7 +429,7 @@ class MainWin(QtGui.QMainWindow):
     def update_gui(self):
 
         if self.timer_execs % 200 == 0:
-            logger.debug("timer executions: %d" % self.timer_execs)
+            # logger.debug("timer executions: %d" % self.timer_execs)
             self._check_latest_release()
 
         self.timer_execs += 1
