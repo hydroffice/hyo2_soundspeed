@@ -6,6 +6,7 @@ import numpy as np
 import os
 import logging
 
+from matplotlib import rc_context
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT
 from matplotlib.backend_bases import cursors
 try:
@@ -30,6 +31,21 @@ class NavToolbar(NavigationToolbar2QT):
 
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
+    font_size = 6
+    rc_context = {
+        'font.family': 'sans-serif',
+        'font.sans-serif': ['Tahoma', 'Bitstream Vera Sans', 'Lucida Grande', 'Verdana'],
+        'font.size': font_size,
+        'figure.titlesize': font_size + 1,
+        'axes.labelsize': font_size,
+        'legend.fontsize': font_size,
+        'xtick.labelsize': font_size - 3,
+        'ytick.labelsize': font_size - 3,
+        'axes.linewidth': 0.5,
+        'axes.xmargin': 0.01,
+        'axes.ymargin': 0.01,
+        'backend.qt4': 'PySide'
+    }
 
     def __init__(self, canvas, parent, plot_win, prj, coordinates=True):
 
@@ -244,56 +260,76 @@ class NavToolbar(NavigationToolbar2QT):
                 self.set_message(s)
 
             if self.mode == 'insert':
+
                 msg = str()
-                if self.insert_sample:
-                    if self.insert_sample.depth:
-                        msg += "+[d:%.2f," % self.insert_sample.depth
+                if self.insert_sample: # we are adding a 2-step sample
+
+                    if plt_label == "speed":
+                        msg += "1-step insert [d:%.2f" % event.ydata
                     else:
-                        msg += "+[d:%.2f," % event.ydata
+                        if not self.insert_sample.temp:
+                            msg += "now set temp [d:%.2f" % self.insert_sample.depth
+                        elif not self.insert_sample.sal:
+                            msg += "now set sal [d:%.2f" % self.insert_sample.depth
+
                     if self.insert_sample.speed:
-                        msg += " vs:%.2f," % self.insert_sample.speed
+                        msg += ", vs:%.2f" % self.insert_sample.speed
                     else:
                         if plt_label == "speed":
                             msg += ", vs:%.2f" % event.xdata
                         else:
                             msg += ", vs:*"
+
                     if self.insert_sample.temp:
-                        msg += " t:%.2f," % self.insert_sample.temp
+                        msg += ", t:%.2f" % self.insert_sample.temp
                     else:
                         if plt_label == "temp":
                             msg += ", t:%.2f" % event.xdata
                         else:
                             msg += ", t:*"
+
                     if self.insert_sample.sal:
-                        msg += " s:%.2f]" % self.insert_sample.sal
+                        msg += ", s:%.2f]" % self.insert_sample.sal
                     else:
                         if plt_label == "sal":
                             msg += ", s:%.2f]" % event.xdata
                         else:
                             msg += ", s:*]"
-                else:
-                    msg += "+[d:%.2f" % event.ydata
+
+                else:  # we don't know if the user will select a 2-step insertion or directly a sound speed value
+
+                    if plt_label == "speed":
+                        msg += "1-step insert [d:%.2f" % event.ydata
+                    else:
+                        msg += "2-step insert [d:%.2f" % event.ydata
+
                     if plt_label == "speed":
                         msg += ", vs:%.2f" % event.xdata
                     else:
                         msg += ", vs:*"
+
                     if plt_label == "temp":
                         msg += ", t:%.2f" % event.xdata
                     else:
                         msg += ", t:*"
+
                     if plt_label == "sal":
                         msg += ", s:%.2f]" % event.xdata
                     else:
                         msg += ", s:*]"
+
                 self.mon_label.setText(msg)
+
             else:
                 self.mon_label.setText('')
 
         else:
             if self.mode:
                 self.set_message('%s' % self.mode)
+
             else:
                 self.set_message('')
+
             self.mon_label.setText('')
 
     def _set_cursor(self, event):
@@ -989,30 +1025,37 @@ class NavToolbar(NavigationToolbar2QT):
             self._button_pressed = 1
         else:  # nothing and return for middle
             self._button_pressed = None
+            self.insert_sample = None
             return
         logger.debug("INSERT > press > button #%s" % self._button_pressed)
 
         x, y = event.x, event.y  # cursor position in pixel
         xd, yd = event.xdata, event.ydata  # cursor position in data coords
-        logger.debug("INSERT > press > loc (%.3f,%.3f)(%.3f,%.3f)" % (x, y, xd, yd))
+        # using %s since they might be None
+        logger.debug("INSERT > press > loc (%s,%s)(%s,%s)" % (x, y, xd, yd))
 
         if not self.insert_sample:
             self.insert_sample = Sample()
 
+        # click outside the axes
+        if event.inaxes is None:
+            return
+
         plt_label = event.inaxes.get_label()
-        if plt_label == "speed":
+        if plt_label == "speed":  # we store both y and x
             if self.insert_sample.temp:
                 self.insert_sample.temp = None
             if self.insert_sample.sal:
                 self.insert_sample.sal = None
-            if not self.insert_sample.depth:
-                self.insert_sample.depth = yd
+            self.insert_sample.depth = yd
             self.insert_sample.speed = xd
-        elif plt_label == "temp":
+
+        elif plt_label == "temp":  # we don't overwrite y, if present
             if not self.insert_sample.depth:
                 self.insert_sample.depth = yd
             self.insert_sample.temp = xd
-        elif plt_label == "sal":
+
+        elif plt_label == "sal":  # we don't overwrite y, if present
             if not self.insert_sample.depth:
                 self.insert_sample.depth = yd
             self.insert_sample.sal = xd
@@ -1041,19 +1084,25 @@ class NavToolbar(NavigationToolbar2QT):
 
     def grid_plot(self):
         grid_flag = self.grid_action.isChecked()
-        for a in self.canvas.figure.get_axes():
-            a.grid(grid_flag)
+
+        with rc_context(self.rc_context):
+            for a in self.canvas.figure.get_axes():
+                a.grid(grid_flag)
+
         self.dynamic_update()
 
     def legend_plot(self):
         legend_flag = self.legend_action.isChecked()
         logger.debug("plot legend: %s" % legend_flag)
-        if legend_flag:
-            for a in self.canvas.figure.get_axes():
-                a.legend(loc='lower left')
-        else:
-            for a in self.canvas.figure.get_axes():
-                a.legend_.remove()
+
+        with rc_context(self.rc_context):
+            if legend_flag:
+                for a in self.canvas.figure.get_axes():
+                    a.legend(loc='lower left')
+            else:
+                for a in self.canvas.figure.get_axes():
+                    a.legend_.remove()
+
         self.dynamic_update()
 
     def flagged_plot(self):

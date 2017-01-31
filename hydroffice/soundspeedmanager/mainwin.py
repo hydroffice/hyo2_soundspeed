@@ -50,7 +50,7 @@ class MainWin(QtGui.QMainWindow):
 
         # set the minimum and the initial size
         self.setMinimumSize(640, 480)
-        self.resize(900, 600)
+        self.resize(920, 600)
 
         # set icons
         icon_info = QtCore.QFileInfo(os.path.join(self.media, 'favicon.png'))

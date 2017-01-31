@@ -2,16 +2,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import os
 import numpy as np
-from matplotlib import rcParams
-rcParams.update(
-    {
-        'font.family': 'sans-serif',
-        'font.size': 9
-    }
-)
-rcParams['backend.qt4'] = 'PySide'
+
 import matplotlib
 matplotlib.use('Qt4Agg')
+from matplotlib import rc_context
 
 from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
@@ -24,6 +18,22 @@ logger = logging.getLogger(__name__)
 
 class PlotDb(object):
     """Class that plots sound speed db data"""
+
+    font_size = 6
+    rc_context = {
+        'font.family': 'sans-serif',
+        'font.sans-serif': ['Tahoma', 'Bitstream Vera Sans', 'Lucida Grande', 'Verdana'],
+        'font.size': font_size,
+        'figure.titlesize': font_size + 1,
+        'axes.labelsize': font_size,
+        'legend.fontsize': font_size,
+        'xtick.labelsize': font_size - 1,
+        'ytick.labelsize': font_size - 1,
+        'axes.linewidth': 0.5,
+        'axes.xmargin': 0.01,
+        'axes.ymargin': 0.01,
+        'backend.qt4': 'PySide'
+    }
 
     def __init__(self, db):
         self.db = db
@@ -44,111 +54,113 @@ class PlotDb(object):
     def map_profiles(self, output_folder, save_fig=False):
         """plot all the ssp in the database"""
 
-        if not save_fig:
-            plt.ion()
+        with rc_context(self.rc_context):
 
-        rows = self.db.list_profiles()
-        if rows is None:
-            raise RuntimeError("Unable to retrieve ssp view rows > Empty database?")
-        if len(rows) == 0:
-            raise RuntimeError("Unable to retrieve ssp view rows > Empty database?")
+            if not save_fig:
+                plt.ion()
 
-        # prepare the data
-        ssp_x = list()
-        ssp_y = list()
-        ssp_label = list()
-        for row in rows:
-            ssp_x.append(row[2].x)
-            ssp_y.append(row[2].y)
-            ssp_label.append(row[0])
-        ssp_x_min = min(ssp_x)
-        ssp_x_max = max(ssp_x)
-        ssp_x_mean = (ssp_x_min + ssp_x_max) / 2
-        ssp_x_delta = max(0.05, abs(ssp_x_max - ssp_x_min) / 5)
-        ssp_y_min = min(ssp_y)
-        ssp_y_max = max(ssp_y)
-        # ssp_y_mean = (ssp_y_min + ssp_y_max) / 2
-        ssp_y_delta = max(0.05, abs(ssp_y_max - ssp_y_min) / 5)
-        logger.info("data boundary: %.4f, %.4f (%.4f) / %.4f, %.4f (%.4f)"
-                    % (ssp_x_min, ssp_x_max, ssp_x_delta, ssp_y_min, ssp_y_max, ssp_y_delta))
+            rows = self.db.list_profiles()
+            if rows is None:
+                raise RuntimeError("Unable to retrieve ssp view rows > Empty database?")
+            if len(rows) == 0:
+                raise RuntimeError("Unable to retrieve ssp view rows > Empty database?")
 
-        # make the world map
-        fig = plt.figure()
-        # plt.title("SSP Map (%s profiles)" % len(view_rows))
-        ax = fig.add_subplot(111)
-        plt.ioff()
+            # prepare the data
+            ssp_x = list()
+            ssp_y = list()
+            ssp_label = list()
+            for row in rows:
+                ssp_x.append(row[2].x)
+                ssp_y.append(row[2].y)
+                ssp_label.append(row[0])
+            ssp_x_min = min(ssp_x)
+            ssp_x_max = max(ssp_x)
+            ssp_x_mean = (ssp_x_min + ssp_x_max) / 2
+            ssp_x_delta = max(0.05, abs(ssp_x_max - ssp_x_min) / 5)
+            ssp_y_min = min(ssp_y)
+            ssp_y_max = max(ssp_y)
+            # ssp_y_mean = (ssp_y_min + ssp_y_max) / 2
+            ssp_y_delta = max(0.05, abs(ssp_y_max - ssp_y_min) / 5)
+            logger.info("data boundary: %.4f, %.4f (%.4f) / %.4f, %.4f (%.4f)"
+                        % (ssp_x_min, ssp_x_max, ssp_x_delta, ssp_y_min, ssp_y_max, ssp_y_delta))
 
-        wm = self._world_draw_map()
-        # x, y = wm(ssp_x_mean, ssp_y_mean)
-        # wm.scatter(x, y, s=18, color='y')
+            # make the world map
+            fig = plt.figure()
+            # plt.title("SSP Map (%s profiles)" % len(view_rows))
+            ax = fig.add_subplot(111)
+            plt.ioff()
 
-        if ssp_x_mean > 0:
-            ssp_loc = 2
-        else:
-            ssp_loc = 1
-
-        max_delta_range = max(abs(ssp_x_min - ssp_x_max), abs(ssp_y_min - ssp_y_max))
-        logger.info("maximum delta range: %s" % max_delta_range)
-
-        if max_delta_range > 50:
-            ins_scale = 0  # no inset
-        elif max_delta_range > 15:
-            ins_scale = 6
-        elif max_delta_range > 12:
-            ins_scale = 9
-        elif max_delta_range > 6:
-            ins_scale = 12
-        elif max_delta_range > 3:
-            ins_scale = 15
-            ssp_x_delta *= 2
-            ssp_y_delta *= 2
-        elif max_delta_range > 1:
-            ins_scale = 18
-            ssp_x_delta *= 5
-            ssp_y_delta *= 5
-        elif max_delta_range > 0.1:
-            ins_scale = 21
-            ssp_x_delta *= 10
-            ssp_y_delta *= 10
-        else:
-            ins_scale = 24
-            ssp_x_delta *= 40
-            ssp_y_delta *= 40
-
-        # to avoid inset for too large area
-        if ins_scale != 0:
-
-            ax_ins = zoomed_inset_axes(ax, ins_scale, loc=ssp_loc)
-            ax_ins.set_xlim((ssp_x_min - ssp_x_delta), (ssp_x_max + ssp_x_delta))
-            ax_ins.set_ylim((ssp_y_min - ssp_y_delta), (ssp_y_max + ssp_y_delta))
-
-            m = self._inset_draw_map(llcrnrlon=(ssp_x_min - ssp_x_delta), llcrnrlat=(ssp_y_min - ssp_y_delta),
-                                     urcrnrlon=(ssp_x_max + ssp_x_delta), urcrnrlat=(ssp_y_max + ssp_y_delta),
-                                     ax_ins=ax_ins)
-
-            x, y = m(ssp_x, ssp_y)
-            m.scatter(x, y, marker='o', s=16, color='r')
-            m.scatter(x, y, marker='.', s=1, color='k')
+            wm = self._world_draw_map()
+            # x, y = wm(ssp_x_mean, ssp_y_mean)
+            # wm.scatter(x, y, s=18, color='y')
 
             if ssp_x_mean > 0:
-                mark_inset(ax, ax_ins, loc1=1, loc2=4, fc="none", ec='y')
+                ssp_loc = 2
             else:
-                mark_inset(ax, ax_ins, loc1=2, loc2=3, fc="none", ec='y')
+                ssp_loc = 1
 
-            ax_ins.tick_params(color='y', labelcolor='y')
-            for spine in ax_ins.spines.values():
-                spine.set_edgecolor('y')
+            max_delta_range = max(abs(ssp_x_min - ssp_x_max), abs(ssp_y_min - ssp_y_max))
+            logger.info("maximum delta range: %s" % max_delta_range)
 
-        else:
-            x, y = wm(ssp_x, ssp_y)
-            wm.scatter(x, y, marker='o', s=16, color='r')
-            wm.scatter(x, y, marker='.', s=1, color='k')
+            if max_delta_range > 50:
+                ins_scale = 0  # no inset
+            elif max_delta_range > 15:
+                ins_scale = 6
+            elif max_delta_range > 12:
+                ins_scale = 9
+            elif max_delta_range > 6:
+                ins_scale = 12
+            elif max_delta_range > 3:
+                ins_scale = 15
+                ssp_x_delta *= 2
+                ssp_y_delta *= 2
+            elif max_delta_range > 1:
+                ins_scale = 18
+                ssp_x_delta *= 5
+                ssp_y_delta *= 5
+            elif max_delta_range > 0.1:
+                ins_scale = 21
+                ssp_x_delta *= 10
+                ssp_y_delta *= 10
+            else:
+                ins_scale = 24
+                ssp_x_delta *= 40
+                ssp_y_delta *= 40
 
-        if save_fig:
-            plt.savefig(os.path.join(self.plots_folder(output_folder), 'ssp_map.png'),
-                        bbox_inches='tight')
-        # else:
-        #     plt.show()
+            # to avoid inset for too large area
+            if ins_scale != 0:
+
+                ax_ins = zoomed_inset_axes(ax, ins_scale, loc=ssp_loc)
+                ax_ins.set_xlim((ssp_x_min - ssp_x_delta), (ssp_x_max + ssp_x_delta))
+                ax_ins.set_ylim((ssp_y_min - ssp_y_delta), (ssp_y_max + ssp_y_delta))
+
+                m = self._inset_draw_map(llcrnrlon=(ssp_x_min - ssp_x_delta), llcrnrlat=(ssp_y_min - ssp_y_delta),
+                                         urcrnrlon=(ssp_x_max + ssp_x_delta), urcrnrlat=(ssp_y_max + ssp_y_delta),
+                                         ax_ins=ax_ins)
+
+                x, y = m(ssp_x, ssp_y)
+                m.scatter(x, y, marker='o', s=16, color='r')
+                m.scatter(x, y, marker='.', s=1, color='k')
+
+                if ssp_x_mean > 0:
+                    mark_inset(ax, ax_ins, loc1=1, loc2=4, fc="none", ec='y')
+                else:
+                    mark_inset(ax, ax_ins, loc1=2, loc2=3, fc="none", ec='y')
+
+                ax_ins.tick_params(color='y', labelcolor='y')
+                for spine in ax_ins.spines.values():
+                    spine.set_edgecolor('y')
+
+            else:
+                x, y = wm(ssp_x, ssp_y)
+                wm.scatter(x, y, marker='o', s=16, color='r')
+                wm.scatter(x, y, marker='.', s=1, color='k')
+
+            if save_fig:
+                plt.savefig(os.path.join(self.plots_folder(output_folder), 'ssp_map.png'),
+                            bbox_inches='tight')
+            # else:
+            #     plt.show()
 
         return True
 

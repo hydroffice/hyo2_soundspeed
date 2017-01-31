@@ -3,22 +3,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from PySide import QtGui
 from PySide import QtCore
 
-from matplotlib import rcParams
-rcParams['font.family'] = 'sans-serif'
-rcParams['font.sans-serif'] = ['Tahoma', 'Bitstream Vera Sans', 'Lucida Grande', 'Verdana']
-rcParams['font.size'] = 9
-rcParams['figure.titlesize'] = rcParams['font.size'] + 1
-rcParams['axes.labelsize'] = rcParams['font.size']
-rcParams['legend.fontsize'] = rcParams['font.size'] - 1
-rcParams['xtick.labelsize'] = rcParams['font.size'] - 2
-rcParams['ytick.labelsize'] = rcParams['font.size'] - 2
-rcParams['axes.linewidth'] = 0.5
-rcParams['axes.xmargin'] = 0.01
-rcParams['axes.ymargin'] = 0.01
-rcParams['backend.qt4'] = 'PySide'
 import matplotlib
 matplotlib.use('Qt4Agg')
 
+from matplotlib import rc_context
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib import pyplot as plt
@@ -30,6 +18,22 @@ from hydroffice.soundspeedmanager.dialogs.dialog import AbstractDialog
 
 
 class PlotMultiProfileDialog(AbstractDialog):
+
+    font_size = 6
+    rc_context = {
+        'font.family': 'sans-serif',
+        'font.sans-serif': ['Tahoma', 'Bitstream Vera Sans', 'Lucida Grande', 'Verdana'],
+        'font.size': font_size,
+        'figure.titlesize': font_size + 1,
+        'axes.labelsize': font_size,
+        'legend.fontsize': font_size,
+        'xtick.labelsize': font_size - 1,
+        'ytick.labelsize': font_size - 1,
+        'axes.linewidth': 0.5,
+        'axes.xmargin': 0.01,
+        'axes.ymargin': 0.01,
+        'backend.qt4': 'PySide'
+    }
 
     def __init__(self, main_win, lib, pks, parent=None):
         AbstractDialog.__init__(self, main_win=main_win, lib=lib, parent=parent)
@@ -101,212 +105,221 @@ class PlotMultiProfileDialog(AbstractDialog):
     def on_plot_sound_speed(self):
         logger.debug("plot sound speed")
 
-        plt.ion()
+        with rc_context(self.rc_context):
 
-        # figure and canvas
-        fig = plt.figure("Plot Sound Speed", figsize=self.f_sz, dpi=self.f_dpi)
-        fig.patch.set_alpha(0.0)
-        ax = fig.add_subplot(111)
-        ax.invert_yaxis()
+            plt.ion()
 
-        y_min = None
-        y_max = None
-        x_min = None
-        x_max = None
+            # figure and canvas
+            fig = plt.figure("Plot Sound Speed", figsize=self.f_sz, dpi=self.f_dpi)
+            fig.patch.set_alpha(0.0)
+            ax = fig.add_subplot(111)
+            ax.invert_yaxis()
 
-        # actually do the export
-        for pk in self._pks:
+            y_min = None
+            y_max = None
+            x_min = None
+            x_max = None
 
-            success = self.lib.load_profile(pk, skip_atlas=True)
-            if not success:
+            # actually do the export
+            for pk in self._pks:
 
-                # noinspection PyCallByClass
-                QtGui.QMessageBox.warning(self, "Database", "Unable to load profile #%02d!" % pk, QtGui.QMessageBox.Ok)
-                continue
+                success = self.lib.load_profile(pk, skip_atlas=True)
+                if not success:
 
-            _x_min = self.lib.cur.proc.speed[self.lib.cur.proc_valid].min()
-            if x_min is None:
-                x_min = _x_min
-            else:
-                x_min = min(x_min, _x_min)
+                    # noinspection PyCallByClass
+                    QtGui.QMessageBox.warning(self, "Database", "Unable to load profile #%02d!" % pk, QtGui.QMessageBox.Ok)
+                    continue
 
-            _x_max = self.lib.cur.proc.speed[self.lib.cur.proc_valid].max()
-            if x_max is None:
-                x_max = _x_max
-            else:
-                x_max = max(x_max, _x_max)
+                _x_min = self.lib.cur.proc.speed[self.lib.cur.proc_valid].min()
+                if x_min is None:
+                    x_min = _x_min
+                else:
+                    x_min = min(x_min, _x_min)
 
-            _y_min = self.lib.cur.proc.depth[self.lib.cur.proc_valid].min()
-            if y_min is None:
-                y_min = _y_min
-            else:
-                y_min = min(y_min, _y_min)
+                _x_max = self.lib.cur.proc.speed[self.lib.cur.proc_valid].max()
+                if x_max is None:
+                    x_max = _x_max
+                else:
+                    x_max = max(x_max, _x_max)
 
-            _y_max = self.lib.cur.proc.depth[self.lib.cur.proc_valid].max()
-            if y_max is None:
-                y_max = _y_max
-            else:
-                y_max = max(y_max, _y_max)
+                _y_min = self.lib.cur.proc.depth[self.lib.cur.proc_valid].min()
+                if y_min is None:
+                    y_min = _y_min
+                else:
+                    y_min = min(y_min, _y_min)
 
-            _, = ax.plot(
-                self.lib.cur.proc.speed[self.lib.cur.proc_valid],
-                self.lib.cur.proc.depth[self.lib.cur.proc_valid],
-                label='#%03d' % pk
-            )
+                _y_max = self.lib.cur.proc.depth[self.lib.cur.proc_valid].max()
+                if y_max is None:
+                    y_max = _y_max
+                else:
+                    y_max = max(y_max, _y_max)
 
-        logger.debug("x: min %.2f, max %.2f" % (x_min, x_max))
-        logger.debug("y: min %.2f, max %.2f" % (y_min, y_max))
+                _, = ax.plot(
+                    self.lib.cur.proc.speed[self.lib.cur.proc_valid],
+                    self.lib.cur.proc.depth[self.lib.cur.proc_valid],
+                    label='#%03d' % pk
+                )
 
-        x_range = x_max - x_min
-        y_range = y_max - y_min
+            logger.debug("x: min %.2f, max %.2f" % (x_min, x_max))
+            logger.debug("y: min %.2f, max %.2f" % (y_min, y_max))
 
-        ax.legend(loc='lower left')
-        plt.xlabel('Sound Speed [m/s]', fontsize=8)
-        plt.ylabel('Depth [m]', fontsize=8)
-        fig.get_axes()[0].set_xlim(x_min - 0.1*x_range, x_max + 0.1*x_range)
-        fig.get_axes()[0].set_ylim(y_max + 0.15*y_range, y_min - 0.05*y_range)
-        plt.grid()
-        plt.show()
+            x_range = x_max - x_min
+            y_range = y_max - y_min
+
+            ax.legend(loc='lower left')
+            plt.xlabel('Sound Speed [m/s]', fontsize=8)
+            plt.ylabel('Depth [m]', fontsize=8)
+            fig.get_axes()[0].set_xlim(x_min - 0.1*x_range, x_max + 0.1*x_range)
+            fig.get_axes()[0].set_ylim(y_max + 0.15*y_range, y_min - 0.05*y_range)
+            plt.grid()
+            plt.show()
+
         self.accept()
 
     def on_plot_temperature(self):
         logger.debug("plot temperature")
 
-        plt.ion()
+        with rc_context(self.rc_context):
 
-        # figure and canvas
-        fig = plt.figure("Plot Temperature", figsize=self.f_sz, dpi=self.f_dpi)
-        fig.patch.set_alpha(0.0)
-        ax = fig.add_subplot(111)
-        ax.invert_yaxis()
+            plt.ion()
 
-        y_min = None
-        y_max = None
-        x_min = None
-        x_max = None
+            # figure and canvas
+            fig = plt.figure("Plot Temperature", figsize=self.f_sz, dpi=self.f_dpi)
+            fig.patch.set_alpha(0.0)
+            ax = fig.add_subplot(111)
+            ax.invert_yaxis()
 
-        # actually do the export
-        for pk in self._pks:
+            y_min = None
+            y_max = None
+            x_min = None
+            x_max = None
 
-            success = self.lib.load_profile(pk, skip_atlas=True)
-            if not success:
+            # actually do the export
+            for pk in self._pks:
 
-                # noinspection PyCallByClass
-                QtGui.QMessageBox.warning(self, "Database", "Unable to load profile #%02d!" % pk, QtGui.QMessageBox.Ok)
-                continue
+                success = self.lib.load_profile(pk, skip_atlas=True)
+                if not success:
 
-            _x_min = self.lib.cur.proc.temp[self.lib.cur.proc_valid].min()
-            if x_min is None:
-                x_min = _x_min
-            else:
-                x_min = min(x_min, _x_min)
+                    # noinspection PyCallByClass
+                    QtGui.QMessageBox.warning(self, "Database", "Unable to load profile #%02d!" % pk, QtGui.QMessageBox.Ok)
+                    continue
 
-            _x_max = self.lib.cur.proc.temp[self.lib.cur.proc_valid].max()
-            if x_max is None:
-                x_max = _x_max
-            else:
-                x_max = max(x_max, _x_max)
+                _x_min = self.lib.cur.proc.temp[self.lib.cur.proc_valid].min()
+                if x_min is None:
+                    x_min = _x_min
+                else:
+                    x_min = min(x_min, _x_min)
 
-            _y_min = self.lib.cur.proc.depth[self.lib.cur.proc_valid].min()
-            if y_min is None:
-                y_min = _y_min
-            else:
-                y_min = min(y_min, _y_min)
+                _x_max = self.lib.cur.proc.temp[self.lib.cur.proc_valid].max()
+                if x_max is None:
+                    x_max = _x_max
+                else:
+                    x_max = max(x_max, _x_max)
 
-            _y_max = self.lib.cur.proc.depth[self.lib.cur.proc_valid].max()
-            if y_max is None:
-                y_max = _y_max
-            else:
-                y_max = max(y_max, _y_max)
+                _y_min = self.lib.cur.proc.depth[self.lib.cur.proc_valid].min()
+                if y_min is None:
+                    y_min = _y_min
+                else:
+                    y_min = min(y_min, _y_min)
 
-            _, = ax.plot(
-                self.lib.cur.proc.temp[self.lib.cur.proc_valid],
-                self.lib.cur.proc.depth[self.lib.cur.proc_valid],
-                label='#%03d' % pk
-            )
+                _y_max = self.lib.cur.proc.depth[self.lib.cur.proc_valid].max()
+                if y_max is None:
+                    y_max = _y_max
+                else:
+                    y_max = max(y_max, _y_max)
 
-        logger.debug("x: min %.2f, max %.2f" % (x_min, x_max))
-        logger.debug("y: min %.2f, max %.2f" % (y_min, y_max))
+                _, = ax.plot(
+                    self.lib.cur.proc.temp[self.lib.cur.proc_valid],
+                    self.lib.cur.proc.depth[self.lib.cur.proc_valid],
+                    label='#%03d' % pk
+                )
 
-        x_range = x_max - x_min
-        y_range = y_max - y_min
+            logger.debug("x: min %.2f, max %.2f" % (x_min, x_max))
+            logger.debug("y: min %.2f, max %.2f" % (y_min, y_max))
 
-        ax.legend(loc='lower left')
-        plt.xlabel('Temperature [deg C]', fontsize=8)
-        plt.ylabel('Depth [m]', fontsize=8)
-        fig.get_axes()[0].set_xlim(x_min - 0.1*x_range, x_max + 0.1*x_range)
-        fig.get_axes()[0].set_ylim(y_max + 0.15*y_range, y_min - 0.05*y_range)
-        plt.grid()
-        plt.show()
+            x_range = x_max - x_min
+            y_range = y_max - y_min
+
+            ax.legend(loc='lower left')
+            plt.xlabel('Temperature [deg C]', fontsize=8)
+            plt.ylabel('Depth [m]', fontsize=8)
+            fig.get_axes()[0].set_xlim(x_min - 0.1*x_range, x_max + 0.1*x_range)
+            fig.get_axes()[0].set_ylim(y_max + 0.15*y_range, y_min - 0.05*y_range)
+            plt.grid()
+            plt.show()
+
         self.accept()
 
     def on_plot_salinity(self):
         logger.debug("plot salinity")
 
-        plt.ion()
+        with rc_context(self.rc_context):
 
-        # figure and canvas
-        fig = plt.figure("Plot Salinity", figsize=self.f_sz, dpi=self.f_dpi)
-        fig.patch.set_alpha(0.0)
-        ax = fig.add_subplot(111)
-        ax.invert_yaxis()
+            plt.ion()
 
-        y_min = None
-        y_max = None
-        x_min = None
-        x_max = None
+            # figure and canvas
+            fig = plt.figure("Plot Salinity", figsize=self.f_sz, dpi=self.f_dpi)
+            fig.patch.set_alpha(0.0)
+            ax = fig.add_subplot(111)
+            ax.invert_yaxis()
 
-        # actually do the export
-        for pk in self._pks:
+            y_min = None
+            y_max = None
+            x_min = None
+            x_max = None
 
-            success = self.lib.load_profile(pk, skip_atlas=True)
-            if not success:
+            # actually do the export
+            for pk in self._pks:
 
-                # noinspection PyCallByClass
-                QtGui.QMessageBox.warning(self, "Database", "Unable to load profile #%02d!" % pk, QtGui.QMessageBox.Ok)
-                continue
+                success = self.lib.load_profile(pk, skip_atlas=True)
+                if not success:
 
-            _x_min = self.lib.cur.proc.sal[self.lib.cur.proc_valid].min()
-            if x_min is None:
-                x_min = _x_min
-            else:
-                x_min = min(x_min, _x_min)
+                    # noinspection PyCallByClass
+                    QtGui.QMessageBox.warning(self, "Database", "Unable to load profile #%02d!" % pk, QtGui.QMessageBox.Ok)
+                    continue
 
-            _x_max = self.lib.cur.proc.sal[self.lib.cur.proc_valid].max()
-            if x_max is None:
-                x_max = _x_max
-            else:
-                x_max = max(x_max, _x_max)
+                _x_min = self.lib.cur.proc.sal[self.lib.cur.proc_valid].min()
+                if x_min is None:
+                    x_min = _x_min
+                else:
+                    x_min = min(x_min, _x_min)
 
-            _y_min = self.lib.cur.proc.depth[self.lib.cur.proc_valid].min()
-            if y_min is None:
-                y_min = _y_min
-            else:
-                y_min = min(y_min, _y_min)
+                _x_max = self.lib.cur.proc.sal[self.lib.cur.proc_valid].max()
+                if x_max is None:
+                    x_max = _x_max
+                else:
+                    x_max = max(x_max, _x_max)
 
-            _y_max = self.lib.cur.proc.depth[self.lib.cur.proc_valid].max()
-            if y_max is None:
-                y_max = _y_max
-            else:
-                y_max = max(y_max, _y_max)
+                _y_min = self.lib.cur.proc.depth[self.lib.cur.proc_valid].min()
+                if y_min is None:
+                    y_min = _y_min
+                else:
+                    y_min = min(y_min, _y_min)
 
-            _, = ax.plot(
-                self.lib.cur.proc.sal[self.lib.cur.proc_valid],
-                self.lib.cur.proc.depth[self.lib.cur.proc_valid],
-                label='#%03d' % pk
-            )
+                _y_max = self.lib.cur.proc.depth[self.lib.cur.proc_valid].max()
+                if y_max is None:
+                    y_max = _y_max
+                else:
+                    y_max = max(y_max, _y_max)
 
-        logger.debug("x: min %.2f, max %.2f" % (x_min, x_max))
-        logger.debug("y: min %.2f, max %.2f" % (y_min, y_max))
+                _, = ax.plot(
+                    self.lib.cur.proc.sal[self.lib.cur.proc_valid],
+                    self.lib.cur.proc.depth[self.lib.cur.proc_valid],
+                    label='#%03d' % pk
+                )
 
-        x_range = x_max - x_min
-        y_range = y_max - y_min
+            logger.debug("x: min %.2f, max %.2f" % (x_min, x_max))
+            logger.debug("y: min %.2f, max %.2f" % (y_min, y_max))
 
-        ax.legend(loc='lower left')
-        plt.xlabel('Salinity [PSU]', fontsize=8)
-        plt.ylabel('Depth [m]', fontsize=8)
-        fig.get_axes()[0].set_xlim(x_min - 0.1*x_range, x_max + 0.1*x_range)
-        fig.get_axes()[0].set_ylim(y_max + 0.15*y_range, y_min - 0.05*y_range)
-        plt.grid()
-        plt.show()
+            x_range = x_max - x_min
+            y_range = y_max - y_min
+
+            ax.legend(loc='lower left')
+            plt.xlabel('Salinity [PSU]', fontsize=8)
+            plt.ylabel('Depth [m]', fontsize=8)
+            fig.get_axes()[0].set_xlim(x_min - 0.1*x_range, x_max + 0.1*x_range)
+            fig.get_axes()[0].set_ylim(y_max + 0.15*y_range, y_min - 0.05*y_range)
+            plt.grid()
+            plt.show()
+
         self.accept()

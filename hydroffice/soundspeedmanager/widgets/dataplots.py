@@ -7,24 +7,12 @@ import logging
 import numpy as np
 from PySide import QtGui
 from PySide import QtCore
-from matplotlib import rcParams
-rcParams['font.family'] = 'sans-serif'
-rcParams['font.sans-serif'] = ['Tahoma', 'Bitstream Vera Sans', 'Lucida Grande', 'Verdana']
-rcParams['font.size'] = 9
-rcParams['figure.titlesize'] = rcParams['font.size'] + 1
-rcParams['axes.labelsize'] = rcParams['font.size']
-rcParams['legend.fontsize'] = rcParams['font.size'] - 1
-rcParams['xtick.labelsize'] = rcParams['font.size'] - 2
-rcParams['ytick.labelsize'] = rcParams['font.size'] - 2
-rcParams['axes.linewidth'] = 0.5
-rcParams['axes.xmargin'] = 0.01
-rcParams['axes.ymargin'] = 0.01
-rcParams['backend.qt4'] = 'PySide'
+
 import matplotlib
 matplotlib.use('Qt4Agg')
-
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+from matplotlib import rc_context
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +24,21 @@ class DataPlots(AbstractWidget):
 
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
+    font_size = 6
+    rc_context = {
+        'font.family': 'sans-serif',
+        'font.sans-serif': ['Tahoma', 'Bitstream Vera Sans', 'Lucida Grande', 'Verdana'],
+        'font.size': font_size,
+        'figure.titlesize': font_size + 1,
+        'axes.labelsize': font_size,
+        'legend.fontsize': font_size,
+        'xtick.labelsize': font_size - 1,
+        'ytick.labelsize': font_size - 1,
+        'axes.linewidth': 0.5,
+        'axes.xmargin': 0.01,
+        'axes.ymargin': 0.01,
+        'backend.qt4': 'PySide'
+    }
 
     def __init__(self, main_win, lib, server_mode=False):
         AbstractWidget.__init__(self, main_win=main_win, lib=lib)
@@ -68,20 +71,23 @@ class DataPlots(AbstractWidget):
         self.top_widget.setLayout(self.vbox)
 
         # figure and canvas
-        self.f = Figure(figsize=self.f_sz, dpi=self.f_dpi)
-        self.f.patch.set_alpha(0.0)
-        self.c = FigureCanvas(self.f)
-        self.c.setParent(self.top_widget)
-        self.c.setFocusPolicy(QtCore.Qt.ClickFocus)  # key for press events!!!
-        self.c.setFocus()
-        self.vbox.addWidget(self.c)
-        # axes
-        self.speed_ax = self.f.add_subplot(131)
-        self.speed_ax.invert_yaxis()
-        self.temp_ax = self.f.add_subplot(132, sharey=self.speed_ax)
-        self.temp_ax.invert_yaxis()
-        self.sal_ax = self.f.add_subplot(133, sharey=self.speed_ax)
-        self.sal_ax.invert_yaxis()
+        with rc_context(self.rc_context):
+            self.f = Figure(figsize=self.f_sz, dpi=self.f_dpi)
+            self.f.patch.set_alpha(0.0)
+            self.c = FigureCanvas(self.f)
+            self.c.setParent(self.top_widget)
+            self.c.setFocusPolicy(QtCore.Qt.ClickFocus)  # key for press events!!!
+            self.c.setFocus()
+            self.vbox.addWidget(self.c)
+
+            # axes
+            self.speed_ax = self.f.add_subplot(131)
+            self.speed_ax.invert_yaxis()
+            self.temp_ax = self.f.add_subplot(132, sharey=self.speed_ax)
+            self.temp_ax.invert_yaxis()
+            self.sal_ax = self.f.add_subplot(133, sharey=self.speed_ax)
+            self.sal_ax.invert_yaxis()
+
         # lines
         self.speed_draft = None
         self.speed_sensor = None
@@ -400,123 +406,129 @@ class DataPlots(AbstractWidget):
 
     def on_draw(self):
         """Redraws the figure"""
-        self._set_title()
-        # print("cur: %s" % self.lib.cur)
-        # if self.lib.cur:
-        if self.lib.has_ssp():
-            self.update_validity_indices()
-            self._draw_speed()
-            self._draw_temp()
-            self._draw_sal()
-            self.is_drawn = True
+        with rc_context(self.rc_context):
+            self._set_title()
+            # print("cur: %s" % self.lib.cur)
+            # if self.lib.cur:
+            if self.lib.has_ssp():
+                self.update_validity_indices()
+                self._draw_speed()
+                self._draw_temp()
+                self._draw_sal()
+                self.is_drawn = True
 
-        self._draw_grid()
-        self.update_limits()
+            self._draw_grid()
+            self.update_limits()
 
     def update_data(self):
         """Update plot"""
         self.update_validity_indices()
-        # speed
-        if self.speed_sis:
-            self.speed_sis.set_xdata(self.lib.cur.sis.speed[self.svi])
-            self.speed_sis.set_ydata(self.lib.cur.sis.depth[self.svi])
-        if self.speed_valid:
-            self.speed_valid.set_xdata(self.lib.cur.proc.speed[self.vi])
-            self.speed_valid.set_ydata(self.lib.cur.proc.depth[self.vi])
-        if self.speed_invalid:
-            self.speed_invalid.set_xdata(self.lib.cur.proc.speed[self.ii])
-            self.speed_invalid.set_ydata(self.lib.cur.proc.depth[self.ii])
-        # temp
-        if self.temp_valid:
-            self.temp_valid.set_xdata(self.lib.cur.proc.temp[self.vi])
-            self.temp_valid.set_ydata(self.lib.cur.proc.depth[self.vi])
-        if self.temp_invalid:
-            self.temp_invalid.set_xdata(self.lib.cur.proc.temp[self.ii])
-            self.temp_invalid.set_ydata(self.lib.cur.proc.depth[self.ii])
-        # sal
-        if self.sal_valid:
-            self.sal_valid.set_xdata(self.lib.cur.proc.sal[self.vi])
-            self.sal_valid.set_ydata(self.lib.cur.proc.depth[self.vi])
-        if self.sal_invalid:
-            self.sal_invalid.set_xdata(self.lib.cur.proc.sal[self.ii])
-            self.sal_invalid.set_ydata(self.lib.cur.proc.depth[self.ii])
 
-        if not self.lib.use_sis():  # in case that SIS was disabled
-            if self.speed_draft:
+        with rc_context(self.rc_context):
+            # speed
+            if self.speed_sis:
+                self.speed_sis.set_xdata(self.lib.cur.sis.speed[self.svi])
+                self.speed_sis.set_ydata(self.lib.cur.sis.depth[self.svi])
+            if self.speed_valid:
+                self.speed_valid.set_xdata(self.lib.cur.proc.speed[self.vi])
+                self.speed_valid.set_ydata(self.lib.cur.proc.depth[self.vi])
+            if self.speed_invalid:
+                self.speed_invalid.set_xdata(self.lib.cur.proc.speed[self.ii])
+                self.speed_invalid.set_ydata(self.lib.cur.proc.depth[self.ii])
+            # temp
+            if self.temp_valid:
+                self.temp_valid.set_xdata(self.lib.cur.proc.temp[self.vi])
+                self.temp_valid.set_ydata(self.lib.cur.proc.depth[self.vi])
+            if self.temp_invalid:
+                self.temp_invalid.set_xdata(self.lib.cur.proc.temp[self.ii])
+                self.temp_invalid.set_ydata(self.lib.cur.proc.depth[self.ii])
+            # sal
+            if self.sal_valid:
+                self.sal_valid.set_xdata(self.lib.cur.proc.sal[self.vi])
+                self.sal_valid.set_ydata(self.lib.cur.proc.depth[self.vi])
+            if self.sal_invalid:
+                self.sal_invalid.set_xdata(self.lib.cur.proc.sal[self.ii])
+                self.sal_invalid.set_ydata(self.lib.cur.proc.depth[self.ii])
+
+            if not self.lib.use_sis():  # in case that SIS was disabled
+                if self.speed_draft:
+                    self.speed_draft.set_ydata(None)
+                if self.speed_sensor:
+                    self.speed_sensor.set_xdata(None)
+                return
+
+            # plot title
+            self._set_title()
+
+            # it means that data have not been plotted
+            if (not self.speed_draft) or (not self.speed_sensor) or (not self.speed_seafloor):
+                return
+
+            if self.lib.listeners.sis.xyz88 is None:
                 self.speed_draft.set_ydata(None)
-            if self.speed_sensor:
-                self.speed_sensor.set_xdata(None)
-            return
-
-        # plot title
-        self._set_title()
-
-        # it means that data have not been plotted
-        if (not self.speed_draft) or (not self.speed_sensor) or (not self.speed_seafloor):
-            return
-
-        if self.lib.listeners.sis.xyz88 is None:
-            self.speed_draft.set_ydata(None)
-            self.speed_sensor.set_xdata(None)
-        else:
-            # sensor speed
-            if self.lib.listeners.sis.xyz88.sound_speed is None:
                 self.speed_sensor.set_xdata(None)
             else:
-                self.speed_sensor.set_xdata([self.lib.listeners.sis.xyz88.sound_speed, ])
-            # draft
-            if self.lib.listeners.sis.xyz88.transducer_draft is None:
-                self.speed_draft.set_ydata(None)
-            else:
-                self.speed_draft.set_ydata([self.lib.listeners.sis.xyz88.transducer_draft, ])
-            # seafloor
-            mean_depth = self.lib.listeners.sis.xyz88.mean_depth
-            if mean_depth:
-                self.speed_seafloor.set_ydata([mean_depth, ])
-            else:
-                self.speed_seafloor.set_ydata(None)
+                # sensor speed
+                if self.lib.listeners.sis.xyz88.sound_speed is None:
+                    self.speed_sensor.set_xdata(None)
+                else:
+                    self.speed_sensor.set_xdata([self.lib.listeners.sis.xyz88.sound_speed, ])
+                # draft
+                if self.lib.listeners.sis.xyz88.transducer_draft is None:
+                    self.speed_draft.set_ydata(None)
+                else:
+                    self.speed_draft.set_ydata([self.lib.listeners.sis.xyz88.transducer_draft, ])
+                # seafloor
+                mean_depth = self.lib.listeners.sis.xyz88.mean_depth
+                if mean_depth:
+                    self.speed_seafloor.set_ydata([mean_depth, ])
+                else:
+                    self.speed_seafloor.set_ydata(None)
 
     def update_limits(self):
 
-        if self.lib.has_ssp():
+        with rc_context(self.rc_context):
+            if self.lib.has_ssp():
 
-            max_proc_depth = self.lib.cur.proc.depth[self.vi].max()
-            mean_sis_depth = 0
-            if self.lib.use_sis():
-                if self.lib.listeners.sis.xyz88:
-                    if self.lib.listeners.sis.xyz88.mean_depth:
-                        mean_sis_depth = self.lib.listeners.sis.xyz88.mean_depth
-            max_proc_sis_depth = max(max_proc_depth, mean_sis_depth)
+                max_proc_depth = self.lib.cur.proc.depth[self.vi].max()
+                mean_sis_depth = 0
+                if self.lib.use_sis():
+                    if self.lib.listeners.sis.xyz88:
+                        if self.lib.listeners.sis.xyz88.mean_depth:
+                            mean_sis_depth = self.lib.listeners.sis.xyz88.mean_depth
+                max_proc_sis_depth = max(max_proc_depth, mean_sis_depth)
 
-            max_depth = max(30 + max_proc_sis_depth, 1.1 * max_proc_sis_depth)
-            min_depth = -0.05 * max_proc_sis_depth
-            if min_depth > 0:
-                min_depth = -5
+                max_depth = max(30 + max_proc_sis_depth, 1.1 * max_proc_sis_depth)
+                min_depth = -0.05 * max_proc_sis_depth
+                if min_depth > 0:
+                    min_depth = -5
 
-            self.speed_ax.set_ylim([max_depth, min_depth])
+                self.speed_ax.set_ylim([max_depth, min_depth])
 
-        self.c.draw()
+            self.c.draw()
 
     def redraw(self):
         """Redraw the canvases, update the locators"""
-        for a in self.c.figure.get_axes():
 
-            xaxis = getattr(a, 'xaxis', None)
-            yaxis = getattr(a, 'yaxis', None)
-            locators = []
+        with rc_context(self.rc_context):
+            for a in self.c.figure.get_axes():
 
-            if xaxis is not None:
-                locators.append(xaxis.get_major_locator())
-                locators.append(xaxis.get_minor_locator())
+                xaxis = getattr(a, 'xaxis', None)
+                yaxis = getattr(a, 'yaxis', None)
+                locators = []
 
-            if yaxis is not None:
-                locators.append(yaxis.get_major_locator())
-                locators.append(yaxis.get_minor_locator())
+                if xaxis is not None:
+                    locators.append(xaxis.get_major_locator())
+                    locators.append(xaxis.get_minor_locator())
 
-            for loc in locators:
-                loc.refresh()
+                if yaxis is not None:
+                    locators.append(yaxis.get_major_locator())
+                    locators.append(yaxis.get_minor_locator())
 
-        self.c.draw_idle()
+                for loc in locators:
+                    loc.refresh()
+
+            self.c.draw_idle()
 
     def update_validity_indices(self):
         self.svi = self.lib.cur.sis_thinned  # sis valid indices (thinned!)
