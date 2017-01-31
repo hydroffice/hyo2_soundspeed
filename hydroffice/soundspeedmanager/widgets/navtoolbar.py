@@ -6,6 +6,8 @@ import numpy as np
 import os
 import logging
 
+import matplotlib
+matplotlib.rcParams['backend.qt4']='PySide'
 from matplotlib import rc_context
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT
 from matplotlib.backend_bases import cursors
