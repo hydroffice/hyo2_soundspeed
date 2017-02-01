@@ -200,8 +200,15 @@ def python_path():
 
     # required by PyInstaller
     if hasattr(sys, '_MEIPASS'):
-        import win32api
-        sys_prefix = win32api.GetLongPathName(sys._MEIPASS)
+
+        if is_windows():
+            import win32api
+            # noinspection PyProtectedMember
+            sys_prefix = win32api.GetLongPathName(sys._MEIPASS)
+        else:
+            # noinspection PyProtectedMember
+            sys_prefix = sys._MEIPASS
+
         logger.debug("using _MEIPASS: %s" % sys_prefix)
         return sys_prefix
 
