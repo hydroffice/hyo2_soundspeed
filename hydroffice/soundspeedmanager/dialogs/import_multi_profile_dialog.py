@@ -65,6 +65,16 @@ class ImportMultiProfileDialog(AbstractDialog):
         desc = self.lib.desc_readers[idx]
         ext = self.lib.ext_readers[idx]
 
+        if desc in ["Caris", "Kongsberg"]:
+            msg = "Do you really want to store profiles based \non pre-processed %s data?\n\n" \
+                  "This operation may OVERWRITE existing raw data \nin the database!" \
+                  % desc
+            # noinspection PyCallByClass
+            ret = QtGui.QMessageBox.warning(self, "Pre-processed source warning", msg,
+                                            QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+            if ret == QtGui.QMessageBox.No:
+                return
+
         # ask the file path to the user
         flt = "Format %s(*.%s);;All files (*.*)" % (desc, " *.".join(ext))
         settings = QtCore.QSettings()
