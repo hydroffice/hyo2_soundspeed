@@ -23,13 +23,13 @@ from .readers.unb import Unb
 from .readers.valeport import Valeport
 
 readers = list()
-readers.append(Asvp())
 readers.append(Castaway())
 readers.append(DigibarPro())
 readers.append(DigibarS())
 readers.append(Elac())
 readers.append(Idronaut())
 readers.append(Iss())
+readers.append(Asvp())
 # readers.append(Mvp())
 readers.append(Saiv())
 readers.append(Seabird())

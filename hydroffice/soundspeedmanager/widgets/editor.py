@@ -162,11 +162,13 @@ class Editor(AbstractWidget):
 
         if self.lib.cur.meta.sensor_type != Dicts.sensor_types['XBT']:
             msg = "This is a XBT-specific function!"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Salinity", msg, QtGui.QMessageBox.Ok)
             return
 
         if not self.lib.replace_cur_salinity():
             msg = "Issue in replacing the salinity"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Salinity", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -178,11 +180,13 @@ class Editor(AbstractWidget):
         if (self.lib.cur.meta.sensor_type != Dicts.sensor_types['XSV']) \
                 and (self.lib.cur.meta.sensor_type != Dicts.sensor_types['SVP']):
             msg = "This is a XSV- and SVP-specific function!"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Temperature/Salinity", msg, QtGui.QMessageBox.Ok)
             return
 
         if not self.lib.replace_cur_temp_sal():
             msg = "Issue in replacing temperature and salinity"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Temperature/Salinity", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -193,6 +197,7 @@ class Editor(AbstractWidget):
 
         if not self.lib.add_cur_tss():
             msg = "Issue in retrieving transducer sound speed"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Sound speed", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -203,6 +208,7 @@ class Editor(AbstractWidget):
 
         if not self.lib.extend_profile():
             msg = "Issue in extending the profile"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Profile extension", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -214,6 +220,7 @@ class Editor(AbstractWidget):
 
         if not self.lib.prepare_sis():
             msg = "Issue in preview the thinning"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Thinning preview", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -223,6 +230,7 @@ class Editor(AbstractWidget):
         logger.debug('user wants to read/edit spreadsheet')
         if not self.lib.has_ssp():
             msg = "Import data before visualize them in a spreadsheet!"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Spreadsheet warning", msg, QtGui.QMessageBox.Ok)
             return
         dlg = SpreadSheetDialog(lib=self.lib, main_win=self.main_win, parent=self)
@@ -232,6 +240,7 @@ class Editor(AbstractWidget):
         logger.debug('user wants to read/edit metadata')
         if not self.lib.has_ssp():
             msg = "Import data before visualize metadata!"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Metadata warning", msg, QtGui.QMessageBox.Ok)
             return
         dlg = MetadataDialog(lib=self.lib, main_win=self.main_win, parent=self)
@@ -241,8 +250,28 @@ class Editor(AbstractWidget):
         logger.debug('user wants to export a single profile')
         if not self.lib.has_ssp():
             msg = "Import data before export!"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
             return
+
+        if self.lib.cur.meta.sensor_type == Dicts.sensor_types['Synthetic']:
+
+            msg = "Do you really want to export a profile\nbased on synthetic %s data?" \
+                  % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
+            # noinspection PyCallByClass
+            ret = QtGui.QMessageBox.warning(self, "Synthetic source warning", msg, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+            if ret == QtGui.QMessageBox.No:
+                return
+
+        if self.lib.cur.meta.probe_type in (Dicts.probe_types['ASVP'], Dicts.probe_types['Caris']):
+
+            msg = "Do you really want to export a profile\nbased on pre-processed %s data?" \
+                  % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
+            # noinspection PyCallByClass
+            ret = QtGui.QMessageBox.warning(self, "Pre-processed source warning", msg, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+            if ret == QtGui.QMessageBox.No:
+                return
+
         dlg = ExportSingleProfileDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
 
@@ -250,11 +279,32 @@ class Editor(AbstractWidget):
         logger.debug('user wants to transmit the data')
         if not self.lib.has_ssp():
             msg = "Import data before transmit!"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Transmit warning", msg, QtGui.QMessageBox.Ok)
             return
 
+        if self.lib.cur.meta.sensor_type == Dicts.sensor_types['Synthetic']:
+
+            msg = "Do you really want to transmit a profile\nbased on synthetic %s data?" \
+                  % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
+            # noinspection PyCallByClass
+            ret = QtGui.QMessageBox.warning(self, "Synthetic source warning", msg,
+                                            QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+            if ret == QtGui.QMessageBox.No:
+                return
+
+        if self.lib.cur.meta.probe_type in (Dicts.probe_types['ASVP'], Dicts.probe_types['Caris']):
+
+            msg = "Do you really want to transmit a profile\nbased on pre-processed %s data?" \
+                  % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
+            # noinspection PyCallByClass
+            ret = QtGui.QMessageBox.warning(self, "Pre-processed source warning", msg, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+            if ret == QtGui.QMessageBox.No:
+                return
+
         if not self.lib.transmit_ssp():
             msg = "Issue in profile transmission"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Profile transmission", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -264,11 +314,35 @@ class Editor(AbstractWidget):
         logger.debug('user wants to save data to db')
         if not self.lib.has_ssp():
             msg = "Import data before save to db!"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Database warning", msg, QtGui.QMessageBox.Ok)
             return
 
+        if self.lib.cur.meta.sensor_type == Dicts.sensor_types['Synthetic']:
+
+            msg = "Do you really want to store a profile based \non synthetic %s data?\n\n" \
+                  "This operation may OVERWRITE existing raw data \nin the database!" \
+                  % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
+            # noinspection PyCallByClass
+            ret = QtGui.QMessageBox.warning(self, "Synthetic source warning", msg,
+                                            QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+            if ret == QtGui.QMessageBox.No:
+                return
+
+        if self.lib.cur.meta.probe_type in (Dicts.probe_types['ASVP'], Dicts.probe_types['Caris']):
+
+            msg = "Do you really want to store a profile based \non pre-processed %s data?\n\n" \
+                  "This operation may OVERWRITE existing raw data \nin the database!" \
+                  % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
+            # noinspection PyCallByClass
+            ret = QtGui.QMessageBox.warning(self, "Pre-processed source warning", msg,
+                                            QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+            if ret == QtGui.QMessageBox.No:
+                return
+
         if not self.lib.store_data():
             msg = "Unable to save to db!"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Database warning", msg, QtGui.QMessageBox.Ok)
             return
 

@@ -32,7 +32,7 @@ class DigibarS(AbstractTextReader):
 
         # initialize probe/sensor type
         self.ssp.cur.meta.sensor_type = Dicts.sensor_types['SVP']
-        self.ssp.cur.meta.probe_type = Dicts.probe_types['SVP']
+        self.ssp.cur.meta.probe_type = Dicts.probe_types['DigibarS']
 
         self._read(data_path=data_path)
         self._parse_header()

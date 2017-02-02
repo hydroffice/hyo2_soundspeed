@@ -36,6 +36,10 @@ class Dicts(object):
         ('Sonardyne', 108),
         ('Elac', 109),
         ('ISS', 110),
+        ('DigibarPro', 111),
+        ('DigibarS', 112),
+        ('ASVP', 113),
+        ('Caris', 114),
 
         ('Deep Blue', 200),
         ('T-10', 201),
