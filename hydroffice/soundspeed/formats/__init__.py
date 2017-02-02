@@ -6,6 +6,7 @@ log.addHandler(logging.NullHandler())
 
 
 # readers
+from .readers.aoml import Aoml
 from .readers.asvp import Asvp
 from .readers.caris import Caris
 from .readers.castaway import Castaway
@@ -36,6 +37,7 @@ readers.append(Asvp())
 readers.append(Saiv())
 readers.append(Seabird())
 readers.append(Sippican())
+readers.append(Aoml())
 readers.append(Sonardyne())
 readers.append(Turo())
 readers.append(Unb())
