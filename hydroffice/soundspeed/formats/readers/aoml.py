@@ -34,9 +34,6 @@ class Aoml(AbstractTextReader):
         self.desc = "AOML"
         self._ext.add('txt')
 
-        self.is_var_alpha = False
-        self.input_salinity = None
-
         # header tokens
         self.tk_latitude = 'Latitude'
         self.tk_longitude = 'Longitude'

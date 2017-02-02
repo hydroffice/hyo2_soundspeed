@@ -25,6 +25,7 @@ from .readers.unb import Unb
 from .readers.valeport import Valeport
 
 readers = list()
+readers.append(Aoml())
 readers.append(Caris())
 readers.append(Castaway())
 readers.append(DigibarPro())
@@ -37,7 +38,6 @@ readers.append(Asvp())
 readers.append(Saiv())
 readers.append(Seabird())
 readers.append(Sippican())
-readers.append(Aoml())
 readers.append(Sonardyne())
 readers.append(Turo())
 readers.append(Unb())
