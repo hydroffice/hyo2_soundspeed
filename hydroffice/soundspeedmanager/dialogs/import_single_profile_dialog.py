@@ -137,6 +137,25 @@ class ImportSingleProfileDialog(AbstractDialog):
             QtGui.QMessageBox.critical(self, "Import error", msg, QtGui.QMessageBox.Ok)
             return
 
+        if self.lib.ssp_list.nr_profiles > 1:
+            ssp_list = list()
+            for i, ssp in enumerate(self.lib.ssp_list.l):
+                ssp_list.append("#%03d: %s (%.6f, %.6f)" % (i, ssp.meta.utc_time, ssp.meta.latitude, ssp.meta.longitude))
+
+            sel, ok = QtGui.QInputDialog.getItem(self, 'Multiple profiles',
+                                                 'Select a profile (if you want to import all of them,\n'
+                                                 'use the multi-import dialog in Database tab):',
+                                                 ssp_list, 0, False)
+
+            if sel and ok:
+                self.lib.ssp_list.current_index = ssp_list.index(sel)
+
+            else:
+                self.lib.clear_data()
+                self.progress.end()
+                self.accept()
+                return
+
         self.progress.end()
         self.accept()
 

@@ -62,11 +62,15 @@ class Caris(AbstractTextWriter):
             longitude = self.ssp.cur.meta.longitude
         while longitude > 180.0:
             longitude -= 360.0
-        lat_min = int(60 * math.fabs(latitude - int(latitude)))
-        lat_sec = 60 * int(100 * (60 * math.fabs(latitude - int(latitude)) - lat_min))
-        lon_min = int(60 * math.fabs(longitude - int(longitude)))
-        lon_sec = 60 * int(100 * (60 * math.fabs(longitude - int(longitude)) - lon_min))
-        position_string = "{0:02d}:{1:02d}:{2:05.2f} {3:02d}:{4:02d}:{2:05.2f}".format(int(latitude),
+
+        abs_lat = math.fabs(latitude)
+        lat_min = int(60 * (abs_lat - int(abs_lat)))
+        lat_sec = 3600 * (abs_lat - int(abs_lat) - lat_min / 60.0)
+        abs_lon = math.fabs(longitude)
+        lon_min = int(60 * (abs_lon - int(abs_lon)))
+        lon_sec = 3600 * (abs_lon - int(abs_lon) - lon_min / 60.0)
+
+        position_string = "{0:02d}:{1:02d}:{2:05.2f} {3:02d}:{4:02d}:{5:05.2f}".format(int(latitude),
                                                                                        lat_min, lat_sec,
                                                                                        int(longitude),
                                                                                        lon_min, lon_sec)

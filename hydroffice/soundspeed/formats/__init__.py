@@ -7,6 +7,7 @@ log.addHandler(logging.NullHandler())
 
 # readers
 from .readers.asvp import Asvp
+from .readers.caris import Caris
 from .readers.castaway import Castaway
 from .readers.digibarpro import DigibarPro
 from .readers.digibars import DigibarS
@@ -23,6 +24,7 @@ from .readers.unb import Unb
 from .readers.valeport import Valeport
 
 readers = list()
+readers.append(Caris())
 readers.append(Castaway())
 readers.append(DigibarPro())
 readers.append(DigibarS())

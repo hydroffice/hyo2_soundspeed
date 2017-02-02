@@ -80,7 +80,7 @@ class Info(QtGui.QMainWindow):
         self.default_url = default_url
 
         self.toolbar = self.addToolBar('Shortcuts')
-        self.toolbar.setIconSize(QtCore.QSize(42, 42))
+        self.toolbar.setIconSize(QtCore.QSize(40, 40))
         # default
         home_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'home.png')), 'Home page', self)
         home_action.setShortcut('Alt+H')

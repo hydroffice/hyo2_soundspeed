@@ -104,7 +104,7 @@ class MainWin(QtGui.QMainWindow):
         # make tabs
         self.tabs = QtGui.QTabWidget()
         self.setCentralWidget(self.tabs)
-        self.tabs.setIconSize(QtCore.QSize(45, 45))
+        self.tabs.setIconSize(QtCore.QSize(42, 42))
         self.tabs.blockSignals(True)  # durign the initialization
         self.tabs.currentChanged.connect(self.onChange)  # changed!
         # editor

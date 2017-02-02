@@ -27,7 +27,7 @@ class Editor(AbstractWidget):
         AbstractWidget.__init__(self, main_win=main_win, lib=lib)
 
         self.input_bar = self.addToolBar('Input')
-        self.input_bar.setIconSize(QtCore.QSize(42, 42))
+        self.input_bar.setIconSize(QtCore.QSize(40, 40))
         # import
         self.input_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'input.png')),
                                        'Input data', self)
@@ -49,7 +49,7 @@ class Editor(AbstractWidget):
         self.input_bar.addAction(self.set_ref_act)
 
         self.process_bar = self.addToolBar('Process')
-        self.process_bar.setIconSize(QtCore.QSize(42, 42))
+        self.process_bar.setIconSize(QtCore.QSize(40, 40))
         # spreadsheet
         self.spreadsheet_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'grid.png')), 'Spreadsheet', self)
         self.spreadsheet_act.setShortcut('Alt+S')
@@ -107,7 +107,7 @@ class Editor(AbstractWidget):
         self.process_bar.addAction(self.restart_act)
 
         self.output_bar = self.addToolBar('Output')
-        self.output_bar.setIconSize(QtCore.QSize(42, 42))
+        self.output_bar.setIconSize(QtCore.QSize(40, 40))
         # export
         self.export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export.png')), 'Export data', self)
         self.export_act.setShortcut('Alt+E')

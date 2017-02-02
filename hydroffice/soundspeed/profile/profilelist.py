@@ -29,6 +29,10 @@ class ProfileList(object):
         self._list = value
 
     @property
+    def nr_profiles(self):
+        return len(self._list)
+
+    @property
     def cur(self):
         if self._current_index is None:
             raise RuntimeError("current index is None")

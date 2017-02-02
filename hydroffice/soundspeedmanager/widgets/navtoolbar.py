@@ -46,6 +46,7 @@ class NavToolbar(NavigationToolbar2QT):
         'axes.linewidth': 0.5,
         'axes.xmargin': 0.01,
         'axes.ymargin': 0.01,
+        'grid.alpha': 0.2,
         'backend.qt4': 'PySide'
     }
 
