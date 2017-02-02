@@ -60,6 +60,8 @@ Currently implemented features
 
 * Import of several commonly used sensor/file formats:
 
+  * AOML AMVER-SEAS XBT (.txt)
+  * Caris (.svp)
   * Castaway (.csv)
   * Digibar Pro (.txt), and S (.csv)
   * Elac Hydrostar (.sva)
