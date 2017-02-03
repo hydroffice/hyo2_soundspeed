@@ -7,6 +7,8 @@
 # python /path/to/pyinstaller.py SoundSpeedManager.1folder.spec
 #
 # The resulting .exe file is placed in the dist/SoundSpeedManager folder.
+#
+# It may be required to manually copy mkl_avx.dll or mkl_p4.dll
 
 from PyInstaller.building.build_main import Analysis, PYZ, EXE, COLLECT, BUNDLE, TOC
 from PyInstaller import is_darwin
@@ -59,7 +61,7 @@ pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=True,
-          name='SoundSpeedManager.2017.0.0',
+          name='SoundSpeedManager.2017.0.rc3',
           debug=False,
           strip=None,
           upx=True,
@@ -74,4 +76,4 @@ coll = COLLECT(exe,
                pkg_data_3,
                strip=None,
                upx=True,
-               name='SoundSpeedManager.2017.0.0')
+               name='SoundSpeedManager.2017.0.rc3')

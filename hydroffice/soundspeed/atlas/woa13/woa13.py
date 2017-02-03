@@ -65,7 +65,7 @@ class Woa13(AbstractAtlas):
                     return True
 
         # no way to find the database
-        logger.warning("unable to location the WOA13 db")
+        logger.warning("unable to locate the WOA13 db")
         return False
 
     def download_db(self):
