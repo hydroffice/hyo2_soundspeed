@@ -12,11 +12,11 @@ from hydroffice.soundspeed.profile.oceanography import Oceanography as Oc
 
 
 class Elac(AbstractTextWriter):
-    """Elac writer"""
+    """ELAC writer"""
 
     def __init__(self):
         super(Elac, self).__init__()
-        self.desc = "Elac"
+        self.desc = "ELAC"
         self._ext.add('sva')
 
     def write(self, ssp, data_path, data_file=None, project=''):

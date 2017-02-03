@@ -13,11 +13,11 @@ from hydroffice.soundspeed.formats.writers.abstract import AbstractTextWriter
 
 
 class Ixblue(AbstractTextWriter):
-    """Ixblue writer"""
+    """iXBlue writer"""
 
     def __init__(self):
         super(Ixblue, self).__init__()
-        self.desc = "Ixblue"
+        self.desc = "iXBlue"
         self._ext.add('txt')
 
     def write(self, ssp, data_path, data_file=None, project=''):

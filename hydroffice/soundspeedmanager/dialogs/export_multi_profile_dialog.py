@@ -152,15 +152,15 @@ class ExportMultiProfileDialog(AbstractDialog):
         settings.setValue("export_folder", output_folder)
         logger.debug('output folder: %s' % output_folder)
 
-        # Caris-specific check for file concatenation
+        # CARIS-specific check for file concatenation
         for writer in self.selected_writers:
 
             if writer == 'caris':
-                caris_path = os.path.join(output_folder, "caris", self.lib.current_project + ".svp")
+                caris_path = os.path.join(output_folder, "CARIS", self.lib.current_project + ".svp")
                 if os.path.exists(caris_path):
-                    msg = "An existing Caris file is present in the output folder.\n\n" \
+                    msg = "An existing CARIS file is present in the output folder.\n\n" \
                           "Do you want to remove it to avoid possible profile duplications?"
-                    ret = QtGui.QMessageBox.question(self, "Caris export", msg,
+                    ret = QtGui.QMessageBox.question(self, "CARIS export", msg,
                                                      QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
                     if ret == QtGui.QMessageBox.Yes:
                         os.remove(caris_path)

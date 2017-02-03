@@ -65,7 +65,7 @@ class ImportMultiProfileDialog(AbstractDialog):
         desc = self.lib.desc_readers[idx]
         ext = self.lib.ext_readers[idx]
 
-        if desc in ["Caris", "Kongsberg"]:
+        if desc in ["CARIS", "ELAC", "Kongsberg"]:
             msg = "Do you really want to store profiles based \non pre-processed %s data?\n\n" \
                   "This operation may OVERWRITE existing raw data \nin the database!" \
                   % desc

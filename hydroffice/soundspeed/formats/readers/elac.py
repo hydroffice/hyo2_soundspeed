@@ -11,11 +11,11 @@ from hydroffice.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 
 
 class Elac(AbstractTextReader):
-    """Elac reader"""
+    """ELAC reader"""
 
     def __init__(self):
         super(Elac, self).__init__()
-        self.desc = "Elac"
+        self.desc = "ELAC"
         self._ext.add('sva')
 
         # header tokens
@@ -41,7 +41,7 @@ class Elac(AbstractTextReader):
 
         # initialize probe/sensor type
         self.ssp.cur.meta.sensor_type = Dicts.sensor_types['XBT']  # faking XBT
-        self.ssp.cur.meta.probe_type = Dicts.probe_types['Elac']
+        self.ssp.cur.meta.probe_type = Dicts.probe_types['ELAC']
 
         self._read(data_path=data_path)
         self._parse_header()

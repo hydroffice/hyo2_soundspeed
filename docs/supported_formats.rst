@@ -1,29 +1,31 @@
+*****************
 Supported Formats
-=================
+*****************
+
 
 =================================================== ==== =====
                         Format                      Read Write
 =================================================== ==== =====
-aoml (.txt)                                         X
-caris (.svp)                                        X    X
-castaway (.csv)                                     X
-csv (.csv)                                               X
-digibar pro (.txt)                                  X
-digibar s (.csv)                                    X
-elac (.sva)                                         X    X
-hypack (.vel)                                            X
-idronaut (.txt)                                     X
-iss (.v*, .d*, .svp)                                X
-ixblue (.txt)                                            X
-kongsberg asvp (.asvp)                              X    X
-ncei (.nc)                                               X
-qps (.bsvp)                                              X
-saiv (.txt)                                         X
-seabird (.cnv)                                      X
-sippican (.edf)                                     X
-sonardyne (.pro)                                    X    X
-turo (.nc)                                          X
-unb (.unb)                                          X    X
-valeport midas/monitor (.000)                       X
-valeport mini svp (.txt)                            X
+AOML (.txt)                                         X
+CARIS (.svp)                                        X    X
+Castaway (.csv)                                     X
+CSV (.csv)                                               X
+Digibar Pro (.txt)                                  X
+Digibar S (.csv)                                    X
+ELAC (.sva)                                         X    X
+Hypack (.vel)                                            X
+Idronaut (.txt)                                     X
+ISS (.v*, .d*, .svp)                                X
+iXBlue (.txt)                                            X
+Kongsberg asvp (.asvp)                              X    X
+NCEI (.nc)                                               X
+QPS (.bsvp)                                              X
+SAIV (.txt)                                         X
+Seabird (.cnv)                                      X
+Sippican (.edf)                                     X
+Sonardyne (.pro)                                    X    X
+Turo (.nc)                                          X
+UNB (.unb)                                          X    X
+Valeport Midas/Monitor (.000)                       X
+Valeport MiniSVP (.txt)                             X
 =================================================== ==== =====

@@ -21,8 +21,16 @@ class TestSoundSpeedFormats(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def test_read_store_and_write_aoml(self):
+        filters = ["aoml", ]
+        self._run(filters=filters)
+
     def test_read_store_and_write_asvp(self):
         filters = ["asvp", ]
+        self._run(filters=filters)
+
+    def test_read_store_and_write_caris(self):
+        filters = ["caris", ]
         self._run(filters=filters)
 
     def test_read_store_and_write_castaway(self):

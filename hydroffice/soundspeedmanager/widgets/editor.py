@@ -263,7 +263,8 @@ class Editor(AbstractWidget):
             if ret == QtGui.QMessageBox.No:
                 return
 
-        if self.lib.cur.meta.probe_type in (Dicts.probe_types['ASVP'], Dicts.probe_types['Caris']):
+        if self.lib.cur.meta.probe_type in (Dicts.probe_types['ASVP'], Dicts.probe_types['CARIS'],
+                                            Dicts.probe_types['ELAC']):
 
             msg = "Do you really want to export a profile\nbased on pre-processed %s data?" \
                   % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
@@ -293,7 +294,8 @@ class Editor(AbstractWidget):
             if ret == QtGui.QMessageBox.No:
                 return
 
-        if self.lib.cur.meta.probe_type in (Dicts.probe_types['ASVP'], Dicts.probe_types['Caris']):
+        if self.lib.cur.meta.probe_type in (Dicts.probe_types['ASVP'], Dicts.probe_types['CARIS'],
+                                            Dicts.probe_types['ELAC']):
 
             msg = "Do you really want to transmit a profile\nbased on pre-processed %s data?" \
                   % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
@@ -329,7 +331,8 @@ class Editor(AbstractWidget):
             if ret == QtGui.QMessageBox.No:
                 return
 
-        if self.lib.cur.meta.probe_type in (Dicts.probe_types['ASVP'], Dicts.probe_types['Caris']):
+        if self.lib.cur.meta.probe_type in (Dicts.probe_types['ASVP'], Dicts.probe_types['CARIS'],
+                                            Dicts.probe_types['ELAC']):
 
             msg = "Do you really want to store a profile based \non pre-processed %s data?\n\n" \
                   "This operation may OVERWRITE existing raw data \nin the database!" \

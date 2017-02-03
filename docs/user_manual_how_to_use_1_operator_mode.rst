@@ -28,7 +28,7 @@ From the *Editor* tab, select *Import data* and choose the desired import file t
     Click on the *Import data* button in the *Editor* tab to start the import process.
 
 .. figure:: ./_static/editor_tab1.png
-    :width: 300px
+    :width: 280px
     :align: center
     :height: 300px
     :alt: alternate text

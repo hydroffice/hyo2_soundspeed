@@ -13,11 +13,11 @@ from hydroffice.soundspeed.formats.writers.abstract import AbstractTextWriter
 
 
 class Caris(AbstractTextWriter):
-    """Caris svp writer"""
+    """CARIS svp writer"""
 
     def __init__(self):
         super(Caris, self).__init__()
-        self.desc = "Caris"
+        self.desc = "CARIS"
         self._ext.add('svp')
 
     def write(self, ssp, data_path, data_file=None, project=''):

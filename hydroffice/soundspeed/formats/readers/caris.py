@@ -11,11 +11,11 @@ from hydroffice.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 
 
 class Caris(AbstractTextReader):
-    """Caris svp reader"""
+    """CARIS svp reader"""
 
     def __init__(self):
         super(Caris, self).__init__()
-        self.desc = "Caris"
+        self.desc = "CARIS"
         self._ext.add('svp')
 
         self.common_path = None
@@ -80,7 +80,7 @@ class Caris(AbstractTextReader):
 
                 # initialize probe/sensor type
                 self.ssp.cur.meta.sensor_type = Dicts.sensor_types['SVP']
-                self.ssp.cur.meta.probe_type = Dicts.probe_types['Caris']
+                self.ssp.cur.meta.probe_type = Dicts.probe_types['CARIS']
                 self.ssp.cur.meta.original_path = self.common_path
 
                 self._parse_section_header()

@@ -24,7 +24,7 @@ speed profiles (SSP) for underwater acoustic systems:
   under the NSF grant 1150574.
 
 * *SSP Manager*, an application developed at the `Center for Coastal and Ocean Mapping (CCOM, UNH) <http://ccom.unh.edu/>`_
-  as part of the HydrOffice framework.
+  as part of the HydrOffice framework under NOAA grants NA10NOS4000073 and NA15NOS4000200.
 
 In the integration of all these implementations to the current package several improvements have been
 introduced to enhance code maintainability, as well as to also to support Python 3 (from the original Python 2 only
@@ -61,10 +61,10 @@ Currently implemented features
 * Import of several commonly used sensor/file formats:
 
   * AOML AMVER-SEAS XBT (.txt)
-  * Caris (.svp)
+  * CARIS (.svp)
   * Castaway (.csv)
   * Digibar Pro (.txt), and S (.csv)
-  * Elac Hydrostar (.sva)
+  * ELAC Hydrostar (.sva)
   * Idronaut (.txt)
   * ISS Fugro (.svp, .v*, .d*)
   * Kongsberg Maritime (.asvp)
@@ -105,9 +105,9 @@ Currently implemented features
 
   * Caris (.svp) (V2, multiple casts supported)
   * Comma separated values (.csv)
-  * Elac Hydrostar (.sva)
+  * ELAC Hydrostar (.sva)
   * Hypack (.vel)
-  * IXBLUE (.txt)
+  * iXBlue (.txt)
   * Kongsberg Maritime (.asvp)
   * NCEI (.nc)
   * QPS (.bsvp)
