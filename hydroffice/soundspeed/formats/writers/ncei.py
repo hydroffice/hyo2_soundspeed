@@ -251,7 +251,7 @@ class Ncei(AbstractWriter):
 
         # var: flag
         if True:
-            flag = self.root_group.createVariable(b'flag', b'i1', (b'profile', b'z',))
+            flag = self.root_group.createVariable(b'flag', b'i4', (b'profile', b'z',))
             flag[:] = self.ssp.cur.data.flag[vi]
             # RECOMMENDED - Provide a descriptive, long name for this variable.
             flag.long_name = b'quality flag'
