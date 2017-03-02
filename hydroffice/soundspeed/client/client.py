@@ -49,7 +49,7 @@ class Client(object):
             kng_fmt = Dicts.kng_formats['S12']
             logger.info("forcing S12 format")
 
-        if not prj.prepare_sis(thin=True):
+        if not prj.prepare_sis():
             logger.info("issue in preparing the data")
             return False
 

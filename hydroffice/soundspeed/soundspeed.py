@@ -615,7 +615,7 @@ class SoundSpeedLibrary(object):
             idx = self.name_writers.index(name)
             writer = self.writers[idx]
             if writer.name == 'asvp':
-                self.prepare_sis(thin=True)
+                self.prepare_sis()
 
             if not has_data_files:  # we don't have the output file names
                 if len(data_formats) == 1 and name == 'ncei':  # NCEI requires special filename convention
@@ -1177,15 +1177,12 @@ class SoundSpeedLibrary(object):
 
         return True
 
-    def prepare_sis(self, thin=True):
+    def prepare_sis(self):
         if not self.has_ssp():
             logger.warning("no profile!")
             return False
 
         self.cur.clone_proc_to_sis()
-
-        if not thin:
-            return True
 
         if not self.cur.thin(tolerance=0.1):
             logger.warning("thinning issue")

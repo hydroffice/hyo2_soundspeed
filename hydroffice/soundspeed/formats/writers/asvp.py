@@ -12,10 +12,13 @@ logger = logging.getLogger(__name__)
 
 from hydroffice.soundspeed.formats.writers.abstract import AbstractTextWriter
 from hydroffice.soundspeed.profile.dicts import Dicts
+from hydroffice.soundspeed.profile.oceanography import Oceanography as Oc
 
 
 class Asvp(AbstractTextWriter):
     """Kongsberg asvp writer"""
+
+    abs_freqs = [12, 32, 60, 70, 80, 90, 95, 100, 200, 250, 300, 350, 400]
 
     def __init__(self):
         super(Asvp, self).__init__()
@@ -34,6 +37,20 @@ class Asvp(AbstractTextWriter):
 
         self.finalize()
 
+        # this part write the absorption files only if the temp and the sal are present
+        ti = self.ssp.cur.sis_thinned
+        if (np.sum(self.ssp.cur.sis.temp[ti]) != 0) and (np.sum(self.ssp.cur.sis.sal[ti]) != 0):
+
+            asvp_base_name =self.fod.basename
+            for abs_freq in self.abs_freqs:
+                abs_file = "%s_%dkHz.abs" % (asvp_base_name, abs_freq)
+                self._write(data_path=data_path, data_file=abs_file)
+                self._write_header_abs(abs_freq)
+                self._write_body_abs(abs_freq)
+
+        else:
+            logger.warning("not temperature and/or salinity to create absorption files")
+
         logger.debug('*** %s ***: done' % self.driver)
         return True
 
@@ -46,6 +63,55 @@ class Asvp(AbstractTextWriter):
     def _write_body(self):
         logger.debug('generating body')
         body = self._convert_body(fmt=Dicts.kng_formats['ASVP'])
+        self.fod.io.write(body)
+
+    def _write_header_abs(self, freq):
+        logger.debug('generating header for %d kHz' % freq)
+
+        ti = self.ssp.cur.sis_thinned
+
+        # e.g., ( Absorption  1.0 0 201203212242 22.50000000 -156.50000000 -1 0 0 OMS01_00000 P 0035 )
+        abs_header = "( Absorption  1.0 0 "
+        abs_header += self.ssp.cur.meta.utc_time.strftime("%Y%m%d%H%M ")
+        abs_header += "%.8f %.8f -1 0 0 OMS01_00000 P %04d )\n" \
+                       % (self.ssp.cur.meta.latitude,
+                          self.ssp.cur.meta.longitude,
+                          self.ssp.cur.sis.depth[ti].size)
+        self.fod.io.write(abs_header)
+
+    def _write_body_abs(self, freq):
+        logger.debug('generating body for %d kHz' % freq)
+
+        ti = self.ssp.cur.sis_thinned
+
+        top_mean = 0
+        bottom_mean = 0
+
+        body = str()
+        sample_sz = np.sum(ti)
+        for i in range(sample_sz):
+            abs = Oc.attenuation(f=freq, t=self.ssp.cur.sis.temp[ti][i], d=self.ssp.cur.sis.depth[ti][i],
+                                 s=self.ssp.cur.sis.sal[ti][i], ph=8.1)
+
+            if i == 0:  # first
+                delta = (self.ssp.cur.sis.depth[ti][0] + self.ssp.cur.sis.depth[ti][1]) / 2.0
+
+            elif i == sample_sz - 1:  # last
+                delta = (self.ssp.cur.sis.depth[ti][sample_sz - 1] -
+                         (self.ssp.cur.sis.depth[ti][sample_sz - 1] + self.ssp.cur.sis.depth[ti][sample_sz - 2]) / 2.0)
+
+            else:
+                delta = ((self.ssp.cur.sis.depth[ti][i + 1] + self.ssp.cur.sis.depth[ti][i]) / 2.0 -
+                         (self.ssp.cur.sis.depth[ti][i] + self.ssp.cur.sis.depth[ti][i - 1]) / 2.0)
+
+            top_mean += abs * delta
+            bottom_mean += delta
+
+            mean_abs = top_mean / bottom_mean
+
+            body += "%.3f %.3f %.3f %s\n" \
+                    % (self.ssp.cur.sis.depth[ti][i], abs, mean_abs, "999.000")
+
         self.fod.io.write(body)
 
     def convert(self, ssp, fmt):
@@ -68,8 +134,8 @@ class Asvp(AbstractTextWriter):
         else:
             # e.g., ( SoundVelocity  1.0 0 201203212242 22.50000000 -156.50000000 -1 0 0 MVS01_00000 P 0035 )
             self.header += "( SoundVelocity  1.0 0 "
-            self.header += self.ssp.cur.meta.utc_time.strftime("%Y%m%d%H%M%S ")
-            self.header += "%.7f %.7f -1 0 0 OMS01_00000 P %4d )\n" \
+            self.header += self.ssp.cur.meta.utc_time.strftime("%Y%m%d%H%M ")
+            self.header += "%.8f %.8f -1 0 0 OMS01_00000 P %04d )\n" \
                            % (self.ssp.cur.meta.latitude,
                               self.ssp.cur.meta.longitude,
                               self.ssp.cur.sis.depth[ti].size)
@@ -92,7 +158,7 @@ class Asvp(AbstractTextWriter):
                         % (self.ssp.cur.sis.depth[ti][i],
                            self.ssp.cur.sis.temp[ti][i], self.ssp.cur.sis.sal[ti][i])
             elif fmt == Dicts.kng_formats['ASVP']:
-                body += "%.2f %.1f\n" \
+                body += "%.2f %.2f\n" \
                         % (self.ssp.cur.sis.depth[ti][i], self.ssp.cur.sis.speed[ti][i])
 
         if fmt == Dicts.kng_formats['ASVP']:

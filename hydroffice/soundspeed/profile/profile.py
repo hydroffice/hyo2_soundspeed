@@ -753,6 +753,12 @@ class Profile(object):
         """Thin the sis data"""
         logger.info("thinning the sis samples")
 
+        # if the profile is too short, we just pass it back
+        if self.sis.depth[self.sis_valid].size < 100:
+            self.sis.flag[self.sis_valid] = Dicts.flags['thin']
+            logger.debug("skipping thinning for short profile (%d samples)" % self.sis.depth[self.sis_valid].size)
+            return True
+
         # - 1000 points for: EM2040, EM710, EM302 and EM122;
         # - 570 points for: EM3000, EM3002, EM1002, EM300, EM120
         # TODO: the resulting profile must be less than 30kB

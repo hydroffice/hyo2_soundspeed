@@ -696,3 +696,43 @@ class Oceanography(object):
                 dyn_height[i] = (geo_strf_dyn_height0[int(ii_data[i])] - geo_strf_dyn_height0[i_bpr]) * 1e4
 
         return dyn_height
+
+    @classmethod
+    def attenuation(cls, f, t, s, d, ph):
+        # Francois & Garrison, J. Acoust. Soc. Am., Vol. 72, No. 6, December 1982
+        # f frequency (kHz)
+        # T Temperature (degC)
+        # S Salinity (ppt)
+        # D Depth (m)
+        # pH Acidity
+        abs_temp = 273.0 + t
+
+        # sound speed calculation
+        c = 1412.0 + 3.21 * t + 1.19 * s + 0.0167 * d
+
+        # Boric Acid Contribution
+        A1 = (8.86 / c) * math.pow(10.0, (0.78 * ph - 5.0))
+        P1 = 1.0
+
+        f1 = 2.8 * math.pow((s / 35.0), 0.5) * math.pow(10.0, 4.0 - (1245.0 / abs_temp))
+
+        # MgSO4 Contribution
+        A2 = (21.44 * s / c) * (1.0 + 0.025 * t)
+        P2 = (1.0 - 1.37E-4 * d) + (6.2E-9 * d * d)
+        f2 = (8.17 * math.pow(10.0, 8.0 - 1990.0 / abs_temp)) / (1.0 + 0.0018 * (s - 35.0))
+
+        # Pure Water Contribution
+        if t <= 20.0:
+            A3 = 4.937E-4 - 2.59E-5 * t + 9.11E-7 * t * t - 1.50E-8 * t * t * t
+        else:
+            A3 = 3.964E-4 - 1.146E-5 * t + 1.45E-7 * t * t - 6.5E-10 * t * t * t
+
+        P3 = 1.0 - 3.83E-5 * d + 4.9E-10 * d * d
+
+        boric = (A1 * P1 * f1 * f * f) / (f * f + f1 * f1)
+        magnes = (A2 * P2 * f2 * f * f) / (f * f + f2 * f2)
+        purewat = A3 * P3 * f * f
+
+        atten = boric + magnes + purewat
+
+        return atten
