@@ -39,9 +39,10 @@ class Asvp(AbstractTextWriter):
 
         # this part write the absorption files only if the temp and the sal are present
         ti = self.ssp.cur.sis_thinned
-        if (np.sum(self.ssp.cur.sis.temp[ti]) != 0) and (np.sum(self.ssp.cur.sis.sal[ti]) != 0):
+        if (np.sum(self.ssp.cur.sis.temp[ti]) != 0) and (np.sum(self.ssp.cur.sis.sal[ti]) != 0) \
+                and (np.sum(self.ssp.cur.sis.speed[ti]) != 0):
 
-            asvp_base_name =self.fod.basename
+            asvp_base_name = self.fod.basename
             for abs_freq in self.abs_freqs:
                 abs_file = "%s_%dkHz.abs" % (asvp_base_name, abs_freq)
                 self._write(data_path=data_path, data_file=abs_file)
@@ -90,6 +91,11 @@ class Asvp(AbstractTextWriter):
         body = str()
         sample_sz = np.sum(ti)
         for i in range(sample_sz):
+
+            if self.ssp.cur.sis.sal[ti][i] <= 0:
+                logger.info("skipping invalid salinity")
+                continue
+
             abs = Oc.attenuation(f=freq, t=self.ssp.cur.sis.temp[ti][i], d=self.ssp.cur.sis.depth[ti][i],
                                  s=self.ssp.cur.sis.sal[ti][i], ph=8.1)
 

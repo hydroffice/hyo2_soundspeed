@@ -27,7 +27,7 @@ def main():
 
     # test readers/writers
     logger.info('test: *** START ***')
-    filters = ["asvp", ]
+    filters = ["castaway", ]
     formats = ["asvp", ]
     tests = testing.input_dict_test_files(inclusive_filters=filters)
     # print(tests)
@@ -35,9 +35,9 @@ def main():
     # import each identified file
     for idx, testfile in enumerate(tests.keys()):
 
-        # just 1 file
-        if idx != 1:
-            continue
+        # # just 1 file
+        # if idx != 1:
+        #     continue
 
         logger.info("test: * New profile: #%03d *" % idx)
 
