@@ -18,8 +18,7 @@ except:
 
 import serial  # for serial/usb port communication with SBE instruments
 
-from hydroffice.soundspeed.formats.readers import sbe_constants
-from hydroffice.soundspeed.formats.readers import sbe_tools as Tools
+from hydroffice.soundspeed.formats.readers import seabird as sbe_constants
 from hydroffice.soundspeedmanager import __version__ as ssm_version
 
 import logging
@@ -566,7 +565,7 @@ class SBE19Comm(SeacatComms):
             yr = cur_yr - 1
         else:
             yr = cur_yr
-        doy = Tools.DayOfYear(mon, day, yr)
+        doy = datetime.datetime(yr, mon, day).timetuple().tm_yday
         return (yr, doy, hour, minute, second)
 # status='DS\r\nSEACAT PROFILER  V2.0c  SN 219   03/28/10  18:55:10.689\r\npressure sensor: serial no = 133813,  range = 5000 psia,  tc = -131\r\nclk = 32768.172   iop = 121   vmain = 8.4   vlith = 5.4\r\nncasts = 2   samples = 0   free = 43315   lwait = 0 msec\r\nsample rate = 1 scan every 0.5 seconds\r\nbattery cutoff = 5.8 volts\r\nnumber of voltages sampled = 0\r\nS>'
 
@@ -663,7 +662,7 @@ class SBE19PlusComm(SeacatComms):
             day = int(m.group('day'))
         m = sbe_constants.SEACAT_SBE19PLUS_HEX_TIMERE.search(header)
         hour, minute, second = int(m.group('hour')), int(m.group('minute')), int(m.group('second'))
-        doy = Tools.DayOfYear(mon, day, yr)
+        doy = datetime.datetime(yr, mon, day).timetuple().tm_yday
         return (yr, doy, hour, minute, second)
 
     def get_casts(self, cast_numbers=[1], progbar=None):

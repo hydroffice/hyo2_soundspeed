@@ -166,6 +166,23 @@ class Profile(object):
             if value == max_value:
                 max_reached = True
 
+    def calc_salinity_from_conductivity(self):
+        if np.count_nonzero(self.data.pressure):
+            pressure = self.data.pressure
+        else:
+            if not self.meta.latitude:
+                latitude = 30.0
+                logger.warning("using default latitude: %s" % latitude)
+            else:
+                latitude = self.meta.latitude
+            pressure = Oc.d2p_backup(self.data.depth, latitude)
+
+        self.data.sal = np.zeros_like(self.data.conductivity)
+        # convert from S/m to mmho/cm
+        # self.data.sal[self.data_valid] = Oc.c2s(self.data.conductivity[self.data_valid] * 10.0, pressure[self.data_valid], self.data.temp[self.data_valid])
+        self.data.sal = Oc.c2s(self.data.conductivity * 10.0, pressure, self.data.temp)  # FIXME -- what is the standard conductivity unit?  S/m or mmho/cm  (mS/cm)
+        self.modify_proc_info(Dicts.proc_import_infos['CALC_SAL'])
+
     def calc_salinity(self):
         """Helper method to calculate salinity from depth, sound speed and temperature"""
         # logger.debug("calculate salinity")

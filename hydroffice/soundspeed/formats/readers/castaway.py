@@ -70,7 +70,7 @@ class Castaway(AbstractTextReader):
         has_pressure = False
         has_conductivity = False
         self.conductivity_ms_per_cm = False
-        
+
         for line in self.lines:
 
             if not line:  # skip empty lines
@@ -182,7 +182,7 @@ class Castaway(AbstractTextReader):
             try:
                 self.ssp.cur.data.pressure[count] = float(data[self.field_index[self.tk_pressure]])
                 self.ssp.cur.data.conductivity[count] = float(data[self.field_index[self.tk_conductivity]])
-                if self.conductivity_ms_per_cm: # convert MicroS/cm to S/m
+                if self.conductivity_ms_per_cm:  # convert MicroS/cm to S/m
                     self.ssp.cur.data.conductivity[count] = self.ssp.cur.data.conductivity[count] / 10000.0
             except Exception as e:
                 logger.debug("issue in reading pressure and conductivity: %s -> skipping" % e)

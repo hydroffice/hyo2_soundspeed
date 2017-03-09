@@ -40,6 +40,8 @@ class Dicts(object):
         ('DigibarS', 112),
         ('ASVP', 113),
         ('CARIS', 114),
+        ('Simrad', 115),
+        ('OceanScience', 116),
 
         ('Deep Blue', 200),
         ('T-10', 201),

@@ -378,7 +378,7 @@ class Oceanography(object):
             p: pressure in dBar
             t: temperature in deg Celsius
 
-        Returns: Salinity
+        Returns: Salinity in psu
 
         """
 
@@ -416,7 +416,7 @@ class Oceanography(object):
             cr: conductivity ratio
             t: temperature
 
-        Returns: salinity
+        Returns: salinity in psu
 
         """
 
@@ -451,7 +451,7 @@ class Oceanography(object):
             p: pressure in dBar
             t: temperature in deg Celsisu
 
-        Returns: Conductivity
+        Returns: Conductivity mmho/cm
         """
 
         c = 0

@@ -63,6 +63,10 @@ class AbstractReader(AbstractFormat):
                 # select samples by casting direction
                 profile.reduce_up_down(self.s.ssp_up_or_down)
 
+            # Calc salinity if conductivity and temperature and (pressure or depth exist)
+            if not np.count_nonzero(profile.data.sal) and np.count_nonzero(profile.data.conductivity) and np.count_nonzero(profile.data.temp):
+                profile.calc_salinity_from_conductivity()
+
             # Calc speed if needed (must have temp+salinity) since we are now guaranteed depth.
             if not np.count_nonzero(profile.data.speed) and np.count_nonzero(profile.data.temp) and np.count_nonzero(profile.data.sal):
                 profile.calc_data_speed()
