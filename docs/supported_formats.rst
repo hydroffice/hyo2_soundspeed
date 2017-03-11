@@ -20,6 +20,7 @@ iXBlue (.txt)                                            X
 Kongsberg asvp (.asvp)                              X    X
 NCEI (.nc)                                               X
 QPS (.bsvp)                                              X
+OceanScience (.asc)                                 X
 SAIV (.txt)                                         X
 Seabird (.cnv)                                      X
 Sippican (.edf)                                     X

@@ -61,6 +61,10 @@ class TestSoundSpeedFormats(unittest.TestCase):
         filters = ["mvp", ]
         self._run(filters=filters)
 
+    def test_read_store_and_write_oceanscience(self):
+        filters = ["oceanscience", ]
+        self._run(filters=filters)
+
     def test_read_store_and_write_saiv(self):
         filters = ["saiv", ]
         self._run(filters=filters)

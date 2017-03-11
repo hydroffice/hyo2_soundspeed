@@ -37,6 +37,9 @@ class ImportSingleProfileDialog(AbstractDialog):
         # -- left
         self.leftButtonBox = QtGui.QDialogButtonBox(QtCore.Qt.Vertical)
         self.fmtLayout.addWidget(self.leftButtonBox)
+        # -- middle
+        self.midButtonBox = QtGui.QDialogButtonBox(QtCore.Qt.Vertical)
+        self.fmtLayout.addWidget(self.midButtonBox)
         # -- right
         self.rightButtonBox = QtGui.QDialogButtonBox(QtCore.Qt.Vertical)
         self.fmtLayout.addWidget(self.rightButtonBox)
@@ -49,12 +52,16 @@ class ImportSingleProfileDialog(AbstractDialog):
             btn = QtGui.QPushButton("%s" % self.lib.desc_readers[idx])
             btn.setToolTip("Import %s format [*.%s]" % (self.lib.desc_readers[idx],
                                                         ", *.".join(self.lib.ext_readers[idx])))
-            if (idx % 2) == 0:
+            if (idx % 3) == 0:
                 self.leftButtonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
+            elif (idx % 3) == 1:
+                self.midButtonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
             else:
                 self.rightButtonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
         # noinspection PyUnresolvedReferences
         self.leftButtonBox.clicked.connect(self.on_click_import)
+        # noinspection PyUnresolvedReferences
+        self.midButtonBox.clicked.connect(self.on_click_import)
         # noinspection PyUnresolvedReferences
         self.rightButtonBox.clicked.connect(self.on_click_import)
 

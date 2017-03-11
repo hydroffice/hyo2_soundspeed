@@ -65,6 +65,7 @@ class Asvp(AbstractTextWriter):
         logger.debug('generating body')
         body = self._convert_body(fmt=Dicts.kng_formats['ASVP'])
         self.fod.io.write(body)
+        self.fod.io.close()
 
     def _write_header_abs(self, freq):
         logger.debug('generating header for %d kHz' % freq)
@@ -119,6 +120,7 @@ class Asvp(AbstractTextWriter):
                     % (self.ssp.cur.sis.depth[ti][i], abs, mean_abs, "999.000")
 
         self.fod.io.write(body)
+        self.fod.io.close()
 
     def convert(self, ssp, fmt):
         """Convert a profile in a given Kongsberg format"""

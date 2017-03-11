@@ -47,8 +47,17 @@ class ExportMultiProfileDialog(AbstractDialog):
         hbox = QtGui.QHBoxLayout()
         self.mainLayout.addLayout(hbox)
         hbox.addStretch()
-        self.buttonBox = QtGui.QDialogButtonBox(QtCore.Qt.Vertical)
-        hbox.addWidget(self.buttonBox)
+        # - fmt layout
+        self.fmtLayout = QtGui.QHBoxLayout()
+        hbox.addLayout(self.fmtLayout)
+        # -- left
+        self.leftButtonBox = QtGui.QDialogButtonBox(QtCore.Qt.Vertical)
+        self.leftButtonBox.setFixedWidth(100)
+        self.fmtLayout.addWidget(self.leftButtonBox)
+        # -- right
+        self.rightButtonBox = QtGui.QDialogButtonBox(QtCore.Qt.Vertical)
+        self.rightButtonBox.setFixedWidth(100)
+        self.fmtLayout.addWidget(self.rightButtonBox)
         hbox.addStretch()
         # add buttons (retrieving name, description and extension from the library)
         for idx, name in enumerate(self.lib.name_writers):
@@ -68,10 +77,15 @@ class ExportMultiProfileDialog(AbstractDialog):
                 btn.setChecked(True)
                 self.selected_writers.append(name)
 
-            self.buttonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
+            if (idx % 2) == 0:
+                self.leftButtonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
+            else:
+                self.rightButtonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
 
         # noinspection PyUnresolvedReferences
-        self.buttonBox.clicked.connect(self.on_select_writer_btn)
+        self.leftButtonBox.clicked.connect(self.on_select_writer_btn)
+        # noinspection PyUnresolvedReferences
+        self.rightButtonBox.clicked.connect(self.on_select_writer_btn)
 
         self.mainLayout.addSpacing(16)
 
