@@ -18,6 +18,7 @@ Idronaut (.txt)                                     X
 ISS (.v*, .d*, .svp)                                X
 iXBlue (.txt)                                            X
 Kongsberg asvp (.asvp)                              X    X
+Kongsberg absorption (.abs)                              X
 NCEI (.nc)                                               X
 QPS (.bsvp)                                              X
 OceanScience (.asc)                                 X

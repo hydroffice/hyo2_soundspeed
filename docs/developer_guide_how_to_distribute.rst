@@ -2,23 +2,51 @@ How to distribute
 -----------------
 
 
-Requirements
-^^^^^^^^^^^^
+Preliminary steps
+^^^^^^^^^^^^^^^^^
 
-To bump the version, you need ``bumpversion``:
+* First of all, run the full test suite and check that there are no failures.
 
-* ``pip install bumpversion``
+* Verify the release version in the following files:
+
+  * setup.cfg
+  * setup.py
+  * docs/conf.py
+  * hydroffice/soundspeed/__init__.py
+  * hydroffice/soundspeedmanager/__init__.py
+  * hydroffice/soundspeedsettings/__init__.py
+
+* Push any 'release' changes to GitHub/BitBucket
+
+Update docs
+^^^^^^^^^^^
+
+* Build the new docs as html (make html) and as pdf (make pdf)
+
+* Update the web site with the new html docs
+
+* Update the embedded pdf docs
 
 
-Update the version
-^^^^^^^^^^^^^^^^^^
+Freeze the app
+^^^^^^^^^^^^^^
 
-Once installed, you can run something like:
+* Update the pyinstaller files under 'freeze/'
 
-* ``bumpversion --allow-dirty --new-version 0.1.4.dev0 patch``.
+* Freeze the application and test it on a 'clean' VM
 
-The above release value should then match with the variable ``version`` present in the ``conf.py`` under the `docs` folder.
+* Upload the app on BitBucket
+
+* Update the download link and the version on the SSM web page
 
 
+Final steps
+^^^^^^^^^^^
 
+* Push any 'release' changes to GitHub/BitBucket
 
+* Create a 'tag' with the release
+
+* Create a GitHub release
+
+* Push the package on PyPI

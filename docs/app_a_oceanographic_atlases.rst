@@ -54,7 +54,7 @@ using the estimates immediately local to the area of the cast in either WOA or R
 
 
 WOA09-based profiles
-====================
+--------------------
 
 .. index:: WOA; WOA09
 
@@ -77,7 +77,7 @@ likely with the use of the basin mask file provided with the WOA09 data set.
 
 
 WOA13-based profiles
-====================
+--------------------
 
 .. index:: WOA; WOA13
 
@@ -94,7 +94,7 @@ to a lesser extent, quality control concerns which have surfaced since the initi
 
 
 RTOFS-based profiles
-====================
+--------------------
 
 .. index:: RTOFS; synthetic profile
 
