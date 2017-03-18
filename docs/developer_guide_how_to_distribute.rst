@@ -51,6 +51,6 @@ Final steps
 
 * Create a GitHub release
 
-* Push the package on PyPI
+* Push the package on PyPI: 'python setup.py build bdist_wheel upload -r pypi'
 
 * Start to work on the next release :)

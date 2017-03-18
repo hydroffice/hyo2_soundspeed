@@ -1,16 +1,12 @@
 History
 -------
 
-3.0.a2
-~~~~~~
+2017.0.0
+~~~~~~~~
 
-2016-09-25
+2017-03-18
 
-- Added mechanism to retrieve WOA09/13 DBs from past installations
-
-
-3.0.a1
-~~~~~~
+- First stable release.
 
 2016-03-27
 
