@@ -21,9 +21,9 @@ Preliminary steps
 Update docs
 ^^^^^^^^^^^
 
-* Build the new docs as html (make html) and as pdf (make pdf)
+* Build the new docs as html (make html) and as pdf (make latexpdf)
 
-* Update the web site with the new html docs
+* Update the web site with the new html and pdf docs (urls too)
 
 * Update the embedded pdf docs
 
