@@ -39,6 +39,8 @@ Freeze the app
 
 * Update the download link and the version on the SSM web page
 
+* Update the latest file on the HydrOffice site
+
 
 Final steps
 ^^^^^^^^^^^
@@ -50,3 +52,5 @@ Final steps
 * Create a GitHub release
 
 * Push the package on PyPI
+
+* Start to work on the next release :)
