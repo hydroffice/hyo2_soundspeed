@@ -33,6 +33,9 @@ This package provides functionalities to manage sound speed profiles.
 
 The package is jointly developed by NOAA OCS and UNH CCOM.
 
+.. image:: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/master/hydroffice/soundspeedmanager/media/noaa_ccom.png
+    :alt: joint
+
 
 Other info
 ----------
