@@ -542,7 +542,7 @@ class Oceanography(object):
             pstep = d_p / n if n != 0 else 0
 
             n_ps = n
-            for j in xrange(n):
+            for j in range(n):
                 p_seq[j] = p1 + pstep * (j + 1)
 
             return n_ps
