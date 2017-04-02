@@ -553,7 +553,7 @@ class Oceanography(object):
         dp_min = np.min(dp)
         dp_max = np.max(dp)
         if dp_min <= 0 or np.min(p) < 0:
-            print(dp)
+            #print(dp)
             logger.warning("dp_min: %s, p min: %d" % (dp_min, np.min(p)))
             raise RuntimeError('pressure must be monotonic and non negative')
         p_min = p[0]
@@ -563,7 +563,7 @@ class Oceanography(object):
 
         # Determine if there is a "bottle" at exactly p_ref
         ip_ref = -1
-        for i in xrange(nz):
+        for i in range(nz):
             if p[i] == p_ref:
                 ip_ref = i
                 break
@@ -585,7 +585,7 @@ class Oceanography(object):
             for i in range(nz)[1:]:  # cumulative sum
                 geo_strf_dyn_height0[i] = geo_strf_dyn_height0[i - 1] - geo_strf_dyn_height0[i]
 
-            for i in xrange(nz):
+            for i in range(nz):
                 dyn_height[i] = geo_strf_dyn_height0[i] - geo_strf_dyn_height0[ip_ref]
 
         else:
@@ -615,7 +615,7 @@ class Oceanography(object):
                     i_bpr = ip_ref
 
                 p_cnt = len(p_i)
-                for i in xrange(p_cnt):
+                for i in range(p_cnt):
                     ii_data[i] = i
             else:
                 # interpolation is needed.
@@ -645,7 +645,7 @@ class Oceanography(object):
                     p_i[0] = p_min
                     p_cnt = 1
 
-                for i_bottle in xrange(nz - 1):
+                for i_bottle in range(nz - 1):
 
                     ii_data[i_bottle] = p_cnt - 1
                     if p[i_bottle] == p_ref:
@@ -690,7 +690,7 @@ class Oceanography(object):
             for i in range(p_cnt)[1:]:  # cumulative sum
                 geo_strf_dyn_height0[i] = geo_strf_dyn_height0[i - 1] - geo_strf_dyn_height0[i]
 
-            for i in xrange(nz):
+            for i in range(nz):
                 dyn_height[i] = (geo_strf_dyn_height0[int(ii_data[i])] - geo_strf_dyn_height0[i_bpr]) * 1e4
 
         return dyn_height

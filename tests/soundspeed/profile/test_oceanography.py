@@ -19,7 +19,7 @@ class TestSoundSpeedOceanography(unittest.TestCase):
         trusted_gsw_lat = 30.0
 
         calc_d = Oc.p2d_gsw(p=trusted_gsw_p, lat=trusted_gsw_lat, dyn_height=None)
-        self.assertAlmostEqual(calc_d, trusted_gsw_d, places=1)
+        self.assertLess(abs(calc_d - trusted_gsw_d), 0.1)
 
     def test_p2d_backup(self):
         # check values from Fofonoff and Millard(1983)
