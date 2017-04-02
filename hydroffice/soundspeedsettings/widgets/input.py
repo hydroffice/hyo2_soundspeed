@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import os
 import logging
 
@@ -135,7 +133,7 @@ class Input(AbstractWidget):
         hbox.addLayout(vbox)
         vbox.addStretch()
         self.extension_source = QtGui.QComboBox()
-        self.extension_source.addItems(Dicts.atlases.keys())
+        self.extension_source.addItems([k.encode() for k in Dicts.atlases.keys()])
         vbox.addWidget(self.extension_source)
         vbox.addStretch()
 
@@ -155,7 +153,7 @@ class Input(AbstractWidget):
         hbox.addLayout(vbox)
         vbox.addStretch()
         self.salinity_source = QtGui.QComboBox()
-        self.salinity_source.addItems(Dicts.atlases.keys())
+        self.salinity_source.addItems([k.encode() for k in Dicts.atlases.keys()])
         vbox.addWidget(self.salinity_source)
         vbox.addStretch()
 
@@ -175,7 +173,7 @@ class Input(AbstractWidget):
         hbox.addLayout(vbox)
         vbox.addStretch()
         self.temp_sal_source = QtGui.QComboBox()
-        self.temp_sal_source.addItems(Dicts.atlases.keys())
+        self.temp_sal_source.addItems([k.encode() for k in Dicts.atlases.keys()])
         vbox.addWidget(self.temp_sal_source)
         vbox.addStretch()
 
@@ -298,7 +296,7 @@ class Input(AbstractWidget):
         hbox.addLayout(vbox)
         vbox.addStretch()
         self.profile_direction = QtGui.QComboBox()
-        self.profile_direction.addItems(Dicts.ssp_directions.keys())
+        self.profile_direction.addItems([k.encode() for k in Dicts.ssp_directions.keys()])
         vbox.addWidget(self.profile_direction)
         vbox.addStretch()
 

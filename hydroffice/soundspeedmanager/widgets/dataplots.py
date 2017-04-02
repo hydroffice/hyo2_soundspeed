@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from datetime import datetime
 import os
 import logging
@@ -225,21 +223,25 @@ class DataPlots(AbstractWidget):
                                              ms=4,
                                              picker=3,
                                              label='SIS')
-        self.speed_draft = self.speed_ax.axhline(y=None,
+        self.speed_draft = self.speed_ax.axhline(y=0,
                                                  linewidth=1.5,
                                                  color=self.draft_color,
                                                  linestyle=':',
                                                  label='draft')
-        self.speed_sensor = self.speed_ax.axvline(x=None,
+        self.speed_sensor = self.speed_ax.axvline(x=1500,
                                                   linewidth=1.5,
                                                   color=self.sensor_color,
                                                   linestyle=':',
                                                   label='tss')
-        self.speed_seafloor = self.speed_ax.axhline(y=None,
+        self.speed_seafloor = self.speed_ax.axhline(y=0,
                                                     linewidth=1.5,
                                                     color=self.seafloor_color,
                                                     linestyle=':',
                                                     label='depth')
+        self.speed_draft.set_ydata(None)
+        self.speed_sensor.set_xdata(None)
+        self.speed_seafloor.set_ydata(None)
+
         self.speed_ax.set_label("speed")
 
     def _draw_temp(self):

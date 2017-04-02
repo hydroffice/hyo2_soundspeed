@@ -2,7 +2,6 @@
 Hydro-Package
 Sound Speed
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
 log = logging.getLogger(__name__)
@@ -16,7 +15,5 @@ __license__ = 'LGPLv2.1 or CCOM-UNH Industrial Associate license'
 __copyright__ = 'Copyright 2017 University of New Hampshire, Center for Coastal and Ocean Mapping'
 
 
-# def hyo():
-# def hyo_app():
 def hyo_lib():
     return __doc__, __version__

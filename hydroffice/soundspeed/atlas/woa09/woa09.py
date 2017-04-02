@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import os
 import math
 import numpy as np
@@ -9,11 +7,11 @@ from datetime import datetime as dt, date
 
 logger = logging.getLogger(__name__)
 
-from ..abstract import AbstractAtlas
-from ..ftp import Ftp
-from ...profile.profile import Profile
-from ...profile.profilelist import ProfileList
-from ...profile.dicts import Dicts
+from hydroffice.soundspeed.atlas.abstract import AbstractAtlas
+from hydroffice.soundspeed.atlas.ftp import Ftp
+from hydroffice.soundspeed.profile.profile import Profile
+from hydroffice.soundspeed.profile.profilelist import ProfileList
+from hydroffice.soundspeed.profile.dicts import Dicts
 
 
 class Woa09(AbstractAtlas):

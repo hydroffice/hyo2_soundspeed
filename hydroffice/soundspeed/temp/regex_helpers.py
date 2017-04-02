@@ -1,17 +1,17 @@
-# builtins
-import re
-import datetime
-from warnings import warn
-from copy import deepcopy, copy
+# TODO: Velocipy legacy: to be cleaned, then moved under hydroffice.soundspeed.base
 
+# builtins
+import datetime
+import re
+from copy import deepcopy, copy
+from warnings import warn
+
+import hydroffice.soundspeed.profile
 # 3rd party libs
 import numpy
-
-# our custom package
-from hydroffice.soundspeed.formats.readers import coordinates
-import hydroffice.soundspeed.profile
 from hydroffice.soundspeed.profile import dicts
-
+# our custom package
+from hydroffice.soundspeed.temp import coordinates
 
 '''
 This module is using a lot of Regular Expressions and numpy.fromregex to read file formats.

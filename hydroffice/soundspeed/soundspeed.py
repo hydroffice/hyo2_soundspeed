@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import numpy as np
 import time
 import os
@@ -998,7 +996,7 @@ class SoundSpeedLibrary(object):
 
     # exporting
 
-    def export_db_profiles_metadata(self, ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile']):
+    def export_db_profiles_metadata(self, ogr_format=GdalAux.ogr_formats['ESRI Shapefile']):
         """Export the db profile metadata"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         lst = db.export.export_profiles_metadata(project_name=self.current_project,

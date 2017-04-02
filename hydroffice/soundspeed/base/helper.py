@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import os
 import sys
 import platform
@@ -8,6 +6,8 @@ import logging
 from codecs import open
 
 logger = logging.getLogger(__name__)
+
+from .. import __version__ as ss_version
 
 
 class FileInfo(object):
@@ -63,7 +63,6 @@ class FileManager(FileInfo):
 
 
 def info_libs():
-    from .. import __version__ as ss_version
     msg = "os: %s %s\n" % (os.name, "64" if is_64bit_os() else "32")
     msg += "python: %s %s-bit\n" % (platform.python_version(), "64" if is_64bit_python() else "32")
     msg += "hydroffice.soundspeed: %s\n" % ss_version
@@ -85,6 +84,15 @@ def info_libs():
 
     vrs = sss_version
     msg += "hydroffice.soundspeedsettings: %s\n" % vrs
+
+    try:
+        from numpy import __version__ as np_version
+
+    except ImportError:
+        np_version = None
+
+    vrs = np_version
+    msg += "numpy: %s\n" % vrs
 
     try:
         from matplotlib import __version__ as mpl_version

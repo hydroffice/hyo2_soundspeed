@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import numpy as np
 import logging
 
@@ -17,7 +15,7 @@ class More(object):
         """
         if len(fields) == 0:
             return
-        dt = [(fld.encode('ASCII'), b'f4') for fld in fields]
+        dt = [(fld, 'f4') for fld in fields]
         self.sa = np.zeros((num_samples, len(fields)), dtype=dt)
 
     def __repr__(self):

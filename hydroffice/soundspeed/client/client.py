@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import time
 import socket
 import logging
@@ -70,7 +68,12 @@ class Client(object):
 
         try:
             sock_out.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 2 ** 16)
-            sock_out.sendto(tx_data, (self.ip, self.port))
+            if isinstance(tx_data, bytes):
+                sock_out.sendto(tx_data, (self.ip, self.port))
+            elif isinstance(tx_data, str):
+                sock_out.sendto(tx_data.encode(), (self.ip, self.port))
+            else:
+                raise RuntimeError("invalid type of data to tx: %s" % type(tx_data))
 
         except socket.error:
             sock_out.close()

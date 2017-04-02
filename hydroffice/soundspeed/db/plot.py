@@ -1,11 +1,9 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import os
 import numpy as np
 
 import matplotlib
 matplotlib.use('Qt4Agg')
-matplotlib.rcParams['backend.qt4']='PySide'
+matplotlib.rcParams['backend.qt4'] = 'PySide'
 from matplotlib import rc_context
 
 from mpl_toolkits.basemap import Basemap
@@ -289,21 +287,16 @@ class PlotDb(object):
                     color=(0.85, 0.85, 0.85), markersize=2
                     # label='%s [%04d] ' % (ts_pk[0].time(), ts_pk[1])
                     )
-            ax.hold(True)
 
             avg_ssp.add_samples(tmp_ssp.cur.data.depth[tmp_ssp.cur.data_valid],
                                 tmp_ssp.cur.data.speed[tmp_ssp.cur.data_valid])
 
         avg_ssp.calc_avg()
         ax.plot(avg_ssp.mean, avg_ssp.depths, '-b', linewidth=2)
-        ax.hold(True)
         ax.plot(avg_ssp.min_2std, avg_ssp.depths, '--b', linewidth=1)
-        ax.hold(True)
         ax.plot(avg_ssp.max_2std, avg_ssp.depths, '--b', linewidth=1)
-        ax.hold(True)
         # fill between std-curves
         # ax.fill_betweenx(avg_ssp.depths, avg_ssp.min_2std, avg_ssp.max_2std, color='b', alpha='0.1')
-        # ax.hold(True)
 
         if save_fig:
             plt.savefig(os.path.join(self.plots_folder(output_folder), 'aggregate_%s_%s.png' % (dates[0], dates[1])),
@@ -361,7 +354,6 @@ class PlotDb(object):
             fig.get_axes()[0].plot(row_ssp.cur.data.speed[row_ssp.cur.data_valid],
                                    row_ssp.cur.data.depth[row_ssp.cur.data_valid],
                                    label='%s [%04d]' % (row[1].time(), row[0]))
-            fig.get_axes()[0].hold(True)
 
         # print(date_plots)
 

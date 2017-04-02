@@ -1,8 +1,7 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import threading
 import os
-import urllib2
+from urllib.request import urlopen
+from urllib.error import URLError
 import logging
 
 from PySide import QtCore
@@ -22,7 +21,7 @@ class DownloadThread(threading.Thread):
         self.downloading_window = downloading_window
 
     def run(self):
-        u = urllib2.urlopen(self.url)
+        u = urlopen(self.url)
         meta = u.info()
         file_size = int(meta.getheaders('Content-Length')[0])
 

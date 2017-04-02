@@ -1,12 +1,10 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import datetime as dt
 import logging
 import struct
 
 import numpy as np
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 from hydroffice.soundspeed.profile.dicts import Dicts
 
@@ -755,7 +753,7 @@ class KmSeabedImage89(Km):
                 loc_data[b_count:b_count + b_size] = b_data
                 b_count += b_size
         # log.debug(self.snippets[0][402], self.snippets[0][403])
-        log.debug("serialized: %s B" % b_count)
+        logger.debug("serialized: %s B" % b_count)
 
         # fix checksum
         b_data = struct.pack("<H", KmSeabedImage89.calc_2bytes_checksum(loc_data))

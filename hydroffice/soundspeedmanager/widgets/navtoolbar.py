@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from matplotlib.backends.qt_compat import QtCore, QtGui, QtWidgets
 
 import numpy as np

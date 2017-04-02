@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from osgeo import gdal
 from osgeo import ogr
 from osgeo import osr
@@ -19,15 +17,15 @@ class GdalAux(object):
     data_fixed = False
 
     ogr_formats = {
-        b'ESRI Shapefile': 0,
-        b'KML': 1,
-        b'CSV': 2,
+        'ESRI Shapefile': 0,
+        'KML': 1,
+        'CSV': 2,
     }
 
     ogr_exts = {
-        b'ESRI Shapefile': '.shp',
-        b'KML': '.kml',
-        b'CSV': '.csv',
+        'ESRI Shapefile': '.shp',
+        'KML': '.kml',
+        'CSV': '.csv',
     }
 
     def __init__(self):
@@ -37,7 +35,7 @@ class GdalAux(object):
 
     @classmethod
     def current_gdal_version(cls):
-        return int(gdal.VersionInfo(b'VERSION_NUM'))
+        return int(gdal.VersionInfo('VERSION_NUM'))
 
     @classmethod
     def is_gdal_2(cls):
@@ -70,7 +68,7 @@ class GdalAux(object):
         if ds is None:
             raise RuntimeError("Ogr failure in creation of data source: %s" % output_path)
 
-        if ogr_format == cls.ogr_formats[b'ESRI Shapefile']:
+        if ogr_format == cls.ogr_formats['ESRI Shapefile']:
             cls.create_prj_file(output_path, epsg=epsg)
 
         return ds
@@ -150,8 +148,8 @@ class GdalAux(object):
         gcs_csv_path1 = os.path.join(gdal_data_path1, 'gcs.csv')
         if os.path.exists(gcs_csv_path1):
 
-            gdal.SetConfigOption(b'GDAL_DATA', gdal_data_path1.encode('utf-8'))
-            logger.debug("resulting GDAL_DATA = %s" % gdal.GetConfigOption(b'GDAL_DATA'))
+            gdal.SetConfigOption('GDAL_DATA', gdal_data_path1)
+            logger.debug("resulting GDAL_DATA = %s" % gdal.GetConfigOption('GDAL_DATA'))
             cls.data_fixed = True
             cls.push_gdal_error_handler()
             return
@@ -161,8 +159,8 @@ class GdalAux(object):
         gcs_csv_path2 = os.path.join(gdal_data_path2, 'gcs.csv')
         if os.path.exists(gcs_csv_path2):
 
-            gdal.SetConfigOption(b'GDAL_DATA', gdal_data_path2.encode('utf-8'))
-            logger.debug("resulting GDAL_DATA = %s" % gdal.GetConfigOption(b'GDAL_DATA'))
+            gdal.SetConfigOption('GDAL_DATA', gdal_data_path2)
+            logger.debug("resulting GDAL_DATA = %s" % gdal.GetConfigOption('GDAL_DATA'))
             cls.data_fixed = True
             cls.push_gdal_error_handler()
             return
@@ -172,8 +170,8 @@ class GdalAux(object):
         gcs_csv_path3 = os.path.join(gdal_data_path3, 'gcs.csv')
         if os.path.exists(gcs_csv_path3):
 
-            gdal.SetConfigOption(b'GDAL_DATA', gdal_data_path3.encode('utf-8'))
-            logger.debug("resulting GDAL_DATA = %s" % gdal.GetConfigOption(b'GDAL_DATA'))
+            gdal.SetConfigOption('GDAL_DATA', gdal_data_path3)
+            logger.debug("resulting GDAL_DATA = %s" % gdal.GetConfigOption('GDAL_DATA'))
             cls.data_fixed = True
             cls.push_gdal_error_handler()
             return
@@ -183,8 +181,8 @@ class GdalAux(object):
         gcs_csv_path4 = os.path.join(gdal_data_path4, 'gcs.csv')
         if os.path.exists(gcs_csv_path4):
 
-            gdal.SetConfigOption(b'GDAL_DATA', gdal_data_path4.encode('utf-8'))
-            logger.debug("resulting GDAL_DATA = %s" % gdal.GetConfigOption(b'GDAL_DATA'))
+            gdal.SetConfigOption('GDAL_DATA', gdal_data_path4)
+            logger.debug("resulting GDAL_DATA = %s" % gdal.GetConfigOption('GDAL_DATA'))
             cls.data_fixed = True
             cls.push_gdal_error_handler()
             return

@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import time
 
 from hydroffice.soundspeed.logging import test_logging

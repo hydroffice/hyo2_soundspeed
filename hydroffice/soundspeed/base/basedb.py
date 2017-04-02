@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from abc import ABCMeta, abstractmethod
 import os
 import sqlite3
@@ -123,7 +121,7 @@ class BaseDb(object):
             # Register the adapter
             sqlite3.register_adapter(BaseDb.Point, BaseDb.adapt_point)
             # Register the converter
-            sqlite3.register_converter(b"point", BaseDb.convert_point)
+            sqlite3.register_converter("point", BaseDb.convert_point)
 
         except sqlite3.Error as e:
             raise RuntimeError("Unable to register 'point': %s - %s" % (type(e), e))

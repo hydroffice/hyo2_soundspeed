@@ -1,19 +1,18 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from datetime import datetime as dt, date, timedelta
 from netCDF4 import Dataset
 import numpy as np
-import httplib
-from urlparse import urlparse
+from http import client
+from urllib import parse
+import socket
 import logging
 
 logger = logging.getLogger(__name__)
 
-from ..abstract import AbstractAtlas
-from ...profile.profile import Profile
-from ...profile.profilelist import ProfileList
-from ...profile.dicts import Dicts
-from ...profile.oceanography import Oceanography as Oc
+from hydroffice.soundspeed.atlas.abstract import AbstractAtlas
+from hydroffice.soundspeed.profile.profile import Profile
+from hydroffice.soundspeed.profile.profilelist import ProfileList
+from hydroffice.soundspeed.profile.dicts import Dicts
+from hydroffice.soundspeed.profile.oceanography import Oceanography as Oc
 
 
 class Rtofs(AbstractAtlas):
@@ -315,9 +314,8 @@ class Rtofs(AbstractAtlas):
     @staticmethod
     def _check_url(url):
         try:
-            import socket
-            p = urlparse(url)
-            conn = httplib.HTTPConnection(p.netloc)
+            p = parse.urlparse(url)
+            conn = client.HTTPConnection(p.netloc)
             conn.request('HEAD', p.path)
             resp = conn.getresponse()
         except socket.error as e:

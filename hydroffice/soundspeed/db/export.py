@@ -1,7 +1,4 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from osgeo import ogr
-
 import os
 import logging
 
@@ -86,7 +83,7 @@ class ExportDb(object):
 
         return lyr
 
-    def export_profiles_metadata(self, project_name, output_folder, ogr_format=GdalAux.ogr_formats[b'ESRI Shapefile']):
+    def export_profiles_metadata(self, project_name, output_folder, ogr_format=GdalAux.ogr_formats['ESRI Shapefile']):
 
         GdalAux()
         output = os.path.join(self.export_folder(output_folder=output_folder), project_name)

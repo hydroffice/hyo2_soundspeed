@@ -1,11 +1,6 @@
-# -*- encoding: utf-8 -*-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import time
 import threading
 import socket
-import struct
-import numpy as np
 import os
 
 # logging settings

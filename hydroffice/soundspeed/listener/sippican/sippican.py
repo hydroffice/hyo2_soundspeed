@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import socket
 import operator
 import logging
@@ -10,11 +8,11 @@ import time
 logger = logging.getLogger(__name__)
 
 from hydroffice.soundspeed.listener.abstract import AbstractListener
-from hydroffice.soundspeed.formats.readers import sippican
+# from hydroffice.soundspeed.formats.readers import sippican
 
 
 class Sippican(AbstractListener):
-    """Sippicanlistener"""
+    """Sippican listener"""
 
     def __init__(self, port, prj, timeout=1, ip="0.0.0.0", target=None, name="Sippican"):
         super(Sippican, self).__init__(port=port, ip=ip, timeout=timeout,

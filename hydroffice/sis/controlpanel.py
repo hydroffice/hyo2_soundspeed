@@ -1,8 +1,4 @@
-from __future__ import absolute_import, division, print_function
-
 import os
-import datetime
-from io import open
 
 from PySide import QtGui
 from PySide import QtCore

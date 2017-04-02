@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import unittest
 import os
 from hydroffice.soundspeed.logging import test_logging
@@ -99,14 +97,14 @@ class TestSoundSpeedBaseDb(unittest.TestCase):
         self.db.reconnect_or_create()
         self.assertNotEqual(self.db.conn, None)
 
-        self.assertEqual(self.db.check_table_total_rows(b'dummyTable'), 0)
+        self.assertEqual(self.db.check_table_total_rows('dummyTable'), 0)
 
-        infos = self.db.check_table_cols_settings(b'dummyTable')
+        infos = self.db.check_table_cols_settings('dummyTable')
         for info in infos:
             # logger.debug("%s" % info[1])
             self.assertTrue(info[1] in ("id", "dummy"))  # the name of the fields
 
-        counts = self.db.check_tables_values_in_cols(b'dummyTable')
+        counts = self.db.check_tables_values_in_cols('dummyTable')
         # logger.debug("%s" % counts)
         for key in counts.keys():
             self.assertEqual(counts[key], 0)  # since the dummy table is empty

@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from PySide import QtGui
 from datetime import datetime as dt
 

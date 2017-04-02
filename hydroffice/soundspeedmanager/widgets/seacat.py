@@ -1,17 +1,12 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import os
 import logging
 import traceback
 import datetime
 import shutil
 try:
-    import _winreg as winreg  # python2.7
+    import winreg  # python 3+
 except:
-    try:
-        import winreg  # python 3+
-    except:
-        pass
+    pass
 
 from PySide import QtGui, QtCore
 from PySide.QtGui import QMessageBox

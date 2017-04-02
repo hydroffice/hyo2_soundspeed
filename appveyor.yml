@@ -8,15 +8,11 @@ environment:
 
   matrix:
 
-    - PYTHON_VERSION: 2.7
+    - PYTHON_VERSION: 3.6
       PYTHON_ARCH: x86
-      MINICONDA: C:\Miniconda
+      MINICONDA: C:\Miniconda3
 
-    - PYTHON_VERSION: 2.7
-      PYTHON_ARCH: x64
-      MINICONDA: C:\Miniconda-x64
-
-    - PYTHON_VERSION: 3.5
+    - PYTHON_VERSION: 3.6
       PYTHON_ARCH: x64
       MINICONDA: C:\Miniconda3-x64
 
@@ -24,7 +20,7 @@ matrix:
 
   allow_failures:
 
-    - PYTHON_VERSION: 3.5
+    - PYTHON_VERSION: 3.6
       PYTHON_ARCH: x64
       MINICONDA: C:\Miniconda3-x64
 

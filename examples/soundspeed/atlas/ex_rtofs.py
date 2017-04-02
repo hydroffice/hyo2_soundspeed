@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from PySide import QtGui
 from datetime import datetime as dt, timedelta
 
@@ -17,8 +15,7 @@ def main():
     mw = QtGui.QMainWindow()
     mw.show()
 
-    lib = SoundSpeedLibrary(qt_progress=QtGui.QProgressDialog)
-    lib.set_callbacks(QtCallbacks(mw))
+    lib = SoundSpeedLibrary(callbacks=QtCallbacks(mw))
 
     tests = [
         (43.026480, -70.318824, dt.utcnow()),  # offshore Portsmouth

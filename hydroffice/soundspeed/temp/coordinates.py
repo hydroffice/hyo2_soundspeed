@@ -1,18 +1,12 @@
+# TODO: Velocipy legacy: to be cleaned, then moved under hydroffice.soundspeed.base
 """
 coordinates.py
 James Hiebert <james.hiebert@noaa.gov>
 April 14, 2008
 """
 
-from re import search, match, I
-
-try:
-    from osgeo.ogr import Geometry, wkbPoint
-except ImportError:
-    try:
-        from ogr import Geometry, wkbPoint
-    except ImportError:
-        print 'ogr not found, OGRPoints can not be created'
+from re import search, match
+from osgeo.ogr import Geometry, wkbPoint
 
 
 class FormattingException(Exception):

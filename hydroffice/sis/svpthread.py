@@ -1,6 +1,3 @@
-# -*- encoding: utf-8 -*-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import datetime
 import time
 import threading
@@ -16,7 +13,7 @@ logger = logging.getLogger(__name__)
 class SvpThread(threading.Thread):
     def __init__(self, installation, runtime, ssp,
                  port_in=4001, port_out=26103, ip_out="localhost",
-                 target=None, name="SVP", verbose=None):
+                 target=None, name="SVP"):
         threading.Thread.__init__(self, target=target, name=name)
         self.port_in = port_in
         self.port_out = port_out
@@ -166,9 +163,14 @@ class SvpThread(threading.Thread):
         now = datetime.datetime.utcnow()
         if not date:
             date = int(now.strftime("%Y%m%d"))
+        if not isinstance(date, int):
+            date = int(date)
         if not secs:
             secs = (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()
+        if not isinstance(secs, int):
+            secs = int(secs)
         # -- header
+        #logger.debug("types: %s %s %s %s" % (type(date), type(secs), type(depths.size), type(d_res)))
         svp = struct.pack("<BBHIIHHIIHH", 2, 0x55, 122, date, secs * 1000, 1, 123, date, secs, depths.size, d_res)
         # -- body
         for count in range(depths.size):

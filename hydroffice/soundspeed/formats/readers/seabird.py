@@ -1,10 +1,9 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-import time
 import datetime
-import re
-import numpy
 import logging
+import re
+import time
+
+import numpy
 
 logger = logging.getLogger(__name__)
 
@@ -12,8 +11,9 @@ from hydroffice.soundspeed.formats.readers.abstract import AbstractTextReader
 from hydroffice.soundspeed.profile.dicts import Dicts
 from hydroffice.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 
-from hydroffice.soundspeed.formats.readers.regex_helpers import Profile, getMetaFromCoord, robust_re_number, named_re_number, parseNumbers
-from hydroffice.soundspeed.formats.readers import coordinates
+from hydroffice.soundspeed.temp.regex_helpers import Profile, getMetaFromCoord, robust_re_number, \
+    parseNumbers
+from hydroffice.soundspeed.temp import coordinates
 
 # Note that Hex header is copied into the CNV header verbatim so these can be used in either.
 SEACAT_SBE19_HEX_YEAR = r'SEACAT\sPROFILER.*?(?P<day>\d+)/(?P<month>\d+)/(?P<year>\d+)'

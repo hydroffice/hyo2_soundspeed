@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import os
 import logging
 
@@ -159,7 +157,7 @@ class Output(AbstractWidget):
         hbox.addLayout(vbox)
         vbox.addStretch()
         self.server_source = QtGui.QComboBox()
-        self.server_source.addItems(Dicts.server_sources.keys())
+        self.server_source.addItems([k.encode() for k in Dicts.server_sources.keys()])
         vbox.addWidget(self.server_source)
         vbox.addStretch()
 

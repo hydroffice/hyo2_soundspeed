@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import unittest
 import os
 
@@ -18,7 +16,7 @@ class TestSoundSpeedTestCallbacks(unittest.TestCase):
         self.assertTrue(isinstance(self.cb.ask_number(), float))
 
     def test_ask_text(self):
-        self.assertTrue(type(self.cb.ask_text()) in [str, unicode])
+        self.assertTrue(type(self.cb.ask_text()) is str)
 
     def test_ask_date(self):
         from datetime import datetime as dt

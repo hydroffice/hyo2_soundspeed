@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from hydroffice.soundspeed.logging import test_logging
 
 import logging
@@ -13,7 +11,7 @@ cb = TestCallbacks()
 logger.debug("ask number: %s" % cb.ask_number())
 logger.debug("ask text: %s" % cb.ask_text())
 logger.debug("ask date: %s" % cb.ask_date())
-logger.debug("ask location: %s %s" % cb.ask_location())
+logger.debug("ask location: %s" % cb.ask_location())
 logger.debug("ask filename: %s" % cb.ask_filename())
 logger.debug("ask directory: %s" % cb.ask_directory())
 logger.debug("ask location from SIS: %s" % cb.ask_location_from_sis())

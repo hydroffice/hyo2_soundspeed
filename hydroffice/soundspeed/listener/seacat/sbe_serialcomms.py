@@ -1,6 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals, with_statement
-#from __future__ import absolute_import
-
 import shutil
 import os
 import sys
@@ -96,7 +93,7 @@ class SeacatComms(object):
                 # print('getting status')
                 self.original_baud = self.comlink.getBaudrate()
                 self.get_status()  # checks and caches a legit return so we can see what kind of seacat it is
-        except serial.SerialException, e:
+        except serial.SerialException as e:
             traceback.print_exc()
             logger.error("Could not open port %s.\nIt's most likely either in use by another program or doesn't exist")
             raise e
@@ -408,7 +405,7 @@ class SeacatComms(object):
                 f.write('Trying ' + func.__name__ + '\n')
                 r = func()
                 f.write(str(r))  # the data comes with newlines over the serial port
-            except Exception, e:
+            except Exception as e:
                 f.write(str(e) + '\n')
         R(self.get_status)
         R(self.get_voltages)
@@ -759,7 +756,7 @@ def scan_for_comports():
             s = serial.Serial(port)
             available.append(port)
             s.close()   # explicit close 'cause of delayed GC in java
-        except serial.SerialException, e:
+        except serial.SerialException as e:
             if 'access is denied' in e.message.lower():
                 available.append(port)
     return available

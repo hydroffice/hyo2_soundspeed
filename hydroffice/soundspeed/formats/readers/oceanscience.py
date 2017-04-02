@@ -1,8 +1,7 @@
-from __future__ import absolute_import, division, print_function
-
 import datetime
 import logging
 import re
+
 import numpy
 
 logger = logging.getLogger(__name__)
@@ -10,10 +9,9 @@ logger = logging.getLogger(__name__)
 from hydroffice.soundspeed.formats.readers.abstract import AbstractTextReader
 from hydroffice.soundspeed.profile.dicts import Dicts
 from hydroffice.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
-from hydroffice.soundspeed.formats.readers import coordinates
-from hydroffice.soundspeed.profile.oceanography import Oceanography
+from hydroffice.soundspeed.temp import coordinates
 
-from hydroffice.soundspeed.formats.readers.regex_helpers import Profile, robust_re_number, named_re_number, parseNumbers, getMetaFromTimeRE, getMetaFromCoord
+from hydroffice.soundspeed.temp.regex_helpers import Profile, parseNumbers, getMetaFromTimeRE, getMetaFromCoord
 
 
 class OceanScience(AbstractTextReader):

@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import os
 import logging
 
@@ -226,7 +224,7 @@ class Listeners(AbstractWidget):
         hbox.addLayout(vbox)
         vbox.addStretch()
         self.mvp_transmission_protocol = QtGui.QComboBox()
-        self.mvp_transmission_protocol.addItems(Dicts.mvp_protocols.keys())
+        self.mvp_transmission_protocol.addItems([k.encode() for k in Dicts.mvp_protocols.keys()])
         vbox.addWidget(self.mvp_transmission_protocol)
         vbox.addStretch()
 
@@ -246,7 +244,7 @@ class Listeners(AbstractWidget):
         hbox.addLayout(vbox)
         vbox.addStretch()
         self.mvp_format = QtGui.QComboBox()
-        self.mvp_format.addItems(Dicts.mvp_formats.keys())
+        self.mvp_format.addItems([k.encode() for k in Dicts.mvp_formats.keys()])
         vbox.addWidget(self.mvp_format)
         vbox.addStretch()
 
@@ -388,7 +386,7 @@ class Listeners(AbstractWidget):
         hbox.addLayout(vbox)
         vbox.addStretch()
         self.mvp_instrument = QtGui.QComboBox()
-        self.mvp_instrument.addItems(Dicts.mvp_instruments.keys())
+        self.mvp_instrument.addItems([k.encode() for k in Dicts.mvp_instruments.keys()])
         vbox.addWidget(self.mvp_instrument)
         vbox.addStretch()
 

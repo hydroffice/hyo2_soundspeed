@@ -1,10 +1,10 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import math
 import os
 import sys
 import ssl
-import urllib2
+from urllib.request import urlopen
+from urllib.error import URLError
+import socket
 
 from PySide import QtGui
 from PySide import QtCore
@@ -394,11 +394,11 @@ class MainWin(QtGui.QMainWindow):
         new_bugfix = False
         latest_version = None
         try:
-            response = urllib2.urlopen('https://www.hydroffice.org/latest/soundspeedmanager.txt', timeout=1)
+            response = urlopen('https://www.hydroffice.org/latest/soundspeedmanager.txt', timeout=1)
             latest_version = response.read().split()[0]
 
             cur_maj, cur_min, cur_fix = ssm_version.split('.')
-            lat_maj, lat_min, lat_fix = latest_version.split('.')
+            lat_maj, lat_min, lat_fix = latest_version.decode().split('.')
 
             if int(lat_maj) > int(cur_maj):
                 new_release = True
@@ -409,7 +409,7 @@ class MainWin(QtGui.QMainWindow):
             elif (int(lat_maj) == int(cur_maj)) and (int(lat_min) == int(cur_min)) and (int(lat_fix) > int(cur_fix)):
                 new_bugfix = True
 
-        except (urllib2.URLError, ssl.SSLError) as e:
+        except (URLError, ssl.SSLError, socket.timeout) as e:
             logger.info("unable to check latest release")
 
         if new_release:

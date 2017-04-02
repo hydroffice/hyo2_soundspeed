@@ -1,9 +1,5 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import sqlite3
-import shutil
 import os
-import sys
 import datetime
 import traceback
 import numpy as np
@@ -90,7 +86,7 @@ class ProjectDb(object):
             # Register the adapter
             sqlite3.register_adapter(Point, adapt_point)
             # Register the converter
-            sqlite3.register_converter(b"point", convert_point)
+            sqlite3.register_converter("point", convert_point)
 
         except sqlite3.Error as e:
             raise RuntimeError("Unable to register 'point': %s - %s" % (type(e), e))
@@ -348,8 +344,8 @@ class ProjectDb(object):
             ret = self.conn.execute("""
                                     SELECT rowid FROM ssp_pk WHERE cast_datetime=? AND cast_position=?
                                     """, (datetime, point,)).fetchone()
-            # logger.info("spp pk: %s" % ret[b'id'])
-            self.tmp_ssp_pk = ret[b'id']
+            # logger.info("spp pk: %s" % ret['id'])
+            self.tmp_ssp_pk = ret['id']
 
         except sqlite3.Error as e:
             logger.error("during ssp pk retrieve, %s: %s" % (type(e), e))
@@ -582,34 +578,34 @@ class ProjectDb(object):
                 for row in sql:
 
                     # special handling in case of unknown future sensor type
-                    sensor_type = row[b'sensor_type']
+                    sensor_type = row['sensor_type']
                     if sensor_type not in Dicts.sensor_types.values():
                         sensor_type = Dicts.sensor_types['Future']
 
                     # special handling in case of unknown future probe type
-                    probe_type = row[b'probe_type']
+                    probe_type = row['probe_type']
                     if probe_type not in Dicts.probe_types.values():
                         probe_type = Dicts.probe_types['Future']
 
-                    ssp_list.append((row[b'pk'],  # 0
-                                     row[b'cast_datetime'],  # 1
-                                     row[b'cast_position'],  # 2
+                    ssp_list.append((row['pk'],  # 0
+                                     row['cast_datetime'],  # 1
+                                     row['cast_position'],  # 2
                                      sensor_type,  # 3
                                      probe_type,  # 4
-                                     row[b'original_path'],  # 5
-                                     row[b'institution'],  # 6
-                                     row[b'survey'],  # 7
-                                     row[b'vessel'],  # 8
-                                     row[b'sn'],  # 9
-                                     row[b'proc_time'],  # 10
-                                     row[b'proc_info'],  # 11
-                                     row[b'comments'],  # 12
-                                     row[b'pressure_uom'],  # 13
-                                     row[b'depth_uom'],  # 14
-                                     row[b'speed_uom'],  # 15
-                                     row[b'temperature_uom'],  # 16
-                                     row[b'conductivity_uom'],  # 17
-                                     row[b'salinity_uom'],  # 18
+                                     row['original_path'],  # 5
+                                     row['institution'],  # 6
+                                     row['survey'],  # 7
+                                     row['vessel'],  # 8
+                                     row['sn'],  # 9
+                                     row['proc_time'],  # 10
+                                     row['proc_info'],  # 11
+                                     row['comments'],  # 12
+                                     row['pressure_uom'],  # 13
+                                     row['depth_uom'],  # 14
+                                     row['speed_uom'],  # 15
+                                     row['temperature_uom'],  # 16
+                                     row['conductivity_uom'],  # 17
+                                     row['salinity_uom'],  # 18
                                      ))
             return ssp_list
 
@@ -632,9 +628,10 @@ class ProjectDb(object):
                 # ssp spatial timestamp
                 # noinspection SqlResolve
                 ssp_idx = self.conn.execute("SELECT * FROM ssp_pk WHERE id=?", (pk, )).fetchone()
-                ssp.cur.meta.utc_time = ssp_idx[b'cast_datetime']
-                ssp.cur.meta.longitude = ssp_idx[b'cast_position'].x
-                ssp.cur.meta.latitude = ssp_idx[b'cast_position'].y
+
+                ssp.cur.meta.utc_time = ssp_idx['cast_datetime']
+                ssp.cur.meta.longitude = ssp_idx['cast_position'].x
+                ssp.cur.meta.latitude = ssp_idx['cast_position'].y
 
             except sqlite3.Error as e:
                 logger.error("spatial timestamp for %s pk > %s: %s" % (pk, type(e), e))
@@ -646,30 +643,30 @@ class ProjectDb(object):
                 ssp_meta = self.conn.execute("SELECT * FROM ssp WHERE pk=?", (pk, )).fetchone()
 
                 # special handling in case of unknown future sensor type
-                ssp.cur.meta.sensor_type = ssp_meta[b'sensor_type']
+                ssp.cur.meta.sensor_type = ssp_meta['sensor_type']
                 if ssp.cur.meta.sensor_type not in Dicts.sensor_types.values():
                     ssp.cur.meta.sensor_type = Dicts.sensor_types['Future']
 
                 # special handling in case of unknown future probe type
-                ssp.cur.meta.probe_type = ssp_meta[b'probe_type']
+                ssp.cur.meta.probe_type = ssp_meta['probe_type']
                 if ssp.cur.meta.probe_type not in Dicts.probe_types.values():
                     ssp.cur.meta.probe_type = Dicts.probe_types['Future']
 
-                ssp.cur.meta.original_path = ssp_meta[b'original_path']
-                ssp.cur.meta.institution = ssp_meta[b'institution']
-                ssp.cur.meta.survey = ssp_meta[b'survey']
-                ssp.cur.meta.vessel = ssp_meta[b'vessel']
-                ssp.cur.meta.sn = ssp_meta[b'sn']
-                ssp.cur.meta.proc_time = ssp_meta[b'proc_time']
-                ssp.cur.meta.proc_info = ssp_meta[b'proc_info']
-                ssp.cur.meta.comments = ssp_meta[b'comments']
+                ssp.cur.meta.original_path = ssp_meta['original_path']
+                ssp.cur.meta.institution = ssp_meta['institution']
+                ssp.cur.meta.survey = ssp_meta['survey']
+                ssp.cur.meta.vessel = ssp_meta['vessel']
+                ssp.cur.meta.sn = ssp_meta['sn']
+                ssp.cur.meta.proc_time = ssp_meta['proc_time']
+                ssp.cur.meta.proc_info = ssp_meta['proc_info']
+                ssp.cur.meta.comments = ssp_meta['comments']
 
-                ssp.cur.meta.pressure_uom = ssp_meta[b'pressure_uom']
-                ssp.cur.meta.depth_uom = ssp_meta[b'depth_uom']
-                ssp.cur.meta.speed_uom = ssp_meta[b'speed_uom']
-                ssp.cur.meta.temperature_uom = ssp_meta[b'temperature_uom']
-                ssp.cur.meta.conductivity_uom = ssp_meta[b'conductivity_uom']
-                ssp.cur.meta.salinity_uom = ssp_meta[b'salinity_uom']
+                ssp.cur.meta.pressure_uom = ssp_meta['pressure_uom']
+                ssp.cur.meta.depth_uom = ssp_meta['depth_uom']
+                ssp.cur.meta.speed_uom = ssp_meta['speed_uom']
+                ssp.cur.meta.temperature_uom = ssp_meta['temperature_uom']
+                ssp.cur.meta.conductivity_uom = ssp_meta['conductivity_uom']
+                ssp.cur.meta.salinity_uom = ssp_meta['salinity_uom']
 
             except sqlite3.Error as e:
                 logger.error("ssp meta for %s pk > %s: %s" % (pk, type(e), e))
@@ -684,14 +681,15 @@ class ProjectDb(object):
                 # logger.debug("raw data samples: %s" % num_samples)
                 for i in range(num_samples):
                     # print(ssp_samples[i])
-                    ssp.cur.data.pressure[i] = ssp_samples[i][b'pressure']
-                    ssp.cur.data.depth[i] = ssp_samples[i][b'depth']
-                    ssp.cur.data.speed[i] = ssp_samples[i][b'speed']
-                    ssp.cur.data.temp[i] = ssp_samples[i][b'temperature']
-                    ssp.cur.data.conductivity[i] = ssp_samples[i][b'conductivity']
-                    ssp.cur.data.sal[i] = ssp_samples[i][b'salinity']
-                    ssp.cur.data.source[i] = ssp_samples[i][b'source']
-                    ssp.cur.data.flag[i] = ssp_samples[i][b'flag']
+
+                    ssp.cur.data.pressure[i] = ssp_samples[i]['pressure']
+                    ssp.cur.data.depth[i] = ssp_samples[i]['depth']
+                    ssp.cur.data.speed[i] = ssp_samples[i]['speed']
+                    ssp.cur.data.temp[i] = ssp_samples[i]['temperature']
+                    ssp.cur.data.conductivity[i] = ssp_samples[i]['conductivity']
+                    ssp.cur.data.sal[i] = ssp_samples[i]['salinity']
+                    ssp.cur.data.source[i] = ssp_samples[i]['source']
+                    ssp.cur.data.flag[i] = ssp_samples[i]['flag']
 
             except sqlite3.Error as e:
                 logger.error("reading raw samples for %s pk, %s: %s" % (pk, type(e), e))
@@ -706,14 +704,14 @@ class ProjectDb(object):
                 # logger.debug("proc data samples: %s" % num_samples)
                 for i in range(num_samples):
                     # print(ssp_samples[i])
-                    ssp.cur.proc.pressure[i] = ssp_samples[i][b'pressure']
-                    ssp.cur.proc.depth[i] = ssp_samples[i][b'depth']
-                    ssp.cur.proc.speed[i] = ssp_samples[i][b'speed']
-                    ssp.cur.proc.temp[i] = ssp_samples[i][b'temperature']
-                    ssp.cur.proc.conductivity[i] = ssp_samples[i][b'conductivity']
-                    ssp.cur.proc.sal[i] = ssp_samples[i][b'salinity']
-                    ssp.cur.proc.source[i] = ssp_samples[i][b'source']
-                    ssp.cur.proc.flag[i] = ssp_samples[i][b'flag']
+                    ssp.cur.proc.pressure[i] = ssp_samples[i]['pressure']
+                    ssp.cur.proc.depth[i] = ssp_samples[i]['depth']
+                    ssp.cur.proc.speed[i] = ssp_samples[i]['speed']
+                    ssp.cur.proc.temp[i] = ssp_samples[i]['temperature']
+                    ssp.cur.proc.conductivity[i] = ssp_samples[i]['conductivity']
+                    ssp.cur.proc.sal[i] = ssp_samples[i]['salinity']
+                    ssp.cur.proc.source[i] = ssp_samples[i]['source']
+                    ssp.cur.proc.flag[i] = ssp_samples[i]['flag']
 
             except sqlite3.Error as e:
                 logger.error("reading raw samples for %s pk, %s: %s" % (pk, type(e), e))
@@ -728,14 +726,14 @@ class ProjectDb(object):
                 # logger.debug("sis data samples: %s" % num_samples)
                 for i in range(num_samples):
                     # print(ssp_samples[i])
-                    ssp.cur.sis.pressure[i] = ssp_samples[i][b'depth']
-                    ssp.cur.sis.depth[i] = ssp_samples[i][b'depth']
-                    ssp.cur.sis.speed[i] = ssp_samples[i][b'speed']
-                    ssp.cur.sis.temp[i] = ssp_samples[i][b'temperature']
-                    ssp.cur.sis.conductivity[i] = ssp_samples[i][b'conductivity']
-                    ssp.cur.sis.sal[i] = ssp_samples[i][b'salinity']
-                    ssp.cur.sis.source[i] = ssp_samples[i][b'source']
-                    ssp.cur.sis.flag[i] = ssp_samples[i][b'flag']
+                    ssp.cur.sis.pressure[i] = ssp_samples[i]['depth']
+                    ssp.cur.sis.depth[i] = ssp_samples[i]['depth']
+                    ssp.cur.sis.speed[i] = ssp_samples[i]['speed']
+                    ssp.cur.sis.temp[i] = ssp_samples[i]['temperature']
+                    ssp.cur.sis.conductivity[i] = ssp_samples[i]['conductivity']
+                    ssp.cur.sis.sal[i] = ssp_samples[i]['salinity']
+                    ssp.cur.sis.source[i] = ssp_samples[i]['source']
+                    ssp.cur.sis.flag[i] = ssp_samples[i]['flag']
 
             except sqlite3.Error as e:
                 logger.error("reading sis samples for %s pk, %s: %s" % (pk, type(e), e))

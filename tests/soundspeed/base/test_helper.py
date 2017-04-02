@@ -1,7 +1,6 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import unittest
 import os
+from io import IOBase
 
 from hydroffice.soundspeed.base import helper
 
@@ -22,10 +21,10 @@ class TestSoundSpeedBaseHelper(unittest.TestCase):
         self.assertEqual(fi.io, None)
 
         fi.io = open(__file__)
-        self.assertEqual(type(fi.io), file)
+        self.assertTrue(isinstance(fi.io, IOBase))
 
     def test_creation_with_File_manager(self):
-        fm = helper.FileManager(__file__, b'r')
+        fm = helper.FileManager(__file__, 'r')
         self.assertEqual(fm.path, os.path.abspath(__file__))
         self.assertEqual(fm.basename, os.path.basename(os.path.abspath(__file__)).split('.')[0])
         self.assertEqual(fm.ext, os.path.basename(os.path.abspath(__file__)).split('.')[1])
@@ -33,7 +32,7 @@ class TestSoundSpeedBaseHelper(unittest.TestCase):
         self.assertFalse(fm.append_exists)
 
     def test_append_with_File_manager(self):
-        fm = helper.FileManager(__file__, b'a')
+        fm = helper.FileManager(__file__, 'a')
         self.assertEqual(fm.path, os.path.abspath(__file__))
         self.assertEqual(fm.basename, os.path.basename(os.path.abspath(__file__)).split('.')[0])
         self.assertEqual(fm.ext, os.path.basename(os.path.abspath(__file__)).split('.')[1])
