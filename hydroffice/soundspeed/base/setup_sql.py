@@ -2,6 +2,61 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+from hydroffice.soundspeed.base.helper import is_pydro, hstb_woa09_folder, hstb_woa13_folder
+
+vessel_list = [
+    "RA Rainier (ship)",
+    "R3 Rainier - Launch 2803",
+    "R4 Rainier - Launch 2801",
+    "R5 Rainier - Launch 2802",
+    "R6 Rainier - Launch 2804",
+    "TJ Thomas Jefferson (ship)",
+    "T1 Thomas Jefferson - Launch 3101",
+    "T2 Thomas Jefferson - Launch 3102",
+    "BH Bay Hydro II",
+    "N1 NRT-1  Gulf",
+    "N2 NRT-2  Atlantic",
+    "N3 NRT-3  Pacific",
+    "N4 NRT-4  Great Lakes",
+    "N5 NRT-5  New York",
+    "N6 NRT-6  San Francisco",
+    "N7 NRT-7  Middle Atlantic",
+    "FH Ferdinand R. Hassler (Ship)",
+    "FA Fairweather (Ship)",
+    "F5 Fairweather - Launch 2805",
+    "F6 Fairweather - Launch 2806",
+    "F7 Fairweather - Launch 2807",
+    "F8 Fairwaether - Launch 2808",
+    "AR MCArthur",
+    "NF Nancy Foster",
+    "HI Hi'Ialakai",
+    "GM Gloria Michelle",
+    "EX Okeanos Explorer",
+    "ZZ Other"
+]
+
+institution_list = [
+    "NOAA Office of Coast Survey",
+    "UNH CCOM/JHC"
+]
+
+if is_pydro():
+    logger.debug("using pydro setup")
+    default_use_woa_09 = "False"
+    default_use_woa_13 = "True"
+    default_use_rtofs = "False"
+    default_custom_woa09_folder = hstb_woa09_folder()
+    default_custom_woa13_folder = hstb_woa13_folder()
+    default_noaa_tools = "True"
+    default_default_institution = institution_list[0]
+else:
+    default_use_woa_09 = "True"
+    default_use_woa_13 = "False"
+    default_use_rtofs = "False"
+    default_custom_woa09_folder = ""
+    default_custom_woa13_folder = ""
+    default_noaa_tools = "False"
+    default_default_institution = ""
 
 CREATE_SETTINGS = """-- noinspection SqlResolveForFile
  CREATE TABLE IF NOT EXISTS general(
@@ -10,9 +65,9 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      setup_name text NOT NULL UNIQUE DEFAULT "default",
      setup_status text NOT NULL DEFAULT "inactive",
      /* input */
-     use_woa09 text NOT NULL DEFAULT "True",
-     use_woa13 text NOT NULL DEFAULT "False",
-     use_rtofs text NOT NULL DEFAULT "True",
+     use_woa09 text NOT NULL DEFAULT "%s",
+     use_woa13 text NOT NULL DEFAULT "%s",
+     use_rtofs text NOT NULL DEFAULT "%s",
      ssp_extension_source text NOT NULL DEFAULT "WOA09",
      ssp_salinity_source text NOT NULL DEFAULT "WOA09",
      ssp_temp_sal_source text NOT NULL DEFAULT "WOA09",
@@ -52,10 +107,10 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      current_project text NOT NULL DEFAULT "default",
      custom_projects_folder text DEFAULT "",
      custom_outputs_folder text DEFAULT "",
-     custom_woa09_folder text DEFAULT "",
-     custom_woa13_folder text DEFAULT "",
-     noaa_tools text NOT NULL DEFAULT "False",
-     default_institution text NOT NULL DEFAULT "",
+     custom_woa09_folder text DEFAULT "%s",
+     custom_woa13_folder text DEFAULT "%s",
+     noaa_tools text NOT NULL DEFAULT "%s",
+     default_institution text NOT NULL DEFAULT "%s",
      default_survey text NOT NULL DEFAULT "",
      default_vessel text NOT NULL DEFAULT "",
      auto_apply_default_metadata text NOT NULL DEFAULT "True",
@@ -98,7 +153,8 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      /* user-defined */
      CHECK (noaa_tools IN ("True", "False")),
      CHECK (auto_apply_default_metadata IN ("True", "False"))
-     ) """
+     ) """ % (default_use_woa_09, default_use_woa_13, default_use_rtofs,
+              default_custom_woa09_folder, default_custom_woa13_folder, default_noaa_tools, default_default_institution)
 
 CREATE_CLIENT_LIST = """-- noinspection SqlResolveForFile
  CREATE TABLE IF NOT EXISTS client_list(

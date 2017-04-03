@@ -21,8 +21,8 @@ class TestSoundSpeedAtlasRtofs(unittest.TestCase):
 
     def test_creation_of_Rtofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        rtofs = Rtofs(data_folder=prj.data_folder, prj=prj)
-        self.assertTrue('rtofs' in rtofs.folder)
+        rtofs = Rtofs(data_folder=prj.rtofs_folder, prj=prj)
+        self.assertTrue('rtofs' in rtofs.data_folder)
         self.assertFalse(rtofs.is_present())
         prj.close()
 

@@ -47,22 +47,23 @@ class Woa09(AbstractAtlas):
         The default location is first checked. If not present, the search is enlarged to past installations"""
 
         # first check the location based on the current version
-        check_woa09_file = os.path.join(self.folder, 'landsea.msk')
+        check_woa09_file = os.path.join(self.data_folder, 'landsea.msk')
         if os.path.exists(check_woa09_file):
             return True
         # logger.info('unable to locate the WOA09 db at the default location: %s' % self.folder)
 
-        # continue the search based on possible old installations
-        parent_folder = os.path.abspath(os.path.join(self.folder, os.pardir, os.pardir, os.pardir))
-        for folder in os.listdir(parent_folder):
-            candidate_path = os.path.join(parent_folder, folder)
-            if os.path.isdir(candidate_path) and "Sound Speed" in candidate_path:
-                candidate_folder = os.path.join(candidate_path, "atlases", "woa09")
-                check_woa09_file = os.path.join(candidate_folder, 'landsea.msk')
-                if os.path.exists(check_woa09_file):
-                    self.folder = candidate_folder
-                    logger.info("identified WOA09 db at: %s" % self.folder)
-                    return True
+        # TODO: currently unused since there is only a set of DB for all SSM releases
+        # # continue the search based on possible old installations
+        # parent_folder = os.path.abspath(os.path.join(self.data_folder, os.pardir, os.pardir, os.pardir))
+        # for folder in os.listdir(parent_folder):
+        #     candidate_path = os.path.join(parent_folder, folder)
+        #     if os.path.isdir(candidate_path) and "Sound Speed" in candidate_path:
+        #         candidate_folder = os.path.join(candidate_path, "atlases", "woa09")
+        #         check_woa09_file = os.path.join(candidate_folder, 'landsea.msk')
+        #         if os.path.exists(check_woa09_file):
+        #             self.data_folder = candidate_path
+        #             logger.info("identified WOA09 db at: %s" % self.data_folder)
+        #             return True
 
         # no way to find the database
         logger.warning("unable to locate the WOA09 db")
@@ -72,22 +73,23 @@ class Woa09(AbstractAtlas):
         """try to download the data set"""
         logger.debug('downloading WOA9 atlas')
 
-        try:
-            # remove all the content
-            for root, dirs, files in os.walk(self.folder, topdown=False):
-                for name in files:
-                    os.remove(os.path.join(root, name))
-                for name in dirs:
-                    os.rmdir(os.path.join(root, name))
-        except Exception as e:
-            logger.error('during cleaning target folder: %s' % e)
-            return False
+        # FIXME: this was too dangerous if the user select the wrong folder
+        # try:
+        #     # remove all the content
+        #     for root, dirs, files in os.walk(self.data_folder, topdown=False):
+        #         for name in files:
+        #             os.remove(os.path.join(root, name))
+        #         for name in dirs:
+        #             os.rmdir(os.path.join(root, name))
+        # except Exception as e:
+        #     logger.error('during cleaning target folder: %s' % e)
+        #     return False
 
         try:
             ftp = Ftp("ftp.ccom.unh.edu", show_progress=True, debug_mode=False,
                       progress=self.prj.progress)
             data_zip_src = "fromccom/hydroffice/woa09.red.zip"
-            data_zip_dst = os.path.join(self.data_folder, "woa09.red.zip")
+            data_zip_dst = os.path.abspath(os.path.join(self.data_folder, os.pardir, "woa09.red.zip"))
             ftp.get_file(data_zip_src, data_zip_dst, unzip_it=True)
             return self.is_present()
 
@@ -98,12 +100,12 @@ class Woa09(AbstractAtlas):
     def load_grids(self):
         """Load atlas grids"""
         try:
-            self.t_annual = Dataset(os.path.join(self.folder, "temperature_annual_1deg.nc"))
-            self.t_monthly = Dataset(os.path.join(self.folder, "temperature_monthly_1deg.nc"))
-            self.t_seasonal = Dataset(os.path.join(self.folder, "temperature_seasonal_1deg.nc"))
-            self.s_monthly = Dataset(os.path.join(self.folder, "salinity_monthly_1deg.nc"))
-            self.s_seasonal = Dataset(os.path.join(self.folder, "salinity_seasonal_1deg.nc"))
-            landsea = np.genfromtxt((os.path.join(self.folder, "landsea.msk")))
+            self.t_annual = Dataset(os.path.join(self.data_folder, "temperature_annual_1deg.nc"))
+            self.t_monthly = Dataset(os.path.join(self.data_folder, "temperature_monthly_1deg.nc"))
+            self.t_seasonal = Dataset(os.path.join(self.data_folder, "temperature_seasonal_1deg.nc"))
+            self.s_monthly = Dataset(os.path.join(self.data_folder, "salinity_monthly_1deg.nc"))
+            self.s_seasonal = Dataset(os.path.join(self.data_folder, "salinity_seasonal_1deg.nc"))
+            landsea = np.genfromtxt((os.path.join(self.data_folder, "landsea.msk")))
             self.landsea = landsea.reshape((180, 360))
             # basin = np.genfromtxt((os.path.join(self.folder, "basin.msk")))
             # self.basin = basin.reshape((33, 180, 360))

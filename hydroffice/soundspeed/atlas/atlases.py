@@ -18,46 +18,56 @@ class Atlases(object):
         if not os.path.exists(self._atlases_folder):
             os.makedirs(self._atlases_folder)
 
+        # rtofs
+        rtofs_folder = os.path.join(self._atlases_folder, "rtofs")
+        if not os.path.exists(rtofs_folder):
+            os.makedirs(rtofs_folder)
+        logger.info("rtofs path: %s" % rtofs_folder)
+
+        # woa09
+        if (self.prj.setup.custom_woa09_folder is None) or (self.prj.setup.custom_woa09_folder == ""):
+            woa09_folder = os.path.join(self._atlases_folder, "woa09")
+        else:
+            if os.path.exists(os.path.abspath(self.prj.setup.custom_woa09_folder)):
+                woa09_folder = self.prj.setup.custom_woa09_folder
+            else:
+                woa09_folder = os.path.join(self._atlases_folder, "woa09")
+        if not os.path.exists(woa09_folder):
+            os.makedirs(woa09_folder)
+        logger.info("woa09 path: %s" % woa09_folder)
+
+        # woa13
+        if (self.prj.setup.custom_woa09_folder is None) or (self.prj.setup.custom_woa13_folder == ""):
+            woa13_folder = os.path.join(self._atlases_folder, "woa13")
+        else:
+            if os.path.exists(os.path.abspath(self.prj.setup.custom_woa13_folder)):
+                woa13_folder = self.prj.setup.custom_woa13_folder
+            else:
+                woa13_folder = os.path.join(self._atlases_folder, "woa13")
+        if not os.path.exists(woa13_folder):
+            os.makedirs(woa13_folder)
+        logger.info("woa13 path: %s" % woa13_folder)
+
         # available atlases
-        self.rtofs = Rtofs(data_folder=self._atlases_folder, prj=self.prj)
-        self.woa09 = Woa09(data_folder=self._atlases_folder, prj=self.prj)
-        self.woa13 = Woa13(data_folder=self._atlases_folder, prj=self.prj)
+        self.rtofs = Rtofs(data_folder=rtofs_folder, prj=self.prj)
+        self.woa09 = Woa09(data_folder=woa09_folder, prj=self.prj)
+        self.woa13 = Woa13(data_folder=woa13_folder, prj=self.prj)
 
     @property
     def atlases_folder(self):
         return self._atlases_folder
 
-    @atlases_folder.setter
-    def atlases_folder(self, value):
-        """ Set the atlases folder"""
-        self._atlases_folder = value
-
     @property
     def woa09_folder(self):
-        return self.woa09.folder
-
-    @woa09_folder.setter
-    def woa09_folder(self, value):
-        """ Set the woa09 folder"""
-        self.woa09.folder = value
+        return self.woa09.data_folder
 
     @property
     def woa13_folder(self):
-        return self.woa13.folder
-
-    @woa13_folder.setter
-    def woa13_folder(self, value):
-        """ Set the woa13 folder"""
-        self.woa13.folder = value
+        return self.woa13.data_folder
 
     @property
     def rtofs_folder(self):
-        return self.rtofs.folder
-
-    @rtofs_folder.setter
-    def rtofs_folder(self, value):
-        """ Set the woa09 folder"""
-        self.rtofs.folder = value
+        return self.rtofs.data_folder
 
     def __repr__(self):
         msg = "  <atlases>\n"

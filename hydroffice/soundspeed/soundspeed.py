@@ -87,24 +87,6 @@ class SoundSpeedLibrary(object):
                 self.setup.custom_outputs_folder = str()
                 self.setup.save_to_db()
 
-        # woa09 folder
-        if len(self.setup.custom_woa09_folder):
-
-            if os.path.exists(self.setup.custom_woa09_folder):
-                self.woa09_folder = self.setup.custom_woa09_folder
-            else:  # delete the not-existing folder
-                self.setup.custom_woa09_folder = str()
-                self.setup.save_to_db()
-
-        # woa13 folder
-        if len(self.setup.custom_woa13_folder):
-
-            if os.path.exists(self.setup.custom_woa13_folder):
-                self.woa13_folder = self.setup.custom_woa13_folder
-            else:  # delete the not-existing folder
-                self.setup.custom_woa13_folder = str()
-                self.setup.save_to_db()
-
     def close(self):
         """Destructor"""
         logger.info("** > LIB: closing ...")
@@ -258,11 +240,6 @@ class SoundSpeedLibrary(object):
         """Get the atlases folder"""
         return self.atlases.atlases_folder
 
-    @atlases_folder.setter
-    def atlases_folder(self, value):
-        """ Set the atlases folder"""
-        self.atlases.atlases_folder = value
-
     def open_atlases_folder(self):
         explore_folder(self.atlases_folder)
 
@@ -271,30 +248,15 @@ class SoundSpeedLibrary(object):
         """Get the woa09 atlas folder"""
         return self.atlases.woa09_folder
 
-    @woa09_folder.setter
-    def woa09_folder(self, value):
-        """ Set the woa09 atlas folder"""
-        self.atlases.woa09_folder = value
-
     @property
     def woa13_folder(self):
         """Get the woa13 atlas folder"""
         return self.atlases.woa13_folder
 
-    @woa13_folder.setter
-    def woa13_folder(self, value):
-        """ Set the woa13 atlas folder"""
-        self.atlases.woa13_folder = value
-
     @property
     def rtofs_folder(self):
         """Get the rtofs atlas folder"""
         return self.atlases.rtofs_folder
-
-    @rtofs_folder.setter
-    def rtofs_folder(self, value):
-        """ Set the rtofs atlas folder"""
-        self.atlases.rtofs_folder = value
 
     # projects
 

@@ -234,11 +234,53 @@ def is_pydro():
         return True
 
     except Exception:
+        return False
 
-        try:
-            # noinspection PyUnresolvedReferences
-            import HSTP
-            return True
 
-        except Exception:
-            return False
+def hstb_folder():
+    if not is_pydro():
+        raise RuntimeError("this method should be called only within a Pydro environment")
+
+    # noinspection PyUnresolvedReferences
+    from HSTB import __file__ as hstb_file
+
+    return os.path.abspath(os.path.dirname(hstb_file))
+
+
+def hstb_atlases_folder():
+    if not is_pydro():
+        raise RuntimeError("this method should be called only within a Pydro environment")
+
+    # noinspection PyUnresolvedReferences
+    from HSTB import __file__ as hstb_file
+
+    folder = os.path.join(hstb_folder(), "atlases")
+    if not os.path.exists(folder):
+        os.mkdir(folder)
+    return folder
+
+
+def hstb_woa09_folder():
+    if not is_pydro():
+        raise RuntimeError("this method should be called only within a Pydro environment")
+
+    # noinspection PyUnresolvedReferences
+    from HSTB import __file__ as hstb_file
+
+    folder = os.path.join(hstb_atlases_folder(), "woa09")
+    if not os.path.exists(folder):
+        os.mkdir(folder)
+    return folder
+
+
+def hstb_woa13_folder():
+    if not is_pydro():
+        raise RuntimeError("this method should be called only within a Pydro environment")
+
+    # noinspection PyUnresolvedReferences
+    from HSTB import __file__ as hstb_file
+
+    folder = os.path.join(hstb_atlases_folder(), "woa13")
+    if not os.path.exists(folder):
+        os.mkdir(folder)
+    return folder

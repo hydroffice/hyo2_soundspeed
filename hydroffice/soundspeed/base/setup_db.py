@@ -6,44 +6,6 @@ logger = logging.getLogger(__name__)
 
 from hydroffice.soundspeed.base.basedb import BaseDb
 from hydroffice.soundspeed.base.setup_sql import CREATE_SETTINGS, CREATE_SETTINGS_VIEW, CREATE_CLIENT_LIST
-from hydroffice.soundspeed.base.helper import is_pydro
-
-
-vessel_list = [
-    "RA Rainier (ship)",
-    "R3 Rainier - Launch 2803",
-    "R4 Rainier - Launch 2801",
-    "R5 Rainier - Launch 2802",
-    "R6 Rainier - Launch 2804",
-    "TJ Thomas Jefferson (ship)",
-    "T1 Thomas Jefferson - Launch 3101",
-    "T2 Thomas Jefferson - Launch 3102",
-    "BH Bay Hydro II",
-    "N1 NRT-1  Gulf",
-    "N2 NRT-2  Atlantic",
-    "N3 NRT-3  Pacific",
-    "N4 NRT-4  Great Lakes",
-    "N5 NRT-5  New York",
-    "N6 NRT-6  San Francisco",
-    "N7 NRT-7  Middle Atlantic",
-    "FH Ferdinand R. Hassler (Ship)",
-    "FA Fairweather (Ship)",
-    "F5 Fairweather - Launch 2805",
-    "F6 Fairweather - Launch 2806",
-    "F7 Fairweather - Launch 2807",
-    "F8 Fairwaether - Launch 2808",
-    "AR MCArthur",
-    "NF Nancy Foster",
-    "HI Hi'Ialakai",
-    "GM Gloria Michelle",
-    "EX Okeanos Explorer",
-    "ZZ Other"
-]
-
-institution_list = [
-    "NOAA Office of Coast Survey",
-    "UNH CCOM/JHC"
-]
 
 
 class SetupDb(BaseDb):
@@ -56,10 +18,6 @@ class SetupDb(BaseDb):
         self.reconnect_or_create()
         self._check_default_setup()
         self.use_setup_name = use_setup_name
-
-        if is_new_db and is_pydro():
-            self.noaa_tools = True
-            self.default_institution = institution_list[0]  # NOAA OCS
 
     def build_tables(self):
         if not self.conn:

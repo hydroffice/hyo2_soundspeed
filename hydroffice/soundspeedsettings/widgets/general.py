@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 from hydroffice.soundspeed.profile.dicts import Dicts
 from hydroffice.soundspeedsettings.widgets.widget import AbstractWidget
-from hydroffice.soundspeed.base.setup_db import vessel_list, institution_list
+from hydroffice.soundspeed.base.setup_sql import vessel_list, institution_list
 
 
 class General(AbstractWidget):
@@ -82,6 +82,7 @@ class General(AbstractWidget):
         hbox.addWidget(label)
         # -- value
         self.projects_folder = QtGui.QLineEdit()
+        self.projects_folder.setReadOnly(True)
         hbox.addWidget(self.projects_folder)
         # -- button
         btn = QtGui.QPushButton("...")
@@ -99,6 +100,7 @@ class General(AbstractWidget):
         hbox.addWidget(label)
         # -- value
         self.outputs_folder = QtGui.QLineEdit()
+        self.outputs_folder.setReadOnly(True)
         hbox.addWidget(self.outputs_folder)
         # -- button
         btn = QtGui.QPushButton("...")
@@ -116,6 +118,7 @@ class General(AbstractWidget):
         hbox.addWidget(label)
         # -- value
         self.woa09_folder = QtGui.QLineEdit()
+        self.woa09_folder.setReadOnly(True)
         hbox.addWidget(self.woa09_folder)
         # -- button
         btn = QtGui.QPushButton("...")
@@ -133,6 +136,7 @@ class General(AbstractWidget):
         hbox.addWidget(label)
         # -- value
         self.woa13_folder = QtGui.QLineEdit()
+        self.woa13_folder.setReadOnly(True)
         hbox.addWidget(self.woa13_folder)
         # -- button
         btn = QtGui.QPushButton("...")
@@ -324,13 +328,21 @@ class General(AbstractWidget):
         selection = QtGui.QFileDialog.getExistingDirectory(self, "Path to WOA09",
                                                            settings.value("export_folder"))
         if not selection:
-            return
+            msg = "Do you want to just clear the folder path?"
+            ret = QtGui.QMessageBox.information(self, "WOA09 Folder", msg, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+            if ret == QtGui.QMessageBox.No:
+                return
+            selection = ""
         logger.debug('user selection: %s' % selection)
 
         self.db.custom_woa09_folder = selection
 
         self.setup_changed()
         self.main_win.reload_settings()
+
+        msg = "Restart the application to apply changes!"
+        # noinspection PyCallByClass
+        QtGui.QMessageBox.information(self, "WOA09 Folder", msg, QtGui.QMessageBox.Ok)
 
     def on_woa13_folder(self):
         logger.debug("user wants to set the folder for woa13")
@@ -340,7 +352,11 @@ class General(AbstractWidget):
         selection = QtGui.QFileDialog.getExistingDirectory(self, "Path to WOA13",
                                                            settings.value("export_folder"))
         if not selection:
-            return
+            msg = "Do you want to just clear the folder path?"
+            ret = QtGui.QMessageBox.information(self, "WOA13 Folder", msg, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+            if ret == QtGui.QMessageBox.No:
+                return
+            selection = ""
         logger.debug('user selection: %s' % selection)
 
         self.db.custom_woa13_folder = selection
@@ -348,13 +364,13 @@ class General(AbstractWidget):
         self.setup_changed()
         self.main_win.reload_settings()
 
+        msg = "Restart the application to apply changes!"
+        # noinspection PyCallByClass
+        QtGui.QMessageBox.information(self, "WOA13 Folder", msg, QtGui.QMessageBox.Ok)
+
     def apply_noaa_tools(self):
         # logger.debug("apply NOAA tools: %s" % self.noaa_tools.currentText())
         self.db.noaa_tools = self.noaa_tools.currentText() == "True"
-        if self.noaa_tools.currentText() == "True":
-            self.db.default_institution = institution_list[0]  # NOAA OCS
-        else:
-            self.db.default_institution = ""
         self.setup_changed()
         self.main_win.reload_settings()
 

@@ -136,6 +136,8 @@ class Ftp(object):
             unzip_it:           Unzip the retrieved file
         """
         file_dst = os.path.abspath(file_dst)
+        if os.path.exists(file_dst):
+            os.remove(file_dst)
         self.filesize = self.conn.size(file_src)
         if self.show_progress:
             if self.progress:

@@ -43,24 +43,25 @@ class Woa13(AbstractAtlas):
         The default location is first checked. If not present, the search is enlarged to past installations"""
 
         # first check the location based on the current version
-        check_woa13_temp = os.path.join(self.folder, 'temp', 'woa13_decav_t00_04v2.nc')
-        check_woa13_sal = os.path.join(self.folder, 'sal', 'woa13_decav_s01_04v2.nc')  # s00 is not required
+        check_woa13_temp = os.path.join(self.data_folder, 'temp', 'woa13_decav_t00_04v2.nc')
+        check_woa13_sal = os.path.join(self.data_folder, 'sal', 'woa13_decav_s01_04v2.nc')  # s00 is not required
         if os.path.exists(check_woa13_temp) and os.path.exists(check_woa13_sal):
             return True
         # logger.info('unable to locate the WOA13 db at the default location: %s' % self.folder)
 
-        # continue the search based on possible old installations
-        parent_folder = os.path.abspath(os.path.join(self.folder, os.pardir, os.pardir, os.pardir))
-        for folder in os.listdir(parent_folder):
-            candidate_path = os.path.join(parent_folder, folder)
-            if os.path.isdir(candidate_path) and "Sound Speed" in candidate_path:
-                candidate_folder = os.path.join(candidate_path, "atlases", "woa13")
-                check_woa13_temp = os.path.join(candidate_folder, 'temp', 'woa13_decav_t00_04v2.nc')
-                check_woa13_sal = os.path.join(candidate_folder, 'sal', 'woa13_decav_s01_04v2.nc')
-                if os.path.exists(check_woa13_temp) and os.path.exists(check_woa13_sal):
-                    self.folder = candidate_folder
-                    logger.info("identified WOA13 db at: %s" % self.folder)
-                    return True
+        # TODO: currently unused since there is only a set of DB for all SSM releases
+        # # continue the search based on possible old installations
+        # parent_folder = os.path.abspath(os.path.join(self.data_folder, os.pardir, os.pardir, os.pardir))
+        # for folder in os.listdir(parent_folder):
+        #     candidate_path = os.path.join(parent_folder, folder)
+        #     if os.path.isdir(candidate_path) and "Sound Speed" in candidate_path:
+        #         candidate_folder = os.path.join(candidate_path, "atlases", "woa13")
+        #         check_woa13_temp = os.path.join(candidate_folder, 'temp', 'woa13_decav_t00_04v2.nc')
+        #         check_woa13_sal = os.path.join(candidate_folder, 'sal', 'woa13_decav_s01_04v2.nc')
+        #         if os.path.exists(check_woa13_temp) and os.path.exists(check_woa13_sal):
+        #             self.data_folder = candidate_folder
+        #             logger.info("identified WOA13 db at: %s" % self.data_folder)
+        #             return True
 
         # no way to find the database
         logger.warning("unable to locate the WOA13 db")
@@ -70,28 +71,29 @@ class Woa13(AbstractAtlas):
         """try to download the data set"""
         logger.debug('downloading WOA13 atlas')
 
-        try:
-            # remove all the content
-            for root, dirs, files in os.walk(self.folder, topdown=False):
-                for name in files:
-                    os.remove(os.path.join(root, name))
-                for name in dirs:
-                    os.rmdir(os.path.join(root, name))
-        except Exception as e:
-            logger.error('during cleaning target folder: %s' % e)
-            return False
+        # FIXME: this was too dangerous if the user select the wrong folder
+        # try:
+        #     # remove all the content
+        #     for root, dirs, files in os.walk(self.data_folder, topdown=False):
+        #         for name in files:
+        #             os.remove(os.path.join(root, name))
+        #         for name in dirs:
+        #             os.rmdir(os.path.join(root, name))
+        # except Exception as e:
+        #     logger.error('during cleaning target folder: %s' % e)
+        #     return False
 
         try:
             ftp = Ftp("ftp.ccom.unh.edu", show_progress=True, debug_mode=False,
                       progress=self.prj.progress)
             data_zip_src = "fromccom/hydroffice/woa13_temp.red.zip"
-            data_zip_dst = os.path.join(self.data_folder, "woa13_temp.red.zip")
+            data_zip_dst = os.path.abspath(os.path.join(self.data_folder, os.pardir, "woa13_temp.red.zip"))
             ftp.get_file(data_zip_src, data_zip_dst, unzip_it=True)
 
             ftp = Ftp("ftp.ccom.unh.edu", show_progress=True, debug_mode=False,
                       progress=self.prj.progress)
             data_zip_src = "fromccom/hydroffice/woa13_sal.red.zip"
-            data_zip_dst = os.path.join(self.data_folder, "woa13_sal.red.zip")
+            data_zip_dst = os.path.abspath(os.path.join(self.data_folder, os.pardir, "woa13_sal.red.zip"))
             ftp.get_file(data_zip_src, data_zip_dst, unzip_it=True)
 
             return self.is_present()
@@ -104,16 +106,16 @@ class Woa13(AbstractAtlas):
         """Load atlas grids"""
         try:
             for i in range(17):
-                t_path = os.path.join(self.folder, "temp", "woa13_decav_t%02d_04v2.nc" % i)
+                t_path = os.path.join(self.data_folder, "temp", "woa13_decav_t%02d_04v2.nc" % i)
                 self.t.append(Dataset(t_path))
             for i in range(1, 17):
-                s_path = os.path.join(self.folder, "sal", "woa13_decav_s%02d_04v2.nc" % i)
+                s_path = os.path.join(self.data_folder, "sal", "woa13_decav_s%02d_04v2.nc" % i)
                 self.s.append(Dataset(s_path))
 
             self.lat = self.t[0].variables['lat'][:]
             self.lon = self.t[0].variables['lon'][:]
             # self.lon = np.hstack((lon[lon.size // 2:], lon[:lon.size // 2]))
-            csv_iter = csv.reader(open((os.path.join(self.folder, "landsea_04.msk"))))
+            csv_iter = csv.reader(open((os.path.join(self.data_folder, "landsea_04.msk"))))
             next(csv_iter)  # skip firs header row
             next(csv_iter)   # skip another header row
             landsea = np.asarray([float(data[2]) for data in csv_iter])

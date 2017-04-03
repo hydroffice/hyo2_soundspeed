@@ -4,6 +4,7 @@ import numpy as np
 from http import client
 from urllib import parse
 import socket
+import os
 import logging
 
 logger = logging.getLogger(__name__)

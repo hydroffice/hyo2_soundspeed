@@ -52,6 +52,7 @@ class QtProgress(AbstractProgress):
         self._progress.setMinimumDuration(1000)
 
         self._display()
+        self._progress.setVisible(True)
 
     def update(self, value=None, text=None):
         if self._is_disabled:
