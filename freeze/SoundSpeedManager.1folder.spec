@@ -61,7 +61,7 @@ pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=True,
-          name='SoundSpeedManager.2017.1.0',
+          name='SoundSpeedManager.2017.2.0',
           debug=False,
           strip=None,
           upx=True,
@@ -76,4 +76,4 @@ coll = COLLECT(exe,
                pkg_data_3,
                strip=None,
                upx=True,
-               name='SoundSpeedManager.2017.1.0')
+               name='SoundSpeedManager.2017.2.0')

@@ -37,6 +37,7 @@ class DataPlots(AbstractWidget):
         'axes.linewidth': 0.5,
         'axes.xmargin': 0.01,
         'axes.ymargin': 0.01,
+        'lines.linewidth': 1.0,
         'grid.alpha': 0.2,
         'backend.qt4': 'PySide'
     }

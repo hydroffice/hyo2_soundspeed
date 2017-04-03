@@ -31,6 +31,7 @@ class PlotMultiProfileDialog(AbstractDialog):
         'axes.linewidth': 0.5,
         'axes.xmargin': 0.01,
         'axes.ymargin': 0.01,
+        'lines.linewidth': 1.0,
         'backend.qt4': 'PySide'
     }
 
