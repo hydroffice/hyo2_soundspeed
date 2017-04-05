@@ -13,6 +13,8 @@
 from PyInstaller.building.build_main import Analysis, PYZ, EXE, COLLECT, BUNDLE, TOC
 from PyInstaller import is_darwin
 
+from hydroffice.soundspeed import __version__ as ssm_version
+
 
 def collect_pkg_data(package, include_py_files=False, subdir=None):
     import os
@@ -61,7 +63,7 @@ pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=True,
-          name='SoundSpeedManager.2017.2.0',
+          name='SoundSpeedManager.%s' % ssm_version,
           debug=False,
           strip=None,
           upx=True,
@@ -76,4 +78,4 @@ coll = COLLECT(exe,
                pkg_data_3,
                strip=None,
                upx=True,
-               name='SoundSpeedManager.2017.2.0')
+               name='SoundSpeedManager.%s' % ssm_version)

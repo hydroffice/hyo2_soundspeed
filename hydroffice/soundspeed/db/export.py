@@ -23,60 +23,60 @@ class ExportDb(object):
 
     def _create_ogr_lyr_and_fields(self, ds):
         # create the only data layer
-        lyr = ds.CreateLayer(b'ssp', None, ogr.wkbPoint)
+        lyr = ds.CreateLayer('ssp', None, ogr.wkbPoint)
         if lyr is None:
             logger.error("Layer creation failed")
             return
 
-        field = ogr.FieldDefn(b'pk', ogr.OFTInteger)
+        field = ogr.FieldDefn('pk', ogr.OFTInteger)
         if lyr.CreateField(field) != 0:
             raise RuntimeError("Creating field failed.")
 
-        field = ogr.FieldDefn(b'datetime', ogr.OFTString)
+        field = ogr.FieldDefn('datetime', ogr.OFTString)
         if lyr.CreateField(field) != 0:
             raise RuntimeError("Creating field failed.")
 
-        field = ogr.FieldDefn(b'sensor', ogr.OFTString)
+        field = ogr.FieldDefn('sensor', ogr.OFTString)
         field.SetWidth(254)
         if lyr.CreateField(field) != 0:
             raise RuntimeError("Creating field failed.")
 
-        field = ogr.FieldDefn(b'probe', ogr.OFTString)
+        field = ogr.FieldDefn('probe', ogr.OFTString)
         field.SetWidth(254)
         if lyr.CreateField(field) != 0:
             raise RuntimeError("Creating field failed.")
 
-        field = ogr.FieldDefn(b'path', ogr.OFTString)
+        field = ogr.FieldDefn('path', ogr.OFTString)
         field.SetWidth(254)
         if lyr.CreateField(field) != 0:
             raise RuntimeError("Creating field failed.")
 
-        field = ogr.FieldDefn(b'agency', ogr.OFTString)
+        field = ogr.FieldDefn('agency', ogr.OFTString)
         field.SetWidth(254)
         if lyr.CreateField(field) != 0:
             raise RuntimeError("Creating field failed.")
 
-        field = ogr.FieldDefn(b'survey', ogr.OFTString)
+        field = ogr.FieldDefn('survey', ogr.OFTString)
         field.SetWidth(254)
         if lyr.CreateField(field) != 0:
             raise RuntimeError("Creating field failed.")
 
-        field = ogr.FieldDefn(b'vessel', ogr.OFTString)
+        field = ogr.FieldDefn('vessel', ogr.OFTString)
         field.SetWidth(254)
         if lyr.CreateField(field) != 0:
             raise RuntimeError("Creating field failed.")
 
-        field = ogr.FieldDefn(b'sn', ogr.OFTString)
+        field = ogr.FieldDefn('sn', ogr.OFTString)
         field.SetWidth(254)
         if lyr.CreateField(field) != 0:
             raise RuntimeError("Creating field failed.")
 
-        field = ogr.FieldDefn(b'proc_time', ogr.OFTString)
+        field = ogr.FieldDefn('proc_time', ogr.OFTString)
         field.SetWidth(254)
         if lyr.CreateField(field) != 0:
             raise RuntimeError("Creating field failed.")
 
-        field = ogr.FieldDefn(b'proc_info', ogr.OFTString)
+        field = ogr.FieldDefn('proc_info', ogr.OFTString)
         field.SetWidth(254)
         if lyr.CreateField(field) != 0:
             raise RuntimeError("Creating field failed.")
@@ -106,22 +106,21 @@ class ExportDb(object):
         for row in rows:
 
             ft = ogr.Feature(lyr.GetLayerDefn())
-
-            ft.SetField(b'pk', row[0])
-            ft.SetField(b'datetime', row[1].isoformat())
-            ft.SetField(b'sensor', Dicts.first_match(Dicts.sensor_types, row[3]).encode())
-            ft.SetField(b'probe', Dicts.first_match(Dicts.probe_types, row[4]).encode())
-            ft.SetField(b'path', row[5].encode())
+            ft.SetField('pk', int(row[0]))
+            ft.SetField('datetime', row[1].isoformat())
+            ft.SetField('sensor', Dicts.first_match(Dicts.sensor_types, row[3]))
+            ft.SetField('probe', Dicts.first_match(Dicts.probe_types, row[4]))
+            ft.SetField('path', row[5])
             if row[6]:
-                ft.SetField(b'agency', row[6].encode())
+                ft.SetField('agency', row[6])
             if row[7]:
-                ft.SetField(b'survey', row[7].encode())
+                ft.SetField('survey', row[7])
             if row[8]:
-                ft.SetField(b'vessel', row[8].encode())
+                ft.SetField('vessel', row[8])
             if row[9]:
-                ft.SetField(b'sn', row[9].encode())
-            ft.SetField(b'proc_time', row[10].isoformat())
-            ft.SetField(b'proc_info', row[11].encode())
+                ft.SetField('sn', row[9])
+            ft.SetField('proc_time', row[10].isoformat())
+            ft.SetField('proc_info', row[11])
 
             pt = ogr.Geometry(ogr.wkbPoint)
             pt.SetPoint_2D(0, row[2].x, row[2].y)

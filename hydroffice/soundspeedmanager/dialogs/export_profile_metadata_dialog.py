@@ -1,6 +1,7 @@
 from PySide import QtGui
 from PySide import QtCore
 
+import traceback
 import logging
 logger = logging.getLogger(__name__)
 
@@ -81,20 +82,19 @@ class ExportProfileMetadataDialog(AbstractDialog):
         self.progress.start()
         success = True
 
-        try:
+        # try:
 
-            for fmt in self.fmt_outputs:
-                ret = self.lib.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[fmt])
-                if not ret:
-                    success = False
-                    QtGui.QMessageBox.critical(self, "Database", "Unable to export as %s!" % fmt)
+        for fmt in self.fmt_outputs:
+            ret = self.lib.export_db_profiles_metadata(ogr_format=GdalAux.ogr_formats[fmt])
+            if not ret:
+                success = False
+                QtGui.QMessageBox.critical(self, "Database", "Unable to export as %s!" % fmt)
 
-        except RuntimeError as e:
-
-            self.progress.end()
-            msg = "Issue in exporting the metadata.\nReason: %s" % e
-            QtGui.QMessageBox.critical(self, "Export error", msg, QtGui.QMessageBox.Ok)
-            return
+        # except RuntimeError as e:
+        #     self.progress.end()
+        #     msg = "Issue in exporting the metadata.\nReason: %s" % e
+        #     QtGui.QMessageBox.critical(self, "Export error", msg, QtGui.QMessageBox.Ok)
+        #     return
 
         if success:
             self.lib.open_outputs_folder()
