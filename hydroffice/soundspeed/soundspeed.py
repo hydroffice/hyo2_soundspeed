@@ -576,6 +576,10 @@ class SoundSpeedLibrary(object):
             writer = self.writers[idx]
             if writer.name == 'asvp':
                 self.prepare_sis()
+            if (name == 'ncei') and (self.ssp.l[0].meta.probe_type == Dicts.probe_types['ISS']):
+                logger.info("special case: NCEI and ISS format")
+                writer.instrument = self.cb.ask_text("ISS Instrument",
+                                                     "Enter the used instrument (or leave it empty):")
 
             if not has_data_files:  # we don't have the output file names
                 if len(data_formats) == 1 and name == 'ncei':  # NCEI requires special filename convention

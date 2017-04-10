@@ -26,6 +26,16 @@ class Ncei(AbstractWriter):
         self.desc = "NCEI"
         self._ext.add('nc')
         self.root_group = None
+        self._instrument = None
+
+    @property
+    def instrument(self):
+        return self._instrument
+
+    @instrument.setter
+    def instrument(self, value):
+        logger.debug("instrument value: %s" % value)
+        self._instrument = value
 
     def write(self, ssp, data_path, data_file=None, project=''):
         """Writing raw profile data to NetCDF4 file"""
@@ -33,7 +43,7 @@ class Ncei(AbstractWriter):
 
         self.ssp = ssp
         self._project = project
-        
+
         ship_code = self.ssp.cur.meta.vessel[:2] if len(self.ssp.cur.meta.vessel) >= 2 else 'ZZ'
         nc_file = '%s_%s.nc' %(self.ssp.cur.meta.utc_time.strftime('%Y%m%d%H%M%S'), ship_code)
 
@@ -168,7 +178,10 @@ class Ncei(AbstractWriter):
         # RECOMMENDED - The method of production of the original data.(CF)
         # self.root_group.source = b'sensor: %s, probe type: %s' % (self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
         # SUGGESTED - Name of the contributing instrument(s) or sensor(s) used to create this data set or product. (ACDD)
-        self.root_group.instrument = 'sensor: %s, probe type: %s' % (self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
+        if self.instrument is not None:
+            self.root_group.instrument = '%s' % self.instrument
+        else:
+            self.root_group.instrument = '%s %s' % (self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
         if self.ssp.cur.meta.sn:
             self.root_group.instrument_sn = '%s' % self.ssp.cur.meta.sn
         # SUGGESTED - Published or web - based references that describe the data or methods used to produce it.

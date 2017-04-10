@@ -49,7 +49,7 @@ class RawDataModel(QtCore.QAbstractTableModel):
             return QVariant()
         if orientation == QtCore.Qt.Horizontal:
             try:
-                return self.data_dict.keys()[section]
+                return list(self.data_dict.keys())[section]
             except IndexError:
                 return QVariant()
         elif orientation == QtCore.Qt.Vertical:

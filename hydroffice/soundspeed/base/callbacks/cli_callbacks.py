@@ -14,7 +14,7 @@ class CliCallbacks(AbstractCallbacks):
                    min_value=-2147483647.0, max_value=2147483647.0, decimals=7):
         val = None
         while val is None:
-            raw = raw_input(msg)
+            raw = input(msg)
             # print(raw)
             if raw == "":
                 break
@@ -32,7 +32,7 @@ class CliCallbacks(AbstractCallbacks):
         return val
 
     def ask_text(self, title="", msg="Enter text"):
-        val = raw_input(msg)
+        val = input(msg)
         return val
 
     def ask_date(self):
@@ -44,7 +44,7 @@ class CliCallbacks(AbstractCallbacks):
 
         # date
         while True:
-            raw = raw_input(date_msg)
+            raw = input(date_msg)
             # print(raw)
             if raw == "":
                 dt = datetime(year=now.year, month=now.month, day=now.day)
@@ -60,7 +60,7 @@ class CliCallbacks(AbstractCallbacks):
 
         # time
         while True:
-            raw = raw_input(time_msg)
+            raw = input(time_msg)
             # print(raw)
             if raw == "":
                 dt += timedelta(hours=now.hour, minutes=now.minute, seconds=now.second)
@@ -87,7 +87,7 @@ class CliCallbacks(AbstractCallbacks):
 
         # lat
         while True:
-            raw = raw_input(lat_msg)
+            raw = input(lat_msg)
             # print(raw)
             if raw == "":
                 break
@@ -103,7 +103,7 @@ class CliCallbacks(AbstractCallbacks):
 
         # lon
         while True:
-            raw = raw_input(lon_msg)
+            raw = input(lon_msg)
             # print(raw)
             if raw == "":
                 break
@@ -128,7 +128,7 @@ class CliCallbacks(AbstractCallbacks):
         else:
             filemsg = "Enter filename:"
         while raw == " " or (os.path.exists(raw) and raw != ""):
-            raw = raw_input(filemsg)
+            raw = input(filemsg)
         return os.path.normpath(raw)
 
     def ask_directory(self, key_name=None, default_path=".",
@@ -140,7 +140,7 @@ class CliCallbacks(AbstractCallbacks):
         bool_msg = "Geographic location required for pressure/depth conversion and atlas lookup.\n" \
                    "Use geographic position from SIS?\'y' for yes, other inputs to enter position manually."
 
-        raw = raw_input(bool_msg)
+        raw = input(bool_msg)
         # print(raw)
         if (raw == "Y") or (raw == "y"):
             return True
@@ -153,7 +153,7 @@ class CliCallbacks(AbstractCallbacks):
 
         # lat
         while True:
-            raw = raw_input(tss_msg)
+            raw = input(tss_msg)
             # print(raw)
             if raw == "":
                 break
@@ -176,7 +176,7 @@ class CliCallbacks(AbstractCallbacks):
 
         # lat
         while True:
-            raw = raw_input(draft_msg)
+            raw = input(draft_msg)
             # print(raw)
             if raw == "":
                 break
