@@ -574,12 +574,20 @@ class SoundSpeedLibrary(object):
 
             idx = self.name_writers.index(name)
             writer = self.writers[idx]
+
+            # special case for Kongsberg asvp format
             if writer.name == 'asvp':
                 self.prepare_sis()
+
+            # special case for Fugro ISS format with NCEI format
             if (name == 'ncei') and (self.ssp.l[0].meta.probe_type == Dicts.probe_types['ISS']):
                 logger.info("special case: NCEI and ISS format")
-                writer.instrument = self.cb.ask_text("ISS Instrument",
-                                                     "Enter the used instrument (or leave it empty):")
+                instrument = self.cb.ask_text("ISS for NCEI", "Enter the instrument type and model \n"
+                                                              "(if you don't know, leave it blank):")
+                # if empty, we just use the sensor type
+                if instrument is None or instrument == "":
+                    instrument = self.ssp.l[0].meta.sensor
+                writer.instrument = instrument
 
             if not has_data_files:  # we don't have the output file names
                 if len(data_formats) == 1 and name == 'ncei':  # NCEI requires special filename convention
