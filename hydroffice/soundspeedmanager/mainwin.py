@@ -395,10 +395,10 @@ class MainWin(QtGui.QMainWindow):
         latest_version = None
         try:
             response = urlopen('https://www.hydroffice.org/latest/soundspeedmanager.txt', timeout=1)
-            latest_version = response.read().split()[0]
+            latest_version = response.read().split()[0].decode()
 
             cur_maj, cur_min, cur_fix = ssm_version.split('.')
-            lat_maj, lat_min, lat_fix = latest_version.decode().split('.')
+            lat_maj, lat_min, lat_fix = latest_version.split('.')
 
             if int(lat_maj) > int(cur_maj):
                 new_release = True
