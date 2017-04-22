@@ -22,7 +22,7 @@ HydrOffice Sound Speed
 General Info
 ------------
 
-.. image:: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/master/hydroffice/soundspeedmanager/media/favicon.png
+.. image:: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/master/hyo/soundspeedmanager/media/favicon.png
     :alt: logo
 
 HydrOffice is a research development environment for ocean mapping. Its aim is to provide a collection of
@@ -33,7 +33,7 @@ This package provides functionalities to manage sound speed profiles.
 
 The package is jointly developed by NOAA OCS and UNH CCOM.
 
-.. image:: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/master/hydroffice/soundspeedmanager/media/noaa_ccom.png
+.. image:: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/master/hyo/soundspeedmanager/media/noaa_ccom.png
     :alt: joint
 
 
