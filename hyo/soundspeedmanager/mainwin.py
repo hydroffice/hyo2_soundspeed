@@ -46,7 +46,7 @@ class MainWin(QtGui.QMainWindow):
         _app = QtCore.QCoreApplication.instance()
         _app.setApplicationName('%s' % self.name)
         _app.setOrganizationName("HydrOffice")
-        _app.setOrganizationDomain("hyo.org")
+        _app.setOrganizationDomain("hydroffice.org")
 
         # set the minimum and the initial size
         self.setMinimumSize(640, 480)

@@ -191,7 +191,7 @@ class Info(QtGui.QMainWindow):
         Jack Riley  <a href=\"mailto:jack.riley@noaa.gov?Subject=Hydroffice%20SoundSpeed\">jack.riley@noaa.gov</a><br>
         <br>
         <b>Bugs and support:</b><br>
-        <a href=\"mailto:soundspeed@hyo.org?Subject=SoundSpeedManager\">soundspeed@hyo.org</a>
+        <a href=\"mailto:soundspeed@hydroffice.org?Subject=SoundSpeedManager\">soundspeed@hydroffice.org</a>
         """)
 
         # load default

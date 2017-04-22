@@ -14,7 +14,7 @@ def main():
     # noinspection PyArgumentList
     app.setApplicationName('test')
     app.setOrganizationName("HydrOffice")
-    app.setOrganizationDomain("hyo.org")
+    app.setOrganizationDomain("hydroffice.org")
 
     mw = QtGui.QMainWindow()
     mw.show()

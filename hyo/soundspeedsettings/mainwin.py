@@ -44,7 +44,7 @@ class MainWin(QtGui.QMainWindow):
         if _app.applicationName() == 'python':
             _app.setApplicationName('%s v.%s' % (self.name, self.version))
             _app.setOrganizationName("HydrOffice")
-            _app.setOrganizationDomain("hyo.org")
+            _app.setOrganizationDomain("hydroffice.org")
             logger.debug("set application name: %s" % _app.applicationName())
 
             # set icons
