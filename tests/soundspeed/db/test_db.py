@@ -6,8 +6,8 @@ import time
 import random
 import numpy as np
 
-from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
-from hydroffice.soundspeed.profile.profilelist import ProfileList
+from hyo.soundspeed.soundspeed import SoundSpeedLibrary
+from hyo.soundspeed.profile.profilelist import ProfileList
 
 
 class TestSoundSpeedDb(unittest.TestCase):

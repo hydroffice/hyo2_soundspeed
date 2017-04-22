@@ -1,11 +1,11 @@
 import os
-from hydroffice.soundspeed.logging import test_logging
+from hyo.soundspeed.logging import test_logging
 
 import logging
 logger = logging.getLogger()
 
-from hydroffice.soundspeed.base.gdal_aux import GdalAux
-from hydroffice.soundspeed.base.testing import output_data_folder
+from hyo.soundspeed.base.gdal_aux import GdalAux
+from hyo.soundspeed.base.testing import output_data_folder
 
 GdalAux.list_ogr_drivers()
 

@@ -2,7 +2,7 @@
 License
 *******
 
-Copyright Notice and License Terms for: hydroffice.soundspeed - Sound Speed package for HydrOffice
+Copyright Notice and License Terms for: hyo.soundspeed - Sound Speed package for HydrOffice
 Copyright (c) 2016, University of New Hampshire, Center for Coastal and Ocean Mapping. All rights reserved.  
 Portions of this project were developed under a cooperative agreement with NOAA Coast Survey Development 
 Laboratory, and contain NOAA-developed code in the public domain.

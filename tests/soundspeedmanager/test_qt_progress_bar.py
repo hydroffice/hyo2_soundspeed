@@ -5,7 +5,7 @@ import sys
 
 import time
 from PySide import QtGui
-from hydroffice.soundspeedmanager.qt_progress import QtProgress
+from hyo.soundspeedmanager.qt_progress import QtProgress
 
 
 class TestSoundSpeedManagerQtProgress(unittest.TestCase):

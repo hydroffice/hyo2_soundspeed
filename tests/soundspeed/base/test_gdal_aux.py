@@ -2,7 +2,7 @@ import unittest
 import sys
 import os
 
-from hydroffice.soundspeed.base.gdal_aux import GdalAux
+from hyo.soundspeed.base.gdal_aux import GdalAux
 
 from osgeo import gdal
 
@@ -43,7 +43,7 @@ class TestSoundSpeedGdalAux(unittest.TestCase):
         self.assertTrue(GdalAux.error_loaded)
 
     def test_use_of_Gdal_aux(self):
-        from hydroffice.soundspeed.base.testing import output_data_folder
+        from hyo.soundspeed.base.testing import output_data_folder
 
         aux = GdalAux()
 

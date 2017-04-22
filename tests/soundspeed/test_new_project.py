@@ -4,7 +4,7 @@ import unittest
 class TestSoundSpeedNewProject(unittest.TestCase):
 
     def test_available_projects(self):
-        from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
+        from hyo.soundspeed.soundspeed import SoundSpeedLibrary
 
         lib = SoundSpeedLibrary()
         ssp_list = lib.db_list_profiles()
@@ -16,7 +16,7 @@ class TestSoundSpeedNewProject(unittest.TestCase):
         lib.close()
 
     def test_new_projects(self):
-        from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
+        from hyo.soundspeed.soundspeed import SoundSpeedLibrary
 
         lib = SoundSpeedLibrary()
         ssp_list = lib.db_list_profiles()

@@ -1,9 +1,9 @@
 from time import sleep
 from PySide import QtGui
 
-from hydroffice.soundspeed.logging import test_logging
+from hyo.soundspeed.logging import test_logging
 
-from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
+from hyo.soundspeed.soundspeed import SoundSpeedLibrary
 
 
 def main():

@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from hydroffice.soundspeed.base.callbacks.test_callbacks import TestCallbacks
+from hyo.soundspeed.base.callbacks.test_callbacks import TestCallbacks
 
 
 class TestSoundSpeedTestCallbacks(unittest.TestCase):

@@ -27,7 +27,7 @@ If you decide to install the package in a Python environment, the dependencies a
 
 If you want to install the last stable version (from PyPI):
 
-* :bash:`pip install hydroffice.soundspeed`
+* :bash:`pip install hyo.soundspeed`
 
 Or, if you prefer the last bleeding edge code:
 

@@ -1,4 +1,4 @@
-from hydroffice.soundspeed.formats import readers, writers
+from hyo.soundspeed.formats import readers, writers
 
 print("Readers:")
 fmts = list()

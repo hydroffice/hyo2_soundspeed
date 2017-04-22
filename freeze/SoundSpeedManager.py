@@ -4,7 +4,7 @@ import logging
 class SisParseFilter(logging.Filter):
     def filter(self, record):
 
-        if (record.name == 'hydroffice.soundspeed.listener.sis.sis') and \
+        if (record.name == 'hyo.soundspeed.listener.sis.sis') and \
                 (record.funcName == "parse") and \
                 (record.levelname == "INFO"):
 
@@ -24,5 +24,5 @@ ch.addFilter(SisParseFilter())
 logger.addHandler(ch)
 
 
-from hydroffice.soundspeedmanager import gui
+from hyo.soundspeedmanager import gui
 gui.gui()

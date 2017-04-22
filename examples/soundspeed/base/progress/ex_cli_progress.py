@@ -1,8 +1,8 @@
 import time
 
-from hydroffice.soundspeed.logging import test_logging
+from hyo.soundspeed.logging import test_logging
 
-from hydroffice.soundspeed.base.progress.cli_progress import CliProgress
+from hyo.soundspeed.base.progress.cli_progress import CliProgress
 
 progress = CliProgress()
 

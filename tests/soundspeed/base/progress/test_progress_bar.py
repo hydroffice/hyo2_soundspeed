@@ -1,12 +1,12 @@
 import unittest
 import os
 import sys
-from hydroffice.soundspeed.logging import test_logging
+from hyo.soundspeed.logging import test_logging
 
 import logging
 logger = logging.getLogger()
 
-from hydroffice.soundspeed.base.progress.cli_progress import CliProgress
+from hyo.soundspeed.base.progress.cli_progress import CliProgress
 
 
 class TestSoundSpeedTestCliProgress(unittest.TestCase):

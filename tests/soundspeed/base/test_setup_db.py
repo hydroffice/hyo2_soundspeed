@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from hydroffice.soundspeed.base.setup_db import SetupDb
+from hyo.soundspeed.base.setup_db import SetupDb
 
 
 class TestSoundSpeedSetupDb(unittest.TestCase):

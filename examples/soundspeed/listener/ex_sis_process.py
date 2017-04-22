@@ -1,8 +1,8 @@
 import time
 import multiprocessing
 
-from hydroffice.sis.process import SisProcess
-from hydroffice.soundspeed.logging import test_logging
+from hyo.sis.process import SisProcess
+from hyo.soundspeed.logging import test_logging
 
 import logging
 logger = logging.getLogger()

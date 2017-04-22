@@ -54,7 +54,7 @@ before_install:
 install:
   - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then conda config --add channels conda-forge; fi
   - conda install -q numpy basemap pyside matplotlib netCDF4 gdal libgdal pyproj krb5 pyserial pillow
-  - pip install https://github.com/TEOS-10/python-gsw/archive/master.zip
+  - pip install gsw
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then conda install -c conda-forge pyside; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then conda install jpeg=8; fi
   - pip install --no-deps -e .

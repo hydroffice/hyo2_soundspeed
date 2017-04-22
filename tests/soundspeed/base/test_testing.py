@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from hydroffice.soundspeed.base import testing
+from hyo.soundspeed.base import testing
 
 
 class TestSoundSpeedBaseHelper(unittest.TestCase):

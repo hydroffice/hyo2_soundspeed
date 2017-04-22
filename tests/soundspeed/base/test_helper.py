@@ -2,7 +2,7 @@ import unittest
 import os
 from io import IOBase
 
-from hydroffice.soundspeed.base import helper
+from hyo.soundspeed.base import helper
 
 
 class TestSoundSpeedBaseHelper(unittest.TestCase):
@@ -42,7 +42,7 @@ class TestSoundSpeedBaseHelper(unittest.TestCase):
     def test_result_from_libs_info(self):
         msg = helper.info_libs().lower()
         # logger.info(msg)
-        self.assertTrue('hydroffice' in msg)
+        self.assertTrue('hyo' in msg)
         self.assertTrue('pyside' in msg)
         self.assertTrue('gdal' in msg)
         self.assertTrue('pyproj' in msg)

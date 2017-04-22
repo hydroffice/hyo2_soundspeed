@@ -1,11 +1,11 @@
 import os
 
-from hydroffice.soundspeed.logging import test_logging
+from hyo.soundspeed.logging import test_logging
 
 import logging
 logger = logging.getLogger()
 
-from hydroffice.soundspeed.profile.oceanography import Oceanography as Oc
+from hyo.soundspeed.profile.oceanography import Oceanography as Oc
 
 # check values from Fofonoff and Millard(1983)
 atg_ck = 3.255976e-4

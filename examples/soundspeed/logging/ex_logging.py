@@ -1,8 +1,8 @@
-from hydroffice.soundspeed.logging.sqlitelogging import SqliteLogging
-from hydroffice.soundspeed.base import testing
+from hyo.soundspeed.logging.sqlitelogging import SqliteLogging
+from hyo.soundspeed.base import testing
 
 import os
-from hydroffice.soundspeed.logging import test_logging
+from hyo.soundspeed.logging import test_logging
 
 import logging
 logger = logging.getLogger()

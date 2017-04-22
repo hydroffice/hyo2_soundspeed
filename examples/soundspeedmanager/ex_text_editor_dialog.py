@@ -1,12 +1,12 @@
 from PySide import QtGui
 
-from hydroffice.soundspeed.logging import test_logging
+from hyo.soundspeed.logging import test_logging
 
 import logging
 logger = logging.getLogger()
 
-from hydroffice.soundspeedmanager.dialogs.text_editor_dialog import TextEditorDialog
-from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
+from hyo.soundspeedmanager.dialogs.text_editor_dialog import TextEditorDialog
+from hyo.soundspeed.soundspeed import SoundSpeedLibrary
 
 
 def main():
@@ -14,7 +14,7 @@ def main():
     # noinspection PyArgumentList
     app.setApplicationName('test')
     app.setOrganizationName("HydrOffice")
-    app.setOrganizationDomain("hydroffice.org")
+    app.setOrganizationDomain("hyo.org")
 
     mw = QtGui.QMainWindow()
     mw.show()

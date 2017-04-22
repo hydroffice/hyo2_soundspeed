@@ -1,12 +1,12 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from hydroffice.soundspeed.logging import test_logging
+from hyo.soundspeed.logging import test_logging
 
 import logging
 logger = logging.getLogger()
 
-from hydroffice.soundspeed.profile.profile import Profile
+from hyo.soundspeed.profile.profile import Profile
 
 
 def fresh_profile():

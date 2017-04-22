@@ -2,8 +2,8 @@ import unittest
 import os
 import shutil
 
-from hydroffice.soundspeed.atlas import atlases
-from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
+from hyo.soundspeed.atlas import atlases
+from hyo.soundspeed.soundspeed import SoundSpeedLibrary
 
 
 class TestSoundSpeedAtlasAtlases(unittest.TestCase):

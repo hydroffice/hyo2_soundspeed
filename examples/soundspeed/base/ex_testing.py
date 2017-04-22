@@ -1,10 +1,10 @@
-from hydroffice.soundspeed.logging import test_logging
+from hyo.soundspeed.logging import test_logging
 
 import logging
 logger = logging.getLogger()
 
-from hydroffice.soundspeed.base import testing
-from hydroffice.soundspeed.base import helper
+from hyo.soundspeed.base import testing
+from hyo.soundspeed.base import helper
 
 
 def main():

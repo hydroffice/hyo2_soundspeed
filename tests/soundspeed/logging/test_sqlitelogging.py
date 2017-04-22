@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from hydroffice.soundspeed.logging import sqlitelogging
+from hyo.soundspeed.logging import sqlitelogging
 
 
 class TestSoundSpeedLoggingSqliteLogging(unittest.TestCase):

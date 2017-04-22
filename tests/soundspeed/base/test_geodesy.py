@@ -1,7 +1,7 @@
 import unittest
 import sys
 
-from hydroffice.soundspeed.base.geodesy import Geodesy
+from hyo.soundspeed.base.geodesy import Geodesy
 
 from osgeo import gdal
 

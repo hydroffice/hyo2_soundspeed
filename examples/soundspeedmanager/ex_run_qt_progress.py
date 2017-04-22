@@ -1,12 +1,12 @@
 import time
 from PySide import QtGui
 
-from hydroffice.soundspeed.logging import test_logging
+from hyo.soundspeed.logging import test_logging
 
 import logging
 logger = logging.getLogger()
 
-from hydroffice.soundspeedmanager.qt_progress import QtProgress
+from hyo.soundspeedmanager.qt_progress import QtProgress
 
 app = QtGui.QApplication([])
 

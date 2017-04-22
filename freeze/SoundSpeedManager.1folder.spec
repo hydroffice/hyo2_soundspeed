@@ -13,7 +13,7 @@
 from PyInstaller.building.build_main import Analysis, PYZ, EXE, COLLECT, BUNDLE, TOC
 from PyInstaller import is_darwin
 
-from hydroffice.soundspeed import __version__ as ssm_version
+from hyo.soundspeed import __version__ as ssm_version
 
 
 def collect_pkg_data(package, include_py_files=False, subdir=None):
@@ -40,8 +40,8 @@ def collect_pkg_data(package, include_py_files=False, subdir=None):
 
     return data_toc
 
-pkg_data = collect_pkg_data('hydroffice.soundspeedmanager')
-pkg_data_2 = collect_pkg_data('hydroffice.soundspeedsettings')
+pkg_data = collect_pkg_data('hyo.soundspeedmanager')
+pkg_data_2 = collect_pkg_data('hyo.soundspeedsettings')
 pkg_data_3 = collect_pkg_data('gsw.utilities')
 
 icon_file = 'freeze\SoundSpeedManager.ico'

@@ -1,13 +1,13 @@
 from PySide import QtGui
 from datetime import datetime as dt, timedelta
 
-from hydroffice.soundspeed.logging import test_logging
+from hyo.soundspeed.logging import test_logging
 
 import logging
 logger = logging.getLogger()
 
-from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
-from hydroffice.soundspeedmanager.qt_callbacks import QtCallbacks
+from hyo.soundspeed.soundspeed import SoundSpeedLibrary
+from hyo.soundspeedmanager.qt_callbacks import QtCallbacks
 
 
 def main():

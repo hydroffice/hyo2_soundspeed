@@ -2,8 +2,8 @@ import unittest
 import os
 import shutil
 
-from hydroffice.soundspeed.atlas.rtofs.rtofs import Rtofs
-from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
+from hyo.soundspeed.atlas.rtofs.rtofs import Rtofs
+from hyo.soundspeed.soundspeed import SoundSpeedLibrary
 
 
 class TestSoundSpeedAtlasRtofs(unittest.TestCase):

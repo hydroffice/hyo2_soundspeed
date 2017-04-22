@@ -1,13 +1,13 @@
 import os
 
-from hydroffice.soundspeed.logging import test_logging
+from hyo.soundspeed.logging import test_logging
 
 import logging
 logger = logging.getLogger()
 
-from hydroffice.soundspeed.soundspeed import SoundSpeedLibrary
-from hydroffice.soundspeed.base.callbacks.test_callbacks import TestCallbacks
-from hydroffice.soundspeed.base import testing
+from hyo.soundspeed.soundspeed import SoundSpeedLibrary
+from hyo.soundspeed.base.callbacks.test_callbacks import TestCallbacks
+from hyo.soundspeed.base import testing
 
 
 def main():

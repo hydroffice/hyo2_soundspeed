@@ -1,11 +1,11 @@
 from PySide import QtGui
 
-from hydroffice.soundspeed.logging import test_logging
+from hyo.soundspeed.logging import test_logging
 
 import logging
 logger = logging.getLogger()
 
-from hydroffice.soundspeedmanager.mainwin import MainWin
+from hyo.soundspeedmanager.mainwin import MainWin
 
 
 def main():
