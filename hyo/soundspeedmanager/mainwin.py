@@ -181,7 +181,7 @@ class MainWin(QtGui.QMainWindow):
 
         msg = 'The WOA09 atlas is required by some advanced application functions.\n\n' \
               'The data set (~120MB) can be retrieved from:\n' \
-              '   ftp.ccom.unh.edu/fromccom/hyo/woa09.red.zip\n' \
+              '   ftp.ccom.unh.edu/fromccom/hydroffice/woa09.red.zip\n' \
               'then unzipped it into:\n' \
               '   %s\n\n' \
               'Do you want that I perform this operation for you?\n' \
@@ -192,7 +192,7 @@ class MainWin(QtGui.QMainWindow):
         if ret == QtGui.QMessageBox.No:
             msg = 'You can also manually install it. The steps are:\n' \
                   ' - download the archive from (anonymous ftp):\n' \
-                  '   ftp.ccom.unh.edu/fromccom/hyo/woa09.red.zip\n' \
+                  '   ftp.ccom.unh.edu/fromccom/hydroffice/woa09.red.zip\n' \
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
                   ' - restart Sound Speed Manager\n' % self.lib.woa09_folder
@@ -231,8 +231,8 @@ class MainWin(QtGui.QMainWindow):
 
         msg = 'The WOA13 atlas is required by some advanced application functions.\n\n' \
               'The data set (~4GB) can be retrieved from:\n' \
-              '   ftp.ccom.unh.edu/fromccom/hyo/woa13_temp.red.zip\n' \
-              '   ftp.ccom.unh.edu/fromccom/hyo/woa13_sal.red.zip\n' \
+              '   ftp.ccom.unh.edu/fromccom/hydroffice/woa13_temp.red.zip\n' \
+              '   ftp.ccom.unh.edu/fromccom/hydroffice/woa13_sal.red.zip\n' \
               'then unzipped it into:\n' \
               '   %s\n\n' \
               'Do you want that I perform this operation for you?\n' \
@@ -243,8 +243,8 @@ class MainWin(QtGui.QMainWindow):
         if ret == QtGui.QMessageBox.No:
             msg = 'You can also manually install it. The steps are:\n' \
                   ' - download the archive from (anonymous ftp):\n' \
-                  '   ftp.ccom.unh.edu/fromccom/hyo/woa13_temp.red.zip\n' \
-                  '   ftp.ccom.unh.edu/fromccom/hyo/woa13_sal.red.zip\n' \
+                  '   ftp.ccom.unh.edu/fromccom/hydroffice/woa13_temp.red.zip\n' \
+                  '   ftp.ccom.unh.edu/fromccom/hydroffice/woa13_sal.red.zip\n' \
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
                   ' - restart Sound Speed Manager\n' % self.lib.woa13_folder

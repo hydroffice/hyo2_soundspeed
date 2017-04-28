@@ -88,7 +88,7 @@ class Woa09(AbstractAtlas):
         try:
             ftp = Ftp("ftp.ccom.unh.edu", show_progress=True, debug_mode=False,
                       progress=self.prj.progress)
-            data_zip_src = "fromccom/hyo/woa09.red.zip"
+            data_zip_src = "fromccom/hydroffice/woa09.red.zip"
             data_zip_dst = os.path.abspath(os.path.join(self.data_folder, os.pardir, "woa09.red.zip"))
             ftp.get_file(data_zip_src, data_zip_dst, unzip_it=True)
             return self.is_present()
