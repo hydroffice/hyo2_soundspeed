@@ -44,7 +44,7 @@ install:
 
   # Install dependencies
   - conda install -q numpy basemap pyside matplotlib netCDF4 gdal pyproj pyserial pillow
-  - pip install gsw
+  - pip install gsw==3.0.6
 
 build: off
 build_script:
