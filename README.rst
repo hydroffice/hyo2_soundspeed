@@ -1,8 +1,8 @@
 HydrOffice Sound Speed
 ======================
 
-.. image:: https://img.shields.io/pypi/v/hyo.soundspeed.svg
-    :target: https://pypi.python.org/pypi/hyo.soundspeed
+.. image:: https://img.shields.io/pypi/v/hydroffice.soundspeed.svg
+    :target: https://pypi.python.org/pypi/hydroffice.soundspeed
     :alt: PyPi version
 
 .. image:: https://img.shields.io/badge/docs-latest-brightgreen.svg
