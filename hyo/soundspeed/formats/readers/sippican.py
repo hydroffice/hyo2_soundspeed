@@ -95,7 +95,7 @@ class Sippican(AbstractTextReader):
                 date_str = line.split()[-1]
                 try:
                     month, day, year = [int(i) for i in date_str.split('/')]
-                    self.ssp.cur.meta.utc_time = dt.datetime(year=year, month=1, day=1)
+                    self.ssp.cur.meta.utc_time = dt.datetime(year=year, month=month, day=day)
                 except ValueError:
                     logger.warning("issue in casting the date format at line #%s" % self.samples_offset)
 

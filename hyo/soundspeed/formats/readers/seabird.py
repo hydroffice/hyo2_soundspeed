@@ -122,6 +122,7 @@ class Seabird(AbstractTextReader):
         s = "\n".join(self.lines)
         header, _data = s.split('*END*')
         meta = {}
+
         if SeacatHex_SBE19PLUS_TYPERE.search(header):
             seacat_type = 'SBE19PLUS'
         elif SeacatHex_SBE19_TYPERE.search(header):
@@ -132,6 +133,7 @@ class Seabird(AbstractTextReader):
             seacat_type = 'SBE49'
         else:
             seacat_type = ''
+
         if seacat_type:
             # Parsing lines like--  # name 0 = prDM: Pressure, Digiquartz [db]
             expr = r'''\#\s*name\s*       #lead pound sign, name
@@ -162,6 +164,7 @@ class Seabird(AbstractTextReader):
                         day = int(m.group('day'))
                     m = SEACAT_SBE19PLUS_HEX_TIMERE.search(header)
                     hour, minute = int(m.group('hour')), int(m.group('minute'))
+
                 elif seacat_type == "SBE19":
                     try:  # For the SBE19s the start_time is not always cast time but can be the download time for some firmware revisions.
                         yr = int(SEACAT_SBE19_HEX_YEARRE.search(header).group('year'))
@@ -181,13 +184,16 @@ class Seabird(AbstractTextReader):
                         dt = datetime.datetime(1, 1, 1).strptime(dt_match.group('full'), '%b %d %Y %H:%M:%S')
                         yr, mon, day = dt.year, dt.month, dt.day
                         hour, minute = dt.hour, dt.minute
+
                 elif seacat_type in ('SBE911', 'SBE49'):
                     # * System UpLoad Time = Sep 08 2008 14:18:19
                     m = SEACAT_SBE911_HEX_DATETIMERE.search(header)
                     dt = datetime.datetime(1, 1, 1).strptime(m.group('full'), '%b %d %Y %H:%M:%S')
                     yr, mon, day = dt.year, dt.month, dt.day
                     hour, minute = dt.hour, dt.minute
+
             except:  # bail out and look for the "start time" message that the Seabird Data processing program makes in the CNV file -- This is the download time from the SBE instrument
+
                 dt_match = SEACAT_CNV_START_TIMERE.search(header)
                 if dt_match:
                     dt = datetime.datetime(1, 1, 1).strptime(dt_match.group('full'), '%b %d %Y %H:%M:%S')
