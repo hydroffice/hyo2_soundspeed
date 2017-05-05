@@ -42,8 +42,8 @@ institution_list = [
 
 if is_pydro():
     logger.debug("using pydro setup")
-    default_use_woa_09 = "False"
-    default_use_woa_13 = "True"
+    default_use_woa_09 = "True"
+    default_use_woa_13 = "False"
     default_use_rtofs = "False"
     default_custom_woa09_folder = hstb_woa09_folder()
     default_custom_woa13_folder = hstb_woa13_folder()

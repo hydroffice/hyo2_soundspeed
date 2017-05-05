@@ -263,7 +263,7 @@ def hstb_atlases_folder():
     # noinspection PyUnresolvedReferences
     from HSTB import __file__ as hstb_file
 
-    folder = os.path.join(hstb_folder(), "atlases")
+    folder = os.path.join(hstb_folder(), "..\..\..\supplementals")
     if not os.path.exists(folder):
         os.mkdir(folder)
     return folder
@@ -274,11 +274,13 @@ def hstb_woa09_folder():
         raise RuntimeError("this method should be called only within a Pydro environment")
 
     # noinspection PyUnresolvedReferences
-    from HSTB import __file__ as hstb_file
-
-    folder = os.path.join(hstb_atlases_folder(), "woa09")
-    if not os.path.exists(folder):
-        os.mkdir(folder)
+    try:
+        import WOA09
+        folder = WOA09.__path__[0]
+    except ImportError:
+        folder = os.path.join(hstb_atlases_folder(), "woa09")
+        if not os.path.exists(folder):
+            os.mkdir(folder)
     return folder
 
 
@@ -287,9 +289,11 @@ def hstb_woa13_folder():
         raise RuntimeError("this method should be called only within a Pydro environment")
 
     # noinspection PyUnresolvedReferences
-    from HSTB import __file__ as hstb_file
-
-    folder = os.path.join(hstb_atlases_folder(), "woa13")
-    if not os.path.exists(folder):
-        os.mkdir(folder)
+    try:
+        import WOA13
+        folder = WOA13.__path__[0]
+    except ImportError:
+        folder = os.path.join(hstb_atlases_folder(), "woa13")
+        if not os.path.exists(folder):
+            os.mkdir(folder)
     return folder
