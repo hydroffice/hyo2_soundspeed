@@ -1,8 +1,8 @@
 HydrOffice Sound Speed
 ======================
 
-.. image:: https://img.shields.io/pypi/v/hydroffice.soundspeed.svg
-    :target: https://pypi.python.org/pypi/hydroffice.soundspeed
+.. image:: https://img.shields.io/pypi/v/hyo.soundspeed.svg
+    :target: https://pypi.python.org/pypi/hyo.soundspeed
     :alt: PyPi version
 
 .. image:: https://img.shields.io/badge/docs-latest-brightgreen.svg
@@ -33,7 +33,7 @@ This package provides functionalities to manage sound speed profiles.
 
 The package is jointly developed by NOAA OCS and UNH CCOM.
 
-.. image:: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/master/hyo/soundspeedmanager/media/noaa_ccom.png
+.. image:: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/master/hyo/soundspeedmanager/media/noaa_ccom_small.png
     :alt: joint
 
 
