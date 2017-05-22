@@ -21,8 +21,16 @@ class TestCallbacks(AbstractCallbacks):
     def ask_date(self):
         return datetime.utcnow()
 
-    def ask_location(self):
-        return 43.13555 + random.random(), -70.9395 + random.random()
+    def ask_location(self, default_lat=43.13555, default_lon=-70.9395):
+        try:
+            _ = float(default_lat)
+            _ = float(default_lon)
+
+        except Exception:
+            default_lat = 43.13555
+            default_lon = -70.9395
+
+        return default_lat + random.random(), default_lon + random.random()
 
     def ask_filename(self, saving=True, key_name=None, default_path=".",
                      title="Choose a path/filename", default_file="",

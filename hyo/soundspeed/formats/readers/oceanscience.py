@@ -22,6 +22,7 @@ class OceanScience(AbstractTextReader):
         super(OceanScience, self).__init__()
         self.desc = "OceanScience"
         self._ext.add('asc')
+        self.raw_meta = None
 
     def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
         logger.debug('*** %s ***: start' % self.driver)
@@ -39,6 +40,14 @@ class OceanScience(AbstractTextReader):
         self.ssp.cur.meta.sensor_type = Dicts.sensor_types['CTD']
         self.ssp.cur.meta.probe_type = Dicts.probe_types['OceanScience']
 
+        # fix issue with lat and lon not being well defined (after email exchange with Teledyn OceanScience)
+        # logger.debug("initial lat: %s, lon: %s" % (self.ssp.cur.meta.latitude, self.ssp.cur.meta.longitude))
+        self.ssp.cur.meta.latitude, self.ssp.cur.meta.longitude = self.cb.ask_location(
+            default_lat=self.ssp.cur.meta.latitude, default_lon=self.ssp.cur.meta.longitude)
+        if (self.ssp.cur.meta.latitude is None) or (self.ssp.cur.meta.longitude is None):
+            self.ssp.clear()
+            raise RuntimeError("missing geographic location required for database lookup")
+
         self.fix()
         self.finalize()
 
@@ -46,28 +55,29 @@ class OceanScience(AbstractTextReader):
         return True
 
     def _parse_header(self):
-        '''For old data columns were not listed in the header and had a fixed format.  Okeanos Explorer downloaded a new
-        driver which changed the format.  It now lists fields in the header and since I don't know if they are user configurable
-        will load them dynamically similar to the Seacat data
-        '''
-        meta = {}
+        """ 
+        For old data, columns were not listed in the header and had a fixed format.  
+        Okeanos Explorer downloaded a new driver which changed the format. It now lists fields in the header, but since 
+        we don't know if they are user configurable, they are loaded them dynamically (similar to the Seacat data).
+        """
+        meta = dict()
+
         s = "\n".join(self.lines)
-        # lines = filedata.splitlines()[1:] #skip the header which is bad (is the download date or process date?)
-        latm = re.search(r'/*\*Lat (?P<lat>[\d/]+)', s)
-        lonm = re.search(r'/*\*Lon (?P<lon>[\d/]+)', s)
+        lat_meta = re.search(r'/*\*Lat (?P<lat>[\d/]+)', s)
+        lon_meta = re.search(r'/*\*Lon (?P<lon>[\d/]+)', s)
 
         try:
-            location = coordinates.Coordinate(latm.group('lat'), lonm.group('lon'))
-            location.lon = -location.lon  # force to West since it doesn't specify east/west in it's sample
+            location = coordinates.Coordinate(lat_meta.group('lat'), lon_meta.group('lon'))
             meta.update(getMetaFromCoord(location))
-        except:
-            pass  # newer format? -- or lat/lon is blank
 
-        mDT = re.search(r'/*\*DeviceType=\s*(?P<TYPE>\w+)', s)
-        mSN = re.search(r'/*\*SerialNumber=\s*(?P<SN>\w+)', s)
-        if mSN and mDT:
-            meta['SerialNum'] = mSN.group('SN')
-            meta['Instrument'] = mDT.group('TYPE') + ' (SN:' + mSN.group('SN') + ')'
+        except Exception as e:
+            logger.warning("unable to retrieve cast location: newer format? or lat/lon is blank?")
+
+        device_meta = re.search(r'/*\*DeviceType=\s*(?P<TYPE>\w+)', s)
+        sn_meta = re.search(r'/*\*SerialNumber=\s*(?P<SN>\w+)', s)
+        if sn_meta and device_meta:
+            meta['SerialNum'] = sn_meta.group('SN')
+            meta['Instrument'] = device_meta.group('TYPE') + ' (SN:' + sn_meta.group('SN') + ')'
         else:
             meta['Instrument'] = "Unknown"  # new format isn't necessarily filling out serial number
 
@@ -81,29 +91,33 @@ class OceanScience(AbstractTextReader):
             m = re.search("(?P<yr>\d+)\s+(?P<mon>\d+)\s+(?P<day>\d+)\s+(?P<hour>\d+)\s+(?P<minute>\d+)", tm)
             # update the profile metadata with the interpreted time data
             meta.update(getMetaFromTimeRE(m))
-        meta['filename'] = self.fid._path
-        self.rawmeta = meta
+
+        meta['filename'] = self.fid.path
+
+        self.raw_meta = meta
 
     def _parse_body(self):
-        '''OceanScience format from Nancy Foster example data.
+        """
+        OceanScience format from Nancy Foster example data.
         metadata lines start with an asterisk.
 
         *scan# C[S/m]  T[degC]  P[dbar]
         1  0.00000 20.948    0.031
         2  0.00000 20.952    0.031
         3  0.00000 20.958    0.031
-        '''
+        """
 
-        meta = self.rawmeta
+        meta = self.raw_meta
 
         profile_data = parseNumbers(self.lines,
-                                    [('index', numpy.int32), ('conductivity', numpy.float32), ('temperature', numpy.float32), ('pressure', numpy.float32)],
+                                    [('index', numpy.int32), ('conductivity', numpy.float32),
+                                     ('temperature', numpy.float32), ('pressure', numpy.float32)],
                                     r"[\s,]+", pre=r'^\s*', post=r'\s*$')
-        profile_data = numpy.compress(profile_data['temperature'] >= 0.0, profile_data)  # remove temperatures that make SV equation fail (t<0)
-        profile_data = numpy.compress(profile_data['conductivity'] >= 0.0, profile_data)  # remove temperatures that make SV equation fail (t<0)
-        # clear some of the surface noise when first entering water
-        profile_data = numpy.compress(profile_data['pressure'] >= 0.2, profile_data)  # remove temperatures that make SV equation fail (t<0)
-        # lat = cnv_data.metadata['location'].lat
-        p = Profile(profile_data, ymetric="depth", attribute="soundspeed", metadata=meta)
 
+        # clear some of the surface noise when first entering water
+        profile_data = numpy.compress(profile_data['temperature'] >= 0.0, profile_data)  # remove t<0
+        profile_data = numpy.compress(profile_data['conductivity'] >= 0.0, profile_data)  # remove t<0
+        profile_data = numpy.compress(profile_data['pressure'] >= 0.2, profile_data)  # remove t<0.2
+
+        p = Profile(profile_data, ymetric="depth", attribute="soundspeed", metadata=meta)
         self.ssp.append_profile(p.ConvertToSoundSpeedProfile())

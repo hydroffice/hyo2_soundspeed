@@ -78,14 +78,22 @@ class CliCallbacks(AbstractCallbacks):
 
         return dt
 
-    def ask_location(self):
+    def ask_location(self, default_lat=43.13555, default_lon=-70.9395):
         """Ask user for location"""
-        lat = 43.13555
-        lat_msg = "Enter latitude as DD.DDD [default: %s]:" % lat
-        lon = -70.9395
-        lon_msg = "Enter longitude as DD.DDD [default: %s]:" % lon
+
+        try:
+            _ = float(default_lat)
+            _ = float(default_lon)
+
+        except Exception:
+            default_lat = 43.13555
+            default_lon = -70.9395
+
+        lat_msg = "Enter latitude as DD.DDD [default: %s]:" % default_lat
+        lon_msg = "Enter longitude as DD.DDD [default: %s]:" % default_lon
 
         # lat
+        lat = None
         while True:
             raw = input(lat_msg)
             # print(raw)
@@ -102,6 +110,7 @@ class CliCallbacks(AbstractCallbacks):
                 continue
 
         # lon
+        lon = None
         while True:
             raw = input(lon_msg)
             # print(raw)

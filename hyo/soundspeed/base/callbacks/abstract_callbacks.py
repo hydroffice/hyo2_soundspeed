@@ -25,16 +25,24 @@ class GeneralAbstractCallbacks(object):
         """Ask user for date"""
         pass
 
-    def ask_location(self):
-        """Ask user for location (based on ask_number)"""
+    def ask_location(self, default_lat=43.13555, default_lon=-70.9395):
+        """Ask user for location (it is not an abstract method because it is based on ask_number)"""
+
+        try:
+            _ = float(default_lat)
+            _ = float(default_lon)
+
+        except Exception:
+            default_lat = 43.13555
+            default_lon = -70.9395
 
         # latitude
-        lat = self.ask_number(title="Location", msg="Enter latitude as dd.ddd:", default=37.540,
+        lat = self.ask_number(title="Location", msg="Enter latitude as dd.ddd:", default=default_lat,
                               min_value=-90.0, max_value=90.0, decimals=7)
 
         if lat is not None:  # don't check for lon if lat already failed
             # longitude
-            lon = self.ask_number(title="Location", msg="Enter longitude as dd.ddd:", default=-42.910,
+            lon = self.ask_number(title="Location", msg="Enter longitude as dd.ddd:", default=default_lon,
                                   min_value=-180.0, max_value=180.0, decimals=7)
         else:
             lon = None

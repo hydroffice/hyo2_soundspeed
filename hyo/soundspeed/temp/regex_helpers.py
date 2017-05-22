@@ -370,7 +370,8 @@ class Profile(numpy.recarray):
         try:
             p.meta.latitude = coordinates.LatStrToDec(self.metadata['Latitude'], assume_S=False)
             p.meta.longitude = coordinates.LonStrToDec(self.metadata['Longitude'], assume_W=False)
-        except:
+
+        except Exception:
             p.meta.latitude = None
             p.meta.longitude = None
 
