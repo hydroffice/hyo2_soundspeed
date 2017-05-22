@@ -49,7 +49,7 @@ class ReceiveDialog(AbstractDialog):
             self.lib.retrieve_woa09()
 
         except RuntimeError as e:
-            msg = "Issue in importing the data:\n\n> %s" % e
+            msg = "Issue in importing the WOA09 data:\n\n> %s" % e
             QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -61,7 +61,7 @@ class ReceiveDialog(AbstractDialog):
             self.lib.retrieve_woa13()
 
         except RuntimeError as e:
-            msg = "Issue in importing the data:\n\n> %s" % e
+            msg = "Issue in importing the WOA13 data:\n\n> %s" % e
             QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -73,7 +73,7 @@ class ReceiveDialog(AbstractDialog):
             self.lib.retrieve_rtofs()
 
         except RuntimeError as e:
-            msg = "Issue in importing the data:\n\n> %s" % e
+            msg = "Issue in importing the RTOFS data:\n\n> %s" % e
             QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
             return
 

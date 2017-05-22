@@ -1,6 +1,7 @@
 from PySide import QtGui
 from PySide import QtCore
 
+import traceback
 import os
 import logging
 logger = logging.getLogger(__name__)
@@ -137,6 +138,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             self.progress.end()
+            traceback.print_exc()
             msg = "Issue in importing the data:\n\n> %s" % e
             # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Import error", msg, QtGui.QMessageBox.Ok)
@@ -196,7 +198,7 @@ class ImportSingleProfileDialog(AbstractDialog):
             self.lib.retrieve_woa09()
 
         except RuntimeError as e:
-            msg = "Issue in importing the data:\n\n> %s" % e
+            msg = "Issue in importing the WOA09 data:\n\n> %s" % e
             # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
             return
@@ -209,7 +211,7 @@ class ImportSingleProfileDialog(AbstractDialog):
             self.lib.retrieve_woa13()
 
         except RuntimeError as e:
-            msg = "Issue in importing the data:\n\n> %s" % e
+            msg = "Issue in importing the WOA13 data:\n\n> %s" % e
             # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
             return
@@ -222,7 +224,7 @@ class ImportSingleProfileDialog(AbstractDialog):
             self.lib.retrieve_rtofs()
 
         except RuntimeError as e:
-            msg = "Issue in importing the data:\n\n> %s" % e
+            msg = "Issue in importing the RTOFS data:\n\n> %s" % e
             # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
             return

@@ -13,7 +13,7 @@ from .readers.digibars import DigibarS
 from .readers.elac import Elac
 from .readers.idronaut import Idronaut
 from .readers.iss import Iss
-# from .readers.mvp import Mvp
+from .readers.mvp import Mvp
 from .readers.saiv import Saiv
 from .readers.seabird import Seabird
 # from .readers.simrad import Simrad
@@ -34,7 +34,7 @@ readers.append(Elac())
 readers.append(Idronaut())
 readers.append(Iss())
 readers.append(Asvp())
-# readers.append(Mvp())
+readers.append(Mvp())
 readers.append(Saiv())
 readers.append(Seabird())
 # readers.append(Simrad())

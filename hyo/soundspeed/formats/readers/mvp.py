@@ -1,17 +1,18 @@
 import datetime as dt
 import struct
+import os
 import numpy as np
 import logging
 
 logger = logging.getLogger(__name__)
 
-from hyo.soundspeed.formats.readers.abstract import AbstractReader
+from hyo.soundspeed.formats.readers.abstract import AbstractTextReader
 from hyo.soundspeed.profile.dicts import Dicts
 from hyo.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 from hyo.soundspeed.profile.profilelist import ProfileList
 
 
-class Mvp(AbstractReader):  # TODO: ATYPICAL READER!!!
+class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
     """MVP reader"""
 
     protocols = {
@@ -25,11 +26,28 @@ class Mvp(AbstractReader):  # TODO: ATYPICAL READER!!!
         "S12": 2
     }
 
-    def __init__(self, header, data_blocks, footer, protocol, fmt, progress=None):
+    def __init__(self):  #
         super(Mvp, self).__init__()
+        self.desc = "MVP"
+        self._ext.add('s12')
+        self._ext.add('calc')
+        self._ext.add('asvp')
+
+        # for listener
+        self.file_content = None
+        self.header = None
+        self.footer = None
+        self.protocol = None
+        self.format = None
+
+    def init_from_listener(self, header, data_blocks, footer, protocol, fmt, progress=None):
 
         self.init_data()  # create a new empty profile list
         self.ssp.append()  # append a new profile
+
+        # initialize probe/sensor type
+        self.ssp.cur.meta.sensor_type = Dicts.sensor_types["MVP"]
+        self.ssp.cur.meta.probe_type = Dicts.probe_types["MVP"]
 
         self.file_content = data_blocks
 
@@ -44,10 +62,13 @@ class Mvp(AbstractReader):  # TODO: ATYPICAL READER!!!
         self.total_data = str()
         self._unify_packets()
 
+        self.lines = self.total_data.splitlines()
+
         try:
             # log.info("got data:\n%s" % self.total_data)
-            self._read_header()
-            self._read_body()
+            self._parse_header()
+            self._parse_body()
+
         except RuntimeError as e:
             logger.error("error in data parsing, did you select the correct data format?")
             raise e
@@ -61,19 +82,39 @@ class Mvp(AbstractReader):  # TODO: ATYPICAL READER!!!
         self.s = settings
         self.cb = callbacks
 
+        self.init_data()  # create a new empty profile list
+        self.ssp.append()  # append a new profile
+
+        _, file_ext = os.path.splitext(data_path)
+        file_ext = file_ext.lower()
+
+        if file_ext == ".asvp":
+            self.format = self.formats["ASVP"]
+
+        elif file_ext == ".calc":
+            self.format = self.formats["CALC"]
+
+        elif file_ext == ".s12":
+            self.format = self.formats["S12"]
+
+        else:
+            raise RuntimeError("unknown format: %s" % self.format)
+
+        # initialize probe/sensor type
+        self.ssp.cur.meta.sensor_type = Dicts.sensor_types["MVP"]
+        self.ssp.cur.meta.probe_type = Dicts.probe_types["MVP"]
+
+        self._read(data_path=data_path)
+        self._parse_header()
+        self._parse_body()
+
         self.fix()
         self.finalize()
 
         logger.debug('*** %s ***: done' % self.driver)
         return True
 
-    def _parse_header(self):  # UNUSED
-        pass
-
-    def _parse_body(self):  # UNUSED
-        pass
-
-    def _read_header(self):
+    def _parse_header(self):
 
         logger.info("reading > header")
 
@@ -89,11 +130,10 @@ class Mvp(AbstractReader):  # TODO: ATYPICAL READER!!!
             logger.info("parsing header [S12]")
             self._parse_s12_header()
 
-        # initialize probe/sensor type
-        self.ssp.cur.meta.sensor_type = Dicts.sensor_types["MVP"]
-        self.ssp.cur.meta.probe_type = Dicts.probe_types["MVP"]
+        else:
+            raise RuntimeError("unknown format: %s" % self.format)
 
-    def _read_body(self):
+    def _parse_body(self):
         logger.info("reading > body")
 
         # this assume that the user configured the correct format.
@@ -128,17 +168,18 @@ class Mvp(AbstractReader):  # TODO: ATYPICAL READER!!!
                 num_bytes = block_header[4]
                 total_num_bytes = block_header[5]
                 packet_data = self.file_content[block_count][24:24+num_bytes]
-                self.total_data += packet_data
+                self.total_data += packet_data.decode()
                 logger.info("packet %s/%s [%.1f KB]"
                             % (packet_number + 1, total_num_packets, total_num_bytes / 1024))
             elif self.protocol == self.protocols["UNDEFINED"]:
-                self.total_data += self.file_content[block_count]
+                self.total_data += self.file_content[block_count].decode()
             else:
                 raise RuntimeError("unknown protocol %s" % self.protocol)
 
     def _parse_asvp_header(self):
+
         try:
-            head_line = self.total_data.splitlines()[0]
+            head_line = self.lines[0]
             fields = head_line.split()
         except (ValueError, IndexError):
             raise RuntimeError("unable to parse header")
@@ -322,6 +363,18 @@ class Mvp(AbstractReader):  # TODO: ATYPICAL READER!!!
         try:
             self.ssp.cur.init_data(len(self.total_data.splitlines()))
             logger.info("number of samples: %s" % self.ssp.cur.data.num_samples)
+        except (ValueError, IndexError, TypeError) as e:
+            raise RuntimeError("unable to parse the number of samples: %s" % e)
+
+        try:
+            sensor_field = footer_fields[5].split("*")[0]
+            if sensor_field == "AML_uSVPT":
+                self.ssp.cur.meta.sensor_type = Dicts.sensor_types["SVP"]
+            elif sensor_field == "AML_uCTD":
+                self.ssp.cur.meta.sensor_type = Dicts.sensor_types["CTD"]
+            else:
+                logger.warning("unknown sensor name: %s" % sensor_field)
+
         except (ValueError, IndexError, TypeError) as e:
             raise RuntimeError("unable to parse the number of samples: %s" % e)
 

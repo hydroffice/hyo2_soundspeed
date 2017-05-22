@@ -61,6 +61,10 @@ class FileManager(FileInfo):
         """Return if the file was existing before the appending operation"""
         return self._append_exists
 
+    def close(self):
+        if self._io is not None:
+            self._io.close()
+
 
 def info_libs():
     msg = "os: %s %s\n" % (os.name, "64" if is_64bit_os() else "32")

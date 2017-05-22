@@ -99,6 +99,9 @@ class AbstractReader(AbstractFormat):
             profile.clone_data_to_proc()
             profile.init_sis()  # initialize to zero
 
+        if self.fid is not None:
+            self.fid.close()
+
 
 class AbstractTextReader(AbstractReader):
     """ Abstract text data reader """
@@ -108,22 +111,26 @@ class AbstractTextReader(AbstractReader):
     def __init__(self):
         super(AbstractTextReader, self).__init__()
         self.lines = []
+        self.total_data = None
         self.lines_offset = None
 
     def _read(self, data_path, encoding='utf8'):
         """Helper function to read the raw file"""
         self.fid = FileManager(data_path, mode='r', encoding=encoding)
         try:
-            self.lines = self.fid.io.readlines()
+            self.total_data = self.fid.io.read()
+            self.lines = self.total_data.splitlines()
         except UnicodeDecodeError as e:
             if encoding == 'utf8':
                 logger.info("changing encoding to latin: %s" % e)
                 self.fid = FileManager(data_path, mode='r', encoding='latin')
-                self.lines = self.fid.io.readlines()
+                self.total_data = self.fid.io.read()
+                self.lines = self.total_data.splitlines()
             elif encoding == 'latin':
                 logger.info("changing encoding to utf8: %s" % e)
                 self.fid = FileManager(data_path, mode='r', encoding='utf8')
-                self.lines = self.fid.io.readlines()
+                self.total_data = self.fid.io.read()
+                self.lines = self.total_data.splitlines()
             else:
                 raise e
         self.samples_offset = 0

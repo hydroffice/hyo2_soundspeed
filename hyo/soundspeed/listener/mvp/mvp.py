@@ -78,7 +78,8 @@ class Mvp(AbstractListener):
                          % (len(self.header), len(self.data_blocks), len(self.footer)))
                 logger.info("got num data blocks: %s" % self.num_data_blocks)
 
-                rdr = mvp.Mvp(self.header, self.data_blocks, self.footer, self.protocol, self.format)
+                rdr = mvp.Mvp()
+                rdr.init_from_listener(self.header, self.data_blocks, self.footer, self.protocol, self.format)
                 self.prj.ssp = rdr.ssp
 
                 self.got_header = False
@@ -89,13 +90,54 @@ class Mvp(AbstractListener):
                 self.got_footer = False
                 self.footer = None
 
+                # retrieve atlases data for each retrieved profile
+                if self.prj.use_woa09() and self.prj.has_woa09():
+                    self.prj.ssp.cur.woa09 = self.prj.atlases.woa09.query(lat=self.prj.ssp.cur.meta.latitude,
+                                                                          lon=self.prj.ssp.cur.meta.longitude,
+                                                                          datestamp=self.prj.ssp.cur.meta.utc_time)
+
+                if self.prj.use_woa13() and self.prj.has_woa13():
+                    self.prj.ssp.cur.woa13 = self.prj.atlases.woa13.query(lat=self.prj.ssp.cur.meta.latitude,
+                                                                          lon=self.prj.ssp.cur.meta.longitude,
+                                                                          datestamp=self.prj.ssp.cur.meta.utc_time)
+
+                if self.prj.use_rtofs():
+                    try:
+                        self.prj.ssp.cur.rtofs = self.prj.atlases.rtofs.query(lat=self.prj.ssp.cur.meta.latitude,
+                                                                              lon=self.prj.ssp.cur.meta.longitude,
+                                                                              datestamp=self.prj.ssp.cur.meta.utc_time)
+                    except RuntimeError:
+                        self.prj.ssp.cur.rtofs = None
+                        logger.warning("unable to retrieve RTOFS data")
+
         elif self.protocol == mvp.Mvp.protocols["UNDEFINED"]:
             logger.info("going to parse with UNDEFINED protocol!!")
             logger.info("the data is %s" % self.data)
             self.data_blocks.append(self.data)
             self.num_data_blocks += 1
-            rdr = mvp.Mvp(self.header, self.data_blocks, self.footer, self.protocol, self.format)
+            rdr = mvp.Mvp()
+            rdr.init_from_listener(self.header, self.data_blocks, self.footer, self.protocol, self.format)
             self.prj.ssp = rdr.ssp
+
+            # retrieve atlases data for each retrieved profile
+            if self.prj.use_woa09() and self.prj.has_woa09():
+                self.prj.ssp.cur.woa09 = self.prj.atlases.woa09.query(lat=self.prj.ssp.cur.meta.latitude,
+                                                                      lon=self.prj.ssp.cur.meta.longitude,
+                                                                      datestamp=self.prj.ssp.cur.meta.utc_time)
+
+            if self.prj.use_woa13() and self.prj.has_woa13():
+                self.prj.ssp.cur.woa13 = self.prj.atlases.woa13.query(lat=self.prj.ssp.cur.meta.latitude,
+                                                                      lon=self.prj.ssp.cur.meta.longitude,
+                                                                      datestamp=self.prj.ssp.cur.meta.utc_time)
+
+            if self.prj.use_rtofs():
+                try:
+                    self.prj.ssp.cur.rtofs = self.prj.atlases.rtofs.query(lat=self.prj.ssp.cur.meta.latitude,
+                                                                          lon=self.prj.ssp.cur.meta.longitude,
+                                                                          datestamp=self.prj.ssp.cur.meta.utc_time)
+                except RuntimeError:
+                    self.prj.ssp.cur.rtofs = None
+                    logger.warning("unable to retrieve RTOFS data")
 
         self.data = None
         self.new_ssp.set()
