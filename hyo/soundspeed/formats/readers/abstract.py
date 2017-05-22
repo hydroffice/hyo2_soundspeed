@@ -99,10 +99,6 @@ class AbstractReader(AbstractFormat):
             profile.clone_data_to_proc()
             profile.init_sis()  # initialize to zero
 
-        if self.fid is not None:
-            if self.fid.io is not None:
-                self.fid.io.close()
-
 
 class AbstractTextReader(AbstractReader):
     """ Abstract text data reader """
@@ -137,6 +133,9 @@ class AbstractTextReader(AbstractReader):
         self.samples_offset = 0
         self.field_index = dict()
         self.more_fields = list()
+
+        if self.fid is not None:
+            self.fid.close()
 
 
 class AbstractBinaryReader(AbstractReader):
