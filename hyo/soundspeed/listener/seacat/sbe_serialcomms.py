@@ -1,4 +1,3 @@
-import shutil
 import os
 import sys
 import traceback
@@ -31,6 +30,18 @@ def config_directory():
 class UTF8Serial(serial.Serial):
     def write(self, data):
         serial.Serial.write(self, data.encode('utf-8'))
+
+    def read(self, cnt):
+        data = serial.Serial.read(self, cnt)
+        # print("raw read:", data, self.port, self.baudrate, self.stopbits, self.parity)
+        try:
+            data = data.decode("utf-8")  # converts from bytes in python 3.x
+        except AttributeError:
+            pass
+        except UnicodeDecodeError:
+            data = ""
+        # print("decoded data", str(data))
+        return str(data)  # converts to ascii for python 2.7, leaves as unicode for 3.x
 
 
 class SeacatComms(object):
@@ -68,7 +79,7 @@ class SeacatComms(object):
             if not any([prompt in r for prompt in self.PROMPTS]):
                 # print('prompt is:', self.PROMPTS)
                 # print('r=', r)
-                # print('Seacat not responding on', self.comlink.getPort())
+                # print('Seacat not responding on', self.comlink.port)
                 bSuccess = False
                 if scanbauds:
                     if progbar:
@@ -76,7 +87,7 @@ class SeacatComms(object):
                     print('Going to scan bauds:', self.SUPPORTED_BAUDS)
                     for bi, baud in enumerate(self.SUPPORTED_BAUDS):
                         print('Trying ', baud)
-                        self.comlink.setBaudrate(baud)
+                        self.comlink.baudrate = baud
                         r = self.wake()
                         if progbar:
                             progbar.update(value=bi + 2, text="Baud= " + str(baud))
@@ -91,7 +102,7 @@ class SeacatComms(object):
                         logger.error("Did not get expected response from Seacat.  Is it connected?  Specified correct com port?")
             if self.comlink.isOpen() and any([prompt in r for prompt in self.PROMPTS]):
                 # print('getting status')
-                self.original_baud = self.comlink.getBaudrate()
+                self.original_baud = self.comlink.baudrate
                 self.get_status()  # checks and caches a legit return so we can see what kind of seacat it is
         except serial.SerialException as e:
             traceback.print_exc()
@@ -126,18 +137,18 @@ class SeacatComms(object):
         else:
             cat = None
         if not cat or not cat.isOpen():
+            if progbar:
+                progbar.start(title='Scanning for SBE19')
+            cat = SeacatComms(port, bytesize=serial.SEVENBITS, parity=serial.PARITY_EVEN, quiet=True, progbar=progbar)  # check for SBE19
+            if not cat.isOpen():
                 if progbar:
-                    progbar.start(title='Scanning for SBE19')
-                cat = SeacatComms(port, bytesize=serial.SEVENBITS, parity=serial.PARITY_EVEN, quiet=True, progbar=progbar)  # check for SBE19
-                if not cat.isOpen():
-                    if progbar:
-                        progbar.start(title='Scanning for SBE19 Plus, V2')
-                    cat = SeacatComms(port, quiet=True, progbar=progbar, prompts=["S>", '<Executed/>'])  # find 19plus, V2
+                    progbar.start(title='Scanning for SBE19 Plus, V2')
+                cat = SeacatComms(port, quiet=True, progbar=progbar, prompts=["S>", '<Executed/>'])  # find 19plus, V2
         sbe = cat
         if cat.isOpen():
             status = cat.get_status()
             cat.close()
-            bd = cat.comlink.getBaudrate()
+            bd = cat.comlink.baudrate
             if "SBE 19plus V" in status:
                 sbe = SBE19PlusV2Comm(port, baud=bd, parent=parent, status=status)
             elif "SeacatPlus V" in status:
@@ -149,7 +160,7 @@ class SeacatComms(object):
         if sbe.__class__ == SeacatComms:  # last QC check that we have a real instrument
             sbe.close()
         else:
-            print('found seacat', sbe.get_type_string(), sbe.comlink.getBaudrate(), sbe.comlink.getByteSize(), sbe.comlink.getParity())
+            print('found seacat', sbe.get_type_string(), sbe.comlink.baudrate, sbe.comlink.bytesize, sbe.comlink.parity)
 
         return sbe
 
@@ -194,7 +205,7 @@ class SeacatComms(object):
             if any([re.search(prompt + "[\n\r\s]*$", response) for prompt in self.PROMPTS]):
                 bFinished = True  # recieved the prompt and nothing else
             if len(r) == 0:
-                wait_time += self.comlink.getTimeout()
+                wait_time += self.comlink.timeout
             else:
                 wait_time = 0.0  # restart the clock
 
@@ -224,17 +235,17 @@ class SeacatComms(object):
         is already awake since it will return the prompt and the send_command will read that and return immediately.
         Call send_command "\r" three times in case we changed bauds and there is some garbled stuff in the com port.
         '''
-        r = self.send_command(None, 1.0, quiet=True)
-        r = self.send_command(None, 1.0, quiet=True)
+        _r = self.send_command(None, 1.0, quiet=True)
+        _r = self.send_command(None, 1.0, quiet=True)
         r = self.send_command(None, 1.0)
         self.check_message(r)
         return r
 
     def _set_baud(self, rate, cmd):
-        orig_baud = self.comlink.getBaudrate()
+        orig_baud = self.comlink.baudrate
         print(orig_baud, rate, cmd)
         ra = self.send_command(cmd, 0.5)  # wake the seacat and request change of baud
-        self.comlink.setBaudrate(rate)  # switch to the new baud
+        self.comlink.baudrate = rate  # switch to the new baud
         # If confirmation is required (at least SBE19 V2) send the command again on the new baud
         # can't use send_command since it sends extra \r commands to make sure the seacat is awake, they interfere with the confirmation
         time.sleep(0.2)  # seems the V2 is not switching to new baud fast enough, give it a moment to change bauds.
@@ -244,7 +255,7 @@ class SeacatComms(object):
         r2 = self.send_command('')  # see if we get the prompt
         if not any([prompt in r2 for prompt in self.PROMPTS]):
             print("Appears the seacat didn't change baud, staying at ", orig_baud)
-            self.comlink.setBaudrate(orig_baud)
+            self.comlink.baudrate = orig_baud
         else:
             print("Switched to baud", rate)
         return r + r2
@@ -322,8 +333,8 @@ class SeacatComms(object):
                     lines = r.splitlines()[nhead:-nfoot]
                     if expected_lines < 0 or len(lines) == expected_lines:
                         if min([min(l) for l in lines]) >= '0' and max([max(l) for l in lines]) <= 'F':
-                                ret[n] = lines
-                                break
+                            ret[n] = lines
+                            break
                         else:
                             logger.info('found corrupt data on try %d of %d\n' % (t, self.num_trys))
                     else:
@@ -337,7 +348,7 @@ class SeacatComms(object):
         raise Exception('Overload this, return a datetime object')
 
     def get_scans(self):
-        r = self.send_command(self.HEXFORMAT)
+        _r = self.send_command(self.HEXFORMAT)
         r = self.send_command(self.DISPLAY_SCANS)  # split into list of scans
         self.check_message(r)
         return r
@@ -347,7 +358,7 @@ class SeacatComms(object):
 
     def GetCastTime(self, castnumber=1):
         raise Exception('Overload this')
-        return yr, doy, hour, minute, second  # return this format
+        # return yr, doy, hour, minute, second  # return this format
 
     def download(self, path, cast_numbers=[1], progbar=None):
         casts = self.get_casts(cast_numbers, progbar=progbar)
@@ -360,18 +371,18 @@ class SeacatComms(object):
                 fname = os.path.join(path, "%04d_%03d_%02d%02d%02d.HEX" % (self.get_cast_time(n)))
                 fname = MakeUniqueFilename(fname)[0]
                 logger.info("Saving cast %d to %s\n" % (n, fname))
-                f = file(fname, 'wb')
+                f = open(fname, 'wb')
 
                 def WriteHeaderLines(data):
                     for line in data.splitlines(True):
-                        f.write('* ' + line)
+                        f.write(bytes(('* ' + line).encode('utf-8')))
                 WriteHeaderLines(self.get_hexheader(fname))
                 WriteHeaderLines(self.get_status())
                 if self.DISPLAY_CALIBRATION:
                     WriteHeaderLines(self.get_calibration())  # SBE19 doesn't have this command
                 WriteHeaderLines(headers[n])
-                f.write('*END*\r\n')  # end of header marker
-                f.write("\r\n".join(casts[n]))
+                f.write(bytes('*END*\r\n'.encode('utf-8')))  # end of header marker
+                f.write(bytes(("\r\n".join(casts[n])).encode('utf-8')))
                 f.close()
                 written.append(fname)
             else:
@@ -398,7 +409,7 @@ class SeacatComms(object):
         return head
 
     def RunTest(self, fname):
-        f = file(fname, 'w')
+        f = open(fname, 'w')
 
         def R(func):
             try:
@@ -475,7 +486,7 @@ class SBE19Comm(SeacatComms):
             progbar.start(title="Download", text='Downloading headers', max_value=len(cast_numbers))
         print(self.firmware_major)
         if self.firmware_major >= 3:
-            # orig_baud = self.comlink.getBaudrate()
+            # orig_baud = self.comlink.baudrate
             # self.set_baud(max(self.SUPPORTED_BAUDS))
             ''' B = 1 600 baud    B = 2 1200 baud
                 B = 3 9600 baud   B = 4 19,200 baud
@@ -483,7 +494,7 @@ class SBE19Comm(SeacatComms):
                 DC[Bn](CR) Display raw data from cast n at the baud rate determined by B.
                 If n is omitted, data from cast 0 displayed.
             '''
-            B = {600: '1', 1200: '2', 9600: '3', 19200: '4', 38400: '5'}[self.comlink.getBaudrate()]
+            B = {600: '1', 1200: '2', 9600: '3', 19200: '4', 38400: '5'}[self.comlink.baudrate]
             dc_command = self.DISPLAY_CASTS + B  # don't change the baud rate as I haven't tested that
         else:
             dc_command = self.DISPLAY_CASTS
@@ -495,11 +506,11 @@ class SBE19Comm(SeacatComms):
         return ret
 
     def set_datetime(self, dt):
-        r = self.send_command('ST', quiet=True)
+        _r = self.send_command('ST', quiet=True)
         datestr = dt.strftime('%m%d%y')
         print('Sending date', datestr)
         self.comlink.write(datestr + '\r')  # '031010'
-        r = self.get_response(2.0, quiet=True)
+        _r = self.get_response(2.0, quiet=True)
         timestr = dt.strftime('%H%M%S')
         print('Sending Time', timestr)
         self.comlink.write(timestr + '\r')  # '140828'
@@ -520,7 +531,7 @@ class SBE19Comm(SeacatComms):
         self.send_command(self.INIT_LOGGING, quiet=True)  # send init logging and get the confirm prompt
         print('Sending first confirmation')
         self.comlink.write('y\r')  # send the yes confirmation
-        r = self.get_response(2.0, quiet=True)
+        _r = self.get_response(2.0, quiet=True)
         print('Sending second confirmation')
         self.comlink.write(self.CTRL_Y + '\r')  # send the yes confirmation
         r = self.get_response(2.0)
@@ -666,7 +677,7 @@ class SBE19PlusComm(SeacatComms):
         if progbar:
             progbar.start(text='Changing baud and downloading headers', max_value=len(cast_numbers))
 
-        orig_baud = self.comlink.getBaudrate()
+        orig_baud = self.comlink.baudrate
         self.set_baud(max(self.SUPPORTED_BAUDS))
         r = self.send_command(self.HEXFORMAT)
         ret = SeacatComms.get_casts(self, cast_numbers, progbar, cast_command=self.DISPLAY_CASTS)
@@ -757,7 +768,7 @@ def scan_for_comports():
             available.append(port)
             s.close()   # explicit close 'cause of delayed GC in java
         except serial.SerialException as e:
-            if 'access is denied' in e.message.lower():
+            if 'access is denied' in str(e).lower():
                 available.append(port)
     return available
 
@@ -767,7 +778,7 @@ def get_num_casts(strHexFile, strSeacatType):
         Inspect a retrieved raw data file strHexFile.
     '''
     print(strHexFile, strSeacatType)
-    hexdata = file(strHexFile, 'rb').read()
+    hexdata = open(strHexFile, 'rb').read()
     if strSeacatType == "SBE19":
         ncasts = sbe_constants.SeacatHex_SBE19_NCASTSRE.search(hexdata).group('NumCasts')
     elif strSeacatType in ("SBE19Plus", ):
@@ -790,7 +801,7 @@ def view_con_report(path, seabird_utils_dir, parent=None):
 
 
 def get_serialnum(hexfile_path):
-    hexdata = file(hexfile_path, 'rb').read()
+    hexdata = open(hexfile_path, 'rb').read().decode("utf-8")
     m = sbe_constants.SeacatHex_SNRE.search(hexdata)
     if not m:
         logger.debug('''"Unable to get serial number.
@@ -848,7 +859,7 @@ def convert_hexfile(hexfile_path, confile_path, seabird_utils_dir, parent=None):
             Dim PsaFile As String                     ' Name of psa file
     '''
 
-    hexdata = file(hexfile_path, 'rb').read()
+    hexdata = open(hexfile_path, 'rb').read().decode("utf-8")
     header = hexdata.split('\n')[0]
     # Determine the SeaBird type and serial number from input file.
     if sbe_constants.SeacatHex_SBE19PLUS_TYPERE.search(header):

@@ -160,7 +160,7 @@ class Seacat(AbstractWidget):
             with AutoSeacat(progbar=self.progress) as cat:  # using the with statement auto-closes port even if an exception is thrown
                 if cat.isOpen():
                     self.com_label.setText(cat.get_com_str())
-                    headers = cat.get_headers().items()
+                    headers = list(cat.get_headers().items())
                     headers.sort()  # list of [cast#, header info]
                     if headers:
                         if get_all:
@@ -233,7 +233,7 @@ class Seacat(AbstractWidget):
         with AutoSeacat(progbar=self.progress) as cat:  # using the with statement auto-closes port even if an exception is thrown
             if cat.isOpen():
                 self.com_label.setText(cat.get_com_str())
-                headers = cat.get_headers().items()
+                headers = list(cat.get_headers().items())
                 if headers:
                     headers.sort()
                     msg = '\n'.join(["%d: %s" % hd for hd in headers]) + '\n'
