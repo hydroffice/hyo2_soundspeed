@@ -100,7 +100,8 @@ class AbstractReader(AbstractFormat):
             profile.init_sis()  # initialize to zero
 
         if self.fid is not None:
-            self.fid.close()
+            if self.fid.io is not None:
+                self.fid.io.close()
 
 
 class AbstractTextReader(AbstractReader):
