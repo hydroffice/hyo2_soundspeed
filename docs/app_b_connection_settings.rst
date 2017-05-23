@@ -24,7 +24,7 @@ and transmission protocols (:ref:`mvp_configuration_fig`).
 
     Figure – MVP Controller configuration dialog. Boxes A through C are required for transmission of cast information. Box D can be configured to transmit sensor data.
 
-The MVP computer IP address and the IP address of the machine running the *SSP* package can be configured in *Box A*.
+The MVP computer IP address and the IP address of the machine running the *SSM* package can be configured in *Box A*.
 For newer versions of the MVP controller, it is recommended to choose the ``NAVO_ISS60`` transmission protocol
 as this will allow for large cast files to be transmitted in several packets without overflowing
 the UDP maximum packet size limitation (*Box B*). Older versions of the MVP controller software
@@ -34,12 +34,15 @@ The file format can be adjusted to accommodate a CTD with the ``S12`` format or 
 with the ``CALC`` or ``ASVP`` formats (Box C).
 
 Note that the transmission protocol and file format must be configured in both the MVP controller interface and
-in the *Listeners* sub-tab of the *Setup* tab.
+in the the *Setup* tab (in the *Input* tab, to activate the MVP listener and, in the *Listeners* sub-tab,
+for the communication settings).
 
 Boxes D and E refer to raw instrument transmission settings that are configurable for future use.
 Since casts received from an MVP system do not have a filename embedded in the data stream,
 the *Sound Speed* package will name casts received using the following convention: ``YYYYMMDD_HHMMSS_MVP``.
 The date/time stamp embedded in the filename will be the time of the cast.
+
+.. note:: Once the MVP listener is activated, a "MVP" token will be visualized on the left side of the SSM's status bar.
 
 
 Sippican

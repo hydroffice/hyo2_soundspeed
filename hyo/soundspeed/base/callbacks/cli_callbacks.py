@@ -10,6 +10,9 @@ from hyo.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
 class CliCallbacks(AbstractCallbacks):
     """CLI-based callbacks"""
 
+    def __init__(self, sis_listener=None):
+        super(CliCallbacks, self).__init__(sis_listener=sis_listener)
+
     def ask_number(self, title="", msg="Enter number", default=0.0,
                    min_value=-2147483647.0, max_value=2147483647.0, decimals=7):
         val = None

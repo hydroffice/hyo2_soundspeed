@@ -9,6 +9,9 @@ class GeneralAbstractCallbacks(object):
 
     __metaclass__ = ABCMeta
 
+    def __init__(self, sis_listener=None):
+        self.sis_listener = sis_listener
+
     @abstractmethod
     def ask_number(self, title="", msg="Enter number", default=0.0,
                    min_value=-2147483647.0, max_value=2147483647.0, decimals=7):
@@ -25,16 +28,32 @@ class GeneralAbstractCallbacks(object):
         """Ask user for date"""
         pass
 
-    def ask_location(self, default_lat=43.13555, default_lon=-70.9395):
+    def ask_location(self, default_lat=None, default_lon=None):
         """Ask user for location (it is not an abstract method because it is based on ask_number)"""
 
-        try:
-            _ = float(default_lat)
-            _ = float(default_lon)
+        # try to convert the passed default values
+        if (default_lat is not None) and (default_lon is not None):
 
-        except Exception:
-            default_lat = 43.13555
-            default_lon = -70.9395
+            try:
+                _ = float(default_lat)
+                _ = float(default_lon)
+
+            except Exception:
+                default_lat = 43.13555
+                default_lon = -70.9395
+
+        # if both default lat and lon are None, check if sis has position
+        else:
+
+            if self.sis_listener is not None:
+                if self.sis_listener.nav is not None:
+                    if (self.sis_listener.nav.latitude is not None) and (self.sis_listener.nav.longitude is not None):
+                        default_lat = self.sis_listener.nav.latitude
+                        default_lon = self.sis_listener.nav.longitude
+
+            if (default_lat is None) or (default_lon is None):
+                default_lat = 43.13555
+                default_lon = -70.9395
 
         # latitude
         lat = self.ask_number(title="Location", msg="Enter latitude as dd.ddd:", default=default_lat,
@@ -73,6 +92,9 @@ class AbstractCallbacks(GeneralAbstractCallbacks):
     Specifies that the general callback exist as well as sound speed specific ones."""
 
     __metaclass__ = ABCMeta
+
+    def __init__(self, sis_listener=None):
+        super(AbstractCallbacks, self).__init__(sis_listener=sis_listener)
 
     @abstractmethod
     def ask_location_from_sis(self):

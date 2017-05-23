@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 class QtCallbacks(AbstractCallbacks):
     """Qt-based callbacks"""
 
-    def __init__(self, parent):
+    def __init__(self, parent, sis_listener=None):
+        super(QtCallbacks, self).__init__(sis_listener=sis_listener)
         self._parent = parent
         self._settings = QtCore.QSettings()
 

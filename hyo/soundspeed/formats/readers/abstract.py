@@ -45,6 +45,7 @@ class AbstractReader(AbstractFormat):
 
             # check if location is present
             if (profile.meta.latitude is None) or (profile.meta.longitude is None):
+
                 profile.meta.latitude, profile.meta.longitude = self.cb.ask_location()
                 if (profile.meta.latitude is None) or (profile.meta.longitude is None):
                     self.ssp.clear()

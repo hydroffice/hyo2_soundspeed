@@ -59,6 +59,7 @@ class SoundSpeedLibrary(object):
         self.atlases = Atlases(prj=self)
         self.check_custom_folders()
         self.listeners = Listeners(prj=self)
+        self.cb.sis_listener = self.listeners.sis  # to provide default values from SIS (if available)
         self.server = Server(prj=self)
         self.logs = SqliteLogging(self._release_folder)  # (user and server) loggers
 

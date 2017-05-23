@@ -28,7 +28,7 @@ From the *Editor* tab, select *Import data* and choose the desired import file t
     Click on the *Import data* button in the *Editor* tab to start the import process.
 
 .. figure:: ./_static/editor_tab1.png
-    :width: 280px
+    :width: 400px
     :align: center
     :height: 300px
     :alt: alternate text
@@ -370,9 +370,9 @@ It is possible to upload a single WOA or RTOFS profile to *SIS*.
 This can be done by first select WOA09 atlas or RTOFS atlas under the *Input data* button in the *Editor* toolbar.
 
 .. figure:: ./_static/editor_tab12.png
-    :width: 360px
+    :width: 400px
     :align: center
-    :height: 360px
+    :height: 320px
     :alt: data storage
     :figclass: align-center
 
