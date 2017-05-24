@@ -8,10 +8,8 @@ from hyo.soundspeed.base.helper import FileManager
 from hyo.soundspeed.formats.abstract import AbstractFormat
 
 
-class AbstractWriter(AbstractFormat):
+class AbstractWriter(AbstractFormat, metaclass=ABCMeta):
     """ Abstract data writer """
-
-    __metaclass__ = ABCMeta
 
     def __repr__(self):
         return "<%s:writer:%s:%s>" % (self.name, self.version, ",".join(self._ext))
@@ -38,10 +36,8 @@ class AbstractWriter(AbstractFormat):
                 self.fod.io.close()
 
 
-class AbstractTextWriter(AbstractWriter):
+class AbstractTextWriter(AbstractWriter, metaclass=ABCMeta):
     """ Abstract text data writer """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self):
         super(AbstractTextWriter, self).__init__()

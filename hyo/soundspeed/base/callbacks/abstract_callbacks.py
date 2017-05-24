@@ -4,10 +4,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class GeneralAbstractCallbacks(object):
+class GeneralAbstractCallbacks(object, metaclass=ABCMeta):
     """Abstract class with several callbacks that has to be implemented for a new backend"""
-
-    __metaclass__ = ABCMeta
 
     def __init__(self, sis_listener=None):
         self.sis_listener = sis_listener
@@ -87,11 +85,9 @@ class GeneralAbstractCallbacks(object):
         pass
 
 
-class AbstractCallbacks(GeneralAbstractCallbacks):
+class AbstractCallbacks(GeneralAbstractCallbacks, metaclass=ABCMeta):
     """Abstract class with several callbacks that has to be implemented for a new backend
     Specifies that the general callback exist as well as sound speed specific ones."""
-
-    __metaclass__ = ABCMeta
 
     def __init__(self, sis_listener=None):
         super(AbstractCallbacks, self).__init__(sis_listener=sis_listener)

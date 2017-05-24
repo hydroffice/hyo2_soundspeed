@@ -4,10 +4,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class AbstractProgress(object):
+class AbstractProgress(object, metaclass=ABCMeta):
     """Abstract class for a progress bar"""
-
-    __metaclass__ = ABCMeta
 
     def __init__(self):
 
@@ -39,7 +37,8 @@ class AbstractProgress(object):
         self._range = self._max - self._min
         return self._range
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def canceled(self):
         pass
 

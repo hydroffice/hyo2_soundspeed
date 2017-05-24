@@ -9,10 +9,8 @@ from hyo.soundspeed.formats.abstract import AbstractFormat
 from hyo.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 
 
-class AbstractReader(AbstractFormat):
+class AbstractReader(AbstractFormat, metaclass=ABCMeta):
     """ Abstract data reader """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self):
         super(AbstractReader, self).__init__()
@@ -101,10 +99,8 @@ class AbstractReader(AbstractFormat):
             profile.init_sis()  # initialize to zero
 
 
-class AbstractTextReader(AbstractReader):
+class AbstractTextReader(AbstractReader, metaclass=ABCMeta):
     """ Abstract text data reader """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self):
         super(AbstractTextReader, self).__init__()
@@ -139,10 +135,8 @@ class AbstractTextReader(AbstractReader):
             self.fid.close()
 
 
-class AbstractBinaryReader(AbstractReader):
+class AbstractBinaryReader(AbstractReader, metaclass=ABCMeta):
     """ Abstract binary data reader """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self):
         super(AbstractBinaryReader, self).__init__()
