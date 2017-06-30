@@ -2,6 +2,7 @@ from PySide import QtGui
 from PySide import QtCore
 
 import os
+from datetime import datetime
 import logging
 logger = logging.getLogger(__name__)
 
@@ -58,10 +59,14 @@ class MetadataDialog(AbstractDialog):
         self.latitude.setDisabled(True)
         self.latitude.setText("%s" % self.lib.cur.meta.latitude)
         hbox.addWidget(self.latitude)
+        # noinspection PyUnresolvedReferences
+        self.latitude.textChanged.connect(self.changed_latitude)
         self.longitude = QtGui.QLineEdit()
         self.longitude.setDisabled(True)
         self.longitude.setText("%s" % self.lib.cur.meta.longitude)
         hbox.addWidget(self.longitude)
+        # noinspection PyUnresolvedReferences
+        self.longitude.textChanged.connect(self.changed_longitude)
 
         # datetime
         hbox = QtGui.QHBoxLayout()
@@ -73,6 +78,8 @@ class MetadataDialog(AbstractDialog):
         self.timestamp.setDisabled(True)
         self.timestamp.setText(self.lib.cur.meta.utc_time.strftime("%d/%m/%y %H:%M"))
         hbox.addWidget(self.timestamp)
+        # noinspection PyUnresolvedReferences
+        self.timestamp.textChanged.connect(self.changed_timestamp)
 
         # last edit
         hbox = QtGui.QHBoxLayout()
@@ -294,6 +301,15 @@ class MetadataDialog(AbstractDialog):
         hbox.addStretch()
         self.mainLayout.addLayout(hbox)
 
+    def changed_latitude(self):
+        self.latitude.setStyleSheet("background-color: rgba(255,255,153, 255);")
+
+    def changed_longitude(self):
+        self.longitude.setStyleSheet("background-color: rgba(255,255,153, 255);")
+
+    def changed_timestamp(self):
+        self.timestamp.setStyleSheet("background-color: rgba(255,255,153, 255);")
+
     def changed_institution(self):
         self.institution.setStyleSheet("background-color: rgba(255,255,153, 255);")
 
@@ -329,24 +345,33 @@ class MetadataDialog(AbstractDialog):
 
     def on_editable(self):
         logger.debug("editable: %s" % self.editable.isChecked())
+
         if self.editable.isChecked():
+
             self.load_default.setEnabled(True)
             self.apply.setEnabled(True)
+            self.latitude.setEnabled(True)
+            self.longitude.setEnabled(True)
+            self.timestamp.setEnabled(True)
             self.institution.setEnabled(True)
             self.survey.setEnabled(True)
             self.vessel.setEnabled(True)
             self.sn.setEnabled(True)
             self.comments.setEnabled(True)
-#             self.pressure_uom.setEnabled(True)
-#             self.depth_uom.setEnabled(True)
-#             self.speed_uom.setEnabled(True)
-#             self.temperature_uom.setEnabled(True)
-#             self.conductivity_uom.setEnabled(True)
-#             self.salinity_uom.setEnabled(True)
+            # self.pressure_uom.setEnabled(True)
+            # self.depth_uom.setEnabled(True)
+            # self.speed_uom.setEnabled(True)
+            # self.temperature_uom.setEnabled(True)
+            # self.conductivity_uom.setEnabled(True)
+            # self.salinity_uom.setEnabled(True)
 
         else:
+
             self.load_default.setDisabled(True)
             self.apply.setDisabled(True)
+            self.latitude.setDisabled(True)
+            self.longitude.setDisabled(True)
+            self.timestamp.setDisabled(True)
             self.institution.setDisabled(True)
             self.survey.setDisabled(True)
             self.vessel.setDisabled(True)
@@ -368,8 +393,46 @@ class MetadataDialog(AbstractDialog):
 
     def on_apply(self):
         logger.debug("apply")
+
         # apply changes
         try:
+
+            # extra care on location and time variables, since they are PK
+            try:
+                latitude = float(self.latitude.text())
+                if latitude < -90 or latitude > 90:
+                    raise RuntimeError("invalid latitude: %s" % latitude)
+                logger.debug("latitude: %s" % latitude)
+
+                longitude = float(self.longitude.text())
+                if longitude < -180 or longitude > 180:
+                    raise RuntimeError("invalid longitude: %s" % longitude)
+                logger.debug("longitude: %s" % longitude)
+
+                timestamp = datetime.strptime(self.timestamp.text(), "%d/%m/%y %H:%M")
+                logger.debug("timestamp: %s" % timestamp)
+
+                if (latitude != self.lib.cur.meta.latitude) or \
+                        (longitude != self.lib.cur.meta.longitude) or \
+                        (timestamp != self.lib.cur.meta.utc_time):
+
+                    # only if the timestamp or the location is changed
+                    if not self.lib.remove_data():
+
+                        # only if the profile was loaded from a db
+                        if self.lib.ssp.loaded_from_db:
+                            msg = "Unable to remove old profile!"
+                            QtGui.QMessageBox.warning(self, "Database warning", msg, QtGui.QMessageBox.Ok)
+                            return
+
+            except Exception as e:
+                msg = "Unable to interpret position or location!\n\n%s" % e
+                QtGui.QMessageBox.warning(self, "Database warning", msg, QtGui.QMessageBox.Ok)
+                return
+
+            self.lib.cur.meta.latitude = latitude
+            self.lib.cur.meta.longitude = longitude
+            self.lib.cur.meta.utc_time = timestamp
             self.lib.cur.meta.institution = self.institution.text()
             self.lib.cur.meta.survey = self.survey.text()
             self.lib.cur.meta.vessel = self.vessel.text()
@@ -393,6 +456,7 @@ class MetadataDialog(AbstractDialog):
 
         # we also store the metadata to the db, but only if the profile was loading from a db
         if self.lib.ssp.loaded_from_db:
+
             if not self.lib.store_data():
                 msg = "Unable to save to db!"
                 QtGui.QMessageBox.warning(self, "Database warning", msg, QtGui.QMessageBox.Ok)
@@ -401,6 +465,9 @@ class MetadataDialog(AbstractDialog):
                 self.main_win.data_stored()
 
         # reset to transparent
+        self.latitude.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
+        self.longitude.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
+        self.timestamp.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
         self.institution.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
         self.survey.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
         self.vessel.setStyleSheet("background-color: rgba(255, 255, 255, 255);")

@@ -257,6 +257,33 @@ class ProjectDb(object):
             logger.error("during building tables, %s: %s" % (type(e), e))
             return False
 
+    def remove_casts(self, ssp):
+        if not isinstance(ssp, ProfileList):
+            raise RuntimeError("not passed a ProfileList, but %s" % type(ssp))
+
+        if not self.conn:
+            logger.error("missing db connection")
+            return False
+
+        try:
+            with self.conn:
+
+                for i, self.tmp_data in enumerate(ssp.l):
+
+                    # logger.info("got a new SSP to store:\n%s" % self.tmp_data)
+
+                    if not self._get_ssp_pk():
+                        raise sqlite3.Error("unable to get ssp pk: %s" % self.tmp_ssp_pk)
+
+                    if not self._delete_old_ssp():
+                        raise sqlite3.Error("unable to clean ssp")
+
+            return True
+
+        except sqlite3.Error as e:
+            logger.error("during adding casts, %s: %s" % (type(e), e))
+            return False
+
     def add_casts(self, ssp):
         if not isinstance(ssp, ProfileList):
             raise RuntimeError("not passed a ProfileList, but %s" % type(ssp))

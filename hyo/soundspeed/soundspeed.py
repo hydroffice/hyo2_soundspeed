@@ -652,6 +652,36 @@ class SoundSpeedLibrary(object):
                     prj_list.append(os.path.splitext(os.path.basename(f))[0])
         return prj_list
 
+    def remove_data(self):
+        """Remove the current profile in the project db"""
+
+        # checks
+        if not self.has_ssp():
+            raise RuntimeError("Data not loaded")
+
+        db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
+
+        # special case: synthetic multiple profiles, we just save the average profile
+        if (self.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']) and \
+                ((self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA09']) or
+                     (self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA13'])):
+            tmp_ssp = copy.deepcopy(self.ssp)
+            del tmp_ssp.l[1:]
+            success = db.remove_casts(tmp_ssp)
+
+        else:
+            success = db.remove_casts(self.ssp)
+        db.disconnect()
+
+        # take care of listeners
+        if success:
+            if self.has_sippican_to_process():
+                self.listeners.sippican_to_process = False
+            if self.has_mvp_to_process():
+                self.listeners.mvp_to_process = False
+
+        return success
+
     def store_data(self):
         """Store the current profile in the project db"""
 
