@@ -180,8 +180,24 @@ def is_linux():
     return sys.platform in ['linux', 'linux2']
 
 
+def is_url(value):
+    if len(value) > 7:
+
+        https = "https"
+        if value[:len(https)] == https:
+            return True
+
+    return False
+
+
 def explore_folder(path):
     """Open the passed path using OS-native commands"""
+
+    if is_url(path):
+        import webbrowser
+        webbrowser.open(path)
+        return True
+
     if not os.path.exists(path):
         logger.warning('the passed path to open does not exist: %s' % path)
         return False

@@ -76,7 +76,7 @@ class MetadataDialog(AbstractDialog):
         hbox.addWidget(label)
         self.timestamp = QtGui.QLineEdit()
         self.timestamp.setDisabled(True)
-        self.timestamp.setText(self.lib.cur.meta.utc_time.strftime("%d/%m/%y %H:%M"))
+        self.timestamp.setText(self.lib.cur.meta.utc_time.strftime("%d/%m/%y %H:%M:%S.%f"))
         hbox.addWidget(self.timestamp)
         # noinspection PyUnresolvedReferences
         self.timestamp.textChanged.connect(self.changed_timestamp)
@@ -89,7 +89,7 @@ class MetadataDialog(AbstractDialog):
         hbox.addWidget(label)
         self.proc_time = QtGui.QLineEdit()
         self.proc_time.setDisabled(True)
-        self.proc_time.setText(self.lib.cur.meta.proc_time.strftime("%d/%m/%y %H:%M"))
+        self.proc_time.setText(self.lib.cur.meta.proc_time.strftime("%d/%m/%y %H:%M:%S.%f"))
         hbox.addWidget(self.proc_time)
 
         # proc info
@@ -409,7 +409,7 @@ class MetadataDialog(AbstractDialog):
                     raise RuntimeError("invalid longitude: %s" % longitude)
                 logger.debug("longitude: %s" % longitude)
 
-                timestamp = datetime.strptime(self.timestamp.text(), "%d/%m/%y %H:%M")
+                timestamp = datetime.strptime(self.timestamp.text(), "%d/%m/%y %H:%M:%S.%f")
                 logger.debug("timestamp: %s" % timestamp)
 
                 if (latitude != self.lib.cur.meta.latitude) or \
@@ -452,7 +452,7 @@ class MetadataDialog(AbstractDialog):
             return
 
         # update proc_time widget
-        self.proc_time.setText(self.lib.cur.meta.proc_time.strftime("%d/%m/%y %H:%M"))
+        self.proc_time.setText(self.lib.cur.meta.proc_time.strftime("%d/%m/%y %H:%M:%S.%f"))
 
         # we also store the metadata to the db, but only if the profile was loading from a db
         if self.lib.ssp.loaded_from_db:

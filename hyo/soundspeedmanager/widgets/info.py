@@ -111,6 +111,13 @@ class Info(QtGui.QMainWindow):
         # noinspection PyUnresolvedReferences
         authors_action.triggered.connect(self.show_authors)
         self.toolbar.addAction(authors_action)
+        # smartmap
+        smartmap_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'smartmap.png')),
+                                        'SmartMap WebGIS', self)
+        smartmap_action.setShortcut('Alt+S')
+        # noinspection PyUnresolvedReferences
+        smartmap_action.triggered.connect(self.open_smartmap)
+        self.toolbar.addAction(smartmap_action)
 
         # separator
         self.toolbar.addSeparator()
@@ -229,8 +236,11 @@ class Info(QtGui.QMainWindow):
 
     def load_online_docs(self):
         url = 'https://www.hydroffice.org/manuals/soundspeed/index.html'
-        self.url_input.setText(url)
-        self.web.load(QtCore.QUrl(url))
+        explore_folder(url)
+
+    def open_smartmap(self):
+        url = 'https://www.hydroffice.org/smartmap/'
+        explore_folder(url)
 
     def load_offline_docs(self):
         pdf_path = os.path.join(self.pdf, "SoundSpeedManager.pdf")
