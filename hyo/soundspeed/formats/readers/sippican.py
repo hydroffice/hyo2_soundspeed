@@ -23,7 +23,8 @@ class Sippican(AbstractTextReader):
         Dicts.probe_types["XSV-01"]: Dicts.sensor_types["XSV"],
         Dicts.probe_types["XSV-02"]: Dicts.sensor_types["XSV"],
         Dicts.probe_types["XCTD-1"]: Dicts.sensor_types["XCTD"],
-        Dicts.probe_types["XCTD-2"]: Dicts.sensor_types["XCTD"]
+        Dicts.probe_types["XCTD-2"]: Dicts.sensor_types["XCTD"],
+        Dicts.probe_types["Fast Deep"]: Dicts.sensor_types["XBT"],
     }
 
     def __init__(self):
@@ -192,6 +193,7 @@ class Sippican(AbstractTextReader):
                 self.ssp.cur.data.sal[:] = self.input_salinity
 
         count = 0
+        good_data = None
         for line in self.lines[self.samples_offset:len(self.lines)]:
 
             # skip empty lines
@@ -201,9 +203,9 @@ class Sippican(AbstractTextReader):
             # first required data fields
             try:
                 if self.is_var_alpha:
-                    self._body_alpha(line, count)
+                    good_data = self._body_alpha(line, count)
                 else:
-                    self._body_default(line, count)
+                    good_data = self._body_default(line, count)
 
             except ValueError:
                 logger.warning("invalid conversion parsing of line #%s" % (self.samples_offset + count))
@@ -212,7 +214,8 @@ class Sippican(AbstractTextReader):
                 logger.warning("invalid index parsing of line #%s" % (self.samples_offset + count))
                 continue
 
-            count += 1
+            if good_data:
+                count += 1
 
         self.ssp.cur.data_resize(count)
 
@@ -224,12 +227,12 @@ class Sippican(AbstractTextReader):
         if self.ssp.cur.meta.sensor_type == Dicts.sensor_types["XBT"]:
             if len(fields) < 3:
                 logger.warning("too few fields for line #%s" % (self.samples_offset + count))
-                return
+                return False
 
             # skip 0-speed value
-            if float(fields[2]) == 0.0:
-                logger.info("skipping 0-speed row")
-                return
+            if float(fields[2]) < 1000.0:
+                logger.info("skipping low-speed row")
+                return False
 
             for field in fields:
                 if field_count == 0:
@@ -240,17 +243,17 @@ class Sippican(AbstractTextReader):
                     self.ssp.cur.data.speed[count] = field
                 field_count += 1
 
-            return
+            return True
 
         elif self.ssp.cur.meta.sensor_type == Dicts.sensor_types["XSV"]:
             if len(fields) < 2:
                 logger.warning("too few fields for line #%s" % (self.samples_offset + count))
-                return
+                return False
 
             # skip 0-speed value
-            if float(fields[1]) == 0.0:
-                logger.info("skipping 0-speed row")
-                return
+            if float(fields[1]) < 1000.0:
+                logger.info("skipping low-speed row")
+                return False
 
             for field in fields:
                 if field_count == 0:
@@ -259,17 +262,17 @@ class Sippican(AbstractTextReader):
                     self.ssp.cur.data.speed[count] = field
                 field_count += 1
 
-            return
+            return True
 
         elif self.ssp.cur.meta.sensor_type == Dicts.sensor_types["XCTD"]:
             if len(fields) < 6:
                 logger.warning("too few fields for line #%s" % (self.samples_offset + count))
-                return
+                return False
 
             # skip 0-speed value
-            if float(fields[4]) == 0.0:
-                logger.info("skipping 0-speed row")
-                return
+            if float(fields[4]) < 1000.0:
+                logger.info("skipping low-speed row")
+                return False
 
             for field in fields:
                 if field_count == 0:
@@ -289,7 +292,11 @@ class Sippican(AbstractTextReader):
                     self.ssp.cur.more.sa['Status'][count] = field
                 field_count += 1
 
-            return
+            return True
+
+        else:
+            logger.warning("unknown/unsupported type: %s" % self.ssp.cur.meta.sensor_type)
+            return False
 
     def _body_alpha(self, line, count):
 
@@ -297,34 +304,38 @@ class Sippican(AbstractTextReader):
         # print(self.field_index)
 
         if self.ssp.cur.meta.sensor_type == Dicts.sensor_types["XBT"]:
-            # skip 0-speed value
-            if float(fields[self.field_index["Sound"]]) == 0.0:
-                logger.info("skipping 0-speed row")
-                return
+            # skip low-speed value
+            if float(fields[self.field_index["Sound"]]) < 1000.0:
+                logger.info("skipping low-speed #%d row: %f" % (count, float(fields[self.field_index["Sound"]])))
+                return False
 
             self.ssp.cur.data.depth[count] = float(fields[self.field_index["Depth"]])
             self.ssp.cur.data.speed[count] = float(fields[self.field_index["Sound"]])
             self.ssp.cur.data.temp[count] = float(fields[self.field_index["Temperature"]])
-            return
+            return True
 
         elif self.ssp.cur.meta.sensor_type == Dicts.sensor_types["XSV"]:
-            #  skip 0-speed value
-            if float(fields[self.field_index["Sound"]]) == 0.0:
-                logger.info("skipping 0-speed row")
-                return
+            #  skip low-speed value
+            if float(fields[self.field_index["Sound"]]) < 1000.0:
+                logger.info("skipping low-speed #%d row: %f" % (count, float(fields[self.field_index["Sound"]])))
+                return False
 
             self.ssp.cur.data.depth[count] = float(fields[self.field_index["Depth"]])
             self.ssp.cur.data.speed[count] = float(fields[self.field_index["Sound"]])
-            return
+            return True
 
         elif self.ssp.cur.meta.sensor_type == Dicts.sensor_types["XCTD"]:
-            # skip 0-speed value
-            if float(fields[self.field_index["Sound"]]) == 0.0:
-                logger.info("skipping 0-speed row")
-                return
+            # skip low-speed value
+            if float(fields[self.field_index["Sound"]]) < 1000.0:
+                logger.info("skipping low-speed #%d row: %f" % (count, float(fields[self.field_index["Sound"]])))
+                return False
 
             self.ssp.cur.data.depth[count] = float(fields[self.field_index["Depth"]])
             self.ssp.cur.data.speed[count] = float(fields[self.field_index["Sound"]])
             self.ssp.cur.data.temp[count] = float(fields[self.field_index["Temperature"]])
             self.ssp.cur.data.sal[count] = float(fields[self.field_index["Salinity"]])
-            return
+            return True
+
+        else:
+            logger.warning("unknown/unsupported type: %s" % self.ssp.cur.meta.sensor_type)
+            return False

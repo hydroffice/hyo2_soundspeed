@@ -52,6 +52,7 @@ class Dicts(object):
         ('XSV-02', 208),
         ('XCTD-1', 209),
         ('XCTD-2', 210),
+        ('Fast Deep', 211),
 
         ('MONITOR SVP 500', 300),
         ('MIDAS SVP 6000', 301),
