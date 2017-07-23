@@ -63,8 +63,8 @@ to point to the correct path (see :ref:`package_configuration`).
 
 Among other improvements, the WOA13 db provides a much better spatial resolution, but this comes with a much larger data size (~18 GB).
 
-.. note:: If a previous version of the application was installed, *Sound Speed Manager* will try to localize already installed
-   WOA databases (WOA09 or WOA13).
+.. note:: If a previous version of the application was installed, *Sound Speed Manager* will try to localize past
+    installations of WOA databases (WOA09 or WOA13).
 
 .. _package_configuration:
 

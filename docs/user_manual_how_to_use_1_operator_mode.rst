@@ -96,11 +96,34 @@ The *Hide flagged* option in the plotting toolbar will toggle the display of fla
 .. figure:: ./_static/editor_tab4.png
     :width: 640px
     :align: center
-    :height: 490px
+    :height: 460px
     :alt: data editing
     :figclass: align-center
 
     Interactive data editing of a loaded profile.
+
+
+Metadata editing
+================
+
+Several information related to the cast are collected during the import and the processing of a cast.
+Metadata can be viewed by clicking the *Metadata* button on the tool bar:
+
+.. figure:: ./_static/metadata_button.png
+    :width: 640px
+    :align: center
+    :height: 120px
+    :alt: data editing
+    :figclass: align-center
+
+It is also possible to manually edit several of the metadata entries:
+
+.. figure:: ./_static/metadata_widget.png
+    :width: 400px
+    :align: center
+    :height: 400px
+    :alt: data editing
+    :figclass: align-center
 
 Data augmentation
 =================
@@ -370,9 +393,9 @@ It is possible to upload a single WOA or RTOFS profile to *SIS*.
 This can be done by first select WOA09 atlas or RTOFS atlas under the *Input data* button in the *Editor* toolbar.
 
 .. figure:: ./_static/editor_tab12.png
-    :width: 400px
+    :width: 360px
     :align: center
-    :height: 320px
+    :height: 280px
     :alt: data storage
     :figclass: align-center
 

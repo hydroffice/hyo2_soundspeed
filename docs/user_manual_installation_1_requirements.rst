@@ -10,7 +10,7 @@ Requirements
 
 .. note::
     If you download the frozen application (`from the download page <https://www.hydroffice.org/soundspeed/main>`_),
-    you don't need to care about dependencies (and may just skip this section).
+    you don't need to care about dependencies (and you may just skip this section).
 
 If you decide to install the package in a Python environment, the dependencies are:
 

@@ -2,16 +2,16 @@
 In brief
 ********
 
-.. image:: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/master/hydroffice/soundspeedmanager/media/favicon.png
+.. image:: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/master/hyo/soundspeedmanager/media/favicon.png
     :alt: logo
 
-This package is part of the `HydrOffice <https://www.hydroffice.org/license/>`_ framework.
+The Sound Speed package is part of the `HydrOffice <https://www.hydroffice.org/license/>`_ framework. HydrOffice is
+a research development environment for ocean mapping. It provides a collection of hydro-packages, each of them dealing
+with a specific issue of the field. The main goal is to speed up both algorithms testing and research-2-operation.
 
-HydrOffice is a research development environment for ocean mapping. It provides a collection of hydro-packages, each of them dealing with a specific issue of the field. The main goal is to speed up both algorithms testing and research-2-operation.
-
-This package provides both a library and an application with functionalities to manage sound speed profiles, and
-to provide pre-processing ocean mapping tools to help bridge the gap between sound speed profiling instrumentation and multibeam
-echosounder acquisition systems.
+The Sound Speed package provides both a library and an application with functionalities to manage sound speed profiles,
+and to provide pre-processing ocean mapping tools to help bridge the gap between sound speed profiling instrumentation
+and multibeam echosounder acquisition systems.
 
 It has been developing with the aim to merge together functionalities present in several applications that process sound
 speed profiles (SSP) for underwater acoustic systems:
@@ -27,8 +27,8 @@ speed profiles (SSP) for underwater acoustic systems:
   as part of the HydrOffice framework under NOAA grants NA10NOS4000073 and NA15NOS4000200.
 
 In the integration of all these implementations to the current package several improvements have been
-introduced to enhance code maintainability, as well as to also to support Python 3 (from the original Python 2 only
-implementation) and to store the collected data for further processing and analysis.
+introduced to enhance code maintainability (e.g., Python 3 support) and to store the collected data for further
+processing and analysis.
 
 
 Operation modes
@@ -69,7 +69,7 @@ Currently implemented features
   * ISS Fugro (.svp, .v*, .d*)
   * Kongsberg Maritime (.asvp)
   * Rolls-Royce Moving Vessel Profiler (MVP) (.asvp, .calc, .s12)
-  * OpenScience (.asc)
+  * Oceanscience Underway CTD (.asc)
   * SAIV (.txt)
   * Seabird (.cnv)
   * Sippican XBT, XSV, and XCTD (.EDF)
