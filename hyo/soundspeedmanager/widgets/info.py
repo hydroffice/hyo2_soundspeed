@@ -169,7 +169,7 @@ class Info(QtGui.QMainWindow):
 
         # create an author dialog
         self.authors_dialog = QtGui.QDialog(self)
-        self.authors_dialog.setWindowTitle("Write to the authors")
+        self.authors_dialog.setWindowTitle("Write us")
         self.authors_dialog.setMaximumSize(QtCore.QSize(150, 120))
         self.authors_dialog.setMaximumSize(QtCore.QSize(300, 240))
         vbox = QtGui.QVBoxLayout()
@@ -189,16 +189,13 @@ class Info(QtGui.QMainWindow):
         text0.setOpenExternalLinks(True)
         vbox.addWidget(text0)
         text0.setText("""
-        <b>Comments and feature requests:</b><br>
+        <b>For bugs and troubleshooting:</b><br>
+        <a href=\"mailto:soundspeed@hydroffice.org?Subject=SoundSpeedManager\">soundspeed@hydroffice.org</a>
+        <br>
+        <b>For comments and ideas for new features:</b><br>
         Giuseppe Masetti  <a href=\"mailto:gmasetti@ccom.unh.edu?Subject=Hydroffice%20SoundSpeed\">gmasetti@ccom.unh.edu</a><br>
         Barry Gallagher  <a href=\"mailto:barry.gallagher@noaa.gov?Subject=Hydroffice%20SoundSpeed\">barry.gallagher@noaa.gov</a><br>
-        Brian Calder  <a href=\"mailto:brc@ccom.unh.edu?Subject=Hydroffice%20SoundSpeed\">brc@ccom.unh.edu</a><br>
-        Chen Zhang  <a href=\"mailto:chen.zhang@noaa.gov?Subject=Hydroffice%20SoundSpeed\">chen.zhang@noaa.gov</a><br>
-        Matt Wilson  <a href=\"mailto:matthew.wilson@noaa.gov?Subject=Hydroffice%20SoundSpeed\">matthew.wilson@noaa.gov</a><br>
-        Jack Riley  <a href=\"mailto:jack.riley@noaa.gov?Subject=Hydroffice%20SoundSpeed\">jack.riley@noaa.gov</a><br>
-        <br>
-        <b>Bugs and support:</b><br>
-        <a href=\"mailto:soundspeed@hydroffice.org?Subject=SoundSpeedManager\">soundspeed@hydroffice.org</a>
+        Chen Zhang  <a href=\"mailto:chen.zhang@noaa.gov?Subject=Hydroffice%20SoundSpeed\">chen.zhang@noaa.gov</a><br>        
         """)
 
         # load default
@@ -284,6 +281,7 @@ class UrlInput(QtGui.QLineEdit):
         super(UrlInput, self).__init__()
         self.browser = browser
         self.setText(default_url)
+        # noinspection PyUnresolvedReferences
         self.returnPressed.connect(self.return_pressed)
 
     def return_pressed(self):

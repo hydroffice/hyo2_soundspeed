@@ -91,6 +91,11 @@ class NavToolbar(NavigationToolbar2QT):
     def _init_toolbar(self):
 
         for text, tooltip_text, image_file, callback in self.toolitems:
+
+            if text is None:
+                # bug fix to avoid duplicated separators in the task bar
+                continue
+
             if text == 'Home':
                 home_action = self.addAction(self._icon('home.png'), 'Reset view', self.home)
                 home_action.setToolTip('Reset view')
@@ -103,6 +108,7 @@ class NavToolbar(NavigationToolbar2QT):
                 forward_action = self.addAction(self._icon('forward.png'), 'Forward', self.forward)
                 forward_action.setToolTip('Next view')
                 self._actions['forward'] = forward_action
+                self.addSeparator()
             elif text == 'Pan':
                 pan_action = self.addAction(self._icon('pan.png'), 'Pan', self.pan)
                 pan_action.setToolTip('Pan on plot')
@@ -134,6 +140,7 @@ class NavToolbar(NavigationToolbar2QT):
                 self.insert_action.setToolTip('Insert samples')
                 self.insert_action.setCheckable(True)
                 self._actions['insert'] = self.insert_action
+                self.addSeparator()
             elif text == 'Subplots':
                 self.flagged_action = self.addAction(self._icon("flagged.png"), 'Flagged', self.flagged_plot)
                 self.flagged_action.setToolTip('Hide flagged')
@@ -161,8 +168,6 @@ class NavToolbar(NavigationToolbar2QT):
                 save_action = self.addAction(self._icon('filesave.png'), 'Save', self.save_figure)
                 save_action.setToolTip('Save the figure')
                 self._actions['save'] = save_action
-            elif text is None:
-                self.addSeparator()
             else:
                 a = self.addAction(self._icon(image_file + '.png'), text, getattr(self, callback))
                 self._actions[callback] = a
