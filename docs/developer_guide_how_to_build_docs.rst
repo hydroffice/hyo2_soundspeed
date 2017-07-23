@@ -9,6 +9,10 @@ The documentation is built using ``sphinx``, so you neeed to have it:
 
 * ``pip install sphinx sphinx-autobuild``
 
+To build the pdf manual on Ubuntu:
+
+* ``sudo apt-get install texlive-full``
+
 
 First-time creation of documentation template
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

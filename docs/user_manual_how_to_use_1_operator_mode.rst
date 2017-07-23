@@ -16,8 +16,9 @@ Data import
 .. index::
    single: data; import
 
-From the *Editor* tab, select *Import data* and choose the desired import file type.
+From the *Editor* tab, select *Import data* (:numref:`editor_tab0`) and choose the desired import file type (:numref:`editor_tab1`).
 
+.. _editor_tab0:
 .. figure:: ./_static/editor_tab0.png
     :width: 600px
     :align: center
@@ -27,6 +28,7 @@ From the *Editor* tab, select *Import data* and choose the desired import file t
 
     Click on the *Import data* button in the *Editor* tab to start the import process.
 
+.. _editor_tab1:
 .. figure:: ./_static/editor_tab1.png
     :width: 400px
     :align: center
@@ -36,9 +38,10 @@ From the *Editor* tab, select *Import data* and choose the desired import file t
 
     Click on the desired import file type.
 
-This will launch a file selection dialog (with the expected file extension set as a filter, e.g. ``.edf``
-for *Sippican* files).
+This will launch a file selection dialog (:numref:`editor_tab2`) with the expected file extension set as a filter, e.g. ``.edf``
+for *Sippican* files.
 
+.. _editor_tab2:
 .. figure:: ./_static/editor_tab2.png
     :width: 500px
     :align: center
@@ -51,8 +54,9 @@ for *Sippican* files).
 .. note:: A number of sample data files can be downloaded from the project repository.
 
 After the selection of the desired file, the window shows panels with the sound speed, temperature and
-salinity profiles drawn in solid blue (left to right, respectively, in the following figure).
+salinity profiles drawn in solid blue (left to right, respectively, in :numref:`editor_tab3`).
 
+.. _editor_tab3:
 .. figure:: ./_static/editor_tab3.png
     :width: 640px
     :align: center
@@ -77,8 +81,8 @@ not available).
 Interactive data editing
 ========================
 
-The mouse interactive mode is set using the plotting toolbar at the bottom (or by directly right-clicking
-on the plots once a cast is loaded). Currently available inspection modes are:
+The mouse interactive mode is set using the plotting toolbar at the bottom (:numref:`editor_tab4`) or by directly right-clicking
+on the plots once a cast is loaded. Currently available inspection modes are:
 
 * *Reset view*: to visualize the full profile
 * *Pan*: to move the area visualized in the plot
@@ -93,6 +97,7 @@ Zooming back out to the full view is accomplished by choosing *Reset view* from 
 (or by directly right-clicking on the plot and selecting *Reset view*).
 The *Hide flagged* option in the plotting toolbar will toggle the display of flagged points.
 
+.. _editor_tab4:
 .. figure:: ./_static/editor_tab4.png
     :width: 640px
     :align: center
@@ -107,8 +112,9 @@ Metadata editing
 ================
 
 Several information related to the cast are collected during the import and the processing of a cast.
-Metadata can be viewed by clicking the *Metadata* button on the tool bar:
+Metadata can be viewed by clicking the *Metadata* button on the tool bar (:numref:`metadata_button`).
 
+.. _metadata_button:
 .. figure:: ./_static/metadata_button.png
     :width: 640px
     :align: center
@@ -116,14 +122,19 @@ Metadata can be viewed by clicking the *Metadata* button on the tool bar:
     :alt: data editing
     :figclass: align-center
 
-It is also possible to manually edit several of the metadata entries:
+    Button to access the *Metadata* widget.
 
+It is also possible to manually edit several of the metadata entries (:numref:`metadata_widget`).
+
+.. _metadata_widget:
 .. figure:: ./_static/metadata_widget.png
     :width: 400px
     :align: center
     :height: 400px
     :alt: data editing
     :figclass: align-center
+
+    The *Profile metadata* tool.
 
 Data augmentation
 =================
@@ -144,12 +155,13 @@ assuming that the salinity is constant over all depths or it could be as sophist
 an independent salinity depth profile from an alternate sensor such as a CTD or perhaps from an oceanographic model.
 
 The package follows this second approach. The salinity profile is specified by selecting *Retrieve salinity*
-from the *Editor* toolbar (the option is only active when an XBT cast is loaded). With this command,
+(:numref:`editor_tab5`) from the *Editor* toolbar (the option is only active when an XBT cast is loaded). With this command,
 the dashed WOA or RTOFS salinity profile is used to augment the XBT temperature measurement.
 Since the vertical resolution of the WOA/RTOFS grids is coarse compared to the typical sampling interval
 of the measured data, the salinity estimates are linearly interpolated to the depths associated
 with each of the temperature observations in the measured XBT profile.
 
+.. _editor_tab5:
 .. figure:: ./_static/editor_tab5.png
     :width: 600px
     :align: center
@@ -169,9 +181,10 @@ XSV probes
 .. index:: XSV
 
 In the case of an XSV file, the user can decide to augment the measured sound speed with WOA/RTOFS temperature and
-salinity through the XSV load temperature/salinity option under the *Process* menu (the option is only active
-when an XSV cast is loaded).
+salinity through the XSV load temperature/salinity option under the *Process* menu (:numref:`editor_tab6`).
+The option is only active when an XSV cast is loaded.
 
+.. _editor_tab6:
 .. figure:: ./_static/editor_tab6.png
     :width: 600px
     :align: center
@@ -207,8 +220,10 @@ If configured to receive data from SIS, the surface sound speed and transducer d
 can be used to create a surface layer of thickness equal to the transducer draft and of sound speed equal
 to the value used in beam forming (this is based on the assuption that the value comes
 from the surface sound speed probe).
-This operation can be achieved by selecting *Retrieve Surface Sound Speed* from the *Editor* toolbar.
+This operation can be achieved by selecting *Retrieve Surface Sound Speed* from the *Editor* toolbar
+(:numref:`editor_tab7`).
 
+.. _editor_tab7:
 .. figure:: ./_static/editor_tab7.png
     :width: 600px
     :align: center
@@ -239,7 +254,7 @@ Profile extension using WOA/RTOFS atlases or a reference cast
 .. index:: WOA; extension
 .. index:: RTOFS; extension
 
-Profile extension can be applied by selecting *Extend profile* from the *Editor* toolbar.
+Profile extension can be applied by selecting *Extend profile* from the *Editor* toolbar (:numref:`editor_tab8`).
 This operation will extend the observed cast in depth as much as possible using the WOA/RTOFS profile.
 After that, the three plot panels will be updated. If necessary, users should edit any discontinuities
 between the cast in depth and the extension in the vicinity of the maximum observation depth.
@@ -252,6 +267,7 @@ to 12,000 m depth to meet *SIS* input criteria (thus, there is no need for the u
 Similar to data augmentation for XBT probes and for XSV probes, when a reference cast is set,
 this will be used to extend the cast instead of WOA/RTOFS atlases data.
 
+.. _editor_tab8:
 .. figure:: ./_static/editor_tab8.png
     :width: 600px
     :align: center
@@ -267,8 +283,10 @@ Data export
 
 .. index:: data; export
 
-Any file that is loaded into the package can be exported by accessing the *Export data* from the *Editor* toolbar.
+Any file that is loaded into the package can be exported by accessing the *Export data* from the *Editor* toolbar
+(:numref:`editor_tab10`).
 
+.. _editor_tab10:
 .. figure:: ./_static/editor_tab10.png
     :width: 600px
     :align: center
@@ -292,8 +310,9 @@ Data transmission
 .. index:: data; transmission
 .. index:: SIS
 
-Data transmission is triggered by selecting the *Transmit data* from the *Editor* toolbar.
+Data transmission is triggered by selecting the *Transmit data* from the *Editor* toolbar (:numref:`editor_tab11`).
 
+.. _editor_tab11:
 .. figure:: ./_static/editor_tab11.png
     :width: 600px
     :align: center
@@ -314,8 +333,9 @@ Data storage
 .. index:: database
 
 The package provides also functionalities to permanently storage, delete and retrieve the sound speed data.
-A profile can be store using *Save to database* in the *Editor* toolbar.
+A profile can be store using *Save to database* in the *Editor* toolbar (:numref:`editor_tab9`).
 
+.. _editor_tab9:
 .. figure:: ./_static/editor_tab9.png
     :width: 600px
     :align: center
@@ -331,8 +351,9 @@ In particular, each profile may contain three types of stored data:
 2. The processed samples (with flags to identify the various different source of data).
 3. An optional SIS profile (that represents the result of the thinning process required by *Kongsberg SIS*).
 
-Once stored in the database, the *Database* tab provides analysis functions and tools to manage the collected profiles.
+Once stored in the database, the *Database* tab provides analysis functions and tools to manage the collected profiles (:numref:`database_tab0`).
 
+.. _database_tab0:
 .. figure:: ./_static/database_tab0.png
     :width: 600px
     :align: center
@@ -340,7 +361,8 @@ Once stored in the database, the *Database* tab provides analysis functions and 
     :alt: data storage
     :figclass: align-center
 
-For instance, it is possible to export the profile metadata in several geographic formats (csv, kml, shapefile).
+For instance, it is possible to export the profile metadata in several geographic formats: csv, kml, shapefile
+(eg., :numref:`kml_export_fig`).
 
 .. index:: csv
 .. index:: kml
@@ -390,8 +412,10 @@ Create a WOA or RTOFS profile
 .. index:: RTOFS, synthetic profile
 
 It is possible to upload a single WOA or RTOFS profile to *SIS*.
-This can be done by first select WOA09 atlas or RTOFS atlas under the *Input data* button in the *Editor* toolbar.
+This can be done by first select WOA09 atlas or RTOFS atlas under the *Input data* button in the *Editor* toolbar
+(:numref:`editor_tab12`).
 
+.. _editor_tab12:
 .. figure:: ./_static/editor_tab12.png
     :width: 360px
     :align: center
@@ -445,8 +469,9 @@ There are several scenarios where a CTD profile can be used as a reference cast 
 
 To establish a reference cast, the desired cast is imported using the same mechanism described in :ref:`data_import`.
 After that the profile is verified, edited and perhaps extended further in depth using an oceanographic database,
-it is set as the reference profile by selecting "Reference cast" in the *Editor* toolbar.
+it is set as the reference profile by selecting "Reference cast" in the *Editor* toolbar (:numref:`editor_tab13`).
 
+.. _editor_tab13:
 .. figure:: ./_static/editor_tab13.png
     :width: 600px
     :align: center
@@ -460,14 +485,17 @@ Once a profile is set as the reference cast, the reference profile is drawn in o
 This cast is retained in memory as the currently loaded cast to allow for additional operations,
 such as exporting or transmission to a sounder. The reference profile can be cleared from memory at any time
 via the *Clear reference cast* option under the *Reference cast* menu.
-Further extensions and augmentations will then use WOA/RTOFS.
+Further extensions and augmentations will then use WOA/RTOFS (:numref:`editor_tab14`).
 
+.. _editor_tab14:
 .. figure:: ./_static/editor_tab14.png
     :width: 300px
     :align: center
     :height: 160px
     :alt: reference cast
     :figclass: align-center
+
+    The *Reference cast* tool.
 
 The reference cast can be reimported into memory by choosing *Reload reference cast as current profile* from the *Reference cast* menu.
 This will load a copy of the reference cast into memory for further manipulation.
@@ -523,5 +551,4 @@ Once the cast has been processed and delivered, the statusbar color-coding will 
 
 If the *Server mode* happened to have been running at the moment of reception, it will be stopped and
 the received cast will be displayed as described above.
-
 
