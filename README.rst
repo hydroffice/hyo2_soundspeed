@@ -1,6 +1,10 @@
 HydrOffice Sound Speed
 ======================
 
+.. image:: https://api.codacy.com/project/badge/Grade/9b1d844ce51846c4b78bb7694096fde7
+   :alt: Codacy Badge
+   :target: https://www.codacy.com/app/giumas/hyo_soundspeed?utm_source=github.com&utm_medium=referral&utm_content=hydroffice/hyo_soundspeed&utm_campaign=badger
+
 .. image:: https://img.shields.io/pypi/v/hyo.soundspeed.svg
     :target: https://pypi.python.org/pypi/hyo.soundspeed
     :alt: PyPi version
