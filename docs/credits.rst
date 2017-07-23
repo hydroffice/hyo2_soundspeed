@@ -14,13 +14,27 @@ HydrOffice Sound Speed is developed and maintained by:
 
 - `Barry Gallagher <mailto:barry.gallagher@noaa.gov>`_
 
+- `Chen Zhang <mailto:chen.zhang@noaa.gov>`_
+
+Other contributors:
+
 - `Brian R. Calder <mailto:brc@ccom.unh.edu>`_
 
-- `Chen Zhang <mailto:chen.zhang@noaa.gov>`_
+- `Paul Johnson <mailto:pjohnson@ccom.unh.edu>`_
+
+- `Jonathan Beaudoin <mailto:beaudoin@qps.nl>`_
 
 - `Matthew J. Wilson <mailto:matthew.wilson@noaa.gov>`_
 
 - `Jack Riley <mailto:jack.riley@noaa.gov>`_
+
+- `Sam Greenaway <mailto:samuel.greenaway@noaa.gov>`_
+
+- `Glen Rice <mailto:glen.rice@noaa.gov>`_
+
+- `Kevin Jerram <mailto:kjerram@ccom.unh.edu>`_
+
+- `Lindsay Gee <mailto:lindsayjgee@gmail.com>`_
 
 Feel free to contact us for comments and suggestions.
 
