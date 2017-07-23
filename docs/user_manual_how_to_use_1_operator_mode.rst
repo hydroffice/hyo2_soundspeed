@@ -419,7 +419,7 @@ This can be done by first select WOA09 atlas or RTOFS atlas under the *Input dat
 .. figure:: ./_static/editor_tab12.png
     :width: 360px
     :align: center
-    :height: 280px
+    :height: 260px
     :alt: data storage
     :figclass: align-center
 
@@ -489,7 +489,7 @@ Further extensions and augmentations will then use WOA/RTOFS (:numref:`editor_ta
 
 .. _editor_tab14:
 .. figure:: ./_static/editor_tab14.png
-    :width: 300px
+    :width: 280px
     :align: center
     :height: 160px
     :alt: reference cast
