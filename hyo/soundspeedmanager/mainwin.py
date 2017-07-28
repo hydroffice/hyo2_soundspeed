@@ -2,6 +2,7 @@ import math
 import os
 import sys
 import ssl
+import time
 from urllib.request import urlopen
 from urllib.error import URLError
 import socket
@@ -528,13 +529,21 @@ class MainWin(QtGui.QMainWindow):
                 if not self.tab_server.dataplots.is_drawn:
                     self.tab_server.dataplots.reset()
                     self.tab_server.dataplots.on_draw()
+
                 self.tab_server.dataplots.update_data()
                 self.tab_server.dataplots.redraw()
+
             else:  # user mode
                 if self.lib.has_mvp_to_process() or self.lib.has_sippican_to_process():
+                    # logger.debug("data to import from listeners")
                     # logger.debug("plot drawn: %s" % self.tab_editor.dataplots.is_drawn)
                     if not self.tab_editor.dataplots.is_drawn:
                         self.data_imported()
+
+                    if self.lib.cur.listener_completed and not self.lib.cur.listener_displayed:
+                        self.tab_editor.dataplots.on_draw()
+                        self.lib.cur.listener_displayed = True
+
                 self.tab_editor.dataplots.update_data()
                 self.tab_editor.dataplots.redraw()
 

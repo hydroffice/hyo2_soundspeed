@@ -249,6 +249,7 @@ class DataPlots(AbstractWidget):
         self.temp_ax.clear()
         self.temp_ax.set_xlabel('Temperature [deg C]')
         if self.lib.cur.woa09:
+
             self.temp_woa09, = self.temp_ax.plot(self.lib.cur.woa09.l[0].proc.temp,
                                                  self.lib.cur.woa09.l[0].proc.depth,
                                                  color=self.woa09_color,
@@ -269,6 +270,7 @@ class DataPlots(AbstractWidget):
                                                          label='WOA09 max'
                                                          )
         if self.lib.cur.woa13:
+
             self.temp_woa13, = self.temp_ax.plot(self.lib.cur.woa13.l[0].proc.temp,
                                                  self.lib.cur.woa13.l[0].proc.depth,
                                                  color=self.woa13_color,
@@ -289,6 +291,7 @@ class DataPlots(AbstractWidget):
                                                          label='WOA13 max'
                                                          )
         if self.lib.cur.rtofs:
+
             self.temp_rtofs, = self.temp_ax.plot(self.lib.cur.rtofs.l[0].proc.temp,
                                                  self.lib.cur.rtofs.l[0].proc.depth,
                                                  color=self.rtofs_color,

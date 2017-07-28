@@ -1107,7 +1107,10 @@ class NavToolbar(NavigationToolbar2QT):
                     a.legend(loc='lower left')
             else:
                 for a in self.canvas.figure.get_axes():
-                    a.legend_.remove()
+                    try:
+                        a.legend_.remove()
+                    except AttributeError:
+                        logger.info("missing legend to remove")
 
         self.dynamic_update()
 

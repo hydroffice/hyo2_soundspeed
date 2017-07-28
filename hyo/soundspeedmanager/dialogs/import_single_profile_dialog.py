@@ -194,6 +194,10 @@ class ImportSingleProfileDialog(AbstractDialog):
 
     def on_click_woa09(self):
         """Retrieve WOA09 data"""
+
+        self.progress.start(text="Retrieve WOA09")
+        self.progress.update(value=30)
+
         try:
             self.lib.retrieve_woa09()
 
@@ -201,12 +205,18 @@ class ImportSingleProfileDialog(AbstractDialog):
             msg = "Issue in importing the WOA09 data:\n\n> %s" % e
             # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
+            self.progress.end()
             return
 
         self.accept()
+        self.progress.end()
 
     def on_click_woa13(self):
         """Retrieve WOA13 data"""
+
+        self.progress.start(text="Retrieve WOA13")
+        self.progress.update(value=30)
+
         try:
             self.lib.retrieve_woa13()
 
@@ -214,12 +224,18 @@ class ImportSingleProfileDialog(AbstractDialog):
             msg = "Issue in importing the WOA13 data:\n\n> %s" % e
             # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
+            self.progress.end()
             return
 
         self.accept()
+        self.progress.end()
 
     def on_click_rtofs(self):
         """Retrieve RTOFS data"""
+
+        self.progress.start(text="Retrieve RTOFS")
+        self.progress.update(value=30)
+
         try:
             self.lib.retrieve_rtofs()
 
@@ -227,9 +243,11 @@ class ImportSingleProfileDialog(AbstractDialog):
             msg = "Issue in importing the RTOFS data:\n\n> %s" % e
             # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
+            self.progress.end()
             return
 
         self.accept()
+        self.progress.end()
 
     def on_click_sis(self):
         """Retrieve SIS data"""

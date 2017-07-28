@@ -73,10 +73,10 @@ class Mvp(AbstractListener):
                 self.got_footer = True
 
             if self.got_header and self.got_data and self.got_footer:
-                logger.info("going to assemble cast!")
-                logger.info("got lengths: %s %s %s"
+                logger.info("Assembling the cast!")
+                logger.info("- lengths: %s %s %s"
                          % (len(self.header), len(self.data_blocks), len(self.footer)))
-                logger.info("got num data blocks: %s" % self.num_data_blocks)
+                logger.info("- nr. of data blocks: %s" % self.num_data_blocks)
 
                 rdr = mvp.Mvp()
                 rdr.init_from_listener(self.header, self.data_blocks, self.footer, self.protocol, self.format)
@@ -95,22 +95,29 @@ class Mvp(AbstractListener):
                     self.prj.ssp.cur.woa09 = self.prj.atlases.woa09.query(lat=self.prj.ssp.cur.meta.latitude,
                                                                           lon=self.prj.ssp.cur.meta.longitude,
                                                                           datestamp=self.prj.ssp.cur.meta.utc_time)
+                    logger.debug("added WOA09")
 
                 if self.prj.use_woa13() and self.prj.has_woa13():
                     self.prj.ssp.cur.woa13 = self.prj.atlases.woa13.query(lat=self.prj.ssp.cur.meta.latitude,
                                                                           lon=self.prj.ssp.cur.meta.longitude,
                                                                           datestamp=self.prj.ssp.cur.meta.utc_time)
+                    logger.debug("added WOA13")
 
                 if self.prj.use_rtofs():
                     try:
                         self.prj.ssp.cur.rtofs = self.prj.atlases.rtofs.query(lat=self.prj.ssp.cur.meta.latitude,
                                                                               lon=self.prj.ssp.cur.meta.longitude,
                                                                               datestamp=self.prj.ssp.cur.meta.utc_time)
+                        logger.debug("added RTOFS")
+
                     except RuntimeError:
                         self.prj.ssp.cur.rtofs = None
                         logger.warning("unable to retrieve RTOFS data")
 
+                self.prj.ssp.cur.listener_completed = True
+
         elif self.protocol == mvp.Mvp.protocols["UNDEFINED"]:
+
             logger.info("going to parse with UNDEFINED protocol!!")
             logger.info("the data is %s" % self.data)
             self.data_blocks.append(self.data)
@@ -138,6 +145,8 @@ class Mvp(AbstractListener):
                 except RuntimeError:
                     self.prj.ssp.cur.rtofs = None
                     logger.warning("unable to retrieve RTOFS data")
+
+            self.prj.ssp.cur.listener_completed = True
 
         self.data = None
         self.new_ssp.set()

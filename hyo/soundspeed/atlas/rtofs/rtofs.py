@@ -14,6 +14,7 @@ from hyo.soundspeed.profile.profile import Profile
 from hyo.soundspeed.profile.profilelist import ProfileList
 from hyo.soundspeed.profile.dicts import Dicts
 from hyo.soundspeed.profile.oceanography import Oceanography as Oc
+from hyo.soundspeed.base.progress.cli_progress import CliProgress
 
 
 class Rtofs(AbstractAtlas):
@@ -113,8 +114,6 @@ class Rtofs(AbstractAtlas):
         if lon < self._lon_0:  # Make all longitudes safe
             lon += 360.0
 
-        self.prj.progress.start(text="Retrieve RTOFS data", is_disabled=server_mode)
-
         longitudes = np.zeros((self._search_window, self._search_window))
         if (lon_e_idx < self._lon.size) and (lon_w_idx >= 0):
             # logger.info("safe case")
@@ -125,9 +124,11 @@ class Rtofs(AbstractAtlas):
             # Set 'unfilled' elements to NANs (BUT when the entire array has valid data, it returns numpy.ndarray)
             if isinstance(t, np.ma.core.MaskedArray):
                 t_mask = t.mask
+                t._sharedmask = False
                 t[t_mask] = np.nan
             if isinstance(s, np.ma.core.MaskedArray):
                 s_mask = s.mask
+                s._sharedmask = False
                 s[s_mask] = np.nan
 
             lons = self._lon[lon_w_idx:lon_e_idx + 1]
@@ -148,9 +149,11 @@ class Rtofs(AbstractAtlas):
             s_left = self._file_sal.variables['salinity'][self._day_idx, :, lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
             # Set 'unfilled' elements to NANs (BUT when the entire array has valid data, it returns numpy.ndarray)
             if isinstance(t_left, np.ma.core.MaskedArray):
+
                 t_mask = t_left.mask
                 t_left[t_mask] = np.nan
             if isinstance(s_left, np.ma.core.MaskedArray):
+
                 s_mask = s_left.mask
                 s_left[s_mask] = np.nan
 
@@ -169,14 +172,17 @@ class Rtofs(AbstractAtlas):
             s_right = self._file_sal.variables['salinity'][self._day_idx, :, lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
             # Set 'unfilled' elements to NANs (BUT when the entire array has valid data, it returns numpy.ndarray)
             if isinstance(t_right, np.ma.core.MaskedArray):
+
                 t_mask = t_right.mask
                 t_right[t_mask] = np.nan
             if isinstance(s_right, np.ma.core.MaskedArray):
+
                 s_mask = s_right.mask
                 s_right[s_mask] = np.nan
 
             lons_right = self._lon[lon_w_idx:lon_e_idx + 1]
             for i in range(self._search_window):
+
                 longitudes[i, lons_left.size:self._search_window] = lons_right
 
             # merge data
@@ -187,17 +193,18 @@ class Rtofs(AbstractAtlas):
             s[:, :, 0:lons_left.size] = s_left
             s[:, :, lons_left.size:self._search_window] = s_right
 
-        # logger.info("done data retrieval > calculating nodes distance")
-        self.prj.progress.update(40)
-
         # Calculate distances from requested position to each of the grid node locations
         distances = np.zeros((self._d.size, self._search_window, self._search_window))
         latitudes = np.zeros((self._search_window, self._search_window))
         lats = self._lat[lat_s_idx:lat_n_idx + 1]
         for i in range(self._search_window):
+
             latitudes[:, i] = lats
+
         for i in range(self._search_window):
+
             for j in range(self._search_window):
+
                 dist = self.g.distance(longitudes[i, j], latitudes[i, j], lon, lat)
                 distances[:, i, j] = dist
                 # logger.info("node %s, pos: %3.1f, %3.1f, dist: %3.1f"
@@ -209,8 +216,6 @@ class Rtofs(AbstractAtlas):
         s_mask = np.isnan(s)
         distances[s_mask] = np.nan
 
-        self.prj.progress.update(70)
-
         # Spin through all the depth levels
         temp_pot = np.zeros(self._d.size)
         temp_in_situ = np.zeros(self._d.size)
@@ -218,6 +223,7 @@ class Rtofs(AbstractAtlas):
         sal = np.zeros(self._d.size)
         num_values = 0
         for i in range(self._d.size):
+
             t_level = t[i]
             s_level = s[i]
             d_level = distances[i]
@@ -251,8 +257,8 @@ class Rtofs(AbstractAtlas):
             num_values += 1
 
         if num_values == 0:
+
             logger.info("no data from lookup!")
-            self.prj.progress.end()
             return None
 
         ind = np.nanargmin(distances[0])
@@ -261,8 +267,6 @@ class Rtofs(AbstractAtlas):
         lon_out = longitudes[ind2]
         while lon_out > 180.0:
             lon_out -= 360.0
-
-        self.prj.progress.update(90)
 
         # Make a new SV object to return our query in
         ssp = Profile()
@@ -283,7 +287,6 @@ class Rtofs(AbstractAtlas):
         profiles = ProfileList()
         profiles.append_profile(ssp)
 
-        self.prj.progress.end()
         return profiles
 
     def clear_data(self):
@@ -319,12 +322,15 @@ class Rtofs(AbstractAtlas):
             conn = client.HTTPConnection(p.netloc)
             conn.request('HEAD', p.path)
             resp = conn.getresponse()
+
         except socket.error as e:
             logger.warning("while checking %s, %s" % (url, e))
             return False
+
         except socket.gaierror as e:
             logger.warning("while checking %s, %s" % (url, e))
             return False
+
         return resp.status < 400
 
     @staticmethod
@@ -349,10 +355,12 @@ class Rtofs(AbstractAtlas):
 
     def _download_files(self, datestamp, server_mode=False):
         """Actually, just try to connect with the remote files
-
+        
         For a given queried date, we may have to use the forecast from the previous
         day since the current nowcast doesn't hold data for today (solved?)
         """
+        progress = CliProgress()
+
         if not isinstance(datestamp, date):
             raise RuntimeError("invalid date passed: %s" % type(datestamp))
 
@@ -365,7 +373,7 @@ class Rtofs(AbstractAtlas):
                 logger.info("cleaning data: %s %s" % (self._last_loaded_day, datestamp))
                 self.clear_data()
 
-        self.prj.progress.start(text="Download RTOFS", is_disabled=server_mode)
+        progress.start(text="Download RTOFS", is_disabled=server_mode)
 
         # check if the data are available on the RTOFS server
         url_ck_temp, url_ck_sal = self._build_check_urls(datestamp)
@@ -378,31 +386,32 @@ class Rtofs(AbstractAtlas):
 
                 logger.warning('unable to retrieve data from RTOFS server for date: %s and next day' % datestamp)
                 self.clear_data()
-                self.prj.progress.end()
+                progress.end()
                 return False
-        self.prj.progress.update(30)
+
+        progress.update(30)
 
         # Try to download the data grid grids
         url_temp, url_sal = self._build_opendap_urls(datestamp)
         # logger.debug('downloading RTOFS data for %s' % datestamp)
         try:
             self._file_temp = Dataset(url_temp)
-            self.prj.progress.update(60)
+            progress.update(60)
             self._file_sal = Dataset(url_sal)
-            self.prj.progress.update(80)
+            progress.update(80)
             self._day_idx = 2  # usually 3 1-day steps
 
         except (RuntimeError, IOError):
             logger.warning("unable to access data: %s" % datestamp.strftime("%Y%m%d"))
             self.clear_data()
-            self.prj.progress.end()
+            progress.end()
             return False
 
         # success!
         self._has_data_loaded = True
         self._last_loaded_day = datestamp
         # logger.info("loaded data for %s" % datestamp)
-        self.prj.progress.end()
+        progress.end()
         return True
 
     def _grid_coords(self, lat, lon, datestamp, server_mode=False):

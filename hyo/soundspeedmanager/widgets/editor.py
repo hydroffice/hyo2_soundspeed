@@ -38,6 +38,8 @@ class Editor(AbstractWidget):
         self.clear_act.setShortcut('Alt+C')
         # noinspection PyUnresolvedReferences
         self.clear_act.triggered.connect(self.on_clear_data)
+        # set hidden, but the whole action is candidate to deletion
+        self.clear_act.setVisible(False)
         self.input_bar.addAction(self.clear_act)
         # set ref
         self.set_ref_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'ref.png')), 'Reference cast', self)
@@ -205,7 +207,7 @@ class Editor(AbstractWidget):
         logger.debug('user wants to extend the profile')
 
         if not self.lib.extend_profile():
-            msg = "Issue in extending the profile"
+            msg = "Issue in extending the profile.\n\nCheck in the settings if the selected atlas source is active!"
             # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Profile extension", msg, QtGui.QMessageBox.Ok)
             return

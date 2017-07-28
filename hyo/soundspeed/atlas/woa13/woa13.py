@@ -187,12 +187,10 @@ class Woa13(AbstractAtlas):
             logger.error("invalid query: %s @ (%.6f, %.6f)" % (datestamp.strftime("%Y%m%d"), lon, lat))
             return None
 
-        self.prj.progress.start(text="Retrieve WOA13 data", is_disabled=server_mode)
-
         if not self.has_data_loaded:
             if not self.load_grids():
+                logger.error("No data")
                 return None
-        self.prj.progress.update(20)
 
         self.calc_indices(month=datestamp.month)
 
@@ -200,8 +198,6 @@ class Woa13(AbstractAtlas):
         lat_base_idx, lon_base_idx = self.grid_coords(lat=lat, lon=lon, server_mode=server_mode)
         lat_offsets = range(lat_base_idx - self.search_radius, lat_base_idx + self.search_radius + 1)
         lon_offsets = range(lon_base_idx - self.search_radius, lon_base_idx + self.search_radius + 1)
-
-        self.prj.progress.update(40)
 
         # Search nodes surrounding the requested position to find the closest non-land
         t = np.zeros(self.num_levels)
@@ -231,11 +227,13 @@ class Woa13(AbstractAtlas):
 
                 # Check to see if we're at sea or on land
                 if self.landsea[this_lat_index][this_lon_index] == 1:
-                    # logger.debug("at land: %s, %s" % (this_lat_index, this_lon_index))
+
+                    logger.debug("at land: %s, %s" % (this_lat_index, this_lon_index))
                     # from matplotlib import pyplot
                     # pyplot.imshow(self.landsea, origin='lower')
                     # pyplot.scatter([this_lon_index], [this_lat_index], c='r', s=40)
                     # pyplot.show()
+
                     continue
 
                 # calculate the distance to the grid node
@@ -303,12 +301,9 @@ class Woa13(AbstractAtlas):
 
                 num_visited += 1
 
-        # logger.debug("visited: %s" % num_visited)
-        self.prj.progress.update(90)
-
         if (lat_idx == -1) and (lon_idx == -1):
+
             logger.info("possible request on land")
-            self.prj.progress.end()
             return None
 
         lat_out = self.lat[lat_idx]
@@ -335,9 +330,11 @@ class Woa13(AbstractAtlas):
         # - min/max
         # Isolate realistic values
         for i in range(t_min.size):
+
             if dist_t_sd[i] == 99999999 or dist_s_sd[i] == 99999999:
                 num_values = i
                 break
+
         # -- min
         ssp_min = Profile()
         ssp_min.meta.sensor_type = Dicts.sensor_types['Synthetic']
@@ -384,7 +381,6 @@ class Woa13(AbstractAtlas):
 
         # logger.debug("retrieved: %s" % profiles)
 
-        self.prj.progress.end()
         return profiles
 
     def clear_data(self):

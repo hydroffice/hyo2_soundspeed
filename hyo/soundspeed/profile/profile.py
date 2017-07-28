@@ -29,6 +29,10 @@ class Profile(object):
         self.woa13 = None
         self.rtofs = None
 
+        # variable for listener since the data are populated in another thread
+        self.listener_completed = False
+        self.listener_displayed = False
+
     def __repr__(self):
         msg = "<Profile>\n"
         msg += "%s" % self.meta
@@ -600,7 +604,10 @@ class Profile(object):
     def extend_profile(self, extender, ext_type):
         """ Use the extender samples to extend the profile """
         logger.debug("extension source type: %s" % Dicts.first_match(Dicts.sources, ext_type))
-        extender.cur.proc.source[:] = ext_type
+        try:
+            extender.cur.proc.source[:] = ext_type
+        except AttributeError:
+            return False
 
         # find the max valid depth in the current profile
         if self.proc.num_samples > 0:

@@ -1364,6 +1364,7 @@ class SoundSpeedLibrary(object):
 
     def transmit_ssp(self):
         """Add the transducer sound speed to the current profile"""
+
         if not self.has_ssp():
             logger.warning("no profile!")
             return False

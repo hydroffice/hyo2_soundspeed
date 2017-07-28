@@ -27,6 +27,8 @@ class ClientList(object):
         prog_quantum = 100 / (len(self.clients) + 1)
         for client in self.clients:
 
+            logger.debug("****")
+
             # clean previously received profile from SIS
             if client.protocol == "SIS":
                 prj.listeners.sis.ssp = None

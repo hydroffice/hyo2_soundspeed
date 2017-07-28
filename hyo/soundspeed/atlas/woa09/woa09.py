@@ -183,13 +183,9 @@ class Woa09(AbstractAtlas):
         if lon < 0:  # Make all longitudes positive
             lon += 360.0
 
-        self.prj.progress.start(text="Retrieve WOA09 data", is_disabled=server_mode)
-
         if not self.has_data_loaded:
             if not self.load_grids():
-                self.prj.progress.end()
                 return None
-        self.prj.progress.update(20)
 
         # calculate month and season indices (based on julian day)
         jd = int(datestamp.strftime("%j"))
@@ -200,8 +196,6 @@ class Woa09(AbstractAtlas):
         lat_base_idx, lon_base_idx = self.grid_coords(lat, lon, server_mode=server_mode)
         lat_offsets = range(lat_base_idx - self.search_radius, lat_base_idx + self.search_radius + 1)
         lon_offsets = range(lon_base_idx - self.search_radius, lon_base_idx + self.search_radius + 1)
-
-        self.prj.progress.update(40)
 
         # Search nodes surrounding the requested position to find the closest non-land
         t = np.zeros(self.num_levels)
@@ -230,7 +224,7 @@ class Woa09(AbstractAtlas):
 
                 # Check to see if we're at sea or on land
                 if self.landsea[this_lat_index][this_lon_index] == 1:
-                    # logger.debug("at land: %s, %s" % (this_lat_index, this_lon_index))
+                    logger.debug("at land: %s, %s" % (this_lat_index, this_lon_index))
                     continue
 
                 # calculate the distance to the grid node
@@ -292,11 +286,10 @@ class Woa09(AbstractAtlas):
                 num_visited += 1
 
         # logger.debug("visited: %s" % num_visited)
-        self.prj.progress.update(90)
 
         if (lat_idx == -1) and (lon_idx == -1):
+
             logger.info("possible request on land")
-            self.prj.progress.end()
             return None
 
         lat_out = self.t_monthly.variables['lat'][lat_idx]
@@ -323,9 +316,12 @@ class Woa09(AbstractAtlas):
         # - min/max
         # Isolate realistic values
         for i in range(t_min.size):
+
             if dist_t_sd[i] == 99999999 or dist_s_sd[i] == 99999999:
+
                 num_values = i
                 break
+
         # -- min
         ssp_min = Profile()
         ssp_min.meta.sensor_type = Dicts.sensor_types['Synthetic']
@@ -343,6 +339,7 @@ class Woa09(AbstractAtlas):
             ssp_min.init_sis()
         else:
             ssp_min = None
+
         # -- max
         ssp_max = Profile()
         ssp_max.meta.sensor_type = Dicts.sensor_types['Synthetic']
@@ -369,7 +366,6 @@ class Woa09(AbstractAtlas):
             profiles.append_profile(ssp_max)
         profiles.current_index = 0
 
-        self.prj.progress.end()
         return profiles
 
     def clear_data(self):
