@@ -2,7 +2,6 @@ import math
 import os
 import sys
 import ssl
-import time
 from urllib.request import urlopen
 from urllib.error import URLError
 import socket

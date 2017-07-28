@@ -355,7 +355,6 @@ class Rtofs(AbstractAtlas):
 
     def _download_files(self, datestamp, server_mode=False):
         """Actually, just try to connect with the remote files
-        
         For a given queried date, we may have to use the forecast from the previous
         day since the current nowcast doesn't hold data for today (solved?)
         """
