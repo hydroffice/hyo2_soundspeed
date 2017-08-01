@@ -98,7 +98,7 @@ class SisProcess(Process):
             if (count % 100) == 0:
                 logger.debug("#%04d: running" % count)
 
-            time.sleep(0.1)
+            time.sleep(0.001)
             count += 1
 
         logger.debug("%s end" % self.name)

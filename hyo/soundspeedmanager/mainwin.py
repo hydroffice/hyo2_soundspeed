@@ -21,6 +21,7 @@ from hyo.soundspeedmanager.qt_callbacks import QtCallbacks
 from hyo.soundspeedmanager.widgets.editor import Editor
 from hyo.soundspeedmanager.widgets.database import Database
 from hyo.soundspeedmanager.widgets.seacat import Seacat
+from hyo.soundspeedmanager.widgets.surfacesoundspeed import SurfaceSoundSpeed
 from hyo.soundspeedmanager.widgets.server import Server
 from hyo.soundspeedmanager.widgets.refraction import Refraction
 from hyo.soundspeedmanager.widgets.settings import Settings
@@ -124,19 +125,24 @@ class MainWin(QtGui.QMainWindow):
         self.tabs.setTabToolTip(idx, "SeaCAT")
         if not self.lib.setup.noaa_tools:
             self.tab_seacat.setDisabled(True)
+        # surface sound speed
+        self.tab_sss = SurfaceSoundSpeed(lib=self.lib, main_win=self)
+        idx = self.tabs.insertTab(3, self.tab_sss,
+                                  QtGui.QIcon(os.path.join(self.here, 'media', 'surfacesoundspeed.png')), "")
+        self.tabs.setTabToolTip(idx, "Surface Sound Speed")
         # server
         self.tab_server = Server(lib=self.lib, main_win=self)
-        idx = self.tabs.insertTab(3, self.tab_server,
+        idx = self.tabs.insertTab(4, self.tab_server,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'server.png')), "")
         self.tabs.setTabToolTip(idx, "Synthetic Profile Server")
         # refraction
         self.tab_refraction = Refraction(lib=self.lib, main_win=self)
-        idx = self.tabs.insertTab(4, self.tab_refraction,
+        idx = self.tabs.insertTab(5, self.tab_refraction,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'refraction.png')), "")
         self.tabs.setTabToolTip(idx, "Refraction Monitor")
         # setup
         self.tab_setup = Settings(lib=self.lib, main_win=self)
-        idx = self.tabs.insertTab(5, self.tab_setup,
+        idx = self.tabs.insertTab(6, self.tab_setup,
                                   QtGui.QIcon(os.path.join(self.here, 'media', 'settings.png')), "")
         self.tabs.setTabToolTip(idx, "Setup")
         # info
@@ -300,7 +306,7 @@ class MainWin(QtGui.QMainWindow):
     def check_sis(self):
         if self.lib.use_sis():
             if not self.lib.listen_sis():
-                msg = 'Unable to listening SIS.'
+                msg = 'Unable to listen SIS.'
                 # noinspection PyCallByClass
                 QtGui.QMessageBox.warning(self, "Sound Speed Manager - SIS", msg,
                                           QtGui.QMessageBox.Ok)

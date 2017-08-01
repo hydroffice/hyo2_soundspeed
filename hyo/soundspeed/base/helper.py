@@ -108,6 +108,15 @@ def info_libs():
     msg += "matplotlib: %s\n" % vrs
 
     try:
+        from mpl_toolkits.basemap import __version__ as basemap_version
+
+    except ImportError:
+        basemap_version = None
+
+    vrs = basemap_version
+    msg += "basemap: %s\n" % vrs
+
+    try:
         from PySide import __version__ as pyside_version
 
     except ImportError:
