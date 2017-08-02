@@ -8,7 +8,7 @@ from hyo.soundspeed.base.gdal_aux import GdalAux
 from hyo.soundspeed.profile.dicts import Dicts
 
 
-class ExportDb(object):
+class ExportDb:
     """Class that exports sound speed db data"""
 
     def __init__(self, db):

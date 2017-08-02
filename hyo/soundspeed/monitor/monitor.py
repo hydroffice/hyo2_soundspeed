@@ -1,8 +1,13 @@
 from threading import Timer, Lock
 import math
+import os
+import datetime
 import logging
 
 logger = logging.getLogger(__name__)
+
+from hyo.soundspeed.monitor.db import MonitorDb
+from hyo.soundspeed.base.helper import explore_folder
 
 
 class SoundSpeedMonitor:
@@ -27,6 +32,16 @@ class SoundSpeedMonitor:
 
         self._lock = Lock()
         self._external_lock = False
+
+    @property
+    def output_folder(self):
+        out_folder = os.path.join(self._prj.data_folder, "monitor")
+        if not os.path.exists(out_folder):
+            os.makedirs(out_folder)
+        return out_folder
+
+    def open_output_folder(self):
+        explore_folder(self.output_folder)
 
     def lock_data(self):
         self._lock.acquire()
@@ -78,7 +93,6 @@ class SoundSpeedMonitor:
 
     def monitoring(self):
         if not self._active:
-            # TODO: store the data on database
             self._times.clear()
             self._lats.clear()
             self._longs.clear()
@@ -95,9 +109,11 @@ class SoundSpeedMonitor:
         msg = self._retrieve_from_sis()
 
         if len(msg) > 0:
+
             if (self._counter % 1) == 0:
                 logger.debug("#%04d: monitor: %s" % (self._counter, msg))
             self._counter += 1
+
         Timer(self._timing, self.monitoring).start()
 
     def _retrieve_from_sis(self):
@@ -156,6 +172,9 @@ class SoundSpeedMonitor:
         depth = self._prj.listeners.sis.xyz88.mean_depth
         msg += '%.1f m' % depth
 
+        db = MonitorDb(projects_folder=self.output_folder, base_name=self.base_name)
+        db.add_point(timestamp=timestamp, lat=latitude, long=longitude, tss=tss, draft=draft, avg_depth=depth)
+
         self._lock.acquire()
         self._times.append(timestamp)
         self._lats.append(latitude)
@@ -173,6 +192,7 @@ class SoundSpeedMonitor:
             self._pause = False
             return
 
+        self.base_name = self._prj.current_project + "_" + datetime.datetime.now().strftime("%d%m%Y_%H%M%S")
         self._active = True
         self._pause = False
         self._counter = 0
