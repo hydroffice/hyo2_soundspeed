@@ -13,6 +13,7 @@ from hyo.soundspeedmanager.qt_progress import QtProgress
 class AbstractWidget(QtGui.QMainWindow):
 
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
+    media = os.path.abspath(os.path.join(here, os.pardir, 'media')).replace("\\", "/")
 
     def __init__(self, main_win, lib):
         QtGui.QMainWindow.__init__(self)
@@ -23,7 +24,7 @@ class AbstractWidget(QtGui.QMainWindow):
 
         # set palette
         style_info = QtCore.QFileInfo(os.path.join(self.here, 'styles', 'widget.stylesheet'))
-        style_content = open(style_info.filePath()).read()
+        style_content = open(style_info.filePath()).read().replace("LOCAL_PATH", self.media)
         self.setStyleSheet(style_content)
 
         self.setContentsMargins(0, 0, 0, 0)

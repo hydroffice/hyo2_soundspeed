@@ -578,6 +578,7 @@ class MainWin(QtGui.QMainWindow):
         if reply == QtGui.QMessageBox.Yes:
             event.accept()
             self.lib.close()
+            self.tab_sss.stop_plotting()
             super(MainWin, self).closeEvent(event)
         else:
             event.ignore()

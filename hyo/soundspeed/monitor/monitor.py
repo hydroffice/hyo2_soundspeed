@@ -1,4 +1,4 @@
-from threading import Timer
+from threading import Timer, Lock
 import math
 import logging
 
@@ -18,12 +18,73 @@ class SoundSpeedMonitor:
         self._counter = 0
         self._last_dgtime = None
 
+        self._times = list()
+        self._lats = list()
+        self._longs = list()
+        self._tsss = list()
+        self._drafts = list()
+        self._depths = list()
+
+        self._lock = Lock()
+        self._external_lock = False
+
+    def lock_data(self):
+        self._lock.acquire()
+        self._external_lock = True
+
+    def unlock_data(self):
+        self._lock.release()
+        self._external_lock = False
+
+    @property
+    def times(self):
+        if not self._external_lock:
+            raise RuntimeError("Accessing resources without locking them!")
+        return self._times
+
+    @property
+    def lats(self):
+        if not self._external_lock:
+            raise RuntimeError("Accessing resources without locking them!")
+        return self._lats
+
+    @property
+    def longs(self):
+        if not self._external_lock:
+            raise RuntimeError("Accessing resources without locking them!")
+        return self._longs
+
+    @property
+    def tsss(self):
+        if not self._external_lock:
+            raise RuntimeError("Accessing resources without locking them!")
+        return self._tsss
+
+    @property
+    def drafts(self):
+        if not self._external_lock:
+            raise RuntimeError("Accessing resources without locking them!")
+        return self._drafts
+
+    @property
+    def depths(self):
+        if not self._external_lock:
+            raise RuntimeError("Accessing resources without locking them!")
+        return self._depths
+
     @property
     def active(self):
         return self._active
 
     def monitoring(self):
         if not self._active:
+            # TODO: store the data on database
+            self._times.clear()
+            self._lats.clear()
+            self._longs.clear()
+            self._tsss.clear()
+            self._drafts.clear()
+            self._depths.clear()
             return
 
         if self._pause:
@@ -61,8 +122,9 @@ class SoundSpeedMonitor:
             if self._last_dgtime >= self._prj.listeners.sis.xyz88.dg_time:
                 return str()
         # - add string
-        msg += "%s, " % (self._prj.listeners.sis.xyz88.dg_time.strftime("%H:%M:%S.%f"))
-        self._last_dgtime = self._prj.listeners.sis.xyz88.dg_time
+        timestamp = self._prj.listeners.sis.xyz88.dg_time
+        self._last_dgtime = timestamp
+        msg += "%s, " % timestamp.strftime("%H:%M:%S.%f")
 
         # position
         # - latitude
@@ -85,11 +147,23 @@ class SoundSpeedMonitor:
         msg += "(%s, %s), " % (lat_str, lon_str)
 
         # - tss
-        msg += '%.2f m/s,  ' % self._prj.listeners.sis.xyz88.sound_speed
+        tss = self._prj.listeners.sis.xyz88.sound_speed
+        msg += '%.2f m/s,  ' % tss
         # - draft
-        msg += '%.1f m, ' % self._prj.listeners.sis.xyz88.transducer_draft
+        draft = self._prj.listeners.sis.xyz88.transducer_draft
+        msg += '%.1f m, ' % draft
         # - mean depth
-        msg += '%.1f m' % self._prj.listeners.sis.xyz88.mean_depth
+        depth = self._prj.listeners.sis.xyz88.mean_depth
+        msg += '%.1f m' % depth
+
+        self._lock.acquire()
+        self._times.append(timestamp)
+        self._lats.append(latitude)
+        self._longs.append(longitude)
+        self._tsss.append(tss)
+        self._drafts.append(draft)
+        self._depths.append(depth)
+        self._lock.release()
 
         return msg
 
@@ -115,3 +189,9 @@ class SoundSpeedMonitor:
         self._active = False
         self._pause = False
         logger.debug("stop monitoring")
+
+    def nr_of_samples(self):
+        self._lock.acquire()
+        nr = len(self._times)
+        self._lock.release()
+        return nr

@@ -32,3 +32,32 @@ QTableWidget::item
     padding: 3px;
     outline: 0;
 }
+
+
+QDockWidget
+{
+    border: 1 px solid  #403f3f;
+    titlebar-close-icon: url(LOCAL_PATH/close.png);
+    titlebar-normal-icon: url(LOCAL_PATH/undock.png);
+    color: #aaaaaa;
+}
+
+QDockWidget::title
+{
+    text-align: left;
+    background:  #f6f6f6;
+    padding-left: 5px;
+}
+
+QDockWidget::close-button:hover, QDockWidget::float-button:hover
+{
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 10);
+}
+
+QDockWidget::close-button:pressed, QDockWidget::float-button:pressed
+{
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 10);
+    padding: 1px -1px -1px 1px;
+}
