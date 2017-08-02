@@ -115,10 +115,12 @@ class SurfaceSoundSpeed(AbstractWidget):
                                          color=self.valid_color,
                                          linestyle='--',
                                          marker='o',
-                                         label='TSS'
+                                         label='TSS',
+                                         ms=3
                                          )
             self.tss_ax.set_ylim(1450.0, 1550.0)
             self.tss_ax.set_xlim(datetime.now(), datetime.now() + timedelta(seconds=60))
+            self.tss_ax.grid(True)
             # dates = matplotlib.dates.date2num(list_of_datetimes)
             self.nv1 = NavToolBar(canvas=self.c1, parent=self.w1, coordinates=True)
             self.nv1.setIconSize(QtCore.QSize(14, 14))
@@ -149,10 +151,12 @@ class SurfaceSoundSpeed(AbstractWidget):
                                              color=self.draft_color,
                                              linestyle='--',
                                              marker='o',
-                                             label='TSS'
+                                             label='TSS',
+                                             ms=3
                                              )
             self.draft_ax.set_ylim(10.0, 0.0)
             self.draft_ax.set_xlim(datetime.now(), datetime.now() + timedelta(seconds=60))
+            self.draft_ax.grid(True)
             self.nv2 = NavToolBar(canvas=self.c2, parent=self.w2, coordinates=True)
             self.nv2.setIconSize(QtCore.QSize(14, 14))
         vbox.addWidget(self.c2)
@@ -168,6 +172,7 @@ class SurfaceSoundSpeed(AbstractWidget):
         vbox = QtGui.QVBoxLayout(self.w3)
         self.w3.setLayout(vbox)
         with rc_context(self.rc_context):
+
             self.f3 = Figure(figsize=self.f_sz, dpi=self.f_dpi)
             self.f3.patch.set_alpha(0.0)
             self.c3 = FigureCanvas(self.f3)
@@ -178,14 +183,21 @@ class SurfaceSoundSpeed(AbstractWidget):
             self.map = Basemap(projection='kav7', lon_0=0, resolution='c', ax=self.map_ax)
             self.map.drawcoastlines(zorder=1)
             self.map.fillcontinents(color='lightgray', zorder=1)
-            self.map.drawparallels(np.arange(-90., 120., 30.))
-            self.map.drawmeridians(np.arange(0., 360., 60.))
+            self.map.drawparallels(np.arange(-90., 120., 30.), color="#cccccc", labels=[False, True, True, False])
+            self.map.drawmeridians(np.arange(0., 360., 60.), color="#cccccc", labels=[True, False, False, True])
             self.map_colormap = cm.get_cmap('gist_rainbow')
-            self.map_points = self.map.scatter([], [], c=[], zorder=2, s=30,
+            self.map_points = self.map.scatter([], [], c=[], zorder=2, s=20,
                                                vmin=1450.0, vmax=1550.0, cmap=self.map_colormap)
+
+            def format_coord(x, y):
+                pair = self.map(x, y, inverse=True)
+                return '%.6f, %.6f' % pair
+
+            self.map_ax.format_coord = format_coord
             self.f3_colorbar = None
             self.nv3 = NavToolBar(canvas=self.c3, parent=self.w3, coordinates=True)
             self.nv3.setIconSize(QtCore.QSize(14, 14))
+
         vbox.addWidget(self.c3)
         vbox.addWidget(self.nv3)
         vbox.setContentsMargins(0, 0, 0, 0)
@@ -216,7 +228,8 @@ class SurfaceSoundSpeed(AbstractWidget):
         self.tss.set_ydata([])
         self.draft.set_xdata([])
         self.draft.set_ydata([])
-        self.map_points.set_offsets([[], []])
+        self.map_points = self.map.scatter([], [], c=[], zorder=2, s=20,
+                                           vmin=1450.0, vmax=1550.0, cmap=self.map_colormap)
 
         self.c1.draw()
         self.c2.draw()
@@ -235,15 +248,17 @@ class SurfaceSoundSpeed(AbstractWidget):
         self.draft.set_ydata(self.lib.monitor.drafts)
         xs, ys = self.map(self.lib.monitor.longs, self.lib.monitor.lats)
         self.map_points = self.map.scatter(xs, ys,
-                                           zorder=2, s=30,
+                                           zorder=2, s=20,
                                            c=self.lib.monitor.tsss,
                                            vmin=(min(self.lib.monitor.tsss) - 0.1),
                                            vmax=(max(self.lib.monitor.tsss) + 0.1),
-                                           cmap=self.map_colormap)
+                                           cmap=self.map_colormap, alpha=0.4)
         if self.f3_colorbar is None:
             with rc_context(self.rc_context):
-                self.f3_colorbar = self.f3.colorbar(self.map_points, ax=self.map_ax,
+                self.f3_colorbar = self.f3.colorbar(self.map_points, ax=self.map_ax, aspect=50,
                                                     orientation='horizontal', format='%.1f')
+                self.f3_colorbar.solids.set(alpha=1)
+                self.f3.tight_layout()
         self.f3_colorbar.set_clim(vmin=(min(self.lib.monitor.tsss) - 0.1),
                                   vmax=(max(self.lib.monitor.tsss) + 0.1))
 
