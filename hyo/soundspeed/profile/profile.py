@@ -655,16 +655,16 @@ class Profile(object):
         self.proc.num_samples = self.proc.depth.size
 
         # update processing info
-        if ext_type == Dicts.atlases['ref']:
+        if ext_type == Dicts.sources['ref_ext']:
             self.modify_proc_info(Dicts.proc_user_infos['EXT_REF'])
 
-        elif ext_type == Dicts.atlases['RTOFS']:
+        elif ext_type == Dicts.sources['rtofs_ext']:
             self.modify_proc_info(Dicts.proc_user_infos['EXT_RTOFS'])
 
-        elif ext_type == Dicts.atlases['WOA09']:
+        elif ext_type == Dicts.sources['woa09_ext']:
             self.modify_proc_info(Dicts.proc_user_infos['EXT_WOA09'])
 
-        elif ext_type == Dicts.atlases['WOA13']:
+        elif ext_type == Dicts.sources['woa13_ext']:
             self.modify_proc_info(Dicts.proc_user_infos['EXT_WOA13'])
 
         else:
