@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 from hyo.soundspeedmanager.widgets.widget import AbstractWidget
 
 
-class SurfaceSoundSpeed(AbstractWidget):
+class SurveyDataMonitor(AbstractWidget):
 
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.abspath(os.path.join(here, os.pardir, 'media')).replace("\\", "/")
@@ -45,20 +45,24 @@ class SurfaceSoundSpeed(AbstractWidget):
         'backend.qt4': 'PySide'
     }
 
-    def __init__(self, main_win, lib, timing=3.0):
+    def __init__(self, main_win, lib, timing=2.0):
         AbstractWidget.__init__(self, main_win=main_win, lib=lib)
-        self._timing = timing
+        self._plotting_timing = timing
 
-        self._active = False
-        self._pause = False
+        self._plotting_active = False
+        self._plotting_pause = False
         self._last_nr_samples = 0
 
-        self.monitor_bar = self.addToolBar('Monitor')
+        # ###    ACTIONS   ###
+
+        # ### Data Monitor ###
+
+        self.monitor_bar = self.addToolBar('Data Monitor')
         self.monitor_bar.setIconSize(QtCore.QSize(40, 40))
 
         # start
         self.start_monitor_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'start.png')),
-                                               'Start monitoring the surface sound speed', self)
+                                               'Start monitoring survey data', self)
         self.start_monitor_act.setShortcut('Alt+M')
         # noinspection PyUnresolvedReferences
         self.start_monitor_act.triggered.connect(self.on_start_monitor)
@@ -66,7 +70,7 @@ class SurfaceSoundSpeed(AbstractWidget):
 
         # pause
         self.pause_monitor_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'pause.png')),
-                                               'Pause monitoring the surface sound speed', self)
+                                               'Pause monitoring survey data', self)
         self.pause_monitor_act.setShortcut('Alt+P')
         # noinspection PyUnresolvedReferences
         self.pause_monitor_act.triggered.connect(self.on_pause_monitor)
@@ -75,33 +79,64 @@ class SurfaceSoundSpeed(AbstractWidget):
 
         # stop
         self.stop_monitor_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'stop.png')),
-                                              'Stop monitoring the surface sound speed', self)
+                                              'Stop monitoring survey data', self)
         self.stop_monitor_act.setShortcut('Alt+S')
         # noinspection PyUnresolvedReferences
         self.stop_monitor_act.triggered.connect(self.on_stop_monitor)
         self.stop_monitor_act.setDisabled(True)
         self.monitor_bar.addAction(self.stop_monitor_act)
 
+        # ### Data Manager ###
+
+        self.manager_bar = self.addToolBar('Data Manager')
+        self.manager_bar.setIconSize(QtCore.QSize(40, 40))
+
+        # open output folder
+        self.open_output_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'load.png')),
+                                             'Open output folder', self)
+        self.open_output_act.setShortcut('Alt+O')
+        # noinspection PyUnresolvedReferences
+        self.open_output_act.triggered.connect(self.on_open_output)
+        self.manager_bar.addAction(self.open_output_act)
+
+        # add data
+        self.add_data_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'import_data.png')),
+                                          'Add data to the current data set', self)
+        self.add_data_act.setShortcut('Alt+A')
+        # noinspection PyUnresolvedReferences
+        self.add_data_act.triggered.connect(self.on_add_data)
+        self.manager_bar.addAction(self.add_data_act)
+
+        # export data
+        self.export_data_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export_data.png')),
+                                             'Export data', self)
+        self.export_data_act.setShortcut('Alt+X')
+        # noinspection PyUnresolvedReferences
+        self.export_data_act.triggered.connect(self.on_export_data)
+        self.manager_bar.addAction(self.export_data_act)
+
+        # ###    PLOTS    ###
+
         # create the overall layout
         self.main_layout = QtGui.QVBoxLayout()
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.frame.setLayout(self.main_layout)
 
-        # mpl figure settings
+        # mpl settings
         self.f_dpi = 120  # dots-per-inch
         self.f_sz = (3.5, 2.5)  # inches
-        self.svi = None  # sis valid indices
-        self.vi = None  # proc valid indices
-        self.ii = None  # proc invalid indices
         self.draft_color = '#00cc66'
         self.valid_color = '#3385ff'
 
-        # figure and canvas
+        # figures
+
+        # ###   TSS VS TIME   ###
 
         self.w1 = QtGui.QWidget()
         vbox = QtGui.QVBoxLayout(self.w1)
         self.w1.setLayout(vbox)
         with rc_context(self.rc_context):
+
             self.f1 = Figure(figsize=self.f_sz, dpi=self.f_dpi)
             self.f1.patch.set_alpha(0.0)
             self.c1 = FigureCanvas(self.f1)
@@ -132,6 +167,8 @@ class SurfaceSoundSpeed(AbstractWidget):
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.dw1)
         self.dw1.setWidget(self.w1)
         self.dw1.setHidden(True)
+
+        # ###   DRAFT VS TIME   ###
 
         self.w2 = QtGui.QWidget()
         vbox = QtGui.QVBoxLayout(self.w2)
@@ -167,6 +204,8 @@ class SurfaceSoundSpeed(AbstractWidget):
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.dw2)
         self.dw2.setWidget(self.w2)
         self.dw2.setHidden(True)
+
+        # ###   MAP   ###
 
         self.w3 = QtGui.QWidget()
         vbox = QtGui.QVBoxLayout(self.w3)
@@ -205,13 +244,12 @@ class SurfaceSoundSpeed(AbstractWidget):
         self.w3.setHidden(True)
 
     def plotting(self):
-        if not self._active:
-            self._clear_plot_data()
+        if not self._plotting_active:
             return
 
-        if self._pause:
+        if self._plotting_pause:
             logger.debug("pause")
-            Timer(self._timing, self.plotting).start()
+            Timer(self._plotting_timing, self.plotting).start()
             return
 
         cur_nr_samples = self.lib.monitor.nr_of_samples()
@@ -221,9 +259,10 @@ class SurfaceSoundSpeed(AbstractWidget):
 
         self._last_nr_samples = cur_nr_samples
 
-        Timer(self._timing, self.plotting).start()
+        Timer(self._plotting_timing, self.plotting).start()
 
     def _clear_plot_data(self):
+
         self.tss.set_xdata([])
         self.tss.set_ydata([])
         self.draft.set_xdata([])
@@ -234,6 +273,8 @@ class SurfaceSoundSpeed(AbstractWidget):
         self.c1.draw()
         self.c2.draw()
         self.c3.draw()
+
+        self.update()
 
     def _update_plot_data(self, nr_of_samples):
 
@@ -254,11 +295,13 @@ class SurfaceSoundSpeed(AbstractWidget):
                                            vmax=(max(self.lib.monitor.tsss) + 0.1),
                                            cmap=self.map_colormap, alpha=0.4)
         if self.f3_colorbar is None:
+
             with rc_context(self.rc_context):
                 self.f3_colorbar = self.f3.colorbar(self.map_points, ax=self.map_ax, aspect=50,
                                                     orientation='horizontal', format='%.1f')
                 self.f3_colorbar.solids.set(alpha=1)
                 self.f3.tight_layout()
+
         self.f3_colorbar.set_clim(vmin=(min(self.lib.monitor.tsss) - 0.1),
                                   vmax=(max(self.lib.monitor.tsss) + 0.1))
 
@@ -277,16 +320,18 @@ class SurfaceSoundSpeed(AbstractWidget):
         self.c2.draw()
         self.c3.draw()
 
+        self.update()
+
         logger.debug("updated")
 
     def start_plotting(self):
-        if self._pause:
+        if self._plotting_pause:
             logger.debug("resume plotting")
-            self._pause = False
+            self._plotting_pause = False
             return
 
-        self._active = True
-        self._pause = False
+        self._plotting_active = True
+        self._plotting_pause = False
         self._last_nr_samples = 0
 
         logger.debug("start plotting")
@@ -294,13 +339,13 @@ class SurfaceSoundSpeed(AbstractWidget):
         self.plotting()
 
     def pause_plotting(self):
-        self._active = True
-        self._pause = True
+        self._plotting_active = True
+        self._plotting_pause = True
         logger.debug("pause plotting")
 
     def stop_plotting(self):
-        self._active = False
-        self._pause = False
+        self._plotting_active = False
+        self._plotting_pause = False
         logger.debug("stop plotting")
 
     @QtCore.Slot()
@@ -320,7 +365,24 @@ class SurfaceSoundSpeed(AbstractWidget):
                                       QtGui.QMessageBox.Ok)
             return
 
-        self.lib.monitor.start_monitor()
+        clear_data = True
+        nr_of_samples = self.lib.monitor.nr_of_samples()
+        if nr_of_samples > 0:
+
+            msg = "Some data are already present(%s samples)!\n\n" \
+                  "Do you want to start a new monitoring session?\n" \
+                  "If you click on No, the data will be appended." % nr_of_samples
+            # noinspection PyCallByClass
+            ret = QtGui.QMessageBox.warning(self, "Survey Data Monitor", msg,
+                                            QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+            if ret == QtGui.QMessageBox.No:
+                clear_data = False
+
+        if clear_data:
+            self.lib.monitor.clear_data()
+            self._clear_plot_data()
+
+        self.lib.monitor.start_monitor(clear_data=clear_data)
         self.start_plotting()
 
         self.start_monitor_act.setEnabled(False)
@@ -349,6 +411,74 @@ class SurfaceSoundSpeed(AbstractWidget):
         self.start_monitor_act.setEnabled(True)
         self.pause_monitor_act.setEnabled(False)
         self.stop_monitor_act.setEnabled(False)
-        self.dw1.setVisible(False)
-        self.dw2.setVisible(False)
-        self.w3.setVisible(False)
+
+        if self.lib.monitor.nr_of_samples() == 0:
+            self.dw1.setVisible(False)
+            self.dw2.setVisible(False)
+            self.w3.setVisible(False)
+
+    @QtCore.Slot()
+    def on_open_output(self):
+        self.lib.monitor.open_output_folder()
+
+    @QtCore.Slot()
+    def on_add_data(self):
+        logger.debug("Adding data")
+
+        if self.lib.monitor.active:
+
+            msg = "The survey data monitoring is ongoing!\n\n" \
+                  "To add data, you have to first stop the monitoring."
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.warning(self, "Survey Data Monitor", msg, QtGui.QMessageBox.Ok)
+            return
+
+        # noinspection PyCallByClass
+        selections, _ = QtGui.QFileDialog.getOpenFileNames(self, "Add data", self.lib.monitor.output_folder,
+                                                           "Monitor db(*.mon)")
+        if not selections:
+            return
+        logger.debug("user selected %d files" % len(selections))
+
+        # check if data are already present
+        clear_data = False
+        nr_of_samples = self.lib.monitor.nr_of_samples()
+        if nr_of_samples > 0:
+
+            msg = "Some data are already present(%s samples)!\n\n" \
+                  "Do you want to merge the new samples with the existing ones?\n" \
+                  "If you click on No, a different session will be used." % nr_of_samples
+            # noinspection PyCallByClass
+            ret = QtGui.QMessageBox.warning(self, "Survey Data Monitor", msg,
+                                            QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+            if ret == QtGui.QMessageBox.No:
+                clear_data = True
+
+        if clear_data:
+            self.lib.monitor.clear_data()
+            self._clear_plot_data()
+
+        self.lib.monitor.add_db_data(filenames=selections)
+
+        nr_of_samples = self.lib.monitor.nr_of_samples()
+        self._update_plot_data(nr_of_samples=nr_of_samples)
+        if nr_of_samples > 2:
+            self.dw1.setVisible(True)
+            self.dw2.setVisible(True)
+            self.w3.setVisible(True)
+
+    @QtCore.Slot()
+    def on_export_data(self):
+        logger.debug("Exporting data")
+
+        nr_of_samples = self.lib.monitor.nr_of_samples()
+        if nr_of_samples == 0:
+            msg = "There are currently not samples to export!\n"
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.warning(self, "Survey Data Monitor", msg, QtGui.QMessageBox.Ok)
+            return
+
+        self.lib.monitor.export_surface_speed_points_shapefile()
+        self.lib.monitor.export_surface_speed_points_kml()
+        self.lib.monitor.export_surface_speed_points_csv()
+        self.lib.monitor.open_output_folder()

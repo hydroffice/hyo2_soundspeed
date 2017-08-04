@@ -8,9 +8,10 @@ logger = logging.getLogger(__name__)
 
 from hyo.soundspeed.monitor.db import MonitorDb
 from hyo.soundspeed.base.helper import explore_folder
+from hyo.soundspeed.base.gdal_aux import GdalAux
 
 
-class SoundSpeedMonitor:
+class SurveyDataMonitor:
 
     def __init__(self, prj, timing=3.0):
         logger.debug("Init sound speed monitor")
@@ -32,6 +33,7 @@ class SoundSpeedMonitor:
 
         self._lock = Lock()
         self._external_lock = False
+        self.base_name = None
 
     @property
     def output_folder(self):
@@ -93,12 +95,6 @@ class SoundSpeedMonitor:
 
     def monitoring(self):
         if not self._active:
-            self._times.clear()
-            self._lats.clear()
-            self._longs.clear()
-            self._tsss.clear()
-            self._drafts.clear()
-            self._depths.clear()
             return
 
         if self._pause:
@@ -176,29 +172,55 @@ class SoundSpeedMonitor:
         db.add_point(timestamp=timestamp, lat=latitude, long=longitude, tss=tss, draft=draft, avg_depth=depth)
 
         self._lock.acquire()
-        self._times.append(timestamp)
-        self._lats.append(latitude)
-        self._longs.append(longitude)
-        self._tsss.append(tss)
-        self._drafts.append(draft)
-        self._depths.append(depth)
+
+        insert_idx = self.find_next_idx_in_time(timestamp)
+        self._times.insert(insert_idx, timestamp)
+        self._lats.insert(insert_idx, latitude)
+        self._longs.insert(insert_idx, longitude)
+        self._tsss.insert(insert_idx, tss)
+        self._drafts.insert(insert_idx, draft)
+        self._depths.insert(insert_idx, depth)
+
         self._lock.release()
 
         return msg
 
-    def start_monitor(self):
+    def find_next_idx_in_time(self, ts):
+        time_idx = len(self._times)
+        for _idx, _time in enumerate(self._times):
+            if ts < _time:
+                return _idx
+        return time_idx
+
+    def start_monitor(self, clear_data=True):
         if self._pause:
             logger.debug("resume monitoring")
             self._pause = False
             return
 
-        self.base_name = self._prj.current_project + "_" + datetime.datetime.now().strftime("%d%m%Y_%H%M%S")
+        if clear_data:
+            self.clear_data()
+            self.base_name = self._prj.current_project + "_" + datetime.datetime.now().strftime("%d%m%Y_%H%M%S")
+
+        else:
+            if self.base_name is None:
+                self.base_name = self._prj.current_project + "_" + datetime.datetime.now().strftime("%d%m%Y_%H%M%S")
+
         self._active = True
         self._pause = False
-        self._counter = 0
         logger.debug("start monitoring")
 
         self.monitoring()
+
+    def clear_data(self):
+        self._times.clear()
+        self._lats.clear()
+        self._longs.clear()
+        self._tsss.clear()
+        self._drafts.clear()
+        self._depths.clear()
+        self._counter = 0
+        self.base_name = None
 
     def pause_monitor(self):
         self._active = True
@@ -215,3 +237,80 @@ class SoundSpeedMonitor:
         nr = len(self._times)
         self._lock.release()
         return nr
+
+    def add_db_data(self, filenames):
+
+        for filename in filenames:
+
+            if not os.path.exists(filename):
+                raise RuntimeError("The passed db to merge does not exist")
+
+            output_folder = os.path.abspath(os.path.dirname(filename))
+            basename = os.path.splitext(os.path.basename(filename))[0]
+            logger.debug("db: %s, %s" % (output_folder, basename))
+
+            if self.base_name is None:
+                self.base_name = basename
+
+            load_in_db = True
+
+            if (output_folder == self.output_folder) and (basename == self.base_name):
+                logger.debug("Input and output are the same! -> Just loading data")
+                load_in_db = False
+            # print(output_folder, self.output_folder, basename, self.base_name)
+
+            input_db = MonitorDb(projects_folder=output_folder, base_name=basename)
+            # logger.debug("input db: %s" % input_db)
+
+            if load_in_db:
+                output_db = MonitorDb(projects_folder=self.output_folder, base_name=self.base_name)
+                # logger.debug("output db: %s" % output_db)
+
+            input_times, input_ids = input_db.timestamp_list()
+            if len(input_times) == 0:
+                logger.info("Input db is empty! -> Skipping db file")
+                continue
+            if load_in_db:
+                output_times, output_ids = output_db.timestamp_list()
+            else:
+                output_times = list()
+
+            for idx, input_time in enumerate(input_times):
+
+                if input_time in output_times:
+                    logger.debug("An entry with the same timestamp is in the output db! -> Skipping entry import")
+                    continue
+
+                timestamp, long, lat, tss, draft, avg_depth = input_db.point_by_id(input_ids[idx])
+                if load_in_db:
+                    success = output_db.add_point(timestamp=timestamp, lat=lat, long=long, tss=tss,
+                                                  draft=draft, avg_depth=avg_depth)
+                    if not success:
+                        logger.warning("issue in importing point with timestamp: %s" % input_time)
+
+                # insert the new data in cronological order
+                self._lock.acquire()
+
+                insert_idx = self.find_next_idx_in_time(input_time)
+                self._times.insert(insert_idx, timestamp)
+                self._lats.insert(insert_idx, lat)
+                self._longs.insert(insert_idx, long)
+                self._tsss.insert(insert_idx, tss)
+                self._drafts.insert(insert_idx, draft)
+                self._depths.insert(insert_idx, avg_depth)
+
+                self._lock.release()
+
+    def export_surface_speed_points_shapefile(self):
+        db = MonitorDb(projects_folder=self.output_folder, base_name=self.base_name)
+        db.export.export_surface_speed_points(output_folder=self.output_folder)
+
+    def export_surface_speed_points_kml(self):
+        db = MonitorDb(projects_folder=self.output_folder, base_name=self.base_name)
+        db.export.export_surface_speed_points(output_folder=self.output_folder,
+                                              ogr_format=GdalAux.ogr_formats['KML'])
+
+    def export_surface_speed_points_csv(self):
+        db = MonitorDb(projects_folder=self.output_folder, base_name=self.base_name)
+        db.export.export_surface_speed_points(output_folder=self.output_folder,
+                                              ogr_format=GdalAux.ogr_formats['CSV'])

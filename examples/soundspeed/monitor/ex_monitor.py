@@ -3,8 +3,8 @@ from hyo.soundspeed.logging import test_logging
 import logging
 logger = logging.getLogger()
 
-from hyo.soundspeed.monitor.monitor import SoundSpeedMonitor
+from hyo.soundspeed.monitor.monitor import SurveyDataMonitor
 
 
-monitor = SoundSpeedMonitor(prj=None)
+monitor = SurveyDataMonitor(prj=None)
 

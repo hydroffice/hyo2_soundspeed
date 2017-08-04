@@ -30,9 +30,7 @@ class MonitorDb:
 
         # the passed project name is used to identify the project database to open
         self.db_path = os.path.join(self.data_folder, self.base_name + ".mon")
-        # backup path
-        self.bk_path = self.db_path + '.bk'
-        logger.debug('current project db: %s' % self.db_path)
+        logger.debug('monitor db: %s' % self.db_path)
 
         # add plotting and exporting capabilities
         self.export = ExportDb(db=self)
@@ -272,7 +270,7 @@ class MonitorDb:
 
         ssp_list = list()
         # noinspection SqlResolve
-        sql = self.conn.execute("SELECT * FROM data")
+        sql = self.conn.execute("SELECT * FROM data ORDER BY time")
 
         try:
             with self.conn:
@@ -296,7 +294,7 @@ class MonitorDb:
             logger.error("missing db connection")
             return None
 
-        logger.info("retrieve point with id: %s" % id)
+        # logger.info("retrieve point with id: %s" % id)
 
         with self.conn:
             try:
@@ -330,3 +328,11 @@ class MonitorDb:
                 raise RuntimeError("unable to delete point with id: %s" % id)
 
         return True
+
+    # --- repr
+
+    def __repr__(self):
+        msg = "<%s>\n" % self.__class__.__name__
+        msg += "  <data folder: %s>\n" % self.data_folder
+        msg += "  <base name: %s>\n" % self.base_name
+        return msg

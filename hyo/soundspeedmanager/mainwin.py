@@ -21,7 +21,7 @@ from hyo.soundspeedmanager.qt_callbacks import QtCallbacks
 from hyo.soundspeedmanager.widgets.editor import Editor
 from hyo.soundspeedmanager.widgets.database import Database
 from hyo.soundspeedmanager.widgets.seacat import Seacat
-from hyo.soundspeedmanager.widgets.surfacesoundspeed import SurfaceSoundSpeed
+from hyo.soundspeedmanager.widgets.monitor import SurveyDataMonitor
 from hyo.soundspeedmanager.widgets.server import Server
 from hyo.soundspeedmanager.widgets.refraction import Refraction
 from hyo.soundspeedmanager.widgets.settings import Settings
@@ -126,10 +126,10 @@ class MainWin(QtGui.QMainWindow):
         if not self.lib.setup.noaa_tools:
             self.tab_seacat.setDisabled(True)
         # surface sound speed
-        self.tab_sss = SurfaceSoundSpeed(lib=self.lib, main_win=self)
-        idx = self.tabs.insertTab(3, self.tab_sss,
-                                  QtGui.QIcon(os.path.join(self.here, 'media', 'surfacesoundspeed.png')), "")
-        self.tabs.setTabToolTip(idx, "Surface Sound Speed")
+        self.tab_monitor = SurveyDataMonitor(lib=self.lib, main_win=self)
+        idx = self.tabs.insertTab(3, self.tab_monitor,
+                                  QtGui.QIcon(os.path.join(self.here, 'media', 'surveydatamonitor.png')), "")
+        self.tabs.setTabToolTip(idx, "Survey Data Monitor")
         # server
         self.tab_server = Server(lib=self.lib, main_win=self)
         idx = self.tabs.insertTab(4, self.tab_server,
@@ -578,7 +578,7 @@ class MainWin(QtGui.QMainWindow):
         if reply == QtGui.QMessageBox.Yes:
             event.accept()
             self.lib.close()
-            self.tab_sss.stop_plotting()
+            self.tab_monitor.stop_plotting()
             super(MainWin, self).closeEvent(event)
         else:
             event.ignore()
