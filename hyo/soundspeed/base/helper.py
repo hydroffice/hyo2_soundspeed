@@ -90,6 +90,13 @@ def info_libs():
     msg += "hyo.soundspeedsettings: %s\n" % vrs
 
     try:
+        from hyo.surveydatamonitor import __version__ as sdm_version
+        msg += "hyo.surveydatamonitor: %s\n" % sdm_version
+
+    except ImportError:
+        pass
+
+    try:
         from numpy import __version__ as np_version
 
     except ImportError:

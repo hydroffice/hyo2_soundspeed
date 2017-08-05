@@ -25,7 +25,7 @@ from hyo.soundspeed.logging.sqlitelogging import SqliteLogging
 from hyo.soundspeed.profile.profilelist import ProfileList
 from hyo.soundspeed.profile.dicts import Dicts
 from hyo.soundspeed.server.server import Server
-from hyo.soundspeed.monitor.monitor import SurveyDataMonitor
+# from hyo.soundspeed.monitor.monitor import SurveyDataMonitor
 
 
 class SoundSpeedLibrary(object):
@@ -63,7 +63,6 @@ class SoundSpeedLibrary(object):
         self.cb.sis_listener = self.listeners.sis  # to provide default values from SIS (if available)
         self.server = Server(prj=self)
         self.logs = SqliteLogging(self._release_folder)  # (user and server) loggers
-        self.monitor = SurveyDataMonitor(prj=self)
 
         self.logging()  # Set on/off logging for user and server based on loaded settings
 
@@ -99,9 +98,6 @@ class SoundSpeedLibrary(object):
         if self.server.is_alive():
             self.server.stop()
             self.server.join(2)
-
-        if self.monitor.active:
-            self.monitor.stop_monitor()
 
         logger.info("** > LIB: closed!")
 

@@ -11,8 +11,9 @@ from hyo.soundspeed.profile.dicts import Dicts
 
 class ExportDataMonitorDialog(AbstractDialog):
 
-    def __init__(self, main_win, lib, parent=None):
+    def __init__(self, main_win, lib, monitor, parent=None):
         AbstractDialog.__init__(self, main_win=main_win, lib=lib, parent=parent)
+        self._monitor = monitor
 
         # the list of selected writers passed to the library
         self.selected_writers = list()
@@ -134,16 +135,16 @@ class ExportDataMonitorDialog(AbstractDialog):
                 logger.debug(writer)
 
                 if writer == "shapefile":
-                    self.lib.monitor.export_surface_speed_points_shapefile()
+                    self._monitor.export_surface_speed_points_shapefile()
 
                 elif writer == "kml":
-                    self.lib.monitor.export_surface_speed_points_kml()
+                    self._monitor.export_surface_speed_points_kml()
 
                 elif writer == "csv":
-                    self.lib.monitor.export_surface_speed_points_csv()
+                    self._monitor.export_surface_speed_points_csv()
 
                 elif writer == "geotiff":
-                    self.lib.monitor.export_surface_speed_points_geotiff()
+                    self._monitor.export_surface_speed_points_geotiff()
 
                 else:
                     raise RuntimeError("Unknown writer: %s" % writer)
@@ -159,7 +160,7 @@ class ExportDataMonitorDialog(AbstractDialog):
         export_open_folder = self.openFolder.isChecked()
         settings.setValue("export_open_folder", export_open_folder)
         if export_open_folder:
-            self.lib.monitor.open_output_folder() # open the output folder
+            self._monitor.open_output_folder() # open the output folder
             self.progress.end()
 
         else:

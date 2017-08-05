@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 from hyo.soundspeedmanager.widgets.widget import AbstractWidget
 from hyo.soundspeedmanager.dialogs.export_data_monitor_dialog import ExportDataMonitorDialog
+from hyo.surveydatamonitor import monitor
 
 
 class SurveyDataMonitor(AbstractWidget):
@@ -48,6 +49,7 @@ class SurveyDataMonitor(AbstractWidget):
 
     def __init__(self, main_win, lib, timing=2.0):
         AbstractWidget.__init__(self, main_win=main_win, lib=lib)
+        self.monitor = monitor.SurveyDataMonitor(ssm=self.lib)
         self._plotting_timing = timing
 
         self._plotting_active = False
@@ -116,6 +118,35 @@ class SurveyDataMonitor(AbstractWidget):
         self.export_data_act.triggered.connect(self.on_export_data)
         self.manager_bar.addAction(self.export_data_act)
 
+        # ### Data Views ###
+
+        self.views_bar = self.addToolBar('Data Views')
+        self.views_bar.setIconSize(QtCore.QSize(40, 40))
+
+        # view tss vs time plot
+        self.view_tss_time_plot_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'tss_plot.png')),
+                                                       'View TSS vs time plot', self, checkable=True)
+        self.view_tss_time_plot_action.setShortcut('Ctrl+T')
+        # noinspection PyUnresolvedReferences
+        self.view_tss_time_plot_action.triggered.connect(self.on_view_tss_time_plot)
+        self.views_bar.addAction(self.view_tss_time_plot_action)
+
+        # view draft vs time plot
+        self.view_draft_time_plot_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'draft_plot.png')),
+                                                         'View draft vs time plot', self, checkable=True)
+        self.view_draft_time_plot_action.setShortcut('Ctrl+D')
+        # noinspection PyUnresolvedReferences
+        self.view_draft_time_plot_action.triggered.connect(self.on_view_draft_time_plot)
+        self.views_bar.addAction(self.view_draft_time_plot_action)
+
+        # view avg depth vs time plot
+        self.view_avg_depth_time_plot_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'avg_depth_plot.png')),
+                                                             'View avg depth vs time plot', self, checkable=True)
+        self.view_avg_depth_time_plot_action.setShortcut('Ctrl+A')
+        # noinspection PyUnresolvedReferences
+        self.view_avg_depth_time_plot_action.triggered.connect(self.on_view_avg_depth_time_plot)
+        self.views_bar.addAction(self.view_avg_depth_time_plot_action)
+
         # ###    PLOTS    ###
 
         # create the overall layout
@@ -126,8 +157,10 @@ class SurveyDataMonitor(AbstractWidget):
         # mpl settings
         self.f_dpi = 120  # dots-per-inch
         self.f_sz = (3.5, 2.5)  # inches
+        self.f_map_sz = (4.5, 2.5)  # inches
         self.draft_color = '#00cc66'
-        self.valid_color = '#3385ff'
+        self.tss_color = '#3385ff'
+        self.avg_depth_color = '#ffb266'
 
         # figures
 
@@ -148,7 +181,7 @@ class SurveyDataMonitor(AbstractWidget):
             # self.tss_ax.set_ylabel('Sound Speed [m/s]')
             # self.tss_ax.set_xlabel('Time')
             self.tss, = self.tss_ax.plot([], [],
-                                         color=self.valid_color,
+                                         color=self.tss_color,
                                          linestyle='--',
                                          marker='o',
                                          label='TSS',
@@ -167,7 +200,7 @@ class SurveyDataMonitor(AbstractWidget):
         self.dw1.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.dw1)
         self.dw1.setWidget(self.w1)
-        self.dw1.setHidden(True)
+        self.dw1.installEventFilter(self)
 
         # ###   DRAFT VS TIME   ###
 
@@ -204,22 +237,59 @@ class SurveyDataMonitor(AbstractWidget):
         self.dw2.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.dw2)
         self.dw2.setWidget(self.w2)
-        self.dw2.setHidden(True)
+        self.dw2.installEventFilter(self)
 
-        # ###   MAP   ###
+        # ###   AVG DEPTH VS TIME   ###
 
         self.w3 = QtGui.QWidget()
         vbox = QtGui.QVBoxLayout(self.w3)
         self.w3.setLayout(vbox)
         with rc_context(self.rc_context):
-
             self.f3 = Figure(figsize=self.f_sz, dpi=self.f_dpi)
             self.f3.patch.set_alpha(0.0)
             self.c3 = FigureCanvas(self.f3)
             self.c3.setParent(self.w3)
             self.c3.setFocusPolicy(QtCore.Qt.ClickFocus)  # key for press events!!!
             self.c3.setFocus()
-            self.map_ax = self.f3.add_subplot(111)
+            self.avg_depth_ax = self.f3.add_subplot(111, sharex=self.tss_ax)
+            self.avg_depth_ax.invert_yaxis()
+            # self.avg_depth_ax.set_ylabel('Depth [m]')
+            # self.avg_depth_ax.set_xlabel('Time')
+            self.avg_depth, = self.avg_depth_ax.plot([], [],
+                                                    color=self.avg_depth_color,
+                                                    linestyle='--',
+                                                    marker='o',
+                                                    label='Avg Depth',
+                                                    ms=3
+                                                    )
+            self.avg_depth_ax.set_ylim(1000.0, 0.0)
+            self.avg_depth_ax.set_xlim(datetime.now(), datetime.now() + timedelta(seconds=60))
+            self.avg_depth_ax.grid(True)
+            self.nv3 = NavToolBar(canvas=self.c3, parent=self.w3, coordinates=True)
+            self.nv3.setIconSize(QtCore.QSize(14, 14))
+        vbox.addWidget(self.c3)
+        vbox.addWidget(self.nv3)
+        vbox.setContentsMargins(0, 0, 0, 0)
+        self.dw3 = QtGui.QDockWidget("Average Depth vs. Time", self)
+        self.dw3.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
+        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.dw3)
+        self.dw3.setWidget(self.w3)
+        self.dw3.installEventFilter(self)
+
+        # ###   MAP   ###
+
+        self.w0 = QtGui.QWidget()
+        vbox = QtGui.QVBoxLayout(self.w0)
+        self.w0.setLayout(vbox)
+        with rc_context(self.rc_context):
+
+            self.f0 = Figure(figsize=self.f_map_sz, dpi=self.f_dpi)
+            self.f0.patch.set_alpha(0.0)
+            self.c0 = FigureCanvas(self.f0)
+            self.c0.setParent(self.w0)
+            self.c0.setFocusPolicy(QtCore.Qt.ClickFocus)  # key for press events!!!
+            self.c0.setFocus()
+            self.map_ax = self.f0.add_subplot(111)
             self.map = Basemap(projection='kav7', lon_0=0, resolution='c', ax=self.map_ax)
             self.map.drawcoastlines(zorder=1)
             self.map.fillcontinents(color='lightgray', zorder=1)
@@ -234,15 +304,24 @@ class SurveyDataMonitor(AbstractWidget):
                 return '%.6f, %.6f' % pair
 
             self.map_ax.format_coord = format_coord
-            self.f3_colorbar = None
-            self.nv3 = NavToolBar(canvas=self.c3, parent=self.w3, coordinates=True)
-            self.nv3.setIconSize(QtCore.QSize(14, 14))
+            self.f0_colorbar = None
+            self.nv0 = NavToolBar(canvas=self.c0, parent=self.w0, coordinates=True)
+            self.nv0.setIconSize(QtCore.QSize(14, 14))
 
-        vbox.addWidget(self.c3)
-        vbox.addWidget(self.nv3)
+        vbox.addWidget(self.c0)
+        vbox.addWidget(self.nv0)
         vbox.setContentsMargins(0, 0, 0, 0)
-        self.main_layout.addWidget(self.w3)
-        self.w3.setHidden(True)
+        self.dw0 = QtGui.QDockWidget("Surface Sound Speed Map", self)
+        self.dw0.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
+        self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.dw0)
+        self.dw0.setWidget(self.w0)
+        self.dw0.installEventFilter(self)
+        self.dw0.setHidden(True)
+
+        # initial plot views
+        self._make_tss_time_plot_visible(False)
+        self._make_draft_time_plot_visible(False)
+        self._make_avg_depth_time_plot_visible(False)
 
     def plotting(self):
         if not self._plotting_active:
@@ -253,7 +332,7 @@ class SurveyDataMonitor(AbstractWidget):
             Timer(self._plotting_timing, self.plotting).start()
             return
 
-        cur_nr_samples = self.lib.monitor.nr_of_samples()
+        cur_nr_samples = self.monitor.nr_of_samples()
         if cur_nr_samples > self._last_nr_samples:
             logger.debug("plotting -> samples: %d" % cur_nr_samples)
             self._update_plot_data(cur_nr_samples)
@@ -262,67 +341,72 @@ class SurveyDataMonitor(AbstractWidget):
 
         Timer(self._plotting_timing, self.plotting).start()
 
+    def _refresh_plots(self):
+        self.c1.draw()
+        self.c2.draw()
+        self.c3.draw()
+        self.c0.draw()
+
+        self.update()
+
     def _clear_plot_data(self):
 
         self.tss.set_xdata([])
         self.tss.set_ydata([])
         self.draft.set_xdata([])
         self.draft.set_ydata([])
+        self.avg_depth.set_xdata([])
+        self.avg_depth.set_ydata([])
         self.map_points = self.map.scatter([], [], c=[], zorder=2, s=20,
                                            vmin=1450.0, vmax=1550.0, cmap=self.map_colormap)
 
-        self.c1.draw()
-        self.c2.draw()
-        self.c3.draw()
-
-        self.update()
+        self._refresh_plots()
 
     def _update_plot_data(self, nr_of_samples):
 
         if nr_of_samples < 2:
             return
 
-        self.lib.monitor.lock_data()
+        self.monitor.lock_data()
 
-        self.tss.set_xdata(self.lib.monitor.times)
-        self.tss.set_ydata(self.lib.monitor.tsss)
-        self.draft.set_xdata(self.lib.monitor.times)
-        self.draft.set_ydata(self.lib.monitor.drafts)
-        xs, ys = self.map(self.lib.monitor.longs, self.lib.monitor.lats)
+        self.tss.set_xdata(self.monitor.times)
+        self.tss.set_ydata(self.monitor.tsss)
+        self.draft.set_xdata(self.monitor.times)
+        self.draft.set_ydata(self.monitor.drafts)
+        self.avg_depth.set_xdata(self.monitor.times)
+        self.avg_depth.set_ydata(self.monitor.depths)
+        xs, ys = self.map(self.monitor.longs, self.monitor.lats)
         self.map_points = self.map.scatter(xs, ys,
                                            zorder=2, s=20,
-                                           c=self.lib.monitor.tsss,
-                                           vmin=(min(self.lib.monitor.tsss) - 0.1),
-                                           vmax=(max(self.lib.monitor.tsss) + 0.1),
+                                           c=self.monitor.tsss,
+                                           vmin=(min(self.monitor.tsss) - 0.1),
+                                           vmax=(max(self.monitor.tsss) + 0.1),
                                            cmap=self.map_colormap, alpha=0.4)
-        if self.f3_colorbar is None:
+        if self.f0_colorbar is None:
 
             with rc_context(self.rc_context):
-                self.f3_colorbar = self.f3.colorbar(self.map_points, ax=self.map_ax, aspect=50,
+                self.f0_colorbar = self.f0.colorbar(self.map_points, ax=self.map_ax, aspect=50,
                                                     orientation='horizontal', format='%.1f')
-                self.f3_colorbar.solids.set(alpha=1)
-                self.f3.tight_layout()
+                self.f0_colorbar.solids.set(alpha=1)
+                self.f0.tight_layout()
 
-        vmin_tss, vmax_tss = self.lib.monitor.calc_plot_good_tss()
-        self.f3_colorbar.set_clim(vmin=vmin_tss, vmax=vmax_tss)
+        vmin_tss, vmax_tss = self.monitor.calc_plot_good_tss()
+        self.f0_colorbar.set_clim(vmin=vmin_tss, vmax=vmax_tss)
 
-        self.tss_ax.set_xlim(min(self.lib.monitor.times) - timedelta(seconds=10),
-                             max(self.lib.monitor.times) + timedelta(seconds=10))
-        self.tss_ax.set_ylim(min(self.lib.monitor.tsss) - 0.5,
-                             max(self.lib.monitor.tsss) + 0.5)
-        # self.draft_ax.set_xlim(min(self.lib.monitor.times) - timedelta(seconds=10),
-        #                        max(self.lib.monitor.times) + timedelta(seconds=10))
-        self.draft_ax.set_ylim(max(self.lib.monitor.drafts) + 0.5,
-                               min(self.lib.monitor.drafts) - 0.5)
+        self.tss_ax.set_xlim(min(self.monitor.times) - timedelta(seconds=10),
+                             max(self.monitor.times) + timedelta(seconds=10))
+        self.tss_ax.set_ylim(min(self.monitor.tsss) - 0.5,
+                             max(self.monitor.tsss) + 0.5)
+        # self.draft_ax.set_xlim(min(self.monitor.times) - timedelta(seconds=10),
+        #                        max(self.monitor.times) + timedelta(seconds=10))
+        self.draft_ax.set_ylim(max(self.monitor.drafts) + 0.5,
+                               min(self.monitor.drafts) - 0.5)
+        self.avg_depth_ax.set_ylim(max(self.monitor.depths) + 0.5,
+                                   min(self.monitor.depths) - 0.5)
 
-        self.lib.monitor.unlock_data()
+        self.monitor.unlock_data()
 
-        self.c1.draw()
-        self.c2.draw()
-        self.c3.draw()
-
-        self.update()
-
+        self._refresh_plots()
         logger.debug("updated")
 
     def start_plotting(self):
@@ -345,9 +429,15 @@ class SurveyDataMonitor(AbstractWidget):
         logger.debug("pause plotting")
 
     def stop_plotting(self):
+        if self.monitor.active:
+            self.monitor.stop_monitor()
         self._plotting_active = False
         self._plotting_pause = False
         logger.debug("stop plotting")
+
+    # ### SLOTS ###
+
+    # data monitor
 
     @QtCore.Slot()
     def on_start_monitor(self):
@@ -367,7 +457,7 @@ class SurveyDataMonitor(AbstractWidget):
             return
 
         clear_data = True
-        nr_of_samples = self.lib.monitor.nr_of_samples()
+        nr_of_samples = self.monitor.nr_of_samples()
         if nr_of_samples > 0:
 
             msg = "Some data are already present(%s samples)!\n\n" \
@@ -380,23 +470,48 @@ class SurveyDataMonitor(AbstractWidget):
                 clear_data = False
 
         if clear_data:
-            self.lib.monitor.clear_data()
+            self.monitor.clear_data()
             self._clear_plot_data()
 
-        self.lib.monitor.start_monitor(clear_data=clear_data)
+        self.monitor.start_monitor(clear_data=clear_data)
         self.start_plotting()
 
         self.start_monitor_act.setEnabled(False)
         self.pause_monitor_act.setEnabled(True)
         self.stop_monitor_act.setEnabled(True)
-        self.dw1.setVisible(True)
-        self.dw2.setVisible(True)
-        self.w3.setVisible(True)
+        self._make_tss_time_plot_visible(True)
+        self._make_draft_time_plot_visible(True)
+        self._make_avg_depth_time_plot_visible(False)
+        self.dw0.setVisible(True)
+
+    def _make_tss_time_plot_visible(self, flag):
+        if flag:
+            self.dw1.setVisible(True)
+            self.view_tss_time_plot_action.setChecked(True)
+        else:
+            self.dw1.setVisible(False)
+            self.view_tss_time_plot_action.setChecked(False)
+
+    def _make_draft_time_plot_visible(self, flag):
+        if flag:
+            self.dw2.setVisible(True)
+            self.view_draft_time_plot_action.setChecked(True)
+        else:
+            self.dw2.setVisible(False)
+            self.view_draft_time_plot_action.setChecked(False)
+
+    def _make_avg_depth_time_plot_visible(self, flag):
+        if flag:
+            self.dw3.setVisible(True)
+            self.view_avg_depth_time_plot_action.setChecked(True)
+        else:
+            self.dw3.setVisible(False)
+            self.view_avg_depth_time_plot_action.setChecked(False)
 
     @QtCore.Slot()
     def on_pause_monitor(self):
 
-        self.lib.monitor.pause_monitor()
+        self.monitor.pause_monitor()
         self.pause_plotting()
 
         self.start_monitor_act.setEnabled(True)
@@ -406,27 +521,30 @@ class SurveyDataMonitor(AbstractWidget):
     @QtCore.Slot()
     def on_stop_monitor(self):
 
-        self.lib.monitor.stop_monitor()
+        self.monitor.stop_monitor()
         self.stop_plotting()
 
         self.start_monitor_act.setEnabled(True)
         self.pause_monitor_act.setEnabled(False)
         self.stop_monitor_act.setEnabled(False)
 
-        if self.lib.monitor.nr_of_samples() == 0:
-            self.dw1.setVisible(False)
-            self.dw2.setVisible(False)
-            self.w3.setVisible(False)
+        if self.monitor.nr_of_samples() == 0:
+            self._make_tss_time_plot_visible(False)
+            self._make_draft_time_plot_visible(False)
+            self._make_avg_depth_time_plot_visible(False)
+            self.dw0.setVisible(False)
+
+    # data manager
 
     @QtCore.Slot()
     def on_open_output(self):
-        self.lib.monitor.open_output_folder()
+        self.monitor.open_output_folder()
 
     @QtCore.Slot()
     def on_add_data(self):
         logger.debug("Adding data")
 
-        if self.lib.monitor.active:
+        if self.monitor.active:
 
             msg = "The survey data monitoring is ongoing!\n\n" \
                   "To add data, you have to first stop the monitoring."
@@ -435,7 +553,7 @@ class SurveyDataMonitor(AbstractWidget):
             return
 
         # noinspection PyCallByClass
-        selections, _ = QtGui.QFileDialog.getOpenFileNames(self, "Add data", self.lib.monitor.output_folder,
+        selections, _ = QtGui.QFileDialog.getOpenFileNames(self, "Add data", self.monitor.output_folder,
                                                            "Monitor db(*.mon)")
         if not selections:
             return
@@ -443,7 +561,7 @@ class SurveyDataMonitor(AbstractWidget):
 
         # check if data are already present
         clear_data = False
-        nr_of_samples = self.lib.monitor.nr_of_samples()
+        nr_of_samples = self.monitor.nr_of_samples()
         if nr_of_samples > 0:
 
             msg = "Some data are already present(%s samples)!\n\n" \
@@ -456,28 +574,66 @@ class SurveyDataMonitor(AbstractWidget):
                 clear_data = True
 
         if clear_data:
-            self.lib.monitor.clear_data()
+            self.monitor.clear_data()
             self._clear_plot_data()
 
-        self.lib.monitor.add_db_data(filenames=selections)
+        self.progress.start(title="Survey Data Monitor", text="Data loading")
+        self.progress.update(20)
+        self.monitor.add_db_data(filenames=selections)
+        self.progress.end()
 
-        nr_of_samples = self.lib.monitor.nr_of_samples()
+        nr_of_samples = self.monitor.nr_of_samples()
         self._update_plot_data(nr_of_samples=nr_of_samples)
         if nr_of_samples > 2:
             self.dw1.setVisible(True)
             self.dw2.setVisible(True)
-            self.w3.setVisible(True)
+            self.w0.setVisible(True)
 
     @QtCore.Slot()
     def on_export_data(self):
         logger.debug("Exporting data")
 
-        nr_of_samples = self.lib.monitor.nr_of_samples()
+        nr_of_samples = self.monitor.nr_of_samples()
         if nr_of_samples == 0:
             msg = "There are currently not samples to export!\n"
             # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Survey Data Monitor", msg, QtGui.QMessageBox.Ok)
             return
 
-        dlg = ExportDataMonitorDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        dlg = ExportDataMonitorDialog(lib=self.lib, monitor=self.monitor, main_win=self.main_win, parent=self)
         dlg.exec_()
+
+    # data views
+
+    @QtCore.Slot()
+    def on_view_tss_time_plot(self):
+        if self.dw1.isVisible():
+            self._make_tss_time_plot_visible(False)
+        else:
+            self._make_tss_time_plot_visible(True)
+
+        self._refresh_plots()
+
+    @QtCore.Slot()
+    def on_view_draft_time_plot(self):
+        if self.dw2.isVisible():
+            self._make_draft_time_plot_visible(False)
+        else:
+            self._make_draft_time_plot_visible(True)
+
+        self._refresh_plots()
+
+    @QtCore.Slot()
+    def on_view_avg_depth_time_plot(self):
+        if self.dw3.isVisible():
+            self._make_avg_depth_time_plot_visible(False)
+        else:
+            self._make_avg_depth_time_plot_visible(True)
+
+        self._refresh_plots()
+
+    def eventFilter(self, obj, event):
+        if event.type() == QtCore.QEvent.Resize:
+            self._refresh_plots()
+
+        super().eventFilter(obj, event)
