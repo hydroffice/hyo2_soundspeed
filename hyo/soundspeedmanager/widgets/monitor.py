@@ -554,7 +554,7 @@ class SurveyDataMonitor(AbstractWidget):
 
         # noinspection PyCallByClass
         selections, _ = QtGui.QFileDialog.getOpenFileNames(self, "Add data", self.monitor.output_folder,
-                                                           "Monitor db(*.mon)")
+                                                           "Monitor db(*.mon);;Kongsberg EM Series(*.all)")
         if not selections:
             return
         logger.debug("user selected %d files" % len(selections))
@@ -577,10 +577,23 @@ class SurveyDataMonitor(AbstractWidget):
             self.monitor.clear_data()
             self._clear_plot_data()
 
-        self.progress.start(title="Survey Data Monitor", text="Data loading")
-        self.progress.update(20)
-        self.monitor.add_db_data(filenames=selections)
-        self.progress.end()
+        file_ext = os.path.splitext(selections[0])[-1]
+        if file_ext == ".mon":
+
+            self.progress.start(title="Survey Data Monitor", text="Database data loading")
+            self.progress.update(20)
+            self.monitor.add_db_data(filenames=selections)
+            self.progress.end()
+
+        elif file_ext == ".all":
+
+            self.progress.start(title="Survey Data Monitor", text="Kongsberg data loading")
+            self.progress.update(20)
+            self.monitor.add_kongsberg_data(filenames=selections)
+            self.progress.end()
+
+        else:
+            raise RuntimeError("Passed unsupported file extension: %s" % file_ext)
 
         nr_of_samples = self.monitor.nr_of_samples()
         self._update_plot_data(nr_of_samples=nr_of_samples)
