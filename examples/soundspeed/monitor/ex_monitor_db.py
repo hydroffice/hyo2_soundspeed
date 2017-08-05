@@ -29,6 +29,8 @@ logger.debug("%s" % (points, ))
 timestamp, long, lat, tss, draft, avg_depth = db.point_by_id(2)
 logger.debug("point: %s, %s, %s, %s, %s, %s" % (timestamp, long, lat, tss, draft, avg_depth))
 
-db.export.export_surface_speed_points(output_folder=testing.output_data_folder())
-db.export.export_surface_speed_points(output_folder=testing.output_data_folder(), ogr_format=GdalAux.ogr_formats['KML'])
-db.export.export_surface_speed_points(output_folder=testing.output_data_folder(), ogr_format=GdalAux.ogr_formats['CSV'])
+# db.export.export_surface_speed_points(output_folder=testing.output_data_folder())
+# db.export.export_surface_speed_points(output_folder=testing.output_data_folder(), ogr_format=GdalAux.ogr_formats['KML'])
+# db.export.export_surface_speed_points(output_folder=testing.output_data_folder(), ogr_format=GdalAux.ogr_formats['CSV'])
+
+db.export.rasterize_surface_speed_points(output_folder=testing.output_data_folder())

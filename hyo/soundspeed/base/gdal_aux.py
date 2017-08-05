@@ -191,3 +191,20 @@ class GdalAux(object):
 
         raise RuntimeError("Unable to locate GDAL data at:\n- %s\n- %s\n- %s\n- %s"
                            % (gdal_data_path1, gdal_data_path2, gdal_data_path3, gdal_data_path4))
+
+    @classmethod
+    def lat_long_to_zone_number(cls, lat, long):
+        if 56 <= lat < 64 and 3 <= long < 12:
+            return 32
+
+        if 72 <= lat <= 84 and long >= 0:
+            if long < 9:
+                return 31
+            elif long < 21:
+                return 33
+            elif long < 33:
+                return 35
+            elif long < 42:
+                return 37
+
+        return int((long + 180) / 6) + 1

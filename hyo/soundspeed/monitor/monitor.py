@@ -1,5 +1,6 @@
 from threading import Timer, Lock
 import math
+import statistics
 import os
 import datetime
 import logging
@@ -314,3 +315,43 @@ class SurveyDataMonitor:
         db = MonitorDb(projects_folder=self.output_folder, base_name=self.base_name)
         db.export.export_surface_speed_points(output_folder=self.output_folder,
                                               ogr_format=GdalAux.ogr_formats['CSV'])
+
+    def export_surface_speed_points_geotiff(self):
+        db = MonitorDb(projects_folder=self.output_folder, base_name=self.base_name)
+        db.export.rasterize_surface_speed_points(output_folder=self.output_folder)
+
+    def calc_plot_good_tss(self):
+        return self.calc_plot_good_range(data=self.tsss)
+
+    @classmethod
+    def calc_plot_good_range(cls, data):
+
+        if not isinstance(data, list):
+            raise RuntimeError("Passed data type is not list: %s" % type(data))
+
+        min_plot = 0
+        max_plot = 0
+        min_value = min(data)
+        max_value = max(data)
+        nr_samples = len(data)
+        range = max_value - min_value
+
+        if (nr_samples < 20) or (range < 5.0):
+            min_plot = min_value - 0.1
+            max_plot = max_value + 0.1
+
+        else:
+            def median_mad(in_data):
+                med_value = statistics.median(in_data)
+                mad_value = statistics.median([abs(in_value - med_value) for in_value in in_data])
+
+                return med_value, mad_value
+
+            med, mad = median_mad(in_data=data)
+            logger.debug("median: %s, mad: %s" % (med, mad))
+
+            min_plot = med - 3 * mad
+            max_plot = med + 3 * mad
+
+        return min_plot, max_plot
+

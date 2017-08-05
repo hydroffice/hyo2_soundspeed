@@ -21,6 +21,7 @@ from PySide import QtGui, QtCore
 logger = logging.getLogger(__name__)
 
 from hyo.soundspeedmanager.widgets.widget import AbstractWidget
+from hyo.soundspeedmanager.dialogs.export_data_monitor_dialog import ExportDataMonitorDialog
 
 
 class SurveyDataMonitor(AbstractWidget):
@@ -302,8 +303,8 @@ class SurveyDataMonitor(AbstractWidget):
                 self.f3_colorbar.solids.set(alpha=1)
                 self.f3.tight_layout()
 
-        self.f3_colorbar.set_clim(vmin=(min(self.lib.monitor.tsss) - 0.1),
-                                  vmax=(max(self.lib.monitor.tsss) + 0.1))
+        vmin_tss, vmax_tss = self.lib.monitor.calc_plot_good_tss()
+        self.f3_colorbar.set_clim(vmin=vmin_tss, vmax=vmax_tss)
 
         self.tss_ax.set_xlim(min(self.lib.monitor.times) - timedelta(seconds=10),
                              max(self.lib.monitor.times) + timedelta(seconds=10))
@@ -478,7 +479,5 @@ class SurveyDataMonitor(AbstractWidget):
             QtGui.QMessageBox.warning(self, "Survey Data Monitor", msg, QtGui.QMessageBox.Ok)
             return
 
-        self.lib.monitor.export_surface_speed_points_shapefile()
-        self.lib.monitor.export_surface_speed_points_kml()
-        self.lib.monitor.export_surface_speed_points_csv()
-        self.lib.monitor.open_output_folder()
+        dlg = ExportDataMonitorDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        dlg.exec_()
