@@ -48,9 +48,9 @@ copyright = u'2017, CCOM/JHC,UNH'
 # built documents.
 #
 # The short X.Y version.
-version = '2017.4'
+version = '2017.5'
 # The full version, including alpha/beta/rc tags.
-release = '2017.4.6'
+release = '2017.5.6'
 
 numfig = True
 

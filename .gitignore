@@ -55,7 +55,7 @@ docs/_build/*
 data/download/
 data/output/
 
-tests/outputs
-tests/projects
-tests/releases
+tests/soundspeed/atlas/outputs
+tests/soundspeed/atlas/projects
+tests/soundspeed/atlas/releases
 tests/rtofs

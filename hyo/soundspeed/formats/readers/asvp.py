@@ -58,7 +58,10 @@ class Asvp(AbstractTextReader):
                     for idx, field in enumerate(line.split()):
                         # print(idx, field)
                         if idx == 4:  # time
-                            self.ssp.cur.meta.utc_time = dt.strptime(field, "%Y%m%d%H%M")
+                            try:
+                                self.ssp.cur.meta.utc_time = dt.strptime(field, "%Y%m%d%H%M")
+                            except Exception as e:
+                                self.ssp.cur.meta.utc_time = dt.strptime(field, "%Y%m%d%H%M%S")
                         elif idx == 5:  # latitude
                             self.ssp.cur.meta.latitude = float(field)
                         elif idx == 6:  # longitude

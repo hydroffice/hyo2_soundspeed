@@ -90,6 +90,13 @@ def info_libs():
     msg += "hyo.soundspeedsettings: %s\n" % vrs
 
     try:
+        from hyo.surveydatamonitor import __version__ as sdm_version
+        msg += "hyo.surveydatamonitor: %s\n" % sdm_version
+
+    except ImportError:
+        pass
+
+    try:
         from numpy import __version__ as np_version
 
     except ImportError:
@@ -106,6 +113,15 @@ def info_libs():
 
     vrs = mpl_version
     msg += "matplotlib: %s\n" % vrs
+
+    try:
+        from mpl_toolkits.basemap import __version__ as basemap_version
+
+    except ImportError:
+        basemap_version = None
+
+    vrs = basemap_version
+    msg += "basemap: %s\n" % vrs
 
     try:
         from PySide import __version__ as pyside_version

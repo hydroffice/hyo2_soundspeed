@@ -25,6 +25,7 @@ from hyo.soundspeed.logging.sqlitelogging import SqliteLogging
 from hyo.soundspeed.profile.profilelist import ProfileList
 from hyo.soundspeed.profile.dicts import Dicts
 from hyo.soundspeed.server.server import Server
+# from hyo.soundspeed.monitor.monitor import SurveyDataMonitor
 
 
 class SoundSpeedLibrary(object):
