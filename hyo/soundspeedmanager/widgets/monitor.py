@@ -11,9 +11,7 @@ from matplotlib import cm
 from mpl_toolkits.basemap import Basemap
 import numpy as np
 
-from threading import Timer
 from datetime import datetime, timedelta
-import time
 import os
 import logging
 
