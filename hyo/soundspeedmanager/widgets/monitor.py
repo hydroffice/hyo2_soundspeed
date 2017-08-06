@@ -11,8 +11,9 @@ from matplotlib import cm
 from mpl_toolkits.basemap import Basemap
 import numpy as np
 
-from threading import Timer, Lock
+from threading import Timer
 from datetime import datetime, timedelta
+import time
 import os
 import logging
 
@@ -51,101 +52,24 @@ class SurveyDataMonitor(AbstractWidget):
         AbstractWidget.__init__(self, main_win=main_win, lib=lib)
         self.monitor = monitor.SurveyDataMonitor(ssm=self.lib)
         self._plotting_timing = timing
+        self._plotting_timer = None
 
         self._plotting_active = False
         self._plotting_pause = False
         self._last_nr_samples = 0
 
         # ###    ACTIONS   ###
-
-        # ### Data Monitor ###
-
-        self.monitor_bar = self.addToolBar('Data Monitor')
-        self.monitor_bar.setIconSize(QtCore.QSize(40, 40))
-
-        # start
-        self.start_monitor_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'start.png')),
-                                               'Start monitoring survey data', self)
-        self.start_monitor_act.setShortcut('Alt+M')
-        # noinspection PyUnresolvedReferences
-        self.start_monitor_act.triggered.connect(self.on_start_monitor)
-        self.monitor_bar.addAction(self.start_monitor_act)
-
-        # pause
-        self.pause_monitor_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'pause.png')),
-                                               'Pause monitoring survey data', self)
-        self.pause_monitor_act.setShortcut('Alt+P')
-        # noinspection PyUnresolvedReferences
-        self.pause_monitor_act.triggered.connect(self.on_pause_monitor)
-        self.pause_monitor_act.setDisabled(True)
-        self.monitor_bar.addAction(self.pause_monitor_act)
-
-        # stop
-        self.stop_monitor_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'stop.png')),
-                                              'Stop monitoring survey data', self)
-        self.stop_monitor_act.setShortcut('Alt+S')
-        # noinspection PyUnresolvedReferences
-        self.stop_monitor_act.triggered.connect(self.on_stop_monitor)
-        self.stop_monitor_act.setDisabled(True)
-        self.monitor_bar.addAction(self.stop_monitor_act)
-
-        # ### Data Manager ###
-
-        self.manager_bar = self.addToolBar('Data Manager')
-        self.manager_bar.setIconSize(QtCore.QSize(40, 40))
-
-        # open output folder
-        self.open_output_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'load.png')),
-                                             'Open output folder', self)
-        self.open_output_act.setShortcut('Alt+O')
-        # noinspection PyUnresolvedReferences
-        self.open_output_act.triggered.connect(self.on_open_output)
-        self.manager_bar.addAction(self.open_output_act)
-
-        # add data
-        self.add_data_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'import_data.png')),
-                                          'Add data to the current data set', self)
-        self.add_data_act.setShortcut('Alt+A')
-        # noinspection PyUnresolvedReferences
-        self.add_data_act.triggered.connect(self.on_add_data)
-        self.manager_bar.addAction(self.add_data_act)
-
-        # export data
-        self.export_data_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export_data.png')),
-                                             'Export data', self)
-        self.export_data_act.setShortcut('Alt+X')
-        # noinspection PyUnresolvedReferences
-        self.export_data_act.triggered.connect(self.on_export_data)
-        self.manager_bar.addAction(self.export_data_act)
-
-        # ### Data Views ###
-
-        self.views_bar = self.addToolBar('Data Views')
-        self.views_bar.setIconSize(QtCore.QSize(40, 40))
-
-        # view tss vs time plot
-        self.view_tss_time_plot_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'tss_plot.png')),
-                                                       'View TSS vs time plot', self, checkable=True)
-        self.view_tss_time_plot_action.setShortcut('Ctrl+T')
-        # noinspection PyUnresolvedReferences
-        self.view_tss_time_plot_action.triggered.connect(self.on_view_tss_time_plot)
-        self.views_bar.addAction(self.view_tss_time_plot_action)
-
-        # view draft vs time plot
-        self.view_draft_time_plot_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'draft_plot.png')),
-                                                         'View draft vs time plot', self, checkable=True)
-        self.view_draft_time_plot_action.setShortcut('Ctrl+D')
-        # noinspection PyUnresolvedReferences
-        self.view_draft_time_plot_action.triggered.connect(self.on_view_draft_time_plot)
-        self.views_bar.addAction(self.view_draft_time_plot_action)
-
-        # view avg depth vs time plot
-        self.view_avg_depth_time_plot_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'avg_depth_plot.png')),
-                                                             'View avg depth vs time plot', self, checkable=True)
-        self.view_avg_depth_time_plot_action.setShortcut('Ctrl+A')
-        # noinspection PyUnresolvedReferences
-        self.view_avg_depth_time_plot_action.triggered.connect(self.on_view_avg_depth_time_plot)
-        self.views_bar.addAction(self.view_avg_depth_time_plot_action)
+        self.start_monitor_act = None
+        self.pause_monitor_act = None
+        self.stop_monitor_act = None
+        self.open_output_act = None
+        self.add_data_act = None
+        self.export_data_act = None
+        self.view_tss_time_plot_action = None
+        self.view_draft_time_plot_action = None
+        self.view_avg_depth_time_plot_action = None
+        self.view_info_viewer_action = None
+        self._make_actions()
 
         # ###    PLOTS    ###
 
@@ -165,6 +89,64 @@ class SurveyDataMonitor(AbstractWidget):
         # figures
 
         # ###   TSS VS TIME   ###
+        self.w1 = None
+        self.dw1 = None
+        self.f1 = None
+        self.c1 = None
+        self.tss = None
+        self.tss_ax = None
+        self.nv1 = None
+        self._make_tss_plot()
+
+        # ###   DRAFT VS TIME   ###
+        self.w2 = None
+        self.dw2 = None
+        self.f2 = None
+        self.c2 = None
+        self.draft = None
+        self.draft_ax = None
+        self.nv2 = None
+        self._make_draft_plot()
+
+        # ###   AVG DEPTH VS TIME   ###
+        self.w3 = None
+        self.dw3 = None
+        self.f3 = None
+        self.c3 = None
+        self.avg_depth = None
+        self.avg_depth_ax = None
+        self.nv3 = None
+        self._make_avg_depth_plot()
+
+        # ###   INFO VIEWER   ###
+        self.w4 = None
+        self.dw4 = None
+        self.f4 = None
+        self.c4 = None
+        self.info_viewer = None
+        self.nv4 = None
+        self._make_info_viewer()
+
+        # ###   MAP   ###
+        self.w0 = None
+        self.dw0 = None
+        self.f0 = None
+        self.c0 = None
+        self.map = None
+        self.map_points = None
+        self.map_ax = None
+        self.map_colormap = None
+        self.nv0 = None
+        self._make_tss_map()
+
+        # initial plot views
+
+        self._make_tss_time_plot_visible(False)
+        self._make_draft_time_plot_visible(False)
+        self._make_avg_depth_time_plot_visible(False)
+        self._make_info_viewer_visible(False)
+
+    def _make_tss_plot(self):
 
         self.w1 = QtGui.QWidget()
         vbox = QtGui.QVBoxLayout(self.w1)
@@ -202,7 +184,7 @@ class SurveyDataMonitor(AbstractWidget):
         self.dw1.setWidget(self.w1)
         self.dw1.installEventFilter(self)
 
-        # ###   DRAFT VS TIME   ###
+    def _make_draft_plot(self):
 
         self.w2 = QtGui.QWidget()
         vbox = QtGui.QVBoxLayout(self.w2)
@@ -239,7 +221,7 @@ class SurveyDataMonitor(AbstractWidget):
         self.dw2.setWidget(self.w2)
         self.dw2.installEventFilter(self)
 
-        # ###   AVG DEPTH VS TIME   ###
+    def _make_avg_depth_plot(self):
 
         self.w3 = QtGui.QWidget()
         vbox = QtGui.QVBoxLayout(self.w3)
@@ -276,7 +258,37 @@ class SurveyDataMonitor(AbstractWidget):
         self.dw3.setWidget(self.w3)
         self.dw3.installEventFilter(self)
 
-        # ###   MAP   ###
+    def _make_info_viewer(self):
+
+        self.w4 = QtGui.QWidget()
+        vbox = QtGui.QVBoxLayout(self.w4)
+        self.w4.setLayout(vbox)
+
+        self.info_viewer = QtGui.QTextEdit(self)
+        self.resize(QtCore.QSize(280, 40))
+        self.info_viewer.setTextColor(QtGui.QColor("#4682b4"))
+        # create a monospace font
+        font = QtGui.QFont("Courier New")
+        font.setStyleHint(QtGui.QFont.TypeWriter)
+        font.setFixedPitch(True)
+        font.setPointSize(9)
+        self.info_viewer.document().setDefaultFont(font)
+
+        # set the tab size
+        metrics = QtGui.QFontMetrics(font)
+        self.info_viewer.setTabStopWidth(3 * metrics.width(' '))
+
+        self.info_viewer.setReadOnly(True)
+
+        vbox.addWidget(self.info_viewer)
+        vbox.setContentsMargins(0, 0, 0, 0)
+        self.dw4 = QtGui.QDockWidget("Textual Info", self)
+        self.dw4.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
+        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.dw4)
+        self.dw4.setWidget(self.w4)
+        self.dw4.installEventFilter(self)
+
+    def _make_tss_map(self):
 
         self.w0 = QtGui.QWidget()
         vbox = QtGui.QVBoxLayout(self.w0)
@@ -318,10 +330,104 @@ class SurveyDataMonitor(AbstractWidget):
         self.dw0.installEventFilter(self)
         self.dw0.setHidden(True)
 
-        # initial plot views
-        self._make_tss_time_plot_visible(False)
-        self._make_draft_time_plot_visible(False)
-        self._make_avg_depth_time_plot_visible(False)
+    def _make_actions(self):
+
+        # ### Data Monitor ###
+
+        monitor_bar = self.addToolBar('Data Monitor')
+        monitor_bar.setIconSize(QtCore.QSize(40, 40))
+
+        # start
+        self.start_monitor_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'start.png')),
+                                               'Start monitoring survey data', self)
+        self.start_monitor_act.setShortcut('Alt+M')
+        # noinspection PyUnresolvedReferences
+        self.start_monitor_act.triggered.connect(self.on_start_monitor)
+        monitor_bar.addAction(self.start_monitor_act)
+
+        # pause
+        self.pause_monitor_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'pause.png')),
+                                               'Pause monitoring survey data', self)
+        self.pause_monitor_act.setShortcut('Alt+P')
+        # noinspection PyUnresolvedReferences
+        self.pause_monitor_act.triggered.connect(self.on_pause_monitor)
+        self.pause_monitor_act.setDisabled(True)
+        monitor_bar.addAction(self.pause_monitor_act)
+
+        # stop
+        self.stop_monitor_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'stop.png')),
+                                              'Stop monitoring survey data', self)
+        self.stop_monitor_act.setShortcut('Alt+S')
+        # noinspection PyUnresolvedReferences
+        self.stop_monitor_act.triggered.connect(self.on_stop_monitor)
+        self.stop_monitor_act.setDisabled(True)
+        monitor_bar.addAction(self.stop_monitor_act)
+
+        # ### Data Manager ###
+
+        manager_bar = self.addToolBar('Data Manager')
+        manager_bar.setIconSize(QtCore.QSize(40, 40))
+
+        # open output folder
+        self.open_output_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'load.png')),
+                                             'Open output folder', self)
+        self.open_output_act.setShortcut('Alt+O')
+        # noinspection PyUnresolvedReferences
+        self.open_output_act.triggered.connect(self.on_open_output)
+        manager_bar.addAction(self.open_output_act)
+
+        # add data
+        self.add_data_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'import_data.png')),
+                                          'Add data to the current data set', self)
+        self.add_data_act.setShortcut('Alt+A')
+        # noinspection PyUnresolvedReferences
+        self.add_data_act.triggered.connect(self.on_add_data)
+        manager_bar.addAction(self.add_data_act)
+
+        # export data
+        self.export_data_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export_data.png')),
+                                             'Export data', self)
+        self.export_data_act.setShortcut('Alt+X')
+        # noinspection PyUnresolvedReferences
+        self.export_data_act.triggered.connect(self.on_export_data)
+        manager_bar.addAction(self.export_data_act)
+
+        # ### Data Views ###
+
+        views_bar = self.addToolBar('Data Views')
+        views_bar.setIconSize(QtCore.QSize(40, 40))
+
+        # view tss vs time plot
+        self.view_tss_time_plot_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'tss_plot.png')),
+                                                       'View TSS vs time plot', self, checkable=True)
+        self.view_tss_time_plot_action.setShortcut('Ctrl+T')
+        # noinspection PyUnresolvedReferences
+        self.view_tss_time_plot_action.triggered.connect(self.on_view_tss_time_plot)
+        views_bar.addAction(self.view_tss_time_plot_action)
+
+        # view draft vs time plot
+        self.view_draft_time_plot_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'draft_plot.png')),
+                                                         'View draft vs time plot', self, checkable=True)
+        self.view_draft_time_plot_action.setShortcut('Ctrl+D')
+        # noinspection PyUnresolvedReferences
+        self.view_draft_time_plot_action.triggered.connect(self.on_view_draft_time_plot)
+        views_bar.addAction(self.view_draft_time_plot_action)
+
+        # view avg depth vs time plot
+        self.view_avg_depth_time_plot_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'avg_depth_plot.png')),
+                                                             'View avg depth vs time plot', self, checkable=True)
+        self.view_avg_depth_time_plot_action.setShortcut('Ctrl+A')
+        # noinspection PyUnresolvedReferences
+        self.view_avg_depth_time_plot_action.triggered.connect(self.on_view_avg_depth_time_plot)
+        views_bar.addAction(self.view_avg_depth_time_plot_action)
+
+        # view info viewer
+        self.view_info_viewer_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'info_viewer.png')),
+                                                     'View textual info on current data', self, checkable=True)
+        self.view_info_viewer_action.setShortcut('Ctrl+V')
+        # noinspection PyUnresolvedReferences
+        self.view_info_viewer_action.triggered.connect(self.on_view_info_viewer)
+        views_bar.addAction(self.view_info_viewer_action)
 
     def plotting(self):
         if not self._plotting_active:
@@ -329,7 +435,8 @@ class SurveyDataMonitor(AbstractWidget):
 
         if self._plotting_pause:
             logger.debug("pause")
-            Timer(self._plotting_timing, self.plotting).start()
+            # noinspection PyTypeChecker
+            self._plotting_timer = QtCore.QTimer.singleShot(self._plotting_timing, self.plotting)
             return
 
         cur_nr_samples = self.monitor.nr_of_samples()
@@ -339,7 +446,8 @@ class SurveyDataMonitor(AbstractWidget):
 
         self._last_nr_samples = cur_nr_samples
 
-        Timer(self._plotting_timing, self.plotting).start()
+        # noinspection PyTypeChecker
+        self._plotting_timer = QtCore.QTimer.singleShot(self._plotting_timing, self.plotting)
 
     def _refresh_plots(self):
         self.c1.draw()
@@ -403,6 +511,8 @@ class SurveyDataMonitor(AbstractWidget):
                                min(self.monitor.drafts) - 0.5)
         self.avg_depth_ax.set_ylim(max(self.monitor.depths) + 0.5,
                                    min(self.monitor.depths) - 0.5)
+
+        self.info_viewer.setPlainText(self.monitor.latest_info)
 
         self.monitor.unlock_data()
 
@@ -482,31 +592,8 @@ class SurveyDataMonitor(AbstractWidget):
         self._make_tss_time_plot_visible(True)
         self._make_draft_time_plot_visible(True)
         self._make_avg_depth_time_plot_visible(False)
+        self._make_info_viewer_visible(False)
         self.dw0.setVisible(True)
-
-    def _make_tss_time_plot_visible(self, flag):
-        if flag:
-            self.dw1.setVisible(True)
-            self.view_tss_time_plot_action.setChecked(True)
-        else:
-            self.dw1.setVisible(False)
-            self.view_tss_time_plot_action.setChecked(False)
-
-    def _make_draft_time_plot_visible(self, flag):
-        if flag:
-            self.dw2.setVisible(True)
-            self.view_draft_time_plot_action.setChecked(True)
-        else:
-            self.dw2.setVisible(False)
-            self.view_draft_time_plot_action.setChecked(False)
-
-    def _make_avg_depth_time_plot_visible(self, flag):
-        if flag:
-            self.dw3.setVisible(True)
-            self.view_avg_depth_time_plot_action.setChecked(True)
-        else:
-            self.dw3.setVisible(False)
-            self.view_avg_depth_time_plot_action.setChecked(False)
 
     @QtCore.Slot()
     def on_pause_monitor(self):
@@ -533,6 +620,40 @@ class SurveyDataMonitor(AbstractWidget):
             self._make_draft_time_plot_visible(False)
             self._make_avg_depth_time_plot_visible(False)
             self.dw0.setVisible(False)
+
+    def _make_tss_time_plot_visible(self, flag):
+        if flag:
+            self.dw1.setVisible(True)
+            self.view_tss_time_plot_action.setChecked(True)
+        else:
+            self.dw1.setVisible(False)
+            self.view_tss_time_plot_action.setChecked(False)
+
+    def _make_draft_time_plot_visible(self, flag):
+        if flag:
+            self.dw2.setVisible(True)
+            self.view_draft_time_plot_action.setChecked(True)
+        else:
+            self.dw2.setVisible(False)
+            self.view_draft_time_plot_action.setChecked(False)
+
+    def _make_avg_depth_time_plot_visible(self, flag):
+
+        if flag:
+            self.dw3.setVisible(True)
+            self.view_avg_depth_time_plot_action.setChecked(True)
+        else:
+            self.dw3.setVisible(False)
+            self.view_avg_depth_time_plot_action.setChecked(False)
+
+    def _make_info_viewer_visible(self, flag):
+
+        if flag:
+            self.dw4.setVisible(True)
+            self.view_info_viewer_action.setChecked(True)
+        else:
+            self.dw4.setVisible(False)
+            self.view_info_viewer_action.setChecked(False)
 
     # data manager
 
@@ -642,6 +763,15 @@ class SurveyDataMonitor(AbstractWidget):
             self._make_avg_depth_time_plot_visible(False)
         else:
             self._make_avg_depth_time_plot_visible(True)
+
+        self._refresh_plots()
+
+    @QtCore.Slot()
+    def on_view_info_viewer(self):
+        if self.dw4.isVisible():
+            self._make_info_viewer_visible(False)
+        else:
+            self._make_info_viewer_visible(True)
 
         self._refresh_plots()
 
