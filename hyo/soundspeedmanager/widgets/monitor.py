@@ -717,9 +717,10 @@ class SurveyDataMonitor(AbstractWidget):
         nr_of_samples = self.monitor.nr_of_samples()
         self._update_plot_data(nr_of_samples=nr_of_samples)
         if nr_of_samples > 2:
-            self.dw1.setVisible(True)
-            self.dw2.setVisible(True)
-            self.w0.setVisible(True)
+            self._make_tss_time_plot_visible(True)
+            self._make_draft_time_plot_visible(True)
+            self.dw0.setVisible(True)
+        self._refresh_plots()
 
     @QtCore.Slot()
     def on_export_data(self):
