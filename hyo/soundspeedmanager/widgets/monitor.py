@@ -306,12 +306,23 @@ class SurveyDataMonitor(AbstractWidget):
             self.map.drawparallels(np.arange(-90., 120., 30.), color="#cccccc", labels=[False, True, True, False])
             self.map.drawmeridians(np.arange(0., 360., 60.), color="#cccccc", labels=[True, False, False, True])
             self.map_colormap = cm.get_cmap('gist_rainbow')
-            self.map_points = self.map.scatter([], [], c=[], zorder=2, s=20,
+            self.map_points = self.map.scatter([], [], c=[], zorder=2, s=20, alpha=0.4,
                                                vmin=1450.0, vmax=1550.0, cmap=self.map_colormap)
 
             def format_coord(x, y):
-                pair = self.map(x, y, inverse=True)
-                return '%.6f, %.6f' % pair
+                map_x, map_y = self.map(x, y, inverse=True)
+
+                values = self.map_points.get_array()
+                offsets = self.map_points.get_offsets()
+                # logger.info("%s\n%s" % (values, offsets))
+                dists = np.sum((offsets - (x, y)) ** 2, axis=1)
+                min_idx = np.argmin(dists)
+                min_dist = np.sqrt(dists[min_idx])
+                view_span = self.map_ax.get_ylim()[1] - self.map_ax.get_ylim()[0]
+                if min_dist > view_span * .01:
+                    return '(%.6f, %.6f)' % (map_x, map_y)
+                else:
+                    return '(%.6f, %.6f) -> %.1f m/s' % (map_x, map_y, values[min_idx])
 
             self.map_ax.format_coord = format_coord
             self.f0_colorbar = None
@@ -463,8 +474,8 @@ class SurveyDataMonitor(AbstractWidget):
         self.draft.set_ydata([])
         self.avg_depth.set_xdata([])
         self.avg_depth.set_ydata([])
-        self.map_points = self.map.scatter([], [], c=[], zorder=2, s=20,
-                                           vmin=1450.0, vmax=1550.0, cmap=self.map_colormap)
+        self.map_points.set_array(np.array([]))
+        self.map_points.set_offsets(np.array([[], []]))
 
         self._refresh_plots()
 
@@ -482,21 +493,19 @@ class SurveyDataMonitor(AbstractWidget):
         self.avg_depth.set_xdata(self.monitor.times)
         self.avg_depth.set_ydata(self.monitor.depths)
         xs, ys = self.map(self.monitor.longs, self.monitor.lats)
-        self.map_points = self.map.scatter(xs, ys,
-                                           zorder=2, s=20,
-                                           c=self.monitor.tsss,
-                                           vmin=(min(self.monitor.tsss) - 0.1),
-                                           vmax=(max(self.monitor.tsss) + 0.1),
-                                           cmap=self.map_colormap, alpha=0.4)
+        vmin_tss, vmax_tss = self.monitor.calc_plot_good_tss()
+        self.map_points.set_array(np.array(self.monitor.tsss))
+        self.map_points.set_offsets(np.vstack([xs, ys]).T)
+        self.map_points.set_clim(vmin=vmin_tss, vmax=vmax_tss)
+
         if self.f0_colorbar is None:
 
             with rc_context(self.rc_context):
                 self.f0_colorbar = self.f0.colorbar(self.map_points, ax=self.map_ax, aspect=50,
                                                     orientation='horizontal', format='%.1f')
-                self.f0_colorbar.solids.set(alpha=1)
                 self.f0.tight_layout()
 
-        vmin_tss, vmax_tss = self.monitor.calc_plot_good_tss()
+        self.f0_colorbar.solids.set(alpha=1)
         self.f0_colorbar.set_clim(vmin=vmin_tss, vmax=vmax_tss)
 
         self.tss_ax.set_xlim(min(self.monitor.times) - timedelta(seconds=10),
@@ -694,7 +703,8 @@ class SurveyDataMonitor(AbstractWidget):
 
         if clear_data:
             self.monitor.clear_data()
-            self._clear_plot_data()
+
+        self._clear_plot_data()
 
         file_ext = os.path.splitext(selections[0])[-1]
         if file_ext == ".mon":
