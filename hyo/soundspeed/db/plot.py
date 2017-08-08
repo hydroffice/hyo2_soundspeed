@@ -284,13 +284,13 @@ class PlotDb(object):
             # print(ts_pk[1], ts_pk[0])
             tmp_ssp = self.db.profile_by_pk(ts_pk[0])
             # print(tmp_ssp)
-            ax.plot(tmp_ssp.cur.data.speed[tmp_ssp.cur.data_valid], tmp_ssp.cur.data.depth[tmp_ssp.cur.data_valid], '.',
+            ax.plot(tmp_ssp.cur.proc.speed[tmp_ssp.cur.proc_valid], tmp_ssp.cur.proc.depth[tmp_ssp.cur.proc_valid], '.',
                     color=(0.85, 0.85, 0.85), markersize=2
                     # label='%s [%04d] ' % (ts_pk[0].time(), ts_pk[1])
                     )
 
-            avg_ssp.add_samples(tmp_ssp.cur.data.depth[tmp_ssp.cur.data_valid],
-                                tmp_ssp.cur.data.speed[tmp_ssp.cur.data_valid])
+            avg_ssp.add_samples(tmp_ssp.cur.proc.depth[tmp_ssp.cur.proc_valid],
+                                tmp_ssp.cur.proc.speed[tmp_ssp.cur.proc_valid])
 
         avg_ssp.calc_avg()
         ax.plot(avg_ssp.mean, avg_ssp.depths, '-b', linewidth=2)
@@ -352,8 +352,8 @@ class PlotDb(object):
 
             fig = plt.figure(date_list.index(row_date))
             row_ssp = self.db.profile_by_pk(row[0])
-            fig.get_axes()[0].plot(row_ssp.cur.data.speed[row_ssp.cur.data_valid],
-                                   row_ssp.cur.data.depth[row_ssp.cur.data_valid],
+            fig.get_axes()[0].plot(row_ssp.cur.proc.speed[row_ssp.cur.proc_valid],
+                                   row_ssp.cur.proc.depth[row_ssp.cur.proc_valid],
                                    label='%s [%04d]' % (row[1].time(), row[0]))
 
         # print(date_plots)
