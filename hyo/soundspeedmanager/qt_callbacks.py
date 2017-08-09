@@ -39,22 +39,25 @@ class QtCallbacks(AbstractCallbacks):
         dd_deg = float(degrees)
         min_float = float(minutes)
         if (min_float > 60.0) or (min_float < 0.0):
+            # valid user input is [0, 60]
             return None
         dd_min = min_float / 60
         sec_float = float(seconds)
         if (sec_float > 60.0) or (sec_float < 0.0):
+            # valid user input is [0, 60]
             return None
         dd_sec = sec_float / (60 * 60)
 
-        neg_deg = dd_deg < 0
+        neg_deg = dd_deg < 0  # if negative, we need to invert the sign at the end
         dd = abs(dd_deg) + dd_min + dd_sec
 
         if neg_deg and (direction in ['W', 'S']):
+            # it cannot have a negative sign together with a negative letter
             return None
 
+        # sign inversion cases
         if neg_deg:
             dd *= -1
-
         if direction in ['W', 'S']:
             dd *= -1
 
@@ -66,18 +69,20 @@ class QtCallbacks(AbstractCallbacks):
         dd_deg = float(degrees)
         min_float = float(minutes)
         if (min_float > 60.0) or (min_float < 0.0):
+            # valid user input is [0, 60]
             return None
         dd_min = min_float / 60
 
-        neg_deg = dd_deg < 0
+        neg_deg = dd_deg < 0  # if negative, we need to invert the sign at the end
         dd = abs(dd_deg) + dd_min
 
         if neg_deg and (direction in ['W', 'S']):
+            # it cannot have a negative sign together with a negative letter
             return None
 
+        # sign inversion cases
         if neg_deg:
             dd *= -1
-
         if direction in ['W', 'S']:
             dd *= -1
 
@@ -87,9 +92,11 @@ class QtCallbacks(AbstractCallbacks):
     def interpret_latitude(cls, str_value):
 
         try:
-
+            # this regex split the string if not a number, not a letter ,not . or -
             lat_tokens = re.split('[^\d\w.-]+', str_value)
             logger.debug("lat tokens: %s" % (lat_tokens,))
+
+            # manage the different kind of input by nr. of tokens
             nr_lat_tokens = len(lat_tokens)
             if nr_lat_tokens == 0:
 
@@ -97,39 +104,61 @@ class QtCallbacks(AbstractCallbacks):
 
             elif nr_lat_tokens == 1:
 
-                logger.debug("DD")
-                lat = float(lat_tokens[0])
+                if lat_tokens[0][-1] in ["N", "S"]:  # DDH
+
+                    logger.debug("DDH")
+                    lat = float(lat_tokens[0][0:-1])
+                    if lat_tokens[0][-1].strip() == "S":
+                        lat *= -1
+
+                else:  # DD
+                    logger.debug("DD")
+                    lat = float(lat_tokens[0])
 
             elif nr_lat_tokens == 2:
 
-                if lat_tokens[1].strip() in ["N", "S"]:
+                if lat_tokens[1].strip() in ["N", "S"]:  # DD H
 
-                    logger.debug("DD E")
+                    logger.debug("DD H")
                     lat = float(lat_tokens[0])
                     if lat_tokens[1].strip() == "S":
                         lat *= -1
 
                 else:
-                    logger.debug("DM")
-                    lat = cls.dm2dd(lat_tokens[0], lat_tokens[1])
+
+                    if lat_tokens[1][-1] in ["N", "S"]:  # DMH
+
+                        logger.debug("DMH")
+                        lat = cls.dm2dd(lat_tokens[0], lat_tokens[1][0:-1], lat_tokens[1][-1])
+
+                    else:  # DM
+                        logger.debug("DM")
+                        lat = cls.dm2dd(lat_tokens[0], lat_tokens[1])
 
             elif nr_lat_tokens == 3:
 
-                if lat_tokens[2].strip() in ["N", "S"]:
+                if lat_tokens[2].strip() in ["N", "S"]:  # DM H
 
-                    logger.debug("DM E")
+                    logger.debug("DM H")
                     lat = cls.dm2dd(lat_tokens[0], lat_tokens[1], lat_tokens[2])
 
                 else:
 
-                    logger.debug("DMS")
-                    lat = cls.dms2dd(lat_tokens[0], lat_tokens[1], lat_tokens[2])
+                    if lat_tokens[2][-1] in ["N", "S"]:  # DMSH
+
+                        logger.debug("DMSH")
+                        lat = cls.dms2dd(lat_tokens[0], lat_tokens[1], lat_tokens[2][0:-1], lat_tokens[2][-1])
+
+                    else:  # DMS
+
+                        logger.debug("DMS")
+                        lat = cls.dms2dd(lat_tokens[0], lat_tokens[1], lat_tokens[2])
 
             elif nr_lat_tokens == 4:
 
-                if lat_tokens[3].strip() in ["N", "S"]:
+                if lat_tokens[3].strip() in ["N", "S"]:  # DMS H
 
-                    logger.debug("DMS E")
+                    logger.debug("DMS H")
                     lat = cls.dms2dd(lat_tokens[0], lat_tokens[1], lat_tokens[2], lat_tokens[3])
 
                 else:
@@ -158,8 +187,11 @@ class QtCallbacks(AbstractCallbacks):
 
         try:
 
+            # this regex split the string if not a number, not a letter ,not . or -
             lon_tokens = re.split('[^\d\w.-]+', str_value)
             logger.debug("lon tokens: %s" % (lon_tokens,))
+
+            # manage the different kind of input by nr. of tokens
             nr_lon_tokens = len(lon_tokens)
             if nr_lon_tokens == 0:
 
@@ -167,39 +199,61 @@ class QtCallbacks(AbstractCallbacks):
 
             elif nr_lon_tokens == 1:
 
-                logger.debug("DD")
-                lon = float(lon_tokens[0])
+                if lon_tokens[0][-1] in ["E", "W"]:  # DDH
+
+                    logger.debug("DDH")
+                    lon = float(lon_tokens[0][0:-1])
+                    if lon_tokens[0][-1].strip() == "W":
+                        lon *= -1
+
+                else:  # DD
+
+                    logger.debug("DD")
+                    lon = float(lon_tokens[0])
 
             elif nr_lon_tokens == 2:
 
-                if lon_tokens[1].strip() in ["W", "E"]:
+                if lon_tokens[1].strip() in ["W", "E"]:  # DD H
 
-                    logger.debug("DD E")
+                    logger.debug("DD H")
                     lon = float(lon_tokens[0])
                     if lon_tokens[1].strip() == "W":
                         lon *= -1
 
-                else:
-                    logger.debug("DM")
-                    lon = cls.dm2dd(lon_tokens[0], lon_tokens[1])
+                else:  # DM
+
+                    if lon_tokens[1][-1] in ["W", "E"]:  # DMH
+
+                        logger.debug("DMH")
+                        lon = cls.dm2dd(lon_tokens[0], lon_tokens[1][0:-1], lon_tokens[1][-1])
+
+                    else:  # DM
+                        logger.debug("DM")
+                        lon = cls.dm2dd(lon_tokens[0], lon_tokens[1])
 
             elif nr_lon_tokens == 3:
 
-                if lon_tokens[2].strip() in ["W", "E"]:
+                if lon_tokens[2].strip() in ["W", "E"]:  # DM H
 
-                    logger.debug("DM E")
+                    logger.debug("DM H")
                     lon = cls.dm2dd(lon_tokens[0], lon_tokens[1], lon_tokens[2])
 
-                else:
+                else:  # DMS
 
-                    logger.debug("DMS")
-                    lon = cls.dms2dd(lon_tokens[0], lon_tokens[1], lon_tokens[2])
+                    if lon_tokens[2][-1] in ["W", "E"]:  # DMSH
+
+                        logger.debug("DMSH")
+                        lon = cls.dms2dd(lon_tokens[0], lon_tokens[1], lon_tokens[2][0:-1], lon_tokens[2][-1])
+
+                    else:
+                        logger.debug("DMS")
+                        lon = cls.dms2dd(lon_tokens[0], lon_tokens[1], lon_tokens[2])
 
             elif nr_lon_tokens == 4:
 
-                if lon_tokens[3].strip() in ["W", "E"]:
+                if lon_tokens[3].strip() in ["W", "E"]:  # DMS H
 
-                    logger.debug("DMS E")
+                    logger.debug("DMS H")
                     lon = cls.dms2dd(lon_tokens[0], lon_tokens[1], lon_tokens[2], lon_tokens[3])
 
                 else:
