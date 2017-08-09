@@ -1,9 +1,5 @@
-import socket
-import operator
 import logging
-import functools
-from threading import Thread, Event
-import time
+from threading import Event
 
 logger = logging.getLogger(__name__)
 

@@ -4,8 +4,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from hyo.soundspeed.profile.dicts import Dicts
-
 
 class Server(Thread):
     def __init__(self, prj, target=None, name="server"):

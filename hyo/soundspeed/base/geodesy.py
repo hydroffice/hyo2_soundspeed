@@ -232,7 +232,7 @@ class Geodesy(object):
         try:
             _, _, dist = self.geo.inv(lons1=long_1, lats1=lat_1, lons2=long_2, lats2=lat_2, radians=False)
 
-        except ValueError as e:
+        except ValueError:
             dist = self.haversine(long_1=long_1, lat_1=lat_1, long_2=long_2, lat_2=lat_2)
             # log.info("%s > switch to Haversine: %s" % (e, dist))
 

@@ -394,7 +394,6 @@ class MainWin(QtGui.QMainWindow):
         self.statusBar().setStyleSheet(self.status_bar_normal_style)
 
     def _check_latest_release(self):
-        tokens = list()
 
         new_release = False
         new_bugfix = False

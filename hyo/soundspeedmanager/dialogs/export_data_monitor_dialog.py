@@ -5,8 +5,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 from hyo.soundspeedmanager.dialogs.dialog import AbstractDialog
-from hyo.soundspeed.base.helper import explore_folder
-from hyo.soundspeed.profile.dicts import Dicts
 
 
 class ExportDataMonitorDialog(AbstractDialog):

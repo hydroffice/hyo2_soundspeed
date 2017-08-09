@@ -37,7 +37,7 @@ def input_data_sub_folders():
 def input_test_files(input_sub_folder, ext):
     """Return a list of files with the given extension present in the input test data folder"""
     file_list = list()
-    for root, dirs, files in os.walk(input_sub_folder):
+    for root, _, files in os.walk(input_sub_folder):
         for f in files:
             if f.endswith(ext):
                 file_list.append(os.path.join(root, f))
@@ -110,7 +110,7 @@ def dict_test_files(data_folder, pairs):
         reader = pairs[folder]
         reader_folder = os.path.join(data_folder, folder)
 
-        for root, dirs, files in os.walk(reader_folder):
+        for root, _, files in os.walk(reader_folder):
 
             for filename in files:
 

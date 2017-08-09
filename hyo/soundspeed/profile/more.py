@@ -51,7 +51,7 @@ class More(object):
 
         count = 0  # 0 is depth
         names = self.sa.dtype.names
-        for i in range(nr_figures):  # figure
+        for _ in range(nr_figures):  # figure
 
             if count >= nr_fields:
                 break

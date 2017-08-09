@@ -1,4 +1,3 @@
-from PySide import QtGui
 from PySide import QtCore
 QVariant = lambda value=None: value
 

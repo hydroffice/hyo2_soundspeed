@@ -296,9 +296,6 @@ def hstb_atlases_folder():
     if not is_pydro():
         raise RuntimeError("this method should be called only within a Pydro environment")
 
-    # noinspection PyUnresolvedReferences
-    from HSTB import __file__ as hstb_file
-
     folder = os.path.join(hstb_folder(), "..\..\..\supplementals")
     if not os.path.exists(folder):
         os.mkdir(folder)

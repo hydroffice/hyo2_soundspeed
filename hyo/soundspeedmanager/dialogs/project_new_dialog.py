@@ -5,7 +5,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 from hyo.soundspeedmanager.dialogs.dialog import AbstractDialog
-from hyo.soundspeed.base.gdal_aux import GdalAux
 
 
 class ProjectNewDialog(AbstractDialog):
