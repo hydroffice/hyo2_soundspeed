@@ -172,11 +172,11 @@ class QtCallbacks(AbstractCallbacks):
 
             elif nr_lon_tokens == 2:
 
-                if lon_tokens[1].strip() in ["N", "S"]:
+                if lon_tokens[1].strip() in ["W", "E"]:
 
                     logger.debug("DD E")
                     lon = float(lon_tokens[0])
-                    if lon_tokens[1].strip() == "S":
+                    if lon_tokens[1].strip() == "W":
                         lon *= -1
 
                 else:
@@ -185,7 +185,7 @@ class QtCallbacks(AbstractCallbacks):
 
             elif nr_lon_tokens == 3:
 
-                if lon_tokens[2].strip() in ["N", "S"]:
+                if lon_tokens[2].strip() in ["W", "E"]:
 
                     logger.debug("DM E")
                     lon = cls.dm2dd(lon_tokens[0], lon_tokens[1], lon_tokens[2])
@@ -197,7 +197,7 @@ class QtCallbacks(AbstractCallbacks):
 
             elif nr_lon_tokens == 4:
 
-                if lon_tokens[3].strip() in ["N", "S"]:
+                if lon_tokens[3].strip() in ["W", "E"]:
 
                     logger.debug("DMS E")
                     lon = cls.dms2dd(lon_tokens[0], lon_tokens[1], lon_tokens[2], lon_tokens[3])
