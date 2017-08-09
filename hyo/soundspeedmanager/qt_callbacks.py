@@ -140,7 +140,7 @@ class QtCallbacks(AbstractCallbacks):
 
                 lat = None
 
-        except:
+        except Exception:
 
             lat = None
 
@@ -210,7 +210,7 @@ class QtCallbacks(AbstractCallbacks):
 
                 lon = None
 
-        except:
+        except Exception:
 
             lon = None
 

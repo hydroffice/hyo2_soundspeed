@@ -9,10 +9,10 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class ProgressBar(object):
+class ProgressBar:
     """ Class used to store the options of a progress bar """
 
-    def __init__(self, start_state=0, end_state=10, bar_width=12, bar_fill='+', bar_blank='-',
+    def __init__(self, start_state=0.0, end_state=10.0, bar_width=12, bar_fill='+', bar_blank='-',
                  bar_format='[%(fill)s@%(blank)s] %(progress)s%%', use_stdout=sys.stdout):
         """ Initialize the progress bar
 
@@ -25,7 +25,6 @@ class ProgressBar(object):
             bar_format:    format settings for the progress bar
             use_stdout:    file-object to which send the progress status (default, use sys.stdout)
         """
-        super(ProgressBar, self).__init__()
 
         self.start = start_state
         self.end = end_state
@@ -34,50 +33,45 @@ class ProgressBar(object):
         self.blank = bar_blank
         self.bar_format = bar_format
         self.stdout = use_stdout
-        self.progress = 0
+        self.progress = 0.0
         self.reset()
 
-    def __add__(self, increment):
-        if self.end > self.progress + increment:
+    def add(self, increment):
+        if self.end > (self.progress + increment):
             self.progress += increment
         else:
             self.progress = float(self.end)
-        return self
 
-    def __sub__(self, decrement):
+    def sub(self, decrement):
         if self.start < self.progress - decrement:
             self.progress -= decrement
         else:
             self.progress = float(self.start)
-        return self
 
-    def __str__(self):
+    def __repr__(self):
         cur_width = int(self.progress / self.end * self.width)
         fill = cur_width * self.fill
         blank = (self.width - cur_width) * self.blank
         percentage = int(self.progress / self.end * 100)
         return self.bar_format % {'fill': fill, 'blank': blank, 'progress': percentage}
 
-    __repr__ = __str__
-
     def reset(self):
         """ Resets the current progress to the start point """
         self.progress = float(self.start)
-        return self
 
     def show_progress(self):
         """ Update the progress bar """
         # running in a real terminal
         if hasattr(self.stdout, 'isatty') and self.stdout.isatty():
-            self.stdout.write(b'\r')
+            self.stdout.write('\r')
         # being piped or redirected
         else:
-            self.stdout.write(b'\n')
+            self.stdout.write('\n')
         self.stdout.write(str(self))
         self.stdout.flush()
 
 
-class Ftp(object):
+class Ftp:
     """ This class manage a FTP connection, and may also unzip the downloaded file """
 
     def __init__(self, host, username="anonymous", password="anonymous@", show_progress=False, debug_mode=False,
@@ -152,13 +146,15 @@ class Ftp(object):
                 f.write(chunk)
                 self.chunk_count += len(chunk)
                 if self.show_progress:
+
                     if self.progress:
                         if self.progress.canceled:
                             raise RuntimeError("download stopped by user")
                         pt = int((self.chunk_count / self.filesize) * 100.0)
                         self.progress.update(pt)
+
                     else:
-                        progress + len(chunk)
+                        progress.add(len(chunk))
                         progress.show_progress()
 
             self.conn.retrbinary('RETR %s' % file_src, callback)
@@ -197,7 +193,7 @@ class Ftp(object):
                             pct = int((self.file_count / self.file_nr) * 100.0)
                             self.progress.update(pct)
                         else:
-                            progress + 1
+                            progress.add(1)
                             progress.show_progress()
                 z.close()
                 os.remove(file_dst)
