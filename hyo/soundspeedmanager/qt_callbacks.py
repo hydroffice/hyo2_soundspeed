@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import os
+import re
 
 from PySide import QtGui, QtCore
 
@@ -31,6 +32,262 @@ class QtCallbacks(AbstractCallbacks):
         if not ok:
             date = None
         return date
+
+    @classmethod
+    def dms2dd(cls, degrees, minutes, seconds, direction=''):
+
+        dd_deg = float(degrees)
+        min_float = float(minutes)
+        if (min_float > 60.0) or (min_float < 0.0):
+            return None
+        dd_min = min_float / 60
+        sec_float = float(seconds)
+        if (sec_float > 60.0) or (sec_float < 0.0):
+            return None
+        dd_sec = sec_float / (60 * 60)
+
+        neg_deg = dd_deg < 0
+        dd = abs(dd_deg) + dd_min + dd_sec
+
+        if neg_deg and (direction in ['W', 'S']):
+            return None
+
+        if neg_deg:
+            dd *= -1
+
+        if direction in ['W', 'S']:
+            dd *= -1
+
+        return dd
+
+    @classmethod
+    def dm2dd(cls, degrees, minutes, direction=''):
+
+        dd_deg = float(degrees)
+        min_float = float(minutes)
+        if (min_float > 60.0) or (min_float < 0.0):
+            return None
+        dd_min = min_float / 60
+
+        neg_deg = dd_deg < 0
+        dd = abs(dd_deg) + dd_min
+
+        if neg_deg and (direction in ['W', 'S']):
+            return None
+
+        if neg_deg:
+            dd *= -1
+
+        if direction in ['W', 'S']:
+            dd *= -1
+
+        return dd
+
+    @classmethod
+    def interpret_latitude(cls, str_value):
+
+        try:
+
+            lat_tokens = re.split('[^\d\w.-]+', str_value)
+            logger.debug("lat tokens: %s" % (lat_tokens,))
+            nr_lat_tokens = len(lat_tokens)
+            if nr_lat_tokens == 0:
+
+                lat = None
+
+            elif nr_lat_tokens == 1:
+
+                logger.debug("DD")
+                lat = float(lat_tokens[0])
+
+            elif nr_lat_tokens == 2:
+
+                if lat_tokens[1].strip() in ["N", "S"]:
+
+                    logger.debug("DD E")
+                    lat = float(lat_tokens[0])
+                    if lat_tokens[1].strip() == "S":
+                        lat *= -1
+
+                else:
+                    logger.debug("DM")
+                    lat = cls.dm2dd(lat_tokens[0], lat_tokens[1])
+
+            elif nr_lat_tokens == 3:
+
+                if lat_tokens[2].strip() in ["N", "S"]:
+
+                    logger.debug("DM E")
+                    lat = cls.dm2dd(lat_tokens[0], lat_tokens[1], lat_tokens[2])
+
+                else:
+
+                    logger.debug("DMS")
+                    lat = cls.dms2dd(lat_tokens[0], lat_tokens[1], lat_tokens[2])
+
+            elif nr_lat_tokens == 4:
+
+                if lat_tokens[3].strip() in ["N", "S"]:
+
+                    logger.debug("DMS E")
+                    lat = cls.dms2dd(lat_tokens[0], lat_tokens[1], lat_tokens[2], lat_tokens[3])
+
+                else:
+
+                    lat = None
+
+            else:
+
+                lat = None
+
+        except:
+
+            lat = None
+
+        if lat is not None:
+
+            if (lat < -90.0) or (lat > 90.0):
+                logger.warning("out of bounds: %s" % lat)
+                lat = None
+
+        logger.debug("latitude: %s" % lat)
+        return lat
+
+    @classmethod
+    def interpret_longitude(cls, str_value):
+
+        try:
+
+            lon_tokens = re.split('[^\d\w.-]+', str_value)
+            logger.debug("lon tokens: %s" % (lon_tokens,))
+            nr_lon_tokens = len(lon_tokens)
+            if nr_lon_tokens == 0:
+
+                lon = None
+
+            elif nr_lon_tokens == 1:
+
+                logger.debug("DD")
+                lon = float(lon_tokens[0])
+
+            elif nr_lon_tokens == 2:
+
+                if lon_tokens[1].strip() in ["N", "S"]:
+
+                    logger.debug("DD E")
+                    lon = float(lon_tokens[0])
+                    if lon_tokens[1].strip() == "S":
+                        lon *= -1
+
+                else:
+                    logger.debug("DM")
+                    lon = cls.dm2dd(lon_tokens[0], lon_tokens[1])
+
+            elif nr_lon_tokens == 3:
+
+                if lon_tokens[2].strip() in ["N", "S"]:
+
+                    logger.debug("DM E")
+                    lon = cls.dm2dd(lon_tokens[0], lon_tokens[1], lon_tokens[2])
+
+                else:
+
+                    logger.debug("DMS")
+                    lon = cls.dms2dd(lon_tokens[0], lon_tokens[1], lon_tokens[2])
+
+            elif nr_lon_tokens == 4:
+
+                if lon_tokens[3].strip() in ["N", "S"]:
+
+                    logger.debug("DMS E")
+                    lon = cls.dms2dd(lon_tokens[0], lon_tokens[1], lon_tokens[2], lon_tokens[3])
+
+                else:
+
+                    lon = None
+
+            else:
+
+                lon = None
+
+        except:
+
+            lon = None
+
+        if lon is not None:
+
+            if (lon < -180.0) or (lon > 180.0):
+                logger.warning("out of bounds: %s" % lon)
+                lon = None
+
+        logger.debug("longitude: %s" % lon)
+        return lon
+
+    def ask_location(self, default_lat=None, default_lon=None):
+        """Ask user for location (it is not an abstract method because it is based on ask_number)"""
+
+        # try to convert the passed default values
+        if (default_lat is not None) and (default_lon is not None):
+
+            try:
+                _ = float(default_lat)
+                _ = float(default_lon)
+
+            except Exception:
+                default_lat = 43.13555
+                default_lon = -70.9395
+
+        # if both default lat and lon are None, check if sis has position
+        else:
+
+            if self.sis_listener is not None:
+                if self.sis_listener.nav is not None:
+                    if (self.sis_listener.nav.latitude is not None) and (self.sis_listener.nav.longitude is not None):
+                        default_lat = self.sis_listener.nav.latitude
+                        default_lon = self.sis_listener.nav.longitude
+
+            if (default_lat is None) or (default_lon is None):
+                default_lat = 43.13555
+                default_lon = -70.9395
+
+        # ask user for both lat and long
+        lat = None
+        lon = None
+
+        # first latitude
+        while True:
+
+            lat, ok = QtGui.QInputDialog.getText(self._parent, "Location",
+                                                 "Enter latitude ad DD, DM, or DMS:",
+                                                 text="%s" % default_lat)
+            if not ok:
+                lat = None
+                break
+
+            lat = self.interpret_latitude(lat)
+            if lat is not None:
+                break
+
+        # then longitude
+        if lat is not None:  # don't check for lon if lat already failed
+
+            while True:
+
+                lon, ok = QtGui.QInputDialog.getText(self._parent, "Location",
+                                                     "Enter longitude ad DD, DM, or DMS:",
+                                                     text="%s" % default_lon)
+                if not ok:
+                    lat = None
+                    break
+
+                lon = self.interpret_longitude(lon)
+                if lon is not None:
+                    break
+
+        if (lat is None) or (lon is None):  # return None if one of the two is invalid
+            return None, None
+
+        return lat, lon
 
     def ask_date(self):
         """Ask user for date"""
