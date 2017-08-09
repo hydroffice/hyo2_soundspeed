@@ -258,7 +258,7 @@ class QtCallbacks(AbstractCallbacks):
         while True:
 
             lat, ok = QtGui.QInputDialog.getText(self._parent, "Location",
-                                                 "Enter latitude ad DD, DM, or DMS:",
+                                                 "Enter latitude as DD, DM, or DMS:",
                                                  text="%s" % default_lat)
             if not ok:
                 lat = None
@@ -274,7 +274,7 @@ class QtCallbacks(AbstractCallbacks):
             while True:
 
                 lon, ok = QtGui.QInputDialog.getText(self._parent, "Location",
-                                                     "Enter longitude ad DD, DM, or DMS:",
+                                                     "Enter longitude as DD, DM, or DMS:",
                                                      text="%s" % default_lon)
                 if not ok:
                     lat = None
