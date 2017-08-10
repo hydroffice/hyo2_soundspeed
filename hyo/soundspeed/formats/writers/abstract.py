@@ -45,20 +45,26 @@ class AbstractTextWriter(AbstractWriter, metaclass=ABCMeta):
     def _write(self, data_path, data_file, encoding='utf8', append=False, binary=False):
         """Helper function to write the raw file"""
 
-        data_path = os.path.join(data_path, self.name.lower())
+        # data_path = os.path.join(data_path, self.name.lower())  # commented to avoid the creation of sub-folders
         if not os.path.exists(data_path):
             os.makedirs(data_path)
 
         if data_file:
+
             if len(data_file.split('.')) == 1:
-                data_file += (".%s" % list(self.ext)[0])
+                data_file += (".%s" % (list(self.ext)[0], ))
+        
             file_path = os.path.join(data_path, data_file)
+
         else:
+
             if self.ssp.cur.meta.original_path:
-                data_file = os.path.basename(self.ssp.cur.meta.original_path) + '.' + list(self.ext)[0]
+                data_file = "%s.%s" % (os.path.basename(self.ssp.cur.meta.original_path), list(self.ext)[0])
             else:
-                data_file = 'output.' + list(self.ext)[0]
+                data_file = 'output.%s' % (list(self.ext)[0], )
+
             file_path = os.path.join(data_path, data_file)
+
         logger.info("output file: %s" % file_path)
 
         if append:

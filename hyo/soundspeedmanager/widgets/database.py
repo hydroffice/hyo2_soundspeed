@@ -559,9 +559,19 @@ class Database(AbstractWidget):
 
         # check if any selection
         rows = self.ssp_list.selectionModel().selectedRows()
-        if len(rows) < 2:
+
+        nr_rows = len(rows)
+        if nr_rows == 0:
+
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.information(self, "Profile Export", "You need to select at least 1 profile!")
+
+        elif nr_rows == 1:
+
             self.export_single_profile()
+
         else:
+
             self.export_multi_profile()
 
     def export_profile_metadata(self):
