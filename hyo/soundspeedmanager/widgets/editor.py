@@ -1,3 +1,4 @@
+import numpy as np
 import os
 import logging
 
@@ -389,6 +390,11 @@ class Editor(AbstractWidget):
         if (self.lib.cur.meta.sensor_type == Dicts.sensor_types['XSV']) or \
             (self.lib.cur.meta.sensor_type == Dicts.sensor_types['SVP']):
             self.temp_sal_act.setDisabled(False)
+        elif self.lib.cur.meta.sensor_type == Dicts.sensor_types['MVP']:
+            if (np.sum(self.lib.cur.proc.temp) == 0) and (np.sum(self.lib.cur.proc.sal) == 0):
+                self.temp_sal_act.setDisabled(False)
+            else:
+                self.temp_sal_act.setDisabled(True)
         else:
             self.temp_sal_act.setDisabled(True)
         if self.lib.use_sis():

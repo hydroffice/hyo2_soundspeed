@@ -368,7 +368,9 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
 
         try:
             sensor_field = footer_fields[5].split("*")[0]
-            if sensor_field == "AML_uSVPT":
+            if sensor_field == "AML_SmartSVP":
+                self.ssp.cur.meta.sensor_type = Dicts.sensor_types["SVP"]
+            elif sensor_field == "AML_uSVPT":
                 self.ssp.cur.meta.sensor_type = Dicts.sensor_types["SVP"]
             elif sensor_field == "AML_uCTD":
                 self.ssp.cur.meta.sensor_type = Dicts.sensor_types["CTD"]

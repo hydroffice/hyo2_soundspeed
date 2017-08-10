@@ -128,3 +128,5 @@ Currently implemented features
 .. index:: transmission; supported protocols
 
 * Persistent storage of collected SSP data in a SQLite database
+
+* Survey data monitoring (see :ref:`data_monitor_tool`)
