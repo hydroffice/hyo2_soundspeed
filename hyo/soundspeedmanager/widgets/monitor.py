@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 from hyo.soundspeedmanager.widgets.widget import AbstractWidget
 from hyo.soundspeedmanager.dialogs.export_data_monitor_dialog import ExportDataMonitorDialog
+from hyo.soundspeedmanager.dialogs.monitor_view_option_dialog import MonitorViewOption
 from hyo.surveydatamonitor import monitor
 
 
@@ -51,6 +52,7 @@ class SurveyDataMonitor(AbstractWidget):
         self.monitor = monitor.SurveyDataMonitor(ssm=self.lib)
         self._plotting_timing = timing
         self._plotting_timer = None
+        self._plotting_samples = 200
 
         self._plotting_active = False
         self._plotting_pause = False
@@ -79,7 +81,7 @@ class SurveyDataMonitor(AbstractWidget):
         # mpl settings
         self.f_dpi = 120  # dots-per-inch
         self.f_sz = (3.5, 2.5)  # inches
-        self.f_map_sz = (4.5, 2.5)  # inches
+        self.f_map_sz = (5.5, 3.5)  # inches
         self.draft_color = '#00cc66'
         self.tss_color = '#3385ff'
         self.avg_depth_color = '#ffb266'
@@ -135,7 +137,11 @@ class SurveyDataMonitor(AbstractWidget):
         self.map_ax = None
         self.map_colormap = None
         self.nv0 = None
+        self.f0_colorbar = None
         self._make_tss_map()
+
+        self.view_options = None
+        self._make_view_options()
 
         # initial plot views
 
@@ -143,6 +149,14 @@ class SurveyDataMonitor(AbstractWidget):
         self._make_draft_time_plot_visible(False)
         self._make_avg_depth_time_plot_visible(False)
         self._make_info_viewer_visible(False)
+
+    @property
+    def plotting_samples(self):
+        return self._plotting_samples
+
+    @plotting_samples.setter
+    def plotting_samples(self, value):
+        self._plotting_samples = value
 
     def _make_tss_plot(self):
 
@@ -170,6 +184,7 @@ class SurveyDataMonitor(AbstractWidget):
             self.tss_ax.set_ylim(1450.0, 1550.0)
             self.tss_ax.set_xlim(datetime.now(), datetime.now() + timedelta(seconds=60))
             self.tss_ax.grid(True)
+            self.tss_ax.ticklabel_format(useOffset=False, axis='y')
             # dates = matplotlib.dates.date2num(list_of_datetimes)
             self.nv1 = NavToolBar(canvas=self.c1, parent=self.w1, coordinates=True)
             self.nv1.setIconSize(QtCore.QSize(14, 14))
@@ -208,6 +223,7 @@ class SurveyDataMonitor(AbstractWidget):
             self.draft_ax.set_ylim(10.0, 0.0)
             self.draft_ax.set_xlim(datetime.now(), datetime.now() + timedelta(seconds=60))
             self.draft_ax.grid(True)
+            self.draft_ax.ticklabel_format(useOffset=False, axis='y')
             self.nv2 = NavToolBar(canvas=self.c2, parent=self.w2, coordinates=True)
             self.nv2.setIconSize(QtCore.QSize(14, 14))
         vbox.addWidget(self.c2)
@@ -245,6 +261,7 @@ class SurveyDataMonitor(AbstractWidget):
             self.avg_depth_ax.set_ylim(1000.0, 0.0)
             self.avg_depth_ax.set_xlim(datetime.now(), datetime.now() + timedelta(seconds=60))
             self.avg_depth_ax.grid(True)
+            self.avg_depth_ax.ticklabel_format(useOffset=False, axis='y')
             self.nv3 = NavToolBar(canvas=self.c3, parent=self.w3, coordinates=True)
             self.nv3.setIconSize(QtCore.QSize(14, 14))
         vbox.addWidget(self.c3)
@@ -300,7 +317,7 @@ class SurveyDataMonitor(AbstractWidget):
             self.c0.setFocusPolicy(QtCore.Qt.ClickFocus)  # key for press events!!!
             self.c0.setFocus()
             self.map_ax = self.f0.add_subplot(111)
-            self.map = Basemap(projection='kav7', lon_0=0, resolution='c', ax=self.map_ax)
+            self.map = Basemap(projection='kav7', lon_0=0, resolution='l', ax=self.map_ax)
             self.map.drawcoastlines(zorder=1)
             self.map.fillcontinents(color='lightgray', zorder=1)
             self.map.drawparallels(np.arange(-90., 120., 30.), color="#cccccc", labels=[False, True, True, False])
@@ -338,6 +355,10 @@ class SurveyDataMonitor(AbstractWidget):
         self.dw0.setWidget(self.w0)
         self.dw0.installEventFilter(self)
         self.dw0.setHidden(True)
+
+    def _make_view_options(self):
+        self.view_options = MonitorViewOption(parent=self, main_win=self, lib=self.lib, monitor=self.monitor)
+        self.view_options.setHidden(True)
 
     def _make_actions(self):
 
@@ -438,6 +459,14 @@ class SurveyDataMonitor(AbstractWidget):
         self.view_info_viewer_action.triggered.connect(self.on_view_info_viewer)
         views_bar.addAction(self.view_info_viewer_action)
 
+        # view options
+        self.view_options_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'options.png')),
+                                                 'Set plotting options', self)
+        self.view_options_action.setShortcut('Ctrl+O')
+        # noinspection PyUnresolvedReferences
+        self.view_options_action.triggered.connect(self.on_view_options)
+        views_bar.addAction(self.view_options_action)
+
     def plotting(self):
         if not self._plotting_active:
             return
@@ -451,14 +480,14 @@ class SurveyDataMonitor(AbstractWidget):
         cur_nr_samples = self.monitor.nr_of_samples()
         if cur_nr_samples > self._last_nr_samples:
             logger.debug("plotting -> samples: %d" % cur_nr_samples)
-            self._update_plot_data(cur_nr_samples)
+            self.update_plot_data(cur_nr_samples)
 
         self._last_nr_samples = cur_nr_samples
 
         # noinspection PyTypeChecker
         self._plotting_timer = QtCore.QTimer.singleShot(self._plotting_timing, self.plotting)
 
-    def _refresh_plots(self):
+    def refresh_plots(self):
         self.c1.draw()
         self.c2.draw()
         self.c3.draw()
@@ -477,53 +506,65 @@ class SurveyDataMonitor(AbstractWidget):
         self.map_points.set_array(np.array([]))
         self.map_points.set_offsets(np.array([[], []]))
 
-        self._refresh_plots()
+        self.refresh_plots()
 
-    def _update_plot_data(self, nr_of_samples):
+    def update_plot_data(self, nr_of_samples=None):
+
+        if nr_of_samples is None:
+            nr_of_samples = self.monitor.nr_of_samples()
 
         if nr_of_samples < 2:
             return
 
         self.monitor.lock_data()
 
-        self.tss.set_xdata(self.monitor.times)
-        self.tss.set_ydata(self.monitor.tsss)
-        self.draft.set_xdata(self.monitor.times)
-        self.draft.set_ydata(self.monitor.drafts)
-        self.avg_depth.set_xdata(self.monitor.times)
-        self.avg_depth.set_ydata(self.monitor.depths)
-        xs, ys = self.map(self.monitor.longs, self.monitor.lats)
+        # just plot the latest nth samples, if available
+        plot_idx = self._plotting_samples
+        if plot_idx > nr_of_samples:
+            plot_idx = nr_of_samples
+
+        logger.debug("plotting latest %d samples" % plot_idx)
+        self.tss.set_xdata(self.monitor.times[-plot_idx:])
+        self.tss.set_ydata(self.monitor.tsss[-plot_idx:])
+        self.draft.set_xdata(self.monitor.times[-plot_idx:])
+        self.draft.set_ydata(self.monitor.drafts[-plot_idx:])
+        self.avg_depth.set_xdata(self.monitor.times[-plot_idx:])
+        self.avg_depth.set_ydata(self.monitor.depths[-plot_idx:])
+        xs, ys = self.map(self.monitor.longs[-plot_idx:], self.monitor.lats[-plot_idx:])
         vmin_tss, vmax_tss = self.monitor.calc_plot_good_tss()
-        self.map_points.set_array(np.array(self.monitor.tsss))
-        self.map_points.set_offsets(np.vstack([xs, ys]).T)
+        self.map_points.set_array(np.array(self.monitor.tsss[-plot_idx:]))
+        self.map_points.set_offsets(np.vstack([xs[-plot_idx:], ys[-plot_idx:]]).T)
         self.map_points.set_clim(vmin=vmin_tss, vmax=vmax_tss)
 
         if self.f0_colorbar is None:
 
             with rc_context(self.rc_context):
-                self.f0_colorbar = self.f0.colorbar(self.map_points, ax=self.map_ax, aspect=50,
+
+                self.f0_colorbar = self.f0.colorbar(self.map_points, ax=self.map_ax,
+                                                    aspect=50, fraction=0.07,
                                                     orientation='horizontal', format='%.1f')
                 self.f0.tight_layout()
+                self.f0.subplots_adjust(bottom=0.01, top=0.99)
 
         self.f0_colorbar.solids.set(alpha=1)
         self.f0_colorbar.set_clim(vmin=vmin_tss, vmax=vmax_tss)
 
-        self.tss_ax.set_xlim(min(self.monitor.times) - timedelta(seconds=10),
-                             max(self.monitor.times) + timedelta(seconds=10))
-        self.tss_ax.set_ylim(min(self.monitor.tsss) - 0.5,
-                             max(self.monitor.tsss) + 0.5)
-        # self.draft_ax.set_xlim(min(self.monitor.times) - timedelta(seconds=10),
-        #                        max(self.monitor.times) + timedelta(seconds=10))
-        self.draft_ax.set_ylim(max(self.monitor.drafts) + 0.5,
-                               min(self.monitor.drafts) - 0.5)
-        self.avg_depth_ax.set_ylim(max(self.monitor.depths) + 0.5,
-                                   min(self.monitor.depths) - 0.5)
+        self.tss_ax.set_xlim(min(self.monitor.times[-plot_idx:]) - timedelta(seconds=5),
+                             max(self.monitor.times[-plot_idx:]) + timedelta(seconds=5))
+        self.tss_ax.set_ylim(min(self.monitor.tsss[-plot_idx:]) - 0.3,
+                             max(self.monitor.tsss[-plot_idx:]) + 0.3)
+        # self.draft_ax.set_xlim(min(self.monitor.times[-plot_idx:]) - timedelta(seconds=10),
+        #                        max(self.monitor.times[-plot_idx:]) + timedelta(seconds=10))
+        self.draft_ax.set_ylim(max(self.monitor.drafts[-plot_idx:]) + 0.5,
+                               min(self.monitor.drafts[-plot_idx:]) - 0.5)
+        self.avg_depth_ax.set_ylim(max(self.monitor.depths[-plot_idx:]) + 5.,
+                                   min(self.monitor.depths[-plot_idx:]) - 5.)
 
         self.info_viewer.setPlainText(self.monitor.latest_info)
 
         self.monitor.unlock_data()
 
-        self._refresh_plots()
+        self.refresh_plots()
         logger.debug("updated")
 
     def start_plotting(self):
@@ -725,12 +766,12 @@ class SurveyDataMonitor(AbstractWidget):
             raise RuntimeError("Passed unsupported file extension: %s" % file_ext)
 
         nr_of_samples = self.monitor.nr_of_samples()
-        self._update_plot_data(nr_of_samples=nr_of_samples)
+        self.update_plot_data(nr_of_samples=nr_of_samples)
         if nr_of_samples > 2:
             self._make_tss_time_plot_visible(True)
             self._make_draft_time_plot_visible(True)
             self.dw0.setVisible(True)
-        self._refresh_plots()
+        self.refresh_plots()
 
     @QtCore.Slot()
     def on_export_data(self):
@@ -755,7 +796,7 @@ class SurveyDataMonitor(AbstractWidget):
         else:
             self._make_tss_time_plot_visible(True)
 
-        self._refresh_plots()
+        self.refresh_plots()
 
     @QtCore.Slot()
     def on_view_draft_time_plot(self):
@@ -764,7 +805,7 @@ class SurveyDataMonitor(AbstractWidget):
         else:
             self._make_draft_time_plot_visible(True)
 
-        self._refresh_plots()
+        self.refresh_plots()
 
     @QtCore.Slot()
     def on_view_avg_depth_time_plot(self):
@@ -773,7 +814,7 @@ class SurveyDataMonitor(AbstractWidget):
         else:
             self._make_avg_depth_time_plot_visible(True)
 
-        self._refresh_plots()
+        self.refresh_plots()
 
     @QtCore.Slot()
     def on_view_info_viewer(self):
@@ -782,10 +823,17 @@ class SurveyDataMonitor(AbstractWidget):
         else:
             self._make_info_viewer_visible(True)
 
-        self._refresh_plots()
+        self.refresh_plots()
+
+    @QtCore.Slot()
+    def on_view_options(self):
+        if self.view_options.isVisible():
+            self.view_options.setHidden(True)
+        else:
+            self.view_options.setHidden(False)
 
     def eventFilter(self, obj, event):
         if event.type() == QtCore.QEvent.Resize:
-            self._refresh_plots()
+            self.refresh_plots()
 
         super().eventFilter(obj, event)

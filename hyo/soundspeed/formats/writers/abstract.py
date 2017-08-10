@@ -53,7 +53,7 @@ class AbstractTextWriter(AbstractWriter, metaclass=ABCMeta):
 
             if len(data_file.split('.')) == 1:
                 data_file += (".%s" % (list(self.ext)[0], ))
-        
+
             file_path = os.path.join(data_path, data_file)
 
         else:
