@@ -1,5 +1,3 @@
-import os
-
 from PySide import QtGui
 from PySide import QtCore
 
@@ -14,7 +12,7 @@ class MonitorViewOption(AbstractDialog):
 
     def __init__(self, main_win, lib, monitor, parent=None):
         AbstractDialog.__init__(self, main_win=main_win, lib=lib, parent=parent)
-        if type(monitor) != SurveyDataMonitor:
+        if not isinstance(monitor, SurveyDataMonitor):
             raise RuntimeError("Passed invalid monitor object: %s" % type(lib))
         self._monitor = monitor
 

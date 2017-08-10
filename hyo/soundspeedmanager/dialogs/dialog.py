@@ -17,7 +17,7 @@ class AbstractDialog(QtGui.QDialog):
 
     def __init__(self, main_win, lib, parent=None):
         QtGui.QDialog.__init__(self, parent)
-        if type(lib) != SoundSpeedLibrary:
+        if not isinstance(lib, SoundSpeedLibrary):
             raise RuntimeError("Passed invalid project object: %s" % type(lib))
         self.main_win = main_win
         self.lib = lib
