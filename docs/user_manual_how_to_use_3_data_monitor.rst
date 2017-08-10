@@ -30,8 +30,8 @@ Each plotter has a navigation toolbar that provides basic functionalities like p
 
 .. _data_monitor:
 
-Data monitor
-============
+Data Monitor toolbar
+====================
 
 With SIS interaction active, the *Data Monitor* toolbar (:numref:`data_monitor_toolbar`) can be used to start, pause,
 or stop the collection and the analysis of the survey data.
@@ -50,13 +50,20 @@ The collected monitoring data are stored in a database (.mon).
 
 .. _data_manager:
 
-Data manager
-============
+Data Manager toolbar
+====================
 
 The *Data Manager* toolbar (:numref:`data_manager_toolbar`) provides functionalities to load previously collected data
 as well as to export such data in a few geospatial formats (:numref:`data_manager_export`).
 
 It is also possible to import Kongsberg EM Series (.all) files.
+
+When a GeoTiff output is selected, the surface sound speed values in the collected data points are rasterized
+in two kinds of files:
+
+* Floating point GeoTiff, to be loaded in GIS applications (like QGis, Caris Hips&Sips, Esri ArcMap).
+* Color-table Geotiff, supported by a large number of applications (e.g., Xylem HYPACK).
+
 
 .. _data_manager_toolbar:
 .. figure:: ./_static/monitor_toolbar_manager.png
@@ -80,8 +87,8 @@ It is also possible to import Kongsberg EM Series (.all) files.
 
 .. _data_views:
 
-Data views
-==========
+Data Views toolbar
+==================
 
 The *Data Views* toolbar (:numref:`data_views_toolbar`) helps the user to customize the data visualization.
 
