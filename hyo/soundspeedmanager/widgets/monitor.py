@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 from hyo.soundspeedmanager.widgets.widget import AbstractWidget
 from hyo.soundspeedmanager.dialogs.export_data_monitor_dialog import ExportDataMonitorDialog
-from hyo.soundspeedmanager.dialogs.monitor_view_option_dialog import MonitorViewOption
+from hyo.soundspeedmanager.dialogs.monitor_option_dialog import MonitorOption
 from hyo.surveydatamonitor import monitor
 
 
@@ -50,13 +50,16 @@ class SurveyDataMonitor(AbstractWidget):
     def __init__(self, main_win, lib, timing=2.0):
         AbstractWidget.__init__(self, main_win=main_win, lib=lib)
         self.monitor = monitor.SurveyDataMonitor(ssm=self.lib)
+        self.settings = QtCore.QSettings()
         self._plotting_timing = timing
         self._plotting_timer = None
-        self._plotting_samples = 200
 
         self._plotting_active = False
         self._plotting_pause = False
         self._last_nr_samples = 0
+
+        self._plotting_samples = self.settings.value("monitor/plotting_samples", 200)
+        self.settings.setValue("monitor/plotting_samples", self._plotting_samples)
 
         # ###    ACTIONS   ###
         self.start_monitor_act = None
@@ -157,6 +160,7 @@ class SurveyDataMonitor(AbstractWidget):
     @plotting_samples.setter
     def plotting_samples(self, value):
         self._plotting_samples = value
+        self.settings.setValue("monitor/plotting_samples", self._plotting_samples)
 
     def _make_tss_plot(self):
 
@@ -357,7 +361,7 @@ class SurveyDataMonitor(AbstractWidget):
         self.dw0.setHidden(True)
 
     def _make_view_options(self):
-        self.view_options = MonitorViewOption(parent=self, main_win=self, lib=self.lib, monitor=self.monitor)
+        self.view_options = MonitorOption(parent=self, main_win=self, lib=self.lib, monitor=self.monitor)
         self.view_options.setHidden(True)
 
     def _make_actions(self):
@@ -459,13 +463,18 @@ class SurveyDataMonitor(AbstractWidget):
         self.view_info_viewer_action.triggered.connect(self.on_view_info_viewer)
         views_bar.addAction(self.view_info_viewer_action)
 
-        # view options
-        self.view_options_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'options.png')),
-                                                 'Set plotting options', self)
-        self.view_options_action.setShortcut('Ctrl+O')
+        # ### Options ###
+
+        options_bar = self.addToolBar('Options')
+        options_bar.setIconSize(QtCore.QSize(40, 40))
+
+        # open options
+        self.options_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'options.png')),
+                                            'Set options', self)
+        self.options_action.setShortcut('Ctrl+O')
         # noinspection PyUnresolvedReferences
-        self.view_options_action.triggered.connect(self.on_view_options)
-        views_bar.addAction(self.view_options_action)
+        self.options_action.triggered.connect(self.on_view_options)
+        options_bar.addAction(self.options_action)
 
     def plotting(self):
         if not self._plotting_active:
