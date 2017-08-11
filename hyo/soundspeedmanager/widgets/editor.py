@@ -174,6 +174,7 @@ class Editor(AbstractWidget):
             return
 
         self.dataplots.update_data()
+        self.dataplots.update_speed_limits()
 
     def on_retrieve_temp_sal(self):
         logger.debug('user wants to retrieve temp/sal')
@@ -214,7 +215,8 @@ class Editor(AbstractWidget):
             return
 
         self.dataplots.update_data()
-        self.dataplots.update_limits()
+        self.dataplots.update_depth_limits()
+        self.dataplots.update_speed_limits()
 
     def on_preview_thinning(self):
         logger.debug('user wants to preview thinning')

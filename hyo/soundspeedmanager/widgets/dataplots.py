@@ -427,7 +427,7 @@ class DataPlots(AbstractWidget):
                 self.is_drawn = True
 
             self._draw_grid()
-            self.update_limits()
+            self.update_depth_limits()
 
     def update_data(self):
         """Update plot"""
@@ -494,7 +494,7 @@ class DataPlots(AbstractWidget):
                 else:
                     self.speed_seafloor.set_ydata(None)
 
-    def update_limits(self):
+    def update_depth_limits(self):
 
         with rc_context(self.rc_context):
             if self.lib.has_ssp():
@@ -507,12 +507,24 @@ class DataPlots(AbstractWidget):
                             mean_sis_depth = self.lib.listeners.sis.xyz88.mean_depth
                 max_proc_sis_depth = max(max_proc_depth, mean_sis_depth)
 
-                max_depth = max(30 + max_proc_sis_depth, 1.1 * max_proc_sis_depth)
+                max_depth = max(30. + max_proc_sis_depth, 1.1 * max_proc_sis_depth)
                 min_depth = -0.05 * max_proc_sis_depth
                 if min_depth > 0:
                     min_depth = -5
 
                 self.speed_ax.set_ylim([max_depth, min_depth])
+
+            self.c.draw()
+
+    def update_speed_limits(self):
+
+        with rc_context(self.rc_context):
+            if self.lib.has_ssp():
+
+                max_proc_speed = self.lib.cur.proc.speed[self.vi].max()
+                min_proc_speed = self.lib.cur.proc.speed[self.vi].min()
+
+                self.speed_ax.set_xlim([min_proc_speed - 3.0, max_proc_speed + 3.0])
 
             self.c.draw()
 
