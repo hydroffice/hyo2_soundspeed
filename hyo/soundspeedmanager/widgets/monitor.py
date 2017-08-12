@@ -571,6 +571,10 @@ class SurveyDataMonitor(AbstractWidget):
 
         self.info_viewer.setPlainText(self.monitor.latest_info)
 
+        if self.monitor.casttime_updated:
+
+            self.monitor.casttime.plot_comparison(show=True)
+
         self.monitor.unlock_data()
 
         self.refresh_plots()

@@ -80,6 +80,14 @@ class MonitorOption(AbstractDialog):
         hbox.addStretch()
         # button group
         self.active_estimator = QtGui.QButtonGroup()
+        # disabled
+        hbox = QtGui.QHBoxLayout()
+        estimator_mainLayout.addLayout(hbox)
+        hbox.addSpacing(30)
+        none_estimator = QtGui.QRadioButton("None")
+        self.active_estimator.addButton(none_estimator)
+        hbox.addWidget(none_estimator)
+        hbox.addStretch()
         # cast time
         hbox = QtGui.QHBoxLayout()
         estimator_mainLayout.addLayout(hbox)
@@ -88,15 +96,15 @@ class MonitorOption(AbstractDialog):
         self.active_estimator.addButton(casttime_estimator)
         hbox.addWidget(casttime_estimator)
         hbox.addStretch()
-        # bayes
+        # fore cast
         hbox = QtGui.QHBoxLayout()
         estimator_mainLayout.addLayout(hbox)
         hbox.addSpacing(30)
-        bayes_estimator = QtGui.QRadioButton("BayesForeCast")
+        forecast_estimator = QtGui.QRadioButton("ForeCast")
         # temporarily disabled
-        bayes_estimator.setDisabled(True)
-        self.active_estimator.addButton(bayes_estimator)
-        hbox.addWidget(bayes_estimator)
+        forecast_estimator.setDisabled(True)
+        self.active_estimator.addButton(forecast_estimator)
+        hbox.addWidget(forecast_estimator)
         hbox.addStretch()
         # noinspection PyUnresolvedReferences
         self.active_estimator.buttonClicked.connect(self.on_active_estimator_changed)
@@ -262,13 +270,13 @@ class MonitorOption(AbstractDialog):
         bayes_options = QtGui.QWidget(self)
         bayes_mainLayout = QtGui.QVBoxLayout()
         bayes_options.setLayout(bayes_mainLayout)
-        self.bayer_tab_idx = self._tabs.addTab(bayes_options, "BayesForeCast")
+        self.bayer_tab_idx = self._tabs.addTab(bayes_options, "ForeCast")
 
         bayes_mainLayout.addSpacing(12)
 
         # initialization
-        casttime_estimator.setChecked(True)
-        self._tabs.setTabEnabled(self.casttime_tab_idx, True)
+        none_estimator.setChecked(True)
+        self._tabs.setTabEnabled(self.casttime_tab_idx, False)
         self._tabs.setTabEnabled(self.bayer_tab_idx, False)
 
         # data-based initialization
@@ -293,7 +301,13 @@ class MonitorOption(AbstractDialog):
         button_label = idx.text()
         logger.debug("active estimator changed: %s" % button_label)
 
-        if button_label == "CastTime":
+        if button_label == "None":
+
+            self._tabs.setTabEnabled(self.casttime_tab_idx, False)
+            self._tabs.setTabEnabled(self.bayer_tab_idx, False)
+            self._monitor.disable_estimation()
+
+        elif button_label == "CastTime":
 
             self._tabs.setTabEnabled(self.casttime_tab_idx, True)
             self._tabs.setTabEnabled(self.bayer_tab_idx, False)
@@ -303,7 +317,7 @@ class MonitorOption(AbstractDialog):
 
             self._tabs.setTabEnabled(self.casttime_tab_idx, False)
             self._tabs.setTabEnabled(self.bayer_tab_idx, True)
-            self._monitor.activate_bayesforecast()
+            self._monitor.activate_forecast()
 
         else:
 
