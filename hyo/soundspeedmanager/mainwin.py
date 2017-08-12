@@ -137,9 +137,9 @@ class MainWin(QtGui.QMainWindow):
         self.tabs.setTabToolTip(idx, "Synthetic Profile Server")
         # refraction
         self.tab_refraction = Refraction(lib=self.lib, main_win=self)
-        idx = self.tabs.insertTab(5, self.tab_refraction,
-                                  QtGui.QIcon(os.path.join(self.here, 'media', 'refraction.png')), "")
-        self.tabs.setTabToolTip(idx, "Refraction Monitor")
+        # idx = self.tabs.insertTab(5, self.tab_refraction,
+        #                           QtGui.QIcon(os.path.join(self.here, 'media', 'refraction.png')), "")
+        # self.tabs.setTabToolTip(idx, "Refraction Monitor")
         # setup
         self.tab_setup = Settings(lib=self.lib, main_win=self)
         idx = self.tabs.insertTab(6, self.tab_setup,

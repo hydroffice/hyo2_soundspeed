@@ -35,7 +35,8 @@ class Editor(AbstractWidget):
         self.input_act.triggered.connect(self.on_input_data)
         self.input_bar.addAction(self.input_act)
         # clear
-        self.clear_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'clear.png')), 'Clear data', self)
+        self.clear_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'clear.png')),
+                                       'Clear data', self)
         self.clear_act.setShortcut('Alt+C')
         # noinspection PyUnresolvedReferences
         self.clear_act.triggered.connect(self.on_clear_data)
@@ -43,7 +44,8 @@ class Editor(AbstractWidget):
         self.clear_act.setVisible(False)
         self.input_bar.addAction(self.clear_act)
         # set ref
-        self.set_ref_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'ref.png')), 'Reference cast', self)
+        self.set_ref_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'ref.png')),
+                                         'Reference cast', self)
         self.set_ref_act.setShortcut('Alt+R')
         # noinspection PyUnresolvedReferences
         self.set_ref_act.triggered.connect(self.on_set_ref)
@@ -52,13 +54,15 @@ class Editor(AbstractWidget):
         self.process_bar = self.addToolBar('Process')
         self.process_bar.setIconSize(QtCore.QSize(40, 40))
         # spreadsheet
-        self.spreadsheet_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'grid.png')), 'Spreadsheet', self)
+        self.spreadsheet_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'grid.png')),
+                                             'Spreadsheet', self)
         self.spreadsheet_act.setShortcut('Alt+S')
         # noinspection PyUnresolvedReferences
         self.spreadsheet_act.triggered.connect(self.on_spreadsheet)
         self.process_bar.addAction(self.spreadsheet_act)
         # metadata
-        self.metadata_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata.png')), 'Metadata', self)
+        self.metadata_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata.png')),
+                                          'Metadata', self)
         self.metadata_act.setShortcut('Alt+M')
         # noinspection PyUnresolvedReferences
         self.metadata_act.triggered.connect(self.on_metadata)
@@ -66,7 +70,8 @@ class Editor(AbstractWidget):
         # - separator
         self.process_bar.addSeparator()
         # retrieve sal
-        self.sal_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'sal.png')), 'Retrieve salinity', self)
+        self.sal_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'sal.png')),
+                                     'Retrieve salinity', self)
         self.sal_act.setShortcut('Alt+A')
         # noinspection PyUnresolvedReferences
         self.sal_act.triggered.connect(self.on_retrieve_sal)
@@ -86,13 +91,15 @@ class Editor(AbstractWidget):
         self.tss_act.triggered.connect(self.on_retrieve_tss)
         self.process_bar.addAction(self.tss_act)
         # extend profile
-        self.extend_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'extend.png')), 'Extend profile', self)
+        self.extend_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'extend.png')),
+                                        'Extend profile', self)
         self.extend_act.setShortcut('Alt+E')
         # noinspection PyUnresolvedReferences
         self.extend_act.triggered.connect(self.on_extend_profile)
         self.process_bar.addAction(self.extend_act)
         # preview thinning
-        self.thin_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'thinning.png')), 'Preview thinning', self)
+        self.thin_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'thinning.png')),
+                                      'Preview thinning', self)
         self.thin_act.setShortcut('Alt+H')
         # noinspection PyUnresolvedReferences
         self.thin_act.triggered.connect(self.on_preview_thinning)
@@ -110,19 +117,22 @@ class Editor(AbstractWidget):
         self.output_bar = self.addToolBar('Output')
         self.output_bar.setIconSize(QtCore.QSize(40, 40))
         # export
-        self.export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export.png')), 'Export data', self)
+        self.export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export.png')),
+                                        'Export data', self)
         self.export_act.setShortcut('Alt+E')
         # noinspection PyUnresolvedReferences
         self.export_act.triggered.connect(self.on_export_single_profile)
         self.output_bar.addAction(self.export_act)
         # transmit
-        self.transmit_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'transmit.png')), 'Transmit data', self)
+        self.transmit_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'transmit.png')),
+                                          'Transmit data', self)
         self.transmit_act.setShortcut('Alt+E')
         # noinspection PyUnresolvedReferences
         self.transmit_act.triggered.connect(self.on_transmit_data)
         self.output_bar.addAction(self.transmit_act)
         # save db
-        self.save_db_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'db_save.png')), 'Save to database', self)
+        self.save_db_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'db_save.png')),
+                                         'Save to database', self)
         self.save_db_act.setShortcut('Alt+D')
         # noinspection PyUnresolvedReferences
         self.save_db_act.triggered.connect(self.on_save_db)
@@ -161,13 +171,14 @@ class Editor(AbstractWidget):
     def on_retrieve_sal(self):
         logger.debug('user wants to retrieve salinity')
 
-        if self.lib.cur.meta.sensor_type != Dicts.sensor_types['XBT']:
+        if self.lib.cur.meta.sensor_type not in [Dicts.sensor_types['XBT'], ]:
             msg = "This is a XBT-specific function!"
             # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Salinity", msg, QtGui.QMessageBox.Ok)
             return
 
         if not self.lib.replace_cur_salinity():
+
             msg = "Issue in replacing the salinity"
             # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Salinity", msg, QtGui.QMessageBox.Ok)
@@ -179,8 +190,10 @@ class Editor(AbstractWidget):
     def on_retrieve_temp_sal(self):
         logger.debug('user wants to retrieve temp/sal')
 
-        if (self.lib.cur.meta.sensor_type != Dicts.sensor_types['XSV']) \
-                and (self.lib.cur.meta.sensor_type != Dicts.sensor_types['SVP']):
+        if self.lib.cur.meta.sensor_type not in [Dicts.sensor_types['XSV'],
+                                                 Dicts.sensor_types['SVP'],
+                                                 Dicts.sensor_types['MVP']]:
+
             msg = "This is a XSV- and SVP-specific function!"
             # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Temperature/Salinity", msg, QtGui.QMessageBox.Ok)
@@ -257,7 +270,7 @@ class Editor(AbstractWidget):
             QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
             return
 
-        if self.lib.cur.meta.sensor_type == Dicts.sensor_types['Synthetic']:
+        if self.lib.cur.meta.sensor_type in [Dicts.sensor_types['Synthetic'], ]:
 
             msg = "Do you really want to export a profile\nbased on synthetic %s data?" \
                   % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
@@ -266,8 +279,9 @@ class Editor(AbstractWidget):
             if ret == QtGui.QMessageBox.No:
                 return
 
-        if self.lib.cur.meta.probe_type in (Dicts.probe_types['ASVP'], Dicts.probe_types['CARIS'],
-                                            Dicts.probe_types['ELAC']):
+        if self.lib.cur.meta.probe_type in [Dicts.probe_types['ASVP'],
+                                            Dicts.probe_types['CARIS'],
+                                            Dicts.probe_types['ELAC']]:
 
             msg = "Do you really want to export a profile\nbased on pre-processed %s data?" \
                   % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
@@ -287,7 +301,7 @@ class Editor(AbstractWidget):
             QtGui.QMessageBox.warning(self, "Transmit warning", msg, QtGui.QMessageBox.Ok)
             return
 
-        if self.lib.cur.meta.sensor_type == Dicts.sensor_types['Synthetic']:
+        if self.lib.cur.meta.sensor_type in [Dicts.sensor_types['Synthetic'], ]:
 
             msg = "Do you really want to transmit a profile\nbased on synthetic %s data?" \
                   % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
@@ -297,8 +311,9 @@ class Editor(AbstractWidget):
             if ret == QtGui.QMessageBox.No:
                 return
 
-        if self.lib.cur.meta.probe_type in (Dicts.probe_types['ASVP'], Dicts.probe_types['CARIS'],
-                                            Dicts.probe_types['ELAC']):
+        if self.lib.cur.meta.probe_type in [Dicts.probe_types['ASVP'],
+                                            Dicts.probe_types['CARIS'],
+                                            Dicts.probe_types['ELAC']]:
 
             msg = "Do you really want to transmit a profile\nbased on pre-processed %s data?" \
                   % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
@@ -323,7 +338,7 @@ class Editor(AbstractWidget):
             QtGui.QMessageBox.warning(self, "Database warning", msg, QtGui.QMessageBox.Ok)
             return
 
-        if self.lib.cur.meta.sensor_type == Dicts.sensor_types['Synthetic']:
+        if self.lib.cur.meta.sensor_type in [Dicts.sensor_types['Synthetic'], ]:
 
             msg = "Do you really want to store a profile based \non synthetic %s data?\n\n" \
                   "This operation may OVERWRITE existing raw data \nin the database!" \
@@ -334,8 +349,9 @@ class Editor(AbstractWidget):
             if ret == QtGui.QMessageBox.No:
                 return
 
-        if self.lib.cur.meta.probe_type in (Dicts.probe_types['ASVP'], Dicts.probe_types['CARIS'],
-                                            Dicts.probe_types['ELAC']):
+        if self.lib.cur.meta.probe_type in [Dicts.probe_types['ASVP'],
+                                            Dicts.probe_types['CARIS'],
+                                            Dicts.probe_types['ELAC']]:
 
             msg = "Do you really want to store a profile based \non pre-processed %s data?\n\n" \
                   "This operation may OVERWRITE existing raw data \nin the database!" \
@@ -358,6 +374,7 @@ class Editor(AbstractWidget):
         # bars
         self.process_bar.hide()
         self.output_bar.hide()
+
         # dialogs
         self.clear_act.setDisabled(True)
         self.set_ref_act.setDisabled(True)
@@ -379,30 +396,38 @@ class Editor(AbstractWidget):
         # bars
         self.process_bar.show()
         self.output_bar.show()
+
         # dialogs
         self.clear_act.setDisabled(False)
         self.set_ref_act.setDisabled(False)
         self.restart_act.setDisabled(False)
         self.spreadsheet_act.setDisabled(False)
         self.metadata_act.setDisabled(False)
-        if self.lib.cur.meta.sensor_type == Dicts.sensor_types['XBT']:
+
+        if self.lib.cur.meta.sensor_type in [Dicts.sensor_types['XBT'], ]:
             self.sal_act.setDisabled(False)
         else:
             self.sal_act.setDisabled(True)
-        if (self.lib.cur.meta.sensor_type == Dicts.sensor_types['XSV']) or \
-            (self.lib.cur.meta.sensor_type == Dicts.sensor_types['SVP']):
+
+        if self.lib.cur.meta.sensor_type in [Dicts.sensor_types['XSV'],
+                                             Dicts.sensor_types['SVP']]:
             self.temp_sal_act.setDisabled(False)
-        elif self.lib.cur.meta.sensor_type == Dicts.sensor_types['MVP']:
+
+        elif self.lib.cur.meta.sensor_type in [Dicts.sensor_types['MVP'], ]:
+
             if (np.sum(self.lib.cur.proc.temp) == 0) and (np.sum(self.lib.cur.proc.sal) == 0):
                 self.temp_sal_act.setDisabled(False)
             else:
                 self.temp_sal_act.setDisabled(True)
+
         else:
             self.temp_sal_act.setDisabled(True)
+
         if self.lib.use_sis():
             self.tss_act.setDisabled(False)
         else:
             self.tss_act.setDisabled(True)
+
         self.extend_act.setDisabled(False)
         self.thin_act.setDisabled(False)
         self.export_act.setDisabled(False)

@@ -264,6 +264,23 @@ class MonitorOption(AbstractDialog):
         hbox.addStretch()
 
         casttime_mainLayout.addStretch()
+        casttime_mainLayout.addSpacing(18)
+
+        # credits
+        hbox = QtGui.QHBoxLayout()
+        casttime_mainLayout.addLayout(hbox)
+        hbox.addStretch()
+        self.casttime_credits_label = QtGui.QLabel("<i>Credits</i>")
+        hbox.addWidget(self.casttime_credits_label)
+        hbox.addStretch()
+        hbox = QtGui.QHBoxLayout()
+        casttime_mainLayout.addLayout(hbox)
+        hbox.addStretch()
+        self.casttime_authors_label = QtGui.QLabel("The original CastTime algorithm was developed\n"
+                                                   "at CCOM,UNH by Matt Wilson and Jonathan Beaudoin.")
+        self.casttime_authors_label.setAlignment(QtCore.Qt.AlignCenter)
+        hbox.addWidget(self.casttime_authors_label)
+        hbox.addStretch()
 
         # ### bayes forecast options ###
 
