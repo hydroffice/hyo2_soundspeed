@@ -5,7 +5,7 @@ logger = logging.getLogger(__name__)
 from hyo.soundspeed.profile.profile import Profile
 
 
-class ProfileList(object):
+class ProfileList:
     """"A thin wrapper around a list for sound speed profiles"""
 
     def __init__(self):

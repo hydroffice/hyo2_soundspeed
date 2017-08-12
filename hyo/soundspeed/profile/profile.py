@@ -15,7 +15,7 @@ from hyo.soundspeed.profile.ray_tracing.ray_tracing import RayTracing
 from hyo.soundspeed.profile.ray_tracing.ray_path import RayPath
 
 
-class Profile(object):
+class Profile:
     """"A sound speed profile with 3 sections: metadata, data specific to the task, and additional data"""
 
     def __init__(self):
@@ -853,7 +853,7 @@ class Profile(object):
             self._plot(samples=self.sis, more=more, kind='sis')
 
     def _plot(self, samples, more, kind):
-        import matplotlib.pyplot as plt
+        from matplotlib import pyplot as plt
         plt.figure("[%s] %s" % (self.meta.original_path, kind), dpi=120)
 
         if samples.speed is not None:

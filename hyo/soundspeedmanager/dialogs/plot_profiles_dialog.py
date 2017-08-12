@@ -126,7 +126,6 @@ class PlotProfilesDialog(AbstractDialog):
                 logger.debug("button: cancel")
                 self.reject()
 
-
         dialog = DateDialog(date_start=ssp_times[0][0], date_end=ssp_times[-1][0], parent=self)
         ret = dialog.exec_()
         if ret == QtGui.QDialog.Accepted:

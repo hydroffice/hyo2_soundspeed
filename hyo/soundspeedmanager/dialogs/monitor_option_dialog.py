@@ -160,7 +160,7 @@ class MonitorOption(AbstractDialog):
         self.minimum_interval.textEdited.connect(self.on_casttime_options_changed)
         hbox.addWidget(self.minimum_interval)
         hbox.addStretch()
-        
+
         # maximum interval
         hbox = QtGui.QHBoxLayout()
         casttime_mainLayout.addLayout(hbox)
@@ -256,23 +256,6 @@ class MonitorOption(AbstractDialog):
         hbox.addStretch()
 
         casttime_mainLayout.addStretch()
-        casttime_mainLayout.addSpacing(18)
-
-        # credits
-        hbox = QtGui.QHBoxLayout()
-        casttime_mainLayout.addLayout(hbox)
-        hbox.addStretch()
-        self.casttime_credits_label = QtGui.QLabel("<i>Credits</i>")
-        hbox.addWidget(self.casttime_credits_label)
-        hbox.addStretch()
-        hbox = QtGui.QHBoxLayout()
-        casttime_mainLayout.addLayout(hbox)
-        hbox.addStretch()
-        self.casttime_authors_label = QtGui.QLabel("The original CastTime algorithm was developed\n"
-                                                   "at CCOM,UNH by Matt Wilson and Jonathan Beaudoin.")
-        self.casttime_authors_label.setAlignment(QtCore.Qt.AlignCenter)
-        hbox.addWidget(self.casttime_authors_label)
-        hbox.addStretch()
 
         # ### bayes forecast options ###
 
@@ -290,7 +273,7 @@ class MonitorOption(AbstractDialog):
 
         # data-based initialization
         self._monitor.lock_data()
-        self.initial_interval.setText("%s" % self._monitor.casttime.initial_interval)
+        self.initial_interval.setText("%s" % self._monitor.casttime.current_interval)
         self.minimum_interval.setText("%s" % self._monitor.casttime.minimum_interval)
         self.maximum_interval.setText("%s" % self._monitor.casttime.maximum_interval)
         self.half_swath_angle.setText("%s" % self._monitor.casttime.half_swath_angle)
@@ -331,7 +314,7 @@ class MonitorOption(AbstractDialog):
         logger.debug("CastTime options changed")
 
         self._monitor.lock_data()
-        self._monitor.casttime.initial_interval = float(self.initial_interval.text())
+        self._monitor.casttime.current_interval = float(self.initial_interval.text())
         self._monitor.casttime.minimum_interval = float(self.minimum_interval.text())
         self._monitor.casttime.maximum_interval = float(self.maximum_interval.text())
         self._monitor.casttime.half_swath_angle = float(self.half_swath_angle.text())

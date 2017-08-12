@@ -16,7 +16,7 @@ from hyo.soundspeed.profile.profilelist import ProfileList
 from hyo.soundspeed.profile.dicts import Dicts
 
 
-class ProjectDb(object):
+class ProjectDb:
     """Class that provides an interface to a SQLite db with Sound Speed data"""
 
     def __init__(self, projects_folder=None, project_name=None):
@@ -32,8 +32,6 @@ class ProjectDb(object):
 
         # the passed project name is used to identify the project database to open
         self.db_path = os.path.join(projects_folder, self.clean_project_name(project_name) + ".db")
-        # backup path
-        self.bk_path = self.db_path + '.bk'
         logger.debug('current project db: %s' % self.db_path)
 
         # add plotting and exporting capabilities
@@ -781,3 +779,10 @@ class ProjectDb(object):
 
         self.tmp_ssp_pk = None
         return True
+
+    def __repr__(self):
+        msg = "<%s>\n" % self.__class__.__name__
+
+        msg += "  <path: %s>" % self.db_path
+
+        return msg
