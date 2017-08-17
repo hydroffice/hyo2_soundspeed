@@ -266,6 +266,7 @@ class Editor(AbstractWidget):
         logger.debug('running safety checks on output')
 
         if not self.lib.has_ssp():
+            
             msg = "You need to first import data!"
             # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Data Warning", msg, QtGui.QMessageBox.Ok)
@@ -273,7 +274,7 @@ class Editor(AbstractWidget):
 
         min_samples = 5
 
-        if len(self.lib.cur.proc.temp) < 5:
+        if len(self.lib.cur.proc.temp) < min_samples:
 
             msg = "Suspect short temperature profile detected!\n\n" \
                   "Do you really want to continue?"
@@ -282,7 +283,8 @@ class Editor(AbstractWidget):
             if ret == QtGui.QMessageBox.No:
                 return False
 
-        elif all(i == 0 for i in self.lib.cur.proc.temp[:5]):
+        elif all(i == 0 for i in self.lib.cur.proc.temp[:min_samples]):
+
             msg = "Suspect zero values in the temperature profile detected!\n" \
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
                   "Do you really want to continue?"
@@ -291,7 +293,7 @@ class Editor(AbstractWidget):
             if ret == QtGui.QMessageBox.No:
                 return False
 
-        if len(self.lib.cur.proc.sal) < 5:
+        if len(self.lib.cur.proc.sal) < min_samples:
 
             msg = "Suspect short salinity profile detected!\n\n" \
                   "Do you really want to continue?"
@@ -300,7 +302,8 @@ class Editor(AbstractWidget):
             if ret == QtGui.QMessageBox.No:
                 return False
 
-        elif all(i == 0 for i in self.lib.cur.proc.sal[:5]):
+        elif all(i == 0 for i in self.lib.cur.proc.sal[:min_samples]):
+
             msg = "Suspect zero values in the salinity profile detected!\n" \
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
                   "Do you really want to continue?"
@@ -309,7 +312,7 @@ class Editor(AbstractWidget):
             if ret == QtGui.QMessageBox.No:
                 return False
 
-        if len(self.lib.cur.proc.speed) < 5:
+        if len(self.lib.cur.proc.speed) < min_samples:
 
             msg = "Suspect short sound speed profile detected!\n\n" \
                   "Do you really want to continue?"
@@ -318,7 +321,8 @@ class Editor(AbstractWidget):
             if ret == QtGui.QMessageBox.No:
                 return False
 
-        elif all(i == 0 for i in self.lib.cur.proc.speed[:5]):
+        elif all(i == 0 for i in self.lib.cur.proc.speed[:min_samples]):
+
             msg = "Suspect zero values in the sound speed profile detected!\n" \
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
                   "Do you really want to continue?"
