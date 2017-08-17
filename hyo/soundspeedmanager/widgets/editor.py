@@ -262,12 +262,22 @@ class Editor(AbstractWidget):
         dlg = MetadataDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
 
+    def _run_safety_checks_on_output(self):
+        logger.debug('running safety checks on output')
+
+        if not self.lib.has_ssp():
+            msg = "You need to first import data!"
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.warning(self, "Data Warning", msg, QtGui.QMessageBox.Ok)
+            return False
+
+        return True
+
     def on_export_single_profile(self):
         logger.debug('user wants to export a single profile')
-        if not self.lib.has_ssp():
-            msg = "Import data before export!"
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
+
+        valid = self._run_safety_checks_on_output()
+        if not valid:
             return
 
         if self.lib.cur.meta.sensor_type in [Dicts.sensor_types['Synthetic'], ]:
@@ -295,10 +305,9 @@ class Editor(AbstractWidget):
 
     def on_transmit_data(self):
         logger.debug('user wants to transmit the data')
-        if not self.lib.has_ssp():
-            msg = "Import data before transmit!"
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.warning(self, "Transmit warning", msg, QtGui.QMessageBox.Ok)
+
+        valid = self._run_safety_checks_on_output()
+        if not valid:
             return
 
         if self.lib.cur.meta.sensor_type in [Dicts.sensor_types['Synthetic'], ]:
@@ -332,10 +341,9 @@ class Editor(AbstractWidget):
 
     def on_save_db(self):
         logger.debug('user wants to save data to db')
-        if not self.lib.has_ssp():
-            msg = "Import data before save to db!"
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.warning(self, "Database warning", msg, QtGui.QMessageBox.Ok)
+
+        valid = self._run_safety_checks_on_output()
+        if not valid:
             return
 
         if self.lib.cur.meta.sensor_type in [Dicts.sensor_types['Synthetic'], ]:
