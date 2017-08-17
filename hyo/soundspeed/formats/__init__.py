@@ -4,6 +4,7 @@ logger.addHandler(logging.NullHandler())
 
 
 # readers
+from .readers.aml import Aml
 from .readers.aoml import Aoml
 from .readers.asvp import Asvp
 from .readers.caris import Caris
@@ -25,6 +26,7 @@ from .readers.unb import Unb
 from .readers.valeport import Valeport
 
 readers = list()
+readers.append(Aml())
 readers.append(Aoml())
 readers.append(Caris())
 readers.append(Castaway())
