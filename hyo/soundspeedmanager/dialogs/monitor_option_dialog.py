@@ -117,7 +117,7 @@ class MonitorOption(AbstractDialog):
         casttime_mainLayout = QtGui.QVBoxLayout()
         casttime_options.setLayout(casttime_mainLayout)
         self.casttime_tab_idx = self._tabs.addTab(casttime_options, "CastTime")
-        logger.debug("casttime idx: %d" % self.casttime_tab_idx)
+        # logger.debug("casttime idx: %d" % self.casttime_tab_idx)
 
         casttime_mainLayout.addStretch()
 
