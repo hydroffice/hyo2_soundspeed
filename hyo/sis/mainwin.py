@@ -6,32 +6,31 @@ from PySide import QtCore
 import logging
 logger = logging.getLogger(__name__)
 
-from . import __doc__ as lib_name
-from . import __version__ as lib_version
-from . import controlpanel
+from hyo.sis import __doc__ as sis_name
+from hyo.sis import __version__ as sis_version
+from hyo.sis import controlpanel
 
 
 class MainWin(QtGui.QMainWindow):
-    """Main window"""
 
     here = os.path.abspath(os.path.dirname(__file__))
     media = os.path.join(here, "media")
 
     def __init__(self):
-        super(MainWin, self).__init__()
-        logger.debug("init")
+        super().__init__()
 
-        self.name = lib_name
-        self.version = lib_version
+        self.name = sis_name
+        self.version = sis_version
 
         # setup default project folder
         self.projects_folder = self.here
 
         self.setWindowTitle('%s v.%s' % (self.name, self.version))
-        app = QtCore.QCoreApplication.instance()
-        app.setOrganizationName("CCOMJHC")
-        app.setOrganizationDomain("ccom.unh.edu")
-        app.setApplicationName('%s %s' % (self.name, self.version))
+        # noinspection PyArgumentList
+        _app = QtCore.QCoreApplication.instance()
+        _app.setApplicationName('%s' % self.name)
+        _app.setOrganizationName("HydrOffice")
+        _app.setOrganizationDomain("hydroffice.org")
 
         # set icons
         icon_info = QtCore.QFileInfo(os.path.join(self.here, 'media', 'favicon.png'))

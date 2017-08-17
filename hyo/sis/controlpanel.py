@@ -12,7 +12,7 @@ from .process import SisProcess
 
 class ControlPanel(QtGui.QWidget):
 
-    here = os.path.abspath(os.path.dirname(__file__))
+    here = os.path.abspath(os.path.dirname(__file__)).replace("\\", "/")
 
     def __init__(self):
         super(ControlPanel, self).__init__()
@@ -41,6 +41,12 @@ class ControlPanel(QtGui.QWidget):
         self.start_sis = None
         self.stop_sis = None
         self._make_sis_commands()
+
+        self.vbox.addSpacing(12)
+        credits = QtGui.QLabel("<i>Comments and suggestions:</i> "
+                               "<a href='mailto:gmasetti@ccom.unh.edu'>gmasetti@ccom.unh.edu</a>")
+        credits.setOpenExternalLinks(True)
+        self.vbox.addWidget(credits)
 
     def _make_sis_settings(self):
         """build "settings" groupbox"""
@@ -87,7 +93,6 @@ class ControlPanel(QtGui.QWidget):
         self.set_output_port.setText("16103")
 
     def _make_sis_inputs(self):
-        """build "inputs" groupbox"""
 
         vbox = QtGui.QVBoxLayout()
         self.sis_inputs.setLayout(vbox)
@@ -103,12 +108,14 @@ class ControlPanel(QtGui.QWidget):
         hbox.addWidget(button_add_files)
         button_add_files.setText("Add files")
         button_add_files.setToolTip('Add files as data source for emulation')
+        # noinspection PyUnresolvedReferences
         button_add_files.clicked.connect(self._add_source_files)
 
         button_clear_files = QtGui.QPushButton()
         hbox.addWidget(button_clear_files)
         button_clear_files.setText("Clear files")
         button_clear_files.setToolTip('Clear the file list')
+        # noinspection PyUnresolvedReferences
         button_clear_files.clicked.connect(self._clear_source_files)
 
         hbox.addStretch()
@@ -127,12 +134,14 @@ class ControlPanel(QtGui.QWidget):
         hbox.addWidget(button_start_sis)
         button_start_sis.setText("Start SIS")
         button_start_sis.setToolTip('Start emulation using defined settings')
+        # noinspection PyUnresolvedReferences
         button_start_sis.clicked.connect(self.sis_start)
 
         button_stop_sis = QtGui.QPushButton()
         hbox.addWidget(button_stop_sis)
         button_stop_sis.setText("Stop SIS")
         button_stop_sis.setToolTip('Stop emulation')
+        # noinspection PyUnresolvedReferences
         button_stop_sis.clicked.connect(self.sis_stop)
 
         hbox.addStretch()
@@ -143,15 +152,23 @@ class ControlPanel(QtGui.QWidget):
     def _add_source_files(self):
         logger.debug('adding files')
 
+        settings = QtCore.QSettings()
+        source_folder = settings.value("source_folder", self.here)
+
         # ask the file path to the user
-        selection, _ = QtGui.QFileDialog.getOpenFileNames(self, "Add Kongsberg data files", "",
-                                                          "Kongbserg file (*.all);;All files (*.*)", None,
-                                                          QtGui.QFileDialog.ExistingFiles)
-        if not selection:
+        # noinspection PyCallByClass
+        selections, _ = QtGui.QFileDialog.getOpenFileNames(self, "Add Kongsberg data files", source_folder,
+                                                           "Kongsberg file (*.all);;All files (*.*)", None,
+                                                           QtGui.QFileDialog.ExistingFiles)
+        if not selections:
             logger.debug('no selection')
             return
 
-        for f in selection:
+        selected_folder = os.path.dirname(selections[0])
+        logger.debug("selected folder: %s" % selected_folder)
+        settings.setValue("source_folder", selected_folder)
+
+        for f in selections:
             ret = self.list_files.findItems(f, QtCore.Qt.MatchExactly)
             if len(ret) > 0:
                 logger.debug('duplicated %s' % os.path.basename(f))
@@ -167,6 +184,7 @@ class ControlPanel(QtGui.QWidget):
     def sis_start(self):
         if self.sis:
             if self.sis.is_alive():
+                # noinspection PyCallByClass
                 QtGui.QMessageBox.warning(self, "Emulator running ...", "The emulator is running! Stop it",
                                           QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
                 return

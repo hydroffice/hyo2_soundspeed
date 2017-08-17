@@ -266,7 +266,7 @@ class Editor(AbstractWidget):
         logger.debug('running safety checks on output')
 
         if not self.lib.has_ssp():
-            
+
             msg = "You need to first import data!"
             # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Data Warning", msg, QtGui.QMessageBox.Ok)
