@@ -64,6 +64,8 @@ class Database(AbstractWidget):
         self.ssp_list.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         # noinspection PyUnresolvedReferences
         self.ssp_list.customContextMenuRequested.connect(self.make_context_menu)
+        # noinspection PyUnresolvedReferences
+        self.ssp_list.itemDoubleClicked.connect(self.load_profile)
         hbox.addWidget(self.ssp_list)
 
         # - RIGHT COLUMN

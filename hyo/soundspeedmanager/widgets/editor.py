@@ -271,7 +271,18 @@ class Editor(AbstractWidget):
             QtGui.QMessageBox.warning(self, "Data Warning", msg, QtGui.QMessageBox.Ok)
             return False
 
-        if all(i == 0 for i in self.lib.cur.proc.temp[:5]):
+        min_samples = 5
+
+        if len(self.lib.cur.proc.temp) < 5:
+
+            msg = "Suspect short temperature profile detected!\n\n" \
+                  "Do you really want to continue?"
+            # noinspection PyCallByClass
+            ret = QtGui.QMessageBox.warning(self, "Data Warning", msg, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+            if ret == QtGui.QMessageBox.No:
+                return False
+
+        elif all(i == 0 for i in self.lib.cur.proc.temp[:5]):
             msg = "Suspect zero values in the temperature profile detected!\n" \
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
                   "Do you really want to continue?"
@@ -280,7 +291,16 @@ class Editor(AbstractWidget):
             if ret == QtGui.QMessageBox.No:
                 return False
 
-        if all(i == 0 for i in self.lib.cur.proc.sal[:5]):
+        if len(self.lib.cur.proc.sal) < 5:
+
+            msg = "Suspect short salinity profile detected!\n\n" \
+                  "Do you really want to continue?"
+            # noinspection PyCallByClass
+            ret = QtGui.QMessageBox.warning(self, "Data Warning", msg, QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+            if ret == QtGui.QMessageBox.No:
+                return False
+
+        elif all(i == 0 for i in self.lib.cur.proc.sal[:5]):
             msg = "Suspect zero values in the salinity profile detected!\n" \
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
                   "Do you really want to continue?"
@@ -289,7 +309,16 @@ class Editor(AbstractWidget):
             if ret == QtGui.QMessageBox.No:
                 return False
 
-        if all(i == 0 for i in self.lib.cur.proc.speed[:5]):
+        if len(self.lib.cur.proc.speed) < 5:
+
+            msg = "Suspect short sound speed profile detected!\n\n" \
+                  "Do you really want to continue?"
+            # noinspection PyCallByClass
+            ret = QtGui.QMessageBox.warning(self, "Data Warning", msg, QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+            if ret == QtGui.QMessageBox.No:
+                return False
+
+        elif all(i == 0 for i in self.lib.cur.proc.speed[:5]):
             msg = "Suspect zero values in the sound speed profile detected!\n" \
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
                   "Do you really want to continue?"
