@@ -1,8 +1,9 @@
+import logging
 import sys
-from PySide import QtGui
 from multiprocessing import freeze_support
 
-import logging
+from PySide import QtGui
+
 logger = logging.getLogger()
 logger.setLevel(logging.NOTSET)
 ch = logging.StreamHandler()
@@ -11,7 +12,7 @@ ch_formatter = logging.Formatter('%(levelname)-9s %(name)s.%(funcName)s:%(lineno
 ch.setFormatter(ch_formatter)
 logger.addHandler(ch)
 
-from hyo.sis import mainwin
+from hyo.sis.gui import mainwin
 
 
 def sis_gui():

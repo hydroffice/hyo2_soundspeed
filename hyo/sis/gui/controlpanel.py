@@ -1,13 +1,17 @@
-import os
-
-from PySide import QtGui
-from PySide import QtCore
-
 # logging settings
 import logging
+import os
+from multiprocessing import Pipe
+from threading import Timer
+
+from PySide import QtCore
+from PySide import QtGui
+
 logger = logging.getLogger(__name__)
 
-from .process import SisProcess
+from hyo.sis.lib.process import SisProcess
+from hyo.sis.gui.infoviewer import InfoViewerDialog
+from hyo.soundspeedmanager.qt_progress import QtProgress
 
 
 class ControlPanel(QtGui.QWidget):
@@ -47,6 +51,15 @@ class ControlPanel(QtGui.QWidget):
                                "<a href='mailto:gmasetti@ccom.unh.edu'>gmasetti@ccom.unh.edu</a>")
         credits.setOpenExternalLinks(True)
         self.vbox.addWidget(credits)
+
+        # info viewer
+        self.info_viewer = InfoViewerDialog(self)
+
+        # processing pipe
+
+        self.conn = None
+        self.child_conn = None
+        self._active = False
 
     def _make_sis_settings(self):
         """build "settings" groupbox"""
@@ -92,6 +105,19 @@ class ControlPanel(QtGui.QWidget):
         self.set_output_port.setValidator(validator)
         self.set_output_port.setText("16103")
 
+        vbox.addSpacing(12)
+
+        # verbose
+        hbox = QtGui.QHBoxLayout()
+        vbox.addLayout(hbox)
+        text_verbose = QtGui.QLabel("Verbose:")
+        hbox.addWidget(text_verbose)
+        text_verbose.setMinimumWidth(80)
+        self.set_verbose = QtGui.QCheckBox()
+        self.set_verbose.setChecked(True)
+        hbox.addWidget(self.set_verbose)
+        hbox.addStretch()
+
     def _make_sis_inputs(self):
 
         vbox = QtGui.QVBoxLayout()
@@ -135,14 +161,14 @@ class ControlPanel(QtGui.QWidget):
         button_start_sis.setText("Start SIS")
         button_start_sis.setToolTip('Start emulation using defined settings')
         # noinspection PyUnresolvedReferences
-        button_start_sis.clicked.connect(self.sis_start)
+        button_start_sis.clicked.connect(self.start_emulation)
 
         button_stop_sis = QtGui.QPushButton()
         hbox.addWidget(button_stop_sis)
         button_stop_sis.setText("Stop SIS")
         button_stop_sis.setToolTip('Stop emulation')
         # noinspection PyUnresolvedReferences
-        button_stop_sis.clicked.connect(self.sis_stop)
+        button_stop_sis.clicked.connect(self.stop_emulation)
 
         hbox.addStretch()
 
@@ -181,7 +207,26 @@ class ControlPanel(QtGui.QWidget):
         logger.debug('clear source files')
         self.list_files.clear()
 
-    def sis_start(self):
+    def monitoring(self):
+
+        if self.conn is None:
+            return
+
+        if self.conn.poll():
+
+            data = self.conn.recv()
+
+            if isinstance(data, str):
+
+                self.info_viewer.append(data)
+                # logger.debug("%s" % data)
+
+        if not self._active:
+            return
+
+        Timer(1.0, self.monitoring).start()
+
+    def start_emulation(self):
         if self.sis:
             if self.sis.is_alive():
                 # noinspection PyCallByClass
@@ -189,15 +234,19 @@ class ControlPanel(QtGui.QWidget):
                                           QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
                 return
 
+        self.info_viewer.show()
+
         # create a new thread
         input_port = int(self.set_input_port.text())
         output_ip = self.set_output_ip.text()
         output_port = int(self.set_output_port.text())
-        self.sis = SisProcess(port_in=input_port, port_out=output_port, ip_out=output_ip)
+        self.conn, self.child_conn = Pipe()
+        self.sis = SisProcess(conn=self.child_conn, port_in=input_port, port_out=output_port, ip_out=output_ip)
         logger.debug('created new simulator')
 
         file_list = list()
         for i in range(self.list_files.count()):
+
             print(self.list_files.item(i).text())
             file_path = self.list_files.item(i).text()
             if os.path.exists(file_path):
@@ -210,9 +259,23 @@ class ControlPanel(QtGui.QWidget):
 
         self.sis.start()
 
-    def sis_stop(self):
+        self._active = True
+        self.monitoring()
+
+    def stop_emulation(self):
         logger.debug("stop SIS")
         if self.sis:
+
+            progress = QtProgress(self)
+            progress.start(title="Halting", text="Wait while threads stop")
+            progress.update(value=20)
             self.sis.stop()
+
+            progress.update(value=30)
             self.sis.join()
             self.sis = None
+
+            progress.end()
+
+        self._active = False
+        self.info_viewer.hide()

@@ -1,10 +1,8 @@
-import time
-import multiprocessing
-
-from hyo.sis.process import SisProcess
-from hyo.soundspeed.logging import test_logging
-
 import logging
+import time
+
+from hyo.sis.lib.process import SisProcess
+
 logger = logging.getLogger()
 
 
