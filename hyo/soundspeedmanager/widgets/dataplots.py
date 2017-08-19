@@ -528,6 +528,30 @@ class DataPlots(AbstractWidget):
 
             self.c.draw()
 
+    def update_temp_limits(self):
+
+        with rc_context(self.rc_context):
+            if self.lib.has_ssp():
+
+                max_proc_temp = self.lib.cur.proc.temp[self.vi].max()
+                min_proc_temp = self.lib.cur.proc.temp[self.vi].min()
+
+                self.temp_ax.set_xlim([min_proc_temp - 3.0, max_proc_temp + 3.0])
+
+            self.c.draw()
+
+    def update_sal_limits(self):
+
+        with rc_context(self.rc_context):
+            if self.lib.has_ssp():
+
+                max_proc_sal = self.lib.cur.proc.sal[self.vi].max()
+                min_proc_sal = self.lib.cur.proc.sal[self.vi].min()
+
+                self.sal_ax.set_xlim([min_proc_sal - 3.0, max_proc_sal + 3.0])
+
+            self.c.draw()
+
     def redraw(self):
         """Redraw the canvases, update the locators"""
 

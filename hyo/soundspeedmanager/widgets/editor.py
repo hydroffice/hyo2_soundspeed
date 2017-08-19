@@ -186,6 +186,7 @@ class Editor(AbstractWidget):
 
         self.dataplots.update_data()
         self.dataplots.update_speed_limits()
+        self.dataplots.update_sal_limits()
 
     def on_retrieve_temp_sal(self):
         logger.debug('user wants to retrieve temp/sal')
@@ -206,6 +207,9 @@ class Editor(AbstractWidget):
             return
 
         self.dataplots.update_data()
+        self.dataplots.update_speed_limits()
+        self.dataplots.update_temp_limits()
+        self.dataplots.update_sal_limits()
 
     def on_retrieve_tss(self):
         logger.debug('user wants to retrieve transducer sound speed')
@@ -230,6 +234,8 @@ class Editor(AbstractWidget):
         self.dataplots.update_data()
         self.dataplots.update_depth_limits()
         self.dataplots.update_speed_limits()
+        self.dataplots.update_temp_limits()
+        self.dataplots.update_sal_limits()
 
     def on_preview_thinning(self):
         logger.debug('user wants to preview thinning')

@@ -60,6 +60,7 @@ class ControlPanel(QtGui.QWidget):
         self.conn = None
         self.child_conn = None
         self._active = False
+        self._replay_timing = 1.0
 
     def _make_sis_settings(self):
         """build "settings" groupbox"""
@@ -106,6 +107,23 @@ class ControlPanel(QtGui.QWidget):
         self.set_output_port.setText("16103")
 
         vbox.addSpacing(12)
+
+        # replay timing
+        hbox = QtGui.QHBoxLayout()
+        vbox.addLayout(hbox)
+        text_timing = QtGui.QLabel("Timing:")
+        hbox.addWidget(text_timing)
+        text_timing.setMinimumWidth(80)
+        self.set_timing = QtGui.QSlider()
+        self.set_timing.setOrientation(QtCore.Qt.Horizontal)
+        self.set_timing.setMinimum(1)
+        self.set_timing.setMaximum(5)
+        self.set_timing.setTickInterval(1)
+        self.set_timing.setValue(1)
+        self.set_timing.setTickPosition(QtGui.QSlider.TicksBelow)
+        # noinspection PyUnresolvedReferences
+        self.set_timing.valueChanged.connect(self.on_replay_timing)
+        hbox.addWidget(self.set_timing)
 
         # verbose
         hbox = QtGui.QHBoxLayout()
@@ -234,6 +252,7 @@ class ControlPanel(QtGui.QWidget):
                                           QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
                 return
 
+        self.info_viewer.viewer.verticalScrollBar().setValue(self.info_viewer.viewer.verticalScrollBar().maximum())
         self.info_viewer.show()
 
         # create a new thread
@@ -241,13 +260,15 @@ class ControlPanel(QtGui.QWidget):
         output_ip = self.set_output_ip.text()
         output_port = int(self.set_output_port.text())
         self.conn, self.child_conn = Pipe()
-        self.sis = SisProcess(conn=self.child_conn, port_in=input_port, port_out=output_port, ip_out=output_ip)
+        self.sis = SisProcess(conn=self.child_conn, port_in=input_port, port_out=output_port, ip_out=output_ip,
+                              replay_timing=self._replay_timing,
+                              verbose=self.set_verbose.isChecked())
         logger.debug('created new simulator')
 
         file_list = list()
         for i in range(self.list_files.count()):
 
-            print(self.list_files.item(i).text())
+            logger.debug("passing file: %s" % self.list_files.item(i).text())
             file_path = self.list_files.item(i).text()
             if os.path.exists(file_path):
                 file_list.append(file_path)
@@ -279,3 +300,26 @@ class ControlPanel(QtGui.QWidget):
 
         self._active = False
         self.info_viewer.hide()
+
+    def on_replay_timing(self):
+        value = self.set_timing.value()
+
+        if value == 1:
+            self._replay_timing = 1.0
+
+        elif value == 2:
+            self._replay_timing = 0.5
+
+        elif value == 3:
+            self._replay_timing = 0.1
+
+        elif value == 4:
+            self._replay_timing = 0.01
+
+        else:
+            self._replay_timing = 0.0001
+
+        if self.sis is not None:
+            self.conn.send(self._replay_timing)
+
+        logger.debug("changed timing: %.4f" % self._replay_timing)

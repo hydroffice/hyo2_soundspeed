@@ -1,5 +1,3 @@
-import os
-
 from PySide import QtGui
 from PySide import QtCore
 
@@ -19,9 +17,10 @@ class InfoViewerDialog(QtGui.QDialog):
         self.setLayout(vbox)
         vbox.setContentsMargins(5, 5, 5, 5)
 
-        self.viewer = QtGui.QTextEdit()
+        self.viewer = QtGui.QTextBrowser()
         self.viewer.resize(QtCore.QSize(280, 40))
         self.viewer.setTextColor(QtGui.QColor("#4682b4"))
+        self.viewer.ensureCursorVisible()
         # create a monospace font
         font = QtGui.QFont("Courier New")
         font.setStyleHint(QtGui.QFont.TypeWriter)
@@ -38,6 +37,7 @@ class InfoViewerDialog(QtGui.QDialog):
 
         try:
             self.viewer.append(text)
+            self.viewer.moveCursor(QtGui.QTextCursor.End)
 
         except RuntimeError:
             logger.info("latest message: %s" % text)
