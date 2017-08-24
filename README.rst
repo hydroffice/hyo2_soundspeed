@@ -21,6 +21,10 @@ HydrOffice Sound Speed
     :target: https://www.codacy.com/app/hydroffice/hyo_soundspeed?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hydroffice/hyo_soundspeed&amp;utm_campaign=Badge_Grade
     :alt: Codacy Status
 
+.. image:: https://zenodo.org/badge/54854024.svg
+   :target: https://zenodo.org/badge/latestdoi/54854024
+   :alt: Zenodo DOI
+
 
 General Info
 ------------
