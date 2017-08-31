@@ -101,8 +101,12 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
             raise RuntimeError("unknown format: %s" % self.format)
 
         # initialize probe/sensor type
-        self.ssp.cur.meta.sensor_type = Dicts.sensor_types["MVP"]
+        if self.format == self.formats["CALC"]:
+            self.ssp.cur.meta.sensor_type = Dicts.sensor_types["SVP"]
+        else:
+            self.ssp.cur.meta.sensor_type = Dicts.sensor_types["MVP"]
         self.ssp.cur.meta.probe_type = Dicts.probe_types["MVP"]
+        self.ssp.cur.meta.original_path = data_path
 
         self._read(data_path=data_path)
         self._parse_header()
@@ -268,10 +272,10 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
             lon_deg = int(lon_field[0:3])
             lon_min = float(lon_field[3:-1])
             lon_hemi = self.total_data.splitlines()[-3].split()[-1].split(",")[-1]
-            self.longitude = lon_deg + lon_min/60.0
+            self.ssp.cur.meta.longitude = lon_deg + lon_min/60.0
             if lon_hemi == "W" or lon_hemi == "w":
-                self.longitude *= -1
-            logger.info("longitude: %s" % self.longitude)
+                self.ssp.cur.meta.longitude *= -1
+            logger.info("longitude: %s" % self.ssp.cur.meta.longitude)
         except (ValueError, IndexError, TypeError) as e:
             raise RuntimeError("unable to convert to longitude: %s" % e)
 
@@ -281,10 +285,10 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
             lat_deg = int(lat_field[0:2])
             lat_min = float(lat_field[2:-1])
             lat_hemi = self.total_data.splitlines()[-4].split()[-1].split(",")[-1]
-            self.latitude = lat_deg + lat_min/60.0
+            self.ssp.cur.meta.latitude = lat_deg + lat_min/60.0
             if lat_hemi == "S" or lat_hemi == "s":
-                self.latitude *= -1
-            logger.info("latitude: %s" % self.latitude)
+                self.ssp.cur.meta.latitude *= -1
+            logger.info("latitude: %s" % self.ssp.cur.meta.latitude)
         except (ValueError, IndexError, TypeError) as e:
             raise RuntimeError("unable to convert to longitude: %s" % e)
 
@@ -353,7 +357,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
             lon_deg = int(lon_field[0:3])
             lon_min = float(lon_field[3:-1])
             lon_hemi = footer_fields[3]
-            self.ssp.cur.meta.longitude = lon_deg + lon_min/60.0
+            self.ssp.cur.meta.longitude = lon_deg + lon_min / 60.0
             if lon_hemi == "W" or lon_hemi == "w":
                 self.ssp.cur.meta.longitude *= -1
             logger.info("longitude: %s" % self.ssp.cur.meta.longitude)
@@ -406,7 +410,6 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
         self.ssp.cur.data_resize(count)
 
 
-# # TODO: ask Jonathan about this unused function
 # # This is the documentation provided by Steve Smyth of Rolls Royce (ODIM Brooke Ocean)
 # # as per an email communication with Shannon Byrne of SAIC, dated February 03, 2009
 # # to facilitate data transfer from MVP to ISS60.
