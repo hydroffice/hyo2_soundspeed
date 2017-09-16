@@ -21,7 +21,6 @@ from hyo.soundspeedmanager.qt_callbacks import QtCallbacks
 from hyo.soundspeedmanager.widgets.editor import Editor
 from hyo.soundspeedmanager.widgets.database import Database
 from hyo.soundspeedmanager.widgets.seacat import Seacat
-from hyo.soundspeedmanager.widgets.monitor import SurveyDataMonitor
 from hyo.soundspeedmanager.widgets.server import Server
 from hyo.soundspeedmanager.widgets.refraction import Refraction
 from hyo.soundspeedmanager.widgets.settings import Settings
@@ -106,7 +105,7 @@ class MainWin(QtGui.QMainWindow):
         self.tabs = QtGui.QTabWidget()
         self.setCentralWidget(self.tabs)
         self.tabs.setIconSize(QtCore.QSize(42, 42))
-        self.tabs.blockSignals(True)  # durign the initialization
+        self.tabs.blockSignals(True)  # during the initialization
         self.tabs.currentChanged.connect(self.onChange)  # changed!
         # editor
         self.tab_editor = Editor(lib=self.lib, main_win=self)
@@ -125,11 +124,18 @@ class MainWin(QtGui.QMainWindow):
         self.tabs.setTabToolTip(idx, "SeaCAT")
         if not self.lib.setup.noaa_tools:
             self.tab_seacat.setDisabled(True)
-        # surface sound speed
-        self.tab_monitor = SurveyDataMonitor(lib=self.lib, main_win=self)
-        idx = self.tabs.insertTab(3, self.tab_monitor,
-                                  QtGui.QIcon(os.path.join(self.here, 'media', 'surveydatamonitor.png')), "")
-        self.tabs.setTabToolTip(idx, "Survey Data Monitor")
+        # survey data monitor
+        self.has_sdm_support = True
+        try:  # try.. except to make SSM working also without SDM
+            from hyo.soundspeedmanager.widgets.monitor.fake import SurveyDataMonitor
+            self.tab_monitor = SurveyDataMonitor(lib=self.lib, main_win=self)
+            idx = self.tabs.insertTab(3, self.tab_monitor,
+                                      QtGui.QIcon(os.path.join(self.here, 'media', 'surveydatamonitor.png')), "")
+            self.tabs.setTabToolTip(idx, "Survey Data Monitor")
+            logger.info("Support for Survey Monitor: ON")
+        except Exception as e:
+            self.has_sdm_support = False
+            logger.info("Support for Survey Monitor: OFF(%s)" % e)
         # server
         self.tab_server = Server(lib=self.lib, main_win=self)
         idx = self.tabs.insertTab(4, self.tab_server,
@@ -577,7 +583,8 @@ class MainWin(QtGui.QMainWindow):
         if reply == QtGui.QMessageBox.Yes:
             event.accept()
             self.lib.close()
-            self.tab_monitor.stop_plotting()
+            if self.has_sdm_support:
+                self.tab_monitor.stop_plotting()
             super(MainWin, self).closeEvent(event)
         else:
             event.ignore()

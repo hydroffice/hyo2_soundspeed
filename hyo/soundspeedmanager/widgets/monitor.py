@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 from hyo.soundspeedmanager.widgets.widget import AbstractWidget
 from hyo.soundspeedmanager.dialogs.export_data_monitor_dialog import ExportDataMonitorDialog
 from hyo.soundspeedmanager.dialogs.monitor_option_dialog import MonitorOption
-from hyo.surveydatamonitor import monitor
+from hyo.surveydatamonitor.lib import monitor
 
 
 class SurveyDataMonitor(AbstractWidget):

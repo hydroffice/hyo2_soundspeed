@@ -1,10 +1,11 @@
-from PySide import QtGui
-from PySide import QtCore
-
 import logging
+
+from PySide import QtCore
+from PySide import QtGui
+
 logger = logging.getLogger(__name__)
 
-from hyo.surveydatamonitor.monitor import SurveyDataMonitor
+from hyo.surveydatamonitor.lib.monitor import SurveyDataMonitor
 from hyo.soundspeedmanager.dialogs.dialog import AbstractDialog
 
 

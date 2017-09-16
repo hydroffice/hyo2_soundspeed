@@ -50,7 +50,7 @@ copyright = u'2017, CCOM/JHC,UNH'
 # The short X.Y version.
 version = '2017.6'
 # The full version, including alpha/beta/rc tags.
-release = '2017.6.0'
+release = '2017.6.5'
 
 numfig = True
 
