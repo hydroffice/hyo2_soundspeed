@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 from hyo.soundspeed.client.client import Client
 
 
-class ClientList(object):
+class ClientList:
     def __init__(self):
         self.num_clients = 0
         self.clients = list()

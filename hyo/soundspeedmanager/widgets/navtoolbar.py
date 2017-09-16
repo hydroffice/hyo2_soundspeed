@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 from hyo.soundspeed.profile.dicts import Dicts
 
 
-class Sample(object):
+class Sample:
     def __init__(self):
         self.depth = None
         self.speed = None

@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class More(object):
+class More:
     def __init__(self):
         self.sa = None
 

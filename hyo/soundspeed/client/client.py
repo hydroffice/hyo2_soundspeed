@@ -9,7 +9,7 @@ from hyo.soundspeed.formats.writers.asvp import Asvp
 from hyo.soundspeed.formats.writers.calc import Calc
 
 
-class Client(object):
+class Client:
     def __init__(self, client):
         # print(client)
         self.name = client.split(":")[0]

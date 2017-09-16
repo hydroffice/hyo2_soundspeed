@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 from hyo.soundspeed.profile.dicts import Dicts
 
 
-class Metadata(object):
+class Metadata:
     def __init__(self):
         self.sensor_type = Dicts.sensor_types['Unknown']
         self.probe_type = Dicts.probe_types['Unknown']

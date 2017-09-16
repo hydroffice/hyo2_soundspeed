@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 from hyo.soundspeed.base.helper import python_path
 
 
-class GdalAux(object):
+class GdalAux:
     """ Auxiliary class to manage GDAL stuff """
 
     error_loaded = False

@@ -9,7 +9,7 @@ from hyo.soundspeed.listener.sippican.sippican import Sippican
 from hyo.soundspeed.listener.mvp.mvp import Mvp
 
 
-class Listeners(object):
+class Listeners:
     """A collection of listening processes"""
 
     def __init__(self, prj):

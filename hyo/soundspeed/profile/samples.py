@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Samples(object):
+class Samples:
     def __init__(self):
         self.num_samples = 0
         self.pressure = None

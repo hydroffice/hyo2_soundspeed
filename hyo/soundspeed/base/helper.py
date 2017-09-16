@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 from .. import __version__ as ss_version
 
 
-class FileInfo(object):
+class FileInfo:
     """A class that collects information on a passed file"""
 
     def __init__(self, data_path):

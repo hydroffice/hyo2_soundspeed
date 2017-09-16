@@ -15,7 +15,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class PlotDb(object):
+class PlotDb:
     """Class that plots sound speed db data"""
 
     font_size = 6
@@ -197,7 +197,7 @@ class PlotDb(object):
             for t in x[m][1]:
                 t.set_color(color)
 
-    class AvgSsp(object):
+    class AvgSsp:
         def __init__(self):
             # create and populate list used in the calculations
             self.limits = list()  # bin limits

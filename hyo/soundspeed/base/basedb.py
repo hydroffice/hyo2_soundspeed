@@ -6,10 +6,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class BaseDb(object, metaclass=ABCMeta):
+class BaseDb(metaclass=ABCMeta):
     """ Abstract class that provides an interface to a SQLite db """
 
-    class Point(object):
+    class Point:
         def __init__(self, x, y):
             self.x, self.y = x, y
 

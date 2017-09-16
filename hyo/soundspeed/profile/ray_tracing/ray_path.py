@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class RayPath(object):
+class RayPath:
     """Represents the path of a SONAR wave through the water column. Basically
        this is just an n by 3 array (travel time, depth, across track).
     """

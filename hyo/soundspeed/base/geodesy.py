@@ -38,7 +38,7 @@ wkt_3857 = "PROJCS[\"WGS 84 / Pseudo-Mercator\",GEOGCS[\"Popular Visualisation C
            "AUTHORITY[\"EPSG\",\"3785\"],AXIS[\"X\",EAST],AXIS[\"Y\",NORTH]]"
 
 
-class Geodesy(object):
+class Geodesy:
     """ A class about geodetic methods and conversions """
 
     @classmethod

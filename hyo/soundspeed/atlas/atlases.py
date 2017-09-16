@@ -8,7 +8,7 @@ from hyo.soundspeed.atlas.woa09.woa09 import Woa09
 from hyo.soundspeed.atlas.woa13.woa13 import Woa13
 
 
-class Atlases(object):
+class Atlases:
     """A collection of atlases"""
 
     def __init__(self, prj):

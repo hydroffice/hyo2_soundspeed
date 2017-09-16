@@ -8,7 +8,7 @@ from hyo.soundspeed.client.clientlist import ClientList
 from hyo.soundspeed.base.helper import first_match
 
 
-class Setup(object):
+class Setup:
 
     def __init__(self, release_folder, use_setup_name=None):
         self.use_setup_name = use_setup_name

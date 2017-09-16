@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Oceanography(object):
+class Oceanography:
     """A collection of oceanographic methods
 
     main refs:

@@ -7,7 +7,7 @@ from hyo.soundspeed.logging.sqlitehandler import SQLiteHandler
 from hyo.soundspeed.logging.filters import NotServerFilter, ServerFilter
 
 
-class SqliteLogging(object):
+class SqliteLogging:
 
     def __init__(self, output_folder, user_db_file="log.user.db", server_db_file="log.server.db"):
         """Logging to Sqlite databases"""

@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class AbstractProgress(object, metaclass=ABCMeta):
+class AbstractProgress(metaclass=ABCMeta):
     """Abstract class for a progress bar"""
 
     def __init__(self):

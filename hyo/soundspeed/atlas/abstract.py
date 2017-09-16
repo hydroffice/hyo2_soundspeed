@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 from hyo.soundspeed.base.geodesy import Geodesy
 
 
-class AbstractAtlas(object, metaclass=ABCMeta):
+class AbstractAtlas(metaclass=ABCMeta):
     """Common abstract atlas"""
 
     def __init__(self, data_folder, prj):

@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Dicts(object):
+class Dicts:
 
     @classmethod
     def first_match(cls, dct, val):

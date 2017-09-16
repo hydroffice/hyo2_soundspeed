@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class GeneralAbstractCallbacks(object, metaclass=ABCMeta):
+class GeneralAbstractCallbacks(metaclass=ABCMeta):
     """Abstract class with several callbacks that has to be implemented for a new backend"""
 
     def __init__(self, sis_listener=None):

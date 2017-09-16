@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 from hyo.soundspeed.profile.profilelist import ProfileList
 
 
-class AbstractFormat(object, metaclass=ABCMeta):
+class AbstractFormat(metaclass=ABCMeta):
     """ Common abstract data format """
 
     def __init__(self):

@@ -44,7 +44,7 @@ class UTF8Serial(serial.Serial):
         return str(data)  # converts to ascii for python 2.7, leaves as unicode for 3.x
 
 
-class SeacatComms(object):
+class SeacatComms:
     '''It seems that the serial module does not clean up nicely.  If an exception occurs the serial port may be held
     until the program exits.
     Make sure to catch all exceptions and close( ) the comm object.

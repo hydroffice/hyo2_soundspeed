@@ -353,7 +353,7 @@ class Seacat(AbstractWidget):
             return True, conname
 
 
-class AutoSeacat(object):
+class AutoSeacat:
     def __init__(self, port=None, progbar=None):
         self.progbar = progbar
         if progbar:

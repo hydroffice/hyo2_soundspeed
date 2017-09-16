@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Point(object):
+class Point:
     """Used to add a Point type to sqlite"""
     def __init__(self, x, y):
         self.x, self.y = x, y

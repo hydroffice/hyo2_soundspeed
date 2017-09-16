@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class RayTracing(object):
+class RayTracing:
 
     @classmethod
     def get_svp_layer_parameters(cls, launch_angle_radians, depths, speeds):
