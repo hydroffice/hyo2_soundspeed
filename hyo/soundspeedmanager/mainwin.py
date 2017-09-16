@@ -5,6 +5,7 @@ import ssl
 from urllib.request import urlopen
 from urllib.error import URLError
 import socket
+import traceback
 
 from PySide import QtGui
 from PySide import QtCore
@@ -127,13 +128,14 @@ class MainWin(QtGui.QMainWindow):
         # survey data monitor
         self.has_sdm_support = True
         try:  # try.. except to make SSM working also without SDM
-            from hyo.soundspeedmanager.widgets.monitor.fake import SurveyDataMonitor
+            from hyo.surveydatamonitor.app.widgets.monitor import SurveyDataMonitor
             self.tab_monitor = SurveyDataMonitor(lib=self.lib, main_win=self)
             idx = self.tabs.insertTab(3, self.tab_monitor,
                                       QtGui.QIcon(os.path.join(self.here, 'media', 'surveydatamonitor.png')), "")
             self.tabs.setTabToolTip(idx, "Survey Data Monitor")
             logger.info("Support for Survey Monitor: ON")
         except Exception as e:
+            traceback.print_exc()
             self.has_sdm_support = False
             logger.info("Support for Survey Monitor: OFF(%s)" % e)
         # server
