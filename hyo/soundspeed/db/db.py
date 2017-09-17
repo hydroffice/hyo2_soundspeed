@@ -32,7 +32,7 @@ class ProjectDb:
 
         # the passed project name is used to identify the project database to open
         self.db_path = os.path.join(projects_folder, self.clean_project_name(project_name) + ".db")
-        logger.debug('current project db: %s' % self.db_path)
+        # logger.debug('current project db: %s' % self.db_path)
 
         # add plotting and exporting capabilities
         self.plot = PlotDb(db=self)
@@ -582,7 +582,7 @@ class ProjectDb:
                 ts_list = self.conn.execute("""
                                              SELECT cast_datetime, pk FROM ssp_view ORDER BY cast_datetime
                                              """).fetchall()
-                logger.info("retrieved %s timestamps from ssp view" % len(ts_list))
+                # logger.info("retrieved %s timestamps from ssp view" % len(ts_list))
                 return ts_list
 
             except sqlite3.Error as e:
