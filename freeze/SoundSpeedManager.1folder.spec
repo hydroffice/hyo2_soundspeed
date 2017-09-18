@@ -43,6 +43,7 @@ def collect_pkg_data(package, include_py_files=False, subdir=None):
 pkg_data = collect_pkg_data('hyo.soundspeedmanager')
 pkg_data_2 = collect_pkg_data('hyo.soundspeedsettings')
 pkg_data_3 = collect_pkg_data('gsw.utilities')
+pkg_data_4 = collect_pkg_data('hyo.surveydatamonitor')
 
 icon_file = 'freeze\SoundSpeedManager.ico'
 if is_darwin:
@@ -50,7 +51,7 @@ if is_darwin:
 
 a = Analysis(['SoundSpeedManager.py'],
              pathex=[],
-             hiddenimports=["PIL", "hyo.surveydatamonitor.estimate.casttime.tracedprofile"],
+             hiddenimports=["PIL", "hyo.surveydatamonitor.lib.estimate.casttime.tracedprofile"],
              excludes=[
                 "IPython", "PyQt", "pandas", "scipy", "sphinx", "sphinx_rtd_theme", "OpenGL_accelerate",
                 "FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter",
@@ -76,6 +77,7 @@ coll = COLLECT(exe,
                pkg_data,
                pkg_data_2,
                pkg_data_3,
+               pkg_data_4,
                strip=None,
                upx=True,
                name='SoundSpeedManager.%s' % ssm_version)
