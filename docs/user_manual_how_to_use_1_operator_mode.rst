@@ -326,6 +326,7 @@ The recipients of such a transmission are configured in the configuration file (
 Given that the profile accepted by *SIS* often requires the application of a thinning algorithm,
 a method *Preview thinning* is provided to inspect the result of such an algorithm before the actual transmission.
 
+.. _ssm_database:
 
 Data storage
 ------------
