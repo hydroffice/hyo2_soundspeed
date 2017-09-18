@@ -33,7 +33,7 @@ The default configuration uses the *CastTime* algorithm to estimate the time sug
     Example of analysis plot to display the error tolerance limits (in magenta on the right pane) used by CastTime
     to estimate the next cast time.
 
-The background color in the *Next-cast Info* viewer (:numref:`data_monitor_tool_tab`) changes identifies
+The background color in the *Next-cast Info* viewer (:numref:`data_monitor_tool_tab`) identifies
 three possible estimation states (calculated in function of the maximum allowable error):
 
 * *Steady* state (blue): the casting interval is the same as in the previous estimation.
