@@ -47,12 +47,13 @@ class Client:
             kng_fmt = Dicts.kng_formats['S12']
             logger.info("forcing S12 format")
 
-        if not prj.prepare_sis():
-            logger.info("issue in preparing the data")
-            return False
+        if self.protocol != "QINSY":
+            if not prj.prepare_sis():
+                logger.info("issue in preparing the data")
+                return False
 
         asvp = Asvp()
-        tx_data = asvp.convert(prj.ssp, fmt=kng_fmt)
+        tx_data = asvp.convert(prj.ssp, fmt=kng_fmt, send_proc=(self.protocol == "QINSY"))
         # print(tx_data)
 
         return self._transmit(tx_data)

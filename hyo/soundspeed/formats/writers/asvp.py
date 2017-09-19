@@ -120,21 +120,26 @@ class Asvp(AbstractTextWriter):
         self.fod.io.write(body)
         self.fod.io.close()
 
-    def convert(self, ssp, fmt):
+    def convert(self, ssp, fmt, send_proc=False):
         """Convert a profile in a given Kongsberg format"""
         self.ssp = ssp
 
-        header = self._convert_header(fmt)
-        body = self._convert_body(fmt)
+        header = self._convert_header(fmt, send_proc)
+        body = self._convert_body(fmt, send_proc)
 
         return header + body
 
-    def _convert_header(self, fmt):
+    def _convert_header(self, fmt, send_proc):
         self.header = self.get_km_prefix(fmt)  # start with the format prefix
-        ti = self.ssp.cur.sis_thinned
+        if send_proc:
+            ti = self.ssp.cur.proc_valid
+            ti_size = self.ssp.cur.proc.depth[ti].size
+        else:
+            ti = self.ssp.cur.sis_thinned
+            ti_size = self.ssp.cur.sis.depth[ti].size
 
         if fmt != Dicts.kng_formats['ASVP']:
-            self.header += "%04d," % self.ssp.cur.sis.depth[ti].size
+            self.header += "%04d," % ti_size
             self.header += self.ssp.cur.meta.utc_time.strftime("%H%M%S,%d,%m,%Y,")
 
         else:
@@ -144,28 +149,33 @@ class Asvp(AbstractTextWriter):
             self.header += "%.8f %.8f -1 0 0 OMS01_00000 P %04d )\n" \
                            % (self.ssp.cur.meta.latitude,
                               self.ssp.cur.meta.longitude,
-                              self.ssp.cur.sis.depth[ti].size)
+                              ti_size)
         return self.header
 
-    def _convert_body(self, fmt):
+    def _convert_body(self, fmt, send_proc):
         body = str()
-        ti = self.ssp.cur.sis_thinned
+        if send_proc:
+            ti = self.ssp.cur.proc_valid
+            depths = self.ssp.cur.proc.depth[ti]
+            speeds = self.ssp.cur.proc.speed[ti]
+            temps = self.ssp.cur.proc.temp[ti]
+            sals = self.ssp.cur.proc.sal[ti]
+        else:
+            ti = self.ssp.cur.sis_thinned
+            depths = self.ssp.cur.sis.depth[ti]
+            speeds = self.ssp.cur.sis.speed[ti]
+            temps = self.ssp.cur.sis.temp[ti]
+            sals = self.ssp.cur.sis.sal[ti]
 
-        for i in range(np.sum(ti)):
+        for i in range(int(np.sum(ti))):
             if (fmt == Dicts.kng_formats['S00']) or (fmt == Dicts.kng_formats['S10']):
-                body += "%.2f,%.1f,,,\r\n" \
-                        % (self.ssp.cur.sis.depth[ti][i], self.ssp.cur.sis.speed[ti][i])
+                body += "%.2f,%.1f,,,\r\n" % (depths[i], speeds[i])
             elif (fmt == Dicts.kng_formats['S01']) or (fmt == Dicts.kng_formats['S12']):
-                body += "%.2f,%1f,%.2f,%.2f,\r\n" \
-                        % (self.ssp.cur.sis.depth[ti][i], self.ssp.cur.sis.speed[ti][i],
-                           self.ssp.cur.sis.temp[ti][i], self.ssp.cur.sis.sal[ti][i])
+                body += "%.2f,%1f,%.2f,%.2f,\r\n" % (depths[i], speeds[i], temps[i], sals[i])
             elif (fmt == Dicts.kng_formats['S02']) or (fmt == Dicts.kng_formats['S22']):
-                body += "%.2f,,%.2f,%.2f,\r\n" \
-                        % (self.ssp.cur.sis.depth[ti][i],
-                           self.ssp.cur.sis.temp[ti][i], self.ssp.cur.sis.sal[ti][i])
+                body += "%.2f,,%.2f,%.2f,\r\n" % (depths[i], temps[i], sals[i])
             elif fmt == Dicts.kng_formats['ASVP']:
-                body += "%.2f %.2f\n" \
-                        % (self.ssp.cur.sis.depth[ti][i], self.ssp.cur.sis.speed[ti][i])
+                body += "%.2f %.2f\n" % (depths[i], speeds[i])
 
         if fmt == Dicts.kng_formats['ASVP']:
             return body
