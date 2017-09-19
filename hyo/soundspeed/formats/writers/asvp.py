@@ -129,7 +129,7 @@ class Asvp(AbstractTextWriter):
 
         return header + body
 
-    def _convert_header(self, fmt, send_proc):
+    def _convert_header(self, fmt, send_proc=False):
         self.header = self.get_km_prefix(fmt)  # start with the format prefix
         if send_proc:
             ti = self.ssp.cur.proc_valid
@@ -152,7 +152,7 @@ class Asvp(AbstractTextWriter):
                               ti_size)
         return self.header
 
-    def _convert_body(self, fmt, send_proc):
+    def _convert_body(self, fmt, send_proc=False):
         body = str()
         if send_proc:
             ti = self.ssp.cur.proc_valid
