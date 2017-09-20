@@ -120,23 +120,20 @@ class Asvp(AbstractTextWriter):
         self.fod.io.write(body)
         self.fod.io.close()
 
-    def convert(self, ssp, fmt, send_proc=False):
+    def convert(self, ssp, fmt):
         """Convert a profile in a given Kongsberg format"""
         self.ssp = ssp
 
-        header = self._convert_header(fmt, send_proc)
-        body = self._convert_body(fmt, send_proc)
+        header = self._convert_header(fmt)
+        body = self._convert_body(fmt)
 
         return header + body
 
-    def _convert_header(self, fmt, send_proc=False):
+    def _convert_header(self, fmt):
         self.header = self.get_km_prefix(fmt)  # start with the format prefix
-        if send_proc:
-            ti = self.ssp.cur.proc_valid
-            ti_size = self.ssp.cur.proc.depth[ti].size
-        else:
-            ti = self.ssp.cur.sis_thinned
-            ti_size = self.ssp.cur.sis.depth[ti].size
+
+        ti = self.ssp.cur.sis_thinned
+        ti_size = self.ssp.cur.sis.depth[ti].size
 
         if fmt != Dicts.kng_formats['ASVP']:
             self.header += "%04d," % ti_size
@@ -152,20 +149,14 @@ class Asvp(AbstractTextWriter):
                               ti_size)
         return self.header
 
-    def _convert_body(self, fmt, send_proc=False):
+    def _convert_body(self, fmt):
         body = str()
-        if send_proc:
-            ti = self.ssp.cur.proc_valid
-            depths = self.ssp.cur.proc.depth[ti]
-            speeds = self.ssp.cur.proc.speed[ti]
-            temps = self.ssp.cur.proc.temp[ti]
-            sals = self.ssp.cur.proc.sal[ti]
-        else:
-            ti = self.ssp.cur.sis_thinned
-            depths = self.ssp.cur.sis.depth[ti]
-            speeds = self.ssp.cur.sis.speed[ti]
-            temps = self.ssp.cur.sis.temp[ti]
-            sals = self.ssp.cur.sis.sal[ti]
+
+        ti = self.ssp.cur.sis_thinned
+        depths = self.ssp.cur.sis.depth[ti]
+        speeds = self.ssp.cur.sis.speed[ti]
+        temps = self.ssp.cur.sis.temp[ti]
+        sals = self.ssp.cur.sis.sal[ti]
 
         for i in range(int(np.sum(ti))):
             if (fmt == Dicts.kng_formats['S00']) or (fmt == Dicts.kng_formats['S10']):

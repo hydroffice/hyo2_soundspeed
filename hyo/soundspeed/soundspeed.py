@@ -1180,16 +1180,19 @@ class SoundSpeedLibrary:
 
         return True
 
-    def prepare_sis(self):
+    def prepare_sis(self, apply_thin=True, apply_12k=True, thin_tolerance=0.1):
         if not self.has_ssp():
             logger.warning("no profile!")
             return False
 
         self.cur.clone_proc_to_sis()
 
-        if not self.cur.thin(tolerance=0.1):
-            logger.warning("thinning issue")
-            return False
+        if apply_thin:
+            if not self.cur.thin(tolerance=thin_tolerance):
+                logger.warning("thinning issue")
+                return False
+        else:
+            self.cur.sis.flag[self.cur.sis_valid] = Dicts.flags['thin']
 
         # filter the data for depth
         si = self.cur.sis_thinned
@@ -1197,14 +1200,18 @@ class SoundSpeedLibrary:
         last_depth = -1.0
         # logger.debug('valid size: %s' % valid.size)
         for i in range(self.cur.sis.flag[si].size):
+
             depth = self.cur.sis.depth[si][i]
             if abs(depth - last_depth) < 0.02:  # ignore sample with small separation
                 valid[i] = Dicts.flags['sis']
                 # logger.debug('small change: %s %s %s' % (i, last_depth, depth))
+
             elif (depth < 0.0) or (depth > 12000.0):
                 valid[i] = Dicts.flags['sis']
                 # logger.debug('out of range: %s %s' % (i, depth))
+
             last_depth = depth
+
         self.cur.sis.flag[si] = valid[:]
 
         # check depth 0.0
@@ -1220,19 +1227,22 @@ class SoundSpeedLibrary:
         # Add a final value at 12000m, from: Taira, K., Yanagimoto, D. and Kitagawa, S. (2005).,
         #  "Deep CTD Casts in the Challenger Deep, Mariana Trench", Journal of Oceanography, Vol. 61, pp. 447 t 454
         # TODO: add T/S at location of max depth in the current basin in between last observation and 12000m sample
-        si = self.cur.sis_thinned
-        if self.cur.sis.flag[si].size == 0:
-            logger.warning("no valid samples after depth filters")
-            return False
-        depth_end = self.cur.sis.depth[si][-1]
-        if depth_end < 12000:
-            self.cur.insert_sis_speed(depth=12000.0, speed=1675.8, src=Dicts.sources['sis'])
+        if apply_12k:
+
             si = self.cur.sis_thinned
-            self.cur.sis.temp[si][-1] = 2.46
-            self.cur.sis.sal[si][-1] = 34.70
-        # logger.debug('last sample: %s %s %s %s'
-        #              % (self.cur.sis.depth[-1], self.cur.sis.speed[-1],
-        #                 self.cur.sis.source[-1], self.cur.sis.flag[-1]))
+            if self.cur.sis.flag[si].size == 0:
+                logger.warning("no valid samples after depth filters")
+                return False
+            depth_end = self.cur.sis.depth[si][-1]
+
+            if depth_end < 12000:
+                self.cur.insert_sis_speed(depth=12000.0, speed=1675.8, src=Dicts.sources['sis'])
+                si = self.cur.sis_thinned
+                self.cur.sis.temp[si][-1] = 2.46
+                self.cur.sis.sal[si][-1] = 34.70
+            # logger.debug('last sample: %s %s %s %s'
+            #              % (self.cur.sis.depth[-1], self.cur.sis.speed[-1],
+            #                 self.cur.sis.source[-1], self.cur.sis.flag[-1]))
 
         return True
 

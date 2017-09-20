@@ -1,5 +1,6 @@
 import time
 import socket
+import traceback
 import logging
 
 logger = logging.getLogger(__name__)
@@ -10,6 +11,9 @@ from hyo.soundspeed.formats.writers.calc import Calc
 
 
 class Client:
+
+    UDP_DATA_LIMIT = (2 ** 16) - 28
+
     def __init__(self, client):
         # print(client)
         self.name = client.split(":")[0]
@@ -47,14 +51,27 @@ class Client:
             kng_fmt = Dicts.kng_formats['S12']
             logger.info("forcing S12 format")
 
-        if self.protocol != "QINSY":
-            if not prj.prepare_sis():
+        apply_thin = True
+        apply_12k = True
+        tolerances = [0.1, 0.5]
+        if self.protocol == "QINSY":
+            apply_12k = False
+            tolerances = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5]
+
+        tx_data = None
+        for tolerance in tolerances:
+
+            if not prj.prepare_sis(apply_thin=apply_thin, apply_12k=apply_12k, thin_tolerance=tolerance):
                 logger.info("issue in preparing the data")
                 return False
 
-        asvp = Asvp()
-        tx_data = asvp.convert(prj.ssp, fmt=kng_fmt, send_proc=(self.protocol == "QINSY"))
-        # print(tx_data)
+            asvp = Asvp()
+            tx_data = asvp.convert(prj.ssp, fmt=kng_fmt)
+            # print(tx_data)
+            tx_data_size = len(tx_data)
+            logger.debug("tx data size: %d (with tolerance: %.3f)" % (tx_data_size, tolerance))
+            if tx_data_size < self.UDP_DATA_LIMIT:
+                break
 
         return self._transmit(tx_data)
 
@@ -76,8 +93,10 @@ class Client:
             else:
                 raise RuntimeError("invalid type of data to tx: %s" % type(tx_data))
 
-        except socket.error:
+        except socket.error as e:
             sock_out.close()
+            traceback.print_exc()
+            logger.warning("socket issue: %s" % e)
             return False
 
         sock_out.close()
