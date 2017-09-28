@@ -210,6 +210,14 @@ class ExportMultiProfileDialog(AbstractDialog):
                     skip_export = True
                     continue
 
+                if self.lib.setup.noaa_tools and not self.lib.current_project.startswith('OPR-'):
+
+                    msg = "The project name cannot be used for NCEI export.\n\n" \
+                          "Rename the project in the Database tab!"
+                    QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
+                    skip_export = True
+                    continue
+
                 if not self.lib.ssp.cur.meta.survey or \
                         not self.lib.ssp.cur.meta.vessel or \
                         not self.lib.ssp.cur.meta.institution:

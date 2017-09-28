@@ -301,7 +301,7 @@ class Ncei(AbstractWriter):
         elif self._is_empty(self.ssp.cur.data.speed[vi]) and self._is_empty(self.ssp.cur.data.temp[vi]) and \
                 self._is_empty(self.ssp.cur.data.conductivity[vi]) and self._is_empty(self.ssp.cur.data.sal[vi]):
             msg = '%s missing critical data' % msg
-        elif self._project in ['', 'default'] or not self._project.startswith('OPR-'):
+        elif self._project in ['', 'default']:
             msg = '%s project name is not valid' % msg
         elif not self.ssp.cur.meta.survey or not self.ssp.cur.meta.vessel or not self.ssp.cur.meta.institution:
             msg = '%s missing survey, vessel, or institution' % msg
