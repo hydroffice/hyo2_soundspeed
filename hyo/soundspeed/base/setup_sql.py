@@ -31,8 +31,7 @@ vessel_list = [
     "NF Nancy Foster",
     "HI Hi'Ialakai",
     "GM Gloria Michelle",
-    "EX Okeanos Explorer",
-    "ZZ Other"
+    "EX Okeanos Explorer"
 ]
 
 institution_list = [

@@ -1,6 +1,7 @@
 import numpy as np
 import netCDF4
 import os
+import re
 import calendar
 import datetime as dt
 import logging
@@ -171,19 +172,28 @@ class Ncei(AbstractWriter):
         self.root_group.project = '%s' % self._project
         # SUGGESTED - Name of the platform(s) that supported the sensor data used to create this data set or product.
         # Platforms can be of any type, including satellite, ship, station, aircraft or other.(ACDD)
-        self.root_group.platform = '%s' % self.ssp.cur.meta.vessel.replace("NRT-", 'NOAA NAVIGATION RESPONSE TEAM-')
+        # Match platform format with velocipy
+        platform = str(self.ssp.cur.meta.vessel).upper()
+        platform = platform.replace('NRT-', 'NOAA NAVIGATION RESPONSE TEAM-')
+        if len(platform) > 2 and platform[:2] in ['RA', 'TJ', 'FH', 'FA']:
+            platform = platform.replace('(SHIP)', 'NOAA SHIP')
+        self.root_group.platform = '%s' % platform
         # RECOMMENDED -The name of the institution principally responsible for originating this data..  An institution
         # attribute can be used for each variable if variables come from more than one institution. (CF/ACDD)
         self.root_group.institution = '%s' % self.ssp.cur.meta.institution
-        # RECOMMENDED - The method of production of the original data.(CF)
-        # self.root_group.source = b'sensor: %s, probe type: %s' % (self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
-        # SUGGESTED - Name of the contributing instrument(s) or sensor(s) used to create this data set or product. (ACDD)
-        if self.instrument is not None:
-            self.root_group.instrument = '%s' % self.instrument
-        else:
-            self.root_group.instrument = '%s %s' % (self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
+        # RECOMMENDED - an instrument variable storing information about a parameter of the instrument used in the
+        # measurement, the dimensions don't have to be specified if the same instrument is used for all the measurements.
+        instrument = self.root_group.createVariable('instrument', 'i4')
+        instrument.long_name = '%s' % self.ssp.cur.meta.sensor
+        probe = str(self.ssp.cur.meta.probe)
+        sn = str(self.ssp.cur.meta.sn)
+        match = re.match('^(\w+?) ?\(SN:(\w+?)\)', sn)
+        if match:
+            probe = match.group(1)
+            sn = match.group(2)
+        instrument.make_model = '%s' % probe
         if self.ssp.cur.meta.sn:
-            self.root_group.instrument_sn = '%s' % self.ssp.cur.meta.sn
+            instrument.serial_number = '%s' % sn
         # SUGGESTED - Published or web - based references that describe the data or methods used to produce it.
         # Recommend URIs(such as a URL or DOI)
         self.root_group.references = 'https://www.hydroffice.org/soundspeed/'
@@ -219,7 +229,7 @@ class Ncei(AbstractWriter):
             # REQUIRED - If using a CF standard name and a suitable name exists in the CF standard name table.
             pressure.standard_name = 'sea_water_pressure'
             pressure.units = 'dbar'
-            
+
         # var: temperature
         if self._not_empty(self.ssp.cur.data.temp[vi]):
             temperature = self.root_group.createVariable('temperature', 'f4', ('profile', 'z',))
@@ -282,7 +292,7 @@ class Ncei(AbstractWriter):
     def _miss_metadata(self):
         vi = self.ssp.cur.data_valid
         msg = 'NCEI export error: '
-        
+
         if self.ssp.cur.meta.sensor_type == Dicts.sensor_types['Unknown'] or \
                 self.ssp.cur.meta.sensor_type == Dicts.sensor_types['Synthetic']:
             msg = '%s cannot export from sensor - %s, probe - %s' % (msg, self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
@@ -291,7 +301,7 @@ class Ncei(AbstractWriter):
         elif self._is_empty(self.ssp.cur.data.speed[vi]) and self._is_empty(self.ssp.cur.data.temp[vi]) and \
                 self._is_empty(self.ssp.cur.data.conductivity[vi]) and self._is_empty(self.ssp.cur.data.sal[vi]):
             msg = '%s missing critical data' % msg
-        elif self._project in ['', 'default']:
+        elif self._project in ['', 'default'] or not self._project.startswith('OPR-'):
             msg = '%s project name is not valid' % msg
         elif not self.ssp.cur.meta.survey or not self.ssp.cur.meta.vessel or not self.ssp.cur.meta.institution:
             msg = '%s missing survey, vessel, or institution' % msg
