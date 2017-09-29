@@ -403,20 +403,23 @@ class General(AbstractWidget):
         # woa13_folder
         self.woa13_folder.setText("%s" % self.db.custom_woa13_folder)
 
-        # noaa tools
+        # noaa tools and default_vessel
         if self.db.noaa_tools:
             self.noaa_tools.setCurrentIndex(0)  # True
+            self.default_vessel.setEditable(False)
+            if self.db.default_vessel and self.default_vessel.findText(self.db.default_vessel) < 0:
+                self.default_vessel.insertItem(0, self.db.default_vessel)
+            self.default_vessel.setCurrentIndex(self.default_vessel.findText(self.db.default_vessel))
         else:
             self.noaa_tools.setCurrentIndex(1)  # False
+            self.default_vessel.setEditable(True)
+            self.default_vessel.setEditText("%s" % self.db.default_vessel)
 
         # default_institution
         self.default_institution.setEditText("%s" % self.db.default_institution)
 
         # default_survey
         self.default_survey.setText("%s" % self.db.default_survey)
-
-        # default_vessel
-        self.default_vessel.setEditText("%s" % self.db.default_vessel)
 
         # auto_apply_default_metadata
         if self.db.auto_apply_default_metadata:

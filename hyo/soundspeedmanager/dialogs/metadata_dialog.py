@@ -7,6 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from hyo.soundspeedmanager.dialogs.dialog import AbstractDialog
+from hyo.soundspeed.base.setup_sql import vessel_list
 
 
 class MetadataDialog(AbstractDialog):
@@ -137,13 +138,18 @@ class MetadataDialog(AbstractDialog):
         label = QtGui.QLabel("Vessel:")
         label.setFixedWidth(lbl_width)
         hbox.addWidget(label)
-        self.vessel = QtGui.QLineEdit()
+        self.vessel = QtGui.QComboBox()
         self.vessel.setDisabled(True)
-        self.vessel.setText("%s" % self.lib.cur.meta.vessel)
+        if not lib.setup.noaa_tools:
+            self.vessel.setEditable(True)
+        self.vessel.addItems(vessel_list)
+        if self.lib.cur.meta.vessel and self.vessel.findText(self.lib.cur.meta.vessel) < 0:
+            self.vessel.insertItem(0, self.lib.cur.meta.vessel)
+        self.vessel.setCurrentIndex(self.vessel.findText(self.lib.cur.meta.vessel))
         hbox.addWidget(self.vessel)
         self.vessel.setAutoFillBackground(True)
         # noinspection PyUnresolvedReferences
-        self.vessel.textChanged.connect(self.changed_vessel)
+        self.vessel.editTextChanged.connect(self.changed_vessel)
 
         # serial number
         hbox = QtGui.QHBoxLayout()
@@ -389,7 +395,9 @@ class MetadataDialog(AbstractDialog):
 
         self.institution.setText(self.lib.setup.default_institution)
         self.survey.setText(self.lib.setup.default_survey)
-        self.vessel.setText(self.lib.setup.default_vessel)
+        if self.lib.setup.default_vessel and self.vessel.findText(self.lib.setup.default_vessel) < 0:
+            self.vessel.insertItem(0, self.lib.setup.default_vessel)
+        self.vessel.setCurrentIndex(self.vessel.findText(self.lib.setup.default_vessel))
 
     def on_apply(self):
         logger.debug("apply")
@@ -435,7 +443,7 @@ class MetadataDialog(AbstractDialog):
             self.lib.cur.meta.utc_time = timestamp
             self.lib.cur.meta.institution = self.institution.text()
             self.lib.cur.meta.survey = self.survey.text()
-            self.lib.cur.meta.vessel = self.vessel.text()
+            self.lib.cur.meta.vessel = self.vessel.currentText()
             self.lib.cur.meta.sn = self.sn.text()
             self.lib.cur.meta.comments = self.comments.toPlainText()
             self.lib.cur.meta.pressure_uom = self.pressure_uom.text()

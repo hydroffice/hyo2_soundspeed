@@ -13,6 +13,8 @@ vessel_list = [
     "TJ Thomas Jefferson (ship)",
     "T1 Thomas Jefferson - Launch 3101",
     "T2 Thomas Jefferson - Launch 3102",
+    "T3 Thomas Jefferson - Launch 2903",
+    "T4 Thomas Jefferson - Launch 2904",
     "BH Bay Hydro II",
     "N1 NRT-1  Gulf",
     "N2 NRT-2  Atlantic",
