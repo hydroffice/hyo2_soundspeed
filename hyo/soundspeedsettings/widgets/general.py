@@ -249,6 +249,7 @@ class General(AbstractWidget):
         self.default_survey.textChanged.connect(self.apply_default_survey)
         # noinspection PyUnresolvedReferences
         self.default_vessel.editTextChanged.connect(self.apply_default_vessel)
+        self.default_vessel.currentIndexChanged.connect(self.apply_default_noaa_vessel)
         # noinspection PyUnresolvedReferences
         self.projects_folder.textChanged.connect(self.apply_custom_folders)
         # noinspection PyUnresolvedReferences
@@ -279,6 +280,13 @@ class General(AbstractWidget):
         self.db.default_vessel = self.default_vessel.currentText()
         self.setup_changed()
         self.main_win.reload_settings()
+
+    def apply_default_noaa_vessel(self):
+        # logger.debug("apply default NOAA vessel")
+        # connect this function to QComboBox currentIndexChanged event
+        # the editTextChanged event doesn't work if QComboBox is non-editable
+        if self.db.noaa_tools:
+            self.apply_default_vessel()
 
     def apply_custom_folders(self):
         # logger.debug("apply default vessel")

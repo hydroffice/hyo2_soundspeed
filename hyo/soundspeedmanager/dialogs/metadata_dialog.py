@@ -150,6 +150,7 @@ class MetadataDialog(AbstractDialog):
         self.vessel.setAutoFillBackground(True)
         # noinspection PyUnresolvedReferences
         self.vessel.editTextChanged.connect(self.changed_vessel)
+        self.vessel.currentIndexChanged.connect(self.changed_vessel)
 
         # serial number
         hbox = QtGui.QHBoxLayout()
