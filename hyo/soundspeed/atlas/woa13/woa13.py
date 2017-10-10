@@ -121,8 +121,8 @@ class Woa13(AbstractAtlas):
             landsea = np.asarray([float(data[2]) for data in csv_iter])
             # print(landsea.shape, lons.size, lats.size)
             landsea = landsea.reshape((self.lat.size, self.lon.size))
-            splitted = np.vsplit(landsea, 2)
-            self.landsea = np.vstack((splitted[1], splitted[0]))
+            splitted = np.hsplit(landsea, 2)
+            self.landsea = np.hstack((splitted[1], splitted[0]))
             # from matplotlib import pyplot
             # pyplot.imshow(self.landsea, origin='lower')
             # pyplot.show()
