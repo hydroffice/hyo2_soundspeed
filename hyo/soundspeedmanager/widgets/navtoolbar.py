@@ -5,7 +5,7 @@ import os
 import logging
 
 import matplotlib
-matplotlib.rcParams['backend.qt4']='PySide'
+matplotlib.rcParams['backend.qt4'] = 'PySide'
 from matplotlib import rc_context
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT
 from matplotlib.backend_bases import cursors
@@ -800,8 +800,46 @@ class NavToolbar(NavigationToolbar2QT):
         # remove flagging area
         self.remove_rubberband()
 
-        if not self._xypress or not event.inaxes:
+        if not self._xypress:  # invalid first click
             return
+
+        if not event.inaxes:
+
+            # we assume that the axis is the same as the first click
+            event.inaxes = self._xypress[0][2]
+
+            # what are the axis bounds in display coords?
+            y_down, y_up = self._xypress[0][2].get_ylim()
+            x_left, x_right = self._xypress[0][2].get_xlim()
+            ax_left, ax_down = self._xypress[0][2].transData.transform((x_left, y_down))
+            ax_right, ax_up = self._xypress[0][2].transData.transform((x_right, y_up))
+            # logger.debug("bottom-left: %s, %s" % (ax_left, ax_down))
+            # logger.debug("top-right: %s, %s" % (ax_right, ax_up))
+
+            # what are the clicked display coords in data coords?
+            inv = self._xypress[0][2].transData.inverted()
+            click_xdata, click_ydata = inv.transform((event.x, event.y))
+            # logger.debug("clicked data: %s, %s" % (click_xdata, click_ydata))
+
+            # in which direction was the click outside the axis?
+            # logger.debug("released outside axes: %s, %s" % (event.x, event.y))
+            if event.x > ax_right:
+                event.xdata = x_right
+                # logger.debug("right")
+            elif event.x < ax_left:
+                event.xdata = x_left
+                # logger.debug("left")
+            else:
+                event.xdata = click_xdata
+
+            if event.y > ax_up:
+                event.ydata = y_up
+                # logger.debug("up")
+            elif event.y < ax_down:
+                event.ydata = y_down
+                # logger.debug("down")
+            else:
+                event.ydata = click_ydata
 
         # retrieve valid initial and ending points
         xd_start, yd_start, ax = self._flag_start
@@ -907,8 +945,46 @@ class NavToolbar(NavigationToolbar2QT):
         # remove flagging area
         self.remove_rubberband()
 
-        if not self._xypress:
+        if not self._xypress:  # invalid first click
             return
+
+        if not event.inaxes:
+
+            # we assume that the axis is the same as the first click
+            event.inaxes = self._xypress[0][2]
+
+            # what are the axis bounds in display coords?
+            y_down, y_up = self._xypress[0][2].get_ylim()
+            x_left, x_right = self._xypress[0][2].get_xlim()
+            ax_left, ax_down = self._xypress[0][2].transData.transform((x_left, y_down))
+            ax_right, ax_up = self._xypress[0][2].transData.transform((x_right, y_up))
+            # logger.debug("bottom-left: %s, %s" % (ax_left, ax_down))
+            # logger.debug("top-right: %s, %s" % (ax_right, ax_up))
+
+            # what are the clicked display coords in data coords?
+            inv = self._xypress[0][2].transData.inverted()
+            click_xdata, click_ydata = inv.transform((event.x, event.y))
+            # logger.debug("clicked data: %s, %s" % (click_xdata, click_ydata))
+
+            # in which direction was the click outside the axis?
+            # logger.debug("released outside axes: %s, %s" % (event.x, event.y))
+            if event.x > ax_right:
+                event.xdata = x_right
+                # logger.debug("right")
+            elif event.x < ax_left:
+                event.xdata = x_left
+                # logger.debug("left")
+            else:
+                event.xdata = click_xdata
+
+            if event.y > ax_up:
+                event.ydata = y_up
+                # logger.debug("up")
+            elif event.y < ax_down:
+                event.ydata = y_down
+                # logger.debug("down")
+            else:
+                event.ydata = click_ydata
 
         # retrieve valid initial and ending points
         xd_start, yd_start, ax = self._flag_start

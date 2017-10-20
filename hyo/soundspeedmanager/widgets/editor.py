@@ -510,9 +510,10 @@ class Editor(AbstractWidget):
 
         # data plots
         self.dataplots.reset()
-        self.dataplots.on_draw()
+        self.dataplots.on_first_draw()
         self.dataplots.setVisible(True)
 
+        # call required to set a flag that a profile was viewed (and hopefully QC)
         self.lib.cur_plotted()
 
     def server_started(self):

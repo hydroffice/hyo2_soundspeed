@@ -7,10 +7,10 @@ import logging
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
-__version__ = '2017.6.12'
+__version__ = '2017.6.13'
 __doc__ = "Sound Speed"
 __author__ = 'gmasetti@ccom.unh.edu; barry.gallagher@noaa.gov; brc@ccom.unh.edu; chen.zhang@noaa.gov; ' \
-             'matthew.wilson@noaa.gov; jack.riley@noaa.gov'
+             'jack.riley@noaa.gov'
 __license__ = 'LGPLv2.1 or CCOM-UNH Industrial Associate license'
 __copyright__ = 'Copyright 2017 University of New Hampshire, Center for Coastal and Ocean Mapping'
 

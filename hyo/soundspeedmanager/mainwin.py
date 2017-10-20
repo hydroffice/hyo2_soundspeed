@@ -540,7 +540,7 @@ class MainWin(QtGui.QMainWindow):
             if self.lib.server.is_alive():  # server mode
                 if not self.tab_server.dataplots.is_drawn:
                     self.tab_server.dataplots.reset()
-                    self.tab_server.dataplots.on_draw()
+                    self.tab_server.dataplots.on_first_draw()
 
                 self.tab_server.dataplots.update_data()
                 self.tab_server.dataplots.redraw()
@@ -553,7 +553,7 @@ class MainWin(QtGui.QMainWindow):
                         self.data_imported()
 
                     if self.lib.cur.listener_completed and not self.lib.cur.listener_displayed:
-                        self.tab_editor.dataplots.on_draw()
+                        self.tab_editor.dataplots.on_first_draw()
                         self.lib.cur.listener_displayed = True
 
                 self.tab_editor.dataplots.update_data()

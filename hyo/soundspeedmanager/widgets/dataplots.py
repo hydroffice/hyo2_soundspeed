@@ -74,6 +74,7 @@ class DataPlots(AbstractWidget):
 
         # figure and canvas
         with rc_context(self.rc_context):
+
             self.f = Figure(figsize=self.f_sz, dpi=self.f_dpi)
             self.f.patch.set_alpha(0.0)
             self.c = FigureCanvas(self.f)
@@ -135,7 +136,7 @@ class DataPlots(AbstractWidget):
             self.nav = NavToolbar(canvas=self.c, parent=self.top_widget, plot_win=self, prj=self.lib)
             self.hbox.addWidget(self.nav)
 
-        self.on_draw()
+        self.on_first_draw()
 
     def _draw_grid(self):
         for a in self.f.get_axes():
@@ -413,8 +414,8 @@ class DataPlots(AbstractWidget):
                                                 (delta.seconds // 60) % 60)
         self.f.suptitle(msg)
 
-    def on_draw(self):
-        """Redraws the figure"""
+    def on_first_draw(self):
+        """Redraws the figure, it is only called at the first import!!!"""
         with rc_context(self.rc_context):
             self._set_title()
             # print("cur: %s" % self.lib.cur)
@@ -427,7 +428,7 @@ class DataPlots(AbstractWidget):
                 self.is_drawn = True
 
             self._draw_grid()
-            self.update_depth_limits()
+            self.update_all_limits()
 
     def update_data(self):
         """Update plot"""
@@ -493,6 +494,12 @@ class DataPlots(AbstractWidget):
                     self.speed_seafloor.set_ydata([mean_depth, ])
                 else:
                     self.speed_seafloor.set_ydata(None)
+
+    def update_all_limits(self):
+        self.update_depth_limits()
+        self.update_temp_limits()
+        self.update_sal_limits()
+        self.update_speed_limits()
 
     def update_depth_limits(self):
 
