@@ -152,14 +152,19 @@ class ExportSingleProfileDialog(AbstractDialog):
             if self.lib.current_project == 'default':
                 msg = "The 'default' project cannot be used for NCEI export.\n\n" \
                       "Rename the project in the Database tab!"
+                if self.lib.setup.noaa_tools:
+                    msg += "\n\nRecommend in project_survey format, e.g. OPR-P999-RA-17_H12345"
                 QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
                 return
 
-            if self.lib.setup.noaa_tools and not self.lib.current_project.startswith('OPR-'):
-                msg = "The project name cannot be used for NCEI export.\n\n" \
-                      "Rename the project in the Database tab!"
-                QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
-                return
+            if self.lib.setup.noaa_tools and self.lib.not_noaa_project(self.lib.current_project):
+                current_project = self.lib.cb.ask_format_text(default=self.lib.noaa_project)
+                if self.lib.not_noaa_project(current_project):
+                    msg = "The project name cannot be used for NCEI export.\n\n" \
+                          "Rename the project in the Database tab!\n\n" \
+                          "Recommend \"project_survey\" format, e.g. OPR-P999-RA-17_H12345"
+                    QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
+                    return
 
             if not self.lib.ssp.cur.meta.survey or \
                     not self.lib.ssp.cur.meta.vessel or \

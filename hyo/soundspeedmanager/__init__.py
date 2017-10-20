@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
-__version__ = '2017.6.11'
+__version__ = '2017.6.12'
 __doc__ = "Sound Speed Manager"
 __author__ = 'gmasetti@ccom.unh.edu; barry.gallagher@noaa.gov; brc@ccom.unh.edu; chen.zhang@noaa.gov; ' \
              'matthew.wilson@noaa.gov; jack.riley@noaa.gov'

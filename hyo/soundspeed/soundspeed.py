@@ -1,6 +1,7 @@
 import numpy as np
 import time
 import os
+import re
 import copy
 import shutil
 import logging
@@ -52,6 +53,9 @@ class SoundSpeedLibrary:
         self._release_folder = None
         self._projects_folder = None
         self._outputs_folder = None
+        # _noaa_project format OPR-Xnnn-XX-nn
+        self._noaa_project = None
+        self._noaa_project_validate = re.compile("^(OPR-[A-Z]\d{3}-[A-Z]{2}-\d{2})")
         self.set_folders(data_folder=data_folder)
 
         # load settings and other functionalities
@@ -590,13 +594,16 @@ class SoundSpeedLibrary:
                     instrument = self.ssp.l[0].meta.sensor
                 writer.instrument = instrument
 
+            current_project = self.current_project
+            if name == 'ncei' and self.setup.noaa_tools:
+               current_project = self.noaa_project
             if not has_data_files:  # we don't have the output file names
                 if len(data_formats) == 1 and name == 'ncei':  # NCEI requires special filename convention
-                    writer.write(ssp=self.ssp, data_path=data_path, data_file='ncei', project=self.current_project)
+                    writer.write(ssp=self.ssp, data_path=data_path, data_file='ncei', project=current_project)
                 else:
-                    writer.write(ssp=self.ssp, data_path=data_path, project=self.current_project)
+                    writer.write(ssp=self.ssp, data_path=data_path, project=current_project)
             else:
-                writer.write(ssp=self.ssp, data_path=data_path, data_file=data_files[i], project=self.current_project)
+                writer.write(ssp=self.ssp, data_path=data_path, data_file=data_files[i], project=current_project)
 
         # take care of listeners
         if self.has_sippican_to_process():
@@ -605,6 +612,18 @@ class SoundSpeedLibrary:
             self.listeners.mvp_to_process = False
 
     # --- project db
+
+    @property
+    def noaa_project(self):
+        """temporary NOAA project name for NCEI"""
+        return str(self._noaa_project)
+
+    def not_noaa_project(self, value):
+        try:
+            self._noaa_project = self._noaa_project_validate.match(value).group(1)
+            return False
+        except:
+            return True
 
     @property
     def current_project(self):
