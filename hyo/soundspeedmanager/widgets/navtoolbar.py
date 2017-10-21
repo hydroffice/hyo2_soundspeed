@@ -74,7 +74,7 @@ class NavToolbar(NavigationToolbar2QT):
         self.grab_cursor = QtGui.QCursor(grab_px)
 
         NavigationToolbar2QT.__init__(self, canvas=canvas, parent=parent, coordinates=coordinates)
-        self.setIconSize(QtCore.QSize(32, 32))
+        self.setIconSize(QtCore.QSize(24, 24))
 
         self.canvas.mpl_connect('button_press_event', self.press)
         self.canvas.mpl_connect('button_release_event', self.release)

@@ -64,6 +64,9 @@ class DataPlots(AbstractWidget):
         self.rtofs_color = '#99cc00'
         self.ref_color = '#ff6600'
         self.sis_color = '#0000e6'
+        self.dot_style = "x"
+        self.dot_ms = 1
+        self.dot_alpha = 0.6
 
         # outline ui
         self.top_widget = QtGui.QWidget()
@@ -205,9 +208,9 @@ class DataPlots(AbstractWidget):
                                                  markerfacecolor=self.invalid_color,
                                                  markeredgecolor=self.invalid_color,
                                                  linestyle='None',
-                                                 marker='.',
-                                                 alpha=0.8,
-                                                 ms=4,
+                                                 marker=self.dot_style,
+                                                 alpha=self.dot_alpha,
+                                                 ms=self.dot_ms,
                                                  picker=3,
                                                  label='flagged')
         self.speed_valid, = self.speed_ax.plot(self.lib.cur.proc.speed[self.vi],
@@ -219,10 +222,10 @@ class DataPlots(AbstractWidget):
                                              self.lib.cur.sis.depth[self.svi],
                                              markerfacecolor=self.sis_color,
                                              markeredgecolor=self.sis_color,
-                                             marker='.',
+                                             marker=self.dot_style,
                                              linestyle='None',
-                                             alpha=0.8,
-                                             ms=4,
+                                             alpha=self.dot_alpha,
+                                             ms=self.dot_ms,
                                              picker=3,
                                              label='SIS')
         self.speed_draft = self.speed_ax.axhline(y=0,
@@ -311,9 +314,9 @@ class DataPlots(AbstractWidget):
                                                markerfacecolor=self.invalid_color,
                                                markeredgecolor=self.invalid_color,
                                                linestyle='None',
-                                               marker='.',
-                                               alpha=0.8,
-                                               ms=4,
+                                               marker=self.dot_style,
+                                               alpha=self.dot_alpha,
+                                               ms=self.dot_ms,
                                                picker=3,
                                                label='flagged')
         self.temp_valid, = self.temp_ax.plot(self.lib.cur.proc.temp[self.vi],
@@ -387,9 +390,9 @@ class DataPlots(AbstractWidget):
                                              markerfacecolor=self.invalid_color,
                                              markeredgecolor=self.invalid_color,
                                              linestyle='None',
-                                             marker='.',
-                                             alpha=0.8,
-                                             ms=4,
+                                             marker=self.dot_style,
+                                             alpha=self.dot_alpha,
+                                             ms=self.dot_ms,
                                              picker=3,
                                              label='flagged')
         self.sal_valid, = self.sal_ax.plot(self.lib.cur.proc.sal[self.vi],

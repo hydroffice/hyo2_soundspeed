@@ -103,6 +103,7 @@ class Editor(AbstractWidget):
         self.thin_act.setShortcut('Alt+H')
         # noinspection PyUnresolvedReferences
         self.thin_act.triggered.connect(self.on_preview_thinning)
+        self.thin_act.setVisible(False)
         self.process_bar.addAction(self.thin_act)
         # - separator
         self.process_bar.addSeparator()
@@ -367,7 +368,11 @@ class Editor(AbstractWidget):
                 return
 
         dlg = ExportSingleProfileDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        dlg.exec_()
+        result = dlg.exec_()
+        if result == QtGui.QDialog.Accepted:
+            self.on_save_db(auto_save=True)
+
+        self.dataplots.update_data()
 
     def on_transmit_data(self):
         logger.debug('user wants to transmit the data')
@@ -398,43 +403,47 @@ class Editor(AbstractWidget):
                 return
 
         if not self.lib.transmit_ssp():
-            msg = "Issue in profile transmission"
+            msg = "Possible issue in profile transmission."
             # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Profile transmission", msg, QtGui.QMessageBox.Ok)
-            return
 
+        self.on_save_db(auto_save=True)
         self.dataplots.update_data()
 
-    def on_save_db(self):
-        logger.debug('user wants to save data to db')
+    def on_save_db(self, auto_save=False):
+        if auto_save:
+            logger.debug('auto-save data to db')
+        else:
+            logger.debug('user wants to save data to db')
 
-        valid = self._run_safety_checks_on_output()
-        if not valid:
-            return
+            # since auto-save the same checks and questions have been asked!
 
-        if self.lib.cur.meta.sensor_type in [Dicts.sensor_types['Synthetic'], ]:
-
-            msg = "Do you really want to store a profile based \non synthetic %s data?\n\n" \
-                  "This operation may OVERWRITE existing raw data \nin the database!" \
-                  % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
-            # noinspection PyCallByClass
-            ret = QtGui.QMessageBox.warning(self, "Synthetic source warning", msg,
-                                            QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
-            if ret == QtGui.QMessageBox.No:
+            valid = self._run_safety_checks_on_output()
+            if not valid:
                 return
 
-        if self.lib.cur.meta.probe_type in [Dicts.probe_types['ASVP'],
-                                            Dicts.probe_types['CARIS'],
-                                            Dicts.probe_types['ELAC']]:
+            if self.lib.cur.meta.sensor_type in [Dicts.sensor_types['Synthetic'], ]:
 
-            msg = "Do you really want to store a profile based \non pre-processed %s data?\n\n" \
-                  "This operation may OVERWRITE existing raw data \nin the database!" \
-                  % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
-            # noinspection PyCallByClass
-            ret = QtGui.QMessageBox.warning(self, "Pre-processed source warning", msg,
-                                            QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
-            if ret == QtGui.QMessageBox.No:
-                return
+                msg = "Do you really want to store a profile based \non synthetic %s data?\n" \
+                      % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
+                # noinspection PyCallByClass
+                ret = QtGui.QMessageBox.warning(self, "Synthetic source warning", msg,
+                                                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+                if ret == QtGui.QMessageBox.No:
+                    return
+
+            if self.lib.cur.meta.probe_type in [Dicts.probe_types['ASVP'],
+                                                Dicts.probe_types['CARIS'],
+                                                Dicts.probe_types['ELAC']]:
+
+                msg = "Do you really want to store a profile based \non pre-processed %s data?\n\n" \
+                      "This operation may OVERWRITE existing raw data \nin the database!" \
+                      % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
+                # noinspection PyCallByClass
+                ret = QtGui.QMessageBox.warning(self, "Pre-processed source warning", msg,
+                                                QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+                if ret == QtGui.QMessageBox.No:
+                    return
 
         if not self.lib.store_data():
             msg = "Unable to save to db!"
@@ -450,19 +459,19 @@ class Editor(AbstractWidget):
         self.output_bar.hide()
 
         # dialogs
-        self.clear_act.setDisabled(True)
-        self.set_ref_act.setDisabled(True)
-        self.restart_act.setDisabled(True)
-        self.spreadsheet_act.setDisabled(True)
-        self.sal_act.setDisabled(True)
-        self.temp_sal_act.setDisabled(True)
-        self.tss_act.setDisabled(True)
-        self.extend_act.setDisabled(True)
-        self.thin_act.setDisabled(True)
-        self.metadata_act.setDisabled(True)
-        self.export_act.setDisabled(True)
-        self.transmit_act.setDisabled(True)
-        self.save_db_act.setDisabled(True)
+        # self.clear_act.setDisabled(True)
+        self.set_ref_act.setVisible(False)
+        self.restart_act.setVisible(False)
+        self.spreadsheet_act.setVisible(False)
+        self.sal_act.setVisible(False)
+        self.temp_sal_act.setVisible(False)
+        self.tss_act.setVisible(False)
+        self.extend_act.setVisible(False)
+        self.thin_act.setVisible(False)
+        self.metadata_act.setVisible(False)
+        self.export_act.setVisible(False)
+        self.transmit_act.setVisible(False)
+        self.save_db_act.setVisible(False)
         # data plots
         self.dataplots.setHidden(True)
 
@@ -472,41 +481,41 @@ class Editor(AbstractWidget):
         self.output_bar.show()
 
         # dialogs
-        self.clear_act.setDisabled(False)
-        self.set_ref_act.setDisabled(False)
-        self.restart_act.setDisabled(False)
-        self.spreadsheet_act.setDisabled(False)
-        self.metadata_act.setDisabled(False)
+        # self.clear_act.setDisabled(False)
+        self.set_ref_act.setVisible(True)
+        self.restart_act.setVisible(True)
+        self.spreadsheet_act.setVisible(True)
+        self.metadata_act.setVisible(True)
 
         if self.lib.cur.meta.sensor_type in [Dicts.sensor_types['XBT'], ]:
-            self.sal_act.setDisabled(False)
+            self.sal_act.setVisible(True)
         else:
-            self.sal_act.setDisabled(True)
+            self.sal_act.setVisible(False)
 
         if self.lib.cur.meta.sensor_type in [Dicts.sensor_types['XSV'],
                                              Dicts.sensor_types['SVP']]:
-            self.temp_sal_act.setDisabled(False)
+            self.temp_sal_act.setVisible(True)
 
         elif self.lib.cur.meta.sensor_type in [Dicts.sensor_types['MVP'], ]:
 
             if (np.sum(self.lib.cur.proc.temp) == 0) and (np.sum(self.lib.cur.proc.sal) == 0):
-                self.temp_sal_act.setDisabled(False)
+                self.temp_sal_act.setVisible(True)
             else:
-                self.temp_sal_act.setDisabled(True)
+                self.temp_sal_act.setVisible(False)
 
         else:
-            self.temp_sal_act.setDisabled(True)
+            self.temp_sal_act.setVisible(False)
 
         if self.lib.use_sis():
-            self.tss_act.setDisabled(False)
+            self.tss_act.setVisible(True)
         else:
-            self.tss_act.setDisabled(True)
+            self.tss_act.setVisible(False)
 
-        self.extend_act.setDisabled(False)
-        self.thin_act.setDisabled(False)
-        self.export_act.setDisabled(False)
-        self.transmit_act.setDisabled(False)
-        self.save_db_act.setDisabled(False)
+        self.extend_act.setVisible(True)
+        # self.thin_act.setDisabled(False)
+        self.export_act.setVisible(True)
+        self.transmit_act.setVisible(True)
+        self.save_db_act.setVisible(True)
 
         # data plots
         self.dataplots.reset()

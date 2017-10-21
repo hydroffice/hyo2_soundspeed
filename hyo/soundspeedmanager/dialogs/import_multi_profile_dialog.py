@@ -14,6 +14,7 @@ class ImportMultiProfileDialog(AbstractDialog):
         AbstractDialog.__init__(self, main_win=main_win, lib=lib, parent=parent)
 
         self.setWindowTitle("Import multiple profiles")
+        self.botton_min_width = 80
 
         # outline ui
         self.mainLayout = QtGui.QHBoxLayout()
@@ -50,6 +51,7 @@ class ImportMultiProfileDialog(AbstractDialog):
             btn = QtGui.QPushButton("%s" % self.lib.desc_readers[idx])
             btn.setToolTip("Import %s format [*.%s]" % (self.lib.desc_readers[idx],
                                                         ", *.".join(self.lib.ext_readers[idx])))
+            btn.setMinimumWidth(self.botton_min_width)
             if (idx % 3) == 0:
                 self.leftButtonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
             elif (idx % 3) == 1:
