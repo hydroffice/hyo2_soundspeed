@@ -1255,13 +1255,15 @@ class SoundSpeedLibrary:
             depth_end = self.cur.sis.depth[si][-1]
 
             if depth_end < 12000:
-                self.cur.insert_sis_speed(depth=12000.0, speed=1675.8, src=Dicts.sources['sis'])
-                si = self.cur.sis_thinned
-                self.cur.sis.temp[si][-1] = 2.46
-                self.cur.sis.sal[si][-1] = 34.70
-            # logger.debug('last sample: %s %s %s %s'
-            #              % (self.cur.sis.depth[-1], self.cur.sis.speed[-1],
-            #                 self.cur.sis.source[-1], self.cur.sis.flag[-1]))
+                logger.debug('extending after last depth: %s' % depth_end)
+                self.cur.insert_sis_speed(depth=12000.0, speed=1675.8, src=Dicts.sources['sis'],
+                                          cond=30.9, temp=2.46, sal=34.70)
+
+            si = self.cur.sis_thinned
+            logger.debug('last sample: d: %s, temp: %s, sal: %s, speed: %s [%s|%s]'
+                         % (self.cur.sis.depth[si][-1], self.cur.sis.temp[si][-1],
+                            self.cur.sis.sal[si][-1], self.cur.sis.speed[si][-1],
+                            self.cur.sis.source[si][-1], self.cur.sis.flag[si][-1]))
 
         return True
 

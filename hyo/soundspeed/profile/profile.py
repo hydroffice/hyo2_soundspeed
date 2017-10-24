@@ -433,7 +433,7 @@ class Profile:
 
             self.proc.num_samples += 1
 
-    def insert_sis_speed(self, depth, speed, src=Dicts.sources['user']):
+    def insert_sis_speed(self, depth, speed, src=Dicts.sources['user'], temp=None, cond=None, sal=None):
         logger.debug("insert speed to sis data: d:%s, vs:%s" % (depth, speed))
 
         # we need to take care of valid samples and user-invalidated samples (to avoid to brake in case un-flagged)
@@ -464,12 +464,20 @@ class Profile:
 
         # manipulate profile (linear interpolation)
         if d_exists:
-            # print('already present')
+            logger.debug('sample already present with depth: %s -> modifying' % depth)
             self.sis.speed[i] = speed
             self.sis.source[i] = src
             self.sis.flag[i] = Dicts.flags['thin']
+
+            if temp is not None:
+                self.sis.temp[i] = temp
+            if cond is not None:
+                self.sis.conductivity[i] = cond
+            if sal is not None:
+                self.sis.sal[i] = sal
+
         else:
-            # print('new depth')
+            logger.debug("added new sample at depth: %s" % depth)
             if depth < self.sis.depth[valid][0]:
                 m_ids = [0, 1]
                 # print('before beginning: %s' % j)
@@ -496,26 +504,36 @@ class Profile:
             # print(self.sis.pressure[0], self.sis.pressure.size)
 
             # interpolate for temp
-            ti = np.array([self.sis.temp[valid][m_ids[0]], self.sis.temp[valid][m_ids[1]]])
-            tm, tc = np.linalg.lstsq(a, ti)[0]
-            self.sis.temp = np.insert(self.sis.temp, j, tm * depth + tc)
-            # print(self.sis.temp[0], self.sis.temp.size)
+            if temp is None:
+                ti = np.array([self.sis.temp[valid][m_ids[0]], self.sis.temp[valid][m_ids[1]]])
+                tm, tc = np.linalg.lstsq(a, ti)[0]
+                self.sis.temp = np.insert(self.sis.temp, j, tm * depth + tc)
+            else:
+                self.sis.temp = np.insert(self.sis.temp, j, temp)
+            # logger.debug("added temperature: %s" % self.sis.temp[j])
 
             # interpolate for conductivity
-            ci = np.array([self.sis.conductivity[valid][m_ids[0]], self.sis.conductivity[valid][m_ids[1]]])
-            cm, cc = np.linalg.lstsq(a, ci)[0]
-            self.sis.conductivity = np.insert(self.sis.conductivity, j, cm * depth + cc)
-            # print(self.proc.conductivity[0], self.proc.conductivity.size)
+            if cond is None:
+                ci = np.array([self.sis.conductivity[valid][m_ids[0]], self.sis.conductivity[valid][m_ids[1]]])
+                cm, cc = np.linalg.lstsq(a, ci)[0]
+                self.sis.conductivity = np.insert(self.sis.conductivity, j, cm * depth + cc)
+            else:
+                self.sis.conductivity = np.insert(self.sis.conductivity, j, cond)
+            # logger.debug("added conductivity: %s" % self.sis.conductivity[j])
 
             # interpolate for sal
-            si = np.array([self.sis.sal[valid][m_ids[0]], self.sis.sal[valid][m_ids[1]]])
-            sm, sc = np.linalg.lstsq(a, si)[0]
-            self.sis.sal = np.insert(self.sis.sal, j, sm * depth + sc)
-            # print(self.proc.sal[0], self.proc.sal.size)
+            if sal is None:
+                si = np.array([self.sis.sal[valid][m_ids[0]], self.sis.sal[valid][m_ids[1]]])
+                sm, sc = np.linalg.lstsq(a, si)[0]
+                self.sis.sal = np.insert(self.sis.sal, j, sm * depth + sc)
+            else:
+                self.sis.sal = np.insert(self.sis.sal, j, sal)
+            # logger.debug("added salinity: %s" % self.sis.sal[j])
 
             self.sis.depth = np.insert(self.sis.depth, j, depth)
             self.sis.speed = np.insert(self.sis.speed, j, speed)
             self.sis.source = np.insert(self.sis.source, j, src)
+            # we flag it as thin since the user most likely wants to have this value in the export
             self.sis.flag = np.insert(self.sis.flag, j, Dicts.flags['thin'])
 
             self.sis.num_samples += 1
