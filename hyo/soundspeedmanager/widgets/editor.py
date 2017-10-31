@@ -290,7 +290,7 @@ class Editor(AbstractWidget):
             if ret == QtGui.QMessageBox.No:
                 return False
 
-        elif all(i == 0 for i in self.lib.cur.proc.temp[:min_samples]):
+        elif all(i == 0 for i in self.lib.cur.proc.temp[self.lib.cur.proc_valid][:min_samples]):
 
             msg = "Suspect zero values in the temperature profile detected!\n" \
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
@@ -309,7 +309,7 @@ class Editor(AbstractWidget):
             if ret == QtGui.QMessageBox.No:
                 return False
 
-        elif all(i == 0 for i in self.lib.cur.proc.sal[:min_samples]):
+        elif all(i == 0 for i in self.lib.cur.proc.sal[self.lib.cur.proc_valid][:min_samples]):
 
             msg = "Suspect zero values in the salinity profile detected!\n" \
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
@@ -328,7 +328,7 @@ class Editor(AbstractWidget):
             if ret == QtGui.QMessageBox.No:
                 return False
 
-        elif all(i == 0 for i in self.lib.cur.proc.speed[:min_samples]):
+        elif all(i == 0 for i in self.lib.cur.proc.speed[self.lib.cur.proc_valid][:min_samples]):
 
             msg = "Suspect zero values in the sound speed profile detected!\n" \
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
