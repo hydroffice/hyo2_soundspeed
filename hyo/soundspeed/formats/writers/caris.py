@@ -41,8 +41,8 @@ class Caris(AbstractTextWriter):
 
         logger.debug("append: %s" % self.fod.append_exists)
         if not self.fod.append_exists:
-            header += "[SVP_VERSION_2]\n"
-            header += "%s\n" % self.fod.path
+            header += "[SVP_VERSION_2]\r\n"
+            header += "%s.%s\r\n" % (self.fod.basename, self.fod.ext)
 
         # date
         if self.ssp.cur.meta.utc_time:
@@ -72,12 +72,12 @@ class Caris(AbstractTextWriter):
                                                                                        int(longitude),
                                                                                        lon_min, lon_sec)
 
-        header += "Section " + date_string + " " + position_string + " Created by hyo.soundspeed\n"
+        header += "Section " + date_string + " " + position_string + "\r\n"
         self.fod.io.write(header)
 
     def _write_body(self):
         logger.debug('generating body')
         vi = self.ssp.cur.proc_valid
         for idx in range(np.sum(vi)):
-            self.fod.io.write("%.6f %.6f\n"
+            self.fod.io.write("%.6f %.6f\r\n"
                               % (self.ssp.cur.proc.depth[vi][idx], self.ssp.cur.proc.speed[vi][idx],))
