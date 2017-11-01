@@ -69,6 +69,13 @@ class Editor(AbstractWidget):
         self.process_bar.addAction(self.metadata_act)
         # - separator
         self.process_bar.addSeparator()
+        # filter
+        self.filter_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'filter.png')),
+                                        'Apply data filter', self)
+        self.filter_act.setShortcut('Alt+F')
+        # noinspection PyUnresolvedReferences
+        self.filter_act.triggered.connect(self.on_data_filter)
+        self.process_bar.addAction(self.filter_act)
         # retrieve sal
         self.sal_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'sal.png')),
                                      'Retrieve salinity', self)
@@ -127,7 +134,7 @@ class Editor(AbstractWidget):
         # transmit
         self.transmit_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'transmit.png')),
                                           'Transmit data', self)
-        self.transmit_act.setShortcut('Alt+E')
+        self.transmit_act.setShortcut('Alt+X')
         # noinspection PyUnresolvedReferences
         self.transmit_act.triggered.connect(self.on_transmit_data)
         self.output_bar.addAction(self.transmit_act)
@@ -168,6 +175,9 @@ class Editor(AbstractWidget):
         logger.debug('user wants to restart processing')
         self.lib.restart_proc()
         self.main_win.data_imported()
+
+    def on_data_filter(self):
+        logger.debug('user wants to filter data')
 
     def on_retrieve_sal(self):
         logger.debug('user wants to retrieve salinity')
@@ -463,6 +473,7 @@ class Editor(AbstractWidget):
         self.set_ref_act.setVisible(False)
         self.restart_act.setVisible(False)
         self.spreadsheet_act.setVisible(False)
+        self.filter_act.setVisible(False)
         self.sal_act.setVisible(False)
         self.temp_sal_act.setVisible(False)
         self.tss_act.setVisible(False)
@@ -487,6 +498,7 @@ class Editor(AbstractWidget):
         self.spreadsheet_act.setVisible(True)
         self.metadata_act.setVisible(True)
 
+        self.filter_act.setVisible(True)
         if self.lib.cur.meta.sensor_type in [Dicts.sensor_types['XBT'], ]:
             self.sal_act.setVisible(True)
         else:
