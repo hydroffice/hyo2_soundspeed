@@ -498,7 +498,7 @@ class Editor(AbstractWidget):
         self.spreadsheet_act.setVisible(True)
         self.metadata_act.setVisible(True)
 
-        # self.filter_act.setVisible(True)
+        self.filter_act.setVisible(True)
         if self.lib.cur.meta.sensor_type in [Dicts.sensor_types['XBT'], ]:
             self.sal_act.setVisible(True)
         else:
