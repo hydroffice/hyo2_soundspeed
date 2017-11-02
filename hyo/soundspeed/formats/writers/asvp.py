@@ -16,7 +16,7 @@ from hyo.soundspeed.profile.oceanography import Oceanography as Oc
 class Asvp(AbstractTextWriter):
     """Kongsberg asvp writer"""
 
-    abs_freqs = [12, 32, 60, 70, 80, 90, 95, 100, 200, 250, 300, 350, 400]
+    abs_freqs = [12, 32, 40, 50, 60, 70, 80, 90, 95, 100, 110, 120, 130, 140, 200, 250, 300, 350, 400]
 
     def __init__(self):
         super(Asvp, self).__init__()

@@ -7,6 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from hyo.soundspeedmanager.dialogs.dialog import AbstractDialog
+from hyo.soundspeedmanager.dialogs.seacat_dialog import SeacatDialog
 
 
 class ImportSingleProfileDialog(AbstractDialog):
@@ -66,7 +67,7 @@ class ImportSingleProfileDialog(AbstractDialog):
         # noinspection PyUnresolvedReferences
         self.rightButtonBox.clicked.connect(self.on_click_import)
 
-        self.mainLayout.addSpacing(12)
+        self.mainLayout.addSpacing(18)
 
         # retrieve data
         self.retrieveLayout = QtGui.QVBoxLayout()
@@ -113,6 +114,12 @@ class ImportSingleProfileDialog(AbstractDialog):
         btn.setToolTip("Retrieve current profile from SIS")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_click_sis)
+        # -- Seabird CTD
+        btn = QtGui.QPushButton("Seabird CTD")
+        self.retrieveButtonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve profiles from Seabird CTD")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_click_seabird_ctd)
 
         self.retrieveLayout.addStretch()
 
@@ -269,4 +276,10 @@ class ImportSingleProfileDialog(AbstractDialog):
             QtGui.QMessageBox.critical(self, "Receive error", msg, QtGui.QMessageBox.Ok)
             return
 
+        self.accept()
+
+    def on_click_seabird_ctd(self):
+        logger.debug("Open Seabird CTD dialog")
+        dlg = SeacatDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        dlg.exec_()
         self.accept()

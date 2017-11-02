@@ -4,6 +4,7 @@ import traceback
 import datetime
 import shutil
 try:
+    # TODO: winreg is windows-only, use QSettings instead
     import winreg  # python 3+
 except:
     pass
@@ -55,6 +56,7 @@ def set_setting_string(keyname, val):
 
 def set_setting_float(keyname, val):
     set_setting(keyname, val)
+
 
 SEACAT_REGKEY = 'SEACAT'
 COMPORT_SUBKEY = SEACAT_REGKEY + '\\COMPORTS'
@@ -148,16 +150,20 @@ class Seacat(AbstractWidget):
         logger.debug('downloading all ...')
         self.download(get_all=True)
 
-    def download(self, get_all=False, selected=[]):
-        '''if all==True then will download and convert all casts and will ignore the selected paramter.
+    def download(self, get_all=False, selected=None):
+        """if get_all==True then will download and convert all casts and will ignore the selected parameter.
         otherwise:
         selected=[-1] will get last cast (or whatever numbers are supplied
         selected=[] --empty list will prompt user for selected casts
-        '''
+        """
+        if selected is None:
+            selected = list()
+
         logger.debug('downloading last ...')
-        output_path = self.lib.cb.ask_directory(key_name="Seacat/DownloadHex", title="Choose Directory to Store Seacat Files in")
+        output_path = self.lib.cb.ask_directory(key_name="Seacat/DownloadHex",
+                                                title="Choose Directory to Store Seacat Files in")
         if output_path:
-            with AutoSeacat(progbar=self.progress) as cat:  # using the with statement auto-closes port even if an exception is thrown
+            with AutoSeacat(progbar=self.progress) as cat:  # with auto-closes port even if an exception is thrown
                 if cat.isOpen():
                     self.com_label.setText(cat.get_com_str())
                     headers = list(cat.get_headers().items())
@@ -172,14 +178,14 @@ class Seacat(AbstractWidget):
                                 raise Exception("Not Implemented, need a multiple item selection")
                         self.download_from_seacat(cat, download_list, output_path)
                     else:
+                        # noinspection PyCallByClass
                         QMessageBox.information(self, "Notice", "No casts in the device")
 
-
     def download_from_seacat(self, cat, casts, hexpath):
-        '''casts is an iterable of cast numbers to download from the open seacat device "cat"
-        hexpath will default to the CATFILES user preference if it is not specified, it is where the downloaded HEX data files are stored
-        '''
-        # with ProgressProcess.MultiProgress([[0,100,"%.lf%% current cast downloaded"],[0,99,"%.lf%% casts finished"]]) as progbar:
+        """casts is an iterable of cast numbers to download from the open seacat device "cat"
+        hexpath will default to the CATFILES user preference if it is not specified, it is where the downloaded HEX
+        data files are stored
+        """
         paths = cat.download(hexpath, casts, progbar=self.progress)
         failed = []
         succeeded = []
@@ -191,23 +197,27 @@ class Seacat(AbstractWidget):
                 if seabird_datacnv:
                     for hexpath in paths:
                         logger.info('Trying to convert:\n' + hexpath + '\n')
-                        is_ok, output = sbe_serialcomms.convert_hexfile(hexpath, conpath, os.path.dirname(seabird_datacnv))  # import the Hex files
+                        is_ok, output = sbe_serialcomms.convert_hexfile(hexpath, conpath,
+                                                                        os.path.dirname(seabird_datacnv))  # import Hex
                         if is_ok:
                             succeeded.append(output)
                         else:
                             failed.append(hexpath)
                     if failed:
-                        QMessageBox.information(self, "Error in Conversion", "The following casts failed to convert:\n\n" + "\n".join(failed))
+                        # noinspection PyCallByClass
+                        QMessageBox.information(self, "Error in Conversion",
+                                                "The following casts failed to convert:\n\n" + "\n".join(failed))
                 else:
                     logger.info('Seabird DataCNV.exe not found\n')
             else:
+                # noinspection PyCallByClass
                 QMessageBox.information(self, confile_path_or_messages[0], confile_path_or_messages[1])
         else:
             logger.info('No hex files downloaded, nothing to import\n')
         return succeeded, failed
 
     def on_choose_comport(self):
-        '''Changes the comport on which to try communicating with a seacat'''
+        """Changes the comport on which to try communicating with a Seacat"""
         logger.debug('choosing comport ...')
         ports = sbe_serialcomms.scan_for_comports()
         old = get_last_comport()
@@ -216,21 +226,22 @@ class Seacat(AbstractWidget):
             save_last_comport(port)
 
     def on_status(self):
-        '''Connects to seacat and shows the status message from the seacat to the user'''
+        """Connects to seacat and shows the status message from the seacat to the user"""
         logger.debug('getting status ...')
-        with AutoSeacat(progbar=self.progress) as cat:  # using the with statement auto-closes port even if an exception is thrown
+        with AutoSeacat(progbar=self.progress) as cat:  # with auto-closes port even if an exception is thrown
             if cat.isOpen():
                 self.com_label.setText(cat.get_com_str())
                 msg = cat.get_status() + '\n'
             else:
                 msg = "Seacat not found"
             logger.info(msg)
+            # noinspection PyCallByClass
             QMessageBox.information(self, "SBE SeaCAT", msg)
 
     def on_headers(self):
-        '''Connects to seacat and shows the header information to the user'''
-        logger.debug('Showing header info from seacat ...')
-        with AutoSeacat(progbar=self.progress) as cat:  # using the with statement auto-closes port even if an exception is thrown
+        """Connects to seacat and shows the header information to the user"""
+        logger.debug('Showing header info from Seacat ...')
+        with AutoSeacat(progbar=self.progress) as cat:  # with auto-closes port even if an exception is thrown
             if cat.isOpen():
                 self.com_label.setText(cat.get_com_str())
                 headers = list(cat.get_headers().items())
@@ -239,31 +250,34 @@ class Seacat(AbstractWidget):
                     msg = '\n'.join(["%d: %s" % hd for hd in headers]) + '\n'
                 else:
                     msg = 'No headers received\n'
-            logger.info(msg)
-            QMessageBox.information(self, "SBE SeaCAT", msg)
+                logger.info(msg)
+                # noinspection PyCallByClass
+                QMessageBox.information(self, "SBE SeaCAT", msg)
 
     def on_settime(self):
-        '''Set the clock with current CPU time on UTC'''
+        """Set the clock with current CPU time on UTC"""
         logger.debug('setting clock to current UTC ...')
-        with AutoSeacat(progbar=self.progress) as cat:  # using the with statement auto-closes port even if an exception is thrown
+        with AutoSeacat(progbar=self.progress) as cat:  # with auto-closes port even if an exception is thrown
             if cat.isOpen():
                 self.com_label.setText(cat.get_com_str())
                 try:
                     msg = "Do you want to set the clock to " + datetime.datetime.utcnow().isoformat()
-                    ret = QMessageBox.question(self, "Confirm Seacat Time Change", msg, QMessageBox.Yes | QMessageBox.No)
+                    # noinspection PyCallByClass
+                    ret = QMessageBox.question(self, "Confirm Seacat Time Change", msg,
+                                               QMessageBox.Yes | QMessageBox.No)
                     if ret == QMessageBox.Yes:
                         cat.set_datetime(datetime.datetime.utcnow())
-                except:
+                except Exception:
                     traceback.print_exc()
 
     def on_precast(self):
-        '''Precast setup checks (and resets seacat clock if more than 3 minutes off) and clears memory'''
+        """Precast setup checks (and resets seacat clock if more than 3 minutes off) and clears memory"""
         logger.debug('precast setup ...')
-        with AutoSeacat(progbar=self.progress) as cat:  # using the with statement auto-closes port even if an exception is thrown
+        with AutoSeacat(progbar=self.progress) as cat:  # with auto-closes port even if an exception is thrown
             if cat.isOpen():
                 try:
                     dt_now = datetime.datetime.utcnow()
-                    dt = cat.get_datetime()  # Getting the time refreshes the Status message -- voltages are included in status
+                    dt = cat.get_datetime()  # Get time refreshes the Status message -- voltages are included in status
                     diff = dt_now - dt
                     # see if time is more than 3 minutes off
                     bSetTime = False
@@ -272,15 +286,16 @@ class Seacat(AbstractWidget):
                         CPU time UTC is %s
                         They differ by more than three minutes.
 
-                        Do you want to reset the seacat time when initializing?""" % (dt.isoformat(), dt_now.isoformat())
-                        ret = QMessageBox.question(self,
-                                                   "Time Mismatch",
-                                                   msg,
-                                                   QMessageBox.Yes | QMessageBox.No)
+                        Do you want to reset the Seacat time when initializing?""" % (dt.isoformat(),
+                                                                                      dt_now.isoformat())
+                        # noinspection PyCallByClass
+                        ret = QMessageBox.question(self, "Time Mismatch", msg, QMessageBox.Yes | QMessageBox.No)
                         if ret == QMessageBox.Yes:
                             bSetTime = True
 
-                    volt_messages = cat.get_voltages()  # Getting the time refreshes the Status message -- voltages are included in status
+                    # Getting the time refreshes the Status message -- voltages are included in status
+                    volt_messages = cat.get_voltages()
+                    # noinspection PyCallByClass
                     ret = QMessageBox.question(self, "Confirm Seacat Init",
                                                "Do you want to clear the Seacat memory now" +
                                                "\nAnd set the clock" * bSetTime + "?"
@@ -290,7 +305,8 @@ class Seacat(AbstractWidget):
                         if bSetTime:
                             cat.set_datetime(datetime.datetime.utcnow())
                         cat.init_logging()
-                except:
+
+                except Exception:
                     traceback.print_exc()
 
     def get_seabird_datacnv(self):
@@ -313,18 +329,23 @@ class Seacat(AbstractWidget):
                     if not os.path.exists(seabird_utils_exe):
                         raise Exception("datcnv not found - asking user to supply location")
             except:
-                seabird_utils_exe = self.lib.cb.ask_filename(saving=False, key_name="Seacat/DataCNV", title="Find the Seabird Data Processing executable",
+                seabird_utils_exe = self.lib.cb.ask_filename(saving=False, key_name="Seacat/DataCNV",
+                                                             title="Find the Seabird Data Processing executable",
                                                              file_filter="DataCNVw.exe|datcnvw.exe")
-                # rcode, seabird_utils_dir = RegistryHelpers.GetDirFromUser(None, RegistryKey="UserSpecifiedSeabird", Title="Find the Seabird Data Processing executable",
-                #                               bLocalMachine=0, DefaultVal="", Message="Plese locate the seabird data processing directory.\nIt's probably under Program files(x86).")
+                # rcode, seabird_utils_dir = RegistryHelpers.GetDirFromUser(None, RegistryKey="UserSpecifiedSeabird",
+                #                               Title="Find the Seabird Data Processing executable",
+                #                               bLocalMachine=0, DefaultVal="",
+                #                               Message="Plese locate the seabird data processing directory.\n"
+                #                               "It's probably under Program files(x86).")
         return seabird_utils_exe
 
     def get_confile_for_hexfile(self, hexfile_path):
         serial_num = sbe_serialcomms.get_serialnum(hexfile_path)
         if serial_num is None:
-            msg = '''"Unable to get serial number.\nCheck raw data file %s''' % hexfile_path
+            msg = "Unable to get serial number.\nCheck raw data file %s" % hexfile_path
             title = "INCORRECT RAW DATA FILE"
             return False, [title, msg]
+
         else:
             # Make sure that calibration file is present.  Ask user if it's not
             # local first
@@ -334,7 +355,8 @@ class Seacat(AbstractWidget):
                 loc = get_setting_string("Seacat/AlternateConFilePath", '')
                 conname = sbe_serialcomms.get_confile_name(serial_num, loc)
                 if not conname:
-                    conname = self.lib.cb.ask_filename(saving=False, key_name="Seacat/AlternateConFilePath", title="Find the config file for %s" % str(serial_num),
+                    conname = self.lib.cb.ask_filename(saving=False, key_name="Seacat/AlternateConFilePath",
+                                                       title="Find the config file for %s" % str(serial_num),
                                                        file_filter="Seacat Config Files (*.con *.xmlcon)")
                     if conname:
                         matches_convention = sbe_serialcomms.get_confile_name(serial_num, os.path.dirname(conname))
@@ -343,6 +365,7 @@ class Seacat(AbstractWidget):
                             msg = "The config file selected doesn't fit the automatically recognized pattern.  " \
                                   "Do you want Sound Speed Manager to make a copy of the config with a name that  "\
                                   "will automatically be found next time?\n\nCopy+Rename to: %s" % better_name
+                            # noinspection PyCallByClass
                             ret = QMessageBox.question(self, "Copy and Rename?", msg, QMessageBox.Yes | QMessageBox.No)
                             if ret == QMessageBox.Yes:
                                 shutil.copyfile(conname, better_name)
@@ -357,7 +380,7 @@ class AutoSeacat:
     def __init__(self, port=None, progbar=None):
         self.progbar = progbar
         if progbar:
-            progbar.start(title="Seacat", text="Waking up seacat")
+            progbar.start(title="Seacat", text="Waking up Seacat")
         self.sbe = open_seacat(port, progbar)
 
     def __enter__(self):
@@ -386,8 +409,8 @@ def open_seacat(port=None, progbar=None):
 
 
 def save_last_comport(comport):
-    '''integer part of COMxx port to be saved'''
-    comport = set_setting_string(COMPORT_SUBKEY + "\\" + COMPORT_NAME, comport)
+    """integer part of COMxx port to be saved"""
+    set_setting_string(COMPORT_SUBKEY + "\\" + COMPORT_NAME, comport)
 
 
 def get_last_comport():
