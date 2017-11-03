@@ -195,7 +195,8 @@ class Info(QtGui.QMainWindow):
         <b>For comments and ideas for new features:</b><br>
         Giuseppe Masetti  <a href=\"mailto:gmasetti@ccom.unh.edu?Subject=Hydroffice%20SoundSpeed\">gmasetti@ccom.unh.edu</a><br>
         Barry Gallagher  <a href=\"mailto:barry.gallagher@noaa.gov?Subject=Hydroffice%20SoundSpeed\">barry.gallagher@noaa.gov</a><br>
-        Chen Zhang  <a href=\"mailto:chen.zhang@noaa.gov?Subject=Hydroffice%20SoundSpeed\">chen.zhang@noaa.gov</a><br>        
+        Chen Zhang  <a href=\"mailto:chen.zhang@noaa.gov?Subject=Hydroffice%20SoundSpeed\">chen.zhang@noaa.gov</a><br> 
+        Matthew Sharr  <a href=\"mailto:matthew.sharr@noaa.gov?Subject=Hydroffice%20SoundSpeed\">matthew.sharr@noaa.gov</a><br>        
         """)
 
         # load default
