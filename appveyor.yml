@@ -10,11 +10,11 @@ environment:
 
     - PYTHON_VERSION: 3.6
       PYTHON_ARCH: x86
-      MINICONDA: C:\Miniconda3
+      MINICONDA: C:\Miniconda36
 
     - PYTHON_VERSION: 3.6
       PYTHON_ARCH: x64
-      MINICONDA: C:\Miniconda3-x64
+      MINICONDA: C:\Miniconda36-x64
 
 matrix:
 
@@ -22,7 +22,7 @@ matrix:
 
     - PYTHON_VERSION: 3.6
       PYTHON_ARCH: x64
-      MINICONDA: C:\Miniconda3-x64
+      MINICONDA: C:\Miniconda36-x64
 
 install:
   - set PATH=%MINICONDA%;%MINICONDA%\Scripts;%PATH%
