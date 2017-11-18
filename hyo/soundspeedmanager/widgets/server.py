@@ -64,18 +64,36 @@ class Server(AbstractWidget):
         btn.clicked.connect(self.on_start_server)
         btn.setToolTip("Start server mode")
         hbox.addWidget(btn)
+        self.start_server_act = QtGui.QAction('Start Server', self)
+        self.start_server_act.setShortcut('Ctrl+Alt+S')
+        # noinspection PyUnresolvedReferences
+        self.start_server_act.triggered.connect(self.on_start_server)
+        self.main_win.server_menu.addAction(self.start_server_act)
+
         # -- force
         btn = QtGui.QPushButton("Send now")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_force_server)
         btn.setToolTip("Force the transmission of a synthethic profile")
         hbox.addWidget(btn)
+        self.force_server_act = QtGui.QAction('Force Transmission', self)
+        self.force_server_act.setShortcut('Ctrl+Alt+T')
+        # noinspection PyUnresolvedReferences
+        self.force_server_act.triggered.connect(self.on_force_server)
+        self.main_win.server_menu.addAction(self.force_server_act)
+
         # -- stop
         btn = QtGui.QPushButton("Stop server")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_stop_server)
         btn.setToolTip("Stop server mode")
         hbox.addWidget(btn)
+        self.stop_server_act = QtGui.QAction('Stop Server', self)
+        self.stop_server_act.setShortcut('Ctrl+Alt+E')
+        # noinspection PyUnresolvedReferences
+        self.stop_server_act.triggered.connect(self.on_stop_server)
+        self.main_win.server_menu.addAction(self.stop_server_act)
+
         hbox.addStretch()
 
         # - plots
@@ -88,6 +106,9 @@ class Server(AbstractWidget):
 
     def on_start_server(self):
         logger.debug('start server')
+
+        self.main_win.switch_to_server_tab()
+
         msg = "Do you really want to start the Server Mode?\n\n" \
               "The Server Mode creates sound speed profiles based on oceanographic models.\n" \
               "Thus, it is meant for use in transit, NOT for systematic seabed mapping.\n" \
@@ -112,6 +133,8 @@ class Server(AbstractWidget):
     def on_force_server(self):
         logger.debug('force server')
 
+        self.main_win.switch_to_server_tab()
+
         if not self.lib.server_is_alive():
             msg = "First start the server mode!"
             QtGui.QMessageBox.warning(self, "Server mode", msg, QtGui.QMessageBox.Ok)
@@ -121,6 +144,8 @@ class Server(AbstractWidget):
 
     def on_stop_server(self):
         logger.debug('stop server')
+
+        self.main_win.switch_to_server_tab()
 
         self.lib.stop_server()
 

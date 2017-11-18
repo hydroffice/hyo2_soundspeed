@@ -74,8 +74,9 @@ class Info(QtGui.QMainWindow):
     media = os.path.join(here, os.pardir, 'media')
     pdf = os.path.join(here, os.pardir, 'pdf')
 
-    def __init__(self, default_url="http://www.hydroffice.org"):
+    def __init__(self, main_win, default_url="http://www.hydroffice.org"):
         QtGui.QMainWindow.__init__(self)
+        self.main_win = main_win
         self.default_url = default_url
 
         self.toolbar = self.addToolBar('Shortcuts')
@@ -93,24 +94,30 @@ class Info(QtGui.QMainWindow):
         # noinspection PyUnresolvedReferences
         online_docs_action.triggered.connect(self.load_online_docs)
         self.toolbar.addAction(online_docs_action)
+        self.main_win.help_menu.addAction(online_docs_action)
         offline_docs_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'offline_docs.png')),
                                             'Offline Documentation', self)
         offline_docs_action.setShortcut('Alt+O')
         # noinspection PyUnresolvedReferences
         offline_docs_action.triggered.connect(self.load_offline_docs)
         self.toolbar.addAction(offline_docs_action)
+        self.main_win.help_menu.addAction(offline_docs_action)
         # license
         license_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'license.png')), 'License', self)
         license_action.setShortcut('Alt+L')
         # noinspection PyUnresolvedReferences
         license_action.triggered.connect(self.load_license)
         self.toolbar.addAction(license_action)
+        self.main_win.help_menu.addAction(license_action)
         # authors
-        authors_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'authors.png')), 'Authors', self)
+        authors_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'authors.png')),
+                                       'About Sound Speed Manager', self)
         authors_action.setShortcut('Alt+A')
         # noinspection PyUnresolvedReferences
         authors_action.triggered.connect(self.show_authors)
         self.toolbar.addAction(authors_action)
+        self.main_win.help_menu.addSeparator()
+        self.main_win.help_menu.addAction(authors_action)
         # smartmap
         smartmap_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'smartmap.png')),
                                         'SmartMap WebGIS', self)
@@ -233,6 +240,7 @@ class Info(QtGui.QMainWindow):
         self.web.load(QtCore.QUrl(self.default_url))
 
     def load_online_docs(self):
+        self.main_win.switch_to_info_tab()
         url = 'https://www.hydroffice.org/manuals/soundspeed/index.html'
         explore_folder(url)
 
@@ -241,6 +249,7 @@ class Info(QtGui.QMainWindow):
         explore_folder(url)
 
     def load_offline_docs(self):
+        self.main_win.switch_to_info_tab()
         pdf_path = os.path.join(self.pdf, "SoundSpeedManager.pdf")
         if not os.path.exists(pdf_path):
             logger.warning("unable to find offline manual at %s" % pdf_path)
@@ -249,6 +258,7 @@ class Info(QtGui.QMainWindow):
         explore_folder(pdf_path)
 
     def load_license(self):
+        self.main_win.switch_to_info_tab()
         url = 'https://www.hydroffice.org/license_lgpl21/'
         self.url_input.setText(url)
         self.web.load(QtCore.QUrl(url))
@@ -274,6 +284,7 @@ class Info(QtGui.QMainWindow):
         self.web.load(QtCore.QUrl(url))
 
     def show_authors(self):
+        self.main_win.switch_to_info_tab()
         self.authors_dialog.show()
 
 

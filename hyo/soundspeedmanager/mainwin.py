@@ -102,6 +102,17 @@ class MainWin(QtGui.QMainWindow):
         if (import_folder is None) or (not os.path.exists(import_folder)):
             settings.setValue("import_folder", self.lib.data_folder)
 
+        # menu
+
+        self.menu = self.menuBar()
+        self.file_menu = self.menu.addMenu("&File")
+        self.edit_menu = self.menu.addMenu("&Edit")
+        self.database_menu = self.menu.addMenu("&Database")
+        self.monitor_menu = self.menu.addMenu("&Monitor")
+        self.server_menu = self.menu.addMenu("&Server")
+        self.setup_menu = self.menu.addMenu("&Setup")
+        self.help_menu = self.menu.addMenu("&Help")
+
         # make tabs
         self.tabs = QtGui.QTabWidget()
         self.setCentralWidget(self.tabs)
@@ -110,29 +121,29 @@ class MainWin(QtGui.QMainWindow):
         self.tabs.currentChanged.connect(self.onChange)  # changed!
         # editor
         self.tab_editor = Editor(lib=self.lib, main_win=self)
-        idx = self.tabs.insertTab(0, self.tab_editor,
-                                  QtGui.QIcon(os.path.join(self.here, 'media', 'editor.png')), "")
-        self.tabs.setTabToolTip(idx, "Editor")
+        self.idx_editor = self.tabs.insertTab(0, self.tab_editor,
+                                              QtGui.QIcon(os.path.join(self.here, 'media', 'editor.png')), "")
+        self.tabs.setTabToolTip(self.idx_editor, "Editor")
         # database
         self.tab_database = Database(lib=self.lib, main_win=self)
-        idx = self.tabs.insertTab(1, self.tab_database,
-                                  QtGui.QIcon(os.path.join(self.here, 'media', 'database.png')), "")
-        self.tabs.setTabToolTip(idx, "Database")
+        self.idx_database = self.tabs.insertTab(1, self.tab_database,
+                                                QtGui.QIcon(os.path.join(self.here, 'media', 'database.png')), "")
+        self.tabs.setTabToolTip(self.idx_database, "Database")
         # seacat
-        self.tab_seacat = Seacat(lib=self.lib, main_win=self)
-        idx = self.tabs.insertTab(2, self.tab_seacat,
-                                  QtGui.QIcon(os.path.join(self.here, 'media', 'seacat.png')), "")
-        self.tabs.setTabToolTip(idx, "SeaCAT")
-        if not self.lib.setup.noaa_tools:
-            self.tab_seacat.setDisabled(True)
+        # self.tab_seacat = Seacat(lib=self.lib, main_win=self)
+        # self.idx_seacat = self.tabs.insertTab(2, self.tab_seacat,
+        #                                       QtGui.QIcon(os.path.join(self.here, 'media', 'seacat.png')), "")
+        # self.tabs.setTabToolTip(self.idx_seacat, "SeaCAT")
+        # if not self.lib.setup.noaa_tools:
+        #     self.tab_seacat.setDisabled(True)
         # survey data monitor
         self.has_sdm_support = True
         try:  # try.. except to make SSM working also without SDM
             from hyo.surveydatamonitor.app.widgets.monitor import SurveyDataMonitor
             self.tab_monitor = SurveyDataMonitor(lib=self.lib, main_win=self)
-            idx = self.tabs.insertTab(3, self.tab_monitor,
-                                      QtGui.QIcon(os.path.join(self.here, 'media', 'surveydatamonitor.png')), "")
-            self.tabs.setTabToolTip(idx, "Survey Data Monitor")
+            self.idx_monitor = self.tabs.insertTab(3, self.tab_monitor,
+                                                   QtGui.QIcon(os.path.join(self.here, 'media', 'surveydatamonitor.png')), "")
+            self.tabs.setTabToolTip(self.idx_monitor, "Survey Data Monitor")
             logger.info("Support for Survey Monitor: ON")
         except Exception as e:
             traceback.print_exc()
@@ -140,9 +151,9 @@ class MainWin(QtGui.QMainWindow):
             logger.info("Support for Survey Monitor: OFF(%s)" % e)
         # server
         self.tab_server = Server(lib=self.lib, main_win=self)
-        idx = self.tabs.insertTab(4, self.tab_server,
-                                  QtGui.QIcon(os.path.join(self.here, 'media', 'server.png')), "")
-        self.tabs.setTabToolTip(idx, "Synthetic Profile Server")
+        self.idx_server = self.tabs.insertTab(4, self.tab_server,
+                                              QtGui.QIcon(os.path.join(self.here, 'media', 'server.png')), "")
+        self.tabs.setTabToolTip(self.idx_server, "Synthetic Profile Server")
         # refraction
         self.tab_refraction = Refraction(lib=self.lib, main_win=self)
         # idx = self.tabs.insertTab(5, self.tab_refraction,
@@ -150,17 +161,17 @@ class MainWin(QtGui.QMainWindow):
         # self.tabs.setTabToolTip(idx, "Refraction Monitor")
         # setup
         self.tab_setup = Settings(lib=self.lib, main_win=self)
-        idx = self.tabs.insertTab(6, self.tab_setup,
-                                  QtGui.QIcon(os.path.join(self.here, 'media', 'settings.png')), "")
-        self.tabs.setTabToolTip(idx, "Setup")
+        self.idx_setup = self.tabs.insertTab(6, self.tab_setup,
+                                             QtGui.QIcon(os.path.join(self.here, 'media', 'settings.png')), "")
+        self.tabs.setTabToolTip(self.idx_setup, "Setup")
         # info
         versioned_url = 'https://www.hydroffice.org/soundspeed/%s' % (ssm_version.replace('.', '_'), )
         if is_pydro():
             versioned_url += "_pydro"
-        self.tab_info = Info(default_url=versioned_url)
-        idx = self.tabs.insertTab(6, self.tab_info,
-                                  QtGui.QIcon(os.path.join(self.here, 'media', 'info.png')), "")
-        self.tabs.setTabToolTip(idx, "Info")
+        self.tab_info = Info(main_win=self, default_url=versioned_url)
+        self.idx_info = self.tabs.insertTab(6, self.tab_info,
+                                            QtGui.QIcon(os.path.join(self.here, 'media', 'info.png')), "")
+        self.tabs.setTabToolTip(self.idx_info, "Info")
 
         self.statusBar().setStyleSheet("QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;}")
         self.status_bar_normal_style = self.statusBar().styleSheet()
@@ -182,6 +193,30 @@ class MainWin(QtGui.QMainWindow):
         # logger.debug("Current Tab Index: %s" % type(self.tabs.widget(i)))
         if type(self.tabs.widget(i)) == Settings:
             self.tab_setup.setup_changed()
+
+    def switch_to_editor_tab(self):
+        if self.tabs.currentIndex() != self.idx_editor:
+            self.tabs.setCurrentIndex(self.idx_editor)
+
+    def switch_to_database_tab(self):
+        if self.tabs.currentIndex() != self.idx_database:
+            self.tabs.setCurrentIndex(self.idx_database)
+
+    def switch_to_monitor_tab(self):
+        if self.tabs.currentIndex() != self.idx_monitor:
+            self.tabs.setCurrentIndex(self.idx_monitor)
+
+    def switch_to_server_tab(self):
+        if self.tabs.currentIndex() != self.idx_server:
+            self.tabs.setCurrentIndex(self.idx_server)
+
+    def switch_to_setup_tab(self):
+        if self.tabs.currentIndex() != self.idx_setup:
+            self.tabs.setCurrentIndex(self.idx_setup)
+
+    def switch_to_info_tab(self):
+        if self.tabs.currentIndex() != self.idx_info:
+            self.tabs.setCurrentIndex(self.idx_info)
 
     def check_woa09(self):
         """ helper function that looks after WOA09 database"""
@@ -447,10 +482,10 @@ class MainWin(QtGui.QMainWindow):
 
         self.timer_execs += 1
 
-        if self.lib.setup.noaa_tools:
-            self.tab_seacat.setEnabled(True)
-        else:
-            self.tab_seacat.setDisabled(True)
+        # if self.lib.setup.noaa_tools:
+        #     self.tab_seacat.setEnabled(True)
+        # else:
+        #     self.tab_seacat.setDisabled(True)
 
         # update the windows title
         self.setWindowTitle('%s v.%s [project: %s]' % (self.name, self.version, self.lib.current_project))

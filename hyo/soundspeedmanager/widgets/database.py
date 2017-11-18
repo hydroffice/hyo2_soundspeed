@@ -80,36 +80,66 @@ class Database(AbstractWidget):
         self.project_box.setLayout(project_vbox)
         self.manage_btn_box = QtGui.QDialogButtonBox(QtCore.Qt.Vertical)
         project_vbox.addWidget(self.manage_btn_box)
+
         # ---- new project
         self.btn_new_project = QtGui.QPushButton("New project")
         # noinspection PyUnresolvedReferences
         self.btn_new_project.clicked.connect(self.new_project)
         self.btn_new_project.setToolTip("Create a new project")
         self.manage_btn_box.addButton(self.btn_new_project, QtGui.QDialogButtonBox.ActionRole)
+        self.new_project_act = QtGui.QAction('New Project DB', self)
+        self.new_project_act.setShortcut('Ctrl+N')
+        # noinspection PyUnresolvedReferences
+        self.new_project_act.triggered.connect(self.new_project)
+        self.main_win.database_menu.addAction(self.new_project_act)
+
         # ---- rename project
         self.btn_rename_project = QtGui.QPushButton("Rename project")
         # noinspection PyUnresolvedReferences
         self.btn_rename_project.clicked.connect(self.rename_project)
         self.btn_rename_project.setToolTip("Rename the current project")
         self.manage_btn_box.addButton(self.btn_rename_project, QtGui.QDialogButtonBox.ActionRole)
+        self.rename_project_act = QtGui.QAction('Rename Current Project DB', self)
+        self.rename_project_act.setShortcut('Ctrl+R')
+        # noinspection PyUnresolvedReferences
+        self.rename_project_act.triggered.connect(self.rename_project)
+        self.main_win.database_menu.addAction(self.rename_project_act)
+
         # ---- load project
         self.btn_load_project = QtGui.QPushButton("Switch project")
         # noinspection PyUnresolvedReferences
         self.btn_load_project.clicked.connect(self.switch_project)
         self.btn_load_project.setToolTip("Switch to another existing project")
         self.manage_btn_box.addButton(self.btn_load_project, QtGui.QDialogButtonBox.ActionRole)
+        self.load_project_act = QtGui.QAction('Switch Project DB', self)
+        self.load_project_act.setShortcut('Ctrl+L')
+        # noinspection PyUnresolvedReferences
+        self.load_project_act.triggered.connect(self.switch_project)
+        self.main_win.database_menu.addAction(self.load_project_act)
+
         # ---- import data
         self.btn_import_data = QtGui.QPushButton("Import data")
         # noinspection PyUnresolvedReferences
         self.btn_import_data.clicked.connect(self.import_data)
         self.btn_import_data.setToolTip("Import data from another project")
         self.manage_btn_box.addButton(self.btn_import_data, QtGui.QDialogButtonBox.ActionRole)
+        self.import_data_act = QtGui.QAction('Import Data from Project DB', self)
+        self.import_data_act.setShortcut('Ctrl+I')
+        # noinspection PyUnresolvedReferences
+        self.import_data_act.triggered.connect(self.import_data)
+        self.main_win.database_menu.addAction(self.import_data_act)
+
         # ---- project folder
         self.btn_project_folder = QtGui.QPushButton("Open folder")
         # noinspection PyUnresolvedReferences
         self.btn_project_folder.clicked.connect(self.project_folder)
-        self.btn_project_folder.setToolTip("Open the project folder")
+        self.btn_project_folder.setToolTip("Open projects folder")
         self.manage_btn_box.addButton(self.btn_project_folder, QtGui.QDialogButtonBox.ActionRole)
+        self.project_folder_act = QtGui.QAction('Open Projects DB Folder', self)
+        self.project_folder_act.setShortcut('Ctrl+P')
+        # noinspection PyUnresolvedReferences
+        self.project_folder_act.triggered.connect(self.project_folder)
+        self.main_win.database_menu.addAction(self.project_folder_act)
 
         right_vbox.addStretch()
         right_vbox.addStretch()
@@ -117,41 +147,73 @@ class Database(AbstractWidget):
         # -- profiles box
         self.profiles_box = QtGui.QGroupBox("Profiles")
         right_vbox.addWidget(self.profiles_box)
+
         # --- manage button box
         profiles_vbox = QtGui.QVBoxLayout()
         self.profiles_box.setLayout(profiles_vbox)
         self.product_btn_box = QtGui.QDialogButtonBox(QtCore.Qt.Vertical)
         profiles_vbox.addWidget(self.product_btn_box)
+
         # ---- import profiles
         btn = QtGui.QPushButton("Import profiles")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.import_profiles)
         btn.setToolTip("Import multiple profiles")
         self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
+        self.import_profiles_act = QtGui.QAction('Import Multiple Profiles', self)
+        self.import_profiles_act.setShortcut('Ctrl+M')
+        # noinspection PyUnresolvedReferences
+        self.import_profiles_act.triggered.connect(self.import_profiles)
+        self.main_win.database_menu.addSeparator()
+        self.main_win.database_menu.addAction(self.import_profiles_act)
+
         # ---- export profiles
         btn = QtGui.QPushButton("Export profiles")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.export_profile_switch)
         btn.setToolTip("Export profile data")
         self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
+        self.export_profiles_act = QtGui.QAction('Export Multiple Profiles', self)
+        self.export_profiles_act.setShortcut('Ctrl+X')
+        # noinspection PyUnresolvedReferences
+        self.export_profiles_act.triggered.connect(self.export_profile_switch)
+        self.main_win.database_menu.addAction(self.export_profiles_act)
+
         # ---- plot profiles
         btn = QtGui.QPushButton("Make plots")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.plot_profiles)
         btn.setToolTip("Create plots with all the profiles")
         self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
+        self.plot_profiles_act = QtGui.QAction('Make Plots from Data', self)
+        self.plot_profiles_act.setShortcut('Ctrl+P')
+        # noinspection PyUnresolvedReferences
+        self.plot_profiles_act.triggered.connect(self.plot_profiles)
+        self.main_win.database_menu.addAction(self.plot_profiles_act)
+
         # ---- export metadata
         btn = QtGui.QPushButton("Export info")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.export_profile_metadata)
         btn.setToolTip("Export profile locations and metadata")
         self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
+        self.export_profile_metadata_act = QtGui.QAction('Export Data Info', self)
+        self.export_profile_metadata_act.setShortcut('Ctrl+D')
+        # noinspection PyUnresolvedReferences
+        self.export_profile_metadata_act.triggered.connect(self.export_profile_metadata)
+        self.main_win.database_menu.addAction(self.export_profile_metadata_act)
+
         # ---- output folder
         btn = QtGui.QPushButton("Output folder")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.output_folder)
         btn.setToolTip("Open the output folder")
         self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
+        self.output_folder_act = QtGui.QAction('Open Output Folder', self)
+        self.output_folder_act.setShortcut('Ctrl+O')
+        # noinspection PyUnresolvedReferences
+        self.output_folder_act.triggered.connect(self.output_folder)
+        self.main_win.database_menu.addAction(self.output_folder_act)
 
         # self.main_layout.addStretch()
 
@@ -268,7 +330,7 @@ class Database(AbstractWidget):
 
         if self.lib.has_ssp():
             self.main_win.data_imported()
-            self.main_win.tabs.setCurrentIndex(0)
+            self.main_win.switch_to_editor_tab()
 
     def stats_profile(self):
         logger.debug("user wants some stats on a single profile")
@@ -499,6 +561,8 @@ class Database(AbstractWidget):
     def new_project(self):
         logger.debug("user want to create a new project")
 
+        self.main_win.switch_to_database_tab()
+
         dlg = ProjectNewDialog(lib=self.lib, main_win=self.main_win, parent=self)
         success = dlg.exec_()
 
@@ -507,6 +571,8 @@ class Database(AbstractWidget):
 
     def rename_project(self):
         logger.debug("user want to rename a project")
+
+        self.main_win.switch_to_database_tab()
 
         dlg = ProjectRenameDialog(lib=self.lib, main_win=self.main_win, parent=self)
         success = dlg.exec_()
@@ -517,6 +583,8 @@ class Database(AbstractWidget):
     def switch_project(self):
         logger.debug("user want to switch to another project")
 
+        self.main_win.switch_to_database_tab()
+
         dlg = ProjectSwitchDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
 
@@ -525,6 +593,8 @@ class Database(AbstractWidget):
     def import_data(self):
         logger.debug("user want to import data from another project")
 
+        self.main_win.switch_to_database_tab()
+
         dlg = ImportDataDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
 
@@ -532,14 +602,20 @@ class Database(AbstractWidget):
 
     def project_folder(self):
         logger.debug("user want to open the project folder")
+
+        self.main_win.switch_to_database_tab()
         self.lib.open_projects_folder()
 
     def output_folder(self):
         logger.debug("user want to open the output folder")
+
+        self.main_win.switch_to_database_tab()
         self.lib.open_outputs_folder()
 
     def import_profiles(self):
         logger.debug("user want to import multiple profiles")
+
+        self.main_win.switch_to_database_tab()
 
         # noinspection PyCallByClass
         QtGui.QMessageBox.warning(self, "Warning about multi-profile import",
@@ -558,6 +634,8 @@ class Database(AbstractWidget):
 
     def export_profile_switch(self):
         logger.debug("user want to export profile data")
+
+        self.main_win.switch_to_database_tab()
 
         # check if any selection
         rows = self.ssp_list.selectionModel().selectedRows()
@@ -578,11 +656,15 @@ class Database(AbstractWidget):
 
     def export_profile_metadata(self):
         logger.debug("user want to export profile metadata")
+
+        self.main_win.switch_to_database_tab()
         dlg = ExportProfileMetadataDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
 
     def plot_profiles(self):
         logger.debug("user want to plot profiles")
+
+        self.main_win.switch_to_database_tab()
 
         dlg = PlotProfilesDialog(lib=self.lib, main_win=self.main_win, parent=self)
         success = dlg.exec_()

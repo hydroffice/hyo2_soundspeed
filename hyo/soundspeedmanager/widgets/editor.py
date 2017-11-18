@@ -27,124 +27,164 @@ class Editor(AbstractWidget):
 
         self.input_bar = self.addToolBar('Input')
         self.input_bar.setIconSize(QtCore.QSize(40, 40))
+
         # import
         self.input_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'input.png')),
-                                       'Input data', self)
+                                       'Input Data', self)
         self.input_act.setShortcut('Alt+I')
         # noinspection PyUnresolvedReferences
         self.input_act.triggered.connect(self.on_input_data)
         self.input_bar.addAction(self.input_act)
+        self.main_win.file_menu.addAction(self.input_act)
+
         # clear
         self.clear_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'clear.png')),
-                                       'Clear data', self)
+                                       'Clear Data', self)
         self.clear_act.setShortcut('Alt+C')
         # noinspection PyUnresolvedReferences
         self.clear_act.triggered.connect(self.on_clear_data)
         # set hidden, but the whole action is candidate to deletion
         self.clear_act.setVisible(False)
         self.input_bar.addAction(self.clear_act)
+
         # set ref
         self.set_ref_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'ref.png')),
-                                         'Reference cast', self)
+                                         'Reference Cast', self)
         self.set_ref_act.setShortcut('Alt+R')
         # noinspection PyUnresolvedReferences
         self.set_ref_act.triggered.connect(self.on_set_ref)
         self.input_bar.addAction(self.set_ref_act)
+        self.main_win.file_menu.addAction(self.set_ref_act)
 
         self.process_bar = self.addToolBar('Process')
         self.process_bar.setIconSize(QtCore.QSize(40, 40))
+
         # spreadsheet
         self.spreadsheet_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'grid.png')),
-                                             'Spreadsheet', self)
+                                             'Show/Edit Data Spreadsheet', self)
         self.spreadsheet_act.setShortcut('Alt+S')
         # noinspection PyUnresolvedReferences
         self.spreadsheet_act.triggered.connect(self.on_spreadsheet)
         self.process_bar.addAction(self.spreadsheet_act)
+        self.main_win.edit_menu.addAction(self.spreadsheet_act)
+
         # metadata
         self.metadata_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata.png')),
-                                          'Metadata', self)
+                                          'Show/Edit Cast Metadata', self)
         self.metadata_act.setShortcut('Alt+M')
         # noinspection PyUnresolvedReferences
         self.metadata_act.triggered.connect(self.on_metadata)
         self.process_bar.addAction(self.metadata_act)
+        self.main_win.edit_menu.addAction(self.metadata_act)
+
         # - separator
         self.process_bar.addSeparator()
+
         # filter
         self.filter_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'filter.png')),
-                                        'Apply data filter', self)
+                                        'Apply Data Filter', self)
         self.filter_act.setShortcut('Alt+F')
         # noinspection PyUnresolvedReferences
         self.filter_act.triggered.connect(self.on_data_filter)
         self.process_bar.addAction(self.filter_act)
+        self.main_win.edit_menu.addSeparator()
+        self.main_win.edit_menu.addAction(self.filter_act)
+
         # retrieve sal
         self.sal_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'sal.png')),
-                                     'Retrieve salinity', self)
+                                     'Retrieve Salinity', self)
         self.sal_act.setShortcut('Alt+A')
         # noinspection PyUnresolvedReferences
         self.sal_act.triggered.connect(self.on_retrieve_sal)
         self.process_bar.addAction(self.sal_act)
+
         # retrieve temp/sal
         self.temp_sal_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'temp_sal.png')),
-                                          'Retrieve temperature/salinity', self)
+                                          'Retrieve Temperature/Salinity', self)
         self.temp_sal_act.setShortcut('Alt+T')
         # noinspection PyUnresolvedReferences
         self.temp_sal_act.triggered.connect(self.on_retrieve_temp_sal)
         self.process_bar.addAction(self.temp_sal_act)
+        self.main_win.edit_menu.addAction(self.temp_sal_act)
+
         # retrieve transducer sound speed
         self.tss_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'tss.png')),
-                                     'Retrieve transducer sound speed', self)
+                                     'Retrieve Transducer Sound Speed', self)
         self.tss_act.setShortcut('Alt+W')
         # noinspection PyUnresolvedReferences
         self.tss_act.triggered.connect(self.on_retrieve_tss)
         self.process_bar.addAction(self.tss_act)
+        self.main_win.edit_menu.addAction(self.tss_act)
+
         # extend profile
         self.extend_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'extend.png')),
-                                        'Extend profile', self)
+                                        'Extend Profile', self)
         self.extend_act.setShortcut('Alt+E')
         # noinspection PyUnresolvedReferences
         self.extend_act.triggered.connect(self.on_extend_profile)
         self.process_bar.addAction(self.extend_act)
+        self.main_win.edit_menu.addAction(self.extend_act)
+
         # preview thinning
         self.thin_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'thinning.png')),
-                                      'Preview thinning', self)
+                                      'Preview Thinning', self)
         self.thin_act.setShortcut('Alt+H')
         # noinspection PyUnresolvedReferences
         self.thin_act.triggered.connect(self.on_preview_thinning)
         self.thin_act.setVisible(False)
         self.process_bar.addAction(self.thin_act)
+        self.main_win.edit_menu.addAction(self.thin_act)
+
         # - separator
         self.process_bar.addSeparator()
+
         # restart processing
         self.restart_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'restart.png')),
-                                         'Restart processing', self)
+                                         'Restart Processing', self)
         self.restart_act.setShortcut('Alt+N')
         # noinspection PyUnresolvedReferences
         self.restart_act.triggered.connect(self.on_restart_proc)
         self.process_bar.addAction(self.restart_act)
+        self.main_win.edit_menu.addAction(self.restart_act)
 
         self.output_bar = self.addToolBar('Output')
         self.output_bar.setIconSize(QtCore.QSize(40, 40))
+
         # export
         self.export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export.png')),
-                                        'Export data', self)
+                                        'Export Data', self)
         self.export_act.setShortcut('Alt+E')
         # noinspection PyUnresolvedReferences
         self.export_act.triggered.connect(self.on_export_single_profile)
         self.output_bar.addAction(self.export_act)
+
         # transmit
         self.transmit_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'transmit.png')),
-                                          'Transmit data', self)
+                                          'Transmit Data', self)
         self.transmit_act.setShortcut('Alt+X')
         # noinspection PyUnresolvedReferences
         self.transmit_act.triggered.connect(self.on_transmit_data)
         self.output_bar.addAction(self.transmit_act)
+        self.main_win.edit_menu.addSeparator()
+        self.main_win.edit_menu.addAction(self.transmit_act)
+
         # save db
         self.save_db_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'db_save.png')),
-                                         'Save to database', self)
+                                         'Save to Database', self)
         self.save_db_act.setShortcut('Alt+D')
         # noinspection PyUnresolvedReferences
         self.save_db_act.triggered.connect(self.on_save_db)
         self.output_bar.addAction(self.save_db_act)
+        self.main_win.edit_menu.addAction(self.save_db_act)
+
+        # exit action
+        exit_action = QtGui.QAction("Exit", self)
+        exit_action.setShortcut("Ctrl+Q")
+        exit_action.setStatusTip("Exit application")
+        # noinspection PyUnresolvedReferences
+        exit_action.triggered.connect(self.main_win.close)
+        self.main_win.file_menu.addSeparator()
+        self.main_win.file_menu.addAction(exit_action)
 
         # plots
         self.dataplots = DataPlots(main_win=self.main_win, lib=self.lib)
@@ -153,6 +193,8 @@ class Editor(AbstractWidget):
     def on_input_data(self):
         """Import a data file"""
         logger.debug('user wants to input data')
+
+        self.main_win.switch_to_editor_tab()
         dlg = ImportSingleProfileDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
         if self.lib.has_ssp():
@@ -166,6 +208,7 @@ class Editor(AbstractWidget):
     def on_set_ref(self):
         logger.debug('user wants to set as a reference')
 
+        self.main_win.switch_to_editor_tab()
         dlg = ReferenceDialog(lib=self.lib, main_win=self.main_win, parent=self)
         success = dlg.exec_()
         if success:
@@ -173,14 +216,20 @@ class Editor(AbstractWidget):
 
     def on_restart_proc(self):
         logger.debug('user wants to restart processing')
+
+        self.main_win.switch_to_editor_tab()
         self.lib.restart_proc()
         self.main_win.data_imported()
 
     def on_data_filter(self):
         logger.debug('user wants to filter data')
 
+        self.main_win.switch_to_editor_tab()
+
     def on_retrieve_sal(self):
         logger.debug('user wants to retrieve salinity')
+
+        self.main_win.switch_to_editor_tab()
 
         if self.lib.cur.meta.sensor_type not in [Dicts.sensor_types['XBT'], ]:
             msg = "This is a XBT-specific function!"
@@ -201,6 +250,8 @@ class Editor(AbstractWidget):
 
     def on_retrieve_temp_sal(self):
         logger.debug('user wants to retrieve temp/sal')
+
+        self.main_win.switch_to_editor_tab()
 
         if self.lib.cur.meta.sensor_type not in [Dicts.sensor_types['XSV'],
                                                  Dicts.sensor_types['SVP'],
@@ -225,6 +276,8 @@ class Editor(AbstractWidget):
     def on_retrieve_tss(self):
         logger.debug('user wants to retrieve transducer sound speed')
 
+        self.main_win.switch_to_editor_tab()
+
         if not self.lib.add_cur_tss():
             msg = "Issue in retrieving transducer sound speed"
             # noinspection PyCallByClass
@@ -235,6 +288,8 @@ class Editor(AbstractWidget):
 
     def on_extend_profile(self):
         logger.debug('user wants to extend the profile')
+
+        self.main_win.switch_to_editor_tab()
 
         if not self.lib.extend_profile():
             msg = "Issue in extending the profile.\n\nCheck in the settings if the selected atlas source is active!"
@@ -251,6 +306,8 @@ class Editor(AbstractWidget):
     def on_preview_thinning(self):
         logger.debug('user wants to preview thinning')
 
+        self.main_win.switch_to_editor_tab()
+
         if not self.lib.prepare_sis():
             msg = "Issue in preview the thinning"
             # noinspection PyCallByClass
@@ -261,6 +318,9 @@ class Editor(AbstractWidget):
 
     def on_spreadsheet(self):
         logger.debug('user wants to read/edit spreadsheet')
+
+        self.main_win.switch_to_editor_tab()
+
         if not self.lib.has_ssp():
             msg = "Import data before visualize them in a spreadsheet!"
             # noinspection PyCallByClass
@@ -271,6 +331,9 @@ class Editor(AbstractWidget):
 
     def on_metadata(self):
         logger.debug('user wants to read/edit metadata')
+
+        self.main_win.switch_to_editor_tab()
+
         if not self.lib.has_ssp():
             msg = "Import data before visualize metadata!"
             # noinspection PyCallByClass
@@ -296,7 +359,7 @@ class Editor(AbstractWidget):
             msg = "Suspect short temperature profile detected!\n\n" \
                   "Do you really want to continue?"
             # noinspection PyCallByClass
-            ret = QtGui.QMessageBox.warning(self, "Data Warning", msg, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+            ret = QtGui.QMessageBox.warning(self, "Data Warning", msg, QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
             if ret == QtGui.QMessageBox.No:
                 return False
 
@@ -306,7 +369,7 @@ class Editor(AbstractWidget):
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
                   "Do you really want to continue?"
             # noinspection PyCallByClass
-            ret = QtGui.QMessageBox.warning(self, "Data Warning", msg, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+            ret = QtGui.QMessageBox.warning(self, "Data Warning", msg, QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
             if ret == QtGui.QMessageBox.No:
                 return False
 
@@ -325,7 +388,7 @@ class Editor(AbstractWidget):
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
                   "Do you really want to continue?"
             # noinspection PyCallByClass
-            ret = QtGui.QMessageBox.warning(self, "Data Warning", msg, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+            ret = QtGui.QMessageBox.warning(self, "Data Warning", msg, QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
             if ret == QtGui.QMessageBox.No:
                 return False
 
@@ -344,7 +407,7 @@ class Editor(AbstractWidget):
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
                   "Do you really want to continue?"
             # noinspection PyCallByClass
-            ret = QtGui.QMessageBox.warning(self, "Data Warning", msg, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+            ret = QtGui.QMessageBox.warning(self, "Data Warning", msg, QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
             if ret == QtGui.QMessageBox.No:
                 return False
 
@@ -352,6 +415,8 @@ class Editor(AbstractWidget):
 
     def on_export_single_profile(self):
         logger.debug('user wants to export a single profile')
+
+        self.main_win.switch_to_editor_tab()
 
         valid = self._run_safety_checks_on_output()
         if not valid:
@@ -362,7 +427,8 @@ class Editor(AbstractWidget):
             msg = "Do you really want to export a profile\nbased on synthetic %s data?" \
                   % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
             # noinspection PyCallByClass
-            ret = QtGui.QMessageBox.warning(self, "Synthetic source warning", msg, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+            ret = QtGui.QMessageBox.warning(self, "Synthetic source warning", msg,
+                                            QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
             if ret == QtGui.QMessageBox.No:
                 return
 
@@ -373,7 +439,8 @@ class Editor(AbstractWidget):
             msg = "Do you really want to export a profile\nbased on pre-processed %s data?" \
                   % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
             # noinspection PyCallByClass
-            ret = QtGui.QMessageBox.warning(self, "Pre-processed source warning", msg, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+            ret = QtGui.QMessageBox.warning(self, "Pre-processed source warning", msg,
+                                            QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
             if ret == QtGui.QMessageBox.No:
                 return
 
@@ -386,6 +453,8 @@ class Editor(AbstractWidget):
 
     def on_transmit_data(self):
         logger.debug('user wants to transmit the data')
+
+        self.main_win.switch_to_editor_tab()
 
         valid = self._run_safety_checks_on_output()
         if not valid:
@@ -408,7 +477,8 @@ class Editor(AbstractWidget):
             msg = "Do you really want to transmit a profile\nbased on pre-processed %s data?" \
                   % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
             # noinspection PyCallByClass
-            ret = QtGui.QMessageBox.warning(self, "Pre-processed source warning", msg, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+            ret = QtGui.QMessageBox.warning(self, "Pre-processed source warning", msg,
+                                            QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
             if ret == QtGui.QMessageBox.No:
                 return
 
@@ -421,10 +491,12 @@ class Editor(AbstractWidget):
         self.dataplots.update_data()
 
     def on_save_db(self, auto_save=False):
+
         if auto_save:
             logger.debug('auto-save data to db')
         else:
             logger.debug('user wants to save data to db')
+            self.main_win.switch_to_editor_tab()
 
             # since auto-save the same checks and questions have been asked!
 
@@ -451,7 +523,7 @@ class Editor(AbstractWidget):
                       % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
                 # noinspection PyCallByClass
                 ret = QtGui.QMessageBox.warning(self, "Pre-processed source warning", msg,
-                                                QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+                                                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
                 if ret == QtGui.QMessageBox.No:
                     return
 

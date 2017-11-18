@@ -44,6 +44,28 @@ class Settings(AbstractWidget):
         hbox.addStretch()
         self.mainLayout.addLayout(hbox)
 
+        # view setup
+        self.view_act = QtGui.QAction('View Setup', self)
+        self.view_act.setShortcut('Ctrl+S')
+        # noinspection PyUnresolvedReferences
+        self.view_act.triggered.connect(self.on_view_setup)
+        self.main_win.setup_menu.addAction(self.view_act)
+
+        # edit setup
+        self.edit_act = QtGui.QAction('Edit Setup', self)
+        self.edit_act.setShortcut('Ctrl+Alt+S')
+        # noinspection PyUnresolvedReferences
+        self.edit_act.triggered.connect(self.on_edit_setup)
+        self.main_win.setup_menu.addAction(self.edit_act)
+
+    def on_view_setup(self):
+        self.main_win.switch_to_setup_tab()
+
+    def on_edit_setup(self):
+        self.main_win.switch_to_setup_tab()
+        self.editable.setChecked(True)
+        self.on_editable()
+
     def on_editable(self):
         logger.debug("editable: %s" % self.editable.isChecked())
         if self.editable.isChecked():
