@@ -153,19 +153,20 @@ class Editor(AbstractWidget):
         # export
         self.export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export.png')),
                                         'Export Data', self)
-        self.export_act.setShortcut('Alt+E')
+        self.export_act.setShortcut('Alt+X')
         # noinspection PyUnresolvedReferences
         self.export_act.triggered.connect(self.on_export_single_profile)
         self.output_bar.addAction(self.export_act)
+        self.main_win.edit_menu.addSeparator()
+        self.main_win.edit_menu.addAction(self.export_act)
 
         # transmit
         self.transmit_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'transmit.png')),
                                           'Transmit Data', self)
-        self.transmit_act.setShortcut('Alt+X')
+        self.transmit_act.setShortcut('Alt+T')
         # noinspection PyUnresolvedReferences
         self.transmit_act.triggered.connect(self.on_transmit_data)
         self.output_bar.addAction(self.transmit_act)
-        self.main_win.edit_menu.addSeparator()
         self.main_win.edit_menu.addAction(self.transmit_act)
 
         # save db
