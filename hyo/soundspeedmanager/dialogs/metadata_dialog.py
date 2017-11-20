@@ -15,8 +15,10 @@ class MetadataDialog(AbstractDialog):
     def __init__(self, main_win, lib, parent=None):
         AbstractDialog.__init__(self, main_win=main_win, lib=lib, parent=parent)
 
+        settings = QtCore.QSettings()
+
         self.setWindowTitle("Profile metadata")
-        self.setMinimumWidth(550)
+        self.setMinimumWidth(400)
 
         lbl_width = 90
 
@@ -150,6 +152,7 @@ class MetadataDialog(AbstractDialog):
         self.vessel.setAutoFillBackground(True)
         # noinspection PyUnresolvedReferences
         self.vessel.editTextChanged.connect(self.changed_vessel)
+        # noinspection PyUnresolvedReferences
         self.vessel.currentIndexChanged.connect(self.changed_vessel)
 
         # serial number
@@ -305,6 +308,18 @@ class MetadataDialog(AbstractDialog):
         else:
             self.apply.setToolTip("Apply changes (if any)")
         hbox.addWidget(self.apply)
+        # --
+        self.show_at_import = QtGui.QPushButton("Show at Import")
+        self.show_at_import.setFixedHeight(self.editable.height())
+        self.show_at_import.setCheckable(True)
+        if settings.value("show_metadata_at_import") == 'true':
+            self.show_at_import.setChecked(True)
+        else:
+            self.show_at_import.setChecked(False)
+        # noinspection PyUnresolvedReferences
+        self.show_at_import.clicked.connect(self.on_show_at_import)
+        self.show_at_import.setToolTip("Show metadata at each cast import")
+        hbox.addWidget(self.show_at_import)
         hbox.addStretch()
         self.mainLayout.addLayout(hbox)
 
@@ -399,6 +414,14 @@ class MetadataDialog(AbstractDialog):
         if self.lib.setup.default_vessel and self.vessel.findText(self.lib.setup.default_vessel) < 0:
             self.vessel.insertItem(0, self.lib.setup.default_vessel)
         self.vessel.setCurrentIndex(self.vessel.findText(self.lib.setup.default_vessel))
+
+    def on_show_at_import(self):
+        logger.debug("on show at import: %s" % self.show_at_import.isChecked())
+        settings = QtCore.QSettings()
+        if self.show_at_import.isChecked():
+            settings.setValue("show_metadata_at_import", True)
+        else:
+            settings.setValue("show_metadata_at_import", False)
 
     def on_apply(self):
         logger.debug("apply")

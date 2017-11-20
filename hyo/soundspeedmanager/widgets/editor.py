@@ -65,7 +65,7 @@ class Editor(AbstractWidget):
         self.spreadsheet_act.setShortcut('Alt+S')
         # noinspection PyUnresolvedReferences
         self.spreadsheet_act.triggered.connect(self.on_spreadsheet)
-        self.process_bar.addAction(self.spreadsheet_act)
+        # self.process_bar.addAction(self.spreadsheet_act)
         self.main_win.edit_menu.addAction(self.spreadsheet_act)
 
         # metadata
@@ -131,8 +131,8 @@ class Editor(AbstractWidget):
         self.thin_act.setShortcut('Alt+H')
         # noinspection PyUnresolvedReferences
         self.thin_act.triggered.connect(self.on_preview_thinning)
-        self.thin_act.setVisible(False)
-        self.process_bar.addAction(self.thin_act)
+        # self.thin_act.setVisible(False)
+        # self.process_bar.addAction(self.thin_act)
         self.main_win.edit_menu.addAction(self.thin_act)
 
         # - separator
@@ -175,7 +175,7 @@ class Editor(AbstractWidget):
         self.save_db_act.setShortcut('Alt+D')
         # noinspection PyUnresolvedReferences
         self.save_db_act.triggered.connect(self.on_save_db)
-        self.output_bar.addAction(self.save_db_act)
+        # self.output_bar.addAction(self.save_db_act)
         self.main_win.edit_menu.addAction(self.save_db_act)
 
         # exit action
@@ -597,7 +597,7 @@ class Editor(AbstractWidget):
             self.tss_act.setVisible(False)
 
         self.extend_act.setVisible(True)
-        # self.thin_act.setDisabled(False)
+        self.thin_act.setVisible(True)
         self.export_act.setVisible(True)
         self.transmit_act.setVisible(True)
         self.save_db_act.setVisible(True)

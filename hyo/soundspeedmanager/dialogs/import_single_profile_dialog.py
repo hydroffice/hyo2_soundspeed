@@ -174,6 +174,11 @@ class ImportSingleProfileDialog(AbstractDialog):
                 return
 
         self.progress.end()
+
+        if settings.value("show_metadata_at_import") == 'true':
+            if self.parent() is not None:
+                self.parent().on_metadata()
+
         self.accept()
 
     def on_load_db(self):
