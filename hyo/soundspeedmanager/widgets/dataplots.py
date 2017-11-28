@@ -413,8 +413,8 @@ class DataPlots(AbstractWidget):
             if len(msg) > 0:
                 msg += " "
             delta = datetime.utcnow() - self.lib.setup.client_list.last_tx_time
-            msg += "[%dh %dm since last tx]" % (delta.days * 24 + delta.seconds // 3600,
-                                                (delta.seconds // 60) % 60)
+            msg += "[%dh %dm since cast time of last tx]" % (delta.days * 24 + delta.seconds // 3600,
+                                                             (delta.seconds // 60) % 60)
         self.f.suptitle(msg)
 
     def on_first_draw(self):
