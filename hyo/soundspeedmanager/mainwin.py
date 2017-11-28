@@ -442,7 +442,7 @@ class MainWin(QtGui.QMainWindow):
         new_bugfix = False
         latest_version = None
         try:
-            response = urlopen('https://www.hydroffice.org/latest/soundspeedmanager.txt', timeout=1)
+            response = urlopen('http://www.hydroffice.org/latest/soundspeedmanager.txt', timeout=2)
             latest_version = response.read().split()[0].decode()
 
             cur_maj, cur_min, cur_fix = ssm_version.split('.')
