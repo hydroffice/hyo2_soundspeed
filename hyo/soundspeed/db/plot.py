@@ -73,88 +73,16 @@ class PlotDb:
                 ssp_x.append(row[2].x)
                 ssp_y.append(row[2].y)
                 ssp_label.append(row[0])
-            ssp_x_min = min(ssp_x)
-            ssp_x_max = max(ssp_x)
-            ssp_x_mean = (ssp_x_min + ssp_x_max) / 2
-            ssp_x_delta = max(0.05, abs(ssp_x_max - ssp_x_min) / 5)
-            ssp_y_min = min(ssp_y)
-            ssp_y_max = max(ssp_y)
-            # ssp_y_mean = (ssp_y_min + ssp_y_max) / 2
-            ssp_y_delta = max(0.05, abs(ssp_y_max - ssp_y_min) / 5)
-            logger.info("data boundary: %.4f, %.4f (%.4f) / %.4f, %.4f (%.4f)"
-                        % (ssp_x_min, ssp_x_max, ssp_x_delta, ssp_y_min, ssp_y_max, ssp_y_delta))
 
             # make the world map
             fig = plt.figure()
             # plt.title("SSP Map (%s profiles)" % len(view_rows))
-            ax = fig.add_subplot(111)
             plt.ioff()
 
             wm = self._world_draw_map()
-            # x, y = wm(ssp_x_mean, ssp_y_mean)
-            # wm.scatter(x, y, s=18, color='y')
-
-            if ssp_x_mean > 0:
-                ssp_loc = 2
-            else:
-                ssp_loc = 1
-
-            max_delta_range = max(abs(ssp_x_min - ssp_x_max), abs(ssp_y_min - ssp_y_max))
-            logger.info("maximum delta range: %s" % max_delta_range)
-
-            if max_delta_range > 50:
-                ins_scale = 0  # no inset
-            elif max_delta_range > 15:
-                ins_scale = 6
-            elif max_delta_range > 12:
-                ins_scale = 9
-            elif max_delta_range > 6:
-                ins_scale = 12
-            elif max_delta_range > 3:
-                ins_scale = 15
-                ssp_x_delta *= 2
-                ssp_y_delta *= 2
-            elif max_delta_range > 1:
-                ins_scale = 18
-                ssp_x_delta *= 5
-                ssp_y_delta *= 5
-            elif max_delta_range > 0.1:
-                ins_scale = 21
-                ssp_x_delta *= 10
-                ssp_y_delta *= 10
-            else:
-                ins_scale = 24
-                ssp_x_delta *= 40
-                ssp_y_delta *= 40
-
-            # to avoid inset for too large area
-            if ins_scale != 0:
-
-                ax_ins = zoomed_inset_axes(ax, ins_scale, loc=ssp_loc)
-                ax_ins.set_xlim((ssp_x_min - ssp_x_delta), (ssp_x_max + ssp_x_delta))
-                ax_ins.set_ylim((ssp_y_min - ssp_y_delta), (ssp_y_max + ssp_y_delta))
-
-                m = self._inset_draw_map(llcrnrlon=(ssp_x_min - ssp_x_delta), llcrnrlat=(ssp_y_min - ssp_y_delta),
-                                         urcrnrlon=(ssp_x_max + ssp_x_delta), urcrnrlat=(ssp_y_max + ssp_y_delta),
-                                         ax_ins=ax_ins)
-
-                x, y = m(ssp_x, ssp_y)
-                m.scatter(x, y, marker='o', s=16, color='r')
-                m.scatter(x, y, marker='.', s=1, color='k')
-
-                if ssp_x_mean > 0:
-                    mark_inset(ax, ax_ins, loc1=1, loc2=4, fc="none", ec='y')
-                else:
-                    mark_inset(ax, ax_ins, loc1=2, loc2=3, fc="none", ec='y')
-
-                ax_ins.tick_params(color='y', labelcolor='y')
-                for spine in ax_ins.spines.values():
-                    spine.set_edgecolor('y')
-
-            else:
-                x, y = wm(ssp_x, ssp_y)
-                wm.scatter(x, y, marker='o', s=16, color='r')
-                wm.scatter(x, y, marker='.', s=1, color='k')
+            x, y = wm(ssp_x, ssp_y)
+            wm.scatter(x, y, marker='o', s=16, color='r')
+            wm.scatter(x, y, marker='.', s=1, color='k')
 
             if save_fig:
                 plt.savefig(os.path.join(self.plots_folder(output_folder), 'ssp_map.png'),
@@ -163,26 +91,6 @@ class PlotDb:
             #     plt.show()
 
         return True
-
-    @staticmethod
-    def _inset_draw_map(llcrnrlon, llcrnrlat, urcrnrlon, urcrnrlat, ax_ins):
-
-        m = Basemap(llcrnrlon=llcrnrlon, llcrnrlat=llcrnrlat, urcrnrlon=urcrnrlon, urcrnrlat=urcrnrlat,
-                    resolution='l', ax=ax_ins)
-        # resolution c, l, i, h, f in that order
-
-        m.drawmapboundary(fill_color='aqua', zorder=2)
-        m.fillcontinents(color='coral', lake_color='aqua', zorder=1)
-
-        m.drawcoastlines(color='0.6', linewidth=0.5)
-        m.drawcountries(color='0.6', linewidth=0.5)
-
-        par = m.drawparallels(np.arange(-90., 91., 5.), labels=[1, 0, 0, 1], dashes=[1, 1], linewidth=0.4, color='.2')
-        PlotDb._set_inset_color(par, 'y')
-        mer = m.drawmeridians(np.arange(0., 360., 5.), labels=[1, 0, 0, 1], dashes=[1, 1], linewidth=0.4, color='.2')
-        PlotDb._set_inset_color(mer, 'y')
-
-        return m
 
     @staticmethod
     def _world_draw_map():
