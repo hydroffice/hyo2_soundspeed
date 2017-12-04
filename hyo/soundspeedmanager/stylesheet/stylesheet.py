@@ -4,7 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from hyo.qc2.common.helper import Helper
+from hyo.soundspeed.base.helper import is_windows
 
 
 def load(pyside=True):
@@ -13,7 +13,7 @@ def load(pyside=True):
         raise RuntimeError("unsupported")
 
     here = os.path.abspath(os.path.dirname(__file__)).replace("\\", "/")
-    if Helper.is_windows():
+    if is_windows():
         import win32api
         # noinspection PyProtectedMember
         here = win32api.GetLongPathName(here)
