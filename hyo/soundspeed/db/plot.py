@@ -75,7 +75,7 @@ class PlotDb:
                 ssp_label.append(row[0])
 
             # make the world map
-            fig = plt.figure()
+            fig = plt.figure("Profiles Map")
             # plt.title("SSP Map (%s profiles)" % len(view_rows))
             plt.ioff()
 
@@ -168,7 +168,7 @@ class PlotDb:
             raise RuntimeError("Unable to retrieve the day list > Empty database?")
 
         # start a new figure
-        fig = plt.figure()
+        fig = plt.figure("Aggregate Plot")
         plt.title("Aggregate SSP plot [from: %s to: %s]" % (dates[0], dates[1]))
         ax = fig.add_subplot(111)
         ax.invert_yaxis()

@@ -39,19 +39,19 @@ class PlotProfilesDialog(AbstractDialog):
         hbox.addWidget(self.buttonBox)
         hbox.addStretch()
         # - profile map
-        btn = QtGui.QPushButton("Profile map")
+        btn = QtGui.QPushButton("Profiles Map")
         self.buttonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_profile_map)
         btn.setToolTip("Create a map with the profile locations")
         # - aggregate plot
-        btn = QtGui.QPushButton("Aggregate plot")
+        btn = QtGui.QPushButton("Aggregate Plot")
         self.buttonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_aggregate_plot)
         btn.setToolTip("Create a plot showing aggregated profiles")
         # - show per-day
-        btn = QtGui.QPushButton("Show per-day")
+        btn = QtGui.QPushButton("Plot per-day")
         self.buttonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_show_perday)
