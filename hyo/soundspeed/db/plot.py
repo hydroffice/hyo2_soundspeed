@@ -76,6 +76,9 @@ class PlotDb:
 
             # make the world map
             fig = plt.figure("Profiles Map")
+            # fig.patch.set_facecolor('#1464F4')
+            plt.subplot(111, aspect='equal')
+            plt.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
             # plt.title("SSP Map (%s profiles)" % len(view_rows))
             plt.ioff()
 
@@ -96,7 +99,8 @@ class PlotDb:
     def _world_draw_map():
         m = Basemap(resolution=None)
         # resolution c, l, i, h, f in that order
-        m.bluemarble(zorder=0)
+        img = m.bluemarble(zorder=0)
+        img.set_alpha(0.8)
         return m
 
     @staticmethod
