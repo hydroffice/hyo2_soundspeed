@@ -63,6 +63,40 @@ COMPORT_SUBKEY = SEACAT_REGKEY + '\\COMPORTS'
 COMPORT_NAME = 'COMPORT'
 
 
+class SelectCastsDlg(QtGui.QDialog):
+
+    def __init__(self, items, parent=None):
+        super(SelectCastsDlg, self).__init__(parent)
+        self.setWindowTitle("Seacat Download")
+        layout = QtGui.QVBoxLayout()
+
+        label = QtGui.QLabel("Select the casts to download")
+        layout.addWidget(label)
+
+        listWidget = self.listWidget = QtGui.QListWidget(self)
+        for item in items:
+            newItem = QtGui.QListWidgetItem("", listWidget)
+            cb = QtGui.QCheckBox(item)
+            listWidget.setItemWidget(newItem, cb)
+        layout.addWidget(listWidget)
+
+        self.buttonBox = QtGui.QDialogButtonBox(QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+        self.buttonBox.setCenterButtons(True)
+        layout.addWidget(self.buttonBox)
+        self.setLayout(layout)
+
+    def get_selected(self):
+        checked_items = []
+        for index in range(self.listWidget.count()):
+            w = self.listWidget.itemWidget(self.listWidget.item(index))
+            if w.isChecked():
+                checked_items.append(index)
+                # print(index, w.text(), w.isChecked())
+        return checked_items
+
+
 class Seacat(AbstractWidget):
 
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
@@ -110,7 +144,8 @@ class Seacat(AbstractWidget):
         hbox4 = QtGui.QHBoxLayout()
         self.main_layout.addLayout(hbox4)
         hbox4.addStretch()  # spacer on left
-        add_btn("Download All Casts", self.on_download_all, "Retrieve and convert all casts in memory", hbox4)
+        add_btn("Download All", self.on_download_all, "Retrieve and convert all casts in memory", hbox4)
+        add_btn("Download Selected", self.on_download_selected, "Retrieve and convert selected casts in memory", hbox4)
         add_btn("Download Last Cast", self.on_download_last, "Retrieve and convert last cast in memory", hbox4)
 
         hbox4.addStretch()  # spacer on right
@@ -162,6 +197,7 @@ class Seacat(AbstractWidget):
         logger.debug('downloading last ...')
         output_path = self.lib.cb.ask_directory(key_name="Seacat/DownloadHex",
                                                 title="Choose Directory to Store Seacat Files in")
+
         if output_path:
             with AutoSeacat(progbar=self.progress) as cat:  # with auto-closes port even if an exception is thrown
                 if cat.isOpen():
@@ -175,8 +211,28 @@ class Seacat(AbstractWidget):
                             if selected:
                                 download_list = [headers[v][0] for v in selected]
                             else:
-                                raise Exception("Not Implemented, need a multiple item selection")
-                        self.download_from_seacat(cat, download_list, output_path)
+                                cast_descriptions = ["%d: %s" % hd for hd in headers]
+                                dlg = SelectCastsDlg(cast_descriptions)
+                                dlg_return = dlg.exec()
+                                if dlg_return:  # user pressed OK
+                                    download_list = dlg.get_selected()
+                                else:
+                                    download_list = []
+
+                        succeeded, _failed = self.download_from_seacat(cat, download_list, output_path)
+                        for pth in succeeded:
+                            try:
+                                self.lib.import_data(data_path=pth, data_format="seabird")
+                                self.lib.store_data()
+                                try:
+                                    self.lib.cur.remove_pre_water_entry()
+                                    self.lib.cur.statistical_filter()
+                                    self.lib.cur.cosine_smooth()
+                                    self.lib.store_data()
+                                except:
+                                    QMessageBox.information(self, "Error", "Filtering failed on the file below\n  The raw data was loaded instead\n\n{}".format(pth))
+                            except:
+                                QMessageBox.information(self, "Notice", "The file below was downloaded from the Seacat instrument\n  but failed to load in SoundSpeedManager\n\n{}".format(pth))
                     else:
                         # noinspection PyCallByClass
                         QMessageBox.information(self, "Notice", "No casts in the device")

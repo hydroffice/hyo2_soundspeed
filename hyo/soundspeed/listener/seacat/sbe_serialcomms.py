@@ -1,5 +1,4 @@
 import os
-import sys
 import traceback
 import re
 import time
@@ -193,7 +192,7 @@ class SeacatComms:
     def get_response(self, maxwait, quiet=False):
         response = ''
         bFinished = False
-        # tic = time.time()
+
         wait_time = 0.0
         while not bFinished and wait_time < maxwait:  # more data to read
             r = self.comlink.read(1000)
@@ -456,7 +455,7 @@ class SBE19Comm(SeacatComms):
         m = re.search(r'SEACAT\sPROFILER\s*V(\d)(\.(\d))?', status)
         if m:
             self.firmware_major = int(m.group(1))
-            self.firmware_minor = int(m.group(3) if m.group(3) != None else 0)
+            self.firmware_minor = int(m.group(3) if m.group(3) is not None else 0)
 
     def get_num_casts_in_device(self):
         status = self.get_status()
@@ -564,7 +563,7 @@ class SBE19Comm(SeacatComms):
         if castnumber > n:
             raise ValueError("castnumber %d is higher than the number of casts in the Seabird device %d" % (castnumber, n))
         header = self.get_headers()[castnumber]
-        cur_yr, cur_mon, cur_day = time.gmtime()[:3]
+        cur_yr, cur_mon, _cur_day = time.gmtime()[:3]
         m = sbe_constants.SEACAT_SBE19_HEX_MONTHDAYRE.search(header)
         mon, day = int(m.group('month')), int(m.group('day'))
         m = sbe_constants.SEACAT_SBE19_HEX_TIMERE.search(header)
@@ -640,8 +639,8 @@ class SBE19PlusComm(SeacatComms):
         return dt
 
     def set_datetime(self, dt):
-        r = self.send_command('MMDDYY=' + dt.strftime('%m%d%y'))  # '031010'
-        r = self.send_command('HHMMSS=' + dt.strftime('%H%M%S'))  # '140828'
+        _r = self.send_command('MMDDYY=' + dt.strftime('%m%d%y'))  # '031010'
+        _r = self.send_command('HHMMSS=' + dt.strftime('%H%M%S'))  # '140828'
 
     def get_type_string(self):
         return 'SBE19Plus'
@@ -679,7 +678,7 @@ class SBE19PlusComm(SeacatComms):
 
         orig_baud = self.comlink.baudrate
         self.set_baud(max(self.SUPPORTED_BAUDS))
-        r = self.send_command(self.HEXFORMAT)
+        _r = self.send_command(self.HEXFORMAT)
         ret = SeacatComms.get_casts(self, cast_numbers, progbar, cast_command=self.DISPLAY_CASTS)
         self.set_baud(orig_baud)
         return ret
@@ -733,7 +732,7 @@ class SBE19PlusV2Comm(SBE19PlusComm):
         self.send_command(self.INIT_LOGGING, quiet=True)  # send init logging and get the confirm prompt
         # print('Sending confirmation')
         self.comlink.write('y\r')  # send the yes confirmation
-        r = self.get_response(2.0)
+        _r = self.get_response(2.0)
 
         self.send_command(self.INIT_LOGGING, quiet=True)  # send init logging and get the confirm prompt
         # print('Sending confirmation')

@@ -99,6 +99,8 @@ class Dicts:
         ('user', 2),
         ('thin', 3),
         ('sis', 4),
+        ('filtered', 5),
+        ('smoothed', 6),
 
     ])
 
@@ -113,6 +115,7 @@ class Dicts:
         ('ref_ext', 6),
         ('interp', 7),
         ('sis', 8),
+        ('smoothed', 9),
 
     ])
 
@@ -228,4 +231,3 @@ class Dicts:
 
         ('PLOTTED', 'plotted'),
     ])
-

@@ -224,6 +224,9 @@ class Editor(AbstractWidget):
 
     def on_data_filter(self):
         logger.debug('user wants to filter data')
+        self.lib.cur.remove_pre_water_entry()
+        self.lib.cur.statistical_filter()
+        self.lib.cur.cosine_smooth()
 
         self.main_win.switch_to_editor_tab()
 
