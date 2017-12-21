@@ -20,10 +20,10 @@ class Profile:
 
     def __init__(self):
         self.meta = Metadata()  # metadata
-        self.data = Samples()   # raw data
-        self.proc = Samples()   # processed data
-        self.sis = Samples()    # sis data
-        self.more = More()      # additional fields
+        self.data = Samples()  # raw data
+        self.proc = Samples()  # processed data
+        self.sis = Samples()  # sis data
+        self.more = More()  # additional fields
 
         self.woa09 = None
         self.woa13 = None
@@ -122,61 +122,66 @@ class Profile:
         return np.equal(self.proc.flag, Dicts.flags['direction'])  # numpy 1.10.4 if a warning
 
     def _get_salinity_threshold(self):
-        '''
-         Subprogram to determine salinity threshold and maximum pressure
-         and salinity from the Sea-Bird converted data file.
+        """
+        Subprogram to determine salinity threshold and maximum pressure
+        and salinity from the Sea-Bird converted data file.
 
-         We should be able to just read data and take min/max really.
-         Change from reading header by assumed column number and start reading
-         the data fields so we can support all formats of CNV data
-         (derived nitrogen can be included for example)
-        '''
-        smin = self.proc.sal[self.proc_valid].min()
-        smax = self.proc.sal[self.proc_valid].max()
+        We should be able to just read data and take min/max really.
+        Change from reading header by assumed column number and start reading
+        the data fields so we can support all formats of CNV data
+        (derived nitrogen can be included for example)
+        """
+        sal_min = self.proc.sal[self.proc_valid].min()
+        sal_max = self.proc.sal[self.proc_valid].max()
 
         # Threshold salinity to help determine where instrument entered water.
-        sthresh = smin + 0.1 * (smax - smin)  # '10% between extremes
-        if sthresh < 0.03:
-            sthresh = 0.03
-        elif sthresh > 3:
-            sthresh = 3.0
-        return sthresh
+        sal_thresh = sal_min + 0.1 * (sal_max - sal_min)  # '10% between extremes
+        if sal_thresh < 0.03:
+            sal_thresh = 0.03
+        elif sal_thresh > 3:
+            sal_thresh = 3.0
+        return sal_thresh
 
-    def _get_pressure_offset(self, sal_thresh):  # Z0 As Single, FtoRead As Integer)
-        ''' Compute the pressure offset.
-            Method: Use the salinity threshold to determine where instrument first
-            entered water.
+    def _get_pressure_offset(self, sal_thresh):
+        """
+        Compute the pressure offset.
+        Method: Use the salinity threshold to determine where instrument first
+        entered water.
 
-           Input variable: sal_thresh   Salinity threshold
-           Returns pressure offset Z0 and index where water entry happened 
-        '''
+        Input variable: sal_thresh   Salinity threshold
+        Returns pressure offset Z0 and index where water entry happened
+        """
         try:
-            iwater = np.argwhere(np.logical_and(self.proc.sal >= sal_thresh, self.proc_valid))[0][0]  # ' Data record # of first point in water
-            if iwater == 0:
-                Z0 = 0  # ' In water at first data record   No points on deck
+            i_water = np.argwhere(np.logical_and(self.proc.sal >= sal_thresh, self.proc_valid))[0][
+                0]  # ' Data record # of first point in water
+            if i_water == 0:
+                z0 = 0  # ' In water at first data record   No points on deck
             else:
-                Z0 = np.average(self.proc.pressure[:iwater])
+                z0 = np.average(self.proc.pressure[:i_water])
         except IndexError:  # never passed threshold
-            Z0 = 0
-            iwater = len(self.proc.pressure) + 1
-        return Z0, iwater
+            z0 = 0
+            i_water = len(self.proc.pressure) + 1
+        return z0, i_water
 
     def remove_pre_water_entry(self):
-        ''' Reads and does QC on Seacat data in preparation for output to a standard "B" file (unedited Velocwin SV vs Depth file)
-        ' Catcre Version 6.0
+        """
+        Reads and does QC on Seacat data in preparation for output to a standard "B" file (unedited Velocwin SV vs
+        Depth file)
+        Catcre Version 6.0
 
-        ' Create a sound velocity profile from a converted Sea-Bird CNV data file
+        Create a sound velocity profile from a converted Sea-Bird CNV data file
 
-        ' Pressure in decibars
-        ' Temperature in degrees C
-        ' Salinity in PSU
-        ' Sigma-theta = (density-1)*1000
-        ' Sound Velocity in m/sec
+        Pressure in decibars
+        Temperature in degrees C
+        Salinity in PSU
+        Sigma-theta = (density-1)*1000
+        Sound Velocity in m/sec
 
-        '''
+        """
         # Get salinity threshold, max RAW pressure from CNV file
-        sthresh = self._get_salinity_threshold()
-        Z0, air_water_index = self._get_pressure_offset(sthresh)  # Using the salinity threshold, compute pressure offset.
+        sal_thresh = self._get_salinity_threshold()
+        # Using the salinity threshold, compute pressure offset.
+        z0, air_water_index = self._get_pressure_offset(sal_thresh)
         # if the data structure was one array we'd use a split here self.proc[air_water_index:]
         in_air_condition = np.arange(0, self.proc.num_samples) <= air_water_index
         # self.proc.compress(in_water_condition)
@@ -191,7 +196,7 @@ class Profile:
         # self.proc.compress(self.proc.sal > salinity_thresh2)
         np.putmask(self.proc.flag, self.proc.sal <= salinity_thresh2, Dicts.flags['filtered'])
 
-        # self.proc.pressure -= Z0  # Corrected pressure
+        # self.proc.pressure -= z0  # Corrected pressure
 
         # Ignore data in air (corrected pressure<0)
         # self.proc.compress(self.proc.pressure > -0.001)
@@ -226,9 +231,9 @@ class Profile:
             v_sum_sq = 0
             for k in range(-2, 3):
                 if k != 0:
-                    vdiff = sv[i + k] - v_zero  # Use computing origin to avoid
-                    v_sum = v_sum + vdiff  # very large quantities
-                    v_sum_sq = v_sum_sq + vdiff * vdiff
+                    v_diff = sv[i + k] - v_zero  # Use computing origin to avoid
+                    v_sum = v_sum + v_diff  # very large quantities
+                    v_sum_sq = v_sum_sq + v_diff * v_diff
 
             variance = (v_sum_sq - v_sum * v_sum / 4) / 3
             v_mean[i] = v_sum / 4 + v_zero  # Add back computing origin
@@ -254,9 +259,9 @@ class Profile:
             i = iend[k]  # Point number
             for j in range(3):
                 ind_kj = index[k][j]
-                vdiff = sv[ind_kj] - v_zero
-                v_sum = v_sum + vdiff
-                v_sum_sq = v_sum_sq + vdiff * vdiff
+                v_diff = sv[ind_kj] - v_zero
+                v_sum = v_sum + v_diff
+                v_sum_sq = v_sum_sq + v_diff * v_diff
 
             variance = (v_sum_sq - v_sum * v_sum / 3) / 2
             v_mean[i] = v_sum / 3 + v_zero
@@ -265,7 +270,7 @@ class Profile:
             sigma[i] = np.sqrt(variance)
             if sigma[i] < sigmin:
                 sigma[i] = sigmin
-            sigma[i] = sigma[i] * c_end  # ' Relax tolerance for endpts
+            sigma[i] = sigma[i] * c_end  # ' Relax tolerance for end pts
 
         factor = c_depth
         for i in range(n_pts):
@@ -275,10 +280,13 @@ class Profile:
             if np.absolute(sv[i] - v_mean[i]) > DV:
                 self.proc.flag[i] = Dicts.flags['filtered']  # So-called bad point
 
-    def cosine_avg(self, domain, binsize, binwidth, ww_min, ww_mul=.0025):
-        '''Cosine averaging used in VelocWin in multiple places.
-        In velocwin it was used on pressure vs density/velocity/pressure (creates and avg pressure value with the avg density/velocity)
-        This was only used on pressure and values greater than zero, but am generalizing it to be +/- in case we want it.
+    def cosine_avg(self, domain, bin_size, bin_width, ww_min, ww_mul=.0025):
+        """
+        Cosine averaging used in VelocWin in multiple places.
+        In velocwin it was used on pressure vs density/velocity/pressure (creates and avg pressure value with
+        the avg density/velocity)
+        This was only used on pressure and values greater than zero, but am generalizing it to be +/-
+        in case we want it.
 
         domain is the X variable, presumably pressure.
         binsize is the size of bins -- units are related to first name/column in records (records[names[0]])
@@ -290,7 +298,7 @@ class Profile:
         CosineAvg(scipy.array([[1,2,3,4,5],[1,2,4,8,16]]), [0,1], 0.1, 5, 0.3, .025) #SMLGauge
 
         For smoothing a time based signal (or evenly sampled) see the scipy cookbook for smoothing.
-        '''
+        """
         # for the existing data types (not including source and type) do a cosine average
         samples_names = ["pressure", "depth", "speed", "temp", "conductivity", "sal"]
         names = [name for name in samples_names if getattr(self.proc, name) is not None]  # , "source", "flag"
@@ -302,23 +310,25 @@ class Profile:
         window_width = np.maximum(np.absolute(z * ww_mul), ww_min)  # The window widths per z (pressure) value
         maxZ, minZ = z.max(), z.min()
         # store the bin value in the zeroth (storage[0]) column and weights in the last column (storage[-1])
-        storage = np.zeros([len(names) + 2, int(2 * (binwidth + 1) + (maxZ - minZ) / binsize)])  # layout storage for summing each bin with extra on either side (remove the extra at the end)
+        # layout storage for summing each bin with extra on either side (remove the extra at the end)
+        storage = np.zeros([len(names) + 2, int(2 * (bin_width + 1) + (maxZ - minZ) / bin_size)])
         # the extra space keeps exceptions from coming up based on array lengths.
 
         for i in np.arange(len(storage[0])):
-            storage[0][i] = (i - binwidth) * binsize + minZ
+            storage[0][i] = (i - bin_width) * bin_size + minZ
         # init_weight = 2.69*np.arange(-binwidth, binwidth+1)
         for i, zv in enumerate(z):
             if self.proc.flag[i] == Dicts.flags['valid']:
-                center_bin = int((zv - minZ) / binsize + .5) + binwidth
-                zdiff = zv - storage[0][center_bin - binwidth:center_bin + binwidth + 1]
-                binweights = 1.0 + np.cos(2.69 * zdiff / window_width[i])  # ' Insure that weight will be .1 at a window width from point I
-                binweights *= np.absolute(zdiff) < window_width[i]
+                center_bin = int((zv - minZ) / bin_size + .5) + bin_width
+                z_diff = zv - storage[0][center_bin - bin_width:center_bin + bin_width + 1]
+                bin_weights = 1.0 + np.cos(
+                    2.69 * z_diff / window_width[i])  # ' Insure that weight will be .1 at a window width from point I
+                bin_weights *= np.absolute(z_diff) < window_width[i]
                 for c, name in enumerate(names):
-                    storage[c + 1][center_bin - binwidth:center_bin + binwidth + 1] += records[name][i] * binweights
-                storage[-1][center_bin - binwidth:center_bin + binwidth + 1] += binweights
+                    storage[c + 1][center_bin - bin_width:center_bin + bin_width + 1] += records[name][i] * bin_weights
+                storage[-1][center_bin - bin_width:center_bin + bin_width + 1] += bin_weights
 
-        storage = storage[:, binwidth: -(binwidth + 1)]  # slice off the end stuff for the binwidths
+        storage = storage[:, bin_width: -(bin_width + 1)]  # slice off the end stuff for the bin widths
         storage = np.compress(storage[-1] > 0.1, storage, axis=1)  # remove bins that didn't have enough weighting.
         for i in range(len(names)):
             storage[i + 1] /= storage[-1]
@@ -332,7 +342,7 @@ class Profile:
         np.putmask(self.proc.flag, self.proc.flag == Dicts.flags['valid'], Dicts.flags['smoothed'])
         for row in storage.T:
             try:
-                i = np.argwhere(getattr(self.proc, domain) > row[0])[0][0]  # integer index of where the storage record falls
+                i = np.argwhere(getattr(self.proc, domain) > row[0])[0][0]  # index of where the storage record falls
             except IndexError:
                 i = len(getattr(self.proc, domain))
             for c, name in enumerate(names):
@@ -348,13 +358,11 @@ class Profile:
         # self.proc.source = np.zeros(self.proc.num_samples) + Dicts.sources['smoothed']
 
     def cosine_smooth(self):
-        """
-        ' Cosine-averaging scheme suggested by Dr. Lloyd Huff
-        """
-        binsize, binwidth = 1.0, 4
-        WWmin, WWMul = 1.7, .0025
+        """Cosine-averaging scheme suggested by Dr. Lloyd Huff"""
+        bin_size, bin_width = 1.0, 4
+        ww_min, ww_mul = 1.7, .0025
 
-        self.cosine_avg('pressure', binsize, binwidth, WWmin, WWMul)
+        self.cosine_avg('pressure', bin_size, bin_width, ww_min, ww_mul)
 
     def reduce_up_down(self, ssp_direction, use_pressure=False):
         """Reduce the raw data samples based on the passed direction"""
@@ -421,8 +429,10 @@ class Profile:
 
         self.data.sal = np.zeros_like(self.data.conductivity)
         # convert from S/m to mmho/cm
-        # self.data.sal[self.data_valid] = Oc.c2s(self.data.conductivity[self.data_valid] * 10.0, pressure[self.data_valid], self.data.temp[self.data_valid])
-        self.data.sal = Oc.c2s(self.data.conductivity * 10.0, pressure, self.data.temp)  # FIXME -- what is the standard conductivity unit?  S/m or mmho/cm  (mS/cm)
+        # self.data.sal[self.data_valid] = Oc.c2s(self.data.conductivity[self.data_valid] * 10.0,
+        #                                  pressure[self.data_valid], self.data.temp[self.data_valid])
+        self.data.sal = Oc.c2s(self.data.conductivity * 10.0, pressure,
+                               self.data.temp)  # FIXME - what is the standard conductivity unit? S/m or mmho/cm (mS/cm)
         self.modify_proc_info(Dicts.proc_import_infos['CALC_SAL'])
 
     def calc_salinity(self):
@@ -637,7 +647,7 @@ class Profile:
                     m_ids = [v_i, v_i + 1]
                 else:
                     m_ids = [v_i - 1, v_i]
-                # print('in the middle')
+                    # print('in the middle')
 
             di = np.array([self.proc.depth[valid][m_ids[0]], self.proc.depth[valid][m_ids[1]]])
             a = np.array([[di[0], 1.], [di[1], 1.]])
@@ -732,7 +742,7 @@ class Profile:
                     m_ids = [v_i, v_i + 1]
                 else:
                     m_ids = [v_i - 1, v_i]
-                # print('in the middle')
+                    # print('in the middle')
 
             di = np.array([self.sis.depth[valid][m_ids[0]], self.sis.depth[valid][m_ids[1]]])
             a = np.array([[di[0], 1.], [di[1], 1.]])
@@ -833,7 +843,7 @@ class Profile:
                     m_ids = [v_i, v_i + 1]
                 else:
                     m_ids = [v_i - 1, v_i]
-                # print('in the middle')
+                    # print('in the middle')
 
             di = np.array([self.proc.depth[valid][m_ids[0]], self.proc.depth[valid][m_ids[1]]])
             a = np.array([[di[0], 1.], [di[1], 1.]])
@@ -888,7 +898,7 @@ class Profile:
             if ind2 <= 0:
                 logger.info("nothing to extend with")
                 return True
-            # logger.debug("ext.max depth: [%s]" % ind2)
+                # logger.debug("ext.max depth: [%s]" % ind2)
         except IndexError as e:
             logger.warning("too short to extend with: %s" % e)
             return True
@@ -1041,7 +1051,6 @@ class Profile:
 
         # - 1000 points for: EM2040, EM710, EM302 and EM122;
         # - 570 points for: EM3000, EM3002, EM1002, EM300, EM120
-        # TODO: the resulting profile must be less than 30kB
         flagged = self.sis.flag[self.sis_valid][:]
         idx_start = 0
         idx_end = self.sis.depth[self.sis_valid].size - 1
