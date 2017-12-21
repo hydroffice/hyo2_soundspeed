@@ -106,7 +106,7 @@ class MainWin(QtGui.QMainWindow):
 
         self.menu = self.menuBar()
         self.file_menu = self.menu.addMenu("&File")
-        self.edit_menu = self.menu.addMenu("&Edit")
+        self.edit_menu = self.menu.addMenu("&Process")
         self.database_menu = self.menu.addMenu("&Database")
         self.monitor_menu = self.menu.addMenu("&Monitor")
         self.server_menu = self.menu.addMenu("&Server")

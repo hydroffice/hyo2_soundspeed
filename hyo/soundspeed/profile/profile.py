@@ -97,6 +97,11 @@ class Profile:
         return np.equal(self.proc.flag, Dicts.flags['valid'])
 
     @property
+    def nr_valid_proc_samples(self):
+        """Return the number of valid proc samples"""
+        return len(self.proc.depth[self.proc_valid])
+
+    @property
     def proc_dqa_valid(self):
         """Return indices of DQA valid proc samples"""
         return np.logical_and(self.proc_valid, np.equal(self.proc.source, Dicts.sources['raw']))
@@ -332,7 +337,7 @@ class Profile:
                 i = len(getattr(self.proc, domain))
             for c, name in enumerate(names):
                 setattr(self.proc, name, np.insert(getattr(self.proc, name), i, row[c + 1]))
-            self.proc.source = np.insert(self.proc.source, i, Dicts.sources['smoothed'])
+            self.proc.source = np.insert(self.proc.source, i, Dicts.sources['smoothing'])
             self.proc.flag = np.insert(self.proc.flag, i, Dicts.flags['valid'])
         self.proc.num_samples = len(self.proc.source)
 

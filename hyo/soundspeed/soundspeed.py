@@ -756,7 +756,7 @@ class SoundSpeedLibrary:
 
         in_db = ProjectDb(projects_folder=in_projects_folder, project_name=in_project_name)
 
-        if in_db.get_db_version() > 1:
+        if in_db.get_db_version() > 2:
             raise RuntimeError("unsupported db version: %s" % in_db.get_db_version())
         logger.debug('input project db version: %s' % in_db.get_db_version())
 
@@ -1028,6 +1028,27 @@ class SoundSpeedLibrary:
                                                  ogr_format=ogr_format)
         db.disconnect()
         return lst
+
+    # --- filter
+
+    def filter_cur_data(self):
+        """Filter/smooth the current profile"""
+        if not self.has_ssp():
+            logger.warning("no profile!")
+            return False
+
+        logger.debug("initial valid samples: %s" % self.cur.nr_valid_proc_samples)
+
+        self.cur.remove_pre_water_entry()
+        logger.debug("post-pre-water-removal valid samples: %s" % self.cur.nr_valid_proc_samples)
+
+        self.cur.statistical_filter()
+        logger.debug("post-filter valid samples: %s" % self.cur.nr_valid_proc_samples)
+
+        self.cur.cosine_smooth()
+        logger.debug("post-smooth valid samples: %s" % self.cur.nr_valid_proc_samples)
+
+        return True
 
     # --- replace
 

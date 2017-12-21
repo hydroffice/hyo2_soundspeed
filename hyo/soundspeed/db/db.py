@@ -146,7 +146,7 @@ class ProjectDb:
                     # noinspection SqlResolve
                     self.conn.execute("""
                                       INSERT INTO library VALUES (?, ?, ?)
-                                      """, (1, "%s v.%s" % (name, version), datetime.datetime.utcnow(),))
+                                      """, (2, "%s v.%s" % (name, version), datetime.datetime.utcnow(),))
 
                 self.conn.execute("""
                                   CREATE TABLE IF NOT EXISTS ssp_pk(
@@ -334,7 +334,7 @@ class ProjectDb:
             return ret[0]
 
         except sqlite3.Error as e:
-            logger.error("whilte getting db version, %s: %s" % (type(e), e))
+            logger.error("while getting db version, %s: %s" % (type(e), e))
             return None
 
     def _get_ssp_pk(self):

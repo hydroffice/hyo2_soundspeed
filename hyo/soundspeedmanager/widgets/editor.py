@@ -82,7 +82,7 @@ class Editor(AbstractWidget):
 
         # filter
         self.filter_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'filter.png')),
-                                        'Apply Data Filter', self)
+                                        'Filter/Smooth Data', self)
         self.filter_act.setShortcut('Alt+F')
         # noinspection PyUnresolvedReferences
         self.filter_act.triggered.connect(self.on_data_filter)
@@ -223,12 +223,21 @@ class Editor(AbstractWidget):
         self.main_win.data_imported()
 
     def on_data_filter(self):
-        logger.debug('user wants to filter data')
-        self.lib.cur.remove_pre_water_entry()
-        self.lib.cur.statistical_filter()
-        self.lib.cur.cosine_smooth()
+        logger.debug('user wants to filter/smooth data')
 
         self.main_win.switch_to_editor_tab()
+
+        if not self.lib.filter_cur_data():
+
+            msg = "Issue in filtering/smoothing the profile"
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.warning(self, "Filter/Smooth", msg, QtGui.QMessageBox.Ok)
+            return
+
+        self.dataplots.update_data()
+        self.dataplots.update_speed_limits()
+        self.dataplots.update_temp_limits()
+        self.dataplots.update_sal_limits()
 
     def on_retrieve_sal(self):
         logger.debug('user wants to retrieve salinity')
