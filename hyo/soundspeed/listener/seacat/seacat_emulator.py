@@ -1,5 +1,3 @@
-from __future__ import print_function, with_statement
-
 import serial
 import time
 import traceback
@@ -7,28 +5,25 @@ import traceback
 try:
     from hyo36.soundspeed.listener.seacat.sbe_serialcomms import SeacatComms, UTF8Serial
 except:
-    try:
-        from HSTB.soundspeed import SeacatComms, UTF8Serial
-    except:
-        print("Seacat serial communications module not found or failed to load")
-        print("Emulator will still work but the capture function will raise an exception")
+    print("Seacat serial communications module not found or failed to load")
+    print("Emulator will still work but the capture function will raise an exception")
 
-        class UTF8Serial(serial.Serial):
-            def write(self, data):
-                serial.Serial.write(self, data.encode('utf-8'))
+    class UTF8Serial(serial.Serial):
+        def write(self, data):
+            serial.Serial.write(self, data.encode('utf-8'))
 
-            def read(self, cnt):
-                data = serial.Serial.read(self, cnt)
-                # print("raw read:", data, self.port, self.baudrate, self.stopbits, self.parity)
-                try:
-                    data = data.decode("utf-8")  # converts from bytes in python 3.x
-                except AttributeError:
-                    pass
-                except UnicodeDecodeError:
-                    data = ""
-                    print("bad message received", data)
-                # print("decoded data", str(data))
-                return str(data)  # converts to ascii for python 2.7, leaves as unicode for 3.x
+        def read(self, cnt):
+            data = serial.Serial.read(self, cnt)
+            # print("raw read:", data, self.port, self.baudrate, self.stopbits, self.parity)
+            try:
+                data = data.decode("utf-8")  # converts from bytes in python 3.x
+            except AttributeError:
+                pass
+            except UnicodeDecodeError:
+                data = ""
+                print("bad message received", data)
+            # print("decoded data", str(data))
+            return str(data)  # converts to ascii for python 2.7, leaves as unicode for 3.x
 
 
 class captureUTF8(UTF8Serial):

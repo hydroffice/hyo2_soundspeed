@@ -165,11 +165,9 @@ class Profile:
 
     def remove_pre_water_entry(self):
         """
-        Reads and does QC on Seacat data in preparation for output to a standard "B" file (unedited Velocwin SV vs
-        Depth file)
-        Catcre Version 6.0
-
-        Create a sound velocity profile from a converted Sea-Bird CNV data file
+        Look for data that is likely out of the water by searching for salinity levels much less than
+        the rest of the data.  Marks data as 'filtered' that falls outside the salinity levels
+        determined from data.  
 
         Pressure in decibars
         Temperature in degrees C
