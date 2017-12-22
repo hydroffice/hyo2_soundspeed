@@ -152,8 +152,8 @@ class Profile:
         Returns pressure offset Z0 and index where water entry happened
         """
         try:
-            i_water = np.argwhere(np.logical_and(self.proc.sal >= sal_thresh, self.proc_valid))[0][
-                0]  # ' Data record # of first point in water
+            # Data record # of first point in water
+            i_water = np.argwhere(np.logical_and(self.proc.sal >= sal_thresh, self.proc_valid))[0][0]
             if i_water == 0:
                 z0 = 0  # ' In water at first data record   No points on deck
             else:
@@ -167,7 +167,7 @@ class Profile:
         """
         Look for data that is likely out of the water by searching for salinity levels much less than
         the rest of the data.  Marks data as 'filtered' that falls outside the salinity levels
-        determined from data.  
+        determined from data.
 
         Pressure in decibars
         Temperature in degrees C
@@ -176,29 +176,33 @@ class Profile:
         Sound Velocity in m/sec
 
         """
-        # Get salinity threshold, max RAW pressure from CNV file
-        sal_thresh = self._get_salinity_threshold()
-        # Using the salinity threshold, compute pressure offset.
-        z0, air_water_index = self._get_pressure_offset(sal_thresh)
-        # if the data structure was one array we'd use a split here self.proc[air_water_index:]
-        in_air_condition = np.arange(0, self.proc.num_samples) <= air_water_index
-        # self.proc.compress(in_water_condition)
-        np.putmask(self.proc.flag, in_air_condition, Dicts.flags['filtered'])
+        if self.proc.sal is not None and self.proc.sal.any():
+            # Get salinity threshold, max RAW pressure from CNV file
+            sal_thresh = self._get_salinity_threshold()
+            # Using the salinity threshold, compute pressure offset.
+            _z0, air_water_index = self._get_pressure_offset(sal_thresh)
+            # if the data structure was one array we'd use a split here self.proc[air_water_index:]
+            in_air_condition = np.arange(0, self.proc.num_samples) < air_water_index
+            # self.proc.compress(in_water_condition)
+            np.putmask(self.proc.flag, in_air_condition, Dicts.flags['filtered'])
 
-        # now done in fix() of the abstract class
-        # self.proc.compress(self.proc.sal <= 40)  # ignore if Salinity out-of-bounds
-        # self.remove_up_or_down_cast()
+            # now done in fix() of the abstract class
+            # self.proc.compress(self.proc.sal <= 40)  # ignore if Salinity out-of-bounds
+            # self.remove_up_or_down_cast()
 
-        # Mod 3/19/96 - use of Sthresh2 to handle case where instrument comes up out of water.
-        salinity_thresh2 = 0.8 * np.compress(self.proc.flag == Dicts.flags['filtered'], self.proc.sal)[0]
-        # self.proc.compress(self.proc.sal > salinity_thresh2)
-        np.putmask(self.proc.flag, self.proc.sal <= salinity_thresh2, Dicts.flags['filtered'])
+            # Mod 3/19/96 - use of Sthresh2 to handle case where instrument comes up out of water.
+            try:
+                salinity_thresh2 = 0.8 * np.compress(self.proc.flag == Dicts.flags['filtered'], self.proc.sal)[0]
+                # self.proc.compress(self.proc.sal > salinity_thresh2)
+                np.putmask(self.proc.flag, self.proc.sal <= salinity_thresh2, Dicts.flags['filtered'])
+            except IndexError:
+                pass  # no filtered data points
 
-        # self.proc.pressure -= z0  # Corrected pressure
+            # self.proc.pressure -= z0  # Corrected pressure
 
-        # Ignore data in air (corrected pressure<0)
-        # self.proc.compress(self.proc.pressure > -0.001)
-        np.putmask(self.proc.flag, self.proc.pressure <= -0.001, Dicts.flags['filtered'])
+            # Ignore data in air (corrected pressure<0)
+            # self.proc.compress(self.proc.pressure > -0.001)
+            np.putmask(self.proc.flag, self.proc.pressure <= -0.001, Dicts.flags['filtered'])
 
     def statistical_filter(self):
         # Literal conversion from EditSV in VelocWin
@@ -330,7 +334,7 @@ class Profile:
         storage = np.compress(storage[-1] > 0.1, storage, axis=1)  # remove bins that didn't have enough weighting.
         for i in range(len(names)):
             storage[i + 1] /= storage[-1]
-        delta_depth = np.hstack(([1], np.diff(storage[1])))  # add a true value for the first difference that
+        delta_depth = np.hstack(([1], np.diff(storage[0])))  # add a true value for the first difference that
         storage = np.compress(delta_depth >= .00001, storage, axis=1)  # make sure duplicate pressures not written
 
         # TODO Question - if a depth already exists should we replace it or have two points at same depth
@@ -359,8 +363,11 @@ class Profile:
         """Cosine-averaging scheme suggested by Dr. Lloyd Huff"""
         bin_size, bin_width = 1.0, 4
         ww_min, ww_mul = 1.7, .0025
-
-        self.cosine_avg('pressure', bin_size, bin_width, ww_min, ww_mul)
+        if self.proc.pressure is not None and self.proc.pressure.any():
+            domain = "pressure"
+        else:
+            domain = "depth"
+        self.cosine_avg(domain, bin_size, bin_width, ww_min, ww_mul)
 
     def reduce_up_down(self, ssp_direction, use_pressure=False):
         """Reduce the raw data samples based on the passed direction"""
