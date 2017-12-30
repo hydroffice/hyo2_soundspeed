@@ -1,4 +1,3 @@
-# logging settings
 import logging
 import os
 from multiprocessing import Pipe
