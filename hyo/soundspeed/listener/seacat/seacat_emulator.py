@@ -3,17 +3,19 @@ import time
 import traceback
 
 try:
-    from hyo36.soundspeed.listener.seacat.sbe_serialcomms import SeacatComms, UTF8Serial
-except:
+    from hyo.soundspeed.listener.seacat.sbe_serialcomms import SeacatComms, UTF8Serial
+
+except Exception:
     print("Seacat serial communications module not found or failed to load")
     print("Emulator will still work but the capture function will raise an exception")
+
 
     class UTF8Serial(serial.Serial):
         def write(self, data):
             serial.Serial.write(self, data.encode('utf-8'))
 
-        def read(self, cnt):
-            data = serial.Serial.read(self, cnt)
+        def read(self, size=1):
+            data = serial.Serial.read(self, size)
             # print("raw read:", data, self.port, self.baudrate, self.stopbits, self.parity)
             try:
                 data = data.decode("utf-8")  # converts from bytes in python 3.x
@@ -26,32 +28,35 @@ except:
             return str(data)  # converts to ascii for python 2.7, leaves as unicode for 3.x
 
 
-class captureUTF8(UTF8Serial):
-    def __init__(self, fname, *args, **args2):
-        UTF8Serial.__init__(self, *args, **args2)
-        self.outfile = open(fname, "wb+")
+class UTF8Capture(UTF8Serial):
+    def __init__(self, filename, *args, **args2):
+        super().__init__(*args, **args2)
+        self.outfile = open(filename, "wb+")
 
     def write(self, data):
-        self.outfile.write("<write>")
+        self.outfile.write(b"<write>")
         self.outfile.write(data)
-        self.outfile.write("</write>\r\n")
+        self.outfile.write(b"</write>\r\n")
         UTF8Serial.write(self, data)
 
-    def read(self, cnt):
-        data = UTF8Serial.read(self, cnt)
-        self.outfile.write("<read>")
+    def read(self, size=1):
+        data = UTF8Serial.read(self, size)
+        self.outfile.write(b"<read>")
         self.outfile.write(data)
-        self.outfile.write("</read>\r\n")
+        self.outfile.write(b"</read>\r\n")
 
 
-def respond(maxt=5.0, sleeptime=.04, port='COM1', baud=9600, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE, timeout=.1):
-    '''listen to a COM port and respond like a Seacat for a certain amount of time'''
-    comlink = UTF8Serial(port, baud, bytesize=bytesize, parity=parity, stopbits=stopbits, timeout=timeout)
+def respond(max_time=5.0, sleep_time=.04, port='COM1', baud=9600, byte_size=serial.EIGHTBITS, parity=serial.PARITY_NONE,
+            stop_bits=serial.STOPBITS_ONE, timeout=.1):
+    """listen to a COM port and respond like a SeaCat for a certain amount of time"""
+    com_link = UTF8Serial(port, baud, bytesize=byte_size, parity=parity, stopbits=stop_bits, timeout=timeout)
+
+    print("start responding to %s for %.1f sec" % (port, max_time))
     try:
         t = time.time()
-        while time.time() - t < maxt:
-            d = comlink.read(1000)
+        while time.time() - t < max_time:
+
+            d = com_link.read(1000)
             if str(d):
                 # print type(d), d
                 try:
@@ -59,45 +64,62 @@ def respond(maxt=5.0, sleeptime=.04, port='COM1', baud=9600, bytesize=serial.EIG
                     print("str:", repr(d))
                 except:
                     print("failed decode")
+
             if "DS" in d:
                 print("writing status")
-                comlink.write("SeacatPlus V 1.6b  SERIAL NO. 4677    05 Mar 2010  16:01:56\r\nvbatt = 13.4, vlith =  8.2, ioper =  60.7 ma, ipump =  45.4 ma, \r\nstatus = not logging\r\nnumber of scans to average = 1\r\nsamples = 1374, free = 761226, casts = 2\r\nmode = profile, minimum cond freq = 3258, pump delay = 40 sec\r\nautorun = no, ignore magnetic switch = no\r\nbattery type = alkaline, battery cutoff =  7.3 volts\r\npressure sensor = strain gauge, range = 508.0\r\nSBE 38 = no, Gas Tension Device = no\r\nExt Volt 0 = no, Ext Volt 1 = no, Ext Volt 2 = no, Ext Volt 3 = no\r\necho commands = yes\r\noutput format = raw HEX\r\nS>")
+                com_link.write(
+                    "SeacatPlus V 1.6b  SERIAL NO. 4677    05 Mar 2010  16:01:56\r\nvbatt = 13.4, vlith =  8.2, "
+                    "ioper =  60.7 ma, ipump =  45.4 ma, \r\nstatus = not logging\r\nnumber of scans to average = 1\r\n"
+                    "samples = 1374, free = 761226, casts = 2\r\nmode = profile, minimum cond freq = 3258, "
+                    "pump delay = 40 sec\r\nautorun = no, ignore magnetic switch = no\r\nbattery type = alkaline, "
+                    "battery cutoff =  7.3 volts\r\npressure sensor = strain gauge, range = 508.0\r\nSBE 38 = no, "
+                    "Gas Tension Device = no\r\nExt Volt 0 = no, Ext Volt 1 = no, Ext Volt 2 = no, Ext Volt 3 = no\r\n"
+                    "echo commands = yes\r\noutput format = raw HEX\r\nS>")
+
             elif "SB" in d or "Baud=" in d:
                 if "SB" in d:
                     if d[2] == "1":
-                        newbaud = 600
+                        new_baud = 600
                     elif d[2] == "2":
-                        newbaud = 1200
+                        new_baud = 1200
                     elif d[3] == "3":
-                        newbaud = 9600
+                        new_baud = 9600
                     else:
                         print("unrecognized baud rate -- ignoring ", d)
                         continue
                 else:
-                    newbaud = int(d[5:10])
-                comlink.close()
-                comlink = UTF8Serial(port, newbaud, bytesize=bytesize, parity=parity, stopbits=stopbits, timeout=timeout)
+                    new_baud = int(d[5:10])
+                com_link.close()
+                com_link = UTF8Serial(port, new_baud, bytesize=byte_size, parity=parity, stopbits=stop_bits,
+                                      timeout=timeout)
+
             elif "DH" in d:
-                comlink.write("Headers!!!\r\nS>")
+                com_link.write("Headers!!!\r\nS>")
+
             elif "\r" in d:
                 print("writing prompt")
-                comlink.write("S>\r\n")
+                com_link.write("S>\r\n")
+
             else:
-                time.sleep(sleeptime)
-    except:
+                time.sleep(sleep_time)
+
+    except Exception:
         traceback.print_exc()
+
     finally:
-        comlink.close()
+        com_link.close()
+        print("end responding to %s" % port)
 
 
-def rawcapture(fname, port='COM1', baud=9600, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE):
-    sbe = SeacatComms.open_seacat(port, baud, bytesize, parity)
+def raw_capture(filename, port='COM1', baud=9600, byte_size=serial.EIGHTBITS, parity=serial.PARITY_NONE):
+    sbe = SeacatComms.open_seacat(port, baud, byte_size, parity)
     sbe.comlink.close()
-    # replace the serial comms with one that will push the data to a file
-    sbe.comlink = captureUTF8(fname, sbe.comlink.port, sbe.comlink.baudrate, bytesize=sbe.comlink.bytesize,
+    # replace the serial COMs with one that will push the data to a file
+    sbe.comlink = UTF8Capture(filename, sbe.comlink.port, sbe.comlink.baudrate, bytesize=sbe.comlink.bytesize,
                               parity=sbe.comlink.parity, stopbits=sbe.comlink.stopbits, timeout=sbe.comlink.timeout)
     try:
         sbe.wake()
+
     except AttributeError:  # HSTB version
         sbe.Wake()
         sbe.GetStatus()
@@ -107,6 +129,7 @@ def rawcapture(fname, port='COM1', baud=9600, bytesize=serial.EIGHTBITS, parity=
         sbe.GetScans()
         sbe.GetCasts()
         sbe.GetCalibration()
+
     else:  # hydroffice version
         sbe.get_status()
         sbe.get_datetime()
@@ -115,9 +138,3 @@ def rawcapture(fname, port='COM1', baud=9600, bytesize=serial.EIGHTBITS, parity=
         sbe.get_scans()
         sbe.get_casts()
         sbe.get_calibration()
-
-
-if __name__ == "__main__":
-    from os import path
-    p = path.join(path.split(path.abspath(__file__))[0], "seacat_capture.txt")
-    rawcapture(p)

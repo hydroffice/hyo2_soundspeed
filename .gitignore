@@ -59,3 +59,4 @@ tests/soundspeed/atlas/outputs
 tests/soundspeed/atlas/projects
 tests/soundspeed/atlas/releases
 tests/rtofs
+/examples/soundspeed/listener/seacat_capture.txt
