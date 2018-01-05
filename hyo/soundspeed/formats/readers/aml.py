@@ -1,4 +1,5 @@
 from datetime import datetime as dt
+import math
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,10 +21,15 @@ class Aml(AbstractTextReader):
         self._time_token = "time"
         self._lat_token = "latitude"
         self._long_token = "longitude"
+        self._lat2_token = "Latitude"
+        self._long2_token = "Longitude"
 
         self._data_token = "[data]"
         self._depth_token = "Depth (m)"
+        self._temp_token = "Temperature (C)"
+        self._sal_token = "Salinity (PSU)"
         self._speed_token = "SV (m/s)"
+        self._speed2_token = "Calc. SV (m/s)"
 
     def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
         logger.debug('*** %s ***: start' % self.driver)
@@ -55,6 +61,8 @@ class Aml(AbstractTextReader):
 
         date = None
         time = None
+        lat = None
+        lon = None
 
         for row_nr, line in enumerate(self.lines):
 
@@ -65,21 +73,45 @@ class Aml(AbstractTextReader):
 
             try:
 
-                if tokens[0] == self._date_token:
-                    date = dt.strptime(tokens[1].strip(), "%m/%d/%y")
-                    continue
+                if (tokens[0] == self._date_token) and (date is None):
+                    try:
+                        date = dt.strptime(tokens[1].strip(), "%m/%d/%y")
+                        continue
+                    except ValueError:
+                        date = dt.strptime(tokens[1].strip(), "%Y-%m-%d")
+                        continue
 
-                if tokens[0] == self._time_token:
+                if (tokens[0] == self._time_token) and (time is None):
                     time = dt.strptime(tokens[1].strip(), "%H:%M:%S")
                     continue
 
-                if tokens[0] == self._lat_token:
-                    self.ssp.cur.meta.latitude = float(tokens[1])
+                if (tokens[0] == self._lat_token) and (lat is None):
+                    lat = float(tokens[1])
                     continue
 
-                if tokens[0] == self._long_token:
-                    self.ssp.cur.meta.longitude = float(tokens[1])
+                if (tokens[0] == self._long_token) and (lon is None):
+                    lon = float(tokens[1])
                     continue
+
+                if (tokens[0] == self._lat2_token) and (lat is None):
+                    lat = float(tokens[1])
+                    continue
+
+                if (tokens[0] == self._long2_token) and (lon is None):
+                    lon = float(tokens[1])
+                    continue
+
+                if (lat is not None) and (lon is not None) and \
+                        (self.ssp.cur.meta.latitude is None) and (self.ssp.cur.meta.longitude is None):
+                    if math.isclose(lat, 0.0) and math.isclose(lon, 0.0):
+                        lat = None
+                        lon = None
+                        logger.info("skipped (0.0, 0.0) location as invalid")
+                    else:
+                        self.ssp.cur.meta.latitude = lat
+                        self.ssp.cur.meta.longitude = lon
+                        logger.debug("retrieved location: (%s, %s)" %
+                                     (self.ssp.cur.meta.longitude, self.ssp.cur.meta.latitude))
 
             except ValueError:
                 logger.warning("invalid conversion parsing of line #%s: %s" % (row_nr, tokens[1]))
@@ -101,7 +133,12 @@ class Aml(AbstractTextReader):
         count = 0
         read_samples = False
         has_depth_and_speed = False
+        has_calc_speed = False
+        has_temp = False
+        has_sal = False
         depth_idx = None
+        temp_idx = None
+        sal_idx = None
         speed_idx = None
 
         self.ssp.cur.init_data(len(self.lines))
@@ -133,21 +170,53 @@ class Aml(AbstractTextReader):
 
                     if token == self._depth_token:
                         depth_idx = idx
-                        if speed_idx is not None:
-                            has_depth_and_speed = True
                         logger.debug("found depth index: %s" % depth_idx)
-                        continue
 
-                    if token == self._speed_token:
+                    elif token == self._temp_token:
+                        temp_idx = idx
+                        has_temp = True
+                        logger.debug("found temp index: %s" % temp_idx)
+
+                    elif token == self._sal_token:
+                        sal_idx = idx
+                        has_sal = True
+                        logger.debug("found sal index: %s" % sal_idx)
+
+                    elif token == self._speed_token:
                         speed_idx = idx
-                        if depth_idx is not None:
-                            has_depth_and_speed = True
                         logger.debug("found sound speed index: %s" % speed_idx)
-                        continue
+
+                    elif (token == self._speed2_token) and (speed_idx is None):
+                        speed_idx = idx
+                        has_calc_speed = True
+                        logger.debug("found sound speed index [2]: %s" % speed_idx)
 
                     continue
 
+                # set flag to true
+                if (depth_idx is not None) and (speed_idx is not None):
+
+                    has_depth_and_speed = True
+                    if has_temp:
+
+                        if not has_sal:
+
+                            if has_calc_speed:  # special case: we treat is as XBT
+                                self.ssp.cur.meta.sensor_type = Dicts.sensor_types['XBT']
+                                logger.debug("detected sensor type: XBT")
+
+                            else:
+                                self.ssp.cur.meta.sensor_type = Dicts.sensor_types['SVPT']
+                                logger.debug("detected sensor type: SVPT")
+
+                        else:
+                            self.ssp.cur.meta.sensor_type = Dicts.sensor_types['CTD']
+                            logger.debug("detected sensor type: CTD")
                 continue
+
+            # identify source type different than SVP
+            if not has_depth_and_speed:
+                raise RuntimeError("unable to find depth and sound speed indices!")
 
             # finally the data
             tokens = line.split(",")
@@ -164,10 +233,21 @@ class Aml(AbstractTextReader):
                             count += 1
                         continue
 
-                    if idx == speed_idx:
+                    elif idx == speed_idx:
                         self.ssp.cur.data.speed[count] = float(tokens[speed_idx])
                         if speed_idx > depth_idx:
                             count += 1
+                        continue
+
+                    elif idx == temp_idx:
+                        self.ssp.cur.data.temp[count] = float(tokens[temp_idx])
+                        continue
+
+                    elif idx == sal_idx:
+                        self.ssp.cur.data.sal[count] = float(tokens[sal_idx])
+                        continue
+
+                    else:  # not parsed value
                         continue
 
                 except ValueError:
@@ -177,13 +257,8 @@ class Aml(AbstractTextReader):
                     logger.warning("invalid index parsing of line #%s" % row_nr)
                     continue
 
-                continue
-
         if read_samples is False:
             raise RuntimeError("Issue in finding data token: %s" % self._data_token)
-
-        if has_depth_and_speed is False:
-            raise RuntimeError("Issue in identifying indices for depth and speed")
 
         logger.debug("retrieved %d samples" % count)
         self.ssp.cur.data_resize(count)
