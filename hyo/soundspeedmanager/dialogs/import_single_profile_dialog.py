@@ -123,9 +123,30 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         self.retrieveLayout.addStretch()
 
+    def showEvent(self, event):
+        self.show()
+
+        # manage case of default format
+        settings = QtCore.QSettings()
+        fmt_desc = settings.value("default_input_format")
+        if (fmt_desc is None) or ("Ask" in fmt_desc):
+            return
+        if fmt_desc == "Seabird CTD":
+            self.on_click_seabird_ctd()
+            return
+        try:
+            idx = self.lib.desc_readers.index(fmt_desc)
+        except Exception as e:
+            logger.debug("while retrieving default format, %s (%s)" % (e, fmt_desc))
+            return
+        self.do_import(idx)
+
     def on_click_import(self, btn):
         # print("clicked %s" % btn.text())
         idx = self.lib.desc_readers.index(btn.text())
+        self.do_import(idx)
+
+    def do_import(self, idx):
         name = self.lib.name_readers[idx]
         desc = self.lib.desc_readers[idx]
         ext = self.lib.ext_readers[idx]
@@ -286,5 +307,9 @@ class ImportSingleProfileDialog(AbstractDialog):
     def on_click_seabird_ctd(self):
         logger.debug("Open Seabird CTD dialog")
         dlg = SeacatDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        dlg.exec_()
+        ret = dlg.exec_()
+        if ret != QtGui.QDialog.Accepted:
+            logger.info("Seabird CTD dialog closed without selection")
+            return
+
         self.accept()

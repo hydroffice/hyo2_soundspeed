@@ -1,16 +1,16 @@
+import logging
 import math
 import os
-import sys
-import ssl
-from urllib.request import urlopen
-from urllib.error import URLError
 import socket
+import ssl
+import sys
 import traceback
+from urllib.error import URLError
+from urllib.request import urlopen
 
-from PySide import QtGui
 from PySide import QtCore
+from PySide import QtGui
 
-import logging
 logger = logging.getLogger(__name__)
 
 from hyo.soundspeedmanager import __version__ as ssm_version
@@ -21,7 +21,6 @@ from hyo.soundspeedmanager.qt_progress import QtProgress
 from hyo.soundspeedmanager.qt_callbacks import QtCallbacks
 from hyo.soundspeedmanager.widgets.editor import Editor
 from hyo.soundspeedmanager.widgets.database import Database
-from hyo.soundspeedmanager.widgets.seacat import Seacat
 from hyo.soundspeedmanager.widgets.server import Server
 from hyo.soundspeedmanager.widgets.refraction import Refraction
 from hyo.soundspeedmanager.widgets.settings import Settings

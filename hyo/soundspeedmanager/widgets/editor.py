@@ -7,6 +7,7 @@ from PySide import QtGui, QtCore
 logger = logging.getLogger(__name__)
 
 from hyo.soundspeedmanager.widgets.widget import AbstractWidget
+from hyo.soundspeedmanager.dialogs.automate_dialog import AutomateDialog
 from hyo.soundspeedmanager.dialogs.import_single_profile_dialog import ImportSingleProfileDialog
 from hyo.soundspeedmanager.dialogs.reference_dialog import ReferenceDialog
 from hyo.soundspeedmanager.dialogs.spreadsheet_dialog import SpreadSheetDialog
@@ -178,6 +179,15 @@ class Editor(AbstractWidget):
         # self.output_bar.addAction(self.save_db_act)
         self.main_win.edit_menu.addAction(self.save_db_act)
 
+        # automate steps
+        self.automate_processing_acts = QtGui.QAction("Automate processing", self)
+        self.automate_processing_acts.setShortcut("Ctrl+A")
+        self.automate_processing_acts.setStatusTip("Automate the processing steps")
+        # noinspection PyUnresolvedReferences
+        self.automate_processing_acts.triggered.connect(self.on_automate_processing)
+        self.main_win.edit_menu.addSeparator()
+        self.main_win.edit_menu.addAction(self.automate_processing_acts)
+
         # exit action
         exit_action = QtGui.QAction("Exit", self)
         exit_action.setShortcut("Ctrl+Q")
@@ -197,9 +207,31 @@ class Editor(AbstractWidget):
 
         self.main_win.switch_to_editor_tab()
         dlg = ImportSingleProfileDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        dlg.exec_()
+        ret = dlg.exec_()
+        if ret != QtGui.QDialog.Accepted:
+            return
+
         if self.lib.has_ssp():
             self.main_win.data_imported()
+
+        # auto-apply options
+        settings = QtCore.QSettings()
+        if settings.value("auto_smooth_filter") == "true":
+            logger.info("auto apply smooth/filter")
+            self.on_data_filter()
+        if settings.value("auto_sal_temp") == "true":
+            if self.temp_sal_act.isEnabled():
+                logger.info("auto retrieve temp/sal")
+                self.on_retrieve_temp_sal()
+            elif self.sal_act.isEnabled():
+                logger.info("auto retrieve sal")
+                self.on_retrieve_sal()
+        if settings.value("auto_tss") == "true":
+            logger.info("auto retrieve TSS")
+            self.on_retrieve_tss()
+        if settings.value("auto_extend") == "true":
+            logger.info("auto extend cast")
+            self.on_extend_profile()
 
     def on_clear_data(self):
         logger.debug('user wants to clear data')
@@ -547,6 +579,15 @@ class Editor(AbstractWidget):
             return
 
         self.main_win.data_stored()
+
+    def on_automate_processing(self):
+
+        logger.debug('open automate processing dialog')
+
+        self.main_win.switch_to_editor_tab()
+
+        dlg = AutomateDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        dlg.exec_()
 
     def data_cleared(self):
         # bars
