@@ -123,10 +123,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         self.retrieveLayout.addStretch()
 
-    def showEvent(self, event):
-        self.show()
-
-        # manage case of default format
+    def _auto_apply(self):
         settings = QtCore.QSettings()
         fmt_desc = settings.value("default_input_format")
         if (fmt_desc is None) or ("Ask" in fmt_desc):
@@ -140,6 +137,11 @@ class ImportSingleProfileDialog(AbstractDialog):
             logger.debug("while retrieving default format, %s (%s)" % (e, fmt_desc))
             return
         self.do_import(idx)
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        # noinspection PyCallByClass,PyTypeChecker
+        QtCore.QTimer.singleShot(100, self._auto_apply)
 
     def on_click_import(self, btn):
         # print("clicked %s" % btn.text())
