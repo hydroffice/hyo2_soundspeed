@@ -1,7 +1,11 @@
 import os
 import datetime
 import shutil
-import winreg
+try:
+    # TODO: winreg is windows-only, use QSettings instead
+    import winreg  # python 3+
+except Exception:
+    pass
 import traceback
 import logging
 
@@ -149,13 +153,13 @@ class SeacatDialog(AbstractDialog):
                                     self.lib.cur.statistical_filter()
                                     self.lib.cur.cosine_smooth()
                                     self.lib.store_data()
-                                except:
+                                except Exception:
                                     # noinspection PyCallByClass
                                     QtGui.QMessageBox.information(self, "Error",
                                                                   "Filtering failed on the file below\n  "
                                                                   "The raw data was loaded instead\n\n{}".format(pth))
                                     self.reject()
-                            except:
+                            except Exception:
                                 # noinspection PyCallByClass
                                 QtGui.QMessageBox.information(self, "Notice",
                                                               "File downloaded from the Seacat instrument\n  "
@@ -317,7 +321,8 @@ class SeacatDialog(AbstractDialog):
                 if seabird_utils_exe:
                     if not os.path.exists(seabird_utils_exe):
                         raise Exception("datcnv not found - asking user to supply location")
-            except:
+
+            except Exception:
                 seabird_utils_exe = self.lib.cb.ask_filename(saving=False, key_name="Seacat/DataCNV",
                                                              title="Find the Seabird Data Processing executable",
                                                              file_filter="DataCNVw.exe|datcnvw.exe")
@@ -363,4 +368,5 @@ class SeacatDialog(AbstractDialog):
                         title = "User Cancelled"
                         msg = "No seabird config file selected."
                         return False, [title, msg]
+
             return True, conname

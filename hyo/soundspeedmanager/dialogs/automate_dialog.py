@@ -1,8 +1,6 @@
 from PySide import QtGui
 from PySide import QtCore
 
-import os
-from datetime import datetime
 import logging
 logger = logging.getLogger(__name__)
 

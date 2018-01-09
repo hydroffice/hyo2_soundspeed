@@ -1,21 +1,9 @@
-import os
 import logging
-import traceback
-import datetime
-import shutil
-try:
-    # TODO: winreg is windows-only, use QSettings instead
-    import winreg  # python 3+
-except:
-    pass
 
 from PySide import QtGui, QtCore
-from PySide.QtGui import QMessageBox
 from hyo.soundspeed.listener.seacat import sbe_serialcomms
 
 logger = logging.getLogger(__name__)
-
-from hyo.soundspeedmanager.widgets.widget import AbstractWidget
 
 
 def add_btn(name, func, tooltip, layout):
