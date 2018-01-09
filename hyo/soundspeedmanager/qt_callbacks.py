@@ -285,6 +285,8 @@ class QtCallbacks(AbstractCallbacks):
     def ask_location(self, default_lat=None, default_lon=None):
         """Ask user for location (it is not an abstract method because it is based on ask_number)"""
 
+        settings = QtCore.QSettings()
+
         # try to convert the passed default values
         if (default_lat is not None) and (default_lon is not None):
 
@@ -306,8 +308,13 @@ class QtCallbacks(AbstractCallbacks):
                         default_lon = self.sis_listener.nav.longitude
 
             if (default_lat is None) or (default_lon is None):
-                default_lat = 43.13555
-                default_lon = -70.9395
+
+                try:
+                    default_lat = float(settings.value("last_lat"))
+                    default_lon = float(settings.value("last_lon"))
+                except Exception:
+                    default_lat = 43.13555
+                    default_lon = -70.9395
 
         # ask user for both lat and long
         lat = None
@@ -345,6 +352,9 @@ class QtCallbacks(AbstractCallbacks):
 
         if (lat is None) or (lon is None):  # return None if one of the two is invalid
             return None, None
+        else:
+            settings.setValue("last_lat", lat)
+            settings.setValue("last_lon", lon)
 
         return lat, lon
 
@@ -454,18 +464,35 @@ class QtCallbacks(AbstractCallbacks):
 
     def ask_tss(self):
         """Ask user for transducer sound speed"""
+        settings = QtCore.QSettings()
+        try:
+            last_tss = float(settings.value("last_tss"))
+        except Exception:
+            last_tss = 1500.0
+
         tss, ok = QtGui.QInputDialog.getDouble(self._parent, "TSS", "Enter transducer sound speed:",
-                                               1500.0, 1000.0, 20000.0, 2)
+                                               last_tss, 1000.0, 20000.0, 2)
+
         if not ok:
             tss = None
+        else:
+            settings.setValue("last_tss", tss)
         return tss
 
     def ask_draft(self):
         """Ask user for draft"""
+        settings = QtCore.QSettings()
+        try:
+            last_draft = float(settings.value("last_draft"))
+        except Exception:
+            last_draft = 8.0
+
         draft, ok = QtGui.QInputDialog.getDouble(self._parent, "Draft", "Enter transducer draft:",
-                                                 8.0, -1000.0, 1000.0, 3)
+                                                 last_draft, -1000.0, 1000.0, 3)
         if not ok:
             draft = None
+        else:
+            settings.setValue("last_draft", draft)
         return draft
 
     def msg_tx_no_verification(self, name, protocol):
