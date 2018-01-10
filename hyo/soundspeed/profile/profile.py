@@ -285,7 +285,7 @@ class Profile:
     def cosine_smooth(self):
         """Cosine-averaging to smooth the profile data"""
 
-        debug = True  # set to True for verbose intermediate steps
+        verbose = False  # set to True for verbose intermediate steps
 
         # parameters
         bin_size = 1.0  # size of bin, unit or measure is meter (depth)
@@ -307,26 +307,26 @@ class Profile:
 
         # create the window widths
         window_width = np.maximum(np.absolute(zs * ww_mul), ww_min)
-        if debug:
+        if verbose:
             logger.debug("cosine avg -> window width: %s" % (window_width,))
 
         # retrieve the profile's z range
         z_min = zs.min()
         z_max = zs.max()
-        if debug:
+        if verbose:
             logger.debug("cosine avg -> z range: (%f, %f)" % (z_min, z_max))
 
         # create a 2D storage array:
         # - [rows -> types]: 2 additional rows (bin values on row #0, weights on row #-1)
         # - [cols -> values]: extra columns (that will be removed at the end) on both sides
         storage = np.zeros([len(names) + 2, int(2 * (bin_width + 1) + (z_max - z_min) / bin_size)])
-        if debug:
+        if verbose:
             logger.debug("cosine avg -> storage: rows %s, columns %s" % (storage.shape[0], storage.shape[1]))
 
         # populate bin values (row #0)
         for i in range(storage.shape[1]):
             storage[0][i] = z_min + (- bin_width + i) * bin_size
-        if debug:
+        if verbose:
             logger.debug("cosine avg -> storage bin values: %s" % (storage[0], ))
 
         # populate weights
@@ -358,7 +358,7 @@ class Profile:
 
             storage[-1][center_idx - bin_width:center_idx + bin_width + 1] += bin_weights
 
-        if debug:
+        if verbose:
             logger.debug("cosine avg -> storage weights: %s" % (storage[-1], ))
             for j, name in enumerate(names):
                 logger.debug("cosine avg -> storage %s sums: %s" % (name, storage[1 + j],))
