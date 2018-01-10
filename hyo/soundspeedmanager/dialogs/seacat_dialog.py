@@ -149,22 +149,19 @@ class SeacatDialog(AbstractDialog):
                                 self.lib.import_data(data_path=pth, data_format="seabird")
                                 self.lib.store_data()
                                 try:
-                                    self.lib.cur.remove_pre_water_entry()
-                                    self.lib.cur.statistical_filter()
-                                    self.lib.cur.cosine_smooth()
+                                    self.lib.filter_cur_data()
                                     self.lib.store_data()
                                 except Exception:
                                     # noinspection PyCallByClass
-                                    QtGui.QMessageBox.information(self, "Error",
-                                                                  "Filtering failed on the file below\n  "
-                                                                  "The raw data was loaded instead\n\n{}".format(pth))
+                                    QtGui.QMessageBox.warning(self, "Error",
+                                                              "Filtering failed on the file below\n  "
+                                                              "The raw data was loaded instead\n\n%s" % (pth, ))
                                     self.reject()
                             except Exception:
                                 # noinspection PyCallByClass
                                 QtGui.QMessageBox.information(self, "Notice",
                                                               "File downloaded from the Seacat instrument\n  "
-                                                              "but failed to load in SoundSpeedManager\n\n{}".format(
-                                                                  pth))
+                                                              "but failed to load in SoundSpeedManager\n\n%s" % (pth, ))
                                 self.reject()
                     else:
                         # noinspection PyCallByClass

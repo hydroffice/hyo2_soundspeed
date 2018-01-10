@@ -272,7 +272,7 @@ class Profile:
             sigma[i] = np.sqrt(variance)
             if sigma[i] < sigmin:
                 sigma[i] = sigmin
-            sigma[i] = sigma[i] * c_end  # ' Relax tolerance for end pts
+            sigma[i] = sigma[i] * c_end  # Relax tolerance for end pts
 
         factor = c_depth
         for i in range(n_pts):
@@ -282,92 +282,119 @@ class Profile:
             if np.absolute(sv[i] - v_mean[i]) > DV:
                 self.proc.flag[i] = Dicts.flags['filtered']  # So-called bad point
 
-    def cosine_avg(self, domain, bin_size, bin_width, ww_min, ww_mul=.0025):
-        """
-        Cosine averaging used in VelocWin in multiple places.
-        In velocwin it was used on pressure vs density/velocity/pressure (creates and avg pressure value with
-        the avg density/velocity)
-        This was only used on pressure and values greater than zero, but am generalizing it to be +/-
-        in case we want it.
+    def cosine_smooth(self):
+        """Cosine-averaging to smooth the profile data"""
 
-        domain is the X variable, presumably pressure.
-        binsize is the size of bins -- units are related to first name/column in records (records[names[0]])
-        binwidth is the number of bins to either side of the value to add to
-        ww_min is the minimum window width for the cos( ) function (relates to name[0])
-        ww_mul is a scalar that allows the window width to grow (spreads the averaging) as the z (name[0]) gets larger.
+        debug = True  # set to True for verbose intermediate steps
 
-        CosineAvg(scipy.array([[1,2,3,4,5],[1,2,4,8,16]]), [0,1], 1, 4, 1.7, .0025) #Seacat
-        CosineAvg(scipy.array([[1,2,3,4,5],[1,2,4,8,16]]), [0,1], 0.1, 5, 0.3, .025) #SMLGauge
-
-        For smoothing a time based signal (or evenly sampled) see the scipy cookbook for smoothing.
-        """
-        # for the existing data types (not including source and type) do a cosine average
+        # parameters
+        bin_size = 1.0  # size of bin, unit or measure is meter (depth)
+        bin_width = 4  # number of bins on both sides of the value
+        ww_min = 1.7  # minimum window width for the cos( ) function
+        ww_mul = 0.0025  # used to grow the window width (that is, to spread the averaging) as the z gets larger
+        domain = "depth"
+        # data types not including source and type
         samples_names = ["pressure", "depth", "speed", "temp", "conductivity", "sal"]
-        names = [name for name in samples_names if getattr(self.proc, name) is not None]  # , "source", "flag"
-        records = {}
+        records = dict()
+
+        # retrieve the domain-specific z samples (depth typically)
+        zs = getattr(self.proc, domain)
+
+        # create a dictionary with only the existing data types
+        names = [name for name in samples_names if getattr(self.proc, name) is not None]
         for name in names:
             records[name] = getattr(self.proc, name)
 
-        z = getattr(self.proc, domain)  # pressure typically
-        window_width = np.maximum(np.absolute(z * ww_mul), ww_min)  # The window widths per z (pressure) value
-        maxZ, minZ = z.max(), z.min()
-        # store the bin value in the zeroth (storage[0]) column and weights in the last column (storage[-1])
-        # layout storage for summing each bin with extra on either side (remove the extra at the end)
-        storage = np.zeros([len(names) + 2, int(2 * (bin_width + 1) + (maxZ - minZ) / bin_size)])
-        # the extra space keeps exceptions from coming up based on array lengths.
+        # create the window widths
+        window_width = np.maximum(np.absolute(zs * ww_mul), ww_min)
+        if debug:
+            logger.debug("cosine avg -> window width: %s" % (window_width,))
 
-        for i in np.arange(len(storage[0])):
-            storage[0][i] = (i - bin_width) * bin_size + minZ
-        # init_weight = 2.69*np.arange(-binwidth, binwidth+1)
-        for i, zv in enumerate(z):
-            if self.proc.flag[i] == Dicts.flags['valid']:
-                center_bin = int((zv - minZ) / bin_size + .5) + bin_width
-                z_diff = zv - storage[0][center_bin - bin_width:center_bin + bin_width + 1]
-                bin_weights = 1.0 + np.cos(
-                    2.69 * z_diff / window_width[i])  # ' Insure that weight will be .1 at a window width from point I
-                bin_weights *= np.absolute(z_diff) < window_width[i]
-                for c, name in enumerate(names):
-                    storage[c + 1][center_bin - bin_width:center_bin + bin_width + 1] += records[name][i] * bin_weights
-                storage[-1][center_bin - bin_width:center_bin + bin_width + 1] += bin_weights
+        # retrieve the profile's z range
+        z_min = zs.min()
+        z_max = zs.max()
+        if debug:
+            logger.debug("cosine avg -> z range: (%f, %f)" % (z_min, z_max))
 
-        storage = storage[:, bin_width: -(bin_width + 1)]  # slice off the end stuff for the bin widths
-        storage = np.compress(storage[-1] > 0.1, storage, axis=1)  # remove bins that didn't have enough weighting.
+        # create a 2D storage array:
+        # - [rows -> types]: 2 additional rows (bin values on row #0, weights on row #-1)
+        # - [cols -> values]: extra columns (that will be removed at the end) on both sides
+        storage = np.zeros([len(names) + 2, int(2 * (bin_width + 1) + (z_max - z_min) / bin_size)])
+        if debug:
+            logger.debug("cosine avg -> storage: rows %s, columns %s" % (storage.shape[0], storage.shape[1]))
+
+        # populate bin values (row #0)
+        for i in range(storage.shape[1]):
+            storage[0][i] = z_min + (- bin_width + i) * bin_size
+        if debug:
+            logger.debug("cosine avg -> storage bin values: %s" % (storage[0], ))
+
+        # populate weights
+        for i, z in enumerate(zs):
+
+            # skip invalid samples
+            if self.proc.flag[i] != Dicts.flags['valid']:
+                continue
+
+            # calculate the index of the central bin value
+            center_idx = int((z - z_min) / bin_size + .5) + bin_width
+            # if debug:
+            #     logger.debug("cosine avg -> z: %s, center index: %s" % (z, center_idx))
+
+            # calculate the differences from the current z values in the averaging windows
+            z_diff = z - storage[0][center_idx - bin_width:center_idx + bin_width + 1]
+            # if debug:
+            #     logger.debug("cosine avg -> z: %s, z diff: %s" % (z, z_diff))
+
+            # Insure that weight will be .1 at a window width from point I
+            bin_weights = 1.0 + np.cos(2.69 * z_diff / window_width[i])
+            bin_weights *= np.absolute(z_diff) < window_width[i]  # set to 0 when outside the window width
+            # if debug:
+            #     logger.debug("cosine avg -> z: %s, bin weights: %s" % (z, bin_weights))
+
+            for j, name in enumerate(names):
+                # summing up for all the types, row is j + 1 since the first row is for bin values
+                storage[1 + j][center_idx - bin_width:center_idx + bin_width + 1] += records[name][i] * bin_weights
+
+            storage[-1][center_idx - bin_width:center_idx + bin_width + 1] += bin_weights
+
+        if debug:
+            logger.debug("cosine avg -> storage weights: %s" % (storage[-1], ))
+            for j, name in enumerate(names):
+                logger.debug("cosine avg -> storage %s sums: %s" % (name, storage[1 + j],))
+
+        # remove the end stuff for the bin widths
+        storage = storage[:, bin_width: -(bin_width + 1)]
+
+        # remove bins that didn't have enough weighting.
+        storage = np.compress(storage[-1] > 0.1, storage, axis=1)
+        # normalize by using the stored weights
         for i in range(len(names)):
-            storage[i + 1] /= storage[-1]
-        delta_depth = np.hstack(([1], np.diff(storage[0])))  # add a true value for the first difference that
-        storage = np.compress(delta_depth >= .00001, storage, axis=1)  # make sure duplicate pressures not written
+            storage[1 + i] /= storage[-1]
 
-        # TODO Question - if a depth already exists should we replace it or have two points at same depth
-        # one marked "smoothed" and one marked valid -- will this cause an issue if the smoothed is "re-accepted"?
+        # calculate the z differences + add 1 value to the outcome (to have the same length as the storage)
+        delta_zs = np.hstack(([1.0], np.diff(storage[0])))
+        # remove duplicated z values
+        storage = np.compress(delta_zs >= .00001, storage, axis=1)
 
-        # insert created data into the self.proc arrays and mark previous 'valid' data as 'smoothed'
-        np.putmask(self.proc.flag, self.proc.flag == Dicts.flags['valid'], Dicts.flags['smoothed'])
+        # mark previous 'valid' data as 'smoothed'
+        self.proc.flag[self.proc_valid] = Dicts.flags['smoothed']
+
+        # insert created data into the self.proc arrays
         for row in storage.T:
+
+            new_zs = getattr(self.proc, domain)
+            # index of where the storage record falls
             try:
-                i = np.argwhere(getattr(self.proc, domain) > row[0])[0][0]  # index of where the storage record falls
+                i = np.argwhere(new_zs > row[0])[0][0]
             except IndexError:
-                i = len(getattr(self.proc, domain))
-            for c, name in enumerate(names):
-                setattr(self.proc, name, np.insert(getattr(self.proc, name), i, row[c + 1]))
+                i = new_zs.size
+            for j, name in enumerate(names):
+                setattr(self.proc, name, np.insert(getattr(self.proc, name), i, row[j + 1]))
             self.proc.source = np.insert(self.proc.source, i, Dicts.sources['smoothing'])
             self.proc.flag = np.insert(self.proc.flag, i, Dicts.flags['valid'])
-        self.proc.num_samples = len(self.proc.source)
 
-        # self.proc.num_samples = len(storage[0])
-        # for c, name in enumerate(names):
-        #     setattr(self.proc, name, storage[c + 1][:])  # fill the proc array with copy from the averaged array
-        # self.proc.flag = np.zeros(self.proc.num_samples) + Dicts.flags['valid']
-        # self.proc.source = np.zeros(self.proc.num_samples) + Dicts.sources['smoothed']
-
-    def cosine_smooth(self):
-        """Cosine-averaging scheme suggested by Dr. Lloyd Huff"""
-        bin_size, bin_width = 1.0, 4
-        ww_min, ww_mul = 1.7, .0025
-        if self.proc.pressure is not None and self.proc.pressure.any():
-            domain = "pressure"
-        else:
-            domain = "depth"
-        self.cosine_avg(domain, bin_size, bin_width, ww_min, ww_mul)
+        self.proc.num_samples = self.proc.depth.size
 
     def reduce_up_down(self, ssp_direction, use_pressure=False):
         """Reduce the raw data samples based on the passed direction"""
