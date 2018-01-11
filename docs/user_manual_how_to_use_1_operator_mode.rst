@@ -372,6 +372,8 @@ Once stored in the database, the *Database* tab provides analysis functions and 
     :alt: data storage
     :figclass: align-center
 
+    The *Database* tab provides access to the collected profiles and related tools.
+
 For instance, it is possible to export the profile metadata in several geographic formats: csv, kml, shapefile
 (e.g., :numref:`kml_export_fig`), and to create maps (:numref:`map_creation_fig`) and plots (:numref:`daily_plot_fig` and :numref:`aggregate_plot_fig`).
 
