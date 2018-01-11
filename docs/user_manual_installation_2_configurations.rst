@@ -37,12 +37,12 @@ Upgrading
 .. index:: upgrade;
 
 It is possible to copy configuration settings from a previous installation.
-When a new installation is performed, the user is prompted to select existing configuration settings (if any).
+When a new installation is performed, the user is prompted (see :numref:`existing_setup`) to select existing configuration settings (if any).
 
+.. _existing_setup:
 .. figure:: ./_static/existing_setup.png
     :width: 470px
     :align: center
-    :height: 122px
     :alt: alternate text
     :figclass: align-center
 
@@ -79,16 +79,16 @@ This SQLite database file has to be modified to reflect the chosen software depl
 configuration settings (e.g., the SIS IP address and ports).
 
 Use the *Setup* tab to view the available configuration options in the database.
-If you want to modify them, click on the 'Lock/Unlock' button.
+If you want to modify them, click on the 'Lock/Unlock' button (:numref:`setup_tab`).
 
+.. _setup_tab:
 .. figure:: ./_static/setup_tab.png
     :width: 600px
     :align: center
-    :height: 412px
     :alt: alternate text
     :figclass: align-center
 
-    You will be asked to confirm that you want to modify the setup.
+    When unlocking, you will be asked to confirm that you want to modify the setup.
 
 
 .. index:: RTOFS
@@ -129,7 +129,7 @@ In such a case, the *DataDistrib.exe* program explored in :ref:`method_3` may be
 The configuration for this method is actually quite simple:
 
 * Stop pinging
-* Access the *Installation Parameters* dialog (see :ref:`method_1_fig`) from the *View* menu by choosing *Tear off* and then *Installation Parameters*
+* Access the *Installation Parameters* dialog (see :numref:`method_1_fig`) from the *View* menu by choosing *Tear off* and then *Installation Parameters*
 
 .. _method_1_fig:
 
@@ -159,7 +159,7 @@ This method is more general, and it can be used for data transmission to other c
 .. note:: *SIS* needs to be restarted for the changes to take effect. Furthermore, since the software does not seem
           to validate user inputs, mistakes made cannot be easily discovered and undone (unsubscribe).
 
-* From the *Tools* menu, choose *Custom…* and then *Datagram Distribution* (see :ref:`method_2_fig`).
+* From the *Tools* menu, choose *Custom…* and then *Datagram Distribution* (see :numref:`method_2_fig`).
 
 .. _method_2_fig:
 
@@ -194,10 +194,9 @@ distribution to this package), or it can accidentally runs twice corrupting the 
 
 The setup of this method is summarized as follows:
 
-* If the program is running already, click the icon in the taskbar to launch the graphical user interface (see :ref:`method_3_fig`). If not, navigate to *C:\\Program Files\\Kongsberg Maritime\\SIS\\bin* and double click on *DataDistrib.exe* to launch it
+* If the program is running already, click the icon in the taskbar to launch the graphical user interface (see :numref:`method_3_fig`). If not, navigate to *C:\\Program Files\\Kongsberg Maritime\\SIS\\bin* and double click on *DataDistrib.exe* to launch it
 
 .. _method_3_fig:
-
 .. figure:: ./_static/method3.png
     :width: 600px
     :align: center
@@ -214,8 +213,9 @@ The setup of this method is summarized as follows:
 Sound Speed Manager side
 ------------------------
 
-The parameters, present in *setup.db*, can be modified using the *Setup* tab.
+The parameters, present in *setup.db*, can be modified using the *Setup* tab (:numref:`settings0`).
 
+.. _settings0:
 .. figure:: ./_static/settings0.png
     :width: 600px
     :align: center
@@ -225,8 +225,9 @@ The parameters, present in *setup.db*, can be modified using the *Setup* tab.
 
     The *Setup* tab, in red, can be used to inspect/modify the package settings.
 
-By default, the *Setup* tab is in read-only mode. To be able to modify the package settings, you need to unlock it.
+By default, the *Setup* tab is in read-only mode. To be able to modify the package settings, you need to unlock it (:numref:`settings1`).
 
+.. _settings1:
 .. figure:: ./_static/settings1.png
     :width: 600px
     :align: center
@@ -237,16 +238,29 @@ By default, the *Setup* tab is in read-only mode. To be able to modify the packa
     The *Setup* tab must be unlocked for settings modifications.
 
 Once unlocked, you can add a new setup, or you may want to modify one of the existing ones. For the interaction
-with *SIS*, you need to access the *Output* sub-tab and the *Listeners* sub-tab.
+with *SIS*, you need to access the *Input* sub-tab, the *Output* sub-tab, and the *Listeners* sub-tab.
 
-In the *Output* sub-tab, you have to add a client to the *client list* you need to specify:
+In the *Input* sub-tab, you have to select "True" in the "Listen SIS" list (:numref:`settings2`).
+
+.. _settings2:
+.. figure:: ./_static/settings2.png
+    :width: 600px
+    :align: center
+    :height: 440px
+    :alt: SIS listener
+    :figclass: align-center
+
+    The *Listen SIS*, in red, is used to activate the *SIS* listening.
+
+In the *Output* sub-tab, you have to add a client to the *client list* you need to specify (:numref:`settings3`):
 
 * a name for the client (for ease of recognition)
 * the client IP address to which the data should be sent by *Sound Speed Manager* (if the package is installed on the same machine as *SIS*, this should be ``127.0.0.1``)
 * the port to which the client is listening for the sound speed profile (*SIS* always listens port ``4001`` for SSP input)
 * the protocol in use: ``SIS``
 
-.. figure:: ./_static/settings2.png
+.. _settings3:
+.. figure:: ./_static/settings3.png
     :width: 600px
     :align: center
     :height: 440px
@@ -255,10 +269,11 @@ In the *Output* sub-tab, you have to add a client to the *client list* you need 
 
     The *Client list*, in red, is used to add the *SIS* client information.
 
-In the *Listeners* sub-tab, the *Listen port* entry, in red, provides the port to which *SIS* has been configured to broadcast datagrams.
+In the *Listeners* sub-tab, the *Listen port* entry, in red, provides the port to which *SIS* has been configured to broadcast datagrams (:numref:`settings4`).
 This should match the port address selected in the previous methods. For instance, ``16103``.
 
-.. figure:: ./_static/settings3.png
+.. _settings4:
+.. figure:: ./_static/settings4.png
     :width: 600px
     :align: center
     :height: 440px
@@ -268,9 +283,10 @@ This should match the port address selected in the previous methods. For instanc
     The *Client list*, in red, is used to add the *SIS* client information.
 
 If both *SIS* and *Sound Speed Manager* sides have been properly configured, *Sound Speed Manager* will show (in the right side
-of the lower window statusbar) the date, geographic position, surface sound speed and average depth (when *SIS* is pinging).
+of the lower window statusbar, see :numref:`settings5`) the date, geographic position, surface sound speed and average depth (when *SIS* is pinging).
 
-.. figure:: ./_static/settings4.png
+.. _settings5:
+.. figure:: ./_static/settings5.png
     :width: 600px
     :align: center
     :height: 440px

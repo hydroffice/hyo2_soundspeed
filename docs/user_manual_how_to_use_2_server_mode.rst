@@ -15,6 +15,7 @@ Given that transit data are usually a lower priority, this mode supports continu
 that are refraction corrected, using the mean temperature and salinity profiles provided by oceanographic models.
 This mode should not be used if SSPs are going to be collected on a regular basis.
 
+.. _server_tab0:
 .. figure:: ./_static/server_tab0.png
     :width: 600px
     :align: center
@@ -29,7 +30,7 @@ This can be checked by looking in the status bar.
 
 When this mode is active, all the user’s manual functionalities becomes unavailable until the *Server mode* is stopped.
 The last sent profile is displayed in the view panel and all three plot panels are colored green.
-The mode can be stopped by selecting *Stop* under the *Server* menu. Closing the application will also stop the server.
+The mode can be stopped by selecting *Stop* under the *Server* menu (:numref:`server_tab0`). Closing the application will also stop the server.
 To guard against accidentally overwriting a profile that was uploaded by the operator after the server was started,
 this mode verifies with SIS that nothing has been uploaded since the last synthetic cast was delivered.
 

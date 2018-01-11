@@ -1,6 +1,12 @@
 History
 -------
 
+2018.0.5
+~~~~~~~~
+
+2018-01-10
+
+- Added automated processing setup and other improvements
 
 2017.3.0
 ~~~~~~~~

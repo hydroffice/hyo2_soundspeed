@@ -106,7 +106,7 @@ organized as follows:
     :figclass: align-center
 
     This tab is used to change the number of samples displayed in the plotters. This value does not affect the storing
-    in the survey database (.mon).
+    in the survey database (.mon). It is also possible to select the initial plotted area (e.g., CONUS).
 
 .. note:: A high number of samples selected in the *Plots* tab (:numref:`data_monitor_option_plots`) may reduce the
     reactivity of Sound Speed Manager.
@@ -169,7 +169,6 @@ Each plotter has a navigation toolbar that provides basic functionalities like p
 .. _data_views_toolbar:
 .. figure:: ./_static/monitor_toolbar_views.png
     :align: center
-    :height: 100px
     :alt: Data Views toolbar
     :figclass: align-center
 
@@ -181,7 +180,7 @@ performed by the next-cast estimator (e.g., *CastTime*).
 .. _next_cast_info:
 .. figure:: ./_static/monitor_next_cast_info.png
     :align: center
-    :height: 400px
+    :height: 300px
     :alt: Next-Cast view
     :figclass: align-center
 

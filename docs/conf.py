@@ -41,16 +41,16 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'HydrOffice Sound Speed'
-copyright = u'2017, CCOM/JHC,UNH'
+copyright = u'2018, CCOM/JHC,UNH'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = '2017.6'
+version = '2018.0'
 # The full version, including alpha/beta/rc tags.
-release = '2017.6.20'
+release = '2018.0.5'
 
 numfig = True
 

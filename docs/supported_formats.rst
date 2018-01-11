@@ -6,6 +6,7 @@ Supported Formats
 =================================================== ==== =====
                         Format                      Read Write
 =================================================== ==== =====
+AML (.csv)                                          X
 AOML (.txt)                                         X
 CARIS (.svp)                                        X    X
 Castaway (.csv)                                     X

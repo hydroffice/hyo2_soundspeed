@@ -16,7 +16,7 @@ If you decide to install the package in a Python environment, the dependencies a
 
 * `basemap <https://github.com/matplotlib/basemap>`_
 * `gdal <https://github.com/OSGeo/gdal>`_
-* `gsw <https://github.com/TEOS-10/python-gsw>`_
+* `gsw <https://github.com/TEOS-10/python-gsw>`_ *(version == 3.0.6)*
 * `matplotlib <https://github.com/matplotlib/matplotlib>`_
 * `pillow <https://github.com/python-pillow/Pillow>`_
 * `netcdf4 <https://github.com/Unidata/netcdf4-python>`_

@@ -11,7 +11,7 @@ __version__ = '0.3.3'
 __doc__ = "SIS"
 __author__ = 'gmasetti@ccom.unh.edu'
 __license__ = 'LGPLv3 license'
-__copyright__ = 'Copyright 2017 University of New Hampshire, Center for Coastal and Ocean Mapping'
+__copyright__ = 'Copyright 2018 University of New Hampshire, Center for Coastal and Ocean Mapping'
 
 
 def hyo():

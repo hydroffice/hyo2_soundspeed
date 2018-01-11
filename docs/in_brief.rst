@@ -7,7 +7,7 @@ In brief
 
 The Sound Speed package is part of the `HydrOffice <https://www.hydroffice.org/license/>`_ framework. HydrOffice is
 a research development environment for ocean mapping. It provides a collection of hydro-packages, each of them dealing
-with a specific issue of the field. The main goal is to speed up both algorithms testing and research-2-operation.
+with a specific issue of the field. The main goal is to speed up both algorithms testing and research-to-operation (R2O).
 
 The Sound Speed package provides both a library and an application with functionalities to manage sound speed profiles,
 and to provide pre-processing ocean mapping tools to help bridge the gap between sound speed profiling instrumentation
@@ -60,6 +60,7 @@ Currently implemented features
 
 * Import of several commonly used sensor/file formats:
 
+  * AML (.csv)
   * AOML AMVER-SEAS XBT (.txt)
   * CARIS (.svp)
   * Castaway (.csv)
