@@ -293,5 +293,7 @@ of the lower window statusbar, see :numref:`settings5`) the date, geographic pos
     :alt: SIS pinging
     :figclass: align-center
 
+    The SIS-received information are displayed in the window statusbar.
+
 .. note:: The surface sound speed and depth will only update if the echosounder is pinging (since the surface sound speed information can only be extracted when *Sound Speed Manager* receives the depth datagram).
 
