@@ -156,13 +156,19 @@ class ImportSingleProfileDialog(AbstractDialog):
         # ask the file path to the user
         flt = "Format %s(*.%s);;All files (*.*)" % (desc, " *.".join(ext))
         settings = QtCore.QSettings()
+        try:
+            startdir = settings.value("import_folders_%s" % name)
+            if not startdir:
+                raise Exception("No previous path for this device - use last overall used path")
+        except Exception:
+            startdir = settings.value("import_folder")
         # noinspection PyCallByClass
-        selection, _ = QtGui.QFileDialog.getOpenFileName(self, "Load data file",
-                                                         settings.value("import_folder"),
-                                                         flt)
+        selection, _ = QtGui.QFileDialog.getOpenFileName(self, "Load %s data file" % desc,
+                                                         startdir, flt)
         if not selection:
             return
         settings.setValue("import_folder", os.path.dirname(selection))
+        settings.setValue("import_folders_%s" % name, os.path.dirname(selection))
         logger.debug('user selection: %s' % selection)
 
         self.progress.start()
