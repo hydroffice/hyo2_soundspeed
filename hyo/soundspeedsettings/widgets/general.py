@@ -246,9 +246,12 @@ class General(AbstractWidget):
         # noinspection PyUnresolvedReferences
         self.default_institution.editTextChanged.connect(self.apply_default_institution)
         # noinspection PyUnresolvedReferences
-        self.default_survey.textChanged.connect(self.apply_default_survey)
+        self.default_survey.textChanged.connect(self.modified_default_survey)
+        # noinspection PyUnresolvedReferences
+        self.default_survey.returnPressed.connect(self.apply_default_survey)
         # noinspection PyUnresolvedReferences
         self.default_vessel.editTextChanged.connect(self.apply_default_vessel)
+        # noinspection PyUnresolvedReferences
         self.default_vessel.currentIndexChanged.connect(self.apply_default_noaa_vessel)
         # noinspection PyUnresolvedReferences
         self.projects_folder.textChanged.connect(self.apply_custom_folders)
@@ -269,11 +272,15 @@ class General(AbstractWidget):
         self.setup_changed()
         self.main_win.reload_settings()
 
+    def modified_default_survey(self):
+        self.default_survey.setStyleSheet("background-color: rgba(255,255,153, 255);")
+
     def apply_default_survey(self):
         # logger.debug("apply default survey")
         self.db.default_survey = self.default_survey.text()
         self.setup_changed()
         self.main_win.reload_settings()
+        self.default_survey.setStyleSheet("background-color: rgba(255,255,255, 255);")
 
     def apply_default_vessel(self):
         # logger.debug("apply default vessel")
