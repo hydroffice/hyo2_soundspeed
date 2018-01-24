@@ -16,8 +16,8 @@ def load(pyside=True):
     if is_windows():
         import win32api
         # noinspection PyProtectedMember
-        here = win32api.GetLongPathName(here)
-    style_path = os.path.join(here, "app.stylesheet")
+        here = win32api.GetLongPathName(here).replace("\\", "/")
+    style_path = os.path.join(here, "app.stylesheet").replace("\\", "/")
 
     # logger.debug(f"here: {here}")
     # logger.debug(f"style path: {style_path}")

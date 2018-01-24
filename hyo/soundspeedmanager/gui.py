@@ -1,5 +1,6 @@
 import sys
-from PySide import QtGui
+import os
+from PySide import QtGui, QtCore
 
 import logging
 
@@ -7,6 +8,13 @@ logger = logging.getLogger(__name__)
 
 from hyo.soundspeedmanager import mainwin
 from hyo.soundspeedmanager.stylesheet import stylesheet
+
+
+def qt_custom_handler(error_type, error_context):
+    logger.info("Qt error: %s [%s]" % (str(error_type), str(error_context)))
+
+
+QtCore.qInstallMsgHandler(qt_custom_handler)
 
 
 def gui():
