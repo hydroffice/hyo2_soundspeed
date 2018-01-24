@@ -1,5 +1,4 @@
 import sys
-import os
 from PySide import QtGui, QtCore
 
 import logging
