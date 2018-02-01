@@ -61,37 +61,50 @@ class Main(AbstractWidget):
         self.btn_new_setup = QtGui.QPushButton("New")
         # noinspection PyUnresolvedReferences
         self.btn_new_setup.clicked.connect(self.new_setup)
+        self.btn_new_setup.setToolTip("Create a new setup profile")
         self.btn_box.addButton(self.btn_new_setup, QtGui.QDialogButtonBox.ActionRole)
         # --- import setup
         self.btn_import_setup = QtGui.QPushButton("Import")
         # noinspection PyUnresolvedReferences
         self.btn_import_setup.clicked.connect(self.import_setup)
+        self.btn_import_setup.setToolTip("Import existing setup profiles")
         self.btn_box.addButton(self.btn_import_setup, QtGui.QDialogButtonBox.ActionRole)
         # --- clone setup
         self.btn_clone_setup = QtGui.QPushButton("Clone")
         # noinspection PyUnresolvedReferences
         self.btn_clone_setup.clicked.connect(self.clone_setup)
+        self.btn_clone_setup.setToolTip("Clone the selected setup profile")
         self.btn_box.addButton(self.btn_clone_setup, QtGui.QDialogButtonBox.ActionRole)
         # --- rename setup
         self.btn_rename_setup = QtGui.QPushButton("Rename")
         # noinspection PyUnresolvedReferences
         self.btn_rename_setup.clicked.connect(self.rename_setup)
+        self.btn_rename_setup.setToolTip("Rename the selected setup profile")
         self.btn_box.addButton(self.btn_rename_setup, QtGui.QDialogButtonBox.ActionRole)
         # --- delete setup
         self.btn_delete_setup = QtGui.QPushButton("Delete")
         # noinspection PyUnresolvedReferences
         self.btn_delete_setup.clicked.connect(self.delete_setup)
+        self.btn_delete_setup.setToolTip("Delete the selected setup profile")
         self.btn_box.addButton(self.btn_delete_setup, QtGui.QDialogButtonBox.ActionRole)
         # --- activate setup
         self.btn_activate_setup = QtGui.QPushButton("Activate")
         # noinspection PyUnresolvedReferences
         self.btn_activate_setup.clicked.connect(self.activate_setup)
+        self.btn_activate_setup.setToolTip("Activate the selected setup profile")
         self.btn_box.addButton(self.btn_activate_setup, QtGui.QDialogButtonBox.ActionRole)
         # --- refresh
         self.btn_refresh_list = QtGui.QPushButton("Refresh")
         # noinspection PyUnresolvedReferences
         self.btn_refresh_list.clicked.connect(self.on_setup_changed)
+        self.btn_refresh_list.setToolTip("Refresh the profiles from the setup database")
         self.btn_box.addButton(self.btn_refresh_list, QtGui.QDialogButtonBox.ActionRole)
+        # --- open folder
+        self.btn_open_folder = QtGui.QPushButton("Folder")
+        # noinspection PyUnresolvedReferences
+        self.btn_open_folder.clicked.connect(self.on_open_folder)
+        self.btn_open_folder.setToolTip("Open the folder with the setup database")
+        self.btn_box.addButton(self.btn_open_folder, QtGui.QDialogButtonBox.ActionRole)
 
         self.main_layout.addSpacing(18)
 
@@ -286,6 +299,9 @@ class Main(AbstractWidget):
 
     def on_setup_changed(self):
         self.main_win.setup_changed()
+
+    def on_open_folder(self):
+        self.db.open_folder()
 
     def setup_changed(self):
         """Refresh the setup list"""

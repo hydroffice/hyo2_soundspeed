@@ -667,8 +667,11 @@ class SoundSpeedLibrary:
         prj_list = list()
         for root, dirs, files in os.walk(self.projects_folder):
             for f in files:
+                if "thumbs" in f.lower():
+                    continue
                 if f.endswith('.db'):
                     prj_list.append(os.path.splitext(os.path.basename(f))[0])
+            break
         return prj_list
 
     def remove_data(self):

@@ -6,6 +6,7 @@ logger = logging.getLogger(__name__)
 
 from hyo.soundspeed.base.basedb import BaseDb
 from hyo.soundspeed.base.setup_sql import CREATE_SETTINGS, CREATE_SETTINGS_VIEW, CREATE_CLIENT_LIST
+from hyo.soundspeed.base.helper import explore_folder
 
 
 class SetupDb(BaseDb):
@@ -40,6 +41,9 @@ class SetupDb(BaseDb):
         except sqlite3.Error as e:
             logger.error("during building tables, %s: %s" % (type(e), e))
             return False
+
+    def open_folder(self):
+        explore_folder(self.data_folder)
 
     # --- setup stuff
     
