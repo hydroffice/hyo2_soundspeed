@@ -353,11 +353,23 @@ class Editor(AbstractWidget):
 
         self.main_win.switch_to_editor_tab()
 
-        if not self.lib.prepare_sis():
-            msg = "Issue in preview the thinning"
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.warning(self, "Thinning preview", msg, QtGui.QMessageBox.Ok)
-            return
+        tolerances = [0.01, 0.1, 0.5]
+        for tolerance in tolerances:
+
+            if not self.lib.prepare_sis(thin_tolerance=tolerance):
+                msg = "Issue in preview the thinning"
+                # noinspection PyCallByClass
+                QtGui.QMessageBox.warning(self, "Thinning preview", msg, QtGui.QMessageBox.Ok)
+                return
+
+            # checking for number of samples
+            si = self.lib.cur.sis_thinned
+            thin_profile_length = self.lib.cur.sis.flag[si].size
+            logger.debug("thin profile size: %d (with tolerance: %.3f)" % (thin_profile_length, tolerance))
+            if thin_profile_length < 1000:
+                break
+
+            logger.info("too many samples, attempting with a lower tolerance")
 
         self.dataplots.update_data()
 

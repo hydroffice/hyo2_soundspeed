@@ -582,7 +582,21 @@ class SoundSpeedLibrary:
 
             # special case for Kongsberg asvp format
             if writer.name == 'asvp':
-                self.prepare_sis()
+
+                tolerances = [0.01, 0.1, 0.5]
+                for tolerance in tolerances:
+
+                    if not self.prepare_sis(thin_tolerance=tolerance):
+                        logger.warning("issue in preparing the data for SIS")
+                        return False
+
+                    si = self.cur.sis_thinned
+                    thin_profile_length = self.cur.sis.flag[si].size
+                    logger.debug("thin profile size: %d (with tolerance: %.3f)" % (thin_profile_length, tolerance))
+                    if thin_profile_length < 1000:
+                        break
+
+                    logger.info("too many samples, attempting with a lower tolerance")
 
             # special case for Fugro ISS format with NCEI format
             if (name == 'ncei') and (self.ssp.l[0].meta.probe_type == Dicts.probe_types['ISS']):
@@ -1223,7 +1237,7 @@ class SoundSpeedLibrary:
 
         return True
 
-    def prepare_sis(self, apply_thin=True, apply_12k=True, thin_tolerance=0.1):
+    def prepare_sis(self, apply_thin=True, apply_12k=True, thin_tolerance=0.01):
         if not self.has_ssp():
             logger.warning("no profile!")
             return False
