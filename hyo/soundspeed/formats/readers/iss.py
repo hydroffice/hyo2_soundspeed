@@ -122,27 +122,39 @@ class Iss(AbstractTextReader):
             logger.warning("unknown Leidos ISS svp format with header starting with: %s" % header[:len(token_header)])
 
         else:
-            hdr_tokens = header.split(' ')
+            hdr_tokens = header.split()
+            # logger.info("tokens: %s" % (hdr_tokens, ))
 
             try:
-                if len(hdr_tokens) == 11:
-                    # cast date-time
-                    token_dt = hdr_tokens[5] + " " + hdr_tokens[4]
-                    self.ssp.cur.meta.utc_time = dt.datetime.strptime(token_dt, '%y%j %H%M%S')
-                    logger.info("date: %s" % self.ssp.cur.meta.utc_time)
+                if len(hdr_tokens) not in [11, 12]:
+                    raise RuntimeError("invalid number of tokens (%d) in: %s" % (len(hdr_tokens), header))
 
-                    # latitude
-                    latitude = float(hdr_tokens[2])
-                    if latitude != 0.0:  # assumed empty fields?
-                        self.ssp.cur.meta.latitude = latitude
-
-                    # longitude
-                    longitude = float(hdr_tokens[3])
-                    if longitude != 0.0:  # assumed empty fields?
-                        self.ssp.cur.meta.longitude = longitude
+                # cast date-time
+                token_dt = hdr_tokens[5] + " " + hdr_tokens[4]
+                self.ssp.cur.meta.utc_time = dt.datetime.strptime(token_dt, '%y%j %H%M%S')
+                logger.info("date: %s" % self.ssp.cur.meta.utc_time)
 
             except ValueError:
                 logger.error("unable to parse date and time from: %s" % header)
+
+            try:
+                if len(hdr_tokens) not in [11, 12]:
+                    raise RuntimeError("invalid number of tokens (%d) in: %s" % (len(hdr_tokens), header))
+
+                # latitude
+                latitude = float(hdr_tokens[2])
+                if latitude != 0.0:  # assumed empty fields?
+                    self.ssp.cur.meta.latitude = latitude
+
+                # longitude
+                longitude = float(hdr_tokens[3])
+                if longitude != 0.0:  # assumed empty fields?
+                    self.ssp.cur.meta.longitude = longitude
+
+                logger.info("(lat, lon): %s, %s" % (self.ssp.cur.meta.latitude, self.ssp.cur.meta.longitude))
+
+            except ValueError:
+                logger.error("unable to parse position from: %s" % header)
 
         if not self.ssp.cur.meta.original_path:
             self.ssp.cur.meta.original_path = self.fid.path
@@ -288,16 +300,22 @@ class Iss(AbstractTextReader):
 
             # In case an incomplete file comes through
             try:
-                dpt, spd = line.split()
+                tokens = line.split()
+                if len(tokens) not in [2, 4]:
+                    logger.info("skipping row at line %d for invalid number of fields: %s" % (i, line))
+                    continue
+
+                dpt = float(tokens[0])
+                spd = float(tokens[1])
 
                 if spd == 0.0:
                     logger.info("skipping 0-speed row at line %d: %s" % (i, line))
                     continue
 
-                self.ssp.cur.data.depth[samples] = float(dpt)
-                self.ssp.cur.data.speed[samples] = float(spd)
-                logger.info("%d %7.1f %7.1f"
-                            % (samples, self.ssp.cur.data.depth[samples], self.ssp.cur.data.speed[samples]))
+                self.ssp.cur.data.depth[samples] = dpt
+                self.ssp.cur.data.speed[samples] = spd
+                # logger.info("%d %7.1f %7.1f"
+                #             % (samples, self.ssp.cur.data.depth[samples], self.ssp.cur.data.speed[samples]))
 
             except ValueError:
                 logger.error("skipping line %s" % i)
