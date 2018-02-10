@@ -2,6 +2,7 @@ import os
 import sys
 import platform
 import logging
+from typing import IO, Dict, Any
 # To use a consistent encoding
 from codecs import open
 
@@ -13,30 +14,30 @@ from .. import __version__ as ss_version
 class FileInfo:
     """A class that collects information on a passed file"""
 
-    def __init__(self, data_path):
+    def __init__(self, data_path: str):
         self._path = os.path.abspath(data_path)
-        self._basename = os.path.basename(self._path).split('.')[0]
-        self._ext = os.path.basename(self._path).split('.')[-1]
+        self._basename = str(os.path.basename(self._path).split('.')[0])
+        self._ext = str(os.path.basename(self._path).split('.')[-1])
         self._io = None
 
     @property
-    def path(self):
+    def path(self) -> str:
         return self._path
 
     @property
-    def basename(self):
+    def basename(self) -> str:
         return self._basename
 
     @property
-    def ext(self):
+    def ext(self) -> str:
         return self._ext
 
     @property
-    def io(self):
+    def io(self) -> IO:
         return self._io
 
     @io.setter
-    def io(self, value):
+    def io(self, value: IO):
         self._io = value
 
     def __repr__(self):
@@ -46,7 +47,7 @@ class FileInfo:
 
 
 class FileManager(FileInfo):
-    def __init__(self, data_path, mode, encoding='utf-8'):
+    def __init__(self, data_path: str, mode: str, encoding: str='utf-8'):
         """Open the passed file and store related info"""
         if (not os.path.exists(data_path)) and ((mode == 'r') or (mode == 'rb')):
             raise RuntimeError('the passed file does not exist: %s' % data_path)
@@ -57,16 +58,16 @@ class FileManager(FileInfo):
         self._io = open(self.path, mode=mode, encoding=encoding)
 
     @property
-    def append_exists(self):
+    def append_exists(self) -> bool:
         """Return if the file was existing before the appending operation"""
         return self._append_exists
 
-    def close(self):
+    def close(self) -> None:
         if self._io is not None:
             self._io.close()
 
 
-def info_libs():
+def info_libs() -> str:
     msg = "os: %s %s\n" % (os.name, "64" if is_64bit_os() else "32")
     msg += "python: %s %s-bit\n" % (platform.python_version(), "64" if is_64bit_python() else "32")
     msg += "hyo.soundspeed: %s\n" % ss_version
@@ -94,7 +95,7 @@ def info_libs():
         msg += "hyo.surveydatamonitor: %s\n" % sdm_version
 
     except ImportError:
-        pass
+        sdm_version = None
 
     try:
         from numpy import __version__ as np_version
@@ -171,32 +172,32 @@ def info_libs():
     return msg
 
 
-def is_64bit_os():
+def is_64bit_os() -> bool:
     """ Check if the current OS is at 64 bits """
     return platform.machine().endswith('64')
 
 
-def is_64bit_python():
+def is_64bit_python() -> bool:
     """ Check if the current Python is at 64 bits """
     return platform.architecture()[0] == "64bit"
 
 
-def is_windows():
+def is_windows() -> bool:
     """ Check if the current OS is Windows """
     return (sys.platform == 'win32') or (os.name is "nt")
 
 
-def is_darwin():
+def is_darwin() -> bool:
     """ Check if the current OS is Mac OS """
     return sys.platform == 'darwin'
 
 
-def is_linux():
+def is_linux() -> bool:
     """ Check if the current OS is Linux """
     return sys.platform in ['linux', 'linux2']
 
 
-def is_url(value):
+def is_url(value: str) -> bool:
     if len(value) > 7:
 
         https = "https"
@@ -206,7 +207,7 @@ def is_url(value):
     return False
 
 
-def explore_folder(path):
+def explore_folder(path: str) -> bool:
     """Open the passed path using OS-native commands"""
 
     if is_url(path):
@@ -237,7 +238,7 @@ def explore_folder(path):
         return False
 
 
-def first_match(dct, val):
+def first_match(dct: Dict[Any, Any], val: Any) -> Any:
     if not isinstance(dct, dict):
         raise RuntimeError("invalid first input: it is %s instead of a dict" % type(dct))
     # print(dct, val)
@@ -248,7 +249,7 @@ def first_match(dct, val):
         raise RuntimeError("unknown value %s in dict: %s" % (val, dct))
 
 
-def python_path():
+def python_path() -> str:
     """ Return the python site-specific directory prefix (PyInstaller-aware) """
 
     # required by PyInstaller
@@ -272,7 +273,7 @@ def python_path():
     return sys.prefix
 
 
-def is_pydro():
+def is_pydro() -> bool:
     try:
         # noinspection PyUnresolvedReferences
         import HSTB
@@ -282,7 +283,7 @@ def is_pydro():
         return False
 
 
-def hstb_folder():
+def hstb_folder() -> str:
     if not is_pydro():
         raise RuntimeError("this method should be called only within a Pydro environment")
 
@@ -292,7 +293,7 @@ def hstb_folder():
     return os.path.abspath(os.path.dirname(hstb_file))
 
 
-def hstb_atlases_folder():
+def hstb_atlases_folder() -> str:
     if not is_pydro():
         raise RuntimeError("this method should be called only within a Pydro environment")
 
@@ -302,12 +303,12 @@ def hstb_atlases_folder():
     return folder
 
 
-def hstb_woa09_folder():
+def hstb_woa09_folder() -> str:
     if not is_pydro():
         raise RuntimeError("this method should be called only within a Pydro environment")
 
-    # noinspection PyUnresolvedReferences
     try:
+        # noinspection PyUnresolvedReferences
         import WOA09
         folder = WOA09.__path__[0]
     except ImportError:
@@ -317,12 +318,12 @@ def hstb_woa09_folder():
     return folder
 
 
-def hstb_woa13_folder():
+def hstb_woa13_folder() -> str:
     if not is_pydro():
         raise RuntimeError("this method should be called only within a Pydro environment")
 
-    # noinspection PyUnresolvedReferences
     try:
+        # noinspection PyUnresolvedReferences
         import WOA13
         folder = WOA13.__path__[0]
     except ImportError:
