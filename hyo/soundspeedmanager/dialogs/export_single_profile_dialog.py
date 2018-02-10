@@ -139,6 +139,10 @@ class ExportSingleProfileDialog(AbstractDialog):
             QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
             return
 
+        # special case for Fugro ISS format
+        iss_writer_instrument = None
+        custom_writer_instrument = None
+
         # special case: synthetic profile and NCEI
         for writer in self.selected_writers:
             if writer != 'ncei':
@@ -158,7 +162,7 @@ class ExportSingleProfileDialog(AbstractDialog):
                 return
 
             if self.lib.setup.noaa_tools and self.lib.not_noaa_project(self.lib.current_project):
-                current_project = self.lib.cb.ask_format_text(default=self.lib.noaa_project)
+                current_project = self.lib.cb.ask_formatted_text(default=self.lib.noaa_project)
                 if self.lib.not_noaa_project(current_project):
                     msg = "The project name cannot be used for NCEI export.\n\n" \
                           "Rename the project in the Database tab!\n\n" \
@@ -175,6 +179,19 @@ class ExportSingleProfileDialog(AbstractDialog):
                       "- Set the missing values using the Metadata button on the Editor tool bar\n"
                 QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
                 return
+
+            # special case for Fugro ISS format with NCEI format
+            if self.lib.ssp.cur.meta.probe_type == Dicts.probe_types['ISS']:
+                logger.info("special case: NCEI and ISS format")
+
+                if custom_writer_instrument is None:
+
+                    msg = "Enter the instrument type and model \n(if you don't know, leave it blank):"
+                    instrument = self.lib.cb.ask_text("ISS for NCEI", msg)
+                    # if empty, we just use the sensor type
+                    if instrument is None or instrument == "":
+                        instrument = self.lib.ssp.cur.meta.sensor
+                    custom_writer_instrument = instrument
 
         settings = QtCore.QSettings()
 
@@ -217,7 +234,7 @@ class ExportSingleProfileDialog(AbstractDialog):
         self.progress.start()
         try:
             self.lib.export_data(data_path=output_folder, data_files=basenames,
-                                 data_formats=self.selected_writers)
+                                 data_formats=self.selected_writers, custom_writer_instrument=custom_writer_instrument)
         except RuntimeError as e:
             self.progress.end()
             msg = "Issue in exporting the data.\nReason: %s" % e

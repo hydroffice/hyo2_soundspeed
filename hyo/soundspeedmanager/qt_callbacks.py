@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 from hyo.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
 from hyo.soundspeedmanager.dialogs.formatted_input_dialog import FormattedInputDialog
+from hyo.soundspeedmanager.dialogs.flaggable_input_dialog import FlaggableInputDialog
 
 
 class QtCallbacks(AbstractCallbacks):
@@ -34,15 +35,12 @@ class QtCallbacks(AbstractCallbacks):
             txt = None
         return txt
 
-    def ask_text_with_flag(self, title="", msg="Enter text", flag_label=""):
+    def ask_text_with_flag(self, title="", msg="Enter text", flag_label="Flag"):
         """Ask user for text with a flag optional"""
-        txt, ok = QtGui.QInputDialog.getText(self._parent, title, msg)
-        if not ok:
-            txt = None
-        return txt
+        return FlaggableInputDialog.get_text_with_flag(self._parent, title, msg, flag_label=flag_label)
 
-    def ask_format_text(self, title="Input", msg="Enter NOAA project", default="",
-                        fmt="^OPR-[A-Z]\d{3}-[A-Z]{2}-\d{2}$"):
+    def ask_formatted_text(self, title="Input", msg="Enter NOAA project", default="",
+                           fmt="^OPR-[A-Z]\d{3}-[A-Z]{2}-\d{2}$"):
         """Ask user for formatted text"""
         text, ok = FormattedInputDialog.get_format_text(self._parent, title, msg, default, fmt)
         return text

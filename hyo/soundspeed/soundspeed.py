@@ -549,7 +549,7 @@ class SoundSpeedLibrary:
 
     # --- export data
 
-    def export_data(self, data_formats, data_path, data_files=None, server_mode=False):
+    def export_data(self, data_formats, data_path, data_files=None, server_mode=False, custom_writer_instrument=None):
         """Export data using a list of formats name"""
 
         # checks
@@ -581,7 +581,7 @@ class SoundSpeedLibrary:
             writer = self.writers[idx]
 
             # special case for Kongsberg asvp format
-            if writer.name == 'asvp':
+            if name == 'asvp':
 
                 tolerances = [0.01, 0.1, 0.5]
                 for tolerance in tolerances:
@@ -598,15 +598,11 @@ class SoundSpeedLibrary:
 
                     logger.info("too many samples, attempting with a lower tolerance")
 
-            # special case for Fugro ISS format with NCEI format
-            if (name == 'ncei') and (self.ssp.l[0].meta.probe_type == Dicts.probe_types['ISS']):
-                logger.info("special case: NCEI and ISS format")
-                instrument = self.cb.ask_text("ISS for NCEI", "Enter the instrument type and model \n"
-                                                              "(if you don't know, leave it blank):")
-                # if empty, we just use the sensor type
-                if instrument is None or instrument == "":
-                    instrument = self.ssp.l[0].meta.sensor
-                writer.instrument = instrument
+            # special case (currently only used for Fugro ISS)
+            if name == 'ncei':
+                if custom_writer_instrument is not None:
+                    logger.debug("NCEI custom writer instrument: %s" % custom_writer_instrument)
+                    writer.instrument = custom_writer_instrument
 
             current_project = self.current_project
             if name == 'ncei' and self.setup.noaa_tools:

@@ -178,6 +178,10 @@ class ExportMultiProfileDialog(AbstractDialog):
                         os.remove(caris_path)
                 break
 
+        # special case for Fugro ISS format
+        force_writer_instrument_for_next_casts = None
+        custom_writer_instrument = None
+
         # actually do the export
         current_project = None
         for pk in self._pks:
@@ -215,7 +219,7 @@ class ExportMultiProfileDialog(AbstractDialog):
 
                 if self.lib.setup.noaa_tools and self.lib.not_noaa_project(self.lib.current_project):
                     if self.lib.not_noaa_project(current_project):
-                        current_project = self.lib.cb.ask_format_text(default=self.lib.noaa_project)
+                        current_project = self.lib.cb.ask_formatted_text(default=self.lib.noaa_project)
                         if self.lib.not_noaa_project(current_project):
                             msg = "The project name cannot be used for NCEI export.\n\n" \
                                   "Rename the project in the Database tab!\n\n" \
@@ -232,9 +236,32 @@ class ExportMultiProfileDialog(AbstractDialog):
                           "To fix the issue:\n" \
                           "- Load the profile (if not already loaded)\n" \
                           "- Set the missing values using the Metadata button on the Editor tool bar\n"
+                    # noinspection PyCallByClass
                     QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
                     skip_export = True
                     continue
+
+                # special case for Fugro ISS format with NCEI format
+                if self.lib.ssp.cur.meta.probe_type == Dicts.probe_types['ISS']:
+                    logger.info("special case: NCEI and ISS format")
+
+                    if force_writer_instrument_for_next_casts is None:
+
+                        msg = "Enter the instrument type and model \n(if you don't know, leave it blank):"
+                        instrument, flag = self.lib.cb.ask_text_with_flag("ISS for NCEI", msg,
+                                                                          flag_label="Apply to all the next profiles")
+                        logger.debug("user input for ISS: %s, %r" % (instrument, flag))
+                        # if empty, we just use the sensor type
+                        if instrument is None or instrument == "":
+                            instrument = self.lib.ssp.cur.meta.sensor
+                        if flag:  # to skip the user dialog for next casts
+                            force_writer_instrument_for_next_casts = instrument
+                        else:
+                            force_writer_instrument_for_next_casts = None
+                        custom_writer_instrument = instrument
+
+                    else:  # user asked to apply to all the next profiles
+                        custom_writer_instrument = force_writer_instrument_for_next_casts
 
             if skip_export:
                 continue
@@ -242,7 +269,8 @@ class ExportMultiProfileDialog(AbstractDialog):
             self.progress.start(text="Exporting profile #%02d" % pk)
             try:
                 self.progress.update(value=60)
-                self.lib.export_data(data_path=output_folder, data_formats=self.selected_writers)
+                self.lib.export_data(data_path=output_folder, data_formats=self.selected_writers,
+                                     custom_writer_instrument=custom_writer_instrument)
 
             except RuntimeError as e:
                 self.progress.end()

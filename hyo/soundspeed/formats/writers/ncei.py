@@ -184,16 +184,29 @@ class Ncei(AbstractWriter):
         # RECOMMENDED - an instrument variable storing information about a parameter of the instrument used in the
         # measurement, the dimensions don't have to be specified if the same instrument is used for all the measurements.
         instrument = self.root_group.createVariable('instrument', 'i4')
-        instrument.long_name = '%s' % self.ssp.cur.meta.sensor
-        probe = str(self.ssp.cur.meta.probe)
-        sn = str(self.ssp.cur.meta.sn)
-        match = re.match('^(\w+?) ?\(SN:(\w+?)\)', sn)
-        if match:
-            probe = match.group(1)
-            sn = match.group(2)
-        instrument.make_model = '%s' % probe
-        if self.ssp.cur.meta.sn:
-            instrument.serial_number = '%s' % sn
+        if self._instrument is None:
+
+            instrument.long_name = '%s' % self.ssp.cur.meta.sensor
+            probe = str(self.ssp.cur.meta.probe)
+            sn = str(self.ssp.cur.meta.sn)
+            match = re.match('^(\w+?) ?\(SN:(\w+?)\)', sn)
+            if match:
+                probe = match.group(1)
+                sn = match.group(2)
+            instrument.make_model = '%s' % probe
+            if self.ssp.cur.meta.sn:
+                instrument.serial_number = '%s' % sn
+
+        else:  # this part is used when a custom instrument is passed (for instance, for ISS format)
+
+            tokens = self._instrument.split()
+            if len(tokens) > 0:
+                instrument.long_name = self._instrument.split()[0]
+            if len(tokens) > 1:
+                instrument.make_model = self._instrument.split()[1]
+            if self.ssp.cur.meta.sn:
+                instrument.serial_number = '%s' % self.ssp.cur.meta.sn
+
         # SUGGESTED - Published or web - based references that describe the data or methods used to produce it.
         # Recommend URIs(such as a URL or DOI)
         self.root_group.references = 'https://www.hydroffice.org/soundspeed/'
