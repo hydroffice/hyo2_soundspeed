@@ -610,7 +610,8 @@ class SoundSpeedLibrary:
 
             current_project = self.current_project
             if name == 'ncei' and self.setup.noaa_tools:
-               current_project = self.noaa_project
+                current_project = self.noaa_project
+
             if not has_data_files:  # we don't have the output file names
                 if len(data_formats) == 1 and name == 'ncei':  # NCEI requires special filename convention
                     writer.write(ssp=self.ssp, data_path=data_path, data_file='ncei', project=current_project)

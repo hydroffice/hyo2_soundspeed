@@ -22,6 +22,11 @@ class GeneralAbstractCallbacks(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def ask_text_with_flag(self, title="", msg="Enter text", flag_label=""):
+        """Ask user for text with a flag optional"""
+        pass
+
+    @abstractmethod
     def ask_date(self):
         """Ask user for date"""
         pass

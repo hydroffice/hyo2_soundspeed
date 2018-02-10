@@ -38,6 +38,13 @@ class CliCallbacks(AbstractCallbacks):
         val = input(msg)
         return val
 
+    def ask_text_with_flag(self, title="", msg="Enter text", flag_label=""):
+        """Ask user for text with a flag optional"""
+        val = input(msg)
+        val2 = input("%s? Y for Yes, otherwise No" % flag_label)
+        flag = val2.lower() == "y"
+        return val, flag
+
     def ask_date(self):
         """Ask user for date"""
         now = datetime.utcnow()

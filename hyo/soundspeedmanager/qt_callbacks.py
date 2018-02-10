@@ -6,9 +6,10 @@ from PySide import QtGui, QtCore
 
 import logging
 
-from hyo.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
-
 logger = logging.getLogger(__name__)
+
+from hyo.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
+from hyo.soundspeedmanager.dialogs.formatted_input_dialog import FormattedInputDialog
 
 
 class QtCallbacks(AbstractCallbacks):
@@ -28,14 +29,22 @@ class QtCallbacks(AbstractCallbacks):
         return val
 
     def ask_text(self, title="", msg="Enter text"):
-        date, ok = QtGui.QInputDialog.getText(self._parent, title, msg)
+        txt, ok = QtGui.QInputDialog.getText(self._parent, title, msg)
         if not ok:
-            date = None
-        return date
+            txt = None
+        return txt
 
-    def ask_format_text(self, title="Input", msg="Enter NOAA project", default="", format="^OPR-[A-Z]\d{3}-[A-Z]{2}-\d{2}$"):
-        """Ask user for formated text"""
-        text, ok = InputDialog.get_format_text(self._parent, title, msg, default, format)
+    def ask_text_with_flag(self, title="", msg="Enter text", flag_label=""):
+        """Ask user for text with a flag optional"""
+        txt, ok = QtGui.QInputDialog.getText(self._parent, title, msg)
+        if not ok:
+            txt = None
+        return txt
+
+    def ask_format_text(self, title="Input", msg="Enter NOAA project", default="",
+                        fmt="^OPR-[A-Z]\d{3}-[A-Z]{2}-\d{2}$"):
+        """Ask user for formatted text"""
+        text, ok = FormattedInputDialog.get_format_text(self._parent, title, msg, default, fmt)
         return text
 
     @classmethod
@@ -523,54 +532,3 @@ class QtCallbacks(AbstractCallbacks):
                                   "2) Ensure SVP datagram is being distributed to this IP "
                                   "on port %d to enable future confirmations"
                                   % (name, ip))
-
-
-class InputDialog(QtGui.QDialog):
-    def __init__(self, parent, title="", msg="", default="", format=""):
-        super(InputDialog, self).__init__(parent, f=QtCore.Qt.WindowTitleHint)
-        self.setWindowTitle(title)
-        rex = QtCore.QRegExp(format)
-        self.validator = QtGui.QRegExpValidator(rex)
-        self.line_edit = QtGui.QLineEdit(default)
-
-        label = QtGui.QLabel(msg)
-        self.ok_btn = QtGui.QPushButton("OK")
-        cancel_btn = QtGui.QPushButton("Cancel")
-        layout = QtGui.QVBoxLayout()
-        hbox = QtGui.QHBoxLayout()
-        hbox.addWidget(self.ok_btn)
-        hbox.addWidget(cancel_btn)
-        layout.addWidget(label)
-        layout.addWidget(self.line_edit)
-        layout.addLayout(hbox)
-        self.setLayout(layout)
-
-        self.ok_btn.clicked.connect(self.accept)
-        cancel_btn.clicked.connect(self.reject)
-        self.line_edit.textChanged.connect(self._check_state)
-        self.line_edit.editingFinished.connect(self._check_state)
-        self._check_state()
-
-    @classmethod
-    def get_format_text(cls, parent, title="", msg="", default="", format=""):
-        dialog = cls(parent, title, msg, default, format)
-        if dialog.exec_() == QtGui.QDialog.Accepted:
-            rtn = dialog.line_edit.text(), True
-        else:
-            rtn = None, False
-        dialog.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        dialog.close()
-        return rtn
-
-    def _check_state(self):
-        state = self.validator.validate(self.line_edit.text(), 0)[0]
-        if state == QtGui.QValidator.Acceptable:
-            color = '#c4df9b' # green
-            self.ok_btn.setEnabled(True)
-        elif state == QtGui.QValidator.Intermediate:
-            color = '#fff79a' # yellow
-            self.ok_btn.setEnabled(False)
-        else:
-            color = '#f6989d' # red
-            self.ok_btn.setEnabled(False)
-        self.line_edit.setStyleSheet("background-color: %s;" % color)

@@ -21,6 +21,9 @@ class TestCallbacks(AbstractCallbacks):
     def ask_text(self, title="", msg="Enter text"):
         return "Hello world"
 
+    def ask_text_with_flag(self, title="", msg="Enter text", flag_label=""):
+        return "Hello world", True
+
     def ask_date(self):
         return datetime.utcnow()
 
