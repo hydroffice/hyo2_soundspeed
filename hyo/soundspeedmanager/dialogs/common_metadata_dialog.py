@@ -175,11 +175,16 @@ class CommonMetadataDialog(AbstractDialog):
 
             # apply changes
             try:
-                self.lib.cur.meta.institution = self.institution.currentText()
-                self.lib.cur.meta.survey = self.survey.text()
-                self.lib.cur.meta.vessel = self.vessel.currentText()
-                self.lib.cur.meta.sn = self.sn.text()
-                self.lib.cur.meta.comments = self.comments.toPlainText()
+                if len(self.institution.currentText()) != 0:
+                    self.lib.cur.meta.institution = self.institution.currentText()
+                if len(self.survey.text()) != 0:
+                    self.lib.cur.meta.survey = self.survey.text()
+                if len(self.vessel.currentText()) != 0:
+                    self.lib.cur.meta.vessel = self.vessel.currentText()
+                if len(self.sn.text()) != 0:
+                    self.lib.cur.meta.sn = self.sn.text()
+                if len(self.comments.toPlainText()) != 0:
+                    self.lib.cur.meta.comments = self.comments.toPlainText()
 
             except RuntimeError as e:
                 msg = "Issue in apply changes\n%s" % e
