@@ -19,6 +19,7 @@ from hyo.soundspeedmanager.dialogs.plot_multi_profile_dialog import PlotMultiPro
 from hyo.soundspeedmanager.dialogs.export_profile_metadata_dialog import ExportProfileMetadataDialog
 from hyo.soundspeedmanager.dialogs.text_editor_dialog import TextEditorDialog
 from hyo.soundspeedmanager.dialogs.metadata_dialog import MetadataDialog
+from hyo.soundspeedmanager.dialogs.common_metadata_dialog import CommonMetadataDialog
 
 
 class Database(AbstractWidget):
@@ -236,69 +237,88 @@ class Database(AbstractWidget):
         if len(rows) == 1:
 
             stats_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'stats.png')),
-                                      "Profile stats", self, statusTip="Get some statistical info about the profile",
+                                      "Profile stats", self, toolTip="Get some statistical info about the profile",
                                       triggered=self.stats_profile)
             menu.addAction(stats_act)
 
             metadata_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata_profile.png')),
-                                         "Metadata info", self, statusTip="View/edit the profile metadata",
+                                         "Metadata info", self, toolTip="View/edit the profile metadata",
                                          triggered=self.metadata_profile)
             menu.addAction(metadata_act)
 
             menu.addMenu(qa_menu)
             dqa_compare_ref_act = QtGui.QAction("DQA (with reference)", self,
-                                                statusTip="Assess data quality by comparison with the reference cast",
+                                                toolTip="Assess data quality by comparison with the reference cast",
                                                 triggered=self.dqa_full_profile)
             qa_menu.addAction(dqa_compare_ref_act)
-            dqa_at_surface_act = QtGui.QAction("DQA (at surface)", self, statusTip="DQA with surface sound speed",
+            dqa_at_surface_act = QtGui.QAction("DQA (at surface)", self, toolTip="DQA with surface sound speed",
                                                triggered=self.dqa_at_surface)
             qa_menu.addAction(dqa_at_surface_act)
 
             menu.addSeparator()
 
             load_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'load_profile.png')),
-                                     "Load profile", self, statusTip="Load a profile", triggered=self.load_profile)
+                                     "Load profile", self, toolTip="Load a profile", triggered=self.load_profile)
             menu.addAction(load_act)
 
             export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export_profile.png')),
-                                       "Export profile", self, statusTip="Export a single profile",
+                                       "Export profile", self, toolTip="Export a single profile",
                                        triggered=self.export_single_profile)
             menu.addAction(export_act)
 
             delete_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'delete.png')),
-                                       "Delete profile", self, statusTip="Delete selected profile",
+                                       "Delete profile", self, toolTip="Delete selected profile",
                                        triggered=self.delete_profile)
             menu.addAction(delete_act)
 
+            def handle_menu_hovered(action):
+                # noinspection PyArgumentList
+                QtGui.QToolTip.showText(QtGui.QCursor.pos(), action.toolTip(), menu, menu.actionGeometry(action))
+
+            # noinspection PyUnresolvedReferences
+            menu.hovered.connect(handle_menu_hovered)
+
         else:  # multiple selection
+
+            metadata_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata_profile.png')), "Edit Metadata",
+                                         self, toolTip="Edit common metadata fields for multiple profiles",
+                                         triggered=self.metadata_profile)
+            menu.addAction(metadata_act)
 
             menu.addMenu(qa_menu)
             if len(rows) == 2:
                 dqa_compare_two_act = QtGui.QAction("DQA (among selections)", self,
-                                                    statusTip="Assess data quality by comparison between two casts",
+                                                    toolTip="Assess data quality by comparison between two casts",
                                                     triggered=self.dqa_full_profile)
                 qa_menu.addAction(dqa_compare_two_act)
 
-            dqa_at_surface_act = QtGui.QAction("DQA (at surface)", self, statusTip="DQA with surface sound speed",
+            dqa_at_surface_act = QtGui.QAction("DQA (at surface)", self, toolTip="DQA with surface sound speed",
                                                triggered=self.dqa_at_surface)
             qa_menu.addAction(dqa_at_surface_act)
 
             plot_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'plot_comparison.png')),
-                                     "Comparison plot", self, statusTip="Plot profiles for comparison",
+                                     "Comparison plot", self, toolTip="Plot profiles for comparison",
                                      triggered=self.plot_comparison)
             menu.addAction(plot_act)
 
             menu.addSeparator()
 
             export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export_profile.png')),
-                                       "Export profiles", self, statusTip="Export multiple profiles",
+                                       "Export profiles", self, toolTip="Export multiple profiles",
                                        triggered=self.export_multi_profile)
             menu.addAction(export_act)
 
             delete_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'delete.png')),
-                                       "Delete profiles", self, statusTip="Delete selected profiles",
+                                       "Delete profiles", self, toolTip="Delete selected profiles",
                                        triggered=self.delete_profile)
             menu.addAction(delete_act)
+
+            def handle_menu_hovered(action):
+                # noinspection PyArgumentList
+                QtGui.QToolTip.showText(QtGui.QCursor.pos(), action.toolTip(), menu, menu.actionGeometry(action))
+
+            # noinspection PyUnresolvedReferences
+            menu.hovered.connect(handle_menu_hovered)
 
         menu.exec_(self.ssp_list.mapToGlobal(pos))
 
@@ -374,22 +394,27 @@ class Database(AbstractWidget):
 
         # check if any selection
         rows = self.ssp_list.selectionModel().selectedRows()
-        if len(rows) != 1:
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.information(self, "Database", "Select a single profile before exporting it!")
-            return
+        if len(rows) == 1:  # single selection
 
-        # the primary key is the first column (= 0)
-        pk = int(self.ssp_list.item(rows[0].row(), 0).text())
-        success = self.lib.load_profile(pk, skip_atlas=True)
-        if not success:
-            # noinspection PyCallByClass
-            QtGui.QMessageBox.warning(self, "Database", "Unable to load profile!", QtGui.QMessageBox.Ok)
-            return
+            # the primary key is the first column (= 0)
+            pk = int(self.ssp_list.item(rows[0].row(), 0).text())
+            success = self.lib.load_profile(pk, skip_atlas=True)
+            if not success:
+                # noinspection PyCallByClass
+                QtGui.QMessageBox.warning(self, "Database", "Unable to load profile!", QtGui.QMessageBox.Ok)
+                return
 
-        msg = self.lib.profile_stats()
-        if msg is not None:
             dlg = MetadataDialog(lib=self.lib, main_win=self.main_win, parent=self)
+            dlg.exec_()
+
+        else:  # multiple selection
+
+            logger.debug("User wants to edit the metadata of multiple profiles")
+
+            pks = [int(self.ssp_list.item(row.row(), 0).text()) for row in rows]
+            logger.debug("pks: %s" % (pks, ))
+
+            dlg = CommonMetadataDialog(lib=self.lib, main_win=self.main_win, pks=pks, parent=self)
             dlg.exec_()
 
         # finally, we clear the just loaded data
