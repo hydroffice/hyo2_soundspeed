@@ -291,6 +291,9 @@ this will be used to extend the cast instead of WOA/RTOFS atlases data.
     The *Extend profile* button in the *Editor* toolbar.
 
 
+Output creation
+===============
+
 Data export
 -----------
 
@@ -337,14 +340,15 @@ The recipients of such a transmission are configured in the configuration file (
 Given that the profile accepted by *SIS* often requires the application of a thinning algorithm,
 a method *Preview thinning* is provided to inspect the result of such an algorithm before the actual transmission.
 
+
 .. _ssm_database:
 
-Data storage
-------------
+Database
+========
 
 .. index:: database
 
-The package provides also functionalities to permanently storage, delete and retrieve the sound speed data.
+The package provides functionalities to permanently storage, delete and retrieve the sound speed profiles.
 Any time that a profile is exported or transmitted, its data content is stored in the database.
 A profile can also be stored in the database by using *Save to database* in the *Editor* toolbar (:numref:`save_to_database`).
 
@@ -357,7 +361,7 @@ A profile can also be stored in the database by using *Save to database* in the 
 
     The *Save to database* menu entry in the *Process* menu.
 
-In particular, each profile may contain three types of stored data:
+In particular, each profile contains three types of stored data:
 
 1. The raw data (that makes possible to redo the processing from scratch).
 2. The processed samples (with flags to identify the various different source of data).
@@ -374,8 +378,63 @@ Once stored in the database, the *Database* tab provides analysis functions and 
 
     The *Database* tab provides access to the collected profiles and related tools.
 
-For instance, it is possible to export the profile metadata in several geographic formats: csv, kml, shapefile
-(e.g., :numref:`kml_export_fig`), and to create maps (:numref:`map_creation_fig`) and plots (:numref:`daily_plot_fig` and :numref:`aggregate_plot_fig`).
+Context menu
+------------
+
+The context menu provides access to different tools based on the number of selected profiles:
+
+* Single-profile selection (:numref:`database_single_selection`).
+* Multi-profile selection (:numref:`database_multi_selection`).
+
+.. _database_single_selection:
+.. figure:: ./_static/database_single_selection.png
+    :width: 640px
+    :align: center
+    :alt: data storage
+    :figclass: align-center
+
+    The single-selection context menu provides functionalities specific to a single profile.
+
+.. _database_multi_selection:
+.. figure:: ./_static/database_multi_selection.png
+    :width: 640px
+    :align: center
+    :alt: data storage
+    :figclass: align-center
+
+    The multi-selection context menu provides functionalities that apply to multiple profiles (e.g., editing common metadata fields for multiple profiles).
+
+Project and Profiles groups
+---------------------------
+
+The *Project* group provides functionalaties to:
+
+* Create a new project (*New project* button).
+
+* Rename an existing project (*Rename project* button).
+
+* Switch among existing projects (*Switch project* button).
+
+* Import data from an existing database to the current project (*Import data* button).
+
+* Open the folder that contains the project databases (*Open folder* button).
+
+From the *Profiles* group, it is possible to import (*Import profiles* button) or export (*Export profiles* button) multiple profiles.
+
+Using the *Make plots* and *Export info* buttons (:numref:`database_make_plots`), you may:
+
+* Export the profile metadata in several geographic formats: csv, kml, shapefile (e.g., :numref:`kml_export_fig`), and
+
+* Create maps (:numref:`map_creation_fig`) and plots (:numref:`daily_plot_fig` and :numref:`aggregate_plot_fig`).
+
+.. _database_make_plots:
+.. figure:: ./_static/database_make_plots.png
+    :width: 640px
+    :align: center
+    :alt: data storage
+    :figclass: align-center
+
+    The *Make plots* and *Export info* buttons in the *Profiles* group creates plots/maps and exports the metadata for all the profiles in the database.
 
 .. index:: csv
 .. index:: kml
