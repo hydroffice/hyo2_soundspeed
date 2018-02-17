@@ -48,6 +48,7 @@ install:
   - conda config --prepend channels conda-forge
   - conda install -q numpy basemap pyside matplotlib netCDF4 gdal libgdal pyproj krb5 pyserial pillow
   - pip install gsw==3.0.6
+  - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then conda install xerces-c==3.2.0; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then conda install jpeg=8; fi
   - pip install --no-deps -e .
 
