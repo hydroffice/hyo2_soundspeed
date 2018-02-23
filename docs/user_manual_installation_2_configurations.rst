@@ -206,9 +206,9 @@ The setup of this method is summarized as follows:
 
     The *Data Distrubution* application, with key settings in red for :ref:`method_3`.
 
-* Find the first empty row and enter the UDP port to which *SIS* has to distribute data in the left most column. Hit the *Enter* key to finalize the entry
+* Find the first empty row and enter the UDP port from which *SIS* has to distribute data in the left most column. Hit the *Enter* key to finalize the entry
 * In the same row, click on the fourth column and type in the IP address of the remote machine on which this package is installed, immediately followed by a colon (:), then port number that the data should be delivered to on the remote machine: e.g., 192.168.1.67:16103. Again, hit the *Enter* key to finalize the entry. If SIS is pinging and distributing the data, you should see the packet count increase steadily in the third column.
-
+* To send data to another port on a computer already connected to SIS through the Data Distribution, simply click on column five in the same row as the existing connection. Enter the same IP address as in column four, followed by a colon, followed by the new port number (e.g. 192.168.1.67:26103). Again, hit the Enter key to finalize the entry.
 
 Sound Speed Manager side
 ------------------------
