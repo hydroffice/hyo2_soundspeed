@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 from hyo.soundspeedmanager.widgets.widget import AbstractWidget
 from hyo.soundspeedmanager.dialogs.automate_dialog import AutomateDialog
+from hyo.soundspeedmanager.dialogs.buttons_dialog import ButtonsDialog
 from hyo.soundspeedmanager.dialogs.import_single_profile_dialog import ImportSingleProfileDialog
 from hyo.soundspeedmanager.dialogs.reference_dialog import ReferenceDialog
 from hyo.soundspeedmanager.dialogs.spreadsheet_dialog import SpreadSheetDialog
@@ -25,6 +26,17 @@ class Editor(AbstractWidget):
 
     def __init__(self, main_win, lib):
         AbstractWidget.__init__(self, main_win=main_win, lib=lib)
+
+        settings = QtCore.QSettings()
+        settings.setValue("editor_buttons/reference", settings.value("editor_buttons/reference", 1))
+        settings.setValue("editor_buttons/spreadsheet", settings.value("editor_buttons/spreadsheet", 0))
+        settings.setValue("editor_buttons/metadata", settings.value("editor_buttons/metadata", 1))
+        settings.setValue("editor_buttons/filter", settings.value("editor_buttons/filter", 1))
+        settings.setValue("editor_buttons/thinning", settings.value("editor_buttons/thinning", 0))
+        settings.setValue("editor_buttons/restart", settings.value("editor_buttons/restart", 1))
+        settings.setValue("editor_buttons/export", settings.value("editor_buttons/export", 1))
+        settings.setValue("editor_buttons/transmit", settings.value("editor_buttons/transmit", 1))
+        settings.setValue("editor_buttons/database", settings.value("editor_buttons/database", 0))
 
         self.input_bar = self.addToolBar('Input')
         self.input_bar.setIconSize(QtCore.QSize(40, 40))
@@ -54,7 +66,8 @@ class Editor(AbstractWidget):
         self.set_ref_act.setShortcut('Alt+R')
         # noinspection PyUnresolvedReferences
         self.set_ref_act.triggered.connect(self.on_set_ref)
-        self.input_bar.addAction(self.set_ref_act)
+        if settings.value("editor_buttons/reference", 1) == 1:
+            self.input_bar.addAction(self.set_ref_act)
         self.main_win.file_menu.addAction(self.set_ref_act)
 
         self.process_bar = self.addToolBar('Process')
@@ -66,7 +79,8 @@ class Editor(AbstractWidget):
         self.spreadsheet_act.setShortcut('Alt+S')
         # noinspection PyUnresolvedReferences
         self.spreadsheet_act.triggered.connect(self.on_spreadsheet)
-        # self.process_bar.addAction(self.spreadsheet_act)
+        if settings.value("editor_buttons/spreadsheet", 0) == 1:
+            self.process_bar.addAction(self.spreadsheet_act)
         self.main_win.edit_menu.addAction(self.spreadsheet_act)
 
         # metadata
@@ -75,11 +89,13 @@ class Editor(AbstractWidget):
         self.metadata_act.setShortcut('Alt+M')
         # noinspection PyUnresolvedReferences
         self.metadata_act.triggered.connect(self.on_metadata)
-        self.process_bar.addAction(self.metadata_act)
+        if settings.value("editor_buttons/metadata", 1) == 1:
+            self.process_bar.addAction(self.metadata_act)
         self.main_win.edit_menu.addAction(self.metadata_act)
 
         # - separator
         self.process_bar.addSeparator()
+        self.main_win.edit_menu.addSeparator()
 
         # filter
         self.filter_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'filter.png')),
@@ -87,8 +103,8 @@ class Editor(AbstractWidget):
         self.filter_act.setShortcut('Alt+F')
         # noinspection PyUnresolvedReferences
         self.filter_act.triggered.connect(self.on_data_filter)
-        self.process_bar.addAction(self.filter_act)
-        self.main_win.edit_menu.addSeparator()
+        if settings.value("editor_buttons/filter", 1) == 1:
+            self.process_bar.addAction(self.filter_act)
         self.main_win.edit_menu.addAction(self.filter_act)
 
         # retrieve sal
@@ -133,7 +149,8 @@ class Editor(AbstractWidget):
         # noinspection PyUnresolvedReferences
         self.thin_act.triggered.connect(self.on_preview_thinning)
         # self.thin_act.setVisible(False)
-        # self.process_bar.addAction(self.thin_act)
+        if settings.value("editor_buttons/thinning", 0) == 1:
+            self.process_bar.addAction(self.thin_act)
         self.main_win.edit_menu.addAction(self.thin_act)
 
         # - separator
@@ -145,11 +162,14 @@ class Editor(AbstractWidget):
         # self.restart_act.setShortcut('Alt+N')
         # noinspection PyUnresolvedReferences
         self.restart_act.triggered.connect(self.on_restart_proc)
-        self.process_bar.addAction(self.restart_act)
+        if settings.value("editor_buttons/restart", 1) == 1:
+            self.process_bar.addAction(self.restart_act)
         self.main_win.edit_menu.addAction(self.restart_act)
 
         self.output_bar = self.addToolBar('Output')
         self.output_bar.setIconSize(QtCore.QSize(40, 40))
+
+        self.main_win.edit_menu.addSeparator()
 
         # export
         self.export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export.png')),
@@ -157,8 +177,8 @@ class Editor(AbstractWidget):
         self.export_act.setShortcut('Alt+X')
         # noinspection PyUnresolvedReferences
         self.export_act.triggered.connect(self.on_export_single_profile)
-        self.output_bar.addAction(self.export_act)
-        self.main_win.edit_menu.addSeparator()
+        if settings.value("editor_buttons/export", 1) == 1:
+            self.output_bar.addAction(self.export_act)
         self.main_win.edit_menu.addAction(self.export_act)
 
         # transmit
@@ -167,7 +187,8 @@ class Editor(AbstractWidget):
         self.transmit_act.setShortcut('Alt+T')
         # noinspection PyUnresolvedReferences
         self.transmit_act.triggered.connect(self.on_transmit_data)
-        self.output_bar.addAction(self.transmit_act)
+        if settings.value("editor_buttons/transmit", 1) == 1:
+            self.output_bar.addAction(self.transmit_act)
         self.main_win.edit_menu.addAction(self.transmit_act)
 
         # save db
@@ -176,8 +197,11 @@ class Editor(AbstractWidget):
         self.save_db_act.setShortcut('Alt+D')
         # noinspection PyUnresolvedReferences
         self.save_db_act.triggered.connect(self.on_save_db)
-        # self.output_bar.addAction(self.save_db_act)
+        if settings.value("editor_buttons/database", 0) == 1:
+            self.output_bar.addAction(self.save_db_act)
         self.main_win.edit_menu.addAction(self.save_db_act)
+
+        self.main_win.edit_menu.addSeparator()
 
         # automate steps
         self.automate_processing_acts = QtGui.QAction("Automate processing", self)
@@ -185,8 +209,14 @@ class Editor(AbstractWidget):
         self.automate_processing_acts.setStatusTip("Automate the processing steps")
         # noinspection PyUnresolvedReferences
         self.automate_processing_acts.triggered.connect(self.on_automate_processing)
-        self.main_win.edit_menu.addSeparator()
         self.main_win.edit_menu.addAction(self.automate_processing_acts)
+
+        # buttons visibility
+        self.buttons_visibility_acts = QtGui.QAction("Change buttons visibility", self)
+        self.buttons_visibility_acts.setStatusTip("Define which buttons are displayed on the toolbar")
+        # noinspection PyUnresolvedReferences
+        self.buttons_visibility_acts.triggered.connect(self.on_buttons_visibility)
+        self.main_win.edit_menu.addAction(self.buttons_visibility_acts)
 
         # exit action
         exit_action = QtGui.QAction("Exit", self)
@@ -599,6 +629,15 @@ class Editor(AbstractWidget):
         self.main_win.switch_to_editor_tab()
 
         dlg = AutomateDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        dlg.exec_()
+
+    def on_buttons_visibility(self):
+
+        logger.debug('open buttons visibility dialog')
+
+        self.main_win.switch_to_editor_tab()
+
+        dlg = ButtonsDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
 
     def data_cleared(self):
