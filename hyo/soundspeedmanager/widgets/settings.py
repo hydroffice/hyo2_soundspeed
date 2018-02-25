@@ -53,7 +53,7 @@ class Settings(AbstractWidget):
 
         # edit setup
         self.edit_act = QtGui.QAction('Edit Setup', self)
-        self.edit_act.setShortcut('Ctrl+Alt+S')
+        # self.edit_act.setShortcut('Ctrl+Alt+S')
         # noinspection PyUnresolvedReferences
         self.edit_act.triggered.connect(self.on_edit_setup)
         self.main_win.setup_menu.addAction(self.edit_act)

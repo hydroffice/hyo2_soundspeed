@@ -101,7 +101,7 @@ class Database(AbstractWidget):
         self.btn_rename_project.setToolTip("Rename the current project")
         self.manage_btn_box.addButton(self.btn_rename_project, QtGui.QDialogButtonBox.ActionRole)
         self.rename_project_act = QtGui.QAction('Rename Current Project DB', self)
-        self.rename_project_act.setShortcut('Ctrl+R')
+        # self.rename_project_act.setShortcut('Ctrl+R')
         # noinspection PyUnresolvedReferences
         self.rename_project_act.triggered.connect(self.rename_project)
         self.main_win.database_menu.addAction(self.rename_project_act)
@@ -113,7 +113,7 @@ class Database(AbstractWidget):
         self.btn_load_project.setToolTip("Switch to another existing project")
         self.manage_btn_box.addButton(self.btn_load_project, QtGui.QDialogButtonBox.ActionRole)
         self.load_project_act = QtGui.QAction('Switch Project DB', self)
-        self.load_project_act.setShortcut('Ctrl+L')
+        # self.load_project_act.setShortcut('Ctrl+L')
         # noinspection PyUnresolvedReferences
         self.load_project_act.triggered.connect(self.switch_project)
         self.main_win.database_menu.addAction(self.load_project_act)
@@ -125,7 +125,7 @@ class Database(AbstractWidget):
         self.btn_import_data.setToolTip("Import data from another project")
         self.manage_btn_box.addButton(self.btn_import_data, QtGui.QDialogButtonBox.ActionRole)
         self.import_data_act = QtGui.QAction('Import Data from Project DB', self)
-        self.import_data_act.setShortcut('Ctrl+I')
+        # self.import_data_act.setShortcut('Ctrl+I')
         # noinspection PyUnresolvedReferences
         self.import_data_act.triggered.connect(self.import_data)
         self.main_win.database_menu.addAction(self.import_data_act)
@@ -137,7 +137,7 @@ class Database(AbstractWidget):
         self.btn_project_folder.setToolTip("Open projects folder")
         self.manage_btn_box.addButton(self.btn_project_folder, QtGui.QDialogButtonBox.ActionRole)
         self.project_folder_act = QtGui.QAction('Open Projects DB Folder', self)
-        self.project_folder_act.setShortcut('Ctrl+P')
+        # self.project_folder_act.setShortcut('Ctrl+P')
         # noinspection PyUnresolvedReferences
         self.project_folder_act.triggered.connect(self.project_folder)
         self.main_win.database_menu.addAction(self.project_folder_act)
@@ -162,7 +162,7 @@ class Database(AbstractWidget):
         btn.setToolTip("Import multiple profiles")
         self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
         self.import_profiles_act = QtGui.QAction('Import Multiple Profiles', self)
-        self.import_profiles_act.setShortcut('Ctrl+M')
+        self.import_profiles_act.setShortcut('Ctrl+I')
         # noinspection PyUnresolvedReferences
         self.import_profiles_act.triggered.connect(self.import_profiles)
         self.main_win.database_menu.addSeparator()
@@ -187,7 +187,7 @@ class Database(AbstractWidget):
         btn.setToolTip("Create plots with all the profiles")
         self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
         self.plot_profiles_act = QtGui.QAction('Make Plots from Data', self)
-        self.plot_profiles_act.setShortcut('Ctrl+P')
+        # self.plot_profiles_act.setShortcut('Ctrl+P')
         # noinspection PyUnresolvedReferences
         self.plot_profiles_act.triggered.connect(self.plot_profiles)
         self.main_win.database_menu.addAction(self.plot_profiles_act)
@@ -199,7 +199,7 @@ class Database(AbstractWidget):
         btn.setToolTip("Export profile locations and metadata")
         self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
         self.export_profile_metadata_act = QtGui.QAction('Export Data Info', self)
-        self.export_profile_metadata_act.setShortcut('Ctrl+D')
+        # self.export_profile_metadata_act.setShortcut('Ctrl+D')
         # noinspection PyUnresolvedReferences
         self.export_profile_metadata_act.triggered.connect(self.export_profile_metadata)
         self.main_win.database_menu.addAction(self.export_profile_metadata_act)
@@ -211,7 +211,7 @@ class Database(AbstractWidget):
         btn.setToolTip("Open the output folder")
         self.product_btn_box.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
         self.output_folder_act = QtGui.QAction('Open Output Folder', self)
-        self.output_folder_act.setShortcut('Ctrl+O')
+        # self.output_folder_act.setShortcut('Ctrl+O')
         # noinspection PyUnresolvedReferences
         self.output_folder_act.triggered.connect(self.output_folder)
         self.main_win.database_menu.addAction(self.output_folder_act)

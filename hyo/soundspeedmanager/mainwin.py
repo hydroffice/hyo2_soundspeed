@@ -104,13 +104,13 @@ class MainWin(QtGui.QMainWindow):
         # menu
 
         self.menu = self.menuBar()
-        self.file_menu = self.menu.addMenu("&File")
-        self.edit_menu = self.menu.addMenu("&Process")
-        self.database_menu = self.menu.addMenu("&Database")
-        self.monitor_menu = self.menu.addMenu("&Monitor")
-        self.server_menu = self.menu.addMenu("&Server")
-        self.setup_menu = self.menu.addMenu("&Setup")
-        self.help_menu = self.menu.addMenu("&Help")
+        self.file_menu = self.menu.addMenu("File")
+        self.edit_menu = self.menu.addMenu("Process")
+        self.database_menu = self.menu.addMenu("Database")
+        self.monitor_menu = self.menu.addMenu("Monitor")
+        self.server_menu = self.menu.addMenu("Server")
+        self.setup_menu = self.menu.addMenu("Setup")
+        self.help_menu = self.menu.addMenu("Help")
 
         # make tabs
         self.tabs = QtGui.QTabWidget()

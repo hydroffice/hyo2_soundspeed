@@ -83,28 +83,28 @@ class Info(QtGui.QMainWindow):
         self.toolbar.setIconSize(QtCore.QSize(40, 40))
         # default
         home_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'home.png')), 'Home page', self)
-        home_action.setShortcut('Alt+H')
+        # home_action.setShortcut('Alt+H')
         # noinspection PyUnresolvedReferences
         home_action.triggered.connect(self.load_default)
         self.toolbar.addAction(home_action)
         # docs
         online_docs_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'online_docs.png')),
                                            'Online Documentation', self)
-        online_docs_action.setShortcut('Alt+D')
+        online_docs_action.setShortcut('Ctrl+H')
         # noinspection PyUnresolvedReferences
         online_docs_action.triggered.connect(self.load_online_docs)
         self.toolbar.addAction(online_docs_action)
         self.main_win.help_menu.addAction(online_docs_action)
         offline_docs_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'offline_docs.png')),
                                             'Offline Documentation', self)
-        offline_docs_action.setShortcut('Alt+O')
+        offline_docs_action.setShortcut('Alt+H')
         # noinspection PyUnresolvedReferences
         offline_docs_action.triggered.connect(self.load_offline_docs)
         self.toolbar.addAction(offline_docs_action)
         self.main_win.help_menu.addAction(offline_docs_action)
         # license
         license_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'license.png')), 'License', self)
-        license_action.setShortcut('Alt+L')
+        # license_action.setShortcut('Alt+L')
         # noinspection PyUnresolvedReferences
         license_action.triggered.connect(self.load_license)
         self.toolbar.addAction(license_action)
@@ -112,7 +112,7 @@ class Info(QtGui.QMainWindow):
         # authors
         authors_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'authors.png')),
                                        'About Sound Speed Manager', self)
-        authors_action.setShortcut('Alt+A')
+        # authors_action.setShortcut('Alt+A')
         # noinspection PyUnresolvedReferences
         authors_action.triggered.connect(self.show_authors)
         self.toolbar.addAction(authors_action)
@@ -121,7 +121,7 @@ class Info(QtGui.QMainWindow):
         # smartmap
         smartmap_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'smartmap.png')),
                                         'SmartMap WebGIS', self)
-        smartmap_action.setShortcut('Alt+S')
+        # smartmap_action.setShortcut('Alt+S')
         # noinspection PyUnresolvedReferences
         smartmap_action.triggered.connect(self.open_smartmap)
         self.toolbar.addAction(smartmap_action)
@@ -130,25 +130,25 @@ class Info(QtGui.QMainWindow):
         self.toolbar.addSeparator()
         # HydrOffice.org
         hyo_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'hyo.png')), 'HydrOffice.org', self)
-        hyo_action.setShortcut('Ctrl+H')
+        # hyo_action.setShortcut('Ctrl+H')
         # noinspection PyUnresolvedReferences
         hyo_action.triggered.connect(self.load_hydroffice_org)
         self.toolbar.addAction(hyo_action)
         # noaa
         noaa_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'noaa.png')), 'nauticalcharts.noaa.gov', self)
-        noaa_action.setShortcut('Alt+N')
+        # noaa_action.setShortcut('Alt+N')
         # noinspection PyUnresolvedReferences
         noaa_action.triggered.connect(self.load_noaa_ocs_gov)
         self.toolbar.addAction(noaa_action)
         # ccom.unh.edu
         ccom_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'ccom.png')), 'ccom.unh.edu', self)
-        ccom_action.setShortcut('Alt+C')
+        # ccom_action.setShortcut('Alt+C')
         # noinspection PyUnresolvedReferences
         ccom_action.triggered.connect(self.load_ccom_unh_edu)
         self.toolbar.addAction(ccom_action)
         # unh.edu
         unh_action = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'unh.png')), 'unh.edu', self)
-        unh_action.setShortcut('Alt+U')
+        # unh_action.setShortcut('Alt+U')
         # noinspection PyUnresolvedReferences
         unh_action.triggered.connect(self.load_unh_edu)
         self.toolbar.addAction(unh_action)

@@ -94,7 +94,7 @@ class Editor(AbstractWidget):
         # retrieve sal
         self.sal_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'sal.png')),
                                      'Retrieve Salinity', self)
-        self.sal_act.setShortcut('Alt+A')
+        # self.sal_act.setShortcut('Alt+A')
         # noinspection PyUnresolvedReferences
         self.sal_act.triggered.connect(self.on_retrieve_sal)
         self.process_bar.addAction(self.sal_act)
@@ -102,7 +102,7 @@ class Editor(AbstractWidget):
         # retrieve temp/sal
         self.temp_sal_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'temp_sal.png')),
                                           'Retrieve Temperature/Salinity', self)
-        self.temp_sal_act.setShortcut('Alt+T')
+        # self.temp_sal_act.setShortcut('Alt+T')
         # noinspection PyUnresolvedReferences
         self.temp_sal_act.triggered.connect(self.on_retrieve_temp_sal)
         self.process_bar.addAction(self.temp_sal_act)
@@ -111,7 +111,7 @@ class Editor(AbstractWidget):
         # retrieve transducer sound speed
         self.tss_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'tss.png')),
                                      'Retrieve Transducer Sound Speed', self)
-        self.tss_act.setShortcut('Alt+W')
+        # self.tss_act.setShortcut('Alt+W')
         # noinspection PyUnresolvedReferences
         self.tss_act.triggered.connect(self.on_retrieve_tss)
         self.process_bar.addAction(self.tss_act)
@@ -120,7 +120,7 @@ class Editor(AbstractWidget):
         # extend profile
         self.extend_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'extend.png')),
                                         'Extend Profile', self)
-        self.extend_act.setShortcut('Alt+E')
+        # self.extend_act.setShortcut('Alt+E')
         # noinspection PyUnresolvedReferences
         self.extend_act.triggered.connect(self.on_extend_profile)
         self.process_bar.addAction(self.extend_act)
@@ -129,7 +129,7 @@ class Editor(AbstractWidget):
         # preview thinning
         self.thin_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'thinning.png')),
                                       'Preview Thinning', self)
-        self.thin_act.setShortcut('Alt+H')
+        # self.thin_act.setShortcut('Alt+T')
         # noinspection PyUnresolvedReferences
         self.thin_act.triggered.connect(self.on_preview_thinning)
         # self.thin_act.setVisible(False)
@@ -142,7 +142,7 @@ class Editor(AbstractWidget):
         # restart processing
         self.restart_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'restart.png')),
                                          'Restart Processing', self)
-        self.restart_act.setShortcut('Alt+N')
+        # self.restart_act.setShortcut('Alt+N')
         # noinspection PyUnresolvedReferences
         self.restart_act.triggered.connect(self.on_restart_proc)
         self.process_bar.addAction(self.restart_act)

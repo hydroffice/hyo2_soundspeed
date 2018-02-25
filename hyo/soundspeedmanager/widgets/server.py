@@ -65,7 +65,7 @@ class Server(AbstractWidget):
         btn.setToolTip("Start server mode")
         hbox.addWidget(btn)
         self.start_server_act = QtGui.QAction('Start Server', self)
-        self.start_server_act.setShortcut('Ctrl+Alt+S')
+        # self.start_server_act.setShortcut('Ctrl+Alt+S')
         # noinspection PyUnresolvedReferences
         self.start_server_act.triggered.connect(self.on_start_server)
         self.main_win.server_menu.addAction(self.start_server_act)
@@ -77,7 +77,7 @@ class Server(AbstractWidget):
         btn.setToolTip("Force the transmission of a synthethic profile")
         hbox.addWidget(btn)
         self.force_server_act = QtGui.QAction('Force Transmission', self)
-        self.force_server_act.setShortcut('Ctrl+Alt+T')
+        # self.force_server_act.setShortcut('Ctrl+Alt+T')
         # noinspection PyUnresolvedReferences
         self.force_server_act.triggered.connect(self.on_force_server)
         self.main_win.server_menu.addAction(self.force_server_act)
@@ -89,7 +89,7 @@ class Server(AbstractWidget):
         btn.setToolTip("Stop server mode")
         hbox.addWidget(btn)
         self.stop_server_act = QtGui.QAction('Stop Server', self)
-        self.stop_server_act.setShortcut('Ctrl+Alt+E')
+        # self.stop_server_act.setShortcut('Ctrl+Alt+E')
         # noinspection PyUnresolvedReferences
         self.stop_server_act.triggered.connect(self.on_stop_server)
         self.main_win.server_menu.addAction(self.stop_server_act)
