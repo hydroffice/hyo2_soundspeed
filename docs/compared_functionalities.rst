@@ -15,13 +15,13 @@ Support of WOA13 atlas                                   **x**                  
 Data filtering/smoothing                                 **x**                   **x**
 DQA analysis                                             **x**                   **x**
 Calculation of profile statistics                        **x**                   **x**
-Input of Digibar Pro format                              **x**                                      **x**
+Input of Digibar Pro format                              **x**                   **x**              **x**
 Input of Idronaut format                                 **x**                                      **x**
 Input of Fugro ISS format                               **\^**                                      **x**
 Input of SAIV format                                     **x**                                      **x**
 Input of Turo format                                     **x**                                      **x**
 Input of Valeport format                                **\^**                                      **-**
-Output of Elac format                                    **x**                                      **x**
+Output of Elac format                                    **x**                   **x**              **x**
 Output of iXBlue format                                  **x**                                      **x**
 Output of Sonardyne format                               **x**                                      **x**
 Output of UNB format                                     **x**                                      **x**
