@@ -23,11 +23,46 @@ class TracedProfilePlot:
         self.new_ssp_color = "#3399FF"
 
         self.legend_loc = None
+        self.legend_color = '#f5f5f5'
+
+        self.old_z = None
+        self.new_z = None
+        self.max_tolerance = None
 
         self.new_outer_raypath = list()
         self.old_outer_raypath = list()
 
+        self._extend = False
+
     def make_plots(self):
+
+        self._extend = False
+        if self.new_ssp.data[0][-1] > self.old_ssp.data[0][-1]:
+            self._extend = True
+
+        step = 0
+        if self._extend:
+
+            step = len(self.new_ssp.rays[-1][2])
+
+        else:
+
+            step = min(len(self.old_ssp.rays[-1][2]), len(self.new_ssp.rays[-1][2]))
+
+        self.new_outer_raypath = [
+            self.new_ssp.rays[-1][1][0:step],
+            self.new_ssp.rays[-1][2][0:step]
+        ]
+        self.old_outer_raypath = [
+            self.old_ssp.rays[-1][1][0:step],
+            self.old_ssp.rays[-1][2][0:step]
+        ]
+        if self._extend:
+
+            self.old_outer_raypath = [
+                np.append(self.old_outer_raypath[0], self.old_ssp.rays[-1][1][step - 1]),
+                np.append(self.old_outer_raypath[1], self.old_ssp.rays[-1][2][step - 1])
+            ]
 
         # take care of labels and legend validity/inputs
         if not isinstance(self.old_ssp_label, str):
@@ -77,28 +112,31 @@ class TracedProfilePlot:
                          self.new_ssp.data[0][-1]],
                         'r--')
 
-        # # error plot axis
-        # err_ax = fig.add_subplot(1, 2, 2)
-        # err_ax.set_title('Ray-Tracing Comparison')
-        # err_ax.set_xlabel('Range [m]')
-        # err_ax.set_ylabel('Depth [m]')
-        # err_ax.set_ylim((z_max + .05 * z_max, 0))
-        # err_ax.set_xlim((0, x_max + 0.05 * x_max))
-        # err_ax.plot(self._plot.old_outer_raypath[0],
-        #             self._plot.old_outer_raypath[1], color=old_profile_color,
-        #             linestyle='--')
-        # err_ax.plot(self._plot.new_outer_raypath[0],
-        #             self._plot.new_outer_raypath[1], color=new_profile_color,
-        #             linestyle=':')
-        # err_ax.plot(self.old_z[0],
-        #             self.old_z[1], color=old_profile_color, linestyle='--', label=label1)
-        # err_ax.plot(self.new_z[0],
-        #             self.new_z[1], color=new_profile_color, linestyle=':', label=label2)
-        # err_ax.plot(self.new_z[0], self.max_tolerance[0], 'm', label="error tolerance")
-        # err_ax.plot(self.new_z[0], self.max_tolerance[1], 'm')
-        # # err_ax.legend((self._profiles[newer_idx].date_time, self._profiles[older_idx].date_time))
-        # legend = err_ax.legend(loc=legend_loc, shadow=True, fontsize='small')
-        # legend.get_frame().set_facecolor('#f5f5f5')
+        # error plot axis
+        err_ax = fig.add_subplot(1, 2, 2)
+        err_ax.set_title('Ray-Tracing Comparison')
+        err_ax.set_xlabel('Range [m]')
+        err_ax.set_ylabel('Depth [m]')
+        err_ax.set_ylim((z_max + .05 * z_max, 0))
+        err_ax.set_xlim((0, x_max + 0.05 * x_max))
+        err_ax.plot(self.old_outer_raypath[0],
+                    self.old_outer_raypath[1], color=self.old_ssp_color,
+                    linestyle='--')
+        err_ax.plot(self.new_outer_raypath[0],
+                    self.new_outer_raypath[1], color=self.new_ssp_color,
+                    linestyle=':')
+        if self.old_z is not None:
+            err_ax.plot(self.old_z[0],
+                        self.old_z[1], color=self.old_ssp_color, linestyle='--', label=self.old_ssp_label)
+        if self.new_z is not None:
+            err_ax.plot(self.new_z[0],
+                        self.new_z[1], color=self.new_ssp_color, linestyle=':', label=self.new_ssp_label)
+        if (self.new_z is not None) and (self.max_tolerance is not None):
+            err_ax.plot(self.new_z[0], self.max_tolerance[0], 'm', label="error tolerance")
+            err_ax.plot(self.new_z[0], self.max_tolerance[1], 'm')
+        if (self.new_z is not None) or (self.old_z is not None):
+            legend = err_ax.legend(loc=self.legend_loc, shadow=True, fontsize='small')
+            legend.get_frame().set_facecolor(self.legend_color)
 
         fig.tight_layout()
         plt.show()

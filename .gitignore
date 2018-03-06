@@ -61,3 +61,5 @@ tests/soundspeed/atlas/projects
 tests/soundspeed/atlas/releases
 tests/rtofs
 /examples/soundspeed/listener/seacat_capture.txt
+hyo/soundspeed/profile/ray_tracing/tracedprofile.cpp
+hyo/soundspeed/profile/ray_tracing/tracedprofile.html

@@ -21,7 +21,7 @@ class TracedProfile:
 
             # skip samples at depth less than the draft
             if ssp.cur.proc.depth[z_idx] <= tss_depth:
-                # logger.debug("skipping sample at depth: %.1f" % ssp.cur.proc.depth[n])
+                # logger.debug("skipping sample at depth: %.1f" % ssp.cur.proc.depth[z_idx])
                 continue
 
             if ssp.cur.proc.flag[z_idx] != Dicts.flags['valid']:

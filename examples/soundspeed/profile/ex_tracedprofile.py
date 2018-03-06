@@ -18,6 +18,7 @@ from hyo.soundspeed.profile.profilelist import ProfileList
 from hyo.soundspeed.profile.ray_tracing.tracedprofile import TracedProfile
 
 
+# create an example profile for testing
 def fresh_profile(bias=0.0):
     ssp = Profile()
     d = np.arange(0.0, 100.0, 0.5)
@@ -29,8 +30,8 @@ def fresh_profile(bias=0.0):
     ssp.proc.speed = vs
     ssp.proc.temp = t
     ssp.proc.sal = s
-    # ssp.proc.flag[40:50] = Dicts.flags['user']
-    # ssp.proc.flag[50:70] = Dicts.flags['filtered']
+    ssp.proc.flag[40:50] = Dicts.flags['user']
+    ssp.proc.flag[50:70] = Dicts.flags['filtered']
     ssp.meta.latitude = 43.13555
     ssp.meta.longitude = -70.9395
     ssp.meta.utc_time = datetime.utcnow()
