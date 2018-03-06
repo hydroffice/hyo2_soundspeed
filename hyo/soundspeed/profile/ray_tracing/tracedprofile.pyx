@@ -83,7 +83,7 @@ class TracedProfile:
                     beta.append(math.acos((speed[idx + 1] / speed[idx]) * (math.cos(beta[idx]))))
                     continue
 
-                else:  # if (dc != 0) and (dy != 0):
+                else:  # if (dc != 0) and (dz != 0):
 
                     gradient = dc / dz  # Lurton, (2.64)
                     if math.cos(beta[idx]) == 0:

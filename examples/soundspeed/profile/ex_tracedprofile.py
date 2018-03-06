@@ -1,3 +1,8 @@
+import pyximport
+pyximport.install()
+import Cython.Compiler.Options
+Cython.Compiler.Options.annotate = True
+
 import os
 from datetime import datetime
 import numpy as np
@@ -8,6 +13,7 @@ import logging
 logger = logging.getLogger()
 
 from hyo.soundspeed.profile.profile import Profile
+from hyo.soundspeed.profile.dicts import Dicts
 from hyo.soundspeed.profile.profilelist import ProfileList
 from hyo.soundspeed.profile.ray_tracing.tracedprofile import TracedProfile
 
@@ -23,8 +29,8 @@ def fresh_profile(bias=0.0):
     ssp.proc.speed = vs
     ssp.proc.temp = t
     ssp.proc.sal = s
-    ssp.proc.flag[40:50] = 1
-    ssp.proc.flag[50:70] = 2
+    # ssp.proc.flag[40:50] = Dicts.flags['user']
+    # ssp.proc.flag[50:70] = Dicts.flags['filtered']
     ssp.meta.latitude = 43.13555
     ssp.meta.longitude = -70.9395
     ssp.meta.utc_time = datetime.utcnow()
