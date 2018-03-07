@@ -9,20 +9,26 @@ from hyo.soundspeed.profile.dicts import Dicts
 
 class TracedProfile:
 
-    def __init__(self, tss_depth, tss_value, avg_depth, half_swath, ssp):
+    def __init__(self, ssp, half_swath=70, avg_depth=10000, tss_depth=None, tss_value=None):
 
         self.avg_depth = avg_depth
         self.half_swath = half_swath
 
         # select samples for the ray tracing (must be deeper than the transducer depth)
-        depth = [tss_depth, ]
-        speed = [tss_value, ]
+        depth = list()
+        if tss_depth is not None:
+            depth.append(tss_depth)
+        speed = list()
+        if tss_value is not None:
+            speed.append(tss_value)
+
         for z_idx in range(0, len(ssp.cur.proc.depth)):
 
             # skip samples at depth less than the draft
-            if ssp.cur.proc.depth[z_idx] <= tss_depth:
-                # logger.debug("skipping sample at depth: %.1f" % ssp.cur.proc.depth[z_idx])
-                continue
+            if tss_depth is not None:
+                if ssp.cur.proc.depth[z_idx] <= tss_depth:
+                    # logger.debug("skipping sample at depth: %.1f" % ssp.cur.proc.depth[z_idx])
+                    continue
 
             if ssp.cur.proc.flag[z_idx] != Dicts.flags['valid']:
                 continue
@@ -49,7 +55,7 @@ class TracedProfile:
 
             # ray angles
             beta = list()
-            beta.append(math.acos(speed[0]/tss_value * math.cos(math.radians(90.0 - angle))))
+            beta.append(math.radians(90.0 - angle))
             total_z = list()
             total_z.append(depth[0])
             total_x = list()
@@ -91,12 +97,17 @@ class TracedProfile:
                     else:  # if math.cos(beta[x]) != 0:
                         curve = speed[idx] / (gradient * math.cos(beta[idx]))  # Lurton, (2.66)
 
-                    # try:
-                    beta.append(math.acos(speed[idx + 1] / speed[idx] * (math.cos(beta[idx]))))  # Derived from Lurton, (2.65)
-                    # except Exception as e:
-                    #     logger.debug("%s: %s, %s, %s -> %s" % (x, speed[x + 1], speed[x], math.degrees(beta[x]),
-                    #     (speed[x + 1] / speed[x]) * (math.cos(beta[x]))))
-                    #     raise e
+                    beta_cos = speed[idx + 1] / speed[idx] * (math.cos(beta[idx]))
+                    if beta_cos > 1.0:
+                        logger.warning("angle %d, sample %d -> invalid beta cos: %s" %
+                                       (angle, idx, beta_cos))
+                        beta_cos = 1.0
+                    if beta_cos < -1.0:
+                        logger.warning("angle %d, sample %d -> invalid beta cos: %s" %
+                                       (angle, idx, beta_cos))
+                        beta_cos = -1.0
+
+                    beta.append(math.acos(beta_cos))  # Derived from Lurton, (2.65)
 
                     dx = curve * ((math.sin(beta[idx])) - (math.sin(beta[idx + 1])))  # Lurton, (2.67)
                     dt = abs((1 / gradient) *

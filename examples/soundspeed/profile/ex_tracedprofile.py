@@ -19,7 +19,7 @@ from hyo.soundspeed.profile.ray_tracing.tracedprofile import TracedProfile
 
 
 # create an example profile for testing
-def fresh_profile(bias=0.0):
+def make_fake_ssp(bias=0.0):
     ssp = Profile()
     d = np.arange(0.0, 100.0, 0.5)
     vs = np.arange(1450.0 + bias, 1550.0 + bias, 0.5)
@@ -42,7 +42,7 @@ tss_depth = 5.0
 tss_value = 1500.0
 avg_depth = 1000.0
 half_swath_angle = 70.0
-ssp = fresh_profile()
+ssp = make_fake_ssp(bias=0.0)
 ssp_list = ProfileList()
 ssp_list.append_profile(ssp)
 

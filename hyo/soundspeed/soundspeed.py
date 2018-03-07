@@ -26,6 +26,9 @@ from hyo.soundspeed.logging.sqlitelogging import SqliteLogging
 from hyo.soundspeed.profile.profilelist import ProfileList
 from hyo.soundspeed.profile.dicts import Dicts
 from hyo.soundspeed.server.server import Server
+from hyo.soundspeed.profile.ray_tracing.tracedprofile import TracedProfile
+from hyo.soundspeed.profile.ray_tracing.diff_tracedprofiles import DiffTracedProfiles
+from hyo.soundspeed.profile.ray_tracing.plot_tracedprofiles import PlotTracedProfiles
 
 
 class SoundSpeedLibrary:
@@ -913,6 +916,25 @@ class SoundSpeedLibrary:
         ret = db.delete_profile_by_pk(pk=pk)
         db.disconnect()
         return ret
+
+    def ray_tracing_comparison(self, pk1, pk2):
+
+        avg_depth = 10000.0  # just a very deep value
+        half_swath_angle = 70.0  # a safely large angle
+
+        ssp1 = self.db_retrieve_profile(pk1)
+        tp1 = TracedProfile(ssp=ssp1, avg_depth=avg_depth,
+                            half_swath=half_swath_angle)
+        ssp2 = self.db_retrieve_profile(pk2)
+
+        tp2 = TracedProfile(ssp=ssp2, avg_depth=avg_depth,
+                            half_swath=half_swath_angle)
+
+        diff = DiffTracedProfiles(old_tp=tp1, new_tp=tp2)
+        diff.calc_diff()
+
+        plot = PlotTracedProfiles(diff_tps=diff)
+        plot.make_plots()
 
     def dqa_at_surface(self, pk):
         """Check the sound speed difference between a point measure and the current profile"""

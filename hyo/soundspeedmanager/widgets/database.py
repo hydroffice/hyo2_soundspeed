@@ -285,6 +285,14 @@ class Database(AbstractWidget):
                                          triggered=self.metadata_profile)
             menu.addAction(metadata_act)
 
+            if len(rows) == 2:
+                ray_tracing_comparison_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media,
+                                                                                    'raytracing_comparison.png')),
+                                                           "Ray-tracing comparison", self,
+                                                           toolTip="Compare ray-tracing using the selected profiles",
+                                                           triggered=self.ray_tracing_comparison)
+                menu.addAction(ray_tracing_comparison_act)
+
             menu.addMenu(qa_menu)
             if len(rows) == 2:
                 dqa_compare_two_act = QtGui.QAction("DQA (among selections)", self,
@@ -582,6 +590,27 @@ class Database(AbstractWidget):
             dlg = TextEditorDialog(title="Profile DQA", basename=basename, body=msg, init_size=QtCore.QSize(800, 800),
                                    main_win=self, lib=self.lib, parent=self)
             dlg.exec_()
+
+    def ray_tracing_comparison(self):
+        logger.debug("user want to do a comparison between two ray-traced profiles")
+
+        rows = self.ssp_list.selectionModel().selectedRows()
+        if len(rows) != 2:
+
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.information(self, "Ray-Tracing comparison",
+                                          "You need to select exactly 2 profiles to do this comparison!")
+            return
+
+        pk1 = int(self.ssp_list.item(rows[0].row(), 0).text())
+        pk2 = int(self.ssp_list.item(rows[1].row(), 0).text())
+        try:
+            self.lib.ray_tracing_comparison(pk1, pk2)
+
+        except RuntimeError as e:
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.critical(self, "Ray-Tracing error", "%s" % e)
+            return
 
     def new_project(self):
         logger.debug("user want to create a new project")
