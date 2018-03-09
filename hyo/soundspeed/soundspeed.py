@@ -934,7 +934,26 @@ class SoundSpeedLibrary:
         diff.calc_diff()
 
         plot = PlotTracedProfiles(diff_tps=diff)
-        plot.make_plots()
+        plot.make_comparison_plots()
+
+    def bias_plots(self, pk1, pk2):
+
+        avg_depth = 10000.0  # just a very deep value
+        half_swath_angle = 70.0  # a safely large angle
+
+        ssp1 = self.db_retrieve_profile(pk1)
+        tp1 = TracedProfile(ssp=ssp1, avg_depth=avg_depth,
+                            half_swath=half_swath_angle)
+        ssp2 = self.db_retrieve_profile(pk2)
+
+        tp2 = TracedProfile(ssp=ssp2, avg_depth=avg_depth,
+                            half_swath=half_swath_angle)
+
+        diff = DiffTracedProfiles(old_tp=tp1, new_tp=tp2)
+        diff.calc_diff()
+
+        plot = PlotTracedProfiles(diff_tps=diff)
+        plot.make_bias_plots()
 
     def dqa_at_surface(self, pk):
         """Check the sound speed difference between a point measure and the current profile"""

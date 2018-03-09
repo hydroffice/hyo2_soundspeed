@@ -384,22 +384,50 @@ Context menu
 The context menu provides access to different tools based on the number of selected profiles:
 
 * Single-profile selection (:numref:`database_single_selection`).
+* Pair-profile selection (:numref:`database_pair_selection`).
 * Multi-profile selection (:numref:`database_multi_selection`).
 
 .. _database_single_selection:
 .. figure:: ./_static/database_single_selection.png
     :width: 640px
     :align: center
-    :alt: data storage
+    :alt: single selection
     :figclass: align-center
 
     The single-selection context menu provides functionalities specific to a single profile.
+
+.. _database_pair_selection:
+.. figure:: ./_static/database_pair_selection.png
+    :width: 640px
+    :align: center
+    :alt: pair selection
+    :figclass: align-center
+
+    The pair-selection context menu provides functionalities like ray-tracing comparison (:numref:`ray_tracing_comparison`) and bias plots (:numref:`bias_plots`).
+
+.. _ray_tracing_comparison:
+.. figure:: ./_static/database_ray_tracing_comparison.png
+    :width: 500px
+    :align: center
+    :alt: ray-tracing comparison
+    :figclass: align-center
+
+    The ray-tracing comparison between the pair of selected profiles.
+
+.. _bias_plots:
+.. figure:: ./_static/database_bias_plots.png
+    :width: 500px
+    :align: center
+    :alt: bias plots
+    :figclass: align-center
+
+    The plots show the vertical and the horizontal bias using the pair of selected profiles.
 
 .. _database_multi_selection:
 .. figure:: ./_static/database_multi_selection.png
     :width: 640px
     :align: center
-    :alt: data storage
+    :alt: multi selection
     :figclass: align-center
 
     The multi-selection context menu provides functionalities that apply to multiple profiles (e.g., editing common metadata fields for multiple profiles).

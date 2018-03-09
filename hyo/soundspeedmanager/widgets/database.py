@@ -293,6 +293,12 @@ class Database(AbstractWidget):
                                                            triggered=self.ray_tracing_comparison)
                 menu.addAction(ray_tracing_comparison_act)
 
+                bias_plots_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'bias_plots.png')),
+                                                           "Bias plots", self,
+                                                           toolTip="Create depth and horizonal bias plots",
+                                                           triggered=self.bias_plots)
+                menu.addAction(bias_plots_act)
+
             menu.addMenu(qa_menu)
             if len(rows) == 2:
                 dqa_compare_two_act = QtGui.QAction("DQA (among selections)", self,
@@ -610,6 +616,33 @@ class Database(AbstractWidget):
         except RuntimeError as e:
             # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Ray-Tracing error", "%s" % e)
+            return
+
+    def bias_plots(self):
+        logger.debug("user want to make bias plots")
+
+        rows = self.ssp_list.selectionModel().selectedRows()
+        if len(rows) != 2:
+
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.information(self, "Bias plots",
+                                          "You need to select exactly 2 profiles to create these plots!")
+            return
+
+        self.progress.start(title="Bias plots", text="Retrieving profiles")
+
+        self.progress.update(10)
+        pk1 = int(self.ssp_list.item(rows[0].row(), 0).text())
+        self.progress.update(20)
+        pk2 = int(self.ssp_list.item(rows[1].row(), 0).text())
+        try:
+            self.progress.update(text="Ray-tracing", value=40)
+            self.lib.bias_plots(pk1, pk2)
+            self.progress.end()
+        except RuntimeError as e:
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.critical(self, "Bias plots error", "%s" % e)
+            self.progress.end()
             return
 
     def new_project(self):

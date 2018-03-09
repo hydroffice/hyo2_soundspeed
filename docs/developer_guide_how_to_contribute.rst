@@ -15,6 +15,18 @@ How to contribute
 
 Every open source project lives from the generous help by contributors that sacrifice their time and this is no different.
 
+Public Repositories
+===================
+
+The source code is available on both `GitHub`_ and `BitBucket`_.
+
+To propose changes to Sound Speed Manager, you can follow the common Fork & Pull Request workflow.
+If you are not familiar with such a workflow, a good starting point may be this `short tutorial`_.
+
+
+Coding Style
+============
+
 To make participation as pleasant as possible, this project adheres to the `Code of Conduct`_ by the Python Software Foundation.
 
 Here are a few hints and rules to get you started:
@@ -36,6 +48,9 @@ Here are a few hints and rules to get you started:
 
 Thank you for considering to contribute! If you have any question or concerns, feel free to reach out to us (see :ref:`credits-label`).
 
+.. _`short tutorial`: https://gist.github.com/giumas/67abeffcbf49d00703a57cbafac8b118
+.. _`GitHub`: https://github.com/hydroffice/hyo_soundspeed
+.. _`BitBucket`: https://bitbucket.org/ccomjhc/hyo_soundspeed
 .. _`Code of Conduct`: http://www.python.org/psf/codeofconduct/
 .. _AUTHORS.txt: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/master/AUTHORS.rst
 .. _changelog: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/master/HISTORY.rst

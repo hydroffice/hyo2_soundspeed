@@ -1,8 +1,3 @@
-import pyximport
-pyximport.install()
-import Cython.Compiler.Options
-Cython.Compiler.Options.annotate = True
-
 import os
 from datetime import datetime
 import numpy as np
@@ -57,4 +52,4 @@ diff = DiffTracedProfiles(old_tp=tp1, new_tp=tp2)
 diff.calc_diff()
 
 plot = PlotTracedProfiles(diff_tps=diff)
-plot.make_plots()
+plot.make_comparison_plots()
