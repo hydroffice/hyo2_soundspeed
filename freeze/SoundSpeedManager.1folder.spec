@@ -51,7 +51,7 @@ if is_darwin:
 
 a = Analysis(['SoundSpeedManager.py'],
              pathex=[],
-             hiddenimports=["PIL", "hyo.surveydatamonitor.lib.estimate.casttime.tracedprofile"],
+             hiddenimports=["PIL", ],
              excludes=[
                 "IPython", "PyQt", "pandas", "scipy", "sphinx", "sphinx_rtd_theme", "OpenGL_accelerate",
                 "FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter",
