@@ -46,7 +46,7 @@ before_install:
 install:
   - conda config --set channel_priority true
   - conda config --prepend channels conda-forge
-  - conda install -q numpy basemap pyside matplotlib netCDF4 gdal pyproj krb5 pyserial pillow python=3.6
+  - conda install -q cython numpy basemap pyside matplotlib netCDF4 gdal pyproj krb5 pyserial pillow python=3.6
   - pip install gsw==3.0.6
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then conda install jpeg=8; fi
   - pip install --no-deps -e .
