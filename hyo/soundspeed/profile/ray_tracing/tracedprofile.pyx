@@ -1,5 +1,7 @@
 import numpy as np
 import math
+from cpython cimport datetime
+from libcpp.vector cimport vector
 import logging
 
 logger = logging.getLogger(__name__)
@@ -7,10 +9,18 @@ logger = logging.getLogger(__name__)
 from hyo.soundspeed.profile.dicts import Dicts
 
 
-class TracedProfile:
+cdef class TracedProfile:
 
-    def __init__(self, ssp, half_swath=70, avg_depth=10000, tss_depth=None, tss_value=None):
+    cpdef public double avg_depth
+    cpdef public double half_swath
+    cpdef public list rays
+    cpdef public datetime.datetime date_time
+    cpdef public double latitude
+    cpdef public double longitude
+    cpdef public list data
 
+    def __init__(self, ssp, double half_swath=70, double avg_depth=10000, tss_depth=None, tss_value=None):
+        # PyDateTime_IMPORT
         self.avg_depth = avg_depth
         self.half_swath = half_swath
 
@@ -22,22 +32,21 @@ class TracedProfile:
         if tss_value is not None:
             speed.append(tss_value)
 
-        for z_idx in range(0, len(ssp.cur.proc.depth)):
+        vi = ssp.cur.proc_valid
+
+        for z_idx in range(0, len(ssp.cur.proc.depth[vi])):
 
             # skip samples at depth less than the draft
             if tss_depth is not None:
-                if ssp.cur.proc.depth[z_idx] <= tss_depth:
+                if ssp.cur.proc.depth[vi][z_idx] <= tss_depth:
                     # logger.debug("skipping sample at depth: %.1f" % ssp.cur.proc.depth[z_idx])
                     continue
 
-            if ssp.cur.proc.flag[z_idx] != Dicts.flags['valid']:
-                continue
-
-            depth.append(ssp.cur.proc.depth[z_idx])
-            speed.append(ssp.cur.proc.speed[z_idx])
+            depth.append(ssp.cur.proc.depth[vi][z_idx])
+            speed.append(ssp.cur.proc.speed[vi][z_idx])
 
             # stop after the first sample deeper than the avg depth (safer)
-            if ssp.cur.proc.depth[z_idx] > self.avg_depth:
+            if ssp.cur.proc.depth[vi][z_idx] > self.avg_depth:
                 break
 
         # remove extension value (if any)
@@ -45,7 +54,8 @@ class TracedProfile:
             logger.info("removed latest extension depth: %s" % depth[-1])
             del depth[-1]
 
-        # logger.debug("samples: %d" % len(depth))
+        logger.debug("samples: %d" % len(depth))
+        logger.debug("max depth: %f" % depth[-1])
         # logger.debug("depths: %s" % depth)
         # logger.debug("speeds: %s" % speed)
 
@@ -119,12 +129,14 @@ class TracedProfile:
                 total_x.append(total_x[-1] + dx)
                 total_t.append(total_t[-1] + dt)
 
-            interp_t = np.arange(total_t[0], ((round(total_t[len(total_t) - 1] * 1e3)) / 1e3), 1e-3)
+            interp_t = np.linspace(total_t[0], total_t[-1], num=20)
+            # logger.info("interp_t:\n%s" % interp_t)
             interp_x = np.interp(interp_t, total_t, total_x)
             interp_z = np.interp(interp_t, total_t, total_z)
             txz_values.append(np.array([interp_t, interp_x, interp_z]))
 
         self.rays = txz_values
+        logger.debug("ray samples: %d" % len(self.rays[0][0]))
         self.date_time = ssp.cur.meta.utc_time
         self.latitude = ssp.cur.meta.latitude
         self.longitude = ssp.cur.meta.longitude

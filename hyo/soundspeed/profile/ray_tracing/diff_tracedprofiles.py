@@ -44,6 +44,9 @@ class DiffTracedProfiles:
 
             if old_extend:
 
+                # logger.debug("len of ray old [x]: %d" % len(ray_old[1]))
+                # logger.debug("len of ray old [z]: %d" % len(ray_old[2]))
+
                 dx = ray_old[1][-1] - ray_old[1][-2]
                 dz = ray_old[2][-1] - ray_old[2][-2]
 
@@ -55,6 +58,9 @@ class DiffTracedProfiles:
                 dz = 0  # unused
 
                 new_nr_samples = min(len(ray_old[2]), len(ray_new[2]))
+
+            # logger.debug("len of ray new: %d" % len(ray_new[1]))
+            # logger.debug("new nr samples: %d" % new_nr_samples)
 
             new_x_end.append(ray_new[1][new_nr_samples - 1])
             new_z_end.append(ray_new[2][new_nr_samples - 1])

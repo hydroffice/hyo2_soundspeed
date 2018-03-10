@@ -46,8 +46,12 @@ ssp = make_fake_ssp(bias=0.0)
 ssp_list = ProfileList()
 ssp_list.append_profile(ssp)
 
+start_time = datetime.now()
 profile = TracedProfile(tss_depth=tss_depth, tss_value=tss_value,
                         avg_depth=avg_depth, half_swath=half_swath_angle,
                         ssp=ssp_list)
+end_time = datetime.now()
+logger.debug("timing: %s" % (end_time - start_time))
 
 logger.debug("traced profile:\n%s" % profile)
+logger.debug("api:\n%s" % dir(profile))

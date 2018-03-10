@@ -1,4 +1,5 @@
 import os
+import traceback
 import logging
 
 from PySide import QtGui, QtCore
@@ -289,14 +290,14 @@ class Database(AbstractWidget):
                 ray_tracing_comparison_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media,
                                                                                     'raytracing_comparison.png')),
                                                            "Ray-tracing comparison", self,
-                                                           toolTip="Compare ray-tracing using the selected profiles",
+                                                           toolTip="Compare ray-tracing using the selected pair",
                                                            triggered=self.ray_tracing_comparison)
                 menu.addAction(ray_tracing_comparison_act)
 
                 bias_plots_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'bias_plots.png')),
-                                                           "Bias plots", self,
-                                                           toolTip="Create depth and horizonal bias plots",
-                                                           triggered=self.bias_plots)
+                                               "Across-swath bias", self,
+                                               toolTip="Create depth and horizontal bias plots across the swath",
+                                               triggered=self.bias_plots)
                 menu.addAction(bias_plots_act)
 
             menu.addMenu(qa_menu)
@@ -614,6 +615,7 @@ class Database(AbstractWidget):
             self.lib.ray_tracing_comparison(pk1, pk2)
 
         except RuntimeError as e:
+            # traceback.print_stack()
             # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Ray-Tracing error", "%s" % e)
             return
@@ -625,7 +627,7 @@ class Database(AbstractWidget):
         if len(rows) != 2:
 
             # noinspection PyCallByClass
-            QtGui.QMessageBox.information(self, "Bias plots",
+            QtGui.QMessageBox.information(self, "Across-swath bias plots",
                                           "You need to select exactly 2 profiles to create these plots!")
             return
 
@@ -640,6 +642,7 @@ class Database(AbstractWidget):
             self.lib.bias_plots(pk1, pk2)
             self.progress.end()
         except RuntimeError as e:
+            # traceback.print_stack()
             # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Bias plots error", "%s" % e)
             self.progress.end()

@@ -51,5 +51,8 @@ tp2 = TracedProfile(ssp=ssp2_list, avg_depth=avg_depth,
 diff = DiffTracedProfiles(old_tp=tp1, new_tp=tp2)
 diff.calc_diff()
 
+start_time = datetime.now()
 plot = PlotTracedProfiles(diff_tps=diff)
 plot.make_comparison_plots()
+end_time = datetime.now()
+logger.debug("timing: %s" % (end_time - start_time))

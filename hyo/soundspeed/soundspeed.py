@@ -4,6 +4,7 @@ import os
 import re
 import copy
 import shutil
+import traceback
 import logging
 
 logger = logging.getLogger(__name__)
@@ -941,19 +942,35 @@ class SoundSpeedLibrary:
         avg_depth = 10000.0  # just a very deep value
         half_swath_angle = 70.0  # a safely large angle
 
-        ssp1 = self.db_retrieve_profile(pk1)
-        tp1 = TracedProfile(ssp=ssp1, avg_depth=avg_depth,
-                            half_swath=half_swath_angle)
-        ssp2 = self.db_retrieve_profile(pk2)
+        try:
+            ssp1 = self.db_retrieve_profile(pk1)
+            tp1 = TracedProfile(ssp=ssp1, avg_depth=avg_depth,
+                                half_swath=half_swath_angle)
+            ssp2 = self.db_retrieve_profile(pk2)
 
-        tp2 = TracedProfile(ssp=ssp2, avg_depth=avg_depth,
-                            half_swath=half_swath_angle)
+            tp2 = TracedProfile(ssp=ssp2, avg_depth=avg_depth,
+                                half_swath=half_swath_angle)
+        except RuntimeError as e:
+            traceback.print_stack()
+            logger.error(e)
+            return
 
-        diff = DiffTracedProfiles(old_tp=tp1, new_tp=tp2)
-        diff.calc_diff()
+        try:
+            diff = DiffTracedProfiles(old_tp=tp1, new_tp=tp2)
+            diff.calc_diff()
+        except RuntimeError as e:
+            traceback.print_stack()
+            logger.error(e)
+            return
 
-        plot = PlotTracedProfiles(diff_tps=diff)
-        plot.make_bias_plots()
+        try:
+            plot = PlotTracedProfiles(diff_tps=diff)
+            plot.make_bias_plots()
+
+        except RuntimeError as e:
+            traceback.print_stack()
+            logger.error(e)
+            return
 
     def dqa_at_surface(self, pk):
         """Check the sound speed difference between a point measure and the current profile"""

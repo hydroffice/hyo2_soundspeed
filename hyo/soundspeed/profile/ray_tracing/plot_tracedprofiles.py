@@ -1,3 +1,4 @@
+from datetime import datetime
 import numpy as np
 import matplotlib
 
@@ -31,6 +32,21 @@ class PlotTracedProfiles:
 
         self.legend_loc = None
         self.legend_color = '#f5f5f5'
+
+        # take care of labels and legend validity/inputs
+        if not isinstance(self.old_tp_label, str):
+            self.old_tp_label = None
+        if not isinstance(self.new_tp_label, str):
+            self.new_tp_label = None
+        if not isinstance(self.legend_loc, str):
+            self.legend_loc = None
+
+        if self.old_tp_label is None:
+            self.old_tp_label = "%s" % self._d.old_tp.date_time.strftime("%Y-%m-%d %H:%M:%S")
+        if self.new_tp_label is None:
+            self.new_tp_label = "%s" % self._d.new_tp.date_time.strftime("%Y-%m-%d %H:%M:%S")
+        if self.legend_loc is None:
+            self.legend_loc = "upper right"
 
     def make_comparison_plots(self):
 
@@ -71,21 +87,6 @@ class PlotTracedProfiles:
                 np.append(old_outmost_raypath[1],
                           self._d.old_tp.rays[-1][2][step - 1])
             ]
-
-        # take care of labels and legend validity/inputs
-        if not isinstance(self.old_tp_label, str):
-            self.old_tp_label = None
-        if not isinstance(self.new_tp_label, str):
-            self.new_tp_label = None
-        if not isinstance(self.legend_loc, str):
-            self.legend_loc = None
-
-        if self.old_tp_label is None:
-            self.old_tp_label = "%s" % self._d.old_tp.date_time
-        if self.new_tp_label is None:
-            self.new_tp_label = "%s" % self._d.new_tp.date_time
-        if self.legend_loc is None:
-            self.legend_loc = "upper right"
 
         # calculate limits
         z_max = max(max(self._d.new_tp.rays[len(self._d.new_tp.rays) - 1][2]),
@@ -157,22 +158,26 @@ class PlotTracedProfiles:
 
         logger.debug("make bias plots")
 
+        start_time = datetime.now()
+
         ssp1_max_t = self._d.old_tp.rays[-1][0][-1]
         ssp2_max_t = self._d.new_tp.rays[-1][0][-1]
-        ssp_max_t = max(ssp1_max_t, ssp2_max_t)
-        logger.debug("max t: %.3f" % ssp_max_t)
+        # ssp_max_t = max(ssp1_max_t, ssp2_max_t)
+        # logger.debug("max t: %.3f" % ssp_max_t)
 
         ssp1_max_x = self._d.old_tp.rays[-1][1][-1]
         ssp2_max_x = self._d.new_tp.rays[-1][1][-1]
         ssp_max_x = max(ssp1_max_x, ssp2_max_x)
-        logger.debug("max x: %.3f" % ssp_max_x)
+        # logger.debug("max x: %.3f" % ssp_max_x)
 
         ssp1_max_z = self._d.old_tp.rays[-1][2][-1]
         ssp2_max_z = self._d.new_tp.rays[-1][2][-1]
         ssp_max_z = max(ssp1_max_z, ssp2_max_z)
-        logger.debug("max z: %.3f" % ssp_max_z)
+        ssp1_min_z = self._d.old_tp.rays[0][2][-1]
+        ssp2_min_z = self._d.new_tp.rays[0][2][-1]
+        ssp_min_z = min(ssp1_min_z, ssp2_min_z)
+        logger.debug("z min: %.3f, max: %.3f" % (ssp_min_z, ssp_max_z))
 
-        ti = np.linspace(0, ssp_max_t, 1000)
         xi = np.linspace(0, ssp_max_x, 1000)
         zi = np.linspace(0, ssp_max_z, 1000)
 
@@ -209,20 +214,28 @@ class PlotTracedProfiles:
             dz = np.append(dz, np.abs(self._d.old_tp.rays[angle][2][:min_angle_samples] -
                                       self._d.new_tp.rays[angle][2][:min_angle_samples]))
 
+        # logger.debug("timing: %s" % (datetime.now() - start_time))
+
+        # logger.debug("griddata inputs: x1 %d, z1 %d, dx %d, xi %d, zi %d"
+        #              % (len(x1), len(z1), len(dx), len(xi), len(zi)))
+
         # noinspection PyTypeChecker
         dxi = griddata(x1, z1, dx, xi, zi, interp='linear')
         # noinspection PyTypeChecker
         dzi = griddata(x1, z1, dz, xi, zi, interp='linear')
 
+        logger.debug("timing: %s" % (datetime.now() - start_time))
+
         # create figure
-        fig = plt.figure(num="Bias Plots",
-                         figsize=(8, 5), dpi=80, facecolor='w', edgecolor='k')
+        fig = plt.figure(num="Across-swath bias plots",
+                         figsize=(9, 6), dpi=80, facecolor='w', edgecolor='k')
 
         # vertical bias
         vb_ax = fig.add_subplot(2, 1, 1)
-        # vb_ax.set_xlabel('Across-Track Distance [m]')
+        vb_ax.set_title('Compared pair of profiles: %s and %s' % (self.old_tp_label, self.new_tp_label))
+        vb_ax.set_xlabel('Across-Track Distance [m]')
         vb_ax.set_ylabel('Depth [m]')
-        vb_ax.set_ylim((ssp_max_z, 0))
+        vb_ax.set_ylim((ssp_min_z, 0))
         vb_ax.set_xlim((0, ssp_max_x * 1.05))
         im = vb_ax.pcolormesh(xi, zi, dzi, cmap=plt.get_cmap('jet'))
         cb = fig.colorbar(im)
@@ -234,7 +247,7 @@ class PlotTracedProfiles:
         hb_ax = fig.add_subplot(2, 1, 2)
         hb_ax.set_xlabel('Across-Track Distance [m]')
         hb_ax.set_ylabel('Depth [m]')
-        hb_ax.set_ylim((ssp_max_z, 0))
+        hb_ax.set_ylim((ssp_min_z, 0))
         hb_ax.set_xlim((0, ssp_max_x * 1.05))
         im = hb_ax.pcolormesh(xi, zi, dxi, cmap=plt.get_cmap('jet'))
         cb = fig.colorbar(im)
