@@ -16,6 +16,7 @@ from .readers.idronaut import Idronaut
 from .readers.iss import Iss
 from .readers.mvp import Mvp
 from .readers.saiv import Saiv
+from .readers.sea_and_sun import SeaAndSun
 from .readers.seabird import Seabird
 # from .readers.simrad import Simrad
 from .readers.oceanscience import OceanScience
@@ -39,6 +40,7 @@ readers.append(Asvp())
 readers.append(Mvp())
 readers.append(OceanScience())
 readers.append(Saiv())
+readers.append(SeaAndSun())
 readers.append(Seabird())
 # readers.append(Simrad())
 readers.append(Sippican())

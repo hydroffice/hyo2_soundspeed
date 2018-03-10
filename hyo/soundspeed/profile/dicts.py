@@ -41,6 +41,7 @@ class Dicts:
         ('Simrad', 115),
         ('OceanScience', 116),
         ('AML', 117),
+        ('SeaAndSun', 118),
 
         ('Deep Blue', 200),
         ('T-10', 201),

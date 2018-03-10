@@ -24,12 +24,14 @@ def main():
 
     # test readers/writers
     logger.info('test: *** START ***')
-    filters = ["aml", ]
+    filters = ["seaandsun", ]
     tests = testing.input_dict_test_files(inclusive_filters=filters)
     # print(tests)
 
     # import each identified file
     for idx, testfile in enumerate(tests.keys()):
+
+        logger.debug("filename: %s" % testfile)
 
         if idx > 4:  # FILE FILTER
             break
@@ -48,18 +50,18 @@ def main():
     from matplotlib import pyplot as plt
     plt.show()
 
-    # retrieve all the id profiles from db
-    lst = lib.db_list_profiles()
-    logger.info("Profiles: %s" % len(lst))
-    for p in lst:
-        logger.info(p)
-
-    # retrieve a specific profile and delete it
-    ssp_pk = lst[0][0]
-    ssp = lib.db_retrieve_profile(pk=ssp_pk)
-    logger.info("Retrieved profile:\n%s" % ssp)
-    ret = lib.delete_db_profile(pk=ssp_pk)
-    logger.info("Deleted profile: %s" % ret)
+    # # retrieve all the id profiles from db
+    # lst = lib.db_list_profiles()
+    # logger.info("Profiles: %s" % len(lst))
+    # for p in lst:
+    #     logger.info(p)
+    #
+    # # retrieve a specific profile and delete it
+    # ssp_pk = lst[0][0]
+    # ssp = lib.db_retrieve_profile(pk=ssp_pk)
+    # logger.info("Retrieved profile:\n%s" % ssp)
+    # ret = lib.delete_db_profile(pk=ssp_pk)
+    # logger.info("Deleted profile: %s" % ret)
 
     logger.info('test: *** END ***')
 
