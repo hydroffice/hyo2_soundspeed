@@ -72,6 +72,7 @@ Currently implemented features
   * Rolls-Royce Moving Vessel Profiler (MVP) (.asvp, .calc, .s12)
   * Oceanscience Underway CTD (.asc)
   * SAIV (.txt)
+  * Sea&Sun (.tob)
   * Seabird (.cnv)
   * Sippican XBT, XSV, and XCTD (.EDF)
   * Sonardyne (.pro)

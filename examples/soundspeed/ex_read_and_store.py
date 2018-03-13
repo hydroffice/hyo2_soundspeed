@@ -24,12 +24,14 @@ def main():
 
     # test readers/writers
     logger.info('test: *** START ***')
-    filters = ["aml", ]
+    filters = ["seaandsun", ]
     tests = testing.input_dict_test_files(inclusive_filters=filters)
     # print(tests)
 
     # import each identified file
     for idx, testfile in enumerate(tests.keys()):
+
+        logger.debug("filename: %s" % testfile)
 
         if idx > 4:  # FILE FILTER
             break

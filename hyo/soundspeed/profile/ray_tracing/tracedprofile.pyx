@@ -1,7 +1,7 @@
-import numpy as np
+cimport numpy
+import numpy
 import math
 from cpython cimport datetime
-from libcpp.vector cimport vector
 import logging
 
 logger = logging.getLogger(__name__)
@@ -61,7 +61,7 @@ cdef class TracedProfile:
 
         # ray-trace a few angles (ref: Lurton, An Introduction to UA, p.50-52)
         txz_values = list()
-        for angle in np.arange(0, int(math.ceil(self.half_swath + 1))):
+        for angle in numpy.arange(0, int(math.ceil(self.half_swath + 1))):
 
             # ray angles
             beta = list()
@@ -129,11 +129,11 @@ cdef class TracedProfile:
                 total_x.append(total_x[-1] + dx)
                 total_t.append(total_t[-1] + dt)
 
-            interp_t = np.linspace(total_t[0], total_t[-1], num=20)
+            interp_t = numpy.linspace(total_t[0], total_t[-1], num=20)
             # logger.info("interp_t:\n%s" % interp_t)
-            interp_x = np.interp(interp_t, total_t, total_x)
-            interp_z = np.interp(interp_t, total_t, total_z)
-            txz_values.append(np.array([interp_t, interp_x, interp_z]))
+            interp_x = numpy.interp(interp_t, total_t, total_x)
+            interp_z = numpy.interp(interp_t, total_t, total_z)
+            txz_values.append(numpy.array([interp_t, interp_x, interp_z]))
 
         self.rays = txz_values
         logger.debug("ray samples: %d" % len(self.rays[0][0]))
