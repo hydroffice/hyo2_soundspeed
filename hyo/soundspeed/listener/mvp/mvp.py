@@ -110,6 +110,21 @@ class Mvp(AbstractListener):
                         self.prj.ssp.cur.rtofs = None
                         logger.warning("unable to retrieve RTOFS data")
 
+                # check for default metadata
+                if self.prj.setup.auto_apply_default_metadata:
+                    if len(self.prj.ssp.cur.meta.institution) == 0:
+                        if len(self.prj.setup.default_institution) != 0:
+                            self.prj.ssp.cur.meta.institution = self.prj.setup.default_institution
+                            # logger.debug('default institution: %s' % self.prj.ssp.cur.meta.institution)
+                    if len(self.prj.ssp.cur.meta.survey) == 0:
+                        if len(self.prj.setup.default_survey) != 0:
+                            self.prj.ssp.cur.meta.survey = self.prj.setup.default_survey
+                            # logger.debug('default survey: %s' % self.prj.ssp.cur.meta.survey)
+                    if len(self.prj.ssp.cur.meta.vessel) == 0:
+                        if len(self.prj.setup.default_vessel) != 0:
+                            self.prj.ssp.cur.meta.vessel = self.prj.setup.default_vessel
+                            # logger.debug('default vessel: %s' % self.prj.ssp.cur.meta.vessel)
+
                 self.prj.ssp.cur.listener_completed = True
 
         elif self.protocol == mvp.Mvp.protocols["UNDEFINED"]:
@@ -141,6 +156,21 @@ class Mvp(AbstractListener):
                 except RuntimeError:
                     self.prj.ssp.cur.rtofs = None
                     logger.warning("unable to retrieve RTOFS data")
+
+            # check for default metadata
+            if self.prj.setup.auto_apply_default_metadata:
+                if len(self.prj.ssp.cur.meta.institution) == 0:
+                    if len(self.prj.setup.default_institution) != 0:
+                        self.prj.ssp.cur.meta.institution = self.prj.setup.default_institution
+                        # logger.debug('default institution: %s' % self.prj.ssp.cur.meta.institution)
+                if len(self.prj.ssp.cur.meta.survey) == 0:
+                    if len(self.prj.setup.default_survey) != 0:
+                        self.prj.ssp.cur.meta.survey = self.prj.setup.default_survey
+                        # logger.debug('default survey: %s' % self.prj.ssp.cur.meta.survey)
+                if len(self.prj.ssp.cur.meta.vessel) == 0:
+                    if len(self.prj.setup.default_vessel) != 0:
+                        self.prj.ssp.cur.meta.vessel = self.prj.setup.default_vessel
+                        # logger.debug('default vessel: %s' % self.prj.ssp.cur.meta.vessel)
 
             self.prj.ssp.cur.listener_completed = True
 
