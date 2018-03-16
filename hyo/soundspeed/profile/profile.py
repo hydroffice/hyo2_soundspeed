@@ -233,8 +233,6 @@ class Profile:
     @property
     def proc_speed_mean(self):
         return self.weighted_harmonic_mean()
-        # w = self.calc_weights(self.proc.speed[self.proc_valid])
-        # return np.average(self.proc.speed[self.proc_valid], weights=w)
 
     @property
     def proc_temp_mean(self):
