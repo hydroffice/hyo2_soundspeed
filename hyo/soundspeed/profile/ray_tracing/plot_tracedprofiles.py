@@ -139,14 +139,14 @@ class PlotTracedProfiles:
                     new_outmost_raypath[1],
                     color=self.new_tp_color,
                     linestyle=':')
-        err_ax.plot(self._d.old_ends[0],
-                    self._d.old_ends[1],
+        err_ax.plot(self._d.old_ends[1],
+                    self._d.old_ends[2],
                     color=self.old_tp_color, linestyle='--', label=self.old_tp_label)
-        err_ax.plot(self._d.new_ends[0],
-                    self._d.new_ends[1],
+        err_ax.plot(self._d.new_ends[1],
+                    self._d.new_ends[2],
                     color=self.new_tp_color, linestyle=':', label=self.new_tp_label)
-        err_ax.plot(self._d.new_ends[0], self._d.max_tolerances[0], 'm', label="error tolerance")
-        err_ax.plot(self._d.new_ends[0], self._d.max_tolerances[1], 'm')
+        err_ax.plot(self._d.new_ends[1], self._d.max_tolerances[0], 'm', label="error tolerance")
+        err_ax.plot(self._d.new_ends[1], self._d.max_tolerances[1], 'm')
         legend = err_ax.legend(loc=self.legend_loc, shadow=True, fontsize='small')
         legend.get_frame().set_facecolor(self.legend_color)
         err_ax.grid(True)

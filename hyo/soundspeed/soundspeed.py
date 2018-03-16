@@ -840,44 +840,45 @@ class SoundSpeedLibrary:
         msg += "%s<b>min</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
                    pre,
-                   self.cur.proc.depth[self.cur.proc_valid].min(), self.cur.meta.depth_uom,
-                   self.cur.proc.speed[self.cur.proc_valid].min(), self.cur.meta.speed_uom,
-                   self.cur.proc.temp[self.cur.proc_valid].min(), self.cur.meta.temperature_uom,
-                   self.cur.proc.sal[self.cur.proc_valid].min(), self.cur.meta.salinity_uom,
+                   self.cur.proc_depth_min, self.cur.meta.depth_uom,
+                   self.cur.proc_speed_min, self.cur.meta.speed_uom,
+                   self.cur.proc_temp_min, self.cur.meta.temperature_uom,
+                   self.cur.proc_sal_min, self.cur.meta.salinity_uom,
                )
         msg += "%s<b>max</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
                    pre,
-                   self.cur.proc.depth[self.cur.proc_valid].max(), self.cur.meta.depth_uom,
-                   self.cur.proc.speed[self.cur.proc_valid].max(), self.cur.meta.speed_uom,
-                   self.cur.proc.temp[self.cur.proc_valid].max(), self.cur.meta.temperature_uom,
-                   self.cur.proc.sal[self.cur.proc_valid].max(), self.cur.meta.salinity_uom
+                   self.cur.proc_depth_max, self.cur.meta.depth_uom,
+                   self.cur.proc_speed_max, self.cur.meta.speed_uom,
+                   self.cur.proc_temp_max, self.cur.meta.temperature_uom,
+                   self.cur.proc_sal_max, self.cur.meta.salinity_uom
                )
         # noinspection PyStringFormat
         msg += "%s<b>med</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
                    pre,
-                   np.median(self.cur.proc.depth[self.cur.proc_valid]), self.cur.meta.depth_uom,
-                   np.median(self.cur.proc.speed[self.cur.proc_valid]), self.cur.meta.speed_uom,
-                   np.median(self.cur.proc.temp[self.cur.proc_valid]), self.cur.meta.temperature_uom,
-                   np.median(self.cur.proc.sal[self.cur.proc_valid]), self.cur.meta.salinity_uom
+                   self.cur.proc_depth_median, self.cur.meta.depth_uom,
+                   self.cur.proc_speed_median, self.cur.meta.speed_uom,
+                   self.cur.proc_temp_median, self.cur.meta.temperature_uom,
+                   self.cur.proc_sal_median, self.cur.meta.salinity_uom
                )
-        msg += "%s<b>avg</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
+        msg += "%s<b>avg(*)</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
                    pre,
-                   np.average(self.cur.proc.depth[self.cur.proc_valid]), self.cur.meta.depth_uom,
-                   np.average(self.cur.proc.speed[self.cur.proc_valid]), self.cur.meta.speed_uom,
-                   np.average(self.cur.proc.temp[self.cur.proc_valid]), self.cur.meta.temperature_uom,
-                   np.average(self.cur.proc.sal[self.cur.proc_valid]), self.cur.meta.salinity_uom
+                   self.cur.proc_depth_mean, self.cur.meta.depth_uom,
+                   self.cur.proc_speed_mean, self.cur.meta.speed_uom,
+                   self.cur.proc_temp_mean, self.cur.meta.temperature_uom,
+                   self.cur.proc_sal_mean, self.cur.meta.salinity_uom
                )
         msg += "%s<b>std</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
                    pre,
-                   self.cur.proc.depth[self.cur.proc_valid].std(), self.cur.meta.depth_uom,
-                   self.cur.proc.speed[self.cur.proc_valid].std(), self.cur.meta.speed_uom,
-                   self.cur.proc.temp[self.cur.proc_valid].std(), self.cur.meta.temperature_uom,
-                   self.cur.proc.sal[self.cur.proc_valid].std(), self.cur.meta.salinity_uom
+                   self.cur.proc_depth_std, self.cur.meta.depth_uom,
+                   self.cur.proc_speed_std, self.cur.meta.speed_uom,
+                   self.cur.proc_temp_std, self.cur.meta.temperature_uom,
+                   self.cur.proc_sal_std, self.cur.meta.salinity_uom
                )
+        msg += "(*) Weighted harmonic mean for sound speed, otherwise arithmetic."
 
         return msg
 
@@ -924,11 +925,11 @@ class SoundSpeedLibrary:
         half_swath_angle = 70.0  # a safely large angle
 
         ssp1 = self.db_retrieve_profile(pk1)
-        tp1 = TracedProfile(ssp=ssp1, avg_depth=avg_depth,
+        tp1 = TracedProfile(ssp=ssp1.cur, avg_depth=avg_depth,
                             half_swath=half_swath_angle)
         ssp2 = self.db_retrieve_profile(pk2)
 
-        tp2 = TracedProfile(ssp=ssp2, avg_depth=avg_depth,
+        tp2 = TracedProfile(ssp=ssp2.cur, avg_depth=avg_depth,
                             half_swath=half_swath_angle)
 
         diff = DiffTracedProfiles(old_tp=tp1, new_tp=tp2)
@@ -944,11 +945,11 @@ class SoundSpeedLibrary:
 
         try:
             ssp1 = self.db_retrieve_profile(pk1)
-            tp1 = TracedProfile(ssp=ssp1, avg_depth=avg_depth,
+            tp1 = TracedProfile(ssp=ssp1.cur, avg_depth=avg_depth,
                                 half_swath=half_swath_angle)
             ssp2 = self.db_retrieve_profile(pk2)
 
-            tp2 = TracedProfile(ssp=ssp2, avg_depth=avg_depth,
+            tp2 = TracedProfile(ssp=ssp2.cur, avg_depth=avg_depth,
                                 half_swath=half_swath_angle)
         except RuntimeError as e:
             traceback.print_stack()

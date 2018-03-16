@@ -1,5 +1,6 @@
 import os
 import time
+import math
 import numpy as np
 import logging
 
@@ -13,6 +14,7 @@ from hyo.soundspeed.profile.dicts import Dicts
 from hyo.soundspeed.profile.oceanography import Oceanography as Oc
 from hyo.soundspeed.profile.ray_tracing.ray_tracing import RayTracing
 from hyo.soundspeed.profile.ray_tracing.ray_path import RayPath
+from hyo.soundspeed.profile.ray_tracing.tracedprofile import TracedProfile
 
 
 class Profile:
@@ -39,6 +41,56 @@ class Profile:
         msg += "%s" % self.data
         msg += "%s" % self.more
         return msg
+
+    @classmethod
+    def calc_weights(cls, depths):
+
+        mids = (depths[1:] + depths[:-1]) / 2
+        mids = np.insert(mids, 0, depths[0])
+        mids = np.append(mids, depths[-1])
+        diff = np.diff(mids)
+        diff = diff / np.sum(diff)
+
+        return diff
+
+    @classmethod
+    def weighted_median(cls, values, weights):
+        # sort values and weights based on values
+        sorted_indices = np.argsort(values)
+        values_sorted = values[sorted_indices]
+        weights_sorted = weights[sorted_indices]
+
+        acc_prob = 0
+        for idx, val in enumerate(values_sorted):
+            acc_prob += weights_sorted[idx]
+            if acc_prob >= 0.5:
+                return val
+
+        raise RuntimeError("unable to calculated median")
+
+    def weighted_harmonic_mean(self):
+        avg_depth = 10000.0  # just a very deep value
+        half_swath_angle = 1.0  # a safely large angle
+
+        tp1 = TracedProfile(ssp=self, avg_depth=avg_depth,
+                            half_swath=half_swath_angle)
+
+        # logger.debug("delta depth: %s" % (tp1.rays[0][2][-1] - tp1.rays[0][2][0]))
+        # logger.debug("delta time: %s" % tp1.rays[0][0][-1])
+
+        return (tp1.rays[0][2][-1] - tp1.rays[0][2][0]) / tp1.rays[0][0][-1]
+
+    @classmethod
+    def weighted_arithmetic_std(cls, values, weights):
+        avg = np.average(values, weights=weights)
+        var = np.average((values - avg)**2, weights=weights)
+        return math.sqrt(var)
+
+    def weighted_harmonic_std(self):
+        w = self.calc_weights(self.proc.speed[self.proc_valid])
+        avg = self.weighted_harmonic_mean()
+        var = np.average((self.proc.speed[self.proc_valid] - avg)**2, weights=w)
+        return math.sqrt(var)
 
     def init_data(self, num_samples):
         if num_samples == 0:
@@ -120,6 +172,98 @@ class Profile:
     def proc_invalid_direction(self):
         """Return indices of invalid data for direction"""
         return np.equal(self.proc.flag, Dicts.flags['direction'])  # numpy 1.10.4 if a warning
+
+    @property
+    def proc_depth_min(self):
+        return self.proc.depth[self.proc_valid].min()
+
+    @property
+    def proc_speed_min(self):
+        return self.proc.speed[self.proc_valid].min()
+
+    @property
+    def proc_temp_min(self):
+        return self.proc.temp[self.proc_valid].min()
+
+    @property
+    def proc_sal_min(self):
+        return self.proc.sal[self.proc_valid].min()
+
+    @property
+    def proc_depth_max(self):
+        return self.proc.depth[self.proc_valid].max()
+
+    @property
+    def proc_speed_max(self):
+        return self.proc.speed[self.proc_valid].max()
+
+    @property
+    def proc_temp_max(self):
+        return self.proc.temp[self.proc_valid].max()
+
+    @property
+    def proc_sal_max(self):
+        return self.proc.sal[self.proc_valid].max()
+
+    @property
+    def proc_depth_median(self):
+        w = self.calc_weights(self.proc.depth[self.proc_valid])
+        return self.weighted_median(self.proc.depth[self.proc_valid], w)
+
+    @property
+    def proc_speed_median(self):
+        w = self.calc_weights(self.proc.speed[self.proc_valid])
+        return self.weighted_median(self.proc.speed[self.proc_valid], w)
+
+    @property
+    def proc_temp_median(self):
+        w = self.calc_weights(self.proc.temp[self.proc_valid])
+        return self.weighted_median(self.proc.temp[self.proc_valid], w)
+
+    @property
+    def proc_sal_median(self):
+        w = self.calc_weights(self.proc.sal[self.proc_valid])
+        return self.weighted_median(self.proc.sal[self.proc_valid], w)
+
+    @property
+    def proc_depth_mean(self):
+        w = self.calc_weights(self.proc.depth[self.proc_valid])
+        return np.average(self.proc.depth[self.proc_valid], weights=w)
+
+    @property
+    def proc_speed_mean(self):
+        return self.weighted_harmonic_mean()
+        # w = self.calc_weights(self.proc.speed[self.proc_valid])
+        # return np.average(self.proc.speed[self.proc_valid], weights=w)
+
+    @property
+    def proc_temp_mean(self):
+        w = self.calc_weights(self.proc.temp[self.proc_valid])
+        return np.average(self.proc.temp[self.proc_valid], weights=w)
+
+    @property
+    def proc_sal_mean(self):
+        w = self.calc_weights(self.proc.sal[self.proc_valid])
+        return np.average(self.proc.sal[self.proc_valid], weights=w)
+
+    @property
+    def proc_depth_std(self):
+        w = self.calc_weights(self.proc.depth[self.proc_valid])
+        return self.weighted_arithmetic_std(self.proc.depth[self.proc_valid], w)
+
+    @property
+    def proc_speed_std(self):
+        return self.weighted_harmonic_std()
+
+    @property
+    def proc_temp_std(self):
+        w = self.calc_weights(self.proc.temp[self.proc_valid])
+        return self.weighted_arithmetic_std(self.proc.temp[self.proc_valid], w)
+
+    @property
+    def proc_sal_std(self):
+        w = self.calc_weights(self.proc.sal[self.proc_valid])
+        return self.weighted_arithmetic_std(self.proc.sal[self.proc_valid], w)
 
     def _get_salinity_threshold(self):
         """

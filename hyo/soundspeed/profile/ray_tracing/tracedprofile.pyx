@@ -32,21 +32,21 @@ cdef class TracedProfile:
         if tss_value is not None:
             speed.append(tss_value)
 
-        vi = ssp.cur.proc_valid
+        vi = ssp.proc_valid
 
-        for z_idx in range(0, len(ssp.cur.proc.depth[vi])):
+        for z_idx in range(0, len(ssp.proc.depth[vi])):
 
             # skip samples at depth less than the draft
             if tss_depth is not None:
-                if ssp.cur.proc.depth[vi][z_idx] <= tss_depth:
-                    # logger.debug("skipping sample at depth: %.1f" % ssp.cur.proc.depth[z_idx])
+                if ssp.proc.depth[vi][z_idx] <= tss_depth:
+                    # logger.debug("skipping sample at depth: %.1f" % ssp.proc.depth[z_idx])
                     continue
 
-            depth.append(ssp.cur.proc.depth[vi][z_idx])
-            speed.append(ssp.cur.proc.speed[vi][z_idx])
+            depth.append(ssp.proc.depth[vi][z_idx])
+            speed.append(ssp.proc.speed[vi][z_idx])
 
             # stop after the first sample deeper than the avg depth (safer)
-            if ssp.cur.proc.depth[vi][z_idx] > self.avg_depth:
+            if ssp.proc.depth[vi][z_idx] > self.avg_depth:
                 break
 
         # remove extension value (if any)
@@ -75,7 +75,7 @@ cdef class TracedProfile:
 
             # logger.debug("angle %d: beta0 %s" % (angle, math.degrees(beta[0])))
 
-            for idx in range(0, len(depth) - 1):
+            for idx in range(len(depth) - 1):
 
                 # calculate delta (next - current)
                 dz = depth[idx+1] - depth[idx]
@@ -107,7 +107,7 @@ cdef class TracedProfile:
                     else:  # if math.cos(beta[x]) != 0:
                         curve = speed[idx] / (gradient * math.cos(beta[idx]))  # Lurton, (2.66)
 
-                    beta_cos = speed[idx + 1] / speed[idx] * (math.cos(beta[idx]))
+                    beta_cos = speed[idx + 1] * (math.cos(beta[idx])) / speed[idx]
                     if beta_cos > 1.0:
                         logger.warning("angle %d, sample %d -> invalid beta cos: %s" %
                                        (angle, idx, beta_cos))
@@ -137,9 +137,9 @@ cdef class TracedProfile:
 
         self.rays = txz_values
         logger.debug("ray samples: %d" % len(self.rays[0][0]))
-        self.date_time = ssp.cur.meta.utc_time
-        self.latitude = ssp.cur.meta.latitude
-        self.longitude = ssp.cur.meta.longitude
+        self.date_time = ssp.meta.utc_time
+        self.latitude = ssp.meta.latitude
+        self.longitude = ssp.meta.longitude
         self.data = [depth, speed]
 
     def __repr__(self):

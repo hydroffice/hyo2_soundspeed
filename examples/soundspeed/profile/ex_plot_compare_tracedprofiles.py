@@ -39,13 +39,13 @@ half_swath_angle = 70.0  # a safely large angle
 ssp1 = make_fake_ssp(bias=0.0)
 ssp1_list = ProfileList()
 ssp1_list.append_profile(ssp1)
-tp1 = TracedProfile(ssp=ssp1_list, avg_depth=avg_depth,
+tp1 = TracedProfile(ssp=ssp1_list.cur, avg_depth=avg_depth,
                     half_swath=half_swath_angle)
 
-ssp2 = make_fake_ssp(bias=10.0)
+ssp2 = make_fake_ssp(bias=100.0)
 ssp2_list = ProfileList()
 ssp2_list.append_profile(ssp2)
-tp2 = TracedProfile(ssp=ssp2_list, avg_depth=avg_depth,
+tp2 = TracedProfile(ssp=ssp2_list.cur, avg_depth=avg_depth,
                     half_swath=half_swath_angle)
 
 diff = DiffTracedProfiles(old_tp=tp1, new_tp=tp2)
