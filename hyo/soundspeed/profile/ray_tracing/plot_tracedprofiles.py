@@ -53,8 +53,9 @@ class PlotTracedProfiles:
         logger.debug("Plotting analysis")
 
         # create figure
+        plt.close("Comparison of Ray-Traced Profiles")  # if any
         fig = plt.figure(num="Comparison of Ray-Traced Profiles",
-                         figsize=(10, 6), dpi=80, facecolor='w', edgecolor='k')
+                                         figsize=(10, 6), dpi=80, facecolor='w', edgecolor='k')
 
         z_max = max(max(self._d.new_tp.data[0]), max(self._d.old_tp.data[0]))
         ss_min = min(min(self._d.new_tp.data[1]), min(self._d.old_tp.data[1]))
@@ -158,7 +159,14 @@ class PlotTracedProfiles:
 
         for ang, ray in enumerate(self._d.new_rays):
 
-            for idx in range(0, len(ray[0]), 100):
+            for idx in range(0, len(ray[0]), 10):
+
+                try:
+                    _ = ray[0][idx]
+                    _ = self._d.old_rays[ang][0][idx]
+                except IndexError as e:
+                    logger.debug("skipping idx %s" % idx)
+                    continue
 
                 t1 = np.append(t1, ray[0][idx])
                 x1 = np.append(x1, ray[1][idx])
@@ -171,6 +179,7 @@ class PlotTracedProfiles:
                 dx = np.append(dx, np.abs(ray[1][idx] - self._d.old_rays[ang][1][idx]))
                 # dz = np.append(dz, np.abs(ray[2][idx] - self._d.old_rays[ang][2][idx]))
                 dz = np.append(dz, np.abs(ray[0][idx] - self._d.old_rays[ang][0][idx]) * 1500)
+
         logger.debug("timing: %s" % (datetime.now() - start_time))
 
         # noinspection PyTypeChecker
@@ -181,6 +190,7 @@ class PlotTracedProfiles:
         logger.debug("timing: %s" % (datetime.now() - start_time))
 
         # create figure
+        plt.close("Across-swath bias plots") # if already open
         fig = plt.figure(num="Across-swath bias plots",
                          figsize=(12, 8), dpi=80, facecolor='w', edgecolor='k')
 

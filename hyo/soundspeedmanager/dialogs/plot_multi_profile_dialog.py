@@ -108,6 +108,7 @@ class PlotMultiProfileDialog(AbstractDialog):
             plt.ion()
 
             # figure and canvas
+            plt.close("Plot Sound Speed")
             fig = plt.figure("Plot Sound Speed", figsize=self.f_sz, dpi=self.f_dpi)
             fig.patch.set_alpha(0.0)
             ax = fig.add_subplot(111)
@@ -182,6 +183,7 @@ class PlotMultiProfileDialog(AbstractDialog):
             plt.ion()
 
             # figure and canvas
+            plt.close("Plot Temperature")
             fig = plt.figure("Plot Temperature", figsize=self.f_sz, dpi=self.f_dpi)
             fig.patch.set_alpha(0.0)
             ax = fig.add_subplot(111)
@@ -256,6 +258,7 @@ class PlotMultiProfileDialog(AbstractDialog):
             plt.ion()
 
             # figure and canvas
+            plt.close("Plot Salinity")
             fig = plt.figure("Plot Salinity", figsize=self.f_sz, dpi=self.f_dpi)
             fig.patch.set_alpha(0.0)
             ax = fig.add_subplot(111)

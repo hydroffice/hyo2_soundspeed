@@ -75,6 +75,7 @@ class PlotDb:
                 ssp_label.append(row[0])
 
             # make the world map
+            plt.close("Profiles Map")
             fig = plt.figure("Profiles Map")
             # fig.patch.set_facecolor('#1464F4')
             plt.subplot(111, aspect='equal')
@@ -172,6 +173,7 @@ class PlotDb:
             raise RuntimeError("Unable to retrieve the day list > Empty database?")
 
         # start a new figure
+        plt.close("Aggregate Plot")
         fig = plt.figure("Aggregate Plot")
         plt.title("Aggregate SSP plot [from: %s to: %s]" % (dates[0], dates[1]))
         ax = fig.add_subplot(111)
