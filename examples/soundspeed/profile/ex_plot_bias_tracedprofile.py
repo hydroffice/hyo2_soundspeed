@@ -48,7 +48,7 @@ ssp2_list.append_profile(ssp2)
 tp2 = TracedProfile(ssp=ssp2_list.cur, avg_depth=avg_depth,
                     half_swath=half_swath_angle)
 
-diff = DiffTracedProfiles(old_tp=tp1, new_tp=tp2)
+diff = DiffTracedProfiles(old_tp=tp2, new_tp=tp1)
 diff.calc_diff()
 
 plot = PlotTracedProfiles(diff_tps=diff)

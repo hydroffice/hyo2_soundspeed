@@ -609,8 +609,13 @@ class Database(AbstractWidget):
                                           "You need to select exactly 2 profiles to do this comparison!")
             return
 
+        self.progress.start(title="Comparison plots", text="Retrieving profiles")
+
+        self.progress.update(10)
         pk1 = int(self.ssp_list.item(rows[0].row(), 0).text())
         pk2 = int(self.ssp_list.item(rows[1].row(), 0).text())
+
+        self.progress.update(text="Ray-tracing", value=20)
         try:
             self.lib.ray_tracing_comparison(pk1, pk2)
 
@@ -618,7 +623,10 @@ class Database(AbstractWidget):
             # traceback.print_stack()
             # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Ray-Tracing error", "%s" % e)
+            self.progress.end()
             return
+
+        self.progress.end()
 
     def bias_plots(self):
         logger.debug("user want to make bias plots")

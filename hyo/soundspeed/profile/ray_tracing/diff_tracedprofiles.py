@@ -16,8 +16,8 @@ class DiffTracedProfiles:
         self.fixed_allowable_error = 0.3
 
         # output
-        self.new_ends = None
-        self.old_ends = None
+        self.new_rays = list()
+        self.old_rays = list()
         self.max_tolerances = None
 
     def calc_diff(self):
@@ -26,77 +26,88 @@ class DiffTracedProfiles:
         if self.new_tp is None:
             raise RuntimeError("first set the new traced profile")
 
-        old_extend = False
-        # Check if the new profile is deeper than the past one
-        if self.new_tp.data[0][-1] > self.old_tp.data[0][-1]:
-            old_extend = True
+        for ang in range(len(self.new_tp.rays)):
+            # logger.info("[angle: %d]" % ang)
+            ray_new = self.new_tp.rays[ang]
+            ray_old = self.old_tp.rays[ang]
 
-        logger.info("old profile requires extension: %s" % old_extend)
+            new_t = list()
+            new_x = list()
+            new_z = list()
 
-        new_x_end = list()
-        new_z_end = list()
-        new_t_end = list()
-        old_x_end = list()
-        old_z_end = list()
-        old_t_end = list()
+            old_t = list()
+            old_x = list()
+            old_z = list()
 
-        for ray_angle, ray_new in enumerate(self.new_tp.rays):
+            init_done = False
+            init_new_t = None
+            init_new_x = None
+            init_new_z = None
+            init_old_t = None
+            init_old_x = None
+            init_old_z = None
 
-            ray_old = self.old_tp.rays[ray_angle]
+            # first retrieve common areas for both profiles (and reset the 0 values)
+            for idx in range(len(ray_new[0])):
 
-            if old_extend:
+                if ray_new[0][idx] == -1:
+                    continue
+                if ray_old[0][idx] == -1:
+                    continue
 
-                # logger.debug("len of ray old [x]: %d" % len(ray_old[1]))
-                # logger.debug("len of ray old [z]: %d" % len(ray_old[2]))
+                if not init_done:
+                    # logger.debug("begin z: %s/%s" % (ray_new[2][idx], ray_old[2][idx]))
+                    init_new_t = ray_new[0][idx]
+                    init_new_x = ray_new[1][idx]
+                    init_new_z = ray_new[2][idx]
+                    init_old_t = ray_old[0][idx]
+                    init_old_x = ray_old[1][idx]
+                    init_old_z = ray_old[2][idx]
+                    init_done = True
 
-                dt = ray_old[0][-1] - ray_old[0][-2]
-                dx = ray_old[1][-1] - ray_old[1][-2]
-                dz = ray_old[2][-1] - ray_old[2][-2]
+                new_t.append(ray_new[0][idx] - init_new_t)
+                new_x.append(ray_new[1][idx] - init_new_x)
+                new_z.append(ray_new[2][idx] - init_new_z)
 
-                new_nr_samples = len(ray_new[2])
+                old_t.append(ray_old[0][idx] - init_old_t)
+                old_x.append(ray_old[1][idx] - init_old_x)
+                old_z.append(ray_old[2][idx] - init_old_z)
 
-            else:
+            # logger.debug("end z: %s/%s" % (new_z[-1], old_z[-1]))
 
-                dt = 0  # unused
-                dx = 0  # unused
-                dz = 0  # unused
+            new_is_longer = False
+            min_time = new_t[-1]
+            if new_t[-1] > old_t[-1]:
+                min_time = old_t[-1]
+                new_is_longer = True
+            # logger.debug("new is longer: %s" % new_is_longer)
+            # logger.debug("min time: %s" % min_time)
 
-                new_nr_samples = min(len(ray_old[2]), len(ray_new[2]))
+            n_t = list()
+            n_x = list()
+            n_z = list()
 
-            # logger.debug("len of ray new: %d" % len(ray_new[1]))
-            # logger.debug("new nr samples: %d" % new_nr_samples)
+            # stop to the minimum common time
+            for idx in range(len(new_t)):
+                if new_t[idx] > min_time:
+                    break
 
-            new_t_end.append(ray_new[0][new_nr_samples - 1])
-            new_x_end.append(ray_new[1][new_nr_samples - 1])
-            new_z_end.append(ray_new[2][new_nr_samples - 1])
+                n_t.append(new_t[idx])
+                n_x.append(new_x[idx])
+                n_z.append(new_z[idx])
 
-            if old_extend:
+            o_t = list()
+            o_x = list()
+            o_z = list()
 
-                old_missing_samples = new_nr_samples - len(ray_old[2])
-                old_t_end.append(ray_old[0][-1] + old_missing_samples * dt)
-                old_x_end.append(ray_old[1][-1] + old_missing_samples * dx)
-                old_z_end.append(ray_old[2][-1] + old_missing_samples * dz)
+            # stop to the minimum common time
+            for idx in range(len(old_t)):
+                if old_t[idx] > min_time:
+                    break
 
-            else:
+                o_t.append(old_t[idx])
+                o_x.append(old_x[idx])
+                o_z.append(old_z[idx])
 
-                old_t_end.append(ray_old[0][new_nr_samples - 1])
-                old_x_end.append(ray_old[1][new_nr_samples - 1])
-                old_z_end.append(ray_old[2][new_nr_samples - 1])
-
-            # logger.debug("new -> %d: end t: %s" % (ray_angle, new_t_end[-1]))
-            # logger.debug("old -> %d: end t: %s" % (ray_angle, old_t_end[-1]))
-            # logger.debug("new -> %d: end x: %s" % (ray_angle, new_x_end[-1]))
-            # logger.debug("old -> %d: end x: %s" % (ray_angle, old_x_end[-1]))
-            # logger.debug("new -> %d: end z: %s" % (ray_angle, new_z_end[-1]))
-            # logger.debug("old -> %d: end z: %s" % (ray_angle, old_z_end[-1]))
-
-        self.new_ends = np.array([new_t_end, new_x_end, new_z_end])
-        self.old_ends = np.array([old_t_end, old_x_end, old_z_end])
-        # noinspection PyTypeChecker
-        self.max_tolerances = np.array([
-            np.repeat(((self.new_ends[2][0]) * self.variable_allowable_error) +
-                      self.new_ends[2][0] + self.fixed_allowable_error,
-                      len(self.new_ends[0])),
-            np.repeat(((-self.new_ends[2][0]) * self.variable_allowable_error) +
-                      self.new_ends[2][0] - self.fixed_allowable_error,
-                      len(self.new_ends[0]))])
+            self.new_rays.append(np.array([n_t, n_x, n_z]))
+            self.old_rays.append(np.array([o_t, o_x, o_z]))

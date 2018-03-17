@@ -1,5 +1,6 @@
 cimport numpy
 import numpy
+from scipy.interpolate import interp1d
 import math
 from cpython cimport datetime
 import logging
@@ -25,12 +26,12 @@ cdef class TracedProfile:
         self.half_swath = half_swath
 
         # select samples for the ray tracing (must be deeper than the transducer depth)
-        depth = list()
+        depths = list()
         if tss_depth is not None:
-            depth.append(tss_depth)
-        speed = list()
+            depths.append(tss_depth)
+        speeds = list()
         if tss_value is not None:
-            speed.append(tss_value)
+            speeds.append(tss_value)
 
         vi = ssp.proc_valid
 
@@ -42,20 +43,21 @@ cdef class TracedProfile:
                     # logger.debug("skipping sample at depth: %.1f" % ssp.proc.depth[z_idx])
                     continue
 
-            depth.append(ssp.proc.depth[vi][z_idx])
-            speed.append(ssp.proc.speed[vi][z_idx])
+            depths.append(ssp.proc.depth[vi][z_idx])
+            speeds.append(ssp.proc.speed[vi][z_idx])
 
             # stop after the first sample deeper than the avg depth (safer)
             if ssp.proc.depth[vi][z_idx] > self.avg_depth:
                 break
 
         # remove extension value (if any)
-        if (depth[-1] - depth[-2]) > 1000:
-            logger.info("removed latest extension depth: %s" % depth[-1])
-            del depth[-1]
+        if (depths[-1] - depths[-2]) > 1000:
+            logger.info("removed latest extension depth: %s" % depths[-1])
+            del depths[-1]
 
-        logger.debug("samples: %d" % len(depth))
-        logger.debug("max depth: %f" % depth[-1])
+        logger.info("profile timestamp: %s" % ssp.meta.utc_time)
+        logger.debug("valid samples: %d" % (len(depths)), )
+        logger.debug("depth: min %.2f, max %.2f" % (depths[0], depths[-1]))
         # logger.debug("depths: %s" % depth)
         # logger.debug("speeds: %s" % speed)
 
@@ -67,7 +69,7 @@ cdef class TracedProfile:
             beta = list()
             beta.append(math.radians(90.0 - angle))
             total_z = list()
-            total_z.append(depth[0])
+            total_z.append(depths[0])
             total_x = list()
             total_x.append(0)
             total_t = list()  # total travel time
@@ -75,11 +77,11 @@ cdef class TracedProfile:
 
             # logger.debug("angle %d: beta0 %s" % (angle, math.degrees(beta[0])))
 
-            for idx in range(len(depth) - 1):
+            for idx in range(len(depths) - 1):
 
                 # calculate delta (next - current)
-                dz = depth[idx+1] - depth[idx]
-                dc = speed[idx+1] - speed[idx]
+                dz = depths[idx+1] - depths[idx]
+                dc = speeds[idx+1] - speeds[idx]
                 # logger.debug("%s: dy %s, dc %s" % (x, dy, dc))
 
                 if dc == 0:  # "constant speed" case: no curvature
@@ -92,11 +94,11 @@ cdef class TracedProfile:
                     # gradient = dc/dy
                     beta.append(beta[idx])  # beta does not change
                     dx = dz / (math.tan(beta[idx+1]))  # no curvature!
-                    dt = (((dx**2)+(dz**2))**.5) / speed[idx+1]
+                    dt = (((dx**2)+(dz**2))**.5) / speeds[idx+1]
 
                 elif dz == 0:  # "same depth" case: just adjust the ray angle
 
-                    beta.append(math.acos((speed[idx + 1] / speed[idx]) * (math.cos(beta[idx]))))
+                    beta.append(math.acos((speeds[idx + 1] / speeds[idx]) * (math.cos(beta[idx]))))
                     continue
 
                 else:  # if (dc != 0) and (dz != 0):
@@ -105,9 +107,9 @@ cdef class TracedProfile:
                     if math.cos(beta[idx]) == 0:
                         curve = 0
                     else:  # if math.cos(beta[x]) != 0:
-                        curve = speed[idx] / (gradient * math.cos(beta[idx]))  # Lurton, (2.66)
+                        curve = speeds[idx] / (gradient * math.cos(beta[idx]))  # Lurton, (2.66)
 
-                    beta_cos = speed[idx + 1] * (math.cos(beta[idx])) / speed[idx]
+                    beta_cos = speeds[idx + 1] * (math.cos(beta[idx])) / speeds[idx]
                     if beta_cos > 1.0:
                         logger.warning("angle %d, sample %d -> invalid beta cos: %s" %
                                        (angle, idx, beta_cos))
@@ -122,25 +124,37 @@ cdef class TracedProfile:
                     dx = curve * ((math.sin(beta[idx])) - (math.sin(beta[idx + 1])))  # Lurton, (2.67)
                     dt = abs((1 / gradient) *
                              math.log(
-                                (speed[idx + 1] / speed[idx]) *
+                                (speeds[idx + 1] / speeds[idx]) *
                                 (abs((1 + math.sin(beta[idx])) / (1 + math.sin(beta[idx + 1]))))))  # Lurton, (2.70)
 
                 total_z.append(total_z[-1] + dz)
                 total_x.append(total_x[-1] + dx)
                 total_t.append(total_t[-1] + dt)
 
-            interp_t = numpy.linspace(total_t[0], total_t[-1], num=20)
-            # logger.info("interp_t:\n%s" % interp_t)
-            interp_x = numpy.interp(interp_t, total_t, total_x)
-            interp_z = numpy.interp(interp_t, total_t, total_z)
+            # interpolate between 0 and 5000 meters with decimetric resolution
+            interp_z = numpy.linspace(0, 5000, num=25001, endpoint=True)
+            fx = interp1d(total_z, total_x, kind='cubic', bounds_error=False, fill_value=-1)
+            interp_x = fx(interp_z)
+            ft = interp1d(total_z, total_t, kind='cubic', bounds_error=False, fill_value=-1)
+            interp_t = ft(interp_z)
             txz_values.append(numpy.array([interp_t, interp_x, interp_z]))
 
         self.rays = txz_values
-        logger.debug("ray samples: %d" % len(self.rays[0][0]))
+        logger.debug("rays: %d (%d samples per-ray)" % (len(self.rays), len(self.rays[0][0])))
         self.date_time = ssp.meta.utc_time
         self.latitude = ssp.meta.latitude
         self.longitude = ssp.meta.longitude
-        self.data = [depth, speed]
+        self.data = [depths, speeds]
+
+    def str_rays(self):
+        msg = str()
+        for ang in range(len(self.rays)):
+            msg += "[%d]\n" % ang
+
+            for idx in range(len(self.rays[ang][0])):
+                msg += "%10.2f %10.2f %10.2f\n" \
+                       % (self.rays[ang][0][idx], self.rays[ang][1][idx], self.rays[ang][2][idx])
+        return msg
 
     def __repr__(self):
         msg = "<%s>\n" % self.__class__.__name__
@@ -150,7 +164,8 @@ cdef class TracedProfile:
         msg += "  <longitude: %.7f>\n" % self.longitude
         msg += "  <avg depth: %.3f>\n" % self.avg_depth
         msg += "  <half swatch: %.1f>\n" % self.half_swath
+        msg += "  <profile valid samples: %d>" % len(self.data[0])
         msg += "  <rays: %d>\n" % len(self.rays)
-        msg += "  <samples: %d>" % len(self.data[0])
+        msg += "  <samples per ray: %d>\n" % len(self.rays[0][0])
 
         return msg
