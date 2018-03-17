@@ -53,7 +53,7 @@ a = Analysis(['SoundSpeedManager.py'],
              pathex=[],
              hiddenimports=["PIL", ],
              excludes=[
-                "IPython", "PyQt", "pandas", "scipy", "sphinx", "sphinx_rtd_theme", "OpenGL_accelerate",
+                "IPython", "PyQt", "pandas", "sphinx", "sphinx_rtd_theme", "OpenGL_accelerate",
                 "FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter",
                 "wx"
                 ],
