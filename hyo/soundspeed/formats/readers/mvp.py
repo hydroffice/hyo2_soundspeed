@@ -23,7 +23,8 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
     formats = {
         "ASVP": 0,
         "CALC": 1,
-        "S12": 2
+        "S12": 2,
+        "M1": 3,
     }
 
     def __init__(self):  #
@@ -32,6 +33,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
         self._ext.add('s12')
         self._ext.add('calc')
         self._ext.add('asvp')
+        self._ext.add('m1')
 
         # for listener
         self.file_content = None
@@ -97,11 +99,14 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
         elif file_ext == ".s12":
             self.format = self.formats["S12"]
 
+        elif file_ext == ".m1":
+            self.format = self.formats["M1"]
+
         else:
             raise RuntimeError("unknown format: %s" % self.format)
 
         # initialize probe/sensor type
-        if self.format == self.formats["CALC"]:
+        if self.format in [self.formats["CALC"], self.formats["M1"]]:
             self.ssp.cur.meta.sensor_type = Dicts.sensor_types["SVP"]
         else:
             self.ssp.cur.meta.sensor_type = Dicts.sensor_types["MVP"]
@@ -134,6 +139,10 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
             logger.info("parsing header [S12]")
             self._parse_s12_header()
 
+        elif self.format == self.formats["M1"]:
+            logger.info("parsing header [M1]")
+            self._parse_m1_header()
+
         else:
             raise RuntimeError("unknown format: %s" % self.format)
 
@@ -152,6 +161,10 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
         elif self.format == self.formats["S12"]:
             logger.info("parsing body [S12]")
             self._parse_s12_body()
+
+        elif self.format == self.formats["M1"]:
+            logger.info("parsing body [M1]")
+            self._parse_m1_body()
 
         else:
             raise RuntimeError("unknown format: %s" % self.format)
@@ -307,6 +320,127 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
                 self.ssp.cur.data.depth[count] = float(fields[0])
                 self.ssp.cur.data.speed[count] = float(fields[1])
                 self.ssp.cur.data.temp[count] = float(fields[2])
+            except (ValueError, IndexError, TypeError) as e:
+                logger.error("skipping %s row: %s" % (count, e))
+                continue
+            count += 1
+
+        self.ssp.cur.data_resize(count)
+
+    def _parse_m1_header(self):
+
+        lines = self.total_data.splitlines()
+
+        date_token = "Date (dd/mm/yyyy):"
+        time_token = "Time (hh|mm|ss.s):"
+        lat_token = "LAT ( ddmm.mmmmmmm,N):"
+        long_token = "LON (dddmm.mmmmmmm,E):"
+        data_token = "<END_OF_HEADER> "
+
+        day = None
+        month = None
+        year = None
+        hour = None
+        minute = None
+        second = None
+
+        for idx, line in enumerate(lines):
+
+            if line[:len(date_token)] == date_token:
+                # logger.debug("date string: %s" % line)
+
+                try:
+                    # Date [dd/mm/yyyy]:  09/04/2013
+                    date_field = line.split(":")[-1].strip()
+
+                    day = int(date_field.split("/")[0])
+                    month = int(date_field.split("/")[1])
+                    year = int(date_field.split("/")[2])
+                    logger.info("date: %s %s %s" % (year, month, day))
+                except (ValueError, IndexError) as e:
+                    raise RuntimeError("unable to parse the date: %s" % e)
+
+            elif line[:len(time_token)] == time_token:
+                # logger.debug("time string: %s" % line)
+
+                try:
+                    # Time [hh:mm:ss.ss]: 13:24:09.39
+                    time_field = line.split()[-1].strip()
+                    hour = int(time_field.split(":")[0])
+                    minute = int(time_field.split(":")[1])
+                    second = float(time_field.split(":")[2])
+                    logger.info("time: %s %s %s" % (hour, minute, second))
+                except (ValueError, IndexError):
+                    raise RuntimeError("unable to parse the time")
+
+            elif line[:len(long_token)] == long_token:
+                # logger.debug("longitude string: %s" % line)
+
+                try:
+                    # LON (dddmm.mmmmmmm,E): 05557.4253510,W
+                    lon_field = line.split()[-1].split(",")[0].strip()
+                    lon_deg = int(lon_field[0:3])
+                    lon_min = float(lon_field[3:-1])
+                    lon_hemi = line.split()[-1].split(",")[-1].strip()
+                    self.ssp.cur.meta.longitude = lon_deg + lon_min/60.0
+                    if lon_hemi == "W" or lon_hemi == "w":
+                        self.ssp.cur.meta.longitude *= -1
+                    logger.info("longitude: %s" % self.ssp.cur.meta.longitude)
+                except (ValueError, IndexError, TypeError) as e:
+                    raise RuntimeError("unable to convert to longitude: %s" % e)
+
+            elif line[:len(lat_token)] == lat_token:
+                # logger.debug("latitude string: %s" % line)
+
+                try:
+                    # LAT ( ddmm.mmmmmmm,N):  4249.4583290,N
+                    lat_field = line.split()[-1].split(",")[0].strip()
+                    lat_deg = int(lat_field[0:2])
+                    lat_min = float(lat_field[2:-1])
+                    lat_hemi = line.split()[-1].split(",")[-1].strip()
+                    self.ssp.cur.meta.latitude = lat_deg + lat_min/60.0
+                    if lat_hemi == "S" or lat_hemi == "s":
+                        self.ssp.cur.meta.latitude *= -1
+                    logger.info("latitude: %s" % self.ssp.cur.meta.latitude)
+                except (ValueError, IndexError, TypeError) as e:
+                    raise RuntimeError("unable to convert to longitude: %s" % e)
+
+            elif line[:len(data_token)] == data_token:
+                self.samples_offset = idx + 17
+                logger.debug("data starts at row: %s" % self.samples_offset)
+                break
+
+        try:
+            if (year is not None) and (hour is not None):
+                # second truncation applied
+                self.ssp.cur.meta.utc_time = dt.datetime(year, month, day, hour, minute, int(second))
+                logger.info("datetime: %s" % self.ssp.cur.meta.utc_time)
+        except (ValueError, IndexError, TypeError) as e:
+            raise RuntimeError("unable to convert to datetime: %s" % e)
+
+        self.ssp.cur.init_data(len(lines) - self.samples_offset)
+
+    def _parse_m1_body(self):
+
+        lines = self.total_data.splitlines()
+        count = 0
+
+        for idx, line in enumerate(lines):
+
+            if idx < self.samples_offset:
+                continue
+
+            if idx == self.samples_offset:
+                logger.debug("first data row: %s" % line)
+
+            fields = line.split(",")
+            if len(fields) != 3:
+                logger.info("skipping %s row" % count)
+                continue
+
+            try:
+                self.ssp.cur.data.depth[count] = float(fields[1].strip())
+                self.ssp.cur.data.speed[count] = float(fields[2].strip())
             except (ValueError, IndexError, TypeError) as e:
                 logger.error("skipping %s row: %s" % (count, e))
                 continue
