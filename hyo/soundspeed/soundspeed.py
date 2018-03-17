@@ -836,8 +836,8 @@ class SoundSpeedLibrary:
 
         msg += "%s<b>Nr. of Samples</b>: %d</pre>" % (pre, self.cur.proc.depth[self.cur.proc_valid].size)
 
-        msg += "%s        <b>Depth</b>     <b>Sound Speed</b>    <b>Temperature</b>   <b>Salinity</b></pre>" % pre
-        msg += "%s<b>min</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
+        msg += "%s           <b>Depth</b>     <b>Sound Speed</b>    <b>Temperature</b>   <b>Salinity</b></pre>" % pre
+        msg += "%s<b>min</b>:    % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
                    pre,
                    self.cur.proc_depth_min, self.cur.meta.depth_uom,
@@ -845,7 +845,7 @@ class SoundSpeedLibrary:
                    self.cur.proc_temp_min, self.cur.meta.temperature_uom,
                    self.cur.proc_sal_min, self.cur.meta.salinity_uom,
                )
-        msg += "%s<b>max</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
+        msg += "%s<b>max</b>:    % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
                    pre,
                    self.cur.proc_depth_max, self.cur.meta.depth_uom,
@@ -854,7 +854,7 @@ class SoundSpeedLibrary:
                    self.cur.proc_sal_max, self.cur.meta.salinity_uom
                )
         # noinspection PyStringFormat
-        msg += "%s<b>med</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
+        msg += "%s<b>med</b>:    % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
                    pre,
                    self.cur.proc_depth_median, self.cur.meta.depth_uom,
@@ -870,7 +870,7 @@ class SoundSpeedLibrary:
                    self.cur.proc_temp_mean, self.cur.meta.temperature_uom,
                    self.cur.proc_sal_mean, self.cur.meta.salinity_uom
                )
-        msg += "%s<b>std</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
+        msg += "%s<b>std</b>:    % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
                    pre,
                    self.cur.proc_depth_std, self.cur.meta.depth_uom,
