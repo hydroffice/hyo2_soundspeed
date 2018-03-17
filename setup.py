@@ -82,6 +82,7 @@ setup_args['setup_requires'] =\
 setup_args['install_requires'] =\
     [
         "numpy",
+        "scipy",
         "matplotlib",
         "pillow",
         "netCDF4",
