@@ -88,11 +88,14 @@ class Asvp(AbstractTextWriter):
         bottom_mean = 0
 
         body = str()
-        sample_sz = np.sum(ti)
+        sample_sz = int(np.sum(ti))
+        has_skipped_salinity = False
         for i in range(sample_sz):
 
             if self.ssp.cur.sis.sal[ti][i] <= 0:
-                logger.info("skipping invalid salinity")
+                if not has_skipped_salinity:
+                    logger.info("skipping invalid salinity values")
+                    has_skipped_salinity = True
                 continue
 
             abs = Oc.attenuation(f=freq, t=self.ssp.cur.sis.temp[ti][i], d=self.ssp.cur.sis.depth[ti][i],
