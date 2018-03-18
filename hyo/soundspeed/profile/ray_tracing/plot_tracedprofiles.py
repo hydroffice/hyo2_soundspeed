@@ -55,7 +55,7 @@ class PlotTracedProfiles:
         # create figure
         plt.close("Comparison of Ray-Traced Profiles")  # if any
         fig = plt.figure(num="Comparison of Ray-Traced Profiles",
-                                         figsize=(10, 6), dpi=80, facecolor='w', edgecolor='k')
+                         figsize=(10, 6), dpi=80, facecolor='w', edgecolor='k')
 
         z_max = max(max(self._d.new_tp.data[0]), max(self._d.old_tp.data[0]))
         ss_min = min(min(self._d.new_tp.data[1]), min(self._d.old_tp.data[1]))
@@ -159,7 +159,15 @@ class PlotTracedProfiles:
 
         for ang, ray in enumerate(self._d.new_rays):
 
-            for idx in range(0, len(ray[0]), 10):
+            nr_samples = len(ray[0])
+            if nr_samples < 500:
+                nr_steps = 10
+            elif nr_samples < 2500:
+                nr_steps = 50
+            else:
+                nr_steps = 100
+
+            for idx in range(0, nr_samples, nr_steps):
 
                 try:
                     _ = ray[0][idx]
