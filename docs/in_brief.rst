@@ -30,6 +30,10 @@ In the integration of all these implementations to the current package several i
 introduced to enhance code maintainability (e.g., Python 3 support) and to store the collected data for further
 processing and analysis.
 
+The current development of Sound Speed Manager is partially supported by:
+
+* NOAA grant NA15NOS4000200, and
+* NSF grant 1150574.
 
 Operation modes
 ===============
@@ -69,7 +73,7 @@ Currently implemented features
   * Idronaut (.txt)
   * ISS Fugro (.svp, .v*, .d*)
   * Kongsberg Maritime (.asvp)
-  * Rolls-Royce Moving Vessel Profiler (MVP) (.asvp, .calc, .s12)
+  * Rolls-Royce Moving Vessel Profiler (MVP) (.asvp, .calc, .m1, .s12)
   * Oceanscience Underway CTD (.asc)
   * SAIV (.txt)
   * Sea&Sun (.tob)
