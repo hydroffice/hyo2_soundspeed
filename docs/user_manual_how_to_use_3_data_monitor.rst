@@ -23,7 +23,7 @@ In Brief
 ========
 
 The default configuration uses the *CastTime* algorithm to estimate the time suggested for the next cast.
-*CastTime* analysis is based on the two latest casts from the Sound Speed Manager database (see :ref:`ssm_database`).
+*CastTime* analysis is based on the two latest casts from the Sound Speed Manager database (see :ref:`database_tab`).
 
 .. _data_monitor_plot_analysis:
 .. figure:: _static/monitor_plot_analysis.png
