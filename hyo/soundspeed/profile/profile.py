@@ -70,15 +70,15 @@ class Profile:
 
     def weighted_harmonic_mean(self):
         avg_depth = 10000.0  # just a very deep value
-        half_swath_angle = 1.0  # a safely large angle
+        half_swath_angle = 1.0  # a small angle since we just cure about nadir
 
         tp1 = TracedProfile(ssp=self, avg_depth=avg_depth,
                             half_swath=half_swath_angle)
 
-        # logger.debug("delta depth: %s" % (tp1.rays[0][2][-1] - tp1.rays[0][2][0]))
-        # logger.debug("delta time: %s" % tp1.rays[0][0][-1])
+        if len(tp1.harmonic_means) == 0:
+            return 0
 
-        return (tp1.rays[0][2][-1] - tp1.rays[0][2][0]) / tp1.rays[0][0][-1]
+        return tp1.harmonic_means[0]
 
     @classmethod
     def weighted_arithmetic_std(cls, values, weights):

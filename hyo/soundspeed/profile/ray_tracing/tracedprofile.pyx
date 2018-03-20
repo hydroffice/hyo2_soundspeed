@@ -15,6 +15,7 @@ cdef class TracedProfile:
     cpdef public double avg_depth
     cpdef public double half_swath
     cpdef public list rays
+    cpdef public list harmonic_means
     cpdef public datetime.datetime date_time
     cpdef public double latitude
     cpdef public double longitude
@@ -62,7 +63,8 @@ cdef class TracedProfile:
         # logger.debug("speeds: %s" % speed)
 
         # ray-trace a few angles (ref: Lurton, An Introduction to UA, p.50-52)
-        txz_values = list()
+        self.rays = list()
+        self.harmonic_means = list()
         for angle in numpy.arange(0, int(math.ceil(self.half_swath + 1))):
 
             # ray angles
@@ -131,15 +133,17 @@ cdef class TracedProfile:
                 total_x.append(total_x[-1] + dx)
                 total_t.append(total_t[-1] + dt)
 
+            harm_mean = (total_z[-1] - total_z[0]) / (total_t[-1] - total_t[0])
+            self.harmonic_means.append(harm_mean)
+
             # interpolate between 0 and 5000 meters with decimetric resolution
             interp_z = numpy.linspace(0, 5000, num=25001, endpoint=True)
             fx = interp1d(total_z, total_x, kind='cubic', bounds_error=False, fill_value=-1)
             interp_x = fx(interp_z)
             ft = interp1d(total_z, total_t, kind='cubic', bounds_error=False, fill_value=-1)
             interp_t = ft(interp_z)
-            txz_values.append(numpy.array([interp_t, interp_x, interp_z]))
+            self.rays.append(numpy.array([interp_t, interp_x, interp_z]))
 
-        self.rays = txz_values
         logger.debug("rays: %d (%d samples per-ray)" % (len(self.rays), len(self.rays[0][0])))
         self.date_time = ssp.meta.utc_time
         self.latitude = ssp.meta.latitude
