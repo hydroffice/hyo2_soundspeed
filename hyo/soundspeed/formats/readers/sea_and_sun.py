@@ -1,4 +1,5 @@
 import datetime as dt
+import locale
 import logging
 
 logger = logging.getLogger(__name__)
@@ -22,10 +23,6 @@ class SeaAndSun(AbstractTextReader):
         # header tokens
         self.tk_datasets = '; Datasets'
         self.tk_header = 'Sea & Sun Technology'
-        # self.tk_probe_type = 'cast probe type'
-        # self.tk_start_time = 'cast start time'
-        # self.tk_start_latitude = 'cast start latitude'
-        # self.tk_start_longitude = 'cast start longitude'
 
         # sample field tokens
         self.tk_pressure = 'Press'
@@ -78,15 +75,25 @@ class SeaAndSun(AbstractTextReader):
 
             # these are weak solutions to retrieve the header content
 
-            elif line_idx == 2:  # time
+            elif line_idx == 2:  # [date and] time
                 time_string = line.split()[-1].strip()
+                try:
+                    old_loc = locale.getlocale(locale.LC_TIME)
+                    locale.setlocale(locale.LC_TIME, locale="German")
+                    date_tuple = dt.datetime.strptime(line.split(",")[-1].strip(), "%d. %B %Y %H:%M:%S")
+                    date_string = date_tuple.strftime("%d.%m.%Y")
+                    locale.setlocale(locale.LC_TIME, old_loc)
+                except Exception as e:
+                    logger.info("Fail to interpret date from German: %s" % e)
+                    date_string = None
 
             elif line_idx == 7:  # vessel
                 self.ssp.cur.meta.vessel = line.split(':')[1].strip().replace("\"", "")
 
             elif line_idx == 8:  # survey and date
-                self.ssp.cur.meta.survey = line.split()[2].strip().replace("\"", "")
-                date_string = line.split()[-1].strip()
+                if date_string is None:
+                    self.ssp.cur.meta.survey = line.split()[2].strip().replace("\"", "")
+                    date_string = line.split()[-1].strip()
 
             elif line_idx == 9:  # latitude and longitude
                 try:
