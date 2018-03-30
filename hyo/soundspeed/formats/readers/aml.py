@@ -127,6 +127,9 @@ class Aml(AbstractTextReader):
                                             hour=time.hour, minute=time.minute, second=time.second)
             logger.debug("retrieved timestamp: %s" % self.ssp.cur.meta.utc_time)
 
+        if not self.ssp.cur.meta.original_path:
+            self.ssp.cur.meta.original_path = self.fid.path
+
     def _parse_body(self):
         logger.debug('parsing body')
 

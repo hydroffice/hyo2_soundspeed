@@ -33,7 +33,7 @@ def txt_read(*paths):
 setup_args = dict()
 
 setup_args['name'] = 'hyo.soundspeed'
-setup_args['version'] = '2018.1.14'
+setup_args['version'] = '2018.1.15'
 setup_args['url'] = 'https://bitbucket.org/ccomjhc/hyo_soundspeed/'
 setup_args['license'] = 'LGPLv2.1 or CCOM-UNH Industrial Associate license'
 setup_args['author'] = 'Giuseppe Masetti(UNH,CCOM); Barry Gallagher(NOAA,OCS); ' \
