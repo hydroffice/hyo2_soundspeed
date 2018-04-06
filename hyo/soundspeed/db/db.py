@@ -612,25 +612,34 @@ class ProjectDb:
                     if probe_type not in Dicts.probe_types.values():
                         probe_type = Dicts.probe_types['Future']
 
+                    # special handling for surface sound speed, min depth, max depth
+                    ssp_samples = self.conn.execute("SELECT * FROM proc WHERE ssp_pk=?", (row['pk'], )).fetchall()
+                    ss_at_min_depth = '%0.2f' %ssp_samples[0]['speed']
+                    min_depth = '%0.2f' %ssp_samples[0]['depth']
+                    max_depth = '%0.2f' %ssp_samples[-1]['depth']
+
                     ssp_list.append((row['pk'],  # 0
                                      row['cast_datetime'],  # 1
                                      row['cast_position'],  # 2
                                      sensor_type,  # 3
                                      probe_type,  # 4
-                                     row['original_path'],  # 5
-                                     row['institution'],  # 6
-                                     row['survey'],  # 7
-                                     row['vessel'],  # 8
-                                     row['sn'],  # 9
-                                     row['proc_time'],  # 10
-                                     row['proc_info'],  # 11
-                                     row['comments'],  # 12
-                                     row['pressure_uom'],  # 13
-                                     row['depth_uom'],  # 14
-                                     row['speed_uom'],  # 15
-                                     row['temperature_uom'],  # 16
-                                     row['conductivity_uom'],  # 17
-                                     row['salinity_uom'],  # 18
+                                     ss_at_min_depth,  # 5
+                                     min_depth,  # 6
+                                     max_depth,  # 7
+                                     row['original_path'],  # 8
+                                     row['institution'],  # 9
+                                     row['survey'],  # 10
+                                     row['vessel'],  # 11
+                                     row['sn'],  # 12
+                                     row['proc_time'],  # 13
+                                     row['proc_info'],  # 14
+                                     row['comments'],  # 15
+                                     row['pressure_uom'],  # 16
+                                     row['depth_uom'],  # 17
+                                     row['speed_uom'],  # 18
+                                     row['temperature_uom'],  # 19
+                                     row['conductivity_uom'],  # 20
+                                     row['salinity_uom'],  # 21
                                      ))
             return ssp_list
 

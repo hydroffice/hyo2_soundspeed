@@ -780,8 +780,9 @@ class Database(AbstractWidget):
         self.ssp_list.clear()
         self.ssp_list.setColumnCount(19)
         self.ssp_list.setHorizontalHeaderLabels(['id', 'time', 'location',
-                                                 'sensor', 'probe', 'original path',
-                                                 'institution',
+                                                 'sensor', 'probe',
+                                                 'ss@min_depth', 'min_depth', 'max_depth',
+                                                 'original path', 'institution',
                                                  'survey', 'vessel', 'sn',
                                                  'processing time', 'processing info', 'comments',
                                                  'pressure uom', 'depth uom', 'speed uom',
