@@ -99,6 +99,7 @@ class Ftp:
         self.file_nr = None
         self.progress = progress
 
+        self.conn = None
         self._connect()  # sets self.conn
 
     def _connect(self):
@@ -119,7 +120,8 @@ class Ftp:
 
     def disconnect(self):
         """ Close the connection """
-        self.conn.quit()
+        if self.conn:
+            self.conn.quit()
 
     def get_file(self, file_src, file_dst, unzip_it=False):
         """ Retrieve a file

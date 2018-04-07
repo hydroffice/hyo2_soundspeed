@@ -91,6 +91,7 @@ class Woa09(AbstractAtlas):
             data_zip_src = "fromccom/hydroffice/woa09.red.zip"
             data_zip_dst = os.path.abspath(os.path.join(self.data_folder, os.pardir, "woa09.red.zip"))
             ftp.get_file(data_zip_src, data_zip_dst, unzip_it=True)
+            ftp.disconnect()
             return self.is_present()
 
         except Exception as e:

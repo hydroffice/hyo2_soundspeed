@@ -322,6 +322,7 @@ class Rtofs(AbstractAtlas):
             conn = client.HTTPConnection(p.netloc)
             conn.request('HEAD', p.path)
             resp = conn.getresponse()
+            conn.close()
 
         except socket.error as e:
             logger.warning("while checking %s, %s" % (url, e))

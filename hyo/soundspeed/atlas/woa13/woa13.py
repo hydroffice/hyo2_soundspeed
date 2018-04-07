@@ -89,12 +89,14 @@ class Woa13(AbstractAtlas):
             data_zip_src = "fromccom/hydroffice/woa13_temp.red.zip"
             data_zip_dst = os.path.abspath(os.path.join(self.data_folder, os.pardir, "woa13_temp.red.zip"))
             ftp.get_file(data_zip_src, data_zip_dst, unzip_it=True)
+            ftp.disconnect()
 
             ftp = Ftp("ftp.ccom.unh.edu", show_progress=True, debug_mode=False,
                       progress=self.prj.progress)
             data_zip_src = "fromccom/hydroffice/woa13_sal.red.zip"
             data_zip_dst = os.path.abspath(os.path.join(self.data_folder, os.pardir, "woa13_sal.red.zip"))
             ftp.get_file(data_zip_src, data_zip_dst, unzip_it=True)
+            ftp.disconnect()
 
             return self.is_present()
 
