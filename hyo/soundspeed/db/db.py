@@ -613,7 +613,8 @@ class ProjectDb:
                         probe_type = Dicts.probe_types['Future']
 
                     # special handling for surface sound speed, min depth, max depth
-                    ssp_samples = self.conn.execute("SELECT * FROM proc WHERE ssp_pk=? AND flag=?", (row['pk'], Dicts.flags['valid'])).fetchall()
+                    ssp_samples = self.conn.execute("SELECT * FROM proc WHERE ssp_pk=? AND flag=?",
+                                                    (row['pk'], Dicts.flags['valid'])).fetchall()
                     ss_at_min_depth = '%0.2f' %ssp_samples[0]['speed']
                     min_depth = '%0.2f' %ssp_samples[0]['depth']
                     max_depth = '%0.2f' %ssp_samples[-1]['depth']

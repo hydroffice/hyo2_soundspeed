@@ -81,6 +81,53 @@ class ExportDb:
         if lyr.CreateField(field) != 0:
             raise RuntimeError("Creating field failed.")
 
+        field = ogr.FieldDefn('comments', ogr.OFTString)
+        field.SetWidth(254)
+        if lyr.CreateField(field) != 0:
+            raise RuntimeError("Creating field failed.")
+
+        field = ogr.FieldDefn('press_uom', ogr.OFTString)
+        field.SetWidth(254)
+        if lyr.CreateField(field) != 0:
+            raise RuntimeError("Creating field failed.")
+
+        field = ogr.FieldDefn('depth_uom', ogr.OFTString)
+        field.SetWidth(254)
+        if lyr.CreateField(field) != 0:
+            raise RuntimeError("Creating field failed.")
+
+        field = ogr.FieldDefn('ss_uom', ogr.OFTString)
+        field.SetWidth(254)
+        if lyr.CreateField(field) != 0:
+            raise RuntimeError("Creating field failed.")
+
+        field = ogr.FieldDefn('temp_uom', ogr.OFTString)
+        field.SetWidth(254)
+        if lyr.CreateField(field) != 0:
+            raise RuntimeError("Creating field failed.")
+
+        field = ogr.FieldDefn('cond_uom', ogr.OFTString)
+        field.SetWidth(254)
+        if lyr.CreateField(field) != 0:
+            raise RuntimeError("Creating field failed.")
+
+        field = ogr.FieldDefn('sal_uom', ogr.OFTString)
+        field.SetWidth(254)
+        if lyr.CreateField(field) != 0:
+            raise RuntimeError("Creating field failed.")
+
+        field = ogr.FieldDefn('ss_at_mind', ogr.OFTReal)
+        if lyr.CreateField(field) != 0:
+            raise RuntimeError("Creating field failed.")
+
+        field = ogr.FieldDefn('min_depth', ogr.OFTReal)
+        if lyr.CreateField(field) != 0:
+            raise RuntimeError("Creating field failed.")
+
+        field = ogr.FieldDefn('max_depth', ogr.OFTReal)
+        if lyr.CreateField(field) != 0:
+            raise RuntimeError("Creating field failed.")
+
         return lyr
 
     def export_profiles_metadata(self, project_name, output_folder, ogr_format=GdalAux.ogr_formats['ESRI Shapefile']):
@@ -121,6 +168,26 @@ class ExportDb:
                 ft.SetField('sn', row[9])
             ft.SetField('proc_time', row[10].isoformat())
             ft.SetField('proc_info', row[11])
+            if row[12]:
+                ft.SetField('comments', row[12])
+            if row[13]:
+                ft.SetField('press_uom', row[13])
+            if row[14]:
+                ft.SetField('depth_uom', row[14])
+            if row[15]:
+                ft.SetField('ss_uom', row[15])
+            if row[16]:
+                ft.SetField('temp_uom', row[16])
+            if row[17]:
+                ft.SetField('cond_uom', row[17])
+            if row[18]:
+                ft.SetField('sal_uom', row[18])
+            if row[19]:
+                ft.SetField('ss_at_mind', row[19])
+            if row[20]:
+                ft.SetField('min_depth', row[20])
+            if row[21]:
+                ft.SetField('max_depth', row[21])
 
             pt = ogr.Geometry(ogr.wkbPoint)
             pt.SetPoint_2D(0, row[2].x, row[2].y)
