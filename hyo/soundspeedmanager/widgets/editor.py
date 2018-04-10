@@ -15,6 +15,7 @@ from hyo.soundspeedmanager.dialogs.spreadsheet_dialog import SpreadSheetDialog
 from hyo.soundspeedmanager.dialogs.metadata_dialog import MetadataDialog
 from hyo.soundspeedmanager.dialogs.export_single_profile_dialog import ExportSingleProfileDialog
 from hyo.soundspeedmanager.widgets.dataplots import DataPlots
+from hyo.soundspeedmanager.dialogs.seacat_dialog import SeacatDialog
 
 from hyo.soundspeed.profile.dicts import Dicts
 
@@ -28,6 +29,7 @@ class Editor(AbstractWidget):
         AbstractWidget.__init__(self, main_win=main_win, lib=lib)
 
         settings = QtCore.QSettings()
+        settings.setValue("input_buttons/seacat_plugin", settings.value("input_buttons/seacat_plugin", 0))
         settings.setValue("editor_buttons/reference", settings.value("editor_buttons/reference", 1))
         settings.setValue("editor_buttons/spreadsheet", settings.value("editor_buttons/spreadsheet", 0))
         settings.setValue("editor_buttons/metadata", settings.value("editor_buttons/metadata", 1))
@@ -69,6 +71,16 @@ class Editor(AbstractWidget):
         if settings.value("editor_buttons/reference", 1) == 1:
             self.input_bar.addAction(self.set_ref_act)
         self.main_win.file_menu.addAction(self.set_ref_act)
+
+        # seacat
+        self.seacat_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'seacat.png')),
+                                        'Seabird CTD setup', self)
+        self.seacat_act.setShortcut('Alt+B')
+        # noinspection PyUnresolvedReferences
+        self.seacat_act.triggered.connect(self.on_seacat)
+        if settings.value("input_buttons/seacat_plugin", 1) == 1:
+            self.input_bar.addAction(self.seacat_act)
+        self.main_win.file_menu.addAction(self.seacat_act)
 
         self.process_bar = self.addToolBar('Process')
         self.process_bar.setIconSize(QtCore.QSize(40, 40))
@@ -267,6 +279,16 @@ class Editor(AbstractWidget):
         logger.debug('user wants to clear data')
         self.lib.clear_data()
         self.main_win.data_cleared()
+
+    def on_seacat(self):
+        logger.debug("Open Seabird CTD dialog")
+        dlg = SeacatDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        ret = dlg.exec_()
+        if ret != QtGui.QDialog.Accepted:
+            logger.info("Seabird CTD dialog closed without selection")
+            return
+
+        self.accept()
 
     def on_set_ref(self):
         logger.debug('user wants to set as a reference')

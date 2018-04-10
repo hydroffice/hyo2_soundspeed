@@ -13,15 +13,16 @@ class ButtonsDialog(AbstractDialog):
         AbstractDialog.__init__(self, main_win=main_win, lib=lib, parent=parent)
 
         self.btn_dict = {
-            "Reference Cast": "reference",
-            "Show/Edit Data Spreadsheet": "spreadsheet",
-            "Show/Edit Cast Metadata": "metadata",
-            "Filter/Smooth Data": "filter",
-            "Preview Thinning": "thinning",
-            "Restart Processing": "restart",
-            "Export Data": "export",
-            "Transmit Data": "transmit",
-            "Save to Database": "database"
+            "SeaBird CTD Setup": "input_buttons/seacat_plugin",
+            "Reference Cast": "editor_buttons/reference",
+            "Show/Edit Data Spreadsheet": "editor_buttons/spreadsheet",
+            "Show/Edit Cast Metadata": "editor_buttons/metadata",
+            "Filter/Smooth Data": "editor_buttons/filter",
+            "Preview Thinning": "editor_buttons/thinning",
+            "Restart Processing": "editor_buttons/restart",
+            "Export Data": "editor_buttons/export",
+            "Transmit Data": "editor_buttons/transmit",
+            "Save to Database": "editor_buttons/database"
         }
 
         settings = QtCore.QSettings()
@@ -61,7 +62,7 @@ class ButtonsDialog(AbstractDialog):
             btn.setMinimumWidth(self.botton_min_width)
             btn.setCheckable(True)
 
-            if settings.value("editor_buttons/%s" % self.btn_dict[btn_label], 0) == 1:
+            if settings.value("%s" % self.btn_dict[btn_label], 0) == 1:
                 btn.setChecked(True)
 
             self.midButtonBox.addButton(btn, QtGui.QDialogButtonBox.ActionRole)
@@ -86,9 +87,9 @@ class ButtonsDialog(AbstractDialog):
         settings = QtCore.QSettings()
         for b in self.midButtonBox.buttons():
             if b.isChecked():
-                settings.setValue("editor_buttons/%s" % self.btn_dict[b.text()], 1)
+                settings.setValue("%s" % self.btn_dict[b.text()], 1)
             else:
-                settings.setValue("editor_buttons/%s" % self.btn_dict[b.text()], 0)
+                settings.setValue("%s" % self.btn_dict[b.text()], 0)
 
         msg = "The new visibility settings for the buttons have been saved. \n" \
               "Close and re-open the app to apply the changes!"
