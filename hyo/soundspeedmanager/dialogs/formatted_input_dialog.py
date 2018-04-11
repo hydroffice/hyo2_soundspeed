@@ -47,7 +47,8 @@ class FormattedInputDialog(QtGui.QDialog):
         return rtn
 
     def _check_state(self):
-        state = self.validator.validate(self.line_edit.text(), 0)[0]
+        input_text = self.line_edit.text()
+        state = self.validator.validate(input_text, 0)[0]
         if state == QtGui.QValidator.Acceptable:
             color = '#c4df9b' # green
             self.ok_btn.setEnabled(True)
@@ -56,5 +57,8 @@ class FormattedInputDialog(QtGui.QDialog):
             self.ok_btn.setEnabled(False)
         else:
             color = '#f6989d' # red
-            self.ok_btn.setEnabled(False)
+            if len(input_text) < 10:
+                self.ok_btn.setEnabled(False)
+            else:
+                self.ok_btn.setEnabled(True) # make long incorrect input acceptable
         self.line_edit.setStyleSheet("background-color: %s;" % color)

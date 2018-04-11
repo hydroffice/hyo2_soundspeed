@@ -633,12 +633,16 @@ class SoundSpeedLibrary:
         """temporary NOAA project name for NCEI"""
         return str(self._noaa_project)
 
-    def not_noaa_project(self, value):
+    def not_noaa_project(self, value, format_ok=False):
         try:
             self._noaa_project = self._noaa_project_validate.match(value).group(1)
             return False
         except:
-            return True
+            if format_ok:
+                self._noaa_project = value
+                return False
+            else:
+                return True
 
     @property
     def current_project(self):

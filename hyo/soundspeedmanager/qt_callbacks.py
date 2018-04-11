@@ -42,8 +42,7 @@ class QtCallbacks(AbstractCallbacks):
     def ask_formatted_text(self, title="Input", msg="Enter NOAA project", default="",
                            fmt="^OPR-[A-Z]\d{3}-[A-Z]{2}-\d{2}$"):
         """Ask user for formatted text"""
-        text, ok = FormattedInputDialog.get_format_text(self._parent, title, msg, default, fmt)
-        return text
+        return FormattedInputDialog.get_format_text(self._parent, title, msg, default, fmt)
 
     @classmethod
     def dms2dd(cls, degrees, minutes, seconds, direction=''):

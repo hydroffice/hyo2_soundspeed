@@ -162,8 +162,8 @@ class ExportSingleProfileDialog(AbstractDialog):
                 return
 
             if self.lib.setup.noaa_tools and self.lib.not_noaa_project(self.lib.current_project):
-                current_project = self.lib.cb.ask_formatted_text(default=self.lib.noaa_project)
-                if self.lib.not_noaa_project(current_project):
+                current_project, format_ok = self.lib.cb.ask_formatted_text(default=self.lib.noaa_project)
+                if self.lib.not_noaa_project(current_project, format_ok):
                     msg = "The project name cannot be used for NCEI export.\n\n" \
                           "Rename the project in the Database tab!\n\n" \
                           "Recommend \"project_survey\" format, e.g. OPR-P999-RA-17_H12345"
