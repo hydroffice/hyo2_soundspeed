@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 from hyo.soundspeedmanager.dialogs.dialog import AbstractDialog
 from hyo.soundspeedmanager.dialogs.seacat_dialog import SeacatDialog
+from hyo.soundspeed.base.helper import web_url
 
 
 class ImportSingleProfileDialog(AbstractDialog):
@@ -170,6 +171,8 @@ class ImportSingleProfileDialog(AbstractDialog):
         settings.setValue("import_folder", os.path.dirname(selection))
         settings.setValue("import_folders_%s" % name, os.path.dirname(selection))
         logger.debug('user selection: %s' % selection)
+
+        self.main_win.change_info_url(web_url(suffix="%s" % name))
 
         self.progress.start()
         try:

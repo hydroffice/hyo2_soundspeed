@@ -21,8 +21,6 @@ class Aml(AbstractTextReader):
         self._time_token = "time"
         self._lat_token = "latitude"
         self._long_token = "longitude"
-        self._lat2_token = "Latitude"
-        self._long2_token = "Longitude"
 
         self._data_token = "[data]"
         self._depth_token = "Depth (m)"
@@ -73,7 +71,7 @@ class Aml(AbstractTextReader):
 
             try:
 
-                if (tokens[0] == self._date_token) and (date is None):
+                if (tokens[0].lower() == self._date_token) and (date is None):
                     try:
                         date = dt.strptime(tokens[1].strip(), "%m/%d/%y")
                         continue
@@ -81,23 +79,15 @@ class Aml(AbstractTextReader):
                         date = dt.strptime(tokens[1].strip(), "%Y-%m-%d")
                         continue
 
-                if (tokens[0] == self._time_token) and (time is None):
+                if (tokens[0].lower() == self._time_token) and (time is None):
                     time = dt.strptime(tokens[1].strip(), "%H:%M:%S")
                     continue
 
-                if (tokens[0] == self._lat_token) and (lat is None):
+                if (tokens[0].lower() == self._lat_token) and (lat is None):
                     lat = float(tokens[1])
                     continue
 
-                if (tokens[0] == self._long_token) and (lon is None):
-                    lon = float(tokens[1])
-                    continue
-
-                if (tokens[0] == self._lat2_token) and (lat is None):
-                    lat = float(tokens[1])
-                    continue
-
-                if (tokens[0] == self._long2_token) and (lon is None):
+                if (tokens[0].lower() == self._long_token) and (lon is None):
                     lon = float(tokens[1])
                     continue
 
@@ -146,6 +136,8 @@ class Aml(AbstractTextReader):
 
         self.ssp.cur.init_data(len(self.lines))
 
+        data_row = 0
+
         for row_nr, line in enumerate(self.lines):
 
             # logger.debug("%d : %s" % (row_nr, line))
@@ -158,9 +150,10 @@ class Aml(AbstractTextReader):
                 if len(tokens) == 0:
                     continue
 
-                if tokens[0] == self._data_token:
+                if tokens[0].lower() == self._data_token:
                     read_samples = True
-                    logger.debug("found data token: %s" % self._data_token)
+                    data_row = row_nr
+                    logger.debug("found data token: %s at row: %d" % (self._data_token, data_row))
                     continue
 
                 continue
@@ -217,10 +210,6 @@ class Aml(AbstractTextReader):
                             logger.debug("detected sensor type: CTD")
                 continue
 
-            # identify source type different than SVP
-            if not has_depth_and_speed:
-                raise RuntimeError("unable to find depth and sound speed indices!")
-
             # finally the data
             tokens = line.split(",")
             if len(tokens) == 0:
@@ -262,6 +251,41 @@ class Aml(AbstractTextReader):
 
         if read_samples is False:
             raise RuntimeError("Issue in finding data token: %s" % self._data_token)
+
+        if not has_depth_and_speed:
+            # # try to guess the sound speed token at index 2
+            # speed_idx = 2
+            #
+            # for row_nr, line in enumerate(self.lines):
+            #     # finally the data
+            #     tokens = line.split(",")
+            #     if len(tokens) == 0:
+            #         continue
+            #
+            #     for idx, token in enumerate(tokens):
+            #
+            #         try:
+            #
+            #             if idx == speed_idx:
+            #                 self.ssp.cur.data.speed[count] = float(tokens[speed_idx])
+            #                 if speed_idx > depth_idx:
+            #                     count += 1
+            #                 continue
+            #
+            #             else:  # not parsed value
+            #                 continue
+            #
+            #         except ValueError:
+            #             logger.warning("invalid conversion parsing of line #%s" % row_nr)
+            #             continue
+            #         except IndexError:
+            #             logger.warning("invalid index parsing of line #%s" % row_nr)
+            #             continue
+            #
+            # self.ssp.cur.meta.sensor_type = Dicts.sensor_types['SVPT']
+            # logger.debug("detected sensor type: SVPT")
+
+            raise RuntimeError("unable to find depth and sound speed indices!")
 
         logger.debug("retrieved %d samples" % count)
         self.ssp.cur.data_resize(count)

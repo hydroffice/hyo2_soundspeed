@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 from hyo.soundspeedmanager import __version__ as ssm_version
 from hyo.soundspeedmanager import __doc__ as ssm_name
 from hyo.soundspeed.soundspeed import SoundSpeedLibrary
-from hyo.soundspeed.base.helper import is_pydro, info_libs
+from hyo.soundspeed.base.helper import is_pydro, info_libs, web_url
 from hyo.soundspeedmanager.qt_progress import QtProgress
 from hyo.soundspeedmanager.qt_callbacks import QtCallbacks
 from hyo.soundspeedmanager.widgets.editor import Editor
@@ -164,10 +164,7 @@ class MainWin(QtGui.QMainWindow):
                                              QtGui.QIcon(os.path.join(self.here, 'media', 'settings.png')), "")
         self.tabs.setTabToolTip(self.idx_setup, "Setup")
         # info
-        versioned_url = 'https://www.hydroffice.org/soundspeed/%s' % (ssm_version.replace('.', '_'), )
-        if is_pydro():
-            versioned_url += "_pydro"
-        self.tab_info = Info(main_win=self, default_url=versioned_url)
+        self.tab_info = Info(main_win=self, default_url=web_url())
         self.idx_info = self.tabs.insertTab(6, self.tab_info,
                                             QtGui.QIcon(os.path.join(self.here, 'media', 'info.png')), "")
         self.tabs.setTabToolTip(self.idx_info, "Info")
@@ -599,6 +596,9 @@ class MainWin(QtGui.QMainWindow):
                                                "font-size: 8pt;background-color:rgba(255,163,102,128);}")
             else:
                 self.statusBar().setStyleSheet(self.status_bar_normal_style)
+
+    def change_info_url(self, url):
+        self.tab_info.change_default(url)
 
     # Quitting #
 

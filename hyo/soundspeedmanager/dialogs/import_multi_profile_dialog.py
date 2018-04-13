@@ -6,6 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from hyo.soundspeedmanager.dialogs.dialog import AbstractDialog
+from hyo.soundspeed.base.helper import web_url
 
 
 class ImportMultiProfileDialog(AbstractDialog):
@@ -98,8 +99,10 @@ class ImportMultiProfileDialog(AbstractDialog):
         quantum = 100 / (nr_profiles * 2 + 1)
         self.progress.start()
 
-        for i, selection in enumerate(selections):
+        self.main_win.change_info_url(web_url(suffix="%s" % name))
 
+        for i, selection in enumerate(selections):
+        
             try:
                 self.progress.add(quantum=quantum, text="profile %s/%s" % (i, nr_profiles))
                 self.lib.import_data(data_path=selection, data_format=name, skip_atlas=True)

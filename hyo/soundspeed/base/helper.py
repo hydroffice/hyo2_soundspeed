@@ -8,7 +8,7 @@ from codecs import open
 
 logger = logging.getLogger(__name__)
 
-from .. import __version__ as ss_version
+from hyo.soundspeed import __version__ as ss_version
 
 
 class FileInfo:
@@ -331,3 +331,15 @@ def hstb_woa13_folder() -> str:
         if not os.path.exists(folder):
             os.mkdir(folder)
     return folder
+
+
+def web_url(suffix=None) -> str:
+
+    url = 'https://www.hydroffice.org/soundspeed/%s' % (ss_version.replace('.', '_'), )
+    if is_pydro():
+        url += "_pydro"
+
+    if suffix and isinstance(suffix, str):
+        url += "_" + suffix
+
+    return url

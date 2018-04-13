@@ -239,6 +239,10 @@ class Info(QtGui.QMainWindow):
         self.url_input.setText(self.default_url)
         self.web.load(QtCore.QUrl(self.default_url))
 
+    def change_default(self, url):
+        self.default_url = url
+        self.load_default()
+
     def load_online_docs(self):
         self.main_win.switch_to_info_tab()
         url = 'https://www.hydroffice.org/manuals/soundspeed/index.html'
