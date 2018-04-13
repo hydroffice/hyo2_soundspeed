@@ -39,7 +39,7 @@ class QtCallbacks(AbstractCallbacks):
         """Ask user for text with a flag optional"""
         return FlaggableInputDialog.get_text_with_flag(self._parent, title, msg, flag_label=flag_label)
 
-    def ask_formatted_text(self, title="Input", msg="Enter NOAA project", default="",
+    def ask_formatted_text(self, title="Input", msg="NOAA Project Name (OPR-XNNN-XX-YR)", default="",
                            fmt="^OPR-[A-Z]\d{3}-[A-Z]{2}-\d{2}$"):
         """Ask user for formatted text"""
         return FormattedInputDialog.get_format_text(self._parent, title, msg, default, fmt)
