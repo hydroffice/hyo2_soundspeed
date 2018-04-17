@@ -27,6 +27,9 @@ def main():
     logger.info('test: *** START ***')
     filters = ["valeport", ]
     formats = ["caris", "csv", "elac", "hypack", "ixblue", "asvp", "qps", "sonardyne", "unb", ]
+    data_outputs = dict()
+    for format in formats:
+        data_outputs[format] = data_output
     tests = testing.input_dict_test_files(inclusive_filters=filters)
     # print(tests)
 
@@ -40,7 +43,7 @@ def main():
 
         # export
         # lib.export_data(data_path=data_output, data_formats=lib.name_writers)
-        lib.export_data(data_path=data_output, data_formats=formats)
+        lib.export_data(data_paths=data_outputs, data_formats=formats)
 
     logger.info('test: *** END ***')
 

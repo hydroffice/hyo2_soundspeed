@@ -27,6 +27,7 @@ def main():
     logger.info('test: *** START ***')
     filters = ["castaway", ]
     formats = ["asvp", ]
+    data_outputs = [data_output, ]
     tests = testing.input_dict_test_files(inclusive_filters=filters)
     # print(tests)
 
@@ -46,7 +47,7 @@ def main():
         lib.replace_cur_temp_sal()
 
         # export
-        lib.export_data(data_path=data_output, data_formats=formats)
+        lib.export_data(data_paths=data_outputs, data_formats=formats)
 
     logger.info('test: *** END ***')
 

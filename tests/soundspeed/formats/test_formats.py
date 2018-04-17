@@ -99,6 +99,9 @@ class TestSoundSpeedFormats(unittest.TestCase):
         lib.setup.current_project = 'test_read_store_and_write'
 
         tests = testing.input_dict_test_files(inclusive_filters=filters)
+        data_outputs = dict()
+        for format in self.formats:
+            data_outputs[format] = self.data_output
 
         for idx, testfile in enumerate(tests.keys()):
 
@@ -108,7 +111,7 @@ class TestSoundSpeedFormats(unittest.TestCase):
 
             lib.store_data()
 
-            lib.export_data(data_path=self.data_output, data_formats=self.formats)
+            lib.export_data(data_paths=data_outputs, data_formats=self.formats)
 
 
 def suite():

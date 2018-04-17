@@ -5,6 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from hyo.soundspeedmanager.dialogs.dialog import AbstractDialog
+from hyo.soundspeedmanager.dialogs.output_folders_dialog import OutputFoldersDialog
 from hyo.soundspeed.base.helper import explore_folder
 from hyo.soundspeed.profile.dicts import Dicts
 
@@ -197,18 +198,20 @@ class ExportSingleProfileDialog(AbstractDialog):
 
         select_output_folder = self.selectFolder.isChecked()
         settings.setValue("select_output_folder", select_output_folder)
+        output_folders = dict()
+        # each writer may potentially have is own folder
         if select_output_folder:
 
-            # ask user for output folder path
-            # noinspection PyCallByClass
-            output_folder = QtGui.QFileDialog.getExistingDirectory(self, "Select output folder",
-                                                                   settings.value("export_folder"))
-            if not output_folder:
-                return
-        else:
-            output_folder = self.lib.outputs_folder
-        settings.setValue("export_folder", output_folder)
-        logger.debug('output folder: %s' % output_folder)
+            dlg = OutputFoldersDialog(main_win=self.main_win, lib=self.lib, writers=self.selected_writers, parent=self)
+            dlg.exec_()
+            output_folders = dlg.output_folders
+
+        # case where all the writers will write to the same folder
+        if len(output_folders) == 0:
+            for writer in self.selected_writers:
+                output_folders[writer] = self.lib.outputs_folder
+            settings.setValue("export_folder", self.lib.outputs_folder)
+            logger.debug('output folder: %s' % self.lib.outputs_folder)
 
         # ask user for basename
         basenames = list()
@@ -233,7 +236,7 @@ class ExportSingleProfileDialog(AbstractDialog):
         # actually do the export
         self.progress.start()
         try:
-            self.lib.export_data(data_path=output_folder, data_files=basenames,
+            self.lib.export_data(data_paths=output_folders, data_files=basenames,
                                  data_formats=self.selected_writers, custom_writer_instrument=custom_writer_instrument)
         except RuntimeError as e:
             self.progress.end()
@@ -246,7 +249,12 @@ class ExportSingleProfileDialog(AbstractDialog):
         export_open_folder = self.openFolder.isChecked()
         settings.setValue("export_open_folder", export_open_folder)
         if export_open_folder:
-            explore_folder(output_folder)  # open the output folder
+
+            opened_folders = list()
+            for output_folder in output_folders.values():
+                if output_folder not in opened_folders:
+                    explore_folder(output_folder)  # open the output folder
+                    opened_folders.append(output_folder)
             self.progress.end()
 
         else:

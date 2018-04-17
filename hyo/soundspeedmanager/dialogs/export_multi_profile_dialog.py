@@ -6,6 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from hyo.soundspeedmanager.dialogs.dialog import AbstractDialog
+from hyo.soundspeedmanager.dialogs.output_folders_dialog import OutputFoldersDialog
 from hyo.soundspeed.base.helper import explore_folder
 from hyo.soundspeed.profile.dicts import Dicts
 
@@ -151,27 +152,30 @@ class ExportMultiProfileDialog(AbstractDialog):
 
         select_output_folder = self.selectFolder.isChecked()
         settings.setValue("select_output_folder", select_output_folder)
+        output_folders = dict()
+        # each writer may potentially have is own folder
         if select_output_folder:
 
-            # ask user for output folder path
-            # noinspection PyCallByClass
-            output_folder = QtGui.QFileDialog.getExistingDirectory(self, "Select output folder",
-                                                                   settings.value("export_folder"))
-            if not output_folder:
-                return
-        else:
-            output_folder = self.lib.outputs_folder
-        settings.setValue("export_folder", output_folder)
-        logger.debug('output folder: %s' % output_folder)
+            dlg = OutputFoldersDialog(main_win=self.main_win, lib=self.lib, writers=self.selected_writers, parent=self)
+            dlg.exec_()
+            output_folders = dlg.output_folders
+
+        # case where all the writers will write to the same folder
+        if len(output_folders) == 0:
+            for writer in self.selected_writers:
+                output_folders[writer] = self.lib.outputs_folder
+            settings.setValue("export_folder", self.lib.outputs_folder)
+            logger.debug('output folder: %s' % self.lib.outputs_folder)
 
         # CARIS-specific check for file concatenation
         for writer in self.selected_writers:
 
             if writer == 'caris':
-                caris_path = os.path.join(output_folder, "CARIS", self.lib.current_project + ".svp")
+                caris_path = os.path.join(output_folders[writer], "CARIS", self.lib.current_project + ".svp")
                 if os.path.exists(caris_path):
                     msg = "An existing CARIS file is present in the output folder.\n\n" \
                           "Do you want to remove it to avoid possible profile duplications?"
+                    # noinspection PyCallByClass
                     ret = QtGui.QMessageBox.question(self, "CARIS export", msg,
                                                      QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
                     if ret == QtGui.QMessageBox.Yes:
@@ -204,6 +208,7 @@ class ExportMultiProfileDialog(AbstractDialog):
                 if self.lib.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']:
 
                     msg = "Attempt to export a synthetic profile in NCEI format!"
+                    # noinspection PyCallByClass
                     QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
                     skip_export = True
                     continue
@@ -214,6 +219,7 @@ class ExportMultiProfileDialog(AbstractDialog):
                           "Rename the project in the Database tab!"
                     if self.lib.setup.noaa_tools:
                         msg += "\n\nRecommend in project_survey format, e.g. OPR-P999-RA-17_H12345"
+                    # noinspection PyCallByClass
                     QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
                     skip_export = True
                     continue
@@ -225,6 +231,7 @@ class ExportMultiProfileDialog(AbstractDialog):
                             msg = "The project name cannot be used for NCEI export.\n\n" \
                                   "Rename the project in the Database tab!\n\n" \
                                   "Recommend \"project_survey\" format, e.g. OPR-P999-RA-17_H12345"
+                            # noinspection PyCallByClass
                             QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
                             skip_export = True
                             continue
@@ -270,7 +277,7 @@ class ExportMultiProfileDialog(AbstractDialog):
             self.progress.start(text="Exporting profile #%02d" % pk)
             try:
                 self.progress.update(value=60)
-                self.lib.export_data(data_path=output_folder, data_formats=self.selected_writers,
+                self.lib.export_data(data_paths=output_folders, data_formats=self.selected_writers,
                                      custom_writer_instrument=custom_writer_instrument)
 
             except RuntimeError as e:
@@ -286,11 +293,15 @@ class ExportMultiProfileDialog(AbstractDialog):
         settings.setValue("export_open_folder", export_open_folder)
         if export_open_folder:
 
-            explore_folder(output_folder)  # open the output folder
+            opened_folders = list()
+            for output_folder in output_folders.values():
+                if output_folder not in opened_folders:
+                    explore_folder(output_folder)  # open the output folder
+                    opened_folders.append(output_folder)
 
         else:
 
-            msg = "Profile successfully exported!"
+            msg = "Profiles successfully exported!"
             # noinspection PyCallByClass
             QtGui.QMessageBox.information(self, "Export profile", msg, QtGui.QMessageBox.Ok)
 

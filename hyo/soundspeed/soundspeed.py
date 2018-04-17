@@ -553,7 +553,7 @@ class SoundSpeedLibrary:
 
     # --- export data
 
-    def export_data(self, data_formats, data_path, data_files=None, server_mode=False, custom_writer_instrument=None):
+    def export_data(self, data_formats, data_paths, data_files=None, server_mode=False, custom_writer_instrument=None):
         """Export data using a list of formats name"""
 
         # checks
@@ -571,8 +571,10 @@ class SoundSpeedLibrary:
             else:
                 has_data_files = True
 
-        if data_path is None:
-            data_path = self.outputs_folder
+        if data_paths is None:
+            data_paths = dict()
+            for name in data_formats:
+                data_paths[name] = self.outputs_folder
 
         # create the outputs
         for i, name in enumerate(data_formats):
@@ -614,11 +616,11 @@ class SoundSpeedLibrary:
 
             if not has_data_files:  # we don't have the output file names
                 if len(data_formats) == 1 and name == 'ncei':  # NCEI requires special filename convention
-                    writer.write(ssp=self.ssp, data_path=data_path, data_file='ncei', project=current_project)
+                    writer.write(ssp=self.ssp, data_path=data_paths[name], data_file='ncei', project=current_project)
                 else:
-                    writer.write(ssp=self.ssp, data_path=data_path, project=current_project)
+                    writer.write(ssp=self.ssp, data_path=data_paths[name], project=current_project)
             else:
-                writer.write(ssp=self.ssp, data_path=data_path, data_file=data_files[i], project=current_project)
+                writer.write(ssp=self.ssp, data_path=data_paths[name], data_file=data_files[i], project=current_project)
 
         # take care of listeners
         if self.has_sippican_to_process():
