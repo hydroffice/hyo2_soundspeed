@@ -191,6 +191,10 @@ class ExportMultiProfileDialog(AbstractDialog):
         # actually do the export
         current_project = None
         format_ok = False
+        opened_folders = list()
+        export_open_folder = self.openFolder.isChecked()
+        settings.setValue("export_open_folder", export_open_folder)
+        all_exported = True
         for pk in self._pks:
 
             success = self.lib.load_profile(pk, skip_atlas=True)
@@ -274,6 +278,7 @@ class ExportMultiProfileDialog(AbstractDialog):
                         custom_writer_instrument = force_writer_instrument_for_next_casts
 
             if skip_export:
+                all_exported = False
                 continue
 
             self.progress.start(text="Exporting profile #%02d" % pk)
@@ -290,21 +295,21 @@ class ExportMultiProfileDialog(AbstractDialog):
                 continue
             self.progress.end()
 
-        # opening the output folder
-        export_open_folder = self.openFolder.isChecked()
-        settings.setValue("export_open_folder", export_open_folder)
-        if export_open_folder:
+            # opening the output folder
+            if export_open_folder:
 
-            opened_folders = list()
-            for output_folder in output_folders.values():
-                if output_folder not in opened_folders:
-                    explore_folder(output_folder)  # open the output folder
-                    opened_folders.append(output_folder)
+                for output_folder in output_folders.values():
+                    if output_folder not in opened_folders:
+                        explore_folder(output_folder)  # open the output folder
+                        opened_folders.append(output_folder)
 
-        else:
-
+        if all_exported:
             msg = "Profiles successfully exported!"
             # noinspection PyCallByClass
             QtGui.QMessageBox.information(self, "Export profile", msg, QtGui.QMessageBox.Ok)
+        else:
+            msg = "At least one profile had issues in being exported!"
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.warning(self, "Export profile", msg, QtGui.QMessageBox.Ok)
 
         self.accept()

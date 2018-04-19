@@ -151,6 +151,7 @@ class ExportSingleProfileDialog(AbstractDialog):
 
             if self.lib.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']:
                 msg = "Attempt to export a synthetic profile in NCEI format!"
+                # noinspection PyCallByClass
                 QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
                 return
 
@@ -159,6 +160,7 @@ class ExportSingleProfileDialog(AbstractDialog):
                       "Rename the project in the Database tab!"
                 if self.lib.setup.noaa_tools:
                     msg += "\n\nRecommend in project_survey format, e.g. OPR-P999-RA-17_H12345"
+                # noinspection PyCallByClass
                 QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
                 return
 
