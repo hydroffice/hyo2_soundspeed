@@ -49,15 +49,9 @@ class Ncei(AbstractWriter):
         nc_file = '%s_%s.nc' %(self.ssp.cur.meta.utc_time.strftime('%Y%m%d%H%M%S'), ship_code)
 
         # define the output file path
-        data_path = os.path.join(data_path, self.name.lower())
         if not os.path.exists(data_path):
             os.makedirs(data_path)
-        if data_file:
-            file_path = os.path.join(data_path, nc_file)
-        else:
-            if not os.path.exists(data_path):
-                os.makedirs(data_path)
-            file_path = os.path.join(data_path, nc_file)
+        file_path = os.path.join(data_path, nc_file)
 
         self._miss_metadata()
         logger.info("output file: %s" % file_path)

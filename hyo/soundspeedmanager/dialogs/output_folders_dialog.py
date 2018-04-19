@@ -58,7 +58,7 @@ class OutputFoldersDialog(AbstractDialog):
             # hbox.addStretch()
             btn = QtGui.QPushButton("%s" % writer)
             btn.setToolTip("Select output folder for %s format" % (writer, ))
-            btn.setMinimumWidth(50)
+            btn.setMinimumWidth(80)
             # noinspection PyUnresolvedReferences
             btn.clicked.connect(self.on_change_folder)
             hbox.addWidget(btn)

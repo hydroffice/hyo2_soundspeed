@@ -615,12 +615,9 @@ class SoundSpeedLibrary:
                 current_project = self.noaa_project
 
             if not has_data_files:  # we don't have the output file names
-                if len(data_formats) == 1 and name == 'ncei':  # NCEI requires special filename convention
-                    writer.write(ssp=self.ssp, data_path=data_paths[name], data_file='ncei', project=current_project)
-                else:
-                    writer.write(ssp=self.ssp, data_path=data_paths[name], project=current_project)
+                writer.write(ssp=self.ssp, data_path=data_paths[name], project=current_project)
             else:
-                writer.write(ssp=self.ssp, data_path=data_paths[name], data_file=data_files[i], project=current_project)
+                writer.write(ssp=self.ssp, data_path=data_paths[name], project=current_project)
 
         # take care of listeners
         if self.has_sippican_to_process():
