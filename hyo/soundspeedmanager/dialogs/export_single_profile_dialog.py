@@ -205,6 +205,8 @@ class ExportSingleProfileDialog(AbstractDialog):
             dlg = OutputFoldersDialog(main_win=self.main_win, lib=self.lib, writers=self.selected_writers, parent=self)
             dlg.exec_()
             output_folders = dlg.output_folders
+            if len(output_folders) == 0:
+                return
 
         # case where all the writers will write to the same folder
         if len(output_folders) == 0:
