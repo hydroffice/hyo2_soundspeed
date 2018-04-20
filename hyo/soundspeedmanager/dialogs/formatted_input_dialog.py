@@ -57,7 +57,7 @@ class FormattedInputDialog(QtGui.QDialog):
             self.ok_btn.setEnabled(False)
         else:
             color = '#f6989d' # red
-            if len(input_text) < 10:
+            if len(input_text) < 10 or input_text.find(' ') >= 0:
                 self.ok_btn.setEnabled(False)
             else:
                 self.ok_btn.setEnabled(True) # make long incorrect input acceptable
