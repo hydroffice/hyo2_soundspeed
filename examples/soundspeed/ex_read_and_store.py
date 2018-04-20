@@ -24,7 +24,7 @@ def main():
 
     # test readers/writers
     logger.info('test: *** START ***')
-    filters = ["seaandsun", ]
+    filters = ["aml", ]
     tests = testing.input_dict_test_files(inclusive_filters=filters)
     # print(tests)
 

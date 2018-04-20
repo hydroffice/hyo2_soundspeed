@@ -253,38 +253,43 @@ class Aml(AbstractTextReader):
             raise RuntimeError("Issue in finding data token: %s" % self._data_token)
 
         if not has_depth_and_speed:
-            # # try to guess the sound speed token at index 2
-            # speed_idx = 2
-            #
-            # for row_nr, line in enumerate(self.lines):
-            #     # finally the data
-            #     tokens = line.split(",")
-            #     if len(tokens) == 0:
-            #         continue
-            #
-            #     for idx, token in enumerate(tokens):
-            #
-            #         try:
-            #
-            #             if idx == speed_idx:
-            #                 self.ssp.cur.data.speed[count] = float(tokens[speed_idx])
-            #                 if speed_idx > depth_idx:
-            #                     count += 1
-            #                 continue
-            #
-            #             else:  # not parsed value
-            #                 continue
-            #
-            #         except ValueError:
-            #             logger.warning("invalid conversion parsing of line #%s" % row_nr)
-            #             continue
-            #         except IndexError:
-            #             logger.warning("invalid index parsing of line #%s" % row_nr)
-            #             continue
-            #
-            # self.ssp.cur.meta.sensor_type = Dicts.sensor_types['SVPT']
-            # logger.debug("detected sensor type: SVPT")
+            # try to guess the sound speed token at index 2
+            speed_idx = 2
+            depth_idx = 3
 
+            for row_nr, line in enumerate(self.lines):
+                # finally the data
+                tokens = line.split(",")
+                if len(tokens) < 4:
+                    continue
+
+                try:
+
+                    depth = float(tokens[depth_idx])
+                    speed = float(tokens[speed_idx])
+
+                    if depth < 0.01:
+                        logger.warning("skipping sample at row #%d -> depth value: %s" % (row_nr, depth))
+                        continue
+                    if (speed < 1200.0) or (speed > 1700):
+                        logger.warning("skipping sample at row #%d -> speed value: %s" % (row_nr, speed))
+                        continue
+
+                    self.ssp.cur.data.depth[count] = depth
+                    self.ssp.cur.data.speed[count] = speed
+                    count += 1
+
+                except ValueError:
+                    logger.warning("invalid conversion parsing of line #%s" % row_nr)
+                    continue
+                except IndexError:
+                    logger.warning("invalid index parsing of line #%s" % row_nr)
+                    continue
+
+            # it should already be set as a SVP type
+            self.ssp.cur.meta.sensor_type = Dicts.sensor_types['SVP']
+
+        if count == 0:
             raise RuntimeError("unable to find depth and sound speed indices!")
 
         logger.debug("retrieved %d samples" % count)
