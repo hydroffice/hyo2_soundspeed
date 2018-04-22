@@ -137,6 +137,7 @@ class ExportSingleProfileDialog(AbstractDialog):
 
         if len(self.selected_writers) == 0:
             msg = "Select output formats before data export!"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -170,6 +171,7 @@ class ExportSingleProfileDialog(AbstractDialog):
                     msg = "The project name cannot be used for NCEI export.\n\n" \
                           "Rename the project in the Database tab!\n\n" \
                           "Recommend \"project_survey\" format, e.g. OPR-P999-RA-17_H12345"
+                    # noinspection PyCallByClass
                     QtGui.QMessageBox.warning(self, "Export warning", msg, QtGui.QMessageBox.Ok)
                     return
 
@@ -218,7 +220,7 @@ class ExportSingleProfileDialog(AbstractDialog):
             logger.debug('output folder: %s' % self.lib.outputs_folder)
 
         # ask user for basename
-        basenames = list()
+        basenames = dict()
         # NCEI has special filename convention
         if (len(self.selected_writers) == 1) and (self.selected_writers[0] == 'ncei'):
 
@@ -233,8 +235,8 @@ class ExportSingleProfileDialog(AbstractDialog):
                                                           text=self.lib.cur_basename)
                 if not ok:
                     return
-                for _ in self.selected_writers:
-                    basenames.append(basename)
+                for writer in self.selected_writers:
+                    basenames[writer] = basename
                 break
 
         # actually do the export

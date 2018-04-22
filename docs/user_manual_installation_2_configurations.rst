@@ -59,6 +59,11 @@ Approximately 500 MB of additional disk space is required for the WOA09 db set o
 Alternatively, it is also possible to manually download, unpack the WOA09 data set, and modify the configuration file
 to point to the correct path (see :ref:`package_configuration`).
 
+The database can be unpacked at any path that SSM can access. On Windows, the suggested paths are:
+
+* "C:/Documents and Settings/*<username>*/Application Data/HydrOffice/Sound Speed/atlases/*[woa09|woa13]*" (WinXP), or
+* "C:/Users/*<username>*/AppData/Local/HydrOffice/Sound Speed/atlases/*[woa09|woa13]*" (newer Windows OS)
+
 .. index:: WOA; WOA13
 
 Among other improvements, the WOA13 db provides a much better spatial resolution, but this comes with a much larger data size (~18 GB).

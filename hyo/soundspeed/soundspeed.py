@@ -617,7 +617,7 @@ class SoundSpeedLibrary:
             if not has_data_files:  # we don't have the output file names
                 writer.write(ssp=self.ssp, data_path=data_paths[name], project=current_project)
             else:
-                writer.write(ssp=self.ssp, data_path=data_paths[name], project=current_project)
+                writer.write(ssp=self.ssp, data_path=data_paths[name], data_file=data_files[name], project=current_project)
 
         # take care of listeners
         if self.has_sippican_to_process():

@@ -389,7 +389,12 @@ class Editor(AbstractWidget):
         self.main_win.switch_to_editor_tab()
 
         if not self.lib.extend_profile():
-            msg = "Issue in extending the profile.\n\nCheck in the settings if the selected atlas source is active!"
+            msg = "Issue in extending the profile!\n\n" \
+                  "Possible causes:\n" \
+                  "- The extension source is not active. Look at Setup/Input!" \
+                  "- The profile from the extension source is too short. Check it on the plots!" \
+                  "- The extension source does not have a profile at the geographic location. " \
+                  "Use another source or manually extend the profile!"
             # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Profile extension", msg, QtGui.QMessageBox.Ok)
             return

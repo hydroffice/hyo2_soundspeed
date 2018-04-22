@@ -44,6 +44,7 @@ pkg_data = collect_pkg_data('hyo.soundspeedmanager')
 pkg_data_2 = collect_pkg_data('hyo.soundspeedsettings')
 pkg_data_3 = collect_pkg_data('gsw.utilities')
 pkg_data_4 = collect_pkg_data('hyo.surveydatamonitor')
+pkg_data_5 = collect_pkg_data('hyo.soundspeed')
 
 icon_file = 'freeze\SoundSpeedManager.ico'
 if is_darwin:
@@ -78,6 +79,7 @@ coll = COLLECT(exe,
                pkg_data_2,
                pkg_data_3,
                pkg_data_4,
+               pkg_data_5,
                strip=None,
                upx=True,
                name='SoundSpeedManager.%s' % ssm_version)
