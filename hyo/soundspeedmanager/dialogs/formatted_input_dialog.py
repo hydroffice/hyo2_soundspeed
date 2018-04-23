@@ -24,8 +24,8 @@ class FormattedInputDialog(QtGui.QDialog):
         hbox.addWidget(cancel_btn)
         layout.addWidget(label)
         layout.addWidget(self.line_edit)
-        layout.addLayout(hbox)
         layout.addWidget(self.check_box)
+        layout.addLayout(hbox)
         self.setLayout(layout)
 
         # noinspection PyUnresolvedReferences
