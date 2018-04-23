@@ -16,6 +16,8 @@ class FormattedInputDialog(QtGui.QDialog):
         label = QtGui.QLabel(msg)
         self.ok_btn = QtGui.QPushButton("OK")
         cancel_btn = QtGui.QPushButton("Cancel")
+        self.check_box = QtGui.QCheckBox("Nonstandard project name")
+        self.check_box_checked = False
         layout = QtGui.QVBoxLayout()
         hbox = QtGui.QHBoxLayout()
         hbox.addWidget(self.ok_btn)
@@ -23,6 +25,7 @@ class FormattedInputDialog(QtGui.QDialog):
         layout.addWidget(label)
         layout.addWidget(self.line_edit)
         layout.addLayout(hbox)
+        layout.addWidget(self.check_box)
         self.setLayout(layout)
 
         # noinspection PyUnresolvedReferences
@@ -33,6 +36,8 @@ class FormattedInputDialog(QtGui.QDialog):
         self.line_edit.textChanged.connect(self._check_state)
         # noinspection PyUnresolvedReferences
         self.line_edit.editingFinished.connect(self._check_state)
+        # noinspection PyUnresolvedReferences
+        self.check_box.stateChanged.connect(self._check_state)
         self._check_state()
 
     @classmethod
@@ -46,19 +51,23 @@ class FormattedInputDialog(QtGui.QDialog):
         dialog.close()
         return rtn
 
-    def _check_state(self):
+    def _check_state(self, state=None):
+        if state == QtCore.Qt.Checked:
+            self.check_box_checked = True
+        elif state == QtCore.Qt.Unchecked:
+            self.check_box_checked = False
         input_text = self.line_edit.text()
-        state = self.validator.validate(input_text, 0)[0]
-        if state == QtGui.QValidator.Acceptable:
+        status = self.validator.validate(input_text, 0)[0]
+        if status == QtGui.QValidator.Acceptable:
             color = '#c4df9b' # green
             self.ok_btn.setEnabled(True)
-        elif state == QtGui.QValidator.Intermediate:
+        elif status == QtGui.QValidator.Intermediate:
             color = '#fff79a' # yellow
             self.ok_btn.setEnabled(False)
         else:
             color = '#f6989d' # red
-            if len(input_text) < 10 or input_text.find(' ') >= 0:
-                self.ok_btn.setEnabled(False)
-            else:
+            if len(input_text) >= 10 and input_text.find(' ') < 0 and self.check_box_checked:
                 self.ok_btn.setEnabled(True) # make long incorrect input acceptable
+            else:
+                self.ok_btn.setEnabled(False)
         self.line_edit.setStyleSheet("background-color: %s;" % color)
