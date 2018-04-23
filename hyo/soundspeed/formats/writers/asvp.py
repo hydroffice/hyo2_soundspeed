@@ -21,7 +21,7 @@ class Asvp(AbstractTextWriter):
 
     def __init__(self):
         super(Asvp, self).__init__()
-        self.desc = "Konsgberg"
+        self.desc = "Kongsberg"
         self._ext.add('asvp')
         self.header = None  # required for checksum
 
@@ -74,9 +74,10 @@ class Asvp(AbstractTextWriter):
         # e.g., ( Absorption  1.0 0 201203212242 22.50000000 -156.50000000 -1 0 0 OMS01_00000 P 0035 )
         abs_header = "( Absorption  1.0 0 "
         abs_header += self.ssp.cur.meta.utc_time.strftime("%Y%m%d%H%M ")
-        abs_header += "%.8f %.8f -1 0 0 OMS01_00000 P %04d )\n" \
+        abs_header += "%.8f %.8f -1 0 0 SSM_%s P %04d )\n" \
                        % (self.ssp.cur.meta.latitude,
                           self.ssp.cur.meta.longitude,
+                          __version__,
                           self.ssp.cur.sis.depth[ti].size)
         self.fod.io.write(abs_header)
 

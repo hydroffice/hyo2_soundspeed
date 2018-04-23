@@ -83,13 +83,13 @@ class Profile:
     @classmethod
     def weighted_arithmetic_std(cls, values, weights):
         avg = np.average(values, weights=weights)
-        var = np.average((values - avg)**2, weights=weights)
+        var = np.average((values - avg) ** 2, weights=weights)
         return math.sqrt(var)
 
     def weighted_harmonic_std(self):
         w = self.calc_weights(self.proc.speed[self.proc_valid])
         avg = self.weighted_harmonic_mean()
-        var = np.average((self.proc.speed[self.proc_valid] - avg)**2, weights=w)
+        var = np.average((self.proc.speed[self.proc_valid] - avg) ** 2, weights=w)
         return math.sqrt(var)
 
     def init_data(self, num_samples):
@@ -263,191 +263,160 @@ class Profile:
         w = self.calc_weights(self.proc.sal[self.proc_valid])
         return self.weighted_arithmetic_std(self.proc.sal[self.proc_valid], w)
 
-    def _get_salinity_threshold(self):
-        """
-        Subprogram to determine salinity threshold and maximum pressure
-        and salinity from the Sea-Bird converted data file.
-
-        We should be able to just read data and take min/max really.
-        Change from reading header by assumed column number and start reading
-        the data fields so we can support all formats of CNV data
-        (derived nitrogen can be included for example)
-        """
+    def _calc_water_salinity_threshold(self):
+        """Determine salinity threshold from min/max values to help determine where instrument entered water"""
         sal_min = self.proc.sal[self.proc_valid].min()
         sal_max = self.proc.sal[self.proc_valid].max()
 
-        # Threshold salinity to help determine where instrument entered water.
         sal_thresh = sal_min + 0.1 * (sal_max - sal_min)  # '10% between extremes
         if sal_thresh < 0.03:
             sal_thresh = 0.03
         elif sal_thresh > 3:
             sal_thresh = 3.0
+
         return sal_thresh
 
-    def _get_pressure_offset(self, sal_thresh):
-        """
-        Compute the pressure offset.
-        Method: Use the salinity threshold to determine where instrument first
-        entered water.
-
-        Input variable: sal_thresh   Salinity threshold
-        Returns pressure offset Z0 and index where water entry happened
-        """
+    def _calc_air_water_index(self):
+        """Use the salinity threshold to determine where instrument first entered water."""
+        sal_thresh = self._calc_water_salinity_threshold()
         try:
-            # Data record # of first point in water
-            i_water = np.argwhere(np.logical_and(self.proc.sal >= sal_thresh, self.proc_valid))[0][0]
-            if i_water == 0:
-                z0 = 0  # ' In water at first data record   No points on deck
-            else:
-                z0 = np.average(self.proc.pressure[:i_water])
+            water_i = np.argwhere(self.proc.sal[self.proc_valid] >= sal_thresh)[0][0]
         except IndexError:  # never passed threshold
-            z0 = 0
-            i_water = len(self.proc.pressure) + 1
-        return z0, i_water
+            water_i = len(self.proc.sal[self.proc_valid]) - 1
+        logger.debug("water index: %d (using salinity threshold: %.3f)" % (water_i, sal_thresh))
+        return water_i
 
     def remove_pre_water_entry(self):
-        """
-        Look for data that is likely out of the water by searching for salinity levels much less than
-        the rest of the data.  Marks data as 'filtered' that falls outside the salinity levels
-        determined from data.
+        """Look for data that is likely out of the water by searching for very low salinity levels"""
 
-        Pressure in decibars
-        Temperature in degrees C
-        Salinity in PSU
-        Sigma-theta = (density-1)*1000
-        Sound Velocity in m/sec
+        if not self.proc.sal.any():
+            logger.debug("all salinity values are zero -> skipping pre-water entry removal")
+            return
 
-        """
-        if self.proc.sal is not None and self.proc.sal.any():
-            # Get salinity threshold, max RAW pressure from CNV file
-            sal_thresh = self._get_salinity_threshold()
-            # Using the salinity threshold, compute pressure offset.
-            _z0, air_water_index = self._get_pressure_offset(sal_thresh)
-            # if the data structure was one array we'd use a split here self.proc[air_water_index:]
-            in_air_condition = np.arange(0, self.proc.num_samples) < air_water_index
-            # self.proc.compress(in_water_condition)
-            np.putmask(self.proc.flag, in_air_condition, Dicts.flags['filtered'])
+        if self.nr_valid_proc_samples == 0:
+            logger.debug("not valid processing samples")
+            return
 
-            # now done in fix() of the abstract class
-            # self.proc.compress(self.proc.sal <= 40)  # ignore if Salinity out-of-bounds
-            # self.remove_up_or_down_cast()
+        # remove initial samples out of water using salinity
+        water_i = self._calc_air_water_index()
+        in_air_ii = np.arange(0, len(self.proc_valid)) < water_i
+        valid_and_in_air_ii = np.logical_and(self.proc_valid, in_air_ii)
+        self.proc.flag[valid_and_in_air_ii] = Dicts.flags['filtered']
 
-            # Mod 3/19/96 - use of Sthresh2 to handle case where instrument comes up out of water.
-            try:
-                salinity_thresh2 = 0.8 * np.compress(self.proc.flag == Dicts.flags['filtered'], self.proc.sal)[0]
-                # self.proc.compress(self.proc.sal > salinity_thresh2)
-                np.putmask(self.proc.flag, self.proc.sal <= salinity_thresh2, Dicts.flags['filtered'])
-            except IndexError:
-                pass  # no filtered data points
+        # remove samples out of water within the profile using salinity
+        try:
+            sal_th = 0.8 * self.proc.sal[self.proc_valid][0]
+            in_air_ii = self.proc.sal <= sal_th
+            valid_and_in_air_ii = np.logical_and(self.proc_valid, in_air_ii)
+            self.proc.flag[valid_and_in_air_ii] = Dicts.flags['filtered']
+        except IndexError:
+            logger.warning("issue with removing samples out of the water using salinity")
 
-            # self.proc.pressure -= z0  # Corrected pressure
-
-            # Ignore data in air (corrected pressure<0)
-            # self.proc.compress(self.proc.pressure > -0.001)
-            np.putmask(self.proc.flag, self.proc.pressure <= -0.001, Dicts.flags['filtered'])
+        # remove samples out of water within the profile using pressure
+        try:
+            press_th = -0.001
+            in_air_ii = self.proc.pressure <= press_th
+            valid_and_in_air_ii = np.logical_and(self.proc_valid, in_air_ii)
+            self.proc.flag[valid_and_in_air_ii] = Dicts.flags['filtered']
+        except IndexError:
+            logger.warning("issue with removing samples out of the water using salinity")
 
     def statistical_filter(self):
-        # Literal conversion from EditSV in VelocWin
-        c_end = 1.3  # Relaxed tolerance factor at endpoints.
-        z_band = 33  # Dist. from surface in which to relax error band.
-        c_depth = 1.3  # Relaxed tolerance factor in depth interval ZBAND.
-        c_spread = 2  # number of standard deviations to use for error band.
-        sigmin = 0.2  # Minimum standard deviation allowed.
 
-        sv = self.proc.speed  # allocate arrays
-        depth = self.proc.depth
-        sigma = sv * 0.0
-        v_mean = sv * 0.0
-        n_pts = len(sv)
+        speed = self.proc.speed[self.proc_valid]
+        depth = self.proc.depth[self.proc_valid]
 
-        v_min = sv.min()
-        v_max = sv.max()
-        v_mid = 0.5 * (v_min + v_max)
-        v_mid = int(0.5 + v_mid / 10.0) * 10
-        v_zero = v_mid - 50  # Computing origin
+        sigma = speed * 0.0
+        speed_mean = speed * 0.0
 
-        # Edit the data statistically.  To obtain local mean and
-        # local standard deviation for point i, use 2 neighboring
-        # points on either side of point i.  Endpoints treated separately.
-        # This looks to be most effective on single point fliers
-        for i in range(2, n_pts - 2):
-            v_sum = 0
-            v_sum_sq = 0
+        nr_samples = len(speed)
+        sigma_min_th = 0.2  # Minimum standard deviation allowed.
+        logger.debug("applying statistical filter at %d valid samples" % nr_samples)
+
+        # Calculate local mean and std dev for each sample, use 2 neighbors on either sides.
+        # Endpoints treated separately. Target: single point fliers
+        for i in range(2, nr_samples - 2):
+            speed_sum = 0
+            speed_sum_sq = 0
             for k in range(-2, 3):
-                if k != 0:
-                    v_diff = sv[i + k] - v_zero  # Use computing origin to avoid
-                    v_sum = v_sum + v_diff  # very large quantities
-                    v_sum_sq = v_sum_sq + v_diff * v_diff
+                if k == 0:  # skip itself
+                    continue
+                speed_sum += speed[i + k]
+                speed_sum_sq += speed[i + k] * speed[i + k]
 
-            variance = (v_sum_sq - v_sum * v_sum / 4) / 3
-            v_mean[i] = v_sum / 4 + v_zero  # Add back computing origin
+            variance = ((4 * speed_sum_sq) - speed_sum * speed_sum) / (4 * 3)  # unbiased variance
+            speed_mean[i] = speed_sum / 4
             if variance < 0:
                 variance = 0
             sigma[i] = np.sqrt(variance)  # Local standard deviation
-            if sigma[i] < sigmin:
-                sigma[i] = sigmin
+            if sigma[i] < sigma_min_th:
+                sigma[i] = sigma_min_th
 
-        # Endpoint treatment -- use only three neighboring points.
-        # Relax tolerance.
-        # Endpoints are the first two and last two points.
-        iend = [0, 1, n_pts - 2, n_pts - 1]
-        index = [(1, 2, 3),
-                 (0, 2, 3),
-                 (n_pts - 4, n_pts - 3, n_pts - 1),
-                 (n_pts - 4, n_pts - 3, n_pts - 2)
-                 ]
-
+        # Endpoints (use only three neighboring points). Relax tolerance.
+        c_end = 1.3  # Relaxed tolerance factor at endpoints.
+        ends_i = [0, 1, nr_samples - 2, nr_samples - 1]
+        index = [(1, 2, 3), (0, 2, 3), (nr_samples - 4, nr_samples - 3, nr_samples - 1),
+                 (nr_samples - 4, nr_samples - 3, nr_samples - 2)]
         for k in range(4):
-            v_sum = 0
-            v_sum_sq = 0
-            i = iend[k]  # Point number
+            speed_sum = 0
+            speed_sum_sq = 0
+            i = ends_i[k]  # Point number
             for j in range(3):
                 ind_kj = index[k][j]
-                v_diff = sv[ind_kj] - v_zero
-                v_sum = v_sum + v_diff
-                v_sum_sq = v_sum_sq + v_diff * v_diff
+                speed_sum += speed[ind_kj]
+                speed_sum_sq += speed[ind_kj] * speed[ind_kj]
 
-            variance = (v_sum_sq - v_sum * v_sum / 3) / 2
-            v_mean[i] = v_sum / 3 + v_zero
+            variance = ((3 * speed_sum_sq) - speed_sum * speed_sum) / (3 * 2)  # unbiased variance
+            speed_mean[i] = speed_sum / 3
             if variance < 0:
                 variance = 0
             sigma[i] = np.sqrt(variance)
-            if sigma[i] < sigmin:
-                sigma[i] = sigmin
-            sigma[i] = sigma[i] * c_end  # Relax tolerance for end pts
+            if sigma[i] < sigma_min_th:
+                sigma[i] = sigma_min_th
+            sigma[i] *= c_end  # Relax tolerance for end pts
 
-        factor = c_depth
-        for i in range(n_pts):
-            if depth[i] > z_band:
-                factor = 1
-            DV = factor * c_spread * sigma[i]  # Half allowable V interval
-            if np.absolute(sv[i] - v_mean[i]) > DV:
-                self.proc.flag[i] = Dicts.flags['filtered']  # So-called bad point
+        # identify the sample to filter
+        nr_std_dev = 2  # number of standard deviations to use for error band.
+        tolerance_factor = 1.3  # Tolerance factor.
+        depth_th = 33.0  # Depth at which to relax error band.
+        factor = tolerance_factor
+        stat_filtered = np.zeros(nr_samples, dtype=bool)
+        for i in range(nr_samples):
+            if depth[i] > depth_th:
+                factor = 1.0
+            th = factor * nr_std_dev * sigma[i]
+            if np.absolute(speed[i] - speed_mean[i]) > th:
+                logger.debug("statistical filtering for sample #%d (%.2f, %.2f, th: %.2f)"
+                             % (i, speed[i], speed_mean[i], th))
+                stat_filtered[i] = True
+
+        # finally apply the statistical filtering
+        filtered_ii = np.zeros(len(self.proc_valid), dtype=bool)
+        filtered_ii[self.proc_valid] = stat_filtered
+        valid_and_filtered_ii = np.logical_and(self.proc_valid, filtered_ii)
+        self.proc.flag[valid_and_filtered_ii] = Dicts.flags['filtered']
 
     def cosine_smooth(self):
         """Cosine-averaging to smooth the profile data"""
 
         verbose = False  # set to True for verbose intermediate steps
 
-        # parameters
-        bin_size = 1.0  # size of bin, unit or measure is meter (depth)
-        bin_width = 4  # number of bins on both sides of the value
-        ww_min = 1.7  # minimum window width for the cos( ) function
-        ww_mul = 0.0025  # used to grow the window width (that is, to spread the averaging) as the z gets larger
-        domain = "depth"
-        # data types not including source and type
-        samples_names = ["pressure", "depth", "speed", "temp", "conductivity", "sal"]
+        # retrieve the depths
+        zs = self.proc.depth[self.proc_valid]
+
+        # create a dictionary with data types, not including source and type
+        names = ["pressure", "depth", "speed", "temp", "conductivity", "sal"]
         records = dict()
-
-        # retrieve the domain-specific z samples (depth typically)
-        zs = getattr(self.proc, domain)
-
-        # create a dictionary with only the existing data types
-        names = [name for name in samples_names if getattr(self.proc, name) is not None]
-        for name in names:
-            records[name] = getattr(self.proc, name)
+        records["pressure"] = self.proc.pressure[self.proc_valid]
+        records["depth"] = self.proc.depth[self.proc_valid]
+        records["speed"] = self.proc.speed[self.proc_valid]
+        records["temp"] = self.proc.temp[self.proc_valid]
+        records["conductivity"] = self.proc.conductivity[self.proc_valid]
+        records["sal"] = self.proc.sal[self.proc_valid]
 
         # create the window widths
+        ww_min = 1.7  # minimum window width for the cos( ) function
+        ww_mul = 0.0025  # used to grow the window width (that is, to spread the averaging) as the z gets larger
         window_width = np.maximum(np.absolute(zs * ww_mul), ww_min)
         if verbose:
             logger.debug("cosine avg -> window width: %s" % (window_width,))
@@ -461,6 +430,8 @@ class Profile:
         # create a 2D storage array:
         # - [rows -> types]: 2 additional rows (bin values on row #0, weights on row #-1)
         # - [cols -> values]: extra columns (that will be removed at the end) on both sides
+        bin_size = 1.0  # size of bin, unit or measure is meter (depth)
+        bin_width = 4  # number of bins on both sides of the value
         storage = np.zeros([len(names) + 2, int(2 * (bin_width + 1) + (z_max - z_min) / bin_size)])
         if verbose:
             logger.debug("cosine avg -> storage: rows %s, columns %s" % (storage.shape[0], storage.shape[1]))
@@ -469,14 +440,10 @@ class Profile:
         for i in range(storage.shape[1]):
             storage[0][i] = z_min + (- bin_width + i) * bin_size
         if verbose:
-            logger.debug("cosine avg -> storage bin values: %s" % (storage[0], ))
+            logger.debug("cosine avg -> storage bin values: %s" % (storage[0],))
 
         # populate weights
         for i, z in enumerate(zs):
-
-            # skip invalid samples
-            if self.proc.flag[i] != Dicts.flags['valid']:
-                continue
 
             # calculate the index of the central bin value
             center_idx = int((z - z_min) / bin_size + .5) + bin_width
@@ -501,7 +468,7 @@ class Profile:
             storage[-1][center_idx - bin_width:center_idx + bin_width + 1] += bin_weights
 
         if verbose:
-            logger.debug("cosine avg -> storage weights: %s" % (storage[-1], ))
+            logger.debug("cosine avg -> storage weights: %s" % (storage[-1],))
             for j, name in enumerate(names):
                 logger.debug("cosine avg -> storage %s sums: %s" % (name, storage[1 + j],))
 
@@ -520,22 +487,29 @@ class Profile:
         storage = np.compress(delta_zs >= .00001, storage, axis=1)
 
         # mark previous 'valid' data as 'smoothed'
+        was_valid = self.proc_valid[:]
         self.proc.flag[self.proc_valid] = Dicts.flags['smoothed']
 
         # insert created data into the self.proc arrays
         for row in storage.T:
 
-            new_zs = getattr(self.proc, domain)
             # index of where the storage record falls
             try:
-                i = np.argwhere(new_zs > row[0])[0][0]
+                d_th = float(row[0])
+                z_bools = np.logical_and(was_valid, self.proc.depth > d_th)
+                i = np.argwhere(z_bools)[0]
             except IndexError:
-                i = new_zs.size
+                i = zs.size
+
+            # logger.debug("depth: %.3f -> index: %d" % (row[0], i))
             for j, name in enumerate(names):
                 setattr(self.proc, name, np.insert(getattr(self.proc, name), i, row[j + 1]))
             self.proc.source = np.insert(self.proc.source, i, Dicts.sources['smoothing'])
             self.proc.flag = np.insert(self.proc.flag, i, Dicts.flags['valid'])
+            # to keep the indices in sync after the insertion
+            was_valid = np.insert(was_valid, i, [True, ])
 
+        # since we inserted new samples
         self.proc.num_samples = self.proc.depth.size
 
     def reduce_up_down(self, ssp_direction, use_pressure=False):

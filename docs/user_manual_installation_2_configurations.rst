@@ -56,13 +56,13 @@ Space requirements
 Approximately 500 MB of additional disk space is required for the WOA09 db set optionally required
 (but warmly suggested) by this hydro-package. If not available, the package will attempt to download it.
 
-Alternatively, it is also possible to manually download, unpack the WOA09 data set, and modify the configuration file
+Alternatively, it is also possible to manually download, unpack the WOA09 data set at any path that SSM can have access to, and modify the configuration file
 to point to the correct path (see :ref:`package_configuration`).
 
-The database can be unpacked at any path that SSM can access. On Windows, the suggested paths are:
+By default, SSM looks for databases at:
 
-* "C:/Documents and Settings/*<username>*/Application Data/HydrOffice/Sound Speed/atlases/*[woa09|woa13]*" (WinXP), or
-* "C:/Users/*<username>*/AppData/Local/HydrOffice/Sound Speed/atlases/*[woa09|woa13]*" (newer Windows OS)
+* "C:/Documents and Settings/**<username>**/Application Data/HydrOffice/Sound Speed/atlases/**[woa09 or woa13]**" (WinXP), or
+* "C:/Users/**<username>**/AppData/Local/HydrOffice/Sound Speed/atlases/**[woa09 or woa13]**" (newer Windows OS)
 
 .. index:: WOA; WOA13
 

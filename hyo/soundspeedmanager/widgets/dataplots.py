@@ -509,20 +509,22 @@ class DataPlots(AbstractWidget):
         with rc_context(self.rc_context):
             if self.lib.has_ssp():
 
-                max_proc_depth = self.lib.cur.proc.depth[self.vi].max()
-                mean_sis_depth = 0
-                if self.lib.use_sis():
-                    if self.lib.listeners.sis.xyz88:
-                        if self.lib.listeners.sis.xyz88.mean_depth:
-                            mean_sis_depth = self.lib.listeners.sis.xyz88.mean_depth
-                max_proc_sis_depth = max(max_proc_depth, mean_sis_depth)
+                if len(self.lib.cur.proc.depth[self.vi]) > 0:
 
-                max_depth = max(30. + max_proc_sis_depth, 1.1 * max_proc_sis_depth)
-                min_depth = -0.05 * max_proc_sis_depth
-                if min_depth > 0:
-                    min_depth = -5
+                    max_proc_depth = self.lib.cur.proc.depth[self.vi].max()
+                    mean_sis_depth = 0
+                    if self.lib.use_sis():
+                        if self.lib.listeners.sis.xyz88:
+                            if self.lib.listeners.sis.xyz88.mean_depth:
+                                mean_sis_depth = self.lib.listeners.sis.xyz88.mean_depth
+                    max_proc_sis_depth = max(max_proc_depth, mean_sis_depth)
 
-                self.speed_ax.set_ylim([max_depth, min_depth])
+                    max_depth = max(30. + max_proc_sis_depth, 1.1 * max_proc_sis_depth)
+                    min_depth = -0.05 * max_proc_sis_depth
+                    if min_depth > 0:
+                        min_depth = -5
+
+                    self.speed_ax.set_ylim([max_depth, min_depth])
 
             self.c.draw()
 
@@ -531,10 +533,11 @@ class DataPlots(AbstractWidget):
         with rc_context(self.rc_context):
             if self.lib.has_ssp():
 
-                max_proc_speed = self.lib.cur.proc.speed[self.vi].max()
-                min_proc_speed = self.lib.cur.proc.speed[self.vi].min()
+                if len(self.lib.cur.proc.speed[self.vi]) > 0:
+                    max_proc_speed = self.lib.cur.proc.speed[self.vi].max()
+                    min_proc_speed = self.lib.cur.proc.speed[self.vi].min()
 
-                self.speed_ax.set_xlim([min_proc_speed - 3.0, max_proc_speed + 3.0])
+                    self.speed_ax.set_xlim([min_proc_speed - 3.0, max_proc_speed + 3.0])
 
             self.c.draw()
 
@@ -543,10 +546,11 @@ class DataPlots(AbstractWidget):
         with rc_context(self.rc_context):
             if self.lib.has_ssp():
 
-                max_proc_temp = self.lib.cur.proc.temp[self.vi].max()
-                min_proc_temp = self.lib.cur.proc.temp[self.vi].min()
+                if len(self.lib.cur.proc.temp[self.vi]) > 0:
+                    max_proc_temp = self.lib.cur.proc.temp[self.vi].max()
+                    min_proc_temp = self.lib.cur.proc.temp[self.vi].min()
 
-                self.temp_ax.set_xlim([min_proc_temp - 3.0, max_proc_temp + 3.0])
+                    self.temp_ax.set_xlim([min_proc_temp - 3.0, max_proc_temp + 3.0])
 
             self.c.draw()
 
@@ -555,10 +559,11 @@ class DataPlots(AbstractWidget):
         with rc_context(self.rc_context):
             if self.lib.has_ssp():
 
-                max_proc_sal = self.lib.cur.proc.sal[self.vi].max()
-                min_proc_sal = self.lib.cur.proc.sal[self.vi].min()
+                if len(self.lib.cur.proc.sal[self.vi]) > 0:
+                    max_proc_sal = self.lib.cur.proc.sal[self.vi].max()
+                    min_proc_sal = self.lib.cur.proc.sal[self.vi].min()
 
-                self.sal_ax.set_xlim([min_proc_sal - 3.0, max_proc_sal + 3.0])
+                    self.sal_ax.set_xlim([min_proc_sal - 3.0, max_proc_sal + 3.0])
 
             self.c.draw()
 
