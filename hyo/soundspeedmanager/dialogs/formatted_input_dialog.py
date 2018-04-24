@@ -66,8 +66,8 @@ class FormattedInputDialog(QtGui.QDialog):
             self.ok_btn.setEnabled(False)
         else:
             color = '#f6989d' # red
-            if len(input_text) >= 10 and input_text.find(' ') < 0 and self.check_box_checked:
-                self.ok_btn.setEnabled(True) # make long incorrect input acceptable
+            if len(input_text) >= 5 and input_text.find(' ') < 0 and self.check_box_checked:
+                self.ok_btn.setEnabled(True) # make nonstandard input acceptable
             else:
                 self.ok_btn.setEnabled(False)
         self.line_edit.setStyleSheet("background-color: %s;" % color)
