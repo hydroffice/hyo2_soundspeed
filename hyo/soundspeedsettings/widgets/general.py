@@ -198,7 +198,7 @@ class General(AbstractWidget):
         hbox = QtGui.QHBoxLayout()
         self.right_layout.addLayout(hbox)
         # -- label
-        label = QtGui.QLabel("Default survey:")
+        label = QtGui.QLabel("Default survey(*):")
         label.setFixedWidth(lbl_width)
         hbox.addWidget(label)
         # -- value
@@ -235,6 +235,19 @@ class General(AbstractWidget):
         self.auto_apply_default_metadata = QtGui.QComboBox()
         self.auto_apply_default_metadata.addItems(["True", "False"])
         hbox.addWidget(self.auto_apply_default_metadata)
+
+        hbox = QtGui.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        label = QtGui.QLabel("")
+        label.setFixedHeight(22)
+        hbox.addWidget(label)
+
+        hbox = QtGui.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        label = QtGui.QLabel("<i>* If yellow, press 'return' to apply changes.</i>")
+        label.setFixedHeight(22)
+        label.setStyleSheet("QLabel { color : #aaaaaa; }")
+        hbox.addWidget(label)
 
         self.right_layout.addStretch()
 
