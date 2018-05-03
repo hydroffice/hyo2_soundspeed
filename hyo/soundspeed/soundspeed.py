@@ -664,11 +664,11 @@ class SoundSpeedLibrary:
         if not os.path.exists(new_db_path):
             raise RuntimeError("unable to copy the project db: %s" % new_db_path)
 
-        os.remove(old_db_path)
-
         self.current_project = name
         self.save_settings_to_db()
         self.reload_settings_from_db()
+
+        os.remove(old_db_path)
 
     def remove_project(self, name):
         if name == self.current_project:

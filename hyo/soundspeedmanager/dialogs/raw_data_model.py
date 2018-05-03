@@ -4,6 +4,8 @@ QVariant = lambda value=None: value
 
 from collections import OrderedDict
 
+from hyo.soundspeed.profile.dicts import Dicts
+
 
 class RawDataModel(QtCore.QAbstractTableModel):
 
@@ -77,9 +79,11 @@ class RawDataModel(QtCore.QAbstractTableModel):
         elif index.column() == self.data_dict['Sal']:
             return QVariant(str(self.prj.cur.data.sal[index.row()]))
         elif index.column() == self.data_dict['Source']:
-            return QVariant(str(self.prj.cur.data.source[index.row()]))
+            return QVariant("%.0f [%s]" % (self.prj.cur.data.source[index.row()],
+                                          Dicts.first_match(Dicts.sources, self.prj.cur.data.source[index.row()])))
         elif index.column() == self.data_dict['Flag']:
-            return QVariant(str(self.prj.cur.data.flag[index.row()]))
+            return QVariant("%.0f [%s]" % (self.prj.cur.data.flag[index.row()],
+                                          Dicts.first_match(Dicts.flags, self.prj.cur.data.flag[index.row()])))
         else:
             return QVariant()
 

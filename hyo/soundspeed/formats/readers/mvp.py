@@ -477,8 +477,9 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
         try:
             lat_field = footer_fields[0]
             lat_deg = int(lat_field[0:2])
-            lat_min = float(lat_field[2:-1])
+            lat_min = float(lat_field[2:])
             lat_hemi = footer_fields[1]
+            logger.debug("lat: %s %s %s" % (lat_deg, lat_min, lat_hemi))
             self.ssp.cur.meta.latitude = lat_deg + lat_min / 60.0
             if lat_hemi == "S" or lat_hemi == "s":
                 self.ssp.cur.meta.latitude *= -1
@@ -489,8 +490,9 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
         try:
             lon_field = footer_fields[2]
             lon_deg = int(lon_field[0:3])
-            lon_min = float(lon_field[3:-1])
+            lon_min = float(lon_field[3:])
             lon_hemi = footer_fields[3]
+            logger.debug("lon: %s %s %s" % (lon_deg, lon_min, lon_hemi))
             self.ssp.cur.meta.longitude = lon_deg + lon_min / 60.0
             if lon_hemi == "W" or lon_hemi == "w":
                 self.ssp.cur.meta.longitude *= -1

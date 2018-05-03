@@ -487,16 +487,15 @@ class Profile:
         storage = np.compress(delta_zs >= .00001, storage, axis=1)
 
         # mark previous 'valid' data as 'smoothed'
-        was_valid = self.proc_valid[:]
         self.proc.flag[self.proc_valid] = Dicts.flags['smoothed']
 
         # insert created data into the self.proc arrays
         for row in storage.T:
 
             # index of where the storage record falls
+            d_th = float(row[0])
             try:
-                d_th = float(row[0])
-                z_bools = np.logical_and(was_valid, self.proc.depth > d_th)
+                z_bools = np.logical_and(self.proc_valid, self.proc.depth > d_th)
                 i = np.argwhere(z_bools)[0]
             except IndexError:
                 i = zs.size
@@ -505,9 +504,6 @@ class Profile:
             for j, name in enumerate(names):
                 setattr(self.proc, name, np.insert(getattr(self.proc, name), i, row[j + 1]))
             self.proc.source = np.insert(self.proc.source, i, Dicts.sources['smoothing'])
-            self.proc.flag = np.insert(self.proc.flag, i, Dicts.flags['valid'])
-            # to keep the indices in sync after the insertion
-            was_valid = np.insert(was_valid, i, [True, ])
 
         # since we inserted new samples
         self.proc.num_samples = self.proc.depth.size

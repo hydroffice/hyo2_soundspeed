@@ -3,6 +3,7 @@ from PySide import QtCore
 QVariant = lambda value=None: value
 
 from collections import OrderedDict
+from hyo.soundspeed.profile.dicts import Dicts
 
 
 class ProcDataModel(QtCore.QAbstractTableModel):
@@ -77,9 +78,11 @@ class ProcDataModel(QtCore.QAbstractTableModel):
         elif index.column() == self.data_dict['Sal']:
             return QVariant(str(self.prj.cur.proc.sal[index.row()]))
         elif index.column() == self.data_dict['Source']:
-            return QVariant(str(self.prj.cur.proc.source[index.row()]))
+            return QVariant("%.0f [%s]" % (self.prj.cur.proc.source[index.row()],
+                                          Dicts.first_match(Dicts.sources, self.prj.cur.proc.source[index.row()])))
         elif index.column() == self.data_dict['Flag']:
-            return QVariant(str(self.prj.cur.proc.flag[index.row()]))
+            return QVariant("%.0f [%s]" % (self.prj.cur.proc.flag[index.row()],
+                                          Dicts.first_match(Dicts.flags, self.prj.cur.proc.flag[index.row()])))
         else:
             return QVariant()
 
@@ -166,7 +169,7 @@ class ProcDataModel(QtCore.QAbstractTableModel):
             self.prj.cur.proc.sal[r] = user_value
 
         elif c == self.data_dict['Source']:
-            if (user_value < 0) or (user_value > 100):
+            if (user_value < 0) or (user_value >= len(Dicts.sources)):
                 ret = QtGui.QMessageBox.warning(self.table, "Spreadsheet",
                                                 "Do you really want to set the data source to %s?" % user_value,
                                                 QtGui.QMessageBox.Ok|QtGui.QMessageBox.No)
@@ -175,7 +178,7 @@ class ProcDataModel(QtCore.QAbstractTableModel):
             self.prj.cur.proc.source[r] = user_value
 
         elif c == self.data_dict['Flag']:
-            if (user_value < 0) or (user_value > 100):
+            if (user_value < 0) or (user_value >= len(Dicts.flags)):
                 ret = QtGui.QMessageBox.warning(self.table, "Spreadsheet",
                                                 "Do you really want to set the data flag to %s?" % user_value,
                                                 QtGui.QMessageBox.Ok|QtGui.QMessageBox.No)
