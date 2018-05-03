@@ -401,14 +401,19 @@ class Profile:
 
         verbose = False  # set to True for verbose intermediate steps
 
+        valid_and_smoothed = self.proc.source[self.proc_valid] == Dicts.sources['smoothing']
+        # noinspection PyUnresolvedReferences
+        if (valid_and_smoothed == True).all():
+            return
+        # logger.debug(valid_and_smoothed)
+
         # retrieve the depths
         zs = self.proc.depth[self.proc_valid]
 
         # create a dictionary with data types, not including source and type
-        names = ["pressure", "depth", "speed", "temp", "conductivity", "sal"]
+        names = ["pressure", "speed", "temp", "conductivity", "sal"]
         records = dict()
         records["pressure"] = self.proc.pressure[self.proc_valid]
-        records["depth"] = self.proc.depth[self.proc_valid]
         records["speed"] = self.proc.speed[self.proc_valid]
         records["temp"] = self.proc.temp[self.proc_valid]
         records["conductivity"] = self.proc.conductivity[self.proc_valid]
@@ -486,27 +491,36 @@ class Profile:
         # remove duplicated z values
         storage = np.compress(delta_zs >= .00001, storage, axis=1)
 
-        # mark previous 'valid' data as 'smoothed'
-        self.proc.flag[self.proc_valid] = Dicts.flags['smoothed']
+        # logger.debug(self.proc.depth)
 
         # insert created data into the self.proc arrays
+        last_depth = 0.0
         for row in storage.T:
 
             # index of where the storage record falls
             d_th = float(row[0])
+            if d_th < last_depth:
+                continue
+            last_depth = d_th
             try:
                 z_bools = np.logical_and(self.proc_valid, self.proc.depth > d_th)
                 i = np.argwhere(z_bools)[0]
             except IndexError:
                 i = zs.size
 
-            # logger.debug("depth: %.3f -> index: %d" % (row[0], i))
+            self.proc.depth = np.insert(self.proc.depth, i, d_th)
+            self.proc.source = np.insert(self.proc.source, i, Dicts.sources['smoothing'])
+            self.proc.flag = np.insert(self.proc.flag, i, Dicts.flags['valid'])
             for j, name in enumerate(names):
                 setattr(self.proc, name, np.insert(getattr(self.proc, name), i, row[j + 1]))
-            self.proc.source = np.insert(self.proc.source, i, Dicts.sources['smoothing'])
+
+            # logger.debug(self.proc.depth)
 
         # since we inserted new samples
         self.proc.num_samples = self.proc.depth.size
+
+        # mark previous 'valid' data as 'smoothed'
+        self.proc.flag[self.proc.source != Dicts.sources['smoothing']] = Dicts.flags['smoothed']
 
     def reduce_up_down(self, ssp_direction, use_pressure=False):
         """Reduce the raw data samples based on the passed direction"""
