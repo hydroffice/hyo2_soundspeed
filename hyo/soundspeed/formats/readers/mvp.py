@@ -434,17 +434,33 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
                 logger.debug("first data row: %s" % line)
 
             fields = line.split(",")
-            if len(fields) != 3:
-                logger.info("skipping %s row" % count)
-                continue
+            if len(fields) == 3:
 
-            try:
-                self.ssp.cur.data.depth[count] = float(fields[1].strip())
-                self.ssp.cur.data.speed[count] = float(fields[2].strip())
-            except (ValueError, IndexError, TypeError) as e:
-                logger.error("skipping %s row: %s" % (count, e))
+                try:
+                    self.ssp.cur.data.depth[count] = float(fields[1].strip())
+                    self.ssp.cur.data.speed[count] = float(fields[2].strip())
+
+                except (ValueError, IndexError, TypeError) as e:
+                    logger.error("skipping %s row: %s" % (idx, e))
+                    continue
+                count += 1
+
+            elif len(fields) >= 6:
+
+                try:
+                    self.ssp.cur.data.depth[count] = float(fields[1].strip())
+                    self.ssp.cur.data.speed[count] = float(fields[2].strip())
+                    self.ssp.cur.data.temp[count] = float(fields[3].strip())
+                    self.ssp.cur.data.sal[count] = float(fields[5].strip())
+
+                except (ValueError, IndexError, TypeError) as e:
+                    logger.error("skipping %s row: %s" % (idx, e))
+                    continue
+                count += 1
+
+            else:
+                logger.info("skipping %s row" % idx)
                 continue
-            count += 1
 
         self.ssp.cur.data_resize(count)
 
