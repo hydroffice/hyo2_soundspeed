@@ -777,11 +777,12 @@ class Database(AbstractWidget):
         lst = self.lib.db_list_profiles()
 
         # prepare the table
+        self.ssp_list.setSortingEnabled(False)
         self.ssp_list.clear()
-        self.ssp_list.setColumnCount(22)
+        self.ssp_list.setColumnCount(23)
         self.ssp_list.setHorizontalHeaderLabels(['id', 'time', 'location',
                                                  'sensor', 'probe',
-                                                 'ss@min depth', 'min depth', 'max depth',
+                                                 'ss@min depth', 'min depth', 'max depth', 'max depth[no ext]',
                                                  'original path', 'institution',
                                                  'survey', 'vessel', 'sn',
                                                  'processing time', 'processing info', 'comments',
@@ -797,7 +798,7 @@ class Database(AbstractWidget):
             processed = True
             tokens = ssp_[11].split(";")
             # Re-arrange index to match the new items and labels
-            ssp = ssp_[0:5] + ssp_[19:22] + ssp_[5:19]
+            ssp = ssp_[0:5] + ssp_[19:23] + ssp_[5:19]
             if Dicts.proc_user_infos['PLOTTED'] not in tokens:
                 processed = False
 
@@ -830,6 +831,7 @@ class Database(AbstractWidget):
 
                 self.ssp_list.setItem(i, j, item)
 
+        self.ssp_list.setSortingEnabled(True)
         self.ssp_list.resizeColumnsToContents()
 
     def data_stored(self):

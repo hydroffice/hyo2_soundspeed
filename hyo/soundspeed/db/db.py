@@ -619,6 +619,14 @@ class ProjectDb:
                     min_depth = '%0.2f' %ssp_samples[0]['depth']
                     max_depth = '%0.2f' %ssp_samples[-1]['depth']
 
+                    ssp_samples = self.conn.execute("SELECT * FROM proc WHERE ssp_pk=? AND flag=? "
+                                                    "AND source!=? AND source!=? AND source!=? AND source!=?",
+                                                    (row['pk'], Dicts.flags['valid'],
+                                                     Dicts.sources['woa09_ext'], Dicts.sources['woa13_ext'],
+                                                     Dicts.sources['rtofs_ext'], Dicts.sources['ref_ext'],
+                                                     )).fetchall()
+                    max_raw_depth = '%0.2f' % ssp_samples[-1]['depth']
+
                     ssp_list.append((row['pk'],  # 0
                                      row['cast_datetime'],  # 1
                                      row['cast_position'],  # 2
@@ -641,6 +649,7 @@ class ProjectDb:
                                      ss_at_min_depth,  # 19
                                      min_depth,  # 20
                                      max_depth,  # 21
+                                     max_raw_depth,  # 22
                                      ))
             return ssp_list
 

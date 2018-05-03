@@ -128,6 +128,10 @@ class ExportDb:
         if lyr.CreateField(field) != 0:
             raise RuntimeError("Creating field failed.")
 
+        field = ogr.FieldDefn('max_raw_d', ogr.OFTReal)
+        if lyr.CreateField(field) != 0:
+            raise RuntimeError("Creating field failed.")
+
         return lyr
 
     def export_profiles_metadata(self, project_name, output_folder, ogr_format=GdalAux.ogr_formats['ESRI Shapefile']):
@@ -188,6 +192,8 @@ class ExportDb:
                 ft.SetField('min_depth', row[20])
             if row[21]:
                 ft.SetField('max_depth', row[21])
+            if row[22]:
+                ft.SetField('max_raw_d', row[22])
 
             pt = ogr.Geometry(ogr.wkbPoint)
             pt.SetPoint_2D(0, row[2].x, row[2].y)
