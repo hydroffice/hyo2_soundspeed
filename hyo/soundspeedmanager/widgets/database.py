@@ -237,6 +237,11 @@ class Database(AbstractWidget):
         # single selection
         if len(rows) == 1:
 
+            map_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'map.png')),
+                                    "Show map", self, toolTip="Show a map with the profile location",
+                                    triggered=self.show_map_for_selected)
+            menu.addAction(map_act)
+
             stats_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'stats.png')),
                                       "Profile stats", self, toolTip="Get some statistical info about the profile",
                                       triggered=self.stats_profile)
@@ -281,7 +286,12 @@ class Database(AbstractWidget):
 
         else:  # multiple selection
 
-            metadata_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata_profile.png')), "Edit Metadata",
+            map_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'map.png')),
+                                    "Show map", self, toolTip="Show a map with profiles location",
+                                    triggered=self.show_map_for_selected)
+            menu.addAction(map_act)
+
+            metadata_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata_profile.png')), "Edit metadata",
                                          self, toolTip="Edit common metadata fields for multiple profiles",
                                          triggered=self.metadata_profile)
             menu.addAction(metadata_act)
@@ -769,6 +779,25 @@ class Database(AbstractWidget):
 
         if success and not dlg.only_saved:
             self.lib.raise_plot_window()
+
+    def show_map_for_selected(self):
+        logger.debug("user want to show a map with the selected profiles")
+
+        self.main_win.switch_to_database_tab()
+
+        rows = self.ssp_list.selectionModel().selectedRows()
+        if len(rows) == 0:
+            # noinspection PyCallByClass
+            QtGui.QMessageBox.information(self, "Map", "You need to select at least profile for the map!")
+            return
+
+        # actually perform the removal
+        pks = list()
+        for row in rows:
+            pks.append(int(self.ssp_list.item(row.row(), 0).text()))
+
+        self.lib.map_db_profiles(pks)
+        self.lib.raise_plot_window()
 
     def update_table(self):
         # set the top label

@@ -51,7 +51,7 @@ class PlotDb:
             os.makedirs(folder)
         return folder
 
-    def map_profiles(self, output_folder, save_fig=False):
+    def map_profiles(self, pks=None, output_folder=None, save_fig=False):
         """plot all the ssp in the database"""
 
         with rc_context(self.rc_context):
@@ -70,15 +70,23 @@ class PlotDb:
             ssp_y = list()
             ssp_label = list()
             for row in rows:
-                ssp_x.append(row[2].x)
-                ssp_y.append(row[2].y)
-                ssp_label.append(row[0])
+
+                if pks is not None:  # only if a pk-based filter was passed
+                    if row[0] in pks:
+                        ssp_x.append(row[2].x)
+                        ssp_y.append(row[2].y)
+                        ssp_label.append(row[0])
+
+                else:
+                    ssp_x.append(row[2].x)
+                    ssp_y.append(row[2].y)
+                    ssp_label.append(row[0])
 
             # make the world map
             plt.close("Profiles Map")
             fig = plt.figure("Profiles Map")
             # fig.patch.set_facecolor('#1464F4')
-            plt.subplot(111, aspect='equal')
+            ax = plt.subplot(111, aspect='equal')
             plt.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
             # plt.title("SSP Map (%s profiles)" % len(view_rows))
             plt.ioff()
@@ -87,8 +95,34 @@ class PlotDb:
             x, y = wm(ssp_x, ssp_y)
             wm.scatter(x, y, marker='o', s=16, color='r')
             wm.scatter(x, y, marker='.', s=1, color='k')
+            if pks is not None:
+                delta = 5.0
+                y_min = min(y)
+                if (y_min - delta) < -90.0:
+                    y_min = -90.0
+                else:
+                    y_min -= delta
+                y_max = max(y)
+                if (y_max + delta) > 90.0:
+                    y_max = 90.0
+                else:
+                    y_max += delta
 
-            if save_fig:
+                x_min = min(x)
+                if (x_min - delta) < -180.0:
+                    x_min = -180.0
+                else:
+                    x_min = x_min - delta
+                x_max = max(x)
+                if (x_max + delta) > 180.0:
+                    x_max = 180.0
+                else:
+                    x_max += delta
+                # logger.debug("%s %s, %s %s" % (y_min, y_max, x_min, x_max))
+                ax.set_ylim(y_min, y_max)
+                ax.set_xlim(x_min, x_max)
+
+            if save_fig and (output_folder is not None):
                 plt.savefig(os.path.join(self.plots_folder(output_folder), 'ssp_map.png'),
                             bbox_inches='tight')
             # else:
