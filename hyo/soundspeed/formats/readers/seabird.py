@@ -63,11 +63,13 @@ SeacatHex_SBE19PLUS_TYPE = r'SBE\s*19\s*PLUS'  # picks up SBE19Plus and V2
 SeacatHex_SBE19_TYPE = r'SBE\s*19'
 SeacatHex_SBE911_TYPE = r'SBE\s*9\s*'
 SeacatHex_SBE49_TYPE = r'SBE\s*49\s*'
+SeacatHex_SBE37_TYPE = r'SBE\s*37\s*'
 
 SeacatHex_SBE19PLUS_TYPERE = re.compile(SeacatHex_SBE19PLUS_TYPE, re.IGNORECASE)
 SeacatHex_SBE19_TYPERE = re.compile(SeacatHex_SBE19_TYPE, re.IGNORECASE)
 SeacatHex_SBE911_TYPERE = re.compile(SeacatHex_SBE911_TYPE, re.IGNORECASE)
 SeacatHex_SBE49_TYPERE = re.compile(SeacatHex_SBE49_TYPE, re.IGNORECASE)
+SeacatHex_SBE37_TYPERE = re.compile(SeacatHex_SBE37_TYPE, re.IGNORECASE)
 SeacatHex_SN = r'Temperature\s*SN\s*=\s*(?P<SN>\d+)'
 SeacatHex_SNRE = re.compile(SeacatHex_SN, re.IGNORECASE)
 
@@ -95,6 +97,8 @@ class Seabird(AbstractTextReader):
         super(Seabird, self).__init__()
         self.desc = "Seabird"
         self._ext.add('cnv')
+
+        self.rawmeta = None
 
     def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
         logger.debug('*** %s ***: start' % self.driver)
@@ -131,94 +135,98 @@ class Seabird(AbstractTextReader):
             seacat_type = 'SBE911'
         elif SeacatHex_SBE49_TYPERE.search(header):
             seacat_type = 'SBE49'
+        elif SeacatHex_SBE37_TYPERE.search(header):
+            seacat_type = 'SBE37'
         else:
-            seacat_type = ''
+            raise RuntimeError("Unknown SeaCat type: %s" % header)
 
-        if seacat_type:
-            # Parsing lines like--  # name 0 = prDM: Pressure, Digiquartz [db]
-            expr = r'''\#\s*name\s*       #lead pound sign, name
-                        (?P<num>\d+)      #column number
-                        \s*=\s*(?P<rawname>[^:]*):\s*  #spaces, equals and stuff up to the colon
-                        (?P<col>\w*)      #the column name (Pressure, Conductivity, Temperature, Salinity, Density, Sound Velocity (we only get Sound as we don't allow spaces currently)
-                        (?P<units>.*)     #The rest of the data -- units are embedded here if we want them later
-                        '''
-            matches = re.findall(expr, s, re.VERBOSE)
-            for i, col in enumerate(matches):
-                if int(col[0]) != i:
-                    raise Exception('Not all column names read correctly, can not parse file')
-            for tag, metaname in (("CRUISE:", 'Project'), ("STATION:", 'Survey')):
-                m = re.search(tag + "(.*)", header, re.IGNORECASE)
+        logger.debug("SeaCat type: %s" % seacat_type)
+
+        # Parsing lines like--  # name 0 = prDM: Pressure, Digiquartz [db]
+        expr = r'''\#\s*name\s*       #lead pound sign, name
+                    (?P<num>\d+)      #column number
+                    \s*=\s*(?P<rawname>[^:]*):\s*  #spaces, equals and stuff up to the colon
+                    (?P<col>\w*)      #the column name (Pressure, Conductivity, Temperature, Salinity, Density, Sound Velocity (we only get Sound as we don't allow spaces currently)
+                    (?P<units>.*)     #The rest of the data -- units are embedded here if we want them later
+                    '''
+        matches = re.findall(expr, s, re.VERBOSE)
+        for i, col in enumerate(matches):
+            if int(col[0]) != i:
+                raise Exception('Not all column names read correctly, can not parse file')
+        for tag, metaname in (("CRUISE:", 'Project'), ("STATION:", 'Survey')):
+            m = re.search(tag + "(.*)", header, re.IGNORECASE)
+            if m:
+                meta[metaname] = m.group(1).strip()
+
+        meta['columns'] = matches
+        try:
+            if seacat_type == "SBE19PLUS":
+                m = SEACAT_SBE19PLUS_HEX_DATE_TXTRE.search(header)
                 if m:
-                    meta[metaname] = m.group(1).strip()
+                    yr, mon, day = time.strptime(m.group('full'), SEACAT_SBE19PLUS_HEX_DATE_TXT_FORMAT)[:3]
+                else:
+                    m = SEACAT_SBE19PLUS_HEX_DATE_MDYRE.search(header)
+                    yr = int(m.group('year'))
+                    mon = int(m.group('month'))
+                    day = int(m.group('day'))
+                m = SEACAT_SBE19PLUS_HEX_TIMERE.search(header)
+                hour, minute = int(m.group('hour')), int(m.group('minute'))
 
-            meta['columns'] = matches
-            try:
-                if seacat_type == "SBE19PLUS":
-                    m = SEACAT_SBE19PLUS_HEX_DATE_TXTRE.search(header)
-                    if m:
-                        yr, mon, day = time.strptime(m.group('full'), SEACAT_SBE19PLUS_HEX_DATE_TXT_FORMAT)[:3]
-                    else:
-                        m = SEACAT_SBE19PLUS_HEX_DATE_MDYRE.search(header)
-                        yr = int(m.group('year'))
-                        mon = int(m.group('month'))
-                        day = int(m.group('day'))
-                    m = SEACAT_SBE19PLUS_HEX_TIMERE.search(header)
-                    hour, minute = int(m.group('hour')), int(m.group('minute'))
-
-                elif seacat_type == "SBE19":
-                    try:  # For the SBE19s the start_time is not always cast time but can be the download time for some firmware revisions.
-                        yr = int(SEACAT_SBE19_HEX_YEARRE.search(header).group('year'))
-                        if yr < 80:
-                            yr += 2000
-                        if yr < 100:
-                            yr += 1900
-                        m1 = SEACAT_SBE19_HEX_MONTHDAYRE.search(header)
-                        m2 = SEACAT_SBE19_HEX_TIMERE.search(header)
-                    except:
-                        m1 = m2 = None  # look for the start_time instead, the year must have failed.
-                    if m1 and m2:
-                        mon, day = int(m1.group('month')), int(m1.group('day'))
-                        hour, minute = int(m2.group('hour')), int(m2.group('minute'))
-                    else:
-                        dt_match = SEACAT_CNV_START_TIMERE.search(header)
-                        dt = datetime.datetime(1, 1, 1).strptime(dt_match.group('full'), '%b %d %Y %H:%M:%S')
-                        yr, mon, day = dt.year, dt.month, dt.day
-                        hour, minute = dt.hour, dt.minute
-
-                elif seacat_type in ('SBE911', 'SBE49'):
-                    # * System UpLoad Time = Sep 08 2008 14:18:19
-                    m = SEACAT_SBE911_HEX_DATETIMERE.search(header)
-                    dt = datetime.datetime(1, 1, 1).strptime(m.group('full'), '%b %d %Y %H:%M:%S')
-                    yr, mon, day = dt.year, dt.month, dt.day
-                    hour, minute = dt.hour, dt.minute
-
-            except:  # bail out and look for the "start time" message that the Seabird Data processing program makes in the CNV file -- This is the download time from the SBE instrument
-
-                dt_match = SEACAT_CNV_START_TIMERE.search(header)
-                if dt_match:
+            elif seacat_type == "SBE19":
+                try:  # For the SBE19s the start_time is not always cast time but can be the download time for some firmware revisions.
+                    yr = int(SEACAT_SBE19_HEX_YEARRE.search(header).group('year'))
+                    if yr < 80:
+                        yr += 2000
+                    if yr < 100:
+                        yr += 1900
+                    m1 = SEACAT_SBE19_HEX_MONTHDAYRE.search(header)
+                    m2 = SEACAT_SBE19_HEX_TIMERE.search(header)
+                except:
+                    m1 = m2 = None  # look for the start_time instead, the year must have failed.
+                if m1 and m2:
+                    mon, day = int(m1.group('month')), int(m1.group('day'))
+                    hour, minute = int(m2.group('hour')), int(m2.group('minute'))
+                else:
+                    dt_match = SEACAT_CNV_START_TIMERE.search(header)
                     dt = datetime.datetime(1, 1, 1).strptime(dt_match.group('full'), '%b %d %Y %H:%M:%S')
                     yr, mon, day = dt.year, dt.month, dt.day
                     hour, minute = dt.hour, dt.minute
 
-            meta['timestamp'] = datetime.datetime(yr, mon, day, hour, minute)
-            meta['Time'] = "%02d:%02d" % (hour, minute)
-            meta['Year'] = '%4d' % yr
-            meta['Day'] = '%03d' % meta['timestamp'].timetuple().tm_yday
-            lat_m = SEACAT_HEX_LATRE.search(header)
-            if lat_m:
-                lon_m = SEACAT_HEX_LONRE.search(header)
-                if lon_m:
-                    coord = coordinates.Coordinate(lat_m.group('lat'), lon_m.group('lon'))
-                    if coord:
-                        meta.update(getMetaFromCoord(coord))  # blank Latitude/Longitude will return a None coord
-            m = SeacatHex_SNRE.search(header)
-            if m:
-                meta['SerialNum'] = m.group('SN')
-                meta['Instrument'] = seacat_type + ' (SN:' + m.group('SN') + ')'
-            meta['samplerate'] = SeacatCNV_INTERVALRE.search(header).group('interval')
-            meta['ImportFormat'] = 'CNV'
-            meta['filename'] = self.fid._path
-            self.rawmeta = meta
+            elif seacat_type in ('SBE911', 'SBE49', 'SBE37'):
+                # * System UpLoad Time = Sep 08 2008 14:18:19
+                m = SEACAT_SBE911_HEX_DATETIMERE.search(header)
+                dt = datetime.datetime(1, 1, 1).strptime(m.group('full'), '%b %d %Y %H:%M:%S')
+                yr, mon, day = dt.year, dt.month, dt.day
+                hour, minute = dt.hour, dt.minute
+
+        except:  # bail out and look for the "start time" message that the Seabird Data processing program makes in the CNV file -- This is the download time from the SBE instrument
+
+            dt_match = SEACAT_CNV_START_TIMERE.search(header)
+            if dt_match:
+                dt = datetime.datetime(1, 1, 1).strptime(dt_match.group('full'), '%b %d %Y %H:%M:%S')
+                yr, mon, day = dt.year, dt.month, dt.day
+                hour, minute = dt.hour, dt.minute
+
+        meta['timestamp'] = datetime.datetime(yr, mon, day, hour, minute)
+        logger.debug("timestamp: %s" % meta['timestamp'])
+        meta['Time'] = "%02d:%02d" % (hour, minute)
+        meta['Year'] = '%4d' % yr
+        meta['Day'] = '%03d' % meta['timestamp'].timetuple().tm_yday
+        lat_m = SEACAT_HEX_LATRE.search(header)
+        if lat_m:
+            lon_m = SEACAT_HEX_LONRE.search(header)
+            if lon_m:
+                coord = coordinates.Coordinate(lat_m.group('lat'), lon_m.group('lon'))
+                if coord:
+                    meta.update(getMetaFromCoord(coord))  # blank Latitude/Longitude will return a None coord
+        m = SeacatHex_SNRE.search(header)
+        if m:
+            meta['SerialNum'] = m.group('SN')
+            meta['Instrument'] = seacat_type + ' (SN:' + m.group('SN') + ')'
+        meta['samplerate'] = SeacatCNV_INTERVALRE.search(header).group('interval')
+        meta['ImportFormat'] = 'CNV'
+        meta['filename'] = self.fid._path
+        self.rawmeta = meta
 
     def _parse_body(self):
         meta = self.rawmeta
