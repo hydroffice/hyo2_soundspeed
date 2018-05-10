@@ -800,6 +800,32 @@ class Database(AbstractWidget):
         self.lib.raise_plot_window()
 
     def update_table(self):
+
+        class NumberWidgetItem(QtGui.QTableWidgetItem):
+
+            def __lt__(self, other):
+                try:
+                    return float(self.text()) < float(other.text())
+
+                except Exception:
+                    return True
+
+        class LocationWidgetItem(QtGui.QTableWidgetItem):
+
+            def __lt__(self, other):
+                self_lon = self.text()[1:].split(';')[0]
+                other_lon = other.text()[1:].split(';')[0]
+                self_lat = self.text()[:-1].split(';')[-1]
+                other_lat = other.text()[:-1].split(';')[-1]
+                logger.debug("%s %s < %s %s" % (self_lon, self_lat, other_lon, other_lat))
+                try:
+                    if self_lon == other_lon:
+                        return float(self_lat) < float(other_lat)
+                    return float(self_lon) < float(other_lon)
+
+                except Exception:
+                    return True
+
         # set the top label
         self.active_label.setText("<b>Current project: %s</b>" % self.lib.current_project)
 
@@ -844,7 +870,12 @@ class Database(AbstractWidget):
                 else:
                     label = field
 
-                item = QtGui.QTableWidgetItem("%s" % label)
+                if j in [0, 5, 6, 7, 8,]:
+                    item = NumberWidgetItem("%s" % label)
+                elif j in [2, ]:
+                    item = LocationWidgetItem("%s" % label)
+                else:
+                    item = QtGui.QTableWidgetItem("%s" % label)
 
                 if (j == 3) and (int(field) == Dicts.sensor_types['Future']):
                     item.setForeground(QtGui.QColor(200, 100, 100))
