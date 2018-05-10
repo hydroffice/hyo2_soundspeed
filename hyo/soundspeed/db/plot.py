@@ -91,7 +91,10 @@ class PlotDb:
             # plt.title("SSP Map (%s profiles)" % len(view_rows))
             plt.ioff()
 
-            wm = self._world_draw_map()
+            if rows:
+                wm = self._world_draw_polygons()
+            else:
+                wm = self._world_draw_map()
             x, y = wm(ssp_x, ssp_y)
             wm.scatter(x, y, marker='o', s=16, color='r')
             wm.scatter(x, y, marker='.', s=1, color='k')
@@ -132,10 +135,28 @@ class PlotDb:
 
     @staticmethod
     def _world_draw_map():
+        logger.debug("drawing blue marble")
         m = Basemap(resolution=None)
         # resolution c, l, i, h, f in that order
         img = m.bluemarble(zorder=0)
         img.set_alpha(0.8)
+        return m
+
+    @staticmethod
+    def _world_draw_polygons():
+        logger.debug("drawing polygons")
+        m = None
+        try:
+            m = Basemap(resolution='i')
+        except OSError:
+            logger.debug("using low resolution for basemap")
+            m = Basemap(resolution='l')
+
+        m.drawcoastlines(zorder=1)
+        m.fillcontinents(color='lightgray', zorder=1)
+        m.drawparallels(np.arange(-90., 120., 10.), color="#cccccc", labels=[False, True, True, False])
+        m.drawmeridians(np.arange(0., 360., 20.), color="#cccccc", labels=[True, False, False, True])
+
         return m
 
     @staticmethod
