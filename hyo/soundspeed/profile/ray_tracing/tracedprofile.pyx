@@ -133,6 +133,10 @@ cdef class TracedProfile:
                 total_x.append(total_x[-1] + dx)
                 total_t.append(total_t[-1] + dt)
 
+            # logger.debug("z:\n%s" % total_z)
+            # logger.debug("x:\n%s" % total_x)
+            # logger.debug("t:\n%s" % total_t)
+
             harm_mean = (total_z[-1] - total_z[0]) / (total_t[-1] - total_t[0])
             self.harmonic_means.append(harm_mean)
 
