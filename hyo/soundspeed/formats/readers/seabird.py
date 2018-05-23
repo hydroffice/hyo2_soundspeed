@@ -1,6 +1,7 @@
 import datetime
 import logging
 import re
+import os
 import time
 
 import numpy
@@ -93,12 +94,19 @@ class Seabird(AbstractTextReader):
     Info: http://www.seabird.com/
     """
 
+    formats = {
+        "CNV": 0,
+        "NAUTILUS": 1,
+    }
+
     def __init__(self):
         super(Seabird, self).__init__()
         self.desc = "Seabird"
         self._ext.add('cnv')
+        self._ext.add('tsv')
 
         self.rawmeta = None
+        self.format = None
 
     def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
         logger.debug('*** %s ***: start' % self.driver)
@@ -107,14 +115,22 @@ class Seabird(AbstractTextReader):
         self.cb = callbacks
 
         self.init_data()  # create a new empty profile list
-
         self._read(data_path=data_path)
+
+        _, file_ext = os.path.splitext(data_path)
+        file_ext = file_ext.lower()
+
+        if file_ext == ".cnv":
+            self.format = self.formats["CNV"]
+
+        elif file_ext == ".tsv":
+            self.format = self.formats["NAUTILUS"]
+
+        else:
+            raise RuntimeError("unknown format: %s" % self.format)
+
         self._parse_header()
         self._parse_body()
-
-        # initialize probe/sensor type
-        self.ssp.cur.meta.sensor_type = Dicts.sensor_types['CTD']
-        self.ssp.cur.meta.probe_type = Dicts.probe_types['SBE']
 
         self.fix()
         self.finalize()
@@ -123,6 +139,20 @@ class Seabird(AbstractTextReader):
         return True
 
     def _parse_header(self):
+        logger.info("reading > header")
+
+        if self.format == self.formats["CNV"]:
+            logger.info("parsing header [CNV]")
+            self._parse_cnv_header()
+
+        elif self.format == self.formats["NAUTILUS"]:
+            logger.info("parsing header [NAUTILUS]")
+            self._parse_tsv_header()
+
+        else:
+            raise RuntimeError("unknown format: %s" % self.format)
+
+    def _parse_cnv_header(self):
         s = "\n".join(self.lines)
         header, _data = s.split('*END*')
         meta = {}
@@ -228,7 +258,60 @@ class Seabird(AbstractTextReader):
         meta['filename'] = self.fid._path
         self.rawmeta = meta
 
+    def _parse_tsv_header(self):
+
+        self.ssp.append()  # append a new profile
+
+        try:
+            head_line = self.lines[0]
+            fields = head_line.split()
+        except (ValueError, IndexError):
+            raise RuntimeError("unable to parse header")
+
+        if len(fields) != 4:
+            raise RuntimeError("invalid number of tokens (%d != 4) in header: %s" % (len(fields), fields))
+
+        try:
+            timestamp = fields[1]
+            self.ssp.cur.meta.utc_time = datetime.datetime.strptime(timestamp, "DATE:%Y-%m-%dT%H:%M:%S")
+            logger.debug("timestamp: %s -> %s" % (timestamp, self.ssp.cur.meta.utc_time))
+
+        except Exception as e:
+            logger.warning("unable to parse date/time: %s (%s)" % (fields[1], e))
+
+        try:
+            latitude = fields[2]
+            self.ssp.cur.meta.latitude = float(latitude.split(":")[-1])
+            logger.debug("latitude: %s -> %s" % (latitude, self.ssp.cur.meta.latitude))
+
+        except Exception as e:
+            logger.warning("unable to parse latitude: %s (%s)" % (fields[2], e))
+
+        try:
+            longitude = fields[3]
+            self.ssp.cur.meta.longitude = float(longitude.split(":")[-1])
+            logger.debug("longitude: %s -> %s" % (longitude, self.ssp.cur.meta.longitude))
+
+        except Exception as e:
+            logger.warning("unable to parse longitude: %s (%s)" % (fields[3], e))
+
+        self.ssp.cur.init_data(len(self.lines) - 1)
+
     def _parse_body(self):
+        logger.info("reading > body")
+
+        if self.format == self.formats["CNV"]:
+            logger.info("parsing body [CNV]")
+            self._parse_cnv_body()
+
+        elif self.format == self.formats["NAUTILUS"]:
+            logger.info("parsing body [NAUTILUS]")
+            self._parse_tsv_body()
+
+        else:
+            raise RuntimeError("unknown format: %s" % self.format)
+
+    def _parse_cnv_body(self):
         meta = self.rawmeta
         col_types = []
         col_names = []
@@ -259,3 +342,43 @@ class Seabird(AbstractTextReader):
                          r"\s+", pre=r'^\s*', post=r'\s*$')
         p = Profile(d, ymetric="depth", attribute="soundspeed", metadata=meta)
         self.ssp.append_profile(p.ConvertToSoundSpeedProfile())
+
+        # set probe/sensor type
+        self.ssp.cur.meta.sensor_type = Dicts.sensor_types['CTD']
+        self.ssp.cur.meta.probe_type = Dicts.probe_types['SBE']
+
+    def _parse_tsv_body(self):
+
+        has_temp_and_sal = None
+        count = 0
+        for line in self.lines[1:]:
+            fields = line.split()
+            if len(fields) not in [2, 4]:
+                logger.info("skipping %s row" % count)
+                continue
+
+            if has_temp_and_sal is None:
+                if len(fields) == 4:
+                    has_temp_and_sal = True
+                else:
+                    has_temp_and_sal = False
+
+            try:
+                self.ssp.cur.data.depth[count] = float(fields[0])
+                self.ssp.cur.data.speed[count] = float(fields[1])
+                if has_temp_and_sal:
+                    self.ssp.cur.data.temp[count] = float(fields[2])
+                    self.ssp.cur.data.sal[count] = float(fields[3])
+            except (ValueError, IndexError, TypeError) as e:
+                logger.error("skipping %s row: %s" % (count, e))
+                continue
+            count += 1
+
+        self.ssp.cur.data_resize(count)
+
+        # set probe/sensor type
+        self.ssp.cur.meta.probe_type = Dicts.probe_types['SBE']
+        if has_temp_and_sal:
+            self.ssp.cur.meta.sensor_type = Dicts.sensor_types['CTD']
+        else:
+            self.ssp.cur.meta.sensor_type = Dicts.sensor_types['SVP']
