@@ -127,8 +127,7 @@ Method #1
 ---------
 
 This method is usually used for the case where the hydro-package and *SIS* are installed on the same machine.
-However, since the *User Defined UDP* port cannot be modified, this method may not be suitable if this mechanism is
-already in used by another program.
+However, this method may not be suitable if this mechanism is already in used by another program.
 In such a case, the *DataDistrib.exe* program explored in :ref:`method_3` may be attempted.
 
 The configuration for this method is actually quite simple:
@@ -153,6 +152,9 @@ The configuration for this method is actually quite simple:
 * Click the *OK* button at the top left of the tabbed panels.
 * Restart pinging.
 
+.. note:: The value of the *User Defined UDP* port in *SIS* cannot be modified.
+
+
 .. _method_2:
 
 Method #2
@@ -160,9 +162,6 @@ Method #2
 
 This method is more general, and it can be used for data transmission to other computers on the network
 (by specifying IP address and port, as well as transmission rate).
-
-.. note:: *SIS* needs to be restarted for the changes to take effect. Furthermore, since the software does not seem
-          to validate user inputs, mistakes made cannot be easily discovered and undone (unsubscribe).
 
 * From the *Tools* menu, choose *Custom…* and then *Datagram Distribution* (see :numref:`method_2_fig`).
 
@@ -181,6 +180,10 @@ This method is more general, and it can be used for data transmission to other c
 * Type in the IP address of the remote machine where this hydro-package is installed, immediately followed by a colon (:), then  the port number that the data should be delivered to on the remote machine: e.g., ``192.168.1.67:16103``.
 * Click the *Subscribe* button.
 * Repeat Steps 2-4 for the *SVP (U)* and the *XYZ88 (X)* datagrams.
+
+.. note:: *SIS* needs to be restarted for the changes to take effect. Furthermore, since the software does not seem
+          to validate user inputs, mistakes made cannot be easily discovered and undone (unsubscribe).
+
 
 .. _method_3:
 
@@ -286,6 +289,8 @@ This should match the port address selected in the previous methods. For instanc
     :figclass: align-center
 
     The *Client list*, in red, is used to add the *SIS* client information.
+
+.. warning:: To apply changes to the listeners settings, restart *Sound Speed Manager*.
 
 If both *SIS* and *Sound Speed Manager* sides have been properly configured, *Sound Speed Manager* will show (in the right side
 of the lower window statusbar, see :numref:`settings5`) the date, geographic position, surface sound speed and average depth (when *SIS* is pinging).

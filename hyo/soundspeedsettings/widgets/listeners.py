@@ -53,7 +53,7 @@ class Listeners(AbstractWidget):
         hbox = QtGui.QHBoxLayout()
         self.left_layout.addLayout(hbox)
         hbox.addStretch()
-        self.label = QtGui.QLabel("SIS:")
+        self.label = QtGui.QLabel("SIS(*):")
         hbox.addWidget(self.label)
         hbox.addStretch()
 
@@ -101,7 +101,7 @@ class Listeners(AbstractWidget):
         hbox = QtGui.QHBoxLayout()
         self.left_layout.addLayout(hbox)
         hbox.addStretch()
-        self.label = QtGui.QLabel("Sippican:")
+        self.label = QtGui.QLabel("Sippican(*):")
         hbox.addWidget(self.label)
         hbox.addStretch()
 
@@ -139,7 +139,7 @@ class Listeners(AbstractWidget):
         hbox = QtGui.QHBoxLayout()
         self.right_layout.addLayout(hbox)
         hbox.addStretch()
-        self.label = QtGui.QLabel("MVP:")
+        self.label = QtGui.QLabel("MVP(*):")
         hbox.addWidget(self.label)
         hbox.addStretch()
 
@@ -391,6 +391,16 @@ class Listeners(AbstractWidget):
         vbox.addStretch()
 
         self.right_layout.addStretch()
+
+        # - active setup
+        hbox = QtGui.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        hbox.addStretch()
+        label = QtGui.QLabel("<i>* To apply changes to the listeners, restart the application.</i>")
+        label.setFixedHeight(22)
+        label.setStyleSheet("QLabel { color : #aaaaaa; }")
+        hbox.addWidget(label)
+        hbox.addStretch()
 
         self.main_layout.addStretch()
 
