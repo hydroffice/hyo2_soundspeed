@@ -453,8 +453,8 @@ class MainWin(QtGui.QMainWindow):
             elif (int(lat_maj) == int(cur_maj)) and (int(lat_min) == int(cur_min)) and (int(lat_fix) > int(cur_fix)):
                 new_bugfix = True
 
-        except (URLError, ssl.SSLError, socket.timeout, ConnectionResetError) as e:
-            logger.info("unable to check latest release")
+        except (URLError, ssl.SSLError, socket.timeout, ConnectionResetError, ValueError) as e:
+            logger.info("unable to check latest release (reason: %s)" % e)
 
         if new_release:
             logger.info("new release available: %s" % latest_version)
