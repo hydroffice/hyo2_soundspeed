@@ -88,12 +88,18 @@ class SeaAndSun(AbstractTextReader):
                     date_string = None
 
             elif line_idx == 7:  # vessel
-                self.ssp.cur.meta.vessel = line.split(':')[1].strip().replace("\"", "")
+                try:
+                    self.ssp.cur.meta.vessel = line.split(':')[1].strip().replace("\"", "")
+                except Exception as e:
+                    logger.warning("unable to retrieve vessel name from %s, %s" % (line, e))
 
             elif line_idx == 8:  # survey and date
                 if date_string is None:
-                    self.ssp.cur.meta.survey = line.split()[2].strip().replace("\"", "")
-                    date_string = line.split()[-1].strip()
+                    try:
+                        self.ssp.cur.meta.survey = line.split()[2].strip().replace("\"", "")
+                        date_string = line.split()[-1].strip()
+                    except Exception as e:
+                        logger.warning("unable to retrieve date from %s, %s" % (line, e))
 
             elif line_idx == 9:  # latitude and longitude
                 try:

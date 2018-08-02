@@ -295,6 +295,9 @@ class Seabird(AbstractTextReader):
         except Exception as e:
             logger.warning("unable to parse longitude: %s (%s)" % (fields[3], e))
 
+        if not self.ssp.cur.meta.original_path:
+            self.ssp.cur.meta.original_path = self.fid.path
+
         self.ssp.cur.init_data(len(self.lines) - 1)
 
     def _parse_body(self):
