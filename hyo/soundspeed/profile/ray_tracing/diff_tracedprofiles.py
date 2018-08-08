@@ -75,6 +75,11 @@ class DiffTracedProfiles:
 
             # logger.debug("end z: %s/%s" % (new_z[-1], old_z[-1]))
 
+            if (len(new_t) == 0) or (len(old_t) == 0):
+                self.new_rays.append(np.array([list(), list(), list()]))
+                self.old_rays.append(np.array([list(), list(), list()]))
+                return
+
             new_is_longer = False
             min_time = new_t[-1]
             if new_t[-1] > old_t[-1]:

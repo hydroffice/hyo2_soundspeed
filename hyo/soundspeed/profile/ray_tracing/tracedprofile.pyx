@@ -52,9 +52,10 @@ cdef class TracedProfile:
                 break
 
         # remove extension value (if any)
-        if (depths[-1] - depths[-2]) > 1000:
-            logger.info("removed latest extension depth: %s" % depths[-1])
-            del depths[-1]
+        if len(depths) > 3:
+            if (depths[-1] - depths[-2]) > 1000:
+                logger.info("removed latest extension depth: %s" % depths[-1])
+                del depths[-1]
 
         logger.info("profile timestamp: %s" % ssp.meta.utc_time)
         logger.debug("valid samples: %d" % (len(depths)), )
@@ -90,7 +91,8 @@ cdef class TracedProfile:
 
                     if dz == 0:  # if (dc == 0) and (dy == 0):
 
-                        logger.warning("skipping duplicated point: #%d" % idx)
+                        # logger.debug("duplicated point: #%d" % idx)
+                        beta.append(beta[idx])  # beta does not change
                         continue
 
                     # gradient = dc/dy
@@ -137,15 +139,27 @@ cdef class TracedProfile:
             # logger.debug("x:\n%s" % total_x)
             # logger.debug("t:\n%s" % total_t)
 
-            harm_mean = (total_z[-1] - total_z[0]) / (total_t[-1] - total_t[0])
+            if len(depths) > 1:
+                harm_mean = (total_z[-1] - total_z[0]) / (total_t[-1] - total_t[0])
+            elif len(depths) == 1:
+                harm_mean = depths[0]
+            else:
+                raise RuntimeError("invalid profile with zero valid depth values")
             self.harmonic_means.append(harm_mean)
 
             # interpolate between 0 and 5000 meters with decimetric resolution
-            interp_z = numpy.linspace(0, 5000, num=25001, endpoint=True)
-            fx = interp1d(total_z, total_x, kind='cubic', bounds_error=False, fill_value=-1)
-            interp_x = fx(interp_z)
-            ft = interp1d(total_z, total_t, kind='cubic', bounds_error=False, fill_value=-1)
-            interp_t = ft(interp_z)
+            if len(depths) > 1:
+                interp_z = numpy.linspace(0, 5000, num=25001, endpoint=True)
+                fx = interp1d(total_z, total_x, kind='cubic', bounds_error=False, fill_value=-1)
+                interp_x = fx(interp_z)
+                ft = interp1d(total_z, total_t, kind='cubic', bounds_error=False, fill_value=-1)
+                interp_t = ft(interp_z)
+
+            elif len(depths) == 1:
+                interp_z = total_z
+                interp_x = total_x
+                interp_t = total_t
+
             self.rays.append(numpy.array([interp_t, interp_x, interp_z]))
 
         logger.debug("rays: %d (%d samples per-ray)" % (len(self.rays), len(self.rays[0][0])))
