@@ -28,7 +28,7 @@ vessel_list = [
     "F5 Fairweather - Launch 2805",
     "F6 Fairweather - Launch 2806",
     "F7 Fairweather - Launch 2807",
-    "F8 Fairwaether - Launch 2808",
+    "F8 Fairweather - Launch 2808",
     "AR MCArthur",
     "NF Nancy Foster",
     "HI Hi'Ialakai",
