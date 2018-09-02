@@ -1,8 +1,8 @@
 .. _additional_functionalities:
 
-***************************
-Addictional Functionalities
-***************************
+**************************
+Additional Functionalities
+**************************
 
 Create a WOA or RTOFS profile
 -----------------------------
