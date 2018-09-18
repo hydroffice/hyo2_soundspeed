@@ -1,8 +1,8 @@
-Sound Speed Manager 2017.1 - Installation Notes
+Sound Speed Manager 2018.1 - Installation Notes
 
-1. Extract the "SoundSpeedManager.2017.1" folder from the zip archive to destination of your choice.
+1. Extract the "SoundSpeedManager.2018.1.x" folder from the zip archive to destination of your choice.
 
-2. Run "SoundSpeedManager.2017.1.exe" from within the folder.
+2. Run "SoundSpeedManager.2018.1.x.exe" from within the folder.
 
 3. At first run, the application will ask to download the WOA database (~120 MB).
    If the machine does NOT have Internet access, click "NO" and close the application (since we will manually copy the WOA09 database).

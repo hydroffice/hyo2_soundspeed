@@ -25,6 +25,11 @@ HydrOffice Sound Speed
    :target: https://zenodo.org/badge/latestdoi/54854024
    :alt: Zenodo DOI
 
+* Code: `GitHub repo <https://github.com/hydroffice/hyo_soundspeed>`_
+* Project page: `url <https://www.hydroffice.org/soundspeed/>`_
+* Download page: `url <https://bitbucket.org/giumas/hyo_sound_speed_manager/downloads/>`_
+* License: LGPLv2.1 or IA license (See `Dual license <https://www.hydroffice.org/license_lgpl21/>`_)
+
 
 General Info
 ------------
@@ -42,12 +47,3 @@ The package is jointly developed by NOAA OCS and UNH CCOM.
 
 .. image:: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/master/hyo/soundspeedmanager/media/noaa_ccom_small.png
     :alt: joint
-
-
-Other info
-----------
-
-* GitHub: `https://github.com/hydroffice/hyo_soundspeed <https://github.com/hydroffice/hyo_soundspeed>`_
-* Bitbucket: `https://bitbucket.org/ccomjhc/hyo_soundspeed <https://bitbucket.org/ccomjhc/hyo_soundspeed>`_
-* Project page: `https://www.hydroffice.org/soundspeed/ <https://www.hydroffice.org/soundspeed/>`_
-* License: LGPLv2.1 or IA license (See `Dual license <https://www.hydroffice.org/license_lgpl21/>`_)
