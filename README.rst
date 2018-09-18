@@ -27,7 +27,7 @@ HydrOffice Sound Speed
 
 * Code: `GitHub repo <https://github.com/hydroffice/hyo_soundspeed>`_
 * Project page: `url <https://www.hydroffice.org/soundspeed/>`_
-* Download page: `url <https://bitbucket.org/giumas/hyo_sound_speed_manager/downloads/>`_
+* Download page: `url <https://bitbucket.org/hydroffice/hyo_sound_speed_manager/downloads/>`_
 * License: LGPLv2.1 or IA license (See `Dual license <https://www.hydroffice.org/license_lgpl21/>`_)
 
 
