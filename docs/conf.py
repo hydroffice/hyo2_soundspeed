@@ -50,7 +50,7 @@ copyright = u'2018, CCOM/JHC,UNH'
 # The short X.Y version.
 version = '2018.1'
 # The full version, including alpha/beta/rc tags.
-release = '2018.1.41'
+release = '2018.1.44'
 
 numfig = True
 
@@ -192,13 +192,13 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'HydrOfficeSoundSpeedManager.tex', u'Sound Speed Manager Documentation',
+  ('index', 'HydrOfficeSoundSpeedManager.tex', u'Sound Speed Manager',
    u'CCOM/JHC,UNH \& CSDL,NOAA', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-#latex_logo = None
+latex_logo = '_static/soundspeedmanager.png'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.

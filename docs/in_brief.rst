@@ -2,7 +2,7 @@
 In brief
 ********
 
-.. image:: https://bitbucket.org/ccomjhc/hyo_soundspeed/raw/master/hyo/soundspeedmanager/media/favicon.png
+.. image:: https://github.com/hydroffice/hyo_soundspeed/raw/master/hyo/soundspeedmanager/media/favicon.png
     :alt: logo
 
 The Sound Speed package is part of the `HydrOffice <https://www.hydroffice.org/license/>`_ framework. HydrOffice is

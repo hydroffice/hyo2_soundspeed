@@ -48,7 +48,7 @@ for *Sippican* files.
 
     Browse to the desired data file.
 
-.. note:: A number of sample data files can be downloaded from the project repository.
+.. note:: A number of sample data files can be downloaded from the `data <https://github.com/hydroffice/hyo_soundspeed/tree/master/data/input>`_ folder in the project repository.
 
 After the selection of the desired file, the window shows panels with the sound speed, temperature and
 salinity profiles drawn in solid blue (left to right, respectively, in :numref:`editor_tab3`).
