@@ -263,17 +263,18 @@ class Rtofs(AbstractAtlas):
 
         ind = np.nanargmin(distances[0])
         ind2 = np.unravel_index(ind, distances[0].shape)
-        lat_out = latitudes[ind2]
-        lon_out = longitudes[ind2]
-        while lon_out > 180.0:
-            lon_out -= 360.0
+        # switching to the query location
+        # lat_out = latitudes[ind2]
+        # lon_out = longitudes[ind2]
+        # while lon_out > 180.0:
+        #     lon_out -= 360.0
 
         # Make a new SV object to return our query in
         ssp = Profile()
         ssp.meta.sensor_type = Dicts.sensor_types['Synthetic']
         ssp.meta.probe_type = Dicts.probe_types['RTOFS']
-        ssp.meta.latitude = lat_out
-        ssp.meta.longitude = lon_out
+        ssp.meta.latitude = lat
+        ssp.meta.longitude = lon
         ssp.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
         ssp.meta.original_path = "RTOFS_%s" % datestamp.strftime("%Y%m%d")
         ssp.init_data(num_values)

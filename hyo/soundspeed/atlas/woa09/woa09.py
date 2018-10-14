@@ -293,8 +293,9 @@ class Woa09(AbstractAtlas):
             logger.info("possible request on land")
             return None
 
-        lat_out = self.t_monthly.variables['lat'][lat_idx]
-        lon_out = self.t_monthly.variables['lon'][lon_idx]
+        # switching to original location
+        # lat_out = self.t_monthly.variables['lat'][lat_idx]
+        # lon_out = self.t_monthly.variables['lon'][lon_idx]
         valid = dist_arr != 99999999
         num_values = t[valid].size
 
@@ -302,8 +303,8 @@ class Woa09(AbstractAtlas):
         ssp = Profile()
         ssp.meta.sensor_type = Dicts.sensor_types['Synthetic']
         ssp.meta.probe_type = Dicts.probe_types['WOA09']
-        ssp.meta.latitude = lat_out
-        ssp.meta.longitude = lon_out
+        ssp.meta.latitude = lat
+        ssp.meta.longitude = lon
         ssp.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
         ssp.meta.original_path = "WOA09_%s" % datestamp.strftime("%Y%m%d")
         ssp.init_data(num_values)
@@ -327,8 +328,8 @@ class Woa09(AbstractAtlas):
         ssp_min = Profile()
         ssp_min.meta.sensor_type = Dicts.sensor_types['Synthetic']
         ssp_min.meta.probe_type = Dicts.probe_types['WOA09']
-        ssp_min.meta.latitude = lat_out
-        ssp_min.meta.longitude = lon_out
+        ssp_min.meta.latitude = lat
+        ssp_min.meta.longitude = lon
         ssp_min.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
         if num_values > 0:
             ssp_min.init_data(num_values)
@@ -345,8 +346,8 @@ class Woa09(AbstractAtlas):
         ssp_max = Profile()
         ssp_max.meta.sensor_type = Dicts.sensor_types['Synthetic']
         ssp_max.meta.probe_type = Dicts.probe_types['WOA09']
-        ssp_max.meta.latitude = lat_out
-        ssp_max.meta.longitude = lon_out
+        ssp_max.meta.latitude = lat
+        ssp_max.meta.longitude = lon
         ssp_max.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
         if num_values > 0:
             ssp_max.init_data(num_values)

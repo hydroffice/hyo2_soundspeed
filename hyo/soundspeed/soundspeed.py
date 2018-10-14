@@ -1524,7 +1524,7 @@ class SoundSpeedLibrary:
         if not self.server.is_alive():
             raise RuntimeError("Server is not alive")
 
-        self.server.force_send.set()
+        self.server.force_send = True
         self.server.check()
 
         return self.server.is_alive()

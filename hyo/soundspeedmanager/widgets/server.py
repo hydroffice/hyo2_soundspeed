@@ -39,7 +39,8 @@ class Server(AbstractWidget):
         img_label = QtGui.QLabel()
         img = QtGui.QImage(os.path.join(self.media, 'server.png'))
         if img.isNull():
-            raise RuntimeError("unable to open refraction image")
+            raise RuntimeError("unable to open server image")
+        # noinspection PyCallByClass
         img_label.setPixmap(QtGui.QPixmap.fromImage(img))
         group_layout.addWidget(img_label)
         # - text
@@ -82,6 +83,17 @@ class Server(AbstractWidget):
         self.force_server_act.triggered.connect(self.on_force_server)
         self.main_win.server_menu.addAction(self.force_server_act)
 
+        # -- refresh
+        btn = QtGui.QPushButton("Refresh DB")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_refresh_db)
+        btn.setToolTip("Refresh the database tab")
+        hbox.addWidget(btn)
+        self.refresh_db_act = QtGui.QAction('Refresh Database', self)
+        # noinspection PyUnresolvedReferences
+        self.refresh_db_act.triggered.connect(self.on_refresh_db)
+        self.main_win.server_menu.addAction(self.refresh_db_act)
+
         # -- stop
         btn = QtGui.QPushButton("Stop server")
         # noinspection PyUnresolvedReferences
@@ -113,13 +125,15 @@ class Server(AbstractWidget):
               "The Server Mode creates sound speed profiles based on oceanographic models.\n" \
               "Thus, it is meant for use in transit, NOT for systematic seabed mapping.\n" \
               "This Mode will OVERWRITE the current SIS SSP.\n"
-        ret = QtGui.QMessageBox.warning(self, "Server mode", msg, QtGui.QMessageBox.Ok|QtGui.QMessageBox.No)
+        # noinspection PyCallByClass
+        ret = QtGui.QMessageBox.warning(self, "Server mode", msg, QtGui.QMessageBox.Ok | QtGui.QMessageBox.No)
         if ret == QtGui.QMessageBox.No:
             return
 
         if not self.lib.server.check_settings():
             msg = "Unable to start the server mode.\n\n" \
                   "Double-check the server settings and be sure that SIS is properly configured."
+            # noinspection PyCallByClass
             QtGui.QMessageBox.critical(self, "Server mode", msg, QtGui.QMessageBox.Ok)
             return
 
@@ -137,10 +151,17 @@ class Server(AbstractWidget):
 
         if not self.lib.server_is_alive():
             msg = "First start the server mode!"
+            # noinspection PyCallByClass
             QtGui.QMessageBox.warning(self, "Server mode", msg, QtGui.QMessageBox.Ok)
             return
 
         self.lib.force_server()
+        self.main_win.data_stored()
+
+    def on_refresh_db(self):
+        logger.debug('refresh db')
+        self.main_win.data_stored()
+        self.main_win.switch_to_database_tab()
 
     def on_stop_server(self):
         logger.debug('stop server')
@@ -153,3 +174,4 @@ class Server(AbstractWidget):
         self.hidden.setVisible(True)
         self.group_box.setVisible(True)
         self.main_win.server_stopped()
+        self.main_win.data_stored()

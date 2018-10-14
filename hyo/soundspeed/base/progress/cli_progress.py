@@ -1,3 +1,4 @@
+from typing import Optional
 import logging
 
 logger = logging.getLogger(__name__)
@@ -12,11 +13,11 @@ class CliProgress(AbstractProgress):
         super(CliProgress, self).__init__()
 
     @property
-    def canceled(self):
+    def canceled(self) -> bool:
         """Currently, always false"""
         return self._is_canceled
 
-    def start(self, title="Processing", text="Please wait!", min_value=0, max_value=100,
+    def start(self, title: str="Processing", text: str="Please wait!", min_value: float=0.0, max_value: float=100.0,
               has_abortion=False, is_disabled=False):
         # has_abortion is not used for CLI implementation
 
@@ -41,7 +42,7 @@ class CliProgress(AbstractProgress):
 
         self._print()
 
-    def update(self, value=None, text=None):
+    def update(self, value: Optional[float]=None, text: Optional[str]=None):
         if self._is_disabled:
             return
 
@@ -59,7 +60,7 @@ class CliProgress(AbstractProgress):
 
         self._print()
 
-    def add(self, quantum, text=None):
+    def add(self, quantum: float, text: Optional[str]=None):
         if self._is_disabled:
             return
 
@@ -78,14 +79,17 @@ class CliProgress(AbstractProgress):
 
         self._print()
 
-    def end(self):
+    def end(self, text: Optional[str]=None):
         if self._is_disabled:
             return
 
         self._value = self._max
-        self._text = 'Done!'
+        if text is None:
+            self._text = 'Done!'
+        else:
+            self._text = text
 
         self._print()
 
-    def _print(self):
-        print('[%s] %s: %.1f%%' % (self._title, self._text, (self._value - self._min) / self._range * 100))
+    def _print(self) -> None:
+        logger.info('[%s] %s: %.1f%%' % (self._title, self._text, (self._value - self._min) / self._range * 100))

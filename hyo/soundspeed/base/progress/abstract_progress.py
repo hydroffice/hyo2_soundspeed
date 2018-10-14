@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
+from typing import Optional
 import logging
 
 logger = logging.getLogger(__name__)
@@ -21,40 +22,41 @@ class AbstractProgress(metaclass=ABCMeta):
         self._is_canceled = False
 
     @property
-    def value(self):
+    def value(self) -> float:
         return self._value
 
     @property
-    def min(self):
+    def min(self) -> float:
         return self._min
 
     @property
-    def max(self):
+    def max(self) -> float:
         return self._max
 
     @property
-    def range(self):
+    def range(self) -> float:
         self._range = self._max - self._min
         return self._range
 
     @property
     @abstractmethod
-    def canceled(self):
+    def canceled(self) -> bool:
         pass
 
     @abstractmethod
-    def start(self, title="Progress", text="Processing", min_value=0, max_value=100,
-              has_abortion=False, is_disabled=False):
+    def start(self, title: str="Progress", text: str="Processing",
+              min_value: float=0.0, max_value: float=100.0,
+              has_abortion: bool=False, is_disabled: bool=False) -> None:
         pass
 
     @abstractmethod
-    def update(self, value=None, text=None):
+    def update(self, value: Optional[float]=None, text: Optional[str]=None) -> None:
         pass
 
     @abstractmethod
-    def add(self, quantum, text=None):
+    def add(self, quantum: float, text: Optional[str]=None) -> None:
         pass
 
     @abstractmethod
-    def end(self):
+    def end(self, text: Optional[str]=None) -> None:
         pass
