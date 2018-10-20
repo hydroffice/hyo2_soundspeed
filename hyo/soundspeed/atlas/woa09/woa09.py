@@ -299,6 +299,9 @@ class Woa09(AbstractAtlas):
         valid = dist_arr != 99999999
         num_values = t[valid].size
 
+        if lon > 180.0:  # Go back to negative longitude
+            lon -= 360.0
+
         # populate output profiles
         ssp = Profile()
         ssp.meta.sensor_type = Dicts.sensor_types['Synthetic']

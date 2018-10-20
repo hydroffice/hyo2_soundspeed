@@ -261,8 +261,8 @@ class Rtofs(AbstractAtlas):
             logger.info("no data from lookup!")
             return None
 
-        ind = np.nanargmin(distances[0])
-        ind2 = np.unravel_index(ind, distances[0].shape)
+        # ind = np.nanargmin(distances[0])
+        # ind2 = np.unravel_index(ind, distances[0].shape)
         # switching to the query location
         # lat_out = latitudes[ind2]
         # lon_out = longitudes[ind2]
@@ -274,6 +274,8 @@ class Rtofs(AbstractAtlas):
         ssp.meta.sensor_type = Dicts.sensor_types['Synthetic']
         ssp.meta.probe_type = Dicts.probe_types['RTOFS']
         ssp.meta.latitude = lat
+        if lon > 180.0:  # Go back to negative longitude
+            lon -= 360.0
         ssp.meta.longitude = lon
         ssp.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
         ssp.meta.original_path = "RTOFS_%s" % datestamp.strftime("%Y%m%d")

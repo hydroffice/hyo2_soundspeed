@@ -132,6 +132,14 @@ class ExportDb:
         if lyr.CreateField(field) != 0:
             raise RuntimeError("Creating field failed.")
 
+        field = ogr.FieldDefn('POINT_X', ogr.OFTReal)
+        if lyr.CreateField(field) != 0:
+            raise RuntimeError("Creating field failed.")
+
+        field = ogr.FieldDefn('POINT_Y', ogr.OFTReal)
+        if lyr.CreateField(field) != 0:
+            raise RuntimeError("Creating field failed.")
+
         return lyr
 
     def export_profiles_metadata(self, project_name, output_folder, ogr_format=GdalAux.ogr_formats['ESRI Shapefile']):
@@ -196,13 +204,20 @@ class ExportDb:
                 ft.SetField('max_raw_d', row[22])
 
             pt = ogr.Geometry(ogr.wkbPoint)
-            pt.SetPoint_2D(0, row[2].x, row[2].y)
+            lat = row[2].y
+            lon = row[2].x
+            if lon > 180.0:  # Go back to negative longitude
+                lon -= 360.0
+            pt.SetPoint_2D(0, lon, lat)
+
+            ft.SetField('POINT_X', lon)
+            ft.SetField('POINT_Y', lat)
 
             try:
                 ft.SetGeometry(pt)
 
             except Exception as e:
-                RuntimeError("%s > pt: %s, %s" % (e, row[2].x, row[2].y))
+                RuntimeError("%s > pt: %s, %s" % (e, lon, lat))
 
             if lyr.CreateFeature(ft) != 0:
                 raise RuntimeError("Unable to create feature")
