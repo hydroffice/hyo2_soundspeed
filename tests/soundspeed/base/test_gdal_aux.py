@@ -39,8 +39,13 @@ class TestSoundSpeedGdalAux(unittest.TestCase):
     def test_check_gdal_data(self):
         GdalAux.check_gdal_data()
 
-        self.assertTrue(GdalAux.data_fixed)
+        self.assertTrue(GdalAux.gdal_data_fixed)
         self.assertTrue(GdalAux.error_loaded)
+
+    def test_check_proj4_data(self):
+        GdalAux.check_proj4_data()
+
+        self.assertTrue(GdalAux.proj4_data_fixed)
 
     def test_use_of_Gdal_aux(self):
         from hyo.soundspeed.base.testing import output_data_folder

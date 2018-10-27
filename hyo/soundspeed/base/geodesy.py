@@ -185,6 +185,7 @@ class Geodesy:
         """ Initialization """
 
         GdalAux.check_gdal_data()
+        GdalAux.check_proj4_data()
 
         self.geo = Geod(ellps='WGS84')
 

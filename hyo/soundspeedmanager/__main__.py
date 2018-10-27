@@ -22,7 +22,6 @@ ch.setFormatter(ch_formatter)
 ch.addFilter(SisParseFilter())
 logger.addHandler(ch)
 
-
 from hyo.soundspeedmanager import gui
 
 gui.gui()

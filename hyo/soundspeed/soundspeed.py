@@ -11,12 +11,12 @@ logger = logging.getLogger(__name__)
 
 from hyo.soundspeed import __version__ as soundspeed_version
 from hyo.soundspeed import __doc__ as soundspeed_name
+from hyo.soundspeed.base.gdal_aux import GdalAux
 from hyo.soundspeed import formats
 from hyo.soundspeed.appdirs.appdirs import user_data_dir
 from hyo.soundspeed.atlas.atlases import Atlases
 from hyo.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
 from hyo.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
-from hyo.soundspeed.base.gdal_aux import GdalAux
 from hyo.soundspeed.base.helper import explore_folder
 from hyo.soundspeed.base.progress.abstract_progress import AbstractProgress
 from hyo.soundspeed.base.progress.cli_progress import CliProgress

@@ -1,6 +1,7 @@
 from osgeo import gdal
 from osgeo import ogr
 from osgeo import osr
+import pyproj
 
 import os
 import logging
@@ -14,7 +15,8 @@ class GdalAux:
     """ Auxiliary class to manage GDAL stuff """
 
     error_loaded = False
-    data_fixed = False
+    gdal_data_fixed = False
+    proj4_data_fixed = False
 
     ogr_formats = {
         'ESRI Shapefile': 0,
@@ -32,6 +34,7 @@ class GdalAux:
         logger.debug("gdal 2: %s [%s]" % (self.is_gdal_2(), self.current_gdal_version()))
         if not self.error_loaded:
             self.check_gdal_data()
+            self.check_proj4_data()
 
     @classmethod
     def current_gdal_version(cls):
@@ -136,7 +139,7 @@ class GdalAux:
     def check_gdal_data(cls):
         """ Check the correctness of os env GDAL_DATA """
 
-        if cls.data_fixed:
+        if cls.gdal_data_fixed:
             return
 
         if 'GDAL_DATA' in os.environ:
@@ -150,7 +153,7 @@ class GdalAux:
 
             gdal.SetConfigOption('GDAL_DATA', gdal_data_path1)
             logger.debug("resulting GDAL_DATA = %s" % gdal.GetConfigOption('GDAL_DATA'))
-            cls.data_fixed = True
+            cls.gdal_data_fixed = True
             cls.push_gdal_error_handler()
             return
 
@@ -161,7 +164,7 @@ class GdalAux:
 
             gdal.SetConfigOption('GDAL_DATA', gdal_data_path2)
             logger.debug("resulting GDAL_DATA = %s" % gdal.GetConfigOption('GDAL_DATA'))
-            cls.data_fixed = True
+            cls.gdal_data_fixed = True
             cls.push_gdal_error_handler()
             return
 
@@ -172,7 +175,7 @@ class GdalAux:
 
             gdal.SetConfigOption('GDAL_DATA', gdal_data_path3)
             logger.debug("resulting GDAL_DATA = %s" % gdal.GetConfigOption('GDAL_DATA'))
-            cls.data_fixed = True
+            cls.gdal_data_fixed = True
             cls.push_gdal_error_handler()
             return
 
@@ -183,7 +186,7 @@ class GdalAux:
 
             gdal.SetConfigOption('GDAL_DATA', gdal_data_path4)
             logger.debug("resulting GDAL_DATA = %s" % gdal.GetConfigOption('GDAL_DATA'))
-            cls.data_fixed = True
+            cls.gdal_data_fixed = True
             cls.push_gdal_error_handler()
             return
 
@@ -191,6 +194,69 @@ class GdalAux:
 
         raise RuntimeError("Unable to locate GDAL data at:\n- %s\n- %s\n- %s\n- %s"
                            % (gdal_data_path1, gdal_data_path2, gdal_data_path3, gdal_data_path4))
+
+    @classmethod
+    def check_proj4_data(cls):
+        """ Check the correctness of os env PROJ_LIB """
+
+        if cls.proj4_data_fixed:
+            return
+
+        if os.path.exists(os.path.join(pyproj.pyproj_datadir, "epsg")):
+            return
+
+        if 'PROJ_LIB' in os.environ:
+
+            logger.debug("unset original PROJ_LIB = %s" % os.environ['PROJ_LIB'])
+            del os.environ['PROJ_LIB']
+
+        proj4_data_path1 = os.path.join(os.path.dirname(pyproj.__file__), 'data')
+        epsg_path1 = os.path.join(proj4_data_path1, 'epsg')
+        if os.path.exists(epsg_path1):
+
+            os.environ['PROJ_LIB'] = proj4_data_path1
+            pyproj.pyproj_datadir = proj4_data_path1
+            logger.debug("resulting PROJ_LIB = %s" % os.environ['PROJ_LIB'])
+            cls.proj4_data_fixed = True
+            return
+
+        # anaconda specific (Win)
+        proj4_data_path2 = os.path.join(python_path(), 'Library', 'data')
+        epsg_path2 = os.path.join(proj4_data_path2, 'epsg')
+        if os.path.exists(epsg_path2):
+
+            os.environ['PROJ_LIB'] = proj4_data_path2
+            pyproj.pyproj_datadir = proj4_data_path2
+            logger.debug("resulting PROJ_LIB = %s" % os.environ['PROJ_LIB'])
+            cls.proj4_data_fixed = True
+            return
+
+        # anaconda specific (Win)
+        proj4_data_path3 = os.path.join(python_path(), 'Library', 'share')
+        epsg_path3 = os.path.join(proj4_data_path3, 'epsg')
+        if os.path.exists(epsg_path3):
+
+            os.environ['PROJ_LIB'] = proj4_data_path3
+            pyproj.pyproj_datadir = proj4_data_path3
+            logger.debug("resulting PROJ_LIB = %s" % os.environ['PROJ_LIB'])
+            cls.proj4_data_fixed = True
+            return
+
+        # anaconda specific (Linux)
+        proj4_data_path4 = os.path.join(python_path(), 'share')
+        epsg_path4 = os.path.join(proj4_data_path4, 'epsg')
+        if os.path.exists(epsg_path4):
+
+            os.environ['PROJ_LIB'] = proj4_data_path4
+            pyproj.pyproj_datadir = proj4_data_path4
+            logger.debug("resulting PROJ_LIB = %s" % os.environ['PROJ_LIB'])
+            cls.proj4_data_fixed = True
+            return
+
+        # TODO: add more cases to find GDAL_DATA
+
+        raise RuntimeError("Unable to locate GDAL data at:\n- %s\n- %s\n- %s\n- %s"
+                           % (proj4_data_path1, proj4_data_path2, proj4_data_path3, proj4_data_path4))
 
     @classmethod
     def lat_long_to_zone_number(cls, lat, long):
@@ -208,3 +274,6 @@ class GdalAux:
                 return 37
 
         return int((long + 180) / 6) + 1
+
+
+GdalAux.check_proj4_data()
