@@ -552,7 +552,7 @@ class Profile:
 
             elif ssp_direction == Dicts.ssp_directions['down'] and not max_reached:
 
-                if i != 0:
+                if (i != 0) and (last_value is not None):
                     if value <= last_value:
                         # print(last_value, value)
                         self.data.flag[i] = Dicts.flags['direction']  # set invalid for direction
@@ -563,7 +563,7 @@ class Profile:
 
             elif ssp_direction == Dicts.ssp_directions['up'] and max_reached:
 
-                if i != 0:
+                if (i != 0) and (last_value is not None):
                     if value >= last_value:
                         self.data.flag[i] = Dicts.flags['direction']  # set invalid for direction
                     else:
@@ -573,6 +573,7 @@ class Profile:
 
             if value == max_value:
                 max_reached = True
+                last_value = value
 
     def calc_salinity_from_conductivity(self):
         if np.count_nonzero(self.data.pressure):

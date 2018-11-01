@@ -10,8 +10,9 @@
 #
 # It may be required to manually copy mkl_avx.dll or mkl_p4.dll or msvcr100.dll
 
+import sys, os
 from PyInstaller.building.build_main import Analysis, PYZ, EXE, COLLECT, BUNDLE, TOC
-from PyInstaller import is_darwin
+from PyInstaller.compat import is_darwin, is_win
 
 from hyo.soundspeed import __version__ as ssm_version
 
@@ -39,6 +40,52 @@ def collect_pkg_data(package, include_py_files=False, subdir=None):
                 data_toc.append((dest_file, source_file, 'DATA'))
 
     return data_toc
+
+
+def python_path() -> str:
+    """ Return the python site-specific directory prefix (PyInstaller-aware) """
+
+    # required by PyInstaller
+    if hasattr(sys, '_MEIPASS'):
+
+        if is_win():
+            import win32api
+            # noinspection PyProtectedMember
+            sys_prefix = win32api.GetLongPathName(sys._MEIPASS)
+        else:
+            # noinspection PyProtectedMember
+            sys_prefix = sys._MEIPASS
+
+        print("using _MEIPASS: %s" % sys_prefix)
+        return sys_prefix
+
+    # check if in a virtual environment
+    if hasattr(sys, 'real_prefix'):
+        return sys.real_prefix
+
+    return sys.prefix
+
+
+def collect_folder_data(input_data_folder: str, relative_output_folder: str):
+
+    data_toc = TOC()
+    if not os.path.exists(input_data_folder):
+        print("issue with folder: %s" % input_data_folder)
+        return data_toc
+
+    for dir_path, dir_names, files in os.walk(input_data_folder):
+        for f in files:
+            source_file = os.path.join(dir_path, f)
+            dest_file = os.path.join(relative_output_folder, f)
+            data_toc.append((dest_file, source_file, 'DATA'))
+        break
+
+    return data_toc
+
+
+share_folder = os.path.join(python_path(), "Library", "share")
+output_folder = os.path.join("Library", "share")
+pyproj_data = collect_folder_data(input_data_folder=share_folder, relative_output_folder=output_folder)
 
 pkg_data = collect_pkg_data('hyo.soundspeedmanager')
 pkg_data_2 = collect_pkg_data('hyo.soundspeedsettings')
@@ -80,6 +127,7 @@ coll = COLLECT(exe,
                pkg_data_3,
                pkg_data_4,
                pkg_data_5,
+               pyproj_data,
                strip=None,
                upx=True,
                name='SoundSpeedManager.%s' % ssm_version)
