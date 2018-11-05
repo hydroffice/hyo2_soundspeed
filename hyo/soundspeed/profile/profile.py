@@ -575,6 +575,17 @@ class Profile:
                 max_reached = True
                 last_value = value
 
+        if ssp_direction == Dicts.ssp_directions['up']:
+            logger.debug("flipping data for up direction")
+            self.data.pressure[:] = np.flipud(self.data.pressure)
+            self.data.depth[:] = np.flipud(self.data.depth)
+            self.data.speed[:] = np.flipud(self.data.speed)
+            self.data.temp[:] = np.flipud(self.data.temp)
+            self.data.conductivity[:] = np.flipud(self.data.conductivity)
+            self.data.sal[:] = np.flipud(self.data.sal)
+            self.data.source[:] = np.flipud(self.data.source)
+            self.data.flag[:] = np.flipud(self.data.flag)
+
     def calc_salinity_from_conductivity(self):
         if np.count_nonzero(self.data.pressure):
             pressure = self.data.pressure
