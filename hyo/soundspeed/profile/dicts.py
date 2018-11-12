@@ -55,6 +55,7 @@ class Dicts:
         ('XCTD-1', 209),
         ('XCTD-2', 210),
         ('Fast Deep', 211),
+        ('T-5_20', 212),
 
         ('MONITOR SVP 500', 300),
         ('MIDAS SVP 6000', 301),
