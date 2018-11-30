@@ -589,7 +589,7 @@ class SoundSpeedLibrary:
             # special case for Kongsberg asvp format
             if name == 'asvp':
 
-                tolerances = [0.01, 0.1, 0.5]
+                tolerances = [0.01, 0.03, 0.06, 0.1, 0.5]
                 for tolerance in tolerances:
 
                     if not self.prepare_sis(thin_tolerance=tolerance):
