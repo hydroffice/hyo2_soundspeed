@@ -323,6 +323,12 @@ under *Process/Automate Processing*.
 Output creation
 ===============
 
+The profile accepted by *SIS* has a limited number of samples, thus the collected profile often requires
+the application of a thinning algorithm when exporting in Kongsberg format.
+The thinning is obtained by iteratively running a custom version of the `Douglas-Peucker algorithm <https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm>`_.
+
+In addition, a *Preview thinning* method is provided to inspect the result of such an algorithm before the actual transmission.
+
 Data export
 -----------
 
@@ -366,8 +372,7 @@ Data transmission is triggered by selecting the *Transmit data* from the *Editor
     The *Transmit data* button in the *Editor* toolbar.
 
 The recipients of such a transmission are configured in the configuration file (see :ref:`package_configuration`).
-Given that the profile accepted by *SIS* often requires the application of a thinning algorithm,
-a method *Preview thinning* is provided to inspect the result of such an algorithm before the actual transmission.
+
 
 Data storage
 ------------
