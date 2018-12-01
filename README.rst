@@ -10,15 +10,13 @@ HydrOffice Sound Speed
     :target: https://www.hydroffice.org/manuals/soundspeed/index.html
     :alt: Latest Documentation
 
-..
-    .. image:: https://ci.appveyor.com/api/projects/status/6krhsxkcqo0jrvu6?svg=true
-        :target: https://ci.appveyor.com/project/hydroffice/hyo2-soundspeed
-        :alt: AppVeyor Status
+.. image:: https://ci.appveyor.com/api/projects/status/6krhsxkcqo0jrvu6?svg=true
+    :target: https://ci.appveyor.com/project/hydroffice/hyo-soundspeed
+    :alt: AppVeyor Status
 
-..
-    .. image:: https://travis-ci.org/hydroffice/hyo_soundspeed.svg?branch=master
-        :target: https://travis-ci.org/hydroffice/hyo_soundspeed
-        :alt: Travis-CI Status
+.. image:: https://travis-ci.org/hydroffice/hyo2_soundspeed.svg?branch=master
+     :target: https://travis-ci.org/hydroffice/hyo2_soundspeed
+     :alt: Travis-CI Status
 
 ..
     .. image:: https://api.codacy.com/project/badge/Grade/9b1d844ce51846c4b78bb7694096fde7
