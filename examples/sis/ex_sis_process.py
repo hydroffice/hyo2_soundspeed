@@ -1,16 +1,16 @@
-from hyo2.soundspeed.logging import test_logging
-
 import logging
 import time
-from multiprocessing import Pipe
+from multiprocessing import Pipe, freeze_support
 
-from hyo.sis.lib.process import SisProcess
-
-logger = logging.getLogger()
+from hyo2.sis.lib.process import SisProcess
 
 
-def main():
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
+
+if __name__ == '__main__':
+    freeze_support()
     logger.debug("sis process")
     parent_conn, child_conn = Pipe()
     p = SisProcess(conn=child_conn)
@@ -32,7 +32,3 @@ def main():
 
     logger.debug("alive: %s" % p.is_alive())
     logger.debug('%s.exitcode = %s' % (p.name, p.exitcode))  # <0: killed with signal; >0: exited with error
-
-
-if __name__ == "__main__":
-    main()

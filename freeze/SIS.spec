@@ -1,7 +1,7 @@
 from PyInstaller.building.build_main import Analysis, PYZ, EXE, COLLECT, BUNDLE, TOC
 from PyInstaller import is_darwin
 
-from hyo.sis import __version__ as sis_version
+from hyo2.sis import __version__ as sis_version
 
 
 def collect_pkg_data(package, include_py_files=False, subdir=None):
@@ -28,7 +28,7 @@ def collect_pkg_data(package, include_py_files=False, subdir=None):
 
     return data_toc
 
-pkg_data = collect_pkg_data('hyo.sis')
+pkg_data = collect_pkg_data('hyo2.sis')
 
 icon_file = 'freeze\SIS.ico'
 if is_darwin:

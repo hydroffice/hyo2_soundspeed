@@ -9,9 +9,9 @@ class DebugFilter(logging.Filter):
         if record.name[:3] != "hyo":
             return False
 
-        # if (record.name == 'hyo2.soundspeed.listener.sis.sis') and \
-        #         (record.funcName == "parse") and (record.levelname == "INFO"):
-        #     return False
+        if (record.name == 'hyo2.soundspeed.listener.sis.sis') and \
+                (record.funcName == "parse") and (record.levelname == "INFO"):
+            return False
 
         return True
 
