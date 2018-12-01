@@ -1,16 +1,13 @@
-import time
-from PySide import QtGui
-
-from hyo.soundspeed.logging import test_logging
-
 import logging
-logger = logging.getLogger()
+import time
 
-from hyo.soundspeedmanager.qt_progress import QtProgress
+from PySide2 import QtWidgets
 
-app = QtGui.QApplication([])
+from hyo2.abc.app.qt_progress import QtProgress
 
-widget = QtGui.QWidget()
+app = QtWidgets.QApplication([])
+
+widget = QtWidgets.QWidget()
 widget.show()
 
 progress = QtProgress(parent=widget)

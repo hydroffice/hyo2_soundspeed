@@ -14,7 +14,7 @@ import sys, os
 from PyInstaller.building.build_main import Analysis, PYZ, EXE, COLLECT, BUNDLE, TOC
 from PyInstaller.compat import is_darwin, is_win
 
-from hyo.soundspeed import __version__ as ssm_version
+from hyo2.soundspeed import __version__ as ssm_version
 
 
 def collect_pkg_data(package, include_py_files=False, subdir=None):
@@ -87,11 +87,11 @@ share_folder = os.path.join(python_path(), "Library", "share")
 output_folder = os.path.join("Library", "share")
 pyproj_data = collect_folder_data(input_data_folder=share_folder, relative_output_folder=output_folder)
 
-pkg_data = collect_pkg_data('hyo.soundspeedmanager')
-pkg_data_2 = collect_pkg_data('hyo.soundspeedsettings')
+pkg_data = collect_pkg_data('hyo2.soundspeedmanager')
+pkg_data_2 = collect_pkg_data('hyo2.soundspeedsettings')
 pkg_data_3 = collect_pkg_data('gsw.utilities')
 pkg_data_4 = collect_pkg_data('hyo.surveydatamonitor')
-pkg_data_5 = collect_pkg_data('hyo.soundspeed')
+pkg_data_5 = collect_pkg_data('hyo2.soundspeed')
 
 icon_file = 'freeze\SoundSpeedManager.ico'
 if is_darwin:

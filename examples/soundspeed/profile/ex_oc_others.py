@@ -1,11 +1,9 @@
-import os
-
-from hyo.soundspeed.logging import test_logging
-
 import logging
-logger = logging.getLogger()
 
-from hyo.soundspeed.profile.oceanography import Oceanography as Oc
+from hyo2.soundspeed.profile.oceanography import Oceanography as Oc
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 # check values from Fofonoff and Millard(1983)
 atg_ck = 3.255976e-4

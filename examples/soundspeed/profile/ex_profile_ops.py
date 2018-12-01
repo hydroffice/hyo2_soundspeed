@@ -1,12 +1,13 @@
-from matplotlib import pyplot as plt
-import numpy as np
-
-from hyo.soundspeed.logging import test_logging
-
 import logging
-logger = logging.getLogger()
 
-from hyo.soundspeed.profile.profile import Profile
+import numpy as np
+from PySide2 import QtWidgets
+from matplotlib import pyplot as plt
+
+from hyo2.soundspeed.profile.profile import Profile
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 def fresh_profile():
@@ -25,25 +26,19 @@ def fresh_profile():
     return ssp
 
 
-def main():
+# ssp = fresh_profile()
+# d_mid = 30.0
+# vs_mid = 1450.0
+# ssp.insert_proc_speed(depth=d_mid, speed=vs_mid)
+# d_mid = 31.0
+# vs_mid = 1455.0
+# ssp.insert_proc_speed(depth=d_mid, speed=vs_mid)
+# ssp.proc_debug_plot()
+# plt.show()
 
-    # ssp = fresh_profile()
-    # d_mid = 30.0
-    # vs_mid = 1450.0
-    # ssp.insert_proc_speed(depth=d_mid, speed=vs_mid)
-    # d_mid = 31.0
-    # vs_mid = 1455.0
-    # ssp.insert_proc_speed(depth=d_mid, speed=vs_mid)
-    # ssp.proc_debug_plot()
-    # plt.show()
-
-    ssp = fresh_profile()
-    d_mid = -1.0
-    vs_mid = 1400.0
-    ssp.insert_proc_speed(depth=d_mid, speed=vs_mid)
-    ssp.proc_debug_plot()
-    plt.show()
-
-
-if __name__ == "__main__":
-    main()
+ssp = fresh_profile()
+d_mid = -1.0
+vs_mid = 1400.0
+ssp.insert_proc_speed(depth=d_mid, speed=vs_mid)
+ssp.proc_debug_plot()
+plt.show()

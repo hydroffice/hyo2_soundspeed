@@ -1,47 +1,43 @@
 import time
-from PySide import QtGui
 from datetime import datetime as dt
-
-from hyo.soundspeed.logging import test_logging
-
 import logging
-logger = logging.getLogger()
 
-from hyo.soundspeed.soundspeed import SoundSpeedLibrary
-from hyo.soundspeedmanager.qt_callbacks import QtCallbacks
-from hyo.soundspeedmanager.qt_progress import QtProgress
+from PySide2 import QtWidgets
+
+from hyo2.abc.app.qt_progress import QtProgress
+from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+from hyo2.soundspeedmanager.qt_callbacks import QtCallbacks
 
 
-def main():
-    app = QtGui.QApplication([])  # PySide stuff (start)
-    mw = QtGui.QMainWindow()
-    mw.show()
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
-    lib = SoundSpeedLibrary(progress=QtProgress(parent=mw), callbacks=QtCallbacks(parent=mw))
+app = QtWidgets.QApplication([])  # PySide stuff (start)
+mw = QtWidgets.QMainWindow()
+mw.show()
 
-    tests = [
-        (43.026480, -70.318824, dt.utcnow()),  # offshore Portsmouth
-        # (-19.1, 74.16, dt.utcnow()),  # Indian Ocean
-        # (18.2648113, 16.1761115, dt.utcnow()),  # in land -> middle of Africa
-    ]
+lib = SoundSpeedLibrary(progress=QtProgress(parent=mw), callbacks=QtCallbacks(parent=mw))
 
-    # download the woa09 if not present
-    if not lib.has_woa09():
-        success = lib.download_woa09()
-        if not success:
-            raise RuntimeError("unable to download")
-    logger.info("has woa09: %s" % lib.has_woa09())
+tests = [
+    (43.026480, -70.318824, dt.utcnow()),  # offshore Portsmouth
+    # (-19.1, 74.16, dt.utcnow()),  # Indian Ocean
+    # (18.2648113, 16.1761115, dt.utcnow()),  # in land -> middle of Africa
+]
 
-    # logger.info("load woa09: %s" % lib.atlases.woa09.load_grids())
+# download the woa09 if not present
+if not lib.has_woa09():
+    success = lib.download_woa09()
+    if not success:
+        raise RuntimeError("unable to download")
+logger.info("has woa09: %s" % lib.has_woa09())
 
-    # test for a few locations
-    for test in tests:
-        start_time = time.time()
-        # just the ssp (there are also ssp_min and ssp_max)
-        logger.info("woa09 profiles:\n%s" % lib.atlases.woa09.query(lat=test[0], lon=test[1], datestamp=test[2]))
-        logger.info("execution time: %.3f s" % (time.time() - start_time))
+# logger.info("load woa09: %s" % lib.atlases.woa09.load_grids())
 
-    # app.exec_()  # PySide stuff (end)
+# test for a few locations
+for test in tests:
+    start_time = time.time()
+    # just the ssp (there are also ssp_min and ssp_max)
+    logger.info("woa09 profiles:\n%s" % lib.atlases.woa09.query(lat=test[0], lon=test[1], datestamp=test[2]))
+    logger.info("execution time: %.3f s" % (time.time() - start_time))
 
-if __name__ == "__main__":
-    main()
+# app.exec_()  # PySide stuff (end)

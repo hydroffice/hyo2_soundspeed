@@ -1,18 +1,10 @@
-from hyo.soundspeed.logging import test_logging
-
-from os import path
+import os
 import logging
 
-from hyo.soundspeed.listener.seacat.seacat_emulator import raw_capture
+from hyo2.soundspeed.listener.seacat.seacat_emulator import raw_capture
 
-logger = logging.getLogger()
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
-
-def main():
-
-    p = path.join(path.split(path.abspath(__file__))[0], "seacat_capture.txt")
-    raw_capture(p)
-
-
-if __name__ == "__main__":
-    main()
+p = os.path.join(os.path.split(os.path.abspath(__file__))[0], "seacat_capture.txt")
+raw_capture(p)

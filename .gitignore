@@ -1,3 +1,5 @@
+syntax: glob
+
 # temp files
 *.sh~
 *.*~
@@ -8,11 +10,12 @@ __pycache__/
 *.pyc
 *.pyo
 *.cache/
-*.mypy_cache/
+*.aux.xml
 
 # coverage files
 .coverage
 .coverage.*
+htmlcov/
 
 # google drive settings
 *desktop.ini
@@ -42,7 +45,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -50,9 +52,12 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
-docs/_build/*
+_build/
 
-# Downloaded/Output data
+# notebooks checkpoint
+*.ipynb_checkpoints
+
+data/temp/
 data/download/
 data/output/
 
@@ -60,6 +65,11 @@ tests/soundspeed/atlas/outputs
 tests/soundspeed/atlas/projects
 tests/soundspeed/atlas/releases
 tests/rtofs
-/examples/soundspeed/listener/seacat_capture.txt
-hyo/soundspeed/profile/ray_tracing/tracedprofile.cpp
-hyo/soundspeed/profile/ray_tracing/tracedprofile.html
+
+examples/soundspeed/listener/seacat_capture.txt
+
+hyo2/soundspeed/profile/ray_tracing/tracedprofile.cpp
+hyo2/soundspeed/profile/ray_tracing/tracedprofile.html
+
+# resources folder
+resources/~$icons.pptx

@@ -1,62 +1,52 @@
-# Based on: http://conda.pydata.org/docs/travis.html
-
-sudo: false
-
-# Travis-CI does not currently support Python and Mac OS X
-language: c
+language: cpp  # Travis-CI does not currently support Python and Mac OS X
 
 os:
   - linux
   - osx
 
 env:
-#  - PYTHON_VERSION=3.5
   - PYTHON_VERSION=3.6
+  - PYTHON_VERSION=3.7
 
 matrix:
+  fast_finish: true
   allow_failures:
   - os: osx
-#  - env: PYTHON_VERSION=3.5
+  - env: PYTHON_VERSION=3.7
 
-# before_script:
-#  - "export DISPLAY=:99.0"
-#  - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then apt-get install xvfb; fi
-#  - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then "sh -e /etc/init.d/xvfb start"; fi
-#  - sleep 3  # give xvfb some time to start
-
-before_install:
-  # Set the anaconda environment
+install:
+  - "export DISPLAY=:99.0"
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      ( sudo Xvfb :99 -ac -screen 0 1024x768x8; echo ok )&
       curl https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -o miniconda.sh;
     else
+      sudo apt-get update;
+      sh -e /etc/init.d/xvfb start;
       wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
     fi
-
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
+  - conda config --add channels conda-forge
   - conda update -q conda
+  # Useful for debugging any issues with conda
   - conda info -a
 
-  # create and activate a test-environment
   - conda create -q -n test-environment python=$PYTHON_VERSION
   - source activate test-environment
-
-install:
-  - conda config --set channel_priority true
-  - conda config --append channels conda-forge
-  - conda install -q cython numpy scipy basemap matplotlib netCDF4 gdal pyproj krb5 pyserial pillow python=3.6
-  - conda uninstall -q pyqt sip
-  - conda install -q pyside
+  - pip install PySide2
+  - conda install numpy matplotlib-base gdal pyproj scipy basemap netCDF4 pillow
   - pip install gsw==3.0.6
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then conda install jpeg; fi
-  - pip install --no-deps -e .
+  - pip install coveralls
+  - pip install https://github.com/hydroffice/hyo2_abc/archive/master.zip
+  - pip install .
+  # - conda remove --force PyQt Qt sip
+  # - rm -f $HOME/miniconda/envs/test-environment/qt.conf
+  - conda list --show-channel-urls
 
 script:
-  - python -m unittest discover
+  - coverage run --source hyo2 setup.py test
 
-after_script:
-  # If tests are successful, create a source distribution.
-  # - python setup.py sdist
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python setup.py bdist_wheel; fi
+after_success:
+  - coveralls

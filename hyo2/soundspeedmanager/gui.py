@@ -1,0 +1,35 @@
+import sys
+import traceback
+import logging
+
+from PySide2 import QtCore, QtWidgets
+
+from hyo2.abc.app.app_style import AppStyle
+from hyo2.soundspeedmanager.mainwin import MainWin
+
+logger = logging.getLogger(__name__)
+
+
+def qt_custom_handler(error_type, error_context):
+    logger.info("Qt error: %s [%s]" % (str(error_type), str(error_context)))
+
+    for line in traceback.format_stack():
+        logger.debug("- %s" % line.strip())
+
+
+QtCore.qInstallMessageHandler(qt_custom_handler)
+
+
+def gui():
+    """Create the application and show the Sound Speed Manager gui"""
+
+    sys.argv.append("--disable-web-security")  # temporary fix for CORS warning (QTBUG-70228)
+    app = QtWidgets.QApplication(sys.argv)
+    app.setStyleSheet(AppStyle.load_stylesheet())
+
+    main_win = MainWin()
+    sys.excepthook = main_win.exception_hook  # install the exception hook
+    main_win.show()
+    main_win.do()
+
+    sys.exit(app.exec_())

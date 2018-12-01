@@ -1,17 +1,11 @@
-from PySide import QtGui
-
-from hyo.soundspeed.logging import test_logging
-
 import logging
-logger = logging.getLogger()
+from PySide2 import QtWidgets
 
-from hyo.soundspeedmanager.dialogs.flaggable_input_dialog import FlaggableInputDialog
+from hyo2.soundspeedmanager.dialogs.flaggable_input_dialog import FlaggableInputDialog
 
-
-def main():
-    _ = QtGui.QApplication([])
-    print(FlaggableInputDialog.get_text_with_flag(None))
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
-if __name__ == "__main__":
-    main()
+_ = QtWidgets.QApplication([])
+print(FlaggableInputDialog.get_text_with_flag(None))

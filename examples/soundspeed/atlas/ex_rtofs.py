@@ -1,51 +1,47 @@
-from PySide import QtGui
 from datetime import datetime as dt, timedelta
-
-from hyo.soundspeed.logging import test_logging
-
 import logging
-logger = logging.getLogger()
 
-from hyo.soundspeed.soundspeed import SoundSpeedLibrary
-from hyo.soundspeedmanager.qt_callbacks import QtCallbacks
+from PySide2 import QtWidgets
+
+from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+from hyo2.soundspeedmanager.qt_callbacks import QtCallbacks
 
 
-def main():
-    app = QtGui.QApplication([])  # PySide stuff (start)
-    mw = QtGui.QMainWindow()
-    mw.show()
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
-    lib = SoundSpeedLibrary(callbacks=QtCallbacks(mw))
+app = QtWidgets.QApplication([])  # PySide stuff (start)
+mw = QtWidgets.QMainWindow()
+mw.show()
 
-    tests = [
-        (43.026480, -70.318824, dt.utcnow()),  # offshore Portsmouth
-        (-19.1, 74.16, dt.utcnow()),  # Indian Ocean
-        (18.2648113, 16.1761115, dt.utcnow()),  # in land -> middle of Africa
-    ]
+lib = SoundSpeedLibrary(callbacks=QtCallbacks(mw))
 
-    # download the current-time rtofs
-    if not lib.has_rtofs():
-        lib.download_rtofs()
-    logger.info("has rtofs: %s" % lib.has_rtofs())
+tests = [
+    (43.026480, -70.318824, dt.utcnow()),  # offshore Portsmouth
+    (-19.1, 74.16, dt.utcnow()),  # Indian Ocean
+    (18.2648113, 16.1761115, dt.utcnow()),  # in land -> middle of Africa
+]
 
-    # test today urls
-    temp_url, sal_url = lib.atlases.rtofs._build_check_urls(dt.utcnow())
-    logger.info("urls:\n%s [%s]\n%s [%s]"
-                % (temp_url, lib.atlases.rtofs._check_url(temp_url), sal_url, lib.atlases.rtofs._check_url(sal_url)))
-    # test yesterday urls
-    temp_url, sal_url = lib.atlases.rtofs._build_check_urls(dt.utcnow() - timedelta(days=1))
-    logger.info("urls:\n%s [%s]\n%s [%s]"
-                % (temp_url, lib.atlases.rtofs._check_url(temp_url), sal_url, lib.atlases.rtofs._check_url(sal_url)))
+# download the current-time rtofs
+if not lib.has_rtofs():
+    lib.download_rtofs()
+logger.info("has rtofs: %s" % lib.has_rtofs())
 
-    # test for a few locations
-    for test in tests:
-        logger.info("rtofs profile:\n%s" % lib.atlases.rtofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+# test today urls
+temp_url, sal_url = lib.atlases.rtofs._build_check_urls(dt.utcnow())
+logger.info("urls:\n%s [%s]\n%s [%s]"
+            % (temp_url, lib.atlases.rtofs._check_url(temp_url), sal_url, lib.atlases.rtofs._check_url(sal_url)))
+# test yesterday urls
+temp_url, sal_url = lib.atlases.rtofs._build_check_urls(dt.utcnow() - timedelta(days=1))
+logger.info("urls:\n%s [%s]\n%s [%s]"
+            % (temp_url, lib.atlases.rtofs._check_url(temp_url), sal_url, lib.atlases.rtofs._check_url(sal_url)))
 
-    # test user interaction
-    lib.retrieve_rtofs()
-    logger.info("lib retrieve rtofs: %s" % lib.ssp)
+# test for a few locations
+for test in tests:
+    logger.info("rtofs profile:\n%s" % lib.atlases.rtofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
 
-    app.exec_()  # PySide stuff (end)
+# test user interaction
+lib.retrieve_rtofs()
+logger.info("lib retrieve rtofs: %s" % lib.ssp)
 
-if __name__ == "__main__":
-    main()
+app.exec_()  # PySide stuff (end)

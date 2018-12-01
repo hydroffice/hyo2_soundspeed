@@ -1,13 +1,15 @@
-from hyo.soundspeed.logging.sqlitelogging import SqliteLogging
-from hyo.soundspeed.base import testing
-
 import os
-from hyo.soundspeed.logging import test_logging
-
 import logging
-logger = logging.getLogger()
+
+from hyo2.soundspeed.logging.sqlitelogging import SqliteLogging
+from hyo2.soundspeed.base.testing import SoundSpeedTesting
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 # create
+data_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir))
+testing = SoundSpeedTesting(root_folder=data_folder)
 sqlite_log = SqliteLogging(output_folder=testing.output_data_folder())
 
 # activate

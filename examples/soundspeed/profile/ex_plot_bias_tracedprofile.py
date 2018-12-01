@@ -1,17 +1,16 @@
-import os
 from datetime import datetime
+import logging
+
 import numpy as np
 
-from hyo.soundspeed.logging import test_logging
+from hyo2.soundspeed.profile.profile import Profile
+from hyo2.soundspeed.profile.profilelist import ProfileList
+from hyo2.soundspeed.profile.ray_tracing.tracedprofile import TracedProfile
+from hyo2.soundspeed.profile.ray_tracing.diff_tracedprofiles import DiffTracedProfiles
+from hyo2.soundspeed.profile.ray_tracing.plot_tracedprofiles import PlotTracedProfiles
 
-import logging
-logger = logging.getLogger()
-
-from hyo.soundspeed.profile.profile import Profile
-from hyo.soundspeed.profile.profilelist import ProfileList
-from hyo.soundspeed.profile.ray_tracing.tracedprofile import TracedProfile
-from hyo.soundspeed.profile.ray_tracing.diff_tracedprofiles import DiffTracedProfiles
-from hyo.soundspeed.profile.ray_tracing.plot_tracedprofiles import PlotTracedProfiles
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 # create an example profile for testing

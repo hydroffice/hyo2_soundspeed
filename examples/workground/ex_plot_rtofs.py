@@ -1,3 +1,5 @@
+from hyo2.soundspeedmanager import AppInfo
+from PySide2 import QtWidgets
 from mpl_toolkits.basemap import Basemap
 import numpy as np
 import matplotlib.pyplot as plt

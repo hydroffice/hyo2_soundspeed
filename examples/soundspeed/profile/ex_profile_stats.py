@@ -1,14 +1,13 @@
-from matplotlib import pyplot as plt
 from datetime import datetime
 import random
+import logging
+
 import numpy as np
 
-from hyo.soundspeed.logging import test_logging
+from hyo2.soundspeed.profile.profile import Profile
 
-import logging
-logger = logging.getLogger()
-
-from hyo.soundspeed.profile.profile import Profile
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 def fresh_profile():

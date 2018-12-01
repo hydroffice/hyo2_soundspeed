@@ -1,11 +1,10 @@
-import os
-from hyo.soundspeed.logging import test_logging
-
 import logging
-logger = logging.getLogger()
 
-from hyo.soundspeed.soundspeed import SoundSpeedLibrary
-from hyo.soundspeed.base.gdal_aux import GdalAux
+from hyo2.abc.lib.gdal_aux import GdalAux
+from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 def main():

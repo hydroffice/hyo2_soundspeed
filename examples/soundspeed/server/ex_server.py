@@ -1,11 +1,11 @@
-from hyo.soundspeed.logging import test_logging
+from hyo2.soundspeed.logging import test_logging
 
 import time
 import logging
 logger = logging.getLogger()
 
-from hyo.soundspeed.server.server import Server
-from hyo.soundspeed.soundspeed import SoundSpeedLibrary
+from hyo2.soundspeed.server.server import Server
+from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
 lib = SoundSpeedLibrary()
 lib.listen_sis()

@@ -1,10 +1,9 @@
-from hyo.soundspeed.logging import test_logging
-
 import logging
-logger = logging.getLogger()
 
+from hyo2.soundspeed.base.callbacks.test_callbacks import TestCallbacks
 
-from hyo.soundspeed.base.callbacks.test_callbacks import TestCallbacks
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 cb = TestCallbacks()
 

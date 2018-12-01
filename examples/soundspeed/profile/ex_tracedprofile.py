@@ -3,19 +3,18 @@ pyximport.install()
 import Cython.Compiler.Options
 Cython.Compiler.Options.annotate = True
 
-import os
+import logging
+
 from datetime import datetime
 import numpy as np
 
-from hyo.soundspeed.logging import test_logging
+from hyo2.soundspeed.profile.profile import Profile
+from hyo2.soundspeed.profile.dicts import Dicts
+from hyo2.soundspeed.profile.profilelist import ProfileList
+from hyo2.soundspeed.profile.ray_tracing.tracedprofile import TracedProfile
 
-import logging
-logger = logging.getLogger()
-
-from hyo.soundspeed.profile.profile import Profile
-from hyo.soundspeed.profile.dicts import Dicts
-from hyo.soundspeed.profile.profilelist import ProfileList
-from hyo.soundspeed.profile.ray_tracing.tracedprofile import TracedProfile
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 # create an example profile for testing
@@ -49,9 +48,9 @@ ssp_list.append_profile(ssp)
 start_time = datetime.now()
 profile = TracedProfile(tss_depth=tss_depth, tss_value=tss_value,
                         avg_depth=avg_depth, half_swath=half_swath_angle,
-                        ssp=ssp_list)
+                        ssp=ssp_list.cur)
 end_time = datetime.now()
 logger.debug("timing: %s" % (end_time - start_time))
 
 logger.debug("traced profile:\n%s" % profile)
-logger.debug("api:\n%s" % dir(profile))
+# logger.debug("api:\n%s" % dir(profile))

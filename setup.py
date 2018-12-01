@@ -1,106 +1,46 @@
-import sys
+import codecs
 import os
-from codecs import open
+import re
 import numpy as np
 
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages, Extension
 from Cython.Build import cythonize
 
-# ---------------------------------------------------------------------------
-#                             Some helper stuff
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------
+#                         HELPER FUNCTIONS
 
 here = os.path.abspath(os.path.dirname(__file__))
 
 
-def is_windows():
-    """ Check if the current OS is Windows """
-    return (sys.platform == 'win32') or (os.name is "nt")
+def read(*parts):
+    # intentionally *not* adding an encoding option to open, See:
+    #   https://github.com/pypa/virtualenv/issues/201#issuecomment-3145690
+    with codecs.open(os.path.join(here, *parts), 'r') as fp:
+        return fp.read()
 
 
-def txt_read(*paths):
-    """ Build a file path from *paths* and return the textual contents """
-    with open(os.path.join(here, *paths), encoding='utf-8') as f:
-        return f.read()
+def find_version(*file_paths):
+    version_file = read(*file_paths)
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M, )
+    if version_match:
+        return version_match.group(1)
+
+    raise RuntimeError("Unable to find version string.")
 
 
-# ---------------------------------------------------------------------------
-#                      Populate dictionary with settings
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------
+#                          POPULATE SETUP
 
-# create a dict with the basic information that is passed to setup after keys are added.
-setup_args = dict()
+setup(
+    name="hyo2.soundspeed",
+    version=find_version("hyo2", "soundspeed", "__init__.py"),
+    license='LGPLv2.1 or CCOM-UNH Industrial Associate license',
 
-setup_args['name'] = 'hyo.soundspeed'
-setup_args['version'] = '2018.1.49'
-setup_args['url'] = 'https://bitbucket.org/ccomjhc/hyo_soundspeed/'
-setup_args['license'] = 'LGPLv2.1 or CCOM-UNH Industrial Associate license'
-setup_args['author'] = 'Giuseppe Masetti(UNH,CCOM); Barry Gallagher(NOAA,OCS); ' \
-                       'Chen Zhang(NOAA,OCS); Matthew Sharr (NOAA,OCS)'
-setup_args['author_email'] = 'gmasetti@ccom.unh.edu, barry.gallagher@noaa.gov, ' \
-                             'chen.zhang@noaa.gov, matthew.sharr@noaa.gov'
-
-#
-# descriptive stuff
-#
-
-description = 'A library and an application to manage sound speed profiles.'
-setup_args['description'] = description
-setup_args['long_description'] = (txt_read('README.rst') + '\n\n\"\"\"\"\"\"\"\n\n' +
-                                  txt_read('HISTORY.rst') + '\n\n\"\"\"\"\"\"\"\n\n' +
-                                  txt_read('AUTHORS.rst') + '\n\n\"\"\"\"\"\"\"\n\n' +
-                                  txt_read(os.path.join('docs', 'developer_guide_how_to_contribute.rst')))
-
-setup_args['classifiers'] = \
-    [  # https://pypi.python.org/pypi?%3Aaction=list_classifiers
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Science/Research',
-        'Natural Language :: English',
-        'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Topic :: Scientific/Engineering :: GIS',
-        'Topic :: Office/Business :: Office Suites',
-    ]
-setup_args['keywords'] = "hydrography ocean mapping survey sound speed profiles"
-
-#
-# code stuff
-#
-
-# requirements
-setup_args['setup_requires'] =\
-    [
-        "setuptools",
-        "wheel",
-        "cython",
-    ]
-setup_args['install_requires'] =\
-    [
-        "numpy",
-        "scipy",
-        "matplotlib",
-        "pillow",
-        "netCDF4",
-        "gdal",
-        "pyproj",
-        "gsw==3.0.6",  # install it from github without scipy dependency, version == 3.0.6
-        "pyserial",
-        # "pyside",  # required, but commented since conda package is not recognized by pip
-        "basemap"  # you may also need: conda install -c conda-forge basemap-data-hires
-    ]
-
-# hydroffice namespace, packages and other files
-setup_args['namespace_packages'] = ['hyo']
-setup_args['packages'] = find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests", "*.test*",
-                                                ])
-setup_args['package_data'] =\
-    {
-        '': [
+    namespace_packages=["hyo2"],
+    packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests", "*.test*", ]),
+    package_data={
+        "": [
             'sis/gui/media/*.png',
             'soundspeed/listener/seacat/CONFIG/*.*',
             'soundspeedmanager/media/*.png',
@@ -114,31 +54,65 @@ setup_args['package_data'] =\
             'soundspeedsettings/widgets/styles/widget.stylesheet',
             'soundspeedsettings/media/*.png',
         ],
-    }
-setup_args['test_suite'] = "tests"
-setup_args['entry_points'] =\
-    {
-        'gui_scripts':
-        [
-            'sound_speed_manager = hyo.soundspeedmanager.gui:gui',
-            'sound_speed_settings = hyo.soundspeedsettings.gui:gui',
+    },
+    zip_safe=False,
+    setup_requires=[
+        "setuptools",
+        "wheel",
+        "cython",
+    ],
+    install_requires=[
+        "hyo2.abc",
+        "gsw==3.0.6",  # install it from github without scipy dependency, version == 3.0.6
+        "netCDF4",
+        "pillow",
+        "pyserial",
+        "scipy",
+        "basemap"  # you may also need: conda install -c conda-forge basemap-data-hires
+    ],
+    ext_modules=cythonize([
+        Extension("hyo2.soundspeed.profile.ray_tracing.tracedprofile",
+                  sources=["hyo2/soundspeed/profile/ray_tracing/tracedprofile.pyx"],
+                  include_dirs=[np.get_include()],
+                  language='c++',
+                  # extra_compile_args=["-Zi", "/Od"],
+                  # extra_link_args=["-debug"],
+                  ),
+    ], annotate=True),
+    python_requires='>=3.5',
+    entry_points={
+        "gui_scripts": [
+            'sound_speed_manager = hyo2.soundspeedmanager.gui:gui',
+            'sound_speed_settings = hyo2.soundspeedsettings.gui:gui',
         ],
-    }
+        "console_scripts": [
+        ],
+    },
+    test_suite="tests",
 
-extensions = [
-    Extension("hyo.soundspeed.profile.ray_tracing.tracedprofile",
-              sources=["hyo/soundspeed/profile/ray_tracing/tracedprofile.pyx"],
-              include_dirs=[np.get_include()],
-              language='c++',
-              # extra_compile_args=["-Zi", "/Od"],
-              # extra_link_args=["-debug"],
-              ),
-]
-
-setup_args['ext_modules'] = cythonize(extensions, annotate=True)
-
-# ---------------------------------------------------------------------------
-#                            Do the actual setup now
-# ---------------------------------------------------------------------------
-
-setup(**setup_args)
+    description="A library and an application to manage sound speed profiles.",
+    long_description=(read("README.rst") + "\n\n\"\"\"\"\"\"\"\n\n" +
+                      read("HISTORY.rst") + "\n\n\"\"\"\"\"\"\"\n\n" +
+                      read("AUTHORS.rst") + "\n\n\"\"\"\"\"\"\"\n\n" +
+                      read(os.path.join("docs", "developer_guide_how_to_contribute.rst")))
+    ,
+    url="https://github.com/hydroffice/hyo2_soundspeed",
+    classifiers=[  #
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Science/Research',
+        'Natural Language :: English',
+        'License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Topic :: Scientific/Engineering :: GIS',
+        'Topic :: Office/Business :: Office Suites',
+    ],
+    keywords="hydrography ocean mapping survey sound speed profiles",
+    author="Giuseppe Masetti(UNH,CCOM); Barry Gallagher(NOAA,OCS); " \
+           "Chen Zhang(NOAA,OCS); Matthew Sharr (NOAA,OCS)",
+    author_email="gmasetti@ccom.unh.edu, barry.gallagher@noaa.gov, " \
+                 "chen.zhang@noaa.gov, matthew.sharr@noaa.gov",
+)

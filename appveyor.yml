@@ -9,6 +9,72 @@ environment:
   matrix:
 
     - PYTHON_VERSION: 3.6
+      PYTHON_ARCH: x64
+      MINICONDA: C:\Miniconda36-x64
+
+    - PYTHON_VERSION: 3.5
+      PYTHON_ARCH: x64
+      MINICONDA: C:\Miniconda36-x64
+
+matrix:
+
+  allow_failures:
+
+    - PYTHON_VERSION: 3.5
+      PYTHON_ARCH: x64
+      MINICONDA: C:\Miniconda36-x64
+
+install:
+  - set PATH=%MINICONDA%;%MINICONDA%\Scripts;%PATH%
+
+  # Install the build and runtime dependencies of the project.
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda info -a
+  - conda config --add channels conda-forge
+  - conda create -q -n test-environment python=%PYTHON_VERSION%
+  - activate test-environment
+  - pip install wheel
+
+  # Check that we have the expected version of Python
+  - python --version
+
+  - pip install coveralls
+  - pip install PySide2
+  - pip install gsw==3.0.6
+  - conda install numpy matplotlib-base gdal pyproj scipy basemap netCDF4 pillow
+  - pip install https://github.com/hydroffice/hyo2_abc/archive/master.zip
+
+build: off
+build_script:
+  - pip install .
+  # - conda remove --force PyQt Qt sip
+  # - del /q %MINICONDA%\envs\test-environment\qt.conf
+  - conda list --show-channel-urls
+
+test: off
+test_script:
+  - coverage run --source hyo2 setup.py test
+  - coverage report -m
+
+after_test:
+  - python setup.py bdist_wheel
+
+artifacts:
+  - path: dist\*
+
+
+version: 0.1.{build}-{branch}
+
+branches:
+  only:
+  - master
+
+environment:
+
+  matrix:
+
+    - PYTHON_VERSION: 3.6
       PYTHON_ARCH: x86
       MINICONDA: C:\Miniconda36
 

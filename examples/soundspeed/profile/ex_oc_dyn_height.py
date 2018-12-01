@@ -1,12 +1,12 @@
-import os
+import logging
+
 import numpy as np
 
-from hyo.soundspeed.logging import test_logging
+from hyo2.soundspeed.profile.oceanography import Oceanography as Oc
 
-import logging
-logger = logging.getLogger()
 
-from hyo.soundspeed.profile.oceanography import Oceanography as Oc
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 # gold ref using the matlab script: generate_gsw_trusted_values.m and GSW 3.05
 

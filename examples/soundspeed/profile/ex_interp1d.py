@@ -1,5 +1,6 @@
-from scipy.interpolate import interp1d
 import numpy as np
+from PySide2 import QtWidgets
+from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 
 in_x = np.linspace(500, 1000, num=101, endpoint=True)

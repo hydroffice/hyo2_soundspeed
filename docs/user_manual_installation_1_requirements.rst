@@ -50,7 +50,7 @@ If you decide to install the package in a Python environment, the dependencies a
 
 If you want to install the last stable version (from PyPI):
 
-* :bash:`pip install hyo.soundspeed`
+* :bash:`pip install hyo2.soundspeed`
 
 Or, if you prefer the last bleeding edge code:
 

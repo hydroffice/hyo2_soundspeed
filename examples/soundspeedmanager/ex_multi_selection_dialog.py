@@ -1,19 +1,19 @@
-import time
-from PySide import QtGui
-
-from hyo.soundspeed.logging import test_logging
-
 import logging
-logger = logging.getLogger()
 
-from hyo.soundspeedmanager.dialogs.multi_selection_dialog import MultiSelectionDialog
+from PySide2 import QtWidgets
 
-app = QtGui.QApplication([])
+from hyo2.soundspeedmanager.dialogs.multi_selection_dialog import MultiSelectionDialog
+
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+app = QtWidgets.QApplication([])
 
 profiles = ["prof 1", "prof 2", "prof 3", "prof 4"]
 ms_dlg = MultiSelectionDialog(title="Sea-Bird Seacat profiles", message="Select profiles:", items=profiles)
 ret = ms_dlg.exec_()
-if ret == QtGui.QDialog.Accepted:
+if ret == QtWidgets.QDialog.Accepted:
     print(ms_dlg.selected_items())
 
 # app.exec_()

@@ -1,25 +1,24 @@
 import sys
 import os
 import numpy as np
-from PySide import QtGui
-from PySide import QtCore
+from PySide2 import QtCore, QtGui, QtWidgets
 import matplotlib
-matplotlib.rcParams['backend.qt4'] = 'PySide'
-matplotlib.use('Qt4Agg')
 
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 
+matplotlib.use('Qt5Agg')
 
-class MatplotlibExample(QtGui.QMainWindow):
+
+class MatplotlibExample(QtWidgets.QMainWindow):
     """HOW TO EMBED MATPLOTLIB WITH PYSIDE"""
 
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.abspath(os.path.join(here, "media"))
 
     def __init__(self, parent=None):
-        QtGui.QMainWindow.__init__(self, parent)
+        QtWidgets.QMainWindow.__init__(self, parent)
 
         self.x = None
         self.y = None
@@ -42,7 +41,7 @@ class MatplotlibExample(QtGui.QMainWindow):
         self.slider = None
 
         # create ui
-        self.setWindowTitle('PySide with matplotlib')
+        self.setWindowTitle('PySide2 with matplotlib')
         self.center()
         self.create_menu()
         self.create_main_frame()
@@ -61,9 +60,9 @@ class MatplotlibExample(QtGui.QMainWindow):
         about_action = self.create_action("&About", shortcut='F1', slot=self.on_about, tip='About this app')
         self.help_menu.addAction(about_action)
 
-    def create_action(self, text, slot=None, shortcut=None, icon=None, tip=None, checkable=False, signal="triggered()"):
+    def create_action(self, text, slot=None, shortcut=None, icon=None, tip=None, checkable=False):
         """Helper function to create an action"""
-        action = QtGui.QAction(text, self)
+        action = QtWidgets.QAction(text, self)
         if icon is not None:
             action.setIcon(QtGui.QIcon(os.path.join(self.media, "%s.png" % icon)))
         if shortcut is not None:
@@ -71,13 +70,14 @@ class MatplotlibExample(QtGui.QMainWindow):
         if tip is not None:
             action.setToolTip(tip)
         if slot is not None:
+            # noinspection PyUnresolvedReferences
             action.triggered.connect(slot)
         if checkable:
             action.setCheckable(True)
         return action
 
     def create_main_frame(self):
-        self.main_frame = QtGui.QWidget()
+        self.main_frame = QtWidgets.QWidget()
 
         # Create Matplotlib figure and canvas
         self.figure = Figure((6.0, 4.0), dpi=self.dpi)  # inches, dots-per-inch
@@ -95,31 +95,35 @@ class MatplotlibExample(QtGui.QMainWindow):
         self.mpl_toolbar = NavigationToolbar(self.canvas, self.main_frame)
 
         # other GUI controls
-        self.textbox = QtGui.QLineEdit()
+        self.textbox = QtWidgets.QLineEdit()
         self.textbox.setMinimumWidth(200)
+        # noinspection PyUnresolvedReferences
         self.textbox.editingFinished.connect(self.on_draw)
         self.textbox.setText('1 3 2 6 3 2 4')
-        self.draw_button = QtGui.QPushButton("&Draw")
+        self.draw_button = QtWidgets.QPushButton("&Draw")
+        # noinspection PyUnresolvedReferences
         self.draw_button.clicked.connect(self.on_draw)
         # grid
-        self.grid_ck = QtGui.QCheckBox("Show &Grid")
+        self.grid_ck = QtWidgets.QCheckBox("Show &Grid")
         self.grid_ck.setChecked(False)
+        # noinspection PyUnresolvedReferences
         self.grid_ck.stateChanged.connect(self.on_draw)
         # slider
-        slider_label = QtGui.QLabel('Plot width (%):')
-        self.slider = QtGui.QSlider(QtCore.Qt.Horizontal)
+        slider_label = QtWidgets.QLabel('Plot width (%):')
+        self.slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self.slider.setRange(1, 100)
         self.slider.setValue(20)
         self.slider.setTracking(True)
-        self.slider.setTickPosition(QtGui.QSlider.TicksBothSides)
+        self.slider.setTickPosition(QtWidgets.QSlider.TicksBothSides)
+        # noinspection PyUnresolvedReferences
         self.slider.valueChanged.connect(self.on_draw)
 
         # layouts
-        hbox = QtGui.QHBoxLayout()
+        hbox = QtWidgets.QHBoxLayout()
         for w in [self.textbox, self.draw_button, self.grid_ck, slider_label, self.slider]:
             hbox.addWidget(w)
             hbox.setAlignment(w, QtCore.Qt.AlignVCenter)
-        vbox = QtGui.QVBoxLayout()
+        vbox = QtWidgets.QVBoxLayout()
         vbox.addWidget(self.canvas)
         vbox.addWidget(self.mpl_toolbar)
         vbox.addLayout(hbox)
@@ -128,24 +132,26 @@ class MatplotlibExample(QtGui.QMainWindow):
 
     def center(self):
         qr = self.frameGeometry()
-        cp = QtGui.QDesktopWidget().availableGeometry().center()
+        cp = QtWidgets.QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
     def save_plot(self):
         flt = "PNG (*.png)|*.png"
-        path = QtGui.QFileDialog.getSaveFileName(self, 'Save file', '', flt)
+        # noinspection PyCallByClass
+        path = QtWidgets.QFileDialog.getSaveFileName(self, 'Save file', '', flt)
         if path:
             self.canvas.print_figure(path, dpi=self.dpi)
 
     def on_about(self):
-        msg = """PySide with matplotlib:
+        msg = """PySide2 with matplotlib:
 - navigation bar
 - grid toggle
 - interactivity ('Draw' button, slider, click on bar)
 - plot saving
 """
-        QtGui.QMessageBox.about(self, "About the demo", msg.strip())
+        # noinspection PyCallByClass
+        QtWidgets.QMessageBox.about(self, "About the demo", msg.strip())
 
     def on_pick(self, event):
         """Manage pick event"""
@@ -199,12 +205,7 @@ class MatplotlibExample(QtGui.QMainWindow):
         self.canvas.draw()
 
 
-def main():
-    app = QtGui.QApplication(sys.argv)
-    form = MatplotlibExample()
-    form.show()
-    app.exec_()
-
-
-if __name__ == "__main__":
-    main()
+app = QtWidgets.QApplication(sys.argv)
+form = MatplotlibExample()
+form.show()
+app.exec_()
