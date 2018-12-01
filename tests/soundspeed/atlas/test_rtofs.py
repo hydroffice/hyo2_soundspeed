@@ -3,10 +3,11 @@ import os
 import shutil
 import logging
 
-logger = logging.getLogger()
+from hyo2.soundspeedmanager import AppInfo
+from hyo2.soundspeed.atlas.rtofs.rtofs import Rtofs
+from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
-from hyo.soundspeed.atlas.rtofs.rtofs import Rtofs
-from hyo.soundspeed.soundspeed import SoundSpeedLibrary
+logger = logging.getLogger()
 
 
 class TestSoundSpeedAtlasRtofs(unittest.TestCase):

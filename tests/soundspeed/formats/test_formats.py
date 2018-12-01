@@ -1,20 +1,23 @@
 import unittest
 import os
-from hyo.soundspeed.logging import test_logging
-
 import logging
-logger = logging.getLogger()
 
-from hyo.soundspeed.soundspeed import SoundSpeedLibrary
-from hyo.soundspeed.base.callbacks.test_callbacks import TestCallbacks
-from hyo.soundspeed.base import testing
+from hyo2.soundspeedmanager import AppInfo
+from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+from hyo2.soundspeed.base.callbacks.test_callbacks import TestCallbacks
+from hyo2.soundspeed.base.testing import SoundSpeedTesting
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 class TestSoundSpeedFormats(unittest.TestCase):
 
     def setUp(self):
         self.formats = ["caris", "csv", "elac", "hypack", "ixblue", "asvp", "qps", "sonardyne", "unb", ]
-        self.data_output = testing.output_data_folder()
+        data_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir))
+        self.testing = SoundSpeedTesting(root_folder=data_folder)
+        self.data_output = self.testing.output_data_folder()
 
     def tearDown(self):
         pass
@@ -98,7 +101,7 @@ class TestSoundSpeedFormats(unittest.TestCase):
         # set the current project name
         lib.setup.current_project = 'test_read_store_and_write'
 
-        tests = testing.input_dict_test_files(inclusive_filters=filters)
+        tests = self.testing.input_dict_test_files(inclusive_filters=filters)
         data_outputs = dict()
         for format in self.formats:
             data_outputs[format] = self.data_output

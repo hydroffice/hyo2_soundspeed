@@ -1,10 +1,12 @@
 import unittest
 
+from hyo2.soundspeedmanager import AppInfo
+from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+
 
 class TestSoundSpeedNewProject(unittest.TestCase):
 
     def test_available_projects(self):
-        from hyo.soundspeed.soundspeed import SoundSpeedLibrary
 
         lib = SoundSpeedLibrary()
         ssp_list = lib.db_list_profiles()
@@ -16,7 +18,6 @@ class TestSoundSpeedNewProject(unittest.TestCase):
         lib.close()
 
     def test_new_projects(self):
-        from hyo.soundspeed.soundspeed import SoundSpeedLibrary
 
         lib = SoundSpeedLibrary()
         ssp_list = lib.db_list_profiles()

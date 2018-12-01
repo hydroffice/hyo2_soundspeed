@@ -1,7 +1,7 @@
 import os
 import logging
 
-from hyo2.soundspeedmanager import AppInfo
+from hyo2.soundspeedmanager import app_info
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 from hyo2.soundspeed.base.testing import SoundSpeedTesting
 from hyo2.soundspeed.base.callbacks.test_callbacks import TestCallbacks

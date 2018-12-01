@@ -1,48 +1,40 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import unittest
+from hyo2.soundspeedsettings import app_info
 
 
 class TestSoundSpeedSettingsInit(unittest.TestCase):
 
     def test_has_version(self):
-        from hyo.soundspeedsettings import __version__
-        self.assertIsNot(len(__version__), 0)
+
+        self.assertIsNot(len(app_info.app_version), 0)
 
     def test_is_version_more_than_3(self):
-        from hyo.soundspeedsettings import __version__
-        self.assertGreaterEqual(int(__version__.split('.')[0]), 3)
+        self.assertGreaterEqual(int(app_info.app_version.split('.')[0]), 3)
 
-    def test_doc(self):
-        from hyo.soundspeedsettings import __doc__
-        self.assertIsNot(len(__doc__), 0)
+    def test_has_doc(self):
+        self.assertIsNot(len(app_info.app_name), 0)
 
     def test_is_sound_in_doc(self):
-        from hyo.soundspeedsettings import __doc__
-        self.assertTrue("sound" in __doc__.lower(), 0)
+        self.assertTrue("sound" in app_info.app_name.lower())
 
-    def test_author(self):
-        from hyo.soundspeedsettings import __author__
-        self.assertIsNot(len(__author__), 0)
+    def test_has_author(self):
+        self.assertIsNot(len(app_info.app_author), 0)
 
     def test_has_multiple_authors(self):
-        from hyo.soundspeedsettings import __author__
-        self.assertGreater(len(__author__.split(';')), 0)
+        self.assertGreater(len(app_info.app_author.split(';')), 0)
 
-    def test_license(self):
-        from hyo.soundspeedsettings import __license__
-        self.assertIsNot(len(__license__), 0)
+    def test_has_license(self):
+        self.assertIsNot(len(app_info.app_license), 0)
 
     def test_has_lgpl_in_license(self):
-        from hyo.soundspeedsettings import __license__
-        self.assertTrue("lgpl" in __license__.lower())
+        self.assertTrue("lgpl" in app_info.app_license.lower())
 
-    def test_copyright(self):
-        from hyo.soundspeedsettings import __copyright__
+    def test_has_copyright(self):
+        from hyo2.soundspeed import __copyright__
         self.assertIsNot(len(__copyright__), 0)
 
     def test_has_current_year_in_copyright(self):
-        from hyo.soundspeedsettings import __copyright__
+        from hyo2.soundspeed import __copyright__
         from datetime import datetime
         self.assertTrue((("%s" % datetime.now().year) in __copyright__) or
                         (("%s" % (datetime.now().year + 1)) in __copyright__))

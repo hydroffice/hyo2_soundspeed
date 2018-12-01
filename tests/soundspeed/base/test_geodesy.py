@@ -1,13 +1,12 @@
 import unittest
 import sys
 
-from hyo.soundspeed.base.geodesy import Geodesy
+from hyo2.soundspeed.base.geodesy import Geodesy
 
 from osgeo import gdal
 
 
 class TestSoundSpeedGeodesy(unittest.TestCase):
-
     gdal_version = int(gdal.__version__.split('.')[0])
     is_windows = sys.platform.startswith("win")
 
@@ -63,13 +62,13 @@ class TestSoundSpeedGeodesy(unittest.TestCase):
 
     def test_dms2dd(self):
         self.assertAlmostEqual(Geodesy.dms2dd(degrees=self.trusted_long_1_d,
-                                               minutes=self.trusted_long_1_m,
-                                               seconds=self.trusted_long_1_s),
+                                              minutes=self.trusted_long_1_m,
+                                              seconds=self.trusted_long_1_s),
                                self.trusted_long_1, places=6)
 
         self.assertAlmostEqual(Geodesy.dms2dd(degrees=self.trusted_long_1_d,
-                                               minutes=self.trusted_long_1_m,
-                                               seconds=self.trusted_long_1_s),
+                                              minutes=self.trusted_long_1_m,
+                                              seconds=self.trusted_long_1_s),
                                self.trusted_long_1, places=6)
 
     def test_dd2dms(self):
@@ -94,7 +93,7 @@ class TestSoundSpeedGeodesy(unittest.TestCase):
         self.assertTrue((dist - 7020851.6) < 0.1)
 
     def test_distance(self):
-                # data retrieved from: http://geographiclib.sourceforge.net/cgi-bin/GeodSolve
+        # data retrieved from: http://geographiclib.sourceforge.net/cgi-bin/GeodSolve
         # ref: C. F. F. Karney, Algorithms for geodesics, J. Geodesy 87, 43–55 (2013); DOI: 10.1007/s00190-012-0578-z
         long_1 = -70.9395
         lat_1 = 43.13555

@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from hyo.soundspeed.profile.oceanography import Oceanography as Oc
+from hyo2.soundspeed.profile.oceanography import Oceanography as Oc
 
 
 class TestSoundSpeedOceanography(unittest.TestCase):

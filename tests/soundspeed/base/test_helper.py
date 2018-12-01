@@ -2,7 +2,7 @@ import unittest
 import os
 from io import IOBase
 
-from hyo.soundspeed.base import helper
+from hyo2.soundspeed.base import helper
 
 
 class TestSoundSpeedBaseHelper(unittest.TestCase):

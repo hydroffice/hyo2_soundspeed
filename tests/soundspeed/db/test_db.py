@@ -2,12 +2,11 @@ import os
 import sys
 import unittest
 from datetime import datetime
-import time
-import random
 import numpy as np
 
-from hyo.soundspeed.soundspeed import SoundSpeedLibrary
-from hyo.soundspeed.profile.profilelist import ProfileList
+from hyo2.soundspeedmanager import AppInfo
+from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+from hyo2.soundspeed.profile.profilelist import ProfileList
 
 
 class TestSoundSpeedDb(unittest.TestCase):

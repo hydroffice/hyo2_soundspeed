@@ -1,11 +1,7 @@
 import unittest
 import os
-from hyo.soundspeed.logging import test_logging
 
-import logging
-logger = logging.getLogger()
-
-from hyo.soundspeed.base.basedb import BaseDb
+from hyo2.soundspeed.base.basedb import BaseDb
 
 
 class TestSoundSpeedBaseDbPoint(unittest.TestCase):

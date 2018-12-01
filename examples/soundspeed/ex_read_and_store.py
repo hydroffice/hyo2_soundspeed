@@ -3,7 +3,7 @@ import logging
 from PySide2 import QtWidgets
 from matplotlib import pyplot as plt
 
-from hyo2.soundspeedmanager import AppInfo
+from hyo2.soundspeedmanager import app_info
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 from hyo2.soundspeed.base.testing import SoundSpeedTesting
 from hyo2.soundspeed.base.callbacks.test_callbacks import TestCallbacks

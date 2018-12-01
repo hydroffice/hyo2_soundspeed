@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from hyo.soundspeed.base.callbacks.test_callbacks import TestCallbacks
+from hyo2.soundspeed.base.callbacks.test_callbacks import TestCallbacks
 
 
 class TestSoundSpeedTestCallbacks(unittest.TestCase):
