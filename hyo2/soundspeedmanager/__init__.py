@@ -5,11 +5,10 @@ Sound Speed Manager
 import logging
 import os
 
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
-
 from hyo2.abc.app.app_info import AppInfo
 
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 name = "Sound Speed Manager"
 __version__ = "2019.0.0"
