@@ -154,7 +154,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.tabs.setTabToolTip(self.idx_server, "Synthetic Profile Server")
 
         # refraction
-        self.tab_refraction = Refraction(lib=self.lib, main_win=self)
+        # self.tab_refraction = Refraction(lib=self.lib, main_win=self)
         # idx = self.tabs.insertTab(5, self.tab_refraction,
         #                           QtGui.QIcon(os.path.join(self.here, 'media', 'refraction.png')), "")
         # self.tabs.setTabToolTip(idx, "Refraction Monitor")
@@ -403,28 +403,28 @@ class MainWin(QtWidgets.QMainWindow):
         self.tab_editor.data_cleared()
         self.tab_database.data_cleared()
         self.tab_server.data_cleared()
-        self.tab_refraction.data_cleared()
+        # self.tab_refraction.data_cleared()
         self.tab_setup.data_cleared()
 
     def data_imported(self):
         self.tab_editor.data_imported()
         self.tab_database.data_imported()
         self.tab_server.data_imported()
-        self.tab_refraction.data_imported()
+        # self.tab_refraction.data_imported()
         self.tab_setup.data_imported()
 
     def data_stored(self):
         self.tab_editor.data_stored()
         self.tab_database.data_stored()
         self.tab_server.data_stored()
-        self.tab_refraction.data_stored()
+        # self.tab_refraction.data_stored()
         self.tab_setup.data_stored()
 
     def data_removed(self):
         self.tab_editor.data_removed()
         self.tab_database.data_removed()
         self.tab_server.data_removed()
-        self.tab_refraction.data_removed()
+        # self.tab_refraction.data_removed()
         self.tab_setup.data_removed()
 
     def server_started(self):
@@ -434,7 +434,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.tab_editor.server_started()
         self.tab_database.server_started()
         self.tab_server.server_started()
-        self.tab_refraction.server_started()
+        # self.tab_refraction.server_started()
         self.tab_setup.server_started()
         self.statusBar().setStyleSheet("QStatusBar{color:rgba(0,0,0,128);"
                                        "font-size: 8pt;background-color:rgba(51,204,255,128);}")
@@ -443,7 +443,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.tab_editor.server_stopped()
         self.tab_database.server_stopped()
         self.tab_server.server_stopped()
-        self.tab_refraction.server_stopped()
+        # self.tab_refraction.server_stopped()
         self.tab_setup.server_stopped()
         self.statusBar().setStyleSheet(self.status_bar_normal_style)
 

@@ -22,11 +22,6 @@ class AbstractWidget(QtWidgets.QMainWindow):
         self.main_win = main_win
         self.lib = lib
 
-        # set palette
-        style_info = QtCore.QFileInfo(os.path.join(self.here, 'styles', 'widget.stylesheet'))
-        style_content = open(style_info.filePath()).read().replace("LOCAL_PATH", self.media)
-        self.setStyleSheet(style_content)
-
         self.setContentsMargins(0, 0, 0, 0)
 
         # add a frame

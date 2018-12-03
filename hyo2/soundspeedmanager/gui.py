@@ -10,8 +10,9 @@ from hyo2.soundspeedmanager.mainwin import MainWin
 logger = logging.getLogger(__name__)
 
 
-def qt_custom_handler(error_type, error_context):
-    logger.info("Qt error: %s [%s]" % (str(error_type), str(error_context)))
+def qt_custom_handler(error_type: QtCore.QtMsgType, error_context: QtCore.QMessageLogContext, message: str):
+    logger.info("Qt error: %s [%s] -> %s"
+                % (error_type, error_context, message))
 
     for line in traceback.format_stack():
         logger.debug("- %s" % line.strip())
