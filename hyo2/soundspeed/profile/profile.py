@@ -824,25 +824,25 @@ class Profile:
 
             # interpolate for pressure
             pi = np.array([self.proc.pressure[valid][m_ids[0]], self.proc.pressure[valid][m_ids[1]]])
-            pm, pc = np.linalg.lstsq(a, pi)[0]
+            pm, pc = np.linalg.lstsq(a, pi, rcond=None)[0]
             self.proc.pressure = np.insert(self.proc.pressure, j, pm * depth + pc)
             # print(self.proc.pressure[0], self.proc.pressure.size)
 
             # interpolate for temp
             ti = np.array([self.proc.temp[valid][m_ids[0]], self.proc.temp[valid][m_ids[1]]])
-            tm, tc = np.linalg.lstsq(a, ti)[0]
+            tm, tc = np.linalg.lstsq(a, ti, rcond=None)[0]
             self.proc.temp = np.insert(self.proc.temp, j, tm * depth + tc)
             # print(self.proc.temp[0], self.proc.temp.size)
 
             # interpolate for conductivity
             ci = np.array([self.proc.conductivity[valid][m_ids[0]], self.proc.conductivity[valid][m_ids[1]]])
-            cm, cc = np.linalg.lstsq(a, ci)[0]
+            cm, cc = np.linalg.lstsq(a, ci, rcond=None)[0]
             self.proc.conductivity = np.insert(self.proc.conductivity, j, cm * depth + cc)
             # print(self.proc.conductivity[0], self.proc.conductivity.size)
 
             # interpolate for sal
             si = np.array([self.proc.sal[valid][m_ids[0]], self.proc.sal[valid][m_ids[1]]])
-            sm, sc = np.linalg.lstsq(a, si)[0]
+            sm, sc = np.linalg.lstsq(a, si, rcond=None)[0]
             self.proc.sal = np.insert(self.proc.sal, j, sm * depth + sc)
             # print(self.proc.sal[0], self.proc.sal.size)
 
@@ -1020,13 +1020,13 @@ class Profile:
 
             # interpolate for pressure
             pi = np.array([self.proc.pressure[valid][m_ids[0]], self.proc.pressure[valid][m_ids[1]]])
-            pm, pc = np.linalg.lstsq(a, pi)[0]
+            pm, pc = np.linalg.lstsq(a, pi, rcond=None)[0]
             self.proc.pressure = np.insert(self.proc.pressure, j, pm * depth + pc)
             # print(self.proc.pressure[0], self.proc.pressure.size)
 
             # interpolate for conductivity
             ci = np.array([self.proc.conductivity[valid][m_ids[0]], self.proc.conductivity[valid][m_ids[1]]])
-            cm, cc = np.linalg.lstsq(a, ci)[0]
+            cm, cc = np.linalg.lstsq(a, ci, rcond=None)[0]
             self.proc.conductivity = np.insert(self.proc.conductivity, j, cm * depth + cc)
             # print(self.proc.conductivity[0], self.proc.conductivity.size)
 

@@ -398,7 +398,7 @@ class NavToolbar(NavigationToolbar2QT):
         x, y = event.x, event.y
 
         # push the current view to define home if stack is empty
-        if self._views.empty():
+        if self._nav_stack.empty():
             self.push_current()
 
         self._xypress = []
@@ -417,7 +417,7 @@ class NavToolbar(NavigationToolbar2QT):
             # safer to use the recorded button at the press than current button
             a.drag_pan(1, event.key, event.x, event.y)  # 1 is pan
 
-        self.dynamic_update()
+        self.canvas.draw_idle()
 
     def release_pan(self, event):
         """the release mouse button callback in pan/scale mode"""
@@ -478,7 +478,7 @@ class NavToolbar(NavigationToolbar2QT):
         x, y = event.x, event.y
 
         # push the current view to define home if stack is empty
-        if self._views.empty():
+        if self._nav_stack.empty():
             self.push_current()
 
         self._xypress = []
@@ -495,7 +495,7 @@ class NavToolbar(NavigationToolbar2QT):
             # safer to use the recorded button at the press than current button
             a.drag_pan(3, event.key, event.x, event.y)  # 3 is scale
 
-        self.dynamic_update()
+        self.canvas.draw_idle()
 
     def release_scale(self, event):
         """the release mouse button callback in pan/scale mode"""
@@ -562,7 +562,7 @@ class NavToolbar(NavigationToolbar2QT):
         x, y = event.x, event.y
 
         # push the current view to define home if stack is empty
-        if self._views.empty():
+        if self._nav_stack.empty():
             self.push_current()
 
         self._xypress = []
@@ -669,7 +669,7 @@ class NavToolbar(NavigationToolbar2QT):
         x, y = event.x, event.y
 
         # push the current view to define home if stack is empty
-        if self._views.empty():
+        if self._nav_stack.empty():
             self.push_current()
 
         self._xypress = []
@@ -1169,7 +1169,7 @@ class NavToolbar(NavigationToolbar2QT):
             for a in self.canvas.figure.get_axes():
                 a.grid(grid_flag)
 
-        self.dynamic_update()
+        self.canvas.draw_idle()
 
     def legend_plot(self):
         legend_flag = self.legend_action.isChecked()
@@ -1186,9 +1186,10 @@ class NavToolbar(NavigationToolbar2QT):
                     except AttributeError:
                         logger.info("missing legend to remove")
 
-        self.dynamic_update()
+        self.canvas.draw_idle()
 
     def flagged_plot(self):
         flagged_flag = self.flagged_action.isChecked()
         self.plot_win.set_invalid_visibility(flagged_flag)
-        self.dynamic_update()
+
+        self.canvas.draw_idle()
