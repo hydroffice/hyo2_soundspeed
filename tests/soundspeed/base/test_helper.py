@@ -2,6 +2,7 @@ import unittest
 import os
 from io import IOBase
 
+from hyo2.soundspeedmanager import app_info
 from hyo2.soundspeed.base import helper
 
 

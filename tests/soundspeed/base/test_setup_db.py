@@ -7,7 +7,7 @@ from hyo2.soundspeed.base.setup_db import SetupDb
 class TestSoundSpeedSetupDb(unittest.TestCase):
 
     def setUp(self):
-        self.data_folder = os.path.abspath(os.curdir)
+        self.data_folder = os.path.abspath(os.path.dirname(__file__))
         self.db_name = "setup.db"
         self.db_path = os.path.join(self.data_folder, self.db_name)
 

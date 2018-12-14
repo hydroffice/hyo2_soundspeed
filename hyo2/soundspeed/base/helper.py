@@ -6,9 +6,9 @@ from typing import IO, Dict, Any
 # To use a consistent encoding
 from codecs import open
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeed import __version__ as ss_version
+
+logger = logging.getLogger(__name__)
 
 
 class FileInfo:
@@ -134,7 +134,7 @@ def info_libs() -> str:
     msg += "pyside: %s\n" % vrs
 
     try:
-        from osgeo.gdal import __version__ as gdal_version
+        from gdal import __version__ as gdal_version
 
     except ImportError:
         gdal_version = None

@@ -1,5 +1,6 @@
 import logging
 
+from hyo2.soundspeedmanager import app_info
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
 logging.basicConfig(level=logging.DEBUG)

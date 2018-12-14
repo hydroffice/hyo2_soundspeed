@@ -2,11 +2,11 @@ import os
 import logging
 import sqlite3
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeed.base.basedb import BaseDb
 from hyo2.soundspeed.base.setup_sql import CREATE_SETTINGS, CREATE_SETTINGS_VIEW, CREATE_CLIENT_LIST
 from hyo2.soundspeed.base.helper import explore_folder
+
+logger = logging.getLogger(__name__)
 
 
 class SetupDb(BaseDb):
@@ -50,6 +50,7 @@ class SetupDb(BaseDb):
     def _check_default_setup(self):
         """Check for the presence of default settings, creating them if missing and not other setups. """
         if len(self.setup_list) == 0:
+            logger.debug("creating default setup")
             default_setup = "default"
             if not self.setup_exists(default_setup):
                 self.add_setup(setup_name=default_setup)
@@ -74,15 +75,15 @@ class SetupDb(BaseDb):
         """ Add setting with passed name and default values."""
         with self.conn:
             try:
+                logger.info("inserting %s settings with default values" % setup_name)
                 # create a default settings record
                 self.conn.execute(""" INSERT INTO general (setup_name) VALUES(?) """, (setup_name,))
-                # logger.info("inserted %s settings with default values" % setup_name)
-   
+
                 # retrieve settings id
                 ret = self.conn.execute(""" SELECT id FROM general WHERE setup_name=? """,
                                         (setup_name,)).fetchone()
                 # logger.info("%s settings id: %s" % (setup_name, ret[0]))
-   
+
                 # add default client list
                 self.conn.execute(""" INSERT INTO client_list (setup_id) VALUES(?) """, (ret[0], ))
                 # logger.info("inserted %s settings values" % setup_name)
@@ -257,7 +258,10 @@ class SetupDb(BaseDb):
         r = self.conn.execute(""" SELECT """ + attrib + """ FROM general WHERE id=? """,
                               (self.active_setup_id,)).fetchone()
         # logger.info("%s = %s" % (attrib, r[0]))
-        return r[0] == "True"
+        if isinstance(r[0], str):
+            return r[0] == "True"
+        else:
+            return r[0] == 1
 
     def _setter_bool(self, attrib, value):
 
@@ -265,11 +269,26 @@ class SetupDb(BaseDb):
             logger.error("passed a %s in place of a boolean" % type(value))
             return
 
+        # required to check whether we are using the old str boolean
+        r = self.conn.execute(""" SELECT """ + attrib + """ FROM general WHERE id=? """,
+                              (self.active_setup_id,)).fetchone()
+        # logger.info("%s = %s" % (attrib, r[0]))
+        if isinstance(r[0], str):
+            is_str = True
+        else:
+            is_str = False
+
         with self.conn:
             if value:
-                value = "True"
+                if is_str:
+                    value = "True"
+                else:
+                    value = 1
             else:
-                value = "False"
+                if is_str:
+                    value = "False"
+                else:
+                    value = 0
 
             try:
                 self.conn.execute(""" UPDATE general SET """ + attrib + """=? WHERE id=? """,
