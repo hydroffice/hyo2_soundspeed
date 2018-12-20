@@ -13,10 +13,12 @@ HydrOffice Sound Speed's documentation
 	developer_guide
 	license
 	credits
-   
 
-* :ref:`genindex`
-* :ref:`search`
+
+.. only:: html
+
+    * :ref:`genindex`
+    * :ref:`search`
 
 
 .. note::
