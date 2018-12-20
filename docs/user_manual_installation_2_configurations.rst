@@ -100,16 +100,18 @@ If you want to modify them, click on the 'Lock/Unlock' button (:numref:`setup_ta
 
 .. warning:: If you want to use the RTOFS data, Internet (and the port 9090) must be accessible from the machine in use.
 
-NOAA tools configuration
-=====================
+NOAA tools flag
+===============
 
-.. index:: NOAA tools
+.. index:: NOAA tools, flag
 
-NOAA ships recommend to turn on the NOAA tools flag in the General settings tab.
-Currently, this NOAA tools flag is mainly used for NCEI file format output. 
-When NOAA tools flag is on, the default institution is uneditable.
-The vessel name is uneditable in the metadata dialog.
-The NOAA specific project name format is enforced during NCEI files exporting.
+For NOAA field, it is recommended to turn on the *NOAA tools* flag in the *General Settings* tab.
+
+Currently, the *NOAA tools* flag is mainly used for NCEI format output. When NOAA tools flag is on:
+
+* The default institution is uneditable.
+* The vessel name is uneditable in the metadata dialog.
+* The NOAA-specific project naming format is enforced during NCEI files exporting.
 
 Sound Speed Manager - SIS interaction
 =====================================
