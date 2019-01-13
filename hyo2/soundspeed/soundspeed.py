@@ -1,4 +1,3 @@
-import numpy as np
 import time
 import os
 import re
@@ -6,17 +5,14 @@ import copy
 import shutil
 import traceback
 import logging
-
-logger = logging.getLogger(__name__)
+from appdirs import user_data_dir
 
 from hyo2.abc.lib.progress.abstract_progress import AbstractProgress
 from hyo2.abc.lib.progress.cli_progress import CliProgress
 from hyo2.abc.lib.gdal_aux import GdalAux
 
-from hyo2.soundspeed import __version__ as soundspeed_version
-from hyo2.soundspeed import name as soundspeed_name
+from hyo2.soundspeed import lib_info
 from hyo2.soundspeed import formats
-from hyo2.soundspeed.appdirs.appdirs import user_data_dir
 from hyo2.soundspeed.atlas.atlases import Atlases
 from hyo2.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
 from hyo2.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
@@ -31,6 +27,8 @@ from hyo2.soundspeed.server.server import Server
 from hyo2.soundspeed.profile.ray_tracing.tracedprofile import TracedProfile
 from hyo2.soundspeed.profile.ray_tracing.diff_tracedprofiles import DiffTracedProfiles
 from hyo2.soundspeed.profile.ray_tracing.plot_tracedprofiles import PlotTracedProfiles
+
+logger = logging.getLogger(__name__)
 
 
 class SoundSpeedLibrary:
@@ -116,7 +114,7 @@ class SoundSpeedLibrary:
 
         # output data folder: where all the library data are written
         if data_folder is None:
-            data_folder = user_data_dir(soundspeed_name, "HydrOffice")
+            data_folder = user_data_dir(lib_info.lib_name, "HydrOffice")
         if not os.path.exists(data_folder):  # create it if it does not exist
             os.makedirs(data_folder)
         # logger.debug("library folder: %s" % data_folder)
@@ -139,7 +137,7 @@ class SoundSpeedLibrary:
     def make_release_folder(cls, data_folder=None):
         # release data folder: release-specific data (as settings)
         releases_folder = cls.make_releases_folder(data_folder=data_folder)
-        release_folder = os.path.join(releases_folder, soundspeed_version[:soundspeed_version.rindex('.')])
+        release_folder = os.path.join(releases_folder, lib_info.lib_version[:lib_info.lib_version.rindex('.')])
         if not os.path.exists(release_folder):  # create it if it does not exist
             os.makedirs(release_folder)
         # logger.debug("release folder: %s" % self.release_folder)
@@ -554,7 +552,7 @@ class SoundSpeedLibrary:
 
     # --- export data
 
-    def export_data(self, data_formats, data_paths, data_files=None, server_mode=False, custom_writer_instrument=None):
+    def export_data(self, data_formats, data_paths, data_files=None, custom_writer_instrument=None):
         """Export data using a list of formats name"""
 
         # checks

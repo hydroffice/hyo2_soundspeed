@@ -18,10 +18,9 @@ HydrOffice Sound Speed
      :target: https://travis-ci.org/hydroffice/hyo2_soundspeed
      :alt: Travis-CI Status
 
-..
-    .. image:: https://api.codacy.com/project/badge/Grade/9b1d844ce51846c4b78bb7694096fde7
-        :target: https://www.codacy.com/app/hydroffice/hyo2_soundspeed?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hydroffice/hyo_soundspeed&amp;utm_campaign=Badge_Grade
-        :alt: Codacy badge
+.. image:: https://api.codacy.com/project/badge/Grade/b92613f1b6794c968eef6ae5472c0c7f
+    :target: https://www.codacy.com/app/hydroffice/hyo2_soundspeed
+    :alt: Codacy badge
 
 .. image:: https://zenodo.org/badge/54854024.svg
    :target: https://zenodo.org/badge/latestdoi/54854024
