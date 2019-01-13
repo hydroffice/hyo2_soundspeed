@@ -8,17 +8,29 @@
 #
 # The resulting .exe file is placed in the dist/SoundSpeedManager folder.
 #
-# It may be required to manually copy mkl_avx.dll or mkl_p4.dll or msvcr100.dll
+# - It may require to manually copy DLL libraries.
+# - Uninstall PyQt and sip
+# - For QtWebEngine:
+#   . copy QtWebEngineProcess.exe in the root
+#   . copy in PySide2 both "resources" and "translations" folder
+#
 
-import sys, os
-from PyInstaller.building.build_main import Analysis, PYZ, EXE, COLLECT, BUNDLE, TOC
+from datetime import datetime
+import sys
+import os
+from PyInstaller.building.build_main import Analysis, PYZ, EXE, COLLECT, TOC
 from PyInstaller.compat import is_darwin, is_win
 
 from hyo2.soundspeed import __version__ as ssm_version
 
+is_beta = True
+if is_beta:
+    beta = ".b%s" % datetime.now().strftime("%Y%m%d%H%M%S")
+else:
+    beta = str()
+
 
 def collect_pkg_data(package, include_py_files=False, subdir=None):
-    import os
     from PyInstaller.utils.hooks import get_package_paths, remove_prefix, PY_IGNORE_EXTENSIONS
 
     # Accept only strings as packages.
@@ -86,25 +98,24 @@ def collect_folder_data(input_data_folder: str, relative_output_folder: str):
 share_folder = os.path.join(python_path(), "Library", "share")
 output_folder = os.path.join("Library", "share")
 pyproj_data = collect_folder_data(input_data_folder=share_folder, relative_output_folder=output_folder)
+pyside2_data = collect_pkg_data('PySide2')
+gsw_data = collect_pkg_data('gsw.utilities')
+abc_data = collect_pkg_data('hyo2.abc')
+sdm_data = collect_pkg_data('hyo2.surveydatamonitor')
+ss_data = collect_pkg_data('hyo2.soundspeed')
+ssm_data = collect_pkg_data('hyo2.soundspeedmanager')
+sss_data = collect_pkg_data('hyo2.soundspeedsettings')
 
-pkg_data = collect_pkg_data('hyo2.soundspeedmanager')
-pkg_data_2 = collect_pkg_data('hyo2.soundspeedsettings')
-pkg_data_3 = collect_pkg_data('gsw.utilities')
-pkg_data_4 = collect_pkg_data('hyo.surveydatamonitor')
-pkg_data_5 = collect_pkg_data('hyo2.soundspeed')
-
-icon_file = 'freeze\SoundSpeedManager.ico'
+icon_file = os.path.join('freeze', 'SoundSpeedManager.ico')
 if is_darwin:
-    icon_file = 'freeze\SoundSpeedManager.icns'
+    icon_file = os.path.join('freeze', 'SoundSpeedManager.icns')
 
 a = Analysis(['SoundSpeedManager.py'],
              pathex=[],
              hiddenimports=["PIL", "scipy._lib.messagestream", "cftime._cftime"],
-             excludes=[
-                "IPython", "PyQt", "pandas", "sphinx", "sphinx_rtd_theme", "OpenGL_accelerate",
-                "FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter",
-                "wx"
-                ],
+             excludes=["IPython", "PyQt4", "PyQt5", "pandas", "sphinx", "sphinx_rtd_theme", "OpenGL_accelerate",
+                       "FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter",
+                       "wx"],
              hookspath=None,
              runtime_hooks=None)
 
@@ -112,7 +123,7 @@ pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=True,
-          name='SoundSpeedManager.%s' % ssm_version,
+          name='SoundSpeedManager.%s%s' % (ssm_version, beta),
           debug=False,
           strip=None,
           upx=True,
@@ -122,12 +133,14 @@ coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
-               pkg_data,
-               pkg_data_2,
-               pkg_data_3,
-               pkg_data_4,
-               pkg_data_5,
+               gsw_data,
+               sdm_data,
                pyproj_data,
+               pyside2_data,
+               abc_data,
+               ss_data,
+               ssm_data,
+               sss_data,
                strip=None,
                upx=True,
-               name='SoundSpeedManager.%s' % ssm_version)
+               name='SoundSpeedManager.%s%s' % (ssm_version, beta))

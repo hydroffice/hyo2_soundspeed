@@ -1,17 +1,18 @@
 import struct
+import enum
+from typing.io import BinaryIO
 
 
 class KmBase:
 
-    flags = {
-        "VALID": 0,
-        "MISSING_FIRST_STX": 1,
-        "CORRUPTED_START_DATAGRAM": 2,
-        "UNEXPECTED_EOF": 3,
-        "CORRUPTED_END_DATAGRAM": 4,
-    }
+    class Flags(enum.Enum):
+        VALID = 0
+        MISSING_FIRST_STX = 1
+        CORRUPTED_START_DATAGRAM = 2
+        UNEXPECTED_EOF = 3
+        CORRUPTED_END_DATAGRAM = 4
 
-    def __init__(self, verbose=False):
+    def __init__(self, verbose: bool = False) -> None:
         self.verbose = verbose
         self.length = None
         self.stx = None
@@ -23,7 +24,7 @@ class KmBase:
         self.etx = None
         self.checksum = None
 
-    def read(self, file_input, file_size):
+    def read(self, file_input: BinaryIO, file_size: int) -> Flags:
         """populate header data"""
 
         first_dg = (file_input.tell() == 0)
@@ -40,12 +41,12 @@ class KmBase:
         if first_dg and self.stx != 2:
             if self.verbose:
                 print("KmBase > invalid Kongberg file > STX: %s" % self.stx)
-            return self.flags["MISSING_FIRST_STX"]
+            return self.Flags.MISSING_FIRST_STX
 
         if (self.stx != 2) or (self.id == 0):
             if self.verbose:
                 print("SIS > corrupted datagram")
-            return self.flags["CORRUPTED_START_DATAGRAM"]
+            return self.Flags.CORRUPTED_START_DATAGRAM
 
         # try to read ETX
 
@@ -54,7 +55,7 @@ class KmBase:
             if self.verbose:
                 print("KmBase > unexpected EOF > current pos: %s, datagram length: %s, file size: %s"
                       % (file_input.tell(), self.length, file_size))
-            return self.flags["UNEXPECTED_EOF"]
+            return self.Flags.UNEXPECTED_EOF
 
         # move file cursor to the end of the datagram
         file_input.seek(self.length - 15, 1)
@@ -67,6 +68,6 @@ class KmBase:
         if self.etx != 3:
             # print 'ETX not found, trying next datagram at position',file.tell()-(length+3)
 
-            return self.flags["CORRUPTED_END_DATAGRAM"]
+            return self.Flags.CORRUPTED_END_DATAGRAM
 
-        return self.flags["VALID"]
+        return self.Flags.VALID

@@ -213,6 +213,10 @@ class ControlPanel(QtWidgets.QWidget):
             ret = self.list_files.findItems(f, QtCore.Qt.MatchExactly)
             if len(ret) > 0:
                 logger.debug('duplicated %s' % os.path.basename(f))
+                # noinspection PyCallByClass
+                QtWidgets.QMessageBox.warning(self, "File Duplication",
+                                              "Attempt to add a listed file:\n%s" % os.path.basename(f),
+                                              QtWidgets.QMessageBox.Ok)
                 continue
             item = QtWidgets.QListWidgetItem(f)
             self.list_files.addItem(item)
@@ -238,20 +242,20 @@ class ControlPanel(QtWidgets.QWidget):
         if not self._active:
             return
 
-        Timer(1.0, self.monitoring).start()
+        Timer(0.5, self.monitoring).start()
 
     def start_emulation(self):
         if self.sis:
             if self.sis.is_alive():
                 # noinspection PyCallByClass
                 QtWidgets.QMessageBox.warning(self, "Emulator running ...", "The emulator is running! Stop it",
-                                              QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.Ok)
+                                              QtWidgets.QMessageBox.Ok)
                 return
 
         self.info_viewer.viewer.verticalScrollBar().setValue(self.info_viewer.viewer.verticalScrollBar().maximum())
         self.info_viewer.show()
 
-        # create a new thread
+        # create a new process
         input_port = int(self.set_input_port.text())
         output_ip = self.set_output_ip.text()
         output_port = int(self.set_output_port.text())

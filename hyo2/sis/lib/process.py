@@ -2,9 +2,10 @@ import logging
 import os
 import time
 from multiprocessing import Process, Event
+import threading
 
-from hyo2.sis.lib.threads.svpthread import SvpThread
-from hyo2.sis.lib.threads.replaythread import ReplayThread
+from hyo2.sis.lib.threads.svp_thread import SvpThread
+from hyo2.sis.lib.threads.replay_thread import ReplayThread
 
 logger = logging.getLogger(__name__)
 
@@ -61,9 +62,13 @@ class SisProcess(Process):
         self.shutdown.set()
 
     def init_thread(self):
+
+        lists_lock = threading.Lock()
+
         self.t_svp = SvpThread(runtime=self.runtime,
                                installation=self.installation,
                                ssp=self.ssp,
+                               lists_lock=lists_lock,
                                port_in=self.port_in,
                                port_out=self.port_out,
                                ip_out=self.ip_out,
@@ -73,6 +78,7 @@ class SisProcess(Process):
         self.t_replay = ReplayThread(runtime=self.runtime,
                                      installation=self.installation,
                                      ssp=self.ssp,
+                                     lists_lock=lists_lock,
                                      files=self.files,
                                      replay_timing=self._replay_timing,
                                      port_in=self.port_in,

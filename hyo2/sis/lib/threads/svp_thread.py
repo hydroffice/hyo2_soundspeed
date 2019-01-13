@@ -4,25 +4,24 @@ import threading
 import socket
 import struct
 import numpy as np
+from typing import Optional
 
 # logging settings
 import logging
+
 logger = logging.getLogger(__name__)
 
 
 class SvpThread(threading.Thread):
-    def __init__(self, installation, runtime, ssp,
-                 port_in=4001, port_out=26103, ip_out="localhost",
-                 target=None, name="SVP", verbose=False):
+    def __init__(self, installation: list, runtime: list, ssp: list, lists_lock: threading.Lock,
+                 port_in: Optional[int] = 4001, port_out: Optional[int] = 26103, ip_out: Optional[str] = "localhost",
+                 target: Optional[object] = None, name: Optional[str] = "SVP", verbose: Optional[bool] = False) -> None:
         threading.Thread.__init__(self, target=target, name=name)
         self.verbose = verbose
 
         self.port_in = port_in
         self.port_out = port_out
         self.ip_out = ip_out
-        logger.debug("input port: %s" % self.port_in)
-        logger.debug("output port: %s" % self.port_out)
-        logger.debug("output address: %s" % self.ip_out)
 
         self.sock_in = None
         self.sock_out = None
@@ -30,11 +29,12 @@ class SvpThread(threading.Thread):
         self.installation = installation
         self.runtime = runtime
         self.ssp = ssp
+        self.lists_lock = lists_lock
 
         self.shutdown = threading.Event()
 
-    def run(self):
-        logger.debug("%s started" % self.name)
+    def run(self) -> None:
+        logger.debug("%s started -> in %s, out %s:%s" % (self.name, self.port_in, self.ip_out, self.port_out))
         self.init_sockets()
         while True:
             if self.shutdown.is_set():
@@ -44,11 +44,11 @@ class SvpThread(threading.Thread):
 
         logger.debug("%s end" % self.name)
 
-    def stop(self):
+    def stop(self) -> None:
         """Stop the thread"""
         self.shutdown.set()
 
-    def init_sockets(self):
+    def init_sockets(self) -> None:
         """Initialize UDP sockets"""
 
         self.sock_in = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -61,7 +61,7 @@ class SvpThread(threading.Thread):
         logger.debug("sock_out > buffer %sKB" %
                      (self.sock_out.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF) / 1024))
 
-    def interaction(self):
+    def interaction(self) -> None:
         try:
             data, address = self.sock_in.recvfrom(2 ** 16)  # 2**15 is max UDP datagram size
             data = data.decode('utf-8')
@@ -80,58 +80,71 @@ class SvpThread(threading.Thread):
 
             logger.debug("got IUR request!")
 
-            # First send the Installation parameters
-            if len(self.installation) != 0:
-                installation = self.installation[-1]
-                if self.verbose:
-                    logger.debug("sending installation: %s" % self.installation)
-                self.sock_out.sendto(self.installation, (self.ip_out, self.port_out))
-                time.sleep(0.5)
+            with self.lists_lock:
 
-            # Second send the Runtime parameters
-            if len(self.runtime) != 0:
-                runtime = self.runtime[-1]
-                if self.verbose:
-                    logger.debug("sending runtime: %s" % self.runtime)
-                self.sock_out.sendto(self.runtime, (self.ip_out, self.port_out))
-                time.sleep(0.5)
+                # First send the Installation parameters
+                logger.debug("installation datagrams: %d" % len(self.installation))
+                if len(self.installation) != 0:
+                    installation = self.installation[-1]
+                    if self.verbose:
+                        logger.debug("sending installation: %s" % self.installation)
+                    self.sock_out.sendto(installation, (self.ip_out, self.port_out))
+                    time.sleep(0.5)
 
-            # Third send the SVP ...
-            if len(self.ssp) == 0:
+                # Second send the Runtime parameters
+                logger.debug("runtime datagrams: %d" % len(self.runtime))
+                if len(self.runtime) != 0:
+                    runtime = self.runtime[-1]
+                    if self.verbose:
+                        logger.debug("sending runtime: %s" % self.runtime)
+                    self.sock_out.sendto(runtime, (self.ip_out, self.port_out))
+                    time.sleep(0.5)
 
-                # If we're running but haven't received an SVP yet, then we build a fake one to send back.
-                # Useful in testing the Server mode since the library establishes comm's before starting to serve
-                num_entries = 3
-                depths = np.zeros(num_entries)
-                speeds = np.zeros(num_entries)
-                depths[0] = 0.0
-                speeds[0] = 1510.0
-                depths[1] = 500.0
-                speeds[1] = 1490.0
-                depths[2] = 12000.0
-                speeds[2] = 1500.0
-                if self.verbose:
-                    logger.debug("making up a fake profile")
+                # Third send the SVP ...
+                logger.debug("ssp datagrams: %d" % len(self.ssp))
+                if len(self.ssp) != 0:
 
-            else:
+                    if self.verbose:
+                        logger.debug("sending svp")
 
-                if self.verbose:
-                    logger.debug("sending svp")
+                    time.sleep(1.5)
+                    ssp = self.ssp[-1]
+                    self.sock_out.sendto(ssp, (self.ip_out, self.port_out))
+                    return
 
-                time.sleep(1.5)
-                ssp = self.ssp[-1]
-                self.sock_out.sendto(ssp, (self.ip_out, self.port_out))
-                return
+            # If we're running but haven't received an SVP yet, then we build a fake one to send back.
+            # Useful in testing the Server mode since the library establishes comm's before starting to serve
+            num_entries = 8
+            depths = np.zeros(num_entries)
+            speeds = np.zeros(num_entries)
+            depths[0] = 0.0
+            speeds[0] = 1537.63
+            depths[1] = 50.0
+            speeds[1] = 1537.52
+            depths[2] = 100.0
+            speeds[2] = 1529.96
+            depths[3] = 300.0
+            speeds[3] = 1521.80
+            depths[4] = 800.0
+            speeds[4] = 1486.73
+            depths[5] = 1400.0
+            speeds[5] = 1444.99
+            depths[6] = 1600.0
+            speeds[6] = 1447.25
+            depths[7] = 12000.0
+            speeds[7] = 1500.0
+            if self.verbose:
+                logger.debug("making up a fake profile")  # it will send at the end of the function
 
         else:
-
-            if self.verbose:
-                logger.debug("received SSP")
+            # the big assumption here is that we received a valid Snn profile
 
             if isinstance(data, bytes):
                 data = data.decode("utf-8")
 
-            # logger.debug(data)
+            if self.verbose and (len(data) > 8):
+                logger.debug("received %s" % data[:6])
+            # logger.debug("received data:\n%s" % data)
 
             depths = None
             speeds = None
@@ -176,12 +189,14 @@ class SvpThread(threading.Thread):
             logger.debug("sending data: %s" % repr(ssp))
         time.sleep(1.5)
         self.sock_out.sendto(ssp, (self.ip_out, self.port_out))
-        self.ssp.append(ssp)
+        with self.lists_lock:
+            self.ssp.append(ssp)
 
         if self.verbose:
             logger.debug("data sent")
 
-    def create_binary_ssp(self, depths, speeds, d_res=1, date=None, secs=None):
+    def create_binary_ssp(self, depths: np.ndarray, speeds: np.ndarray,
+                          date: Optional[int] = None, secs: Optional[int] = None):
         if self.verbose:
             logger.debug('creating a binary ssp')
 

@@ -1,29 +1,21 @@
-# logging settings
 import logging
 import os
 import socket
 import threading
 import time
 from threading import Lock
-
-logger = logging.getLogger(__name__)
+from typing import Optional
 
 from hyo2.sis.lib.kmbase import KmBase
 
+logger = logging.getLogger(__name__)
+
 
 class ReplayThread(threading.Thread):
-    def __init__(self,
-                 installation,
-                 runtime,
-                 ssp,
-                 files,
-                 replay_timing=1.0,
-                 port_in=4001,
-                 port_out=26103,
-                 ip_out="localhost",
-                 target=None,
-                 name="SVP",
-                 verbose=False):
+    def __init__(self, installation: list, runtime: list, ssp: list, lists_lock: threading.Lock, files: list,
+                 replay_timing: Optional[float] = 1.0, port_in: Optional[int] = 4001, port_out: Optional[int] = 26103,
+                 ip_out: Optional[str] = "localhost", target: Optional[object] = None, name: Optional[str] = "REP",
+                 verbose: Optional[bool] = False):
         threading.Thread.__init__(self, target=target, name=name)
         self.verbose = verbose
         self.port_in = port_in
@@ -31,10 +23,6 @@ class ReplayThread(threading.Thread):
         self.ip_out = ip_out
         self.files = files
         self._replay_timing = replay_timing
-        logger.debug("input port: %s" % self.port_in)
-        logger.debug("output port: %s" % self.port_out)
-        logger.debug("output address: %s" % self.ip_out)
-        logger.debug("reply timing: %s" % self._replay_timing)
 
         self.sock_in = None
         self.sock_out = None
@@ -42,6 +30,7 @@ class ReplayThread(threading.Thread):
         self.installation = installation
         self.runtime = runtime
         self.ssp = ssp
+        self.lists_lock = lists_lock
 
         self.dg_counter = None
 
@@ -70,8 +59,8 @@ class ReplayThread(threading.Thread):
         self._external_lock = False
 
     def run(self):
-        if self.verbose:
-            logger.debug("%s started" % self.name)
+        logger.debug("%s started -> in %s, out %s:%s, timing: %s"
+                     % (self.name, self.port_in, self.ip_out, self.port_out, self._replay_timing))
 
         self.init_sockets()
         while True:
@@ -131,29 +120,29 @@ class ReplayThread(threading.Thread):
 
                 base = KmBase(verbose=True)
                 ret = base.read(f, f_sz)
-                if ret == base.flags["MISSING_FIRST_STX"]:
+                if ret == KmBase.Flags.MISSING_FIRST_STX:
 
                     if self.verbose:
                         logger.debug("troubles in reading file > SKIP")
                     break
 
-                elif ret == base.flags["CORRUPTED_START_DATAGRAM"]:
+                elif ret == KmBase.Flags.CORRUPTED_START_DATAGRAM:
 
                     f.seek(-15, 1)  # +1 byte from initial header position
                     logger.debug("troubles in reading initial datagram part > REALIGN to position: %s" % f.tell())
                     continue
 
-                elif ret == base.flags["UNEXPECTED_EOF"]:
+                elif ret == KmBase.Flags.UNEXPECTED_EOF:
 
                     logger.debug("troubles in reading file > SKIP (reason: unexpected EOF)")
                     break
 
-                elif ret == base.flags["CORRUPTED_START_DATAGRAM"]:
+                elif ret == KmBase.Flags.CORRUPTED_START_DATAGRAM:
 
                     f.seek(-(base.length + 3), 1)
                     logger.debug("troubles in reading final datagram part > REALIGN to position: %s" % f.tell())
 
-                elif ret == base.flags["VALID"]:
+                elif ret == KmBase.Flags.VALID:
 
                     self.dg_counter += 1
 
@@ -171,28 +160,24 @@ class ReplayThread(threading.Thread):
                 # - watercolumn (0x6b)
                 if (base.id == 0x4e) or (base.id == 0x49) or (base.id == 0x50) or (base.id == 0x52) or \
                         (base.id == 0x55) or (base.id == 0x58) or (base.id == 0x59) or (base.id == 0x6b):
-                    logger.debug("%s %s > sending dg #%s (length: %sB)"
-                                 % (base.date, base.time, base.id, base.length))
+                    logger.debug("%s %s > sending dg #%s(%s) (length: %sB)"
+                                 % (base.date, base.time, hex(base.id), base.id, base.length))
                     f.seek(-base.length, 1)
                     dg_data = f.read(base.length)
 
-                    # If we come across a runtime datagram then set it in the bounce back thread
-                    if id == 0x49:
-                        self.installation.append(dg_data)
-
-                    # If we come across a runtime datagram then set it in the bounce back thread
-                    if id == 0x52:
-                        self.runtime.append(dg_data)
-
-                    # If we come across an SVP datagram then set it in the bounce back thread
-                    if id == 0x55:
-                        self.ssp.append(dg_data)
+                    # Stores a few datagrams of interest in data lists:
+                    with self.lists_lock:
+                        if base.id == 0x49:
+                            self.installation.append(dg_data)
+                        if base.id == 0x52:
+                            self.runtime.append(dg_data)
+                        if base.id == 0x55:
+                            self.ssp.append(dg_data)
 
                     self.sock_out.sendto(dg_data, (self.ip_out, self.port_out))
 
-                    self._lock.acquire()
-                    time.sleep(self._replay_timing)
-                    self._lock.release()
+                    with self._lock:
+                        time.sleep(self._replay_timing)
 
                 if f.tell() >= f_sz:
                     # end of file
