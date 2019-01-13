@@ -4,7 +4,7 @@ from multiprocessing import freeze_support
 
 from PySide2 import QtWidgets
 
-from hyo2.sis.gui.mainwin import MainWin
+from hyo2.sis.app.mainwin import MainWin
 
 
 class DebugFilter(logging.Filter):

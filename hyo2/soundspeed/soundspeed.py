@@ -58,7 +58,7 @@ class SoundSpeedLibrary:
         self._outputs_folder = None
         # _noaa_project format OPR-Xnnn-XX-nn
         self._noaa_project = None
-        self._noaa_project_validate = re.compile("^(OPR-[A-Z]\d{3}-[A-Z]{2}-\d{2})")
+        self._noaa_project_validate = re.compile(r"^(OPR-[A-Z]\d{3}-[A-Z]{2}-\d{2})")
         self.set_folders(data_folder=data_folder)
 
         # load settings and other functionalities
@@ -81,7 +81,7 @@ class SoundSpeedLibrary:
         if len(self.setup.custom_projects_folder):
 
             if os.path.exists(self.setup.custom_projects_folder):
-                self.projects_folder = self.setup.custom_projects_folder
+                self._projects_folder = self.setup.custom_projects_folder
             else:  # delete the not-existing folder
                 self.setup.custom_projects_folder = str()
                 self.setup.save_to_db()
@@ -90,7 +90,7 @@ class SoundSpeedLibrary:
         if len(self.setup.custom_outputs_folder):
 
             if os.path.exists(self.setup.custom_outputs_folder):
-                self.outputs_folder = self.setup.custom_outputs_folder
+                self._outputs_folder = self.setup.custom_outputs_folder
             else:  # delete the not-existing folder
                 self.setup.custom_outputs_folder = str()
                 self.setup.save_to_db()
@@ -145,12 +145,12 @@ class SoundSpeedLibrary:
         return release_folder
 
     @classmethod
-    def setup_exists(cls, data_folder=None):
+    def setup_exists(cls):
         release_folder = cls.make_release_folder()
         return os.path.exists(os.path.join(release_folder, "setup.db"))
 
     @classmethod
-    def list_other_setups(cls, data_folder=None):
+    def list_other_setups(cls):
         releases_folder = cls.make_releases_folder()
         old_setups = list()
         for release in os.listdir(releases_folder):
@@ -616,7 +616,8 @@ class SoundSpeedLibrary:
             if not has_data_files:  # we don't have the output file names
                 writer.write(ssp=self.ssp, data_path=data_paths[name], project=current_project)
             else:
-                writer.write(ssp=self.ssp, data_path=data_paths[name], data_file=data_files[name], project=current_project)
+                writer.write(ssp=self.ssp, data_path=data_paths[name], data_file=data_files[name],
+                             project=current_project)
 
         # take care of listeners
         if self.has_sippican_to_process():
@@ -635,7 +636,8 @@ class SoundSpeedLibrary:
         try:
             self._noaa_project = self._noaa_project_validate.match(value).group(1)
             return False
-        except:
+
+        except Exception:
             if format_ok:
                 self._noaa_project = value
                 return False
@@ -663,7 +665,7 @@ class SoundSpeedLibrary:
         if not os.path.exists(new_db_path):
             raise RuntimeError("unable to copy the project db: %s" % new_db_path)
 
-        self.current_project = name
+        self.setup.current_project = name
         self.save_settings_to_db()
         self.reload_settings_from_db()
 
@@ -703,7 +705,7 @@ class SoundSpeedLibrary:
         # special case: synthetic multiple profiles, we just save the average profile
         if (self.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']) and \
                 ((self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA09']) or
-                     (self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA13'])):
+                 (self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA13'])):
             tmp_ssp = copy.deepcopy(self.ssp)
             del tmp_ssp.l[1:]
             success = db.remove_casts(tmp_ssp)
@@ -733,7 +735,7 @@ class SoundSpeedLibrary:
         # special case: synthetic multiple profiles, we just save the average profile
         if (self.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']) and \
                 ((self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA09']) or
-                     (self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA13'])):
+                 (self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA13'])):
             tmp_ssp = copy.deepcopy(self.ssp)
             del tmp_ssp.l[1:]
             success = db.add_casts(tmp_ssp)

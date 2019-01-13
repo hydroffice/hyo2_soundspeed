@@ -1,12 +1,13 @@
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2 import QtCore, QtWidgets
 
 import logging
-logger = logging.getLogger(__name__)
 
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
 from hyo2.soundspeedmanager.dialogs.output_folders_dialog import OutputFoldersDialog
 from hyo2.soundspeed.base.helper import explore_folder
 from hyo2.soundspeed.profile.dicts import Dicts
+
+logger = logging.getLogger(__name__)
 
 
 class ExportSingleProfileDialog(AbstractDialog):
@@ -141,7 +142,6 @@ class ExportSingleProfileDialog(AbstractDialog):
             return
 
         # special case for Fugro ISS format
-        iss_writer_instrument = None
         custom_writer_instrument = None
 
         # special case: synthetic profile and NCEI
@@ -181,6 +181,7 @@ class ExportSingleProfileDialog(AbstractDialog):
                       "To fix the issue:\n" \
                       "- Load the profile (if not already loaded)\n" \
                       "- Set the missing values using the Metadata button on the Editor tool bar\n"
+                # noinspection PyCallByClass
                 QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.Ok)
                 return
 
@@ -231,7 +232,7 @@ class ExportSingleProfileDialog(AbstractDialog):
             while True:
                 # noinspection PyCallByClass
                 basename, ok = QtWidgets.QInputDialog.getText(self, "Output basename", basename_msg,
-                                                          text=self.lib.cur_basename)
+                                                              text=self.lib.cur_basename)
                 if not ok:
                     return
                 for writer in self.selected_writers:

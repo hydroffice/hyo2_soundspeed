@@ -5,13 +5,10 @@ import traceback
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
-from hyo2.abc.app.qt_progress import QtProgress
 from hyo2.abc.app.dialogs.exception.exception_dialog import ExceptionDialog
 
 from hyo2.soundspeed import lib_info
-from hyo2.soundspeedmanager import app_info
-from hyo2.soundspeedsettings import __version__ as sss_version
-from hyo2.soundspeedsettings import name as sss_name
+from hyo2.soundspeedsettings import app_info
 from hyo2.soundspeedsettings.widgets.main import Main
 from hyo2.soundspeedsettings.widgets.general import General
 from hyo2.soundspeedsettings.widgets.input import Input
@@ -24,22 +21,20 @@ logger = logging.getLogger(__name__)
 
 
 class MainWin(QtWidgets.QMainWindow):
-    here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
-    media = os.path.join(here, "media")
 
     def __init__(self, lib, main_win=None):
         super().__init__()
 
         # check passed input parameters
-        if type(lib) != SoundSpeedLibrary:
+        if not isinstance(lib, SoundSpeedLibrary):
             raise RuntimeError("Invalid type (%s) in place of a Project instance" % type(lib))
         self.lib = lib
         self.db = lib.settings_db()
         self.main_win = main_win
 
         # set the application name and the version
-        self.name = sss_name
-        self.version = sss_version
+        self.name = app_info.app_name
+        self.version = app_info.app_version
         self.setWindowTitle('%s v.%s' % (self.name, self.version))
 
         # only called when stand-alone (without Sound Speed Manager)
@@ -52,16 +47,7 @@ class MainWin(QtWidgets.QMainWindow):
             logger.debug("set application name: %s" % _app.applicationName())
 
             # set icons
-            icon_info = QtCore.QFileInfo(os.path.join(self.media, 'settings.png'))
-            self.setWindowIcon(QtGui.QIcon(icon_info.absoluteFilePath()))
-            if (sys.platform == 'win32') or (os.name is "nt"):  # is_windows()
-                try:
-                    # This is needed to display the app icon on the taskbar on Windows 7
-                    import ctypes
-                    app_id = '%s v.%s' % (self.name, self.version)
-                    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_id)
-                except AttributeError as e:
-                    logger.debug("Unable to change app icon: %s" % e)
+            self.setWindowIcon(QtGui.QIcon(app_info.app_icon_path))
 
         # make tabs
         self.tabs = QtWidgets.QTabWidget()

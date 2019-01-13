@@ -3,6 +3,7 @@ import logging
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
+from hyo2.soundspeedmanager import app_info
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
 from hyo2.soundspeedmanager.dialogs.text_editor import TextEditor
 
@@ -155,7 +156,7 @@ class TextEditorDialog(AbstractDialog):
     def do_you_really_want(self, title="Quit", text="quit"):
         msg_box = QtWidgets.QMessageBox(self)
         msg_box.setWindowTitle(title)
-        msg_box.setIconPixmap(QtGui.QPixmap(os.path.join(self.media, 'favicon.png')).scaled(QtCore.QSize(36, 36)))
+        msg_box.setIconPixmap(QtGui.QPixmap(app_info.app_icon_path).scaled(QtCore.QSize(36, 36)))
         msg_box.setText('There are unsaved changes!\nDo you really want to %s?' % text)
         msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         msg_box.setDefaultButton(QtWidgets.QMessageBox.No)

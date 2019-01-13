@@ -4,32 +4,19 @@ from multiprocessing import freeze_support
 
 from PySide2 import QtWidgets
 
-from hyo2.sis.gui.mainwin import MainWin
+from hyo2.sis.app.mainwin import MainWin
 
 
-class DebugFilter(logging.Filter):
-
-    def filter(self, record):
-
-        if record.name[:3] != "hyo":
-            return False
-
-        # if (record.name == 'hyo2.soundspeed.listener.sis.sis') and \
-        #         (record.funcName == "parse") and (record.levelname == "INFO"):
-        #     return False
-
-        return True
+def set_logging(default_logging=logging.WARNING, hyo2_logging=logging.INFO, abc_logging=logging.DEBUG):
+    logging.basicConfig(
+        level=default_logging,
+        format="%(levelname)-9s %(name)s.%(funcName)s:%(lineno)d > %(message)s"
+    )
+    logging.getLogger("hyo2").setLevel(hyo2_logging)
+    logging.getLogger("hyo2.sis").setLevel(abc_logging)
 
 
-# logging settings
-logger = logging.getLogger()
-logger.setLevel(logging.NOTSET)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)  # change to WARNING to reduce verbosity, DEBUG for high verbosity
-ch_formatter = logging.Formatter('%(levelname)-9s %(name)s.%(funcName)s:%(lineno)d > %(message)s')
-ch.setFormatter(ch_formatter)
-ch.addFilter(DebugFilter())
-logger.addHandler(ch)
+set_logging()
 
 
 def sis_gui():

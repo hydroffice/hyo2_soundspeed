@@ -41,7 +41,7 @@ setup(
     packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests", "*.test*", ]),
     package_data={
         "": [
-            'sis/gui/media/*.png',
+            'sis/app/media/*.png',
             'soundspeed/listener/seacat/CONFIG/*.*',
             'soundspeedmanager/media/*.png',
             'soundspeedmanager/widgets/media/*.png',

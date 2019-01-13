@@ -18,27 +18,20 @@ from hyo2.abc.lib.helper import Helper
 from hyo2.soundspeed import lib_info
 from hyo2.soundspeedmanager import app_info
 
-# from hyo2.soundspeedmanager import __version__ as ssm_version
-# from hyo2.soundspeedmanager import __doc__ as ssm_name
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
-# from hyo2.soundspeed.base.helper import is_pydro, info_libs, web_url
 from hyo2.soundspeedmanager.qt_callbacks import QtCallbacks
 
 from hyo2.soundspeedmanager.widgets.editor import Editor
 from hyo2.soundspeedmanager.widgets.database import Database
 from hyo2.soundspeedmanager.widgets.server import Server
-from hyo2.soundspeedmanager.widgets.refraction import Refraction
+# from hyo2.soundspeedmanager.widgets.refraction import Refraction
 from hyo2.soundspeedmanager.widgets.settings import Settings
-
-# from hyo2.soundspeedmanager.widgets.info import Info
 
 logger = logging.getLogger(__name__)
 
 
 class MainWin(QtWidgets.QMainWindow):
-    here = os.path.abspath(os.path.dirname(__file__))
-    media = os.path.join(here, "media")
 
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
@@ -60,16 +53,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.resize(920, 600)
 
         # set icons
-        icon_info = QtCore.QFileInfo(os.path.join(self.media, 'favicon.png'))
-        self.setWindowIcon(QtGui.QIcon(icon_info.absoluteFilePath()))
-        if (sys.platform == 'win32') or (os.name is "nt"):  # is_windows()
-            try:
-                # This is needed to display the app icon on the taskbar on Windows 7
-                import ctypes
-                app_id = '%s v.%s' % (self.name, self.version)
-                ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_id)
-            except AttributeError as e:
-                logger.debug("Unable to change app icon: %s" % e)
+        self.setWindowIcon(QtGui.QIcon(app_info.app_icon_path))
 
         # check if setup db exists; if yes, ask to copy
         has_setup = SoundSpeedLibrary.setup_exists()
@@ -121,16 +105,16 @@ class MainWin(QtWidgets.QMainWindow):
         self.tabs.setIconSize(QtCore.QSize(42, 42))
         self.tabs.blockSignals(True)  # during the initialization
         # noinspection PyUnresolvedReferences
-        self.tabs.currentChanged.connect(self.onChange)  # changed!
+        self.tabs.currentChanged.connect(self.on_change)  # changed!
         # editor
         self.tab_editor = Editor(lib=self.lib, main_win=self)
         self.idx_editor = self.tabs.insertTab(0, self.tab_editor,
-                                              QtGui.QIcon(os.path.join(self.here, 'media', 'editor.png')), "")
+                                              QtGui.QIcon(os.path.join(app_info.app_media_path, 'editor.png')), "")
         self.tabs.setTabToolTip(self.idx_editor, "Editor")
         # database
         self.tab_database = Database(lib=self.lib, main_win=self)
         self.idx_database = self.tabs.insertTab(1, self.tab_database,
-                                                QtGui.QIcon(os.path.join(self.here, 'media', 'database.png')), "")
+                                                QtGui.QIcon(os.path.join(app_info.app_media_path, 'database.png')), "")
         self.tabs.setTabToolTip(self.idx_database, "Database")
         # survey data monitor
         self.has_sdm_support = True
@@ -140,7 +124,8 @@ class MainWin(QtWidgets.QMainWindow):
             self.tab_monitor = SurveyDataMonitor(lib=self.lib, main_win=self)
             self.idx_monitor = self.tabs.insertTab(3, self.tab_monitor,
                                                    QtGui.QIcon(
-                                                       os.path.join(self.here, 'media', 'surveydatamonitor.png')), "")
+                                                       os.path.join(app_info.app_media_path, 'surveydatamonitor.png')),
+                                                   "")
             self.tabs.setTabToolTip(self.idx_monitor, "Survey Data Monitor")
             logger.info("Support for Survey Monitor: ON")
         except Exception as e:
@@ -150,18 +135,18 @@ class MainWin(QtWidgets.QMainWindow):
         # server
         self.tab_server = Server(lib=self.lib, main_win=self)
         self.idx_server = self.tabs.insertTab(4, self.tab_server,
-                                              QtGui.QIcon(os.path.join(self.here, 'media', 'server.png')), "")
+                                              QtGui.QIcon(os.path.join(app_info.app_media_path, 'server.png')), "")
         self.tabs.setTabToolTip(self.idx_server, "Synthetic Profile Server")
 
         # refraction
         # self.tab_refraction = Refraction(lib=self.lib, main_win=self)
         # idx = self.tabs.insertTab(5, self.tab_refraction,
-        #                           QtGui.QIcon(os.path.join(self.here, 'media', 'refraction.png')), "")
+        #                           QtGui.QIcon(os.path.join(app_info.app_media_path, 'refraction.png')), "")
         # self.tabs.setTabToolTip(idx, "Refraction Monitor")
         # setup
         self.tab_setup = Settings(lib=self.lib, main_win=self)
         self.idx_setup = self.tabs.insertTab(6, self.tab_setup,
-                                             QtGui.QIcon(os.path.join(self.here, 'media', 'settings.png')), "")
+                                             QtGui.QIcon(os.path.join(app_info.app_media_path, 'settings.png')), "")
         self.tabs.setTabToolTip(self.idx_setup, "Setup")
         # info
         self.tab_info = InfoTab(main_win=self, lib_info=lib_info, app_info=app_info,
@@ -174,7 +159,7 @@ class MainWin(QtWidgets.QMainWindow):
                                 with_unh_link=True,
                                 with_license=True)
         self.idx_info = self.tabs.insertTab(6, self.tab_info,
-                                            QtGui.QIcon(os.path.join(self.here, 'media', 'info.png')), "")
+                                            QtGui.QIcon(os.path.join(app_info.app_media_path, 'info.png')), "")
         self.tabs.setTabToolTip(self.idx_info, "Info")
         # Help menu
         self.help_menu.addAction(self.tab_info.open_online_manual_action)
@@ -200,7 +185,7 @@ class MainWin(QtWidgets.QMainWindow):
 
         logger.info("* > APP: initialized!")
 
-    def onChange(self, i):
+    def on_change(self, i):
         # logger.debug("Current Tab Index: %s" % type(self.tabs.widget(i)))
         if type(self.tabs.widget(i)) == Settings:
             self.tab_setup.setup_changed()
@@ -641,7 +626,7 @@ class MainWin(QtWidgets.QMainWindow):
         """helper function that show to the user a message windows asking to confirm an action"""
         msg_box = QtWidgets.QMessageBox(self)
         msg_box.setWindowTitle(title)
-        msg_box.setIconPixmap(QtGui.QPixmap(os.path.join(self.media, 'favicon.png')).scaled(QtCore.QSize(36, 36)))
+        msg_box.setIconPixmap(QtGui.QPixmap(app_info.app_icon_path).scaled(QtCore.QSize(36, 36)))
         msg_box.setText('Do you really want to %s?' % text)
         msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         msg_box.setDefaultButton(QtWidgets.QMessageBox.No)

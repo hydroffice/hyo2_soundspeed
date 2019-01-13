@@ -6,14 +6,13 @@ from threading import Timer
 from PySide2 import QtCore, QtGui, QtWidgets
 
 from hyo2.sis.lib.process import SisProcess
-from hyo2.sis.gui.infoviewer import InfoViewerDialog
+from hyo2.sis.app.infoviewer import InfoViewerDialog
 from hyo2.abc.app.qt_progress import QtProgress
 
 logger = logging.getLogger(__name__)
 
 
 class ControlPanel(QtWidgets.QWidget):
-
     here = os.path.abspath(os.path.dirname(__file__)).replace("\\", "/")
 
     def __init__(self):
@@ -45,10 +44,10 @@ class ControlPanel(QtWidgets.QWidget):
         self._make_sis_commands()
 
         self.vbox.addSpacing(12)
-        credits = QtWidgets.QLabel("<i>Comments and suggestions:</i> "
-                               "<a href='mailto:gmasetti@ccom.unh.edu'>gmasetti@ccom.unh.edu</a>")
-        credits.setOpenExternalLinks(True)
-        self.vbox.addWidget(credits)
+        comments = QtWidgets.QLabel("<i>Comments and suggestions:</i> "
+                                    "<a href='mailto:gmasetti@ccom.unh.edu'>gmasetti@ccom.unh.edu</a>")
+        comments.setOpenExternalLinks(True)
+        self.vbox.addWidget(comments)
 
         # info viewer
         self.info_viewer = InfoViewerDialog(self)
@@ -87,7 +86,7 @@ class ControlPanel(QtWidgets.QWidget):
         self.set_output_ip = QtWidgets.QLineEdit("")
         hbox.addWidget(self.set_output_ip)
         octet = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])"
-        reg_ex = QtCore.QRegExp("^%s\.%s\.%s\.%s$" % (octet, octet, octet, octet))
+        reg_ex = QtCore.QRegExp(r"^%s\.%s\.%s\.%s$" % (octet, octet, octet, octet))
         validator = QtGui.QRegExpValidator(reg_ex)
         self.set_output_ip.setValidator(validator)
         self.set_output_ip.setText("127.0.0.1")
@@ -200,8 +199,8 @@ class ControlPanel(QtWidgets.QWidget):
         # ask the file path to the user
         # noinspection PyCallByClass
         selections, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "Add Kongsberg data files", source_folder,
-                                                           "Kongsberg file (*.all);;All files (*.*)", None,
-                                                           QtWidgets.QFileDialog.ExistingFiles)
+                                                               "Kongsberg file (*.all);;All files (*.*)", None,
+                                                               QtWidgets.QFileDialog.ExistingFiles)
         if not selections:
             logger.debug('no selection')
             return
@@ -233,7 +232,6 @@ class ControlPanel(QtWidgets.QWidget):
             data = self.conn.recv()
 
             if isinstance(data, str):
-
                 self.info_viewer.append(data)
                 # logger.debug("%s" % data)
 
@@ -247,7 +245,7 @@ class ControlPanel(QtWidgets.QWidget):
             if self.sis.is_alive():
                 # noinspection PyCallByClass
                 QtWidgets.QMessageBox.warning(self, "Emulator running ...", "The emulator is running! Stop it",
-                                          QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.Ok)
+                                              QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.Ok)
                 return
 
         self.info_viewer.viewer.verticalScrollBar().setValue(self.info_viewer.viewer.verticalScrollBar().maximum())
@@ -284,7 +282,6 @@ class ControlPanel(QtWidgets.QWidget):
     def stop_emulation(self):
         logger.debug("stop SIS")
         if self.sis:
-
             progress = QtProgress(self)
             progress.start(title="Halting", text="Wait while threads stop")
             progress.update(value=20)
