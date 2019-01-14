@@ -180,7 +180,7 @@ class Woa09(AbstractAtlas):
 
         # check the inputs
         if (lat is None) or (lon is None) or (datestamp is None):
-            logger.error("invalid query: %s @ (%.6f, %.6f)" % (datestamp.strftime("%Y%m%d"), lon, lat))
+            logger.error("invalid query: %s @ (%s, %s)" % (datestamp.strftime("%Y%m%d"), lon, lat))
             return None
         if lon < 0:  # Make all longitudes positive
             lon += 360.0

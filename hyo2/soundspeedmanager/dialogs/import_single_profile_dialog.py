@@ -1,13 +1,14 @@
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2 import QtCore, QtWidgets
 
 import traceback
 import os
 import logging
-logger = logging.getLogger(__name__)
 
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
 from hyo2.soundspeedmanager.dialogs.seacat_dialog import SeacatDialog
 from hyo2.soundspeed.base.helper import web_url
+
+logger = logging.getLogger(__name__)
 
 
 class ImportSingleProfileDialog(AbstractDialog):
@@ -156,15 +157,10 @@ class ImportSingleProfileDialog(AbstractDialog):
         # ask the file path to the user
         flt = "Format %s(*.%s);;All files (*.*)" % (desc, " *.".join(ext))
         settings = QtCore.QSettings()
-        try:
-            startdir = settings.value("import_folders_%s" % name)
-            if not startdir:
-                raise Exception("No previous path for this device - use last overall used path")
-        except Exception:
-            startdir = settings.value("import_folder")
+        start_dir = settings.value("import_folders_%s" % name, settings.value("import_folder"))
         # noinspection PyCallByClass
         selection, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Load %s data file" % desc,
-                                                         startdir, flt)
+                                                             start_dir, flt)
         if not selection:
             return
         settings.setValue("import_folder", os.path.dirname(selection))
@@ -188,12 +184,14 @@ class ImportSingleProfileDialog(AbstractDialog):
         if self.lib.ssp_list.nr_profiles > 1:
             ssp_list = list()
             for i, ssp in enumerate(self.lib.ssp_list.l):
-                ssp_list.append("#%03d: %s (%.6f, %.6f)" % (i, ssp.meta.utc_time, ssp.meta.latitude, ssp.meta.longitude))
+                ssp_list.append(
+                    "#%03d: %s (%.6f, %.6f)" % (i, ssp.meta.utc_time, ssp.meta.latitude, ssp.meta.longitude))
 
+            # noinspection PyCallByClass
             sel, ok = QtWidgets.QInputDialog.getItem(self, 'Multiple profiles',
-                                                 'Select a profile (if you want to import all of them,\n'
-                                                 'use the multi-import dialog in Database tab):',
-                                                 ssp_list, 0, False)
+                                                     'Select a profile (if you want to import all of them,\n'
+                                                     'use the multi-import dialog in Database tab):',
+                                                     ssp_list, 0, False)
 
             if sel and ok:
                 self.lib.ssp_list.current_index = ssp_list.index(sel)

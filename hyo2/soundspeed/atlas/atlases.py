@@ -1,11 +1,11 @@
 import os
 import logging
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeed.atlas.rtofs.rtofs import Rtofs
 from hyo2.soundspeed.atlas.woa09.woa09 import Woa09
 from hyo2.soundspeed.atlas.woa13.woa13 import Woa13
+
+logger = logging.getLogger(__name__)
 
 
 class Atlases:
