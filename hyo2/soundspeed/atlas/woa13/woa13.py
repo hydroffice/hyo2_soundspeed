@@ -5,14 +5,14 @@ from netCDF4 import Dataset
 import logging
 from datetime import datetime as dt, date
 
-logger = logging.getLogger(__name__)
-
 from hyo2.abc.lib.ftp import Ftp
 
 from hyo2.soundspeed.atlas.abstract import AbstractAtlas
 from hyo2.soundspeed.profile.profile import Profile
 from hyo2.soundspeed.profile.profilelist import ProfileList
 from hyo2.soundspeed.profile.dicts import Dicts
+
+logger = logging.getLogger(__name__)
 
 
 class Woa13(AbstractAtlas):
@@ -231,7 +231,7 @@ class Woa13(AbstractAtlas):
                 # Check to see if we're at sea or on land
                 if self.landsea[this_lat_index][this_lon_index] == 1:
 
-                    logger.debug("at land: %s, %s" % (this_lat_index, this_lon_index))
+                    # logger.debug("at land: %s, %s" % (this_lat_index, this_lon_index))
                     # from matplotlib import pyplot
                     # pyplot.imshow(self.landsea, origin='lower')
                     # pyplot.scatter([this_lon_index], [this_lat_index], c='r', s=40)
@@ -309,9 +309,6 @@ class Woa13(AbstractAtlas):
             logger.info("possible request on land")
             return None
 
-        # switching to original location
-        # lat_out = self.lat[lat_idx]
-        # lon_out = self.lon[lon_idx]
         valid = dist_arr != 99999999
         num_values = t[valid].size
         logger.debug("valid: %s" % num_values)

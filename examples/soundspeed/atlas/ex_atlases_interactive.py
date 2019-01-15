@@ -1,4 +1,3 @@
-from datetime import datetime
 import logging
 
 from PySide2 import QtWidgets
@@ -18,7 +17,7 @@ logger = logging.getLogger(__name__)
 # - Indian Ocean: -19.1, 74.16
 # - middle of Africa (in land): 18.2648113, 16.1761115
 
-switch = "WOA13"  # WOA09 or WOA13
+switch = "RTOFS"  # WOA09 or WOA13 or RTOFS
 
 app = QtWidgets.QApplication([])  # PySide stuff (start)
 mw = QtWidgets.QMainWindow()
@@ -28,7 +27,7 @@ lib = SoundSpeedLibrary(progress=QtProgress(parent=mw), callbacks=QtCallbacks(pa
 
 if switch == "WOA09":
 
-    # download the woa09 if not present
+    # download the WOA09 if not present
     if not lib.has_woa09():
         success = lib.download_woa09()
         if not success:
@@ -41,7 +40,7 @@ if switch == "WOA09":
 
 elif switch == "WOA13":
 
-    # download the woa09 if not present
+    # download the WOA13 if not present
     if not lib.has_woa13():
         success = lib.download_woa13()
         if not success:
@@ -51,6 +50,19 @@ elif switch == "WOA13":
     # ask user for location and timestamp
     lib.retrieve_woa13()
     logger.info("retrieved WOA13 profiles: %s" % lib.ssp)
+
+elif switch == "RTOFS":
+
+    # download the RTOFS if not present
+    if not lib.has_rtofs():
+        success = lib.download_rtofs()
+        if not success:
+            raise RuntimeError("unable to download")
+    logger.info("has RTOFS: %s" % lib.has_rtofs())
+
+    # ask user for location and timestamp
+    lib.retrieve_rtofs()
+    logger.info("retrieved RTOFS profiles: %s" % lib.ssp)
 
 else:
     raise RuntimeError("invalid switch value: %s" % switch)

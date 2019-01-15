@@ -5,14 +5,14 @@ from netCDF4 import Dataset
 import logging
 from datetime import datetime as dt, date
 
-logger = logging.getLogger(__name__)
-
 from hyo2.abc.lib.ftp import Ftp
 
 from hyo2.soundspeed.atlas.abstract import AbstractAtlas
 from hyo2.soundspeed.profile.profile import Profile
 from hyo2.soundspeed.profile.profilelist import ProfileList
 from hyo2.soundspeed.profile.dicts import Dicts
+
+logger = logging.getLogger(__name__)
 
 
 class Woa09(AbstractAtlas):
@@ -111,6 +111,7 @@ class Woa09(AbstractAtlas):
             self.landsea = landsea.reshape((180, 360))
             # basin = np.genfromtxt((os.path.join(self.folder, "basin.msk")))
             # self.basin = basin.reshape((33, 180, 360))
+
         except Exception as e:
             logger.error("issue in reading the netCDF data: %s" % e)
             return False
@@ -226,7 +227,7 @@ class Woa09(AbstractAtlas):
 
                 # Check to see if we're at sea or on land
                 if self.landsea[this_lat_index][this_lon_index] == 1:
-                    logger.debug("at land: %s, %s" % (this_lat_index, this_lon_index))
+                    # logger.debug("at land: %s, %s" % (this_lat_index, this_lon_index))
                     continue
 
                 # calculate the distance to the grid node
@@ -293,9 +294,6 @@ class Woa09(AbstractAtlas):
             logger.info("possible request on land")
             return None
 
-        # switching to original location
-        # lat_out = self.t_monthly.variables['lat'][lat_idx]
-        # lon_out = self.t_monthly.variables['lon'][lon_idx]
         valid = dist_arr != 99999999
         num_values = t[valid].size
 

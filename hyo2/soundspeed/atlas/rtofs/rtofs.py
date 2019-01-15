@@ -2,7 +2,6 @@ from datetime import datetime as dt, date, timedelta
 from http import client
 from urllib import parse
 import socket
-import os
 import logging
 
 from netCDF4 import Dataset
@@ -98,7 +97,7 @@ class Rtofs(AbstractAtlas):
 
         # check the inputs
         if (lat is None) or (lon is None) or (datestamp is None):
-            logger.error("invalid query: %s @ (%.6f, %.6f)" % (datestamp.strftime("%Y%m%d"), lon, lat))
+            logger.error("invalid query: %s @ (%s, %s)" % (datestamp.strftime("%Y%m%d"), lon, lat))
             return None
 
         try:
@@ -121,7 +120,8 @@ class Rtofs(AbstractAtlas):
             # logger.info("safe case")
 
             # Need +1 on the north and east indices since it is the "stop" value in these slices
-            t = self._file_temp.variables['temperature'][self._day_idx, :, lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
+            t = self._file_temp.variables['temperature'][self._day_idx, :, lat_s_idx:lat_n_idx + 1,
+                                                         lon_w_idx:lon_e_idx + 1]
             s = self._file_sal.variables['salinity'][self._day_idx, :, lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
             # Set 'unfilled' elements to NANs (BUT when the entire array has valid data, it returns numpy.ndarray)
             if isinstance(t, np.ma.core.MaskedArray):
@@ -147,15 +147,15 @@ class Rtofs(AbstractAtlas):
             # logger.info("using lon west/east indices -> %s %s" % (lon_w_idx, lon_e_idx))
 
             # Need +1 on the north and east indices since it is the "stop" value in these slices
-            t_left = self._file_temp.variables['temperature'][self._day_idx, :, lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
-            s_left = self._file_sal.variables['salinity'][self._day_idx, :, lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
+            t_left = self._file_temp.variables['temperature'][self._day_idx, :, lat_s_idx:lat_n_idx + 1,
+                                                              lon_w_idx:lon_e_idx + 1]
+            s_left = self._file_sal.variables['salinity'][self._day_idx, :, lat_s_idx:lat_n_idx + 1,
+                                                          lon_w_idx:lon_e_idx + 1]
             # Set 'unfilled' elements to NANs (BUT when the entire array has valid data, it returns numpy.ndarray)
             if isinstance(t_left, np.ma.core.MaskedArray):
-
                 t_mask = t_left.mask
                 t_left[t_mask] = np.nan
             if isinstance(s_left, np.ma.core.MaskedArray):
-
                 s_mask = s_left.mask
                 s_left[s_mask] = np.nan
 
@@ -170,21 +170,20 @@ class Rtofs(AbstractAtlas):
             lon_e_idx = self._search_window - lons_left.size - 1
 
             # Need +1 on the north and east indices since it is the "stop" value in these slices
-            t_right = self._file_temp.variables['temperature'][self._day_idx, :, lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
-            s_right = self._file_sal.variables['salinity'][self._day_idx, :, lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
+            t_right = self._file_temp.variables['temperature'][self._day_idx, :, lat_s_idx:lat_n_idx + 1,
+                                                               lon_w_idx:lon_e_idx + 1]
+            s_right = self._file_sal.variables['salinity'][self._day_idx, :, lat_s_idx:lat_n_idx + 1,
+                                                           lon_w_idx:lon_e_idx + 1]
             # Set 'unfilled' elements to NANs (BUT when the entire array has valid data, it returns numpy.ndarray)
             if isinstance(t_right, np.ma.core.MaskedArray):
-
                 t_mask = t_right.mask
                 t_right[t_mask] = np.nan
             if isinstance(s_right, np.ma.core.MaskedArray):
-
                 s_mask = s_right.mask
                 s_right[s_mask] = np.nan
 
             lons_right = self._lon[lon_w_idx:lon_e_idx + 1]
             for i in range(self._search_window):
-
                 longitudes[i, lons_left.size:self._search_window] = lons_right
 
             # merge data
@@ -200,13 +199,11 @@ class Rtofs(AbstractAtlas):
         latitudes = np.zeros((self._search_window, self._search_window))
         lats = self._lat[lat_s_idx:lat_n_idx + 1]
         for i in range(self._search_window):
-
             latitudes[:, i] = lats
 
         for i in range(self._search_window):
 
             for j in range(self._search_window):
-
                 dist = self.g.distance(longitudes[i, j], latitudes[i, j], lon, lat)
                 distances[:, i, j] = dist
                 # logger.info("node %s, pos: %3.1f, %3.1f, dist: %3.1f"
@@ -244,7 +241,7 @@ class Rtofs(AbstractAtlas):
 
             t_closest = t_level[ind2]
             s_closest = s_level[ind2]
-            d_closest = d_level[ind2]
+            # d_closest = d_level[ind2]
 
             temp_pot[i] = t_closest
             sal[i] = s_closest
@@ -259,7 +256,6 @@ class Rtofs(AbstractAtlas):
             num_values += 1
 
         if num_values == 0:
-
             logger.info("no data from lookup!")
             return None
 
@@ -314,8 +310,8 @@ class Rtofs(AbstractAtlas):
 
     def __repr__(self):
         msg = "%s" % super(Rtofs, self).__repr__()
-        msg += "      <has data loaded: %s>\n" % self._has_data_loaded
-        msg += "      <last loaded day: %s>\n" % self._last_loaded_day.strftime("%d\%m\%Y")
+        msg += "      <has data loaded: %s>\n" % (self._has_data_loaded, )
+        msg += "      <last loaded day: %s>\n" % (self._last_loaded_day.strftime(r"%d\%m\%Y"), )
         return msg
 
     # ### private methods ###
@@ -384,7 +380,6 @@ class Rtofs(AbstractAtlas):
             url_ck_temp, url_ck_sal = self._build_check_urls(datestamp)
 
             if not (self._check_url(url_ck_temp) and self._check_url(url_ck_sal)):
-
                 logger.warning('unable to retrieve data from RTOFS server for date: %s and next day' % datestamp)
                 self.clear_data()
                 progress.end()
