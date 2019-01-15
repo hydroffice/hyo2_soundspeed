@@ -22,7 +22,7 @@ class Atlases:
         rtofs_folder = os.path.join(self._atlases_folder, "rtofs")
         if not os.path.exists(rtofs_folder):
             os.makedirs(rtofs_folder)
-        logger.info("rtofs path: %s" % rtofs_folder)
+        # logger.info("rtofs path: %s" % rtofs_folder)
 
         # woa09
         if (self.prj.setup.custom_woa09_folder is None) or (self.prj.setup.custom_woa09_folder == ""):
@@ -34,7 +34,7 @@ class Atlases:
                 woa09_folder = os.path.join(self._atlases_folder, "woa09")
         if not os.path.exists(woa09_folder):
             os.makedirs(woa09_folder)
-        logger.info("woa09 path: %s" % woa09_folder)
+        # logger.info("woa09 path: %s" % woa09_folder)
 
         # woa13
         if (self.prj.setup.custom_woa09_folder is None) or (self.prj.setup.custom_woa13_folder == ""):
@@ -46,7 +46,7 @@ class Atlases:
                 woa13_folder = os.path.join(self._atlases_folder, "woa13")
         if not os.path.exists(woa13_folder):
             os.makedirs(woa13_folder)
-        logger.info("woa13 path: %s" % woa13_folder)
+        # logger.info("woa13 path: %s" % woa13_folder)
 
         # available atlases
         self.rtofs = Rtofs(data_folder=rtofs_folder, prj=self.prj)

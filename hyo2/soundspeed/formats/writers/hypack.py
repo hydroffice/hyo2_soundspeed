@@ -1,10 +1,9 @@
 import numpy as np
 import logging
 
-logger = logging.getLogger(__name__)
-
-
 from hyo2.soundspeed.formats.writers.abstract import AbstractTextWriter
+
+logger = logging.getLogger(__name__)
 
 
 class Hypack(AbstractTextWriter):
@@ -16,7 +15,7 @@ class Hypack(AbstractTextWriter):
         self._ext.add('vel')
 
     def write(self, ssp, data_path, data_file=None, project=''):
-        logger.debug('*** %s ***: start' % self.driver)
+        # logger.debug('*** %s ***: start' % self.driver)
 
         self.ssp = ssp
         self._write(data_path=data_path, data_file=data_file)
@@ -26,11 +25,11 @@ class Hypack(AbstractTextWriter):
 
         self.finalize()
 
-        logger.debug('*** %s ***: done' % self.driver)
+        # logger.debug('*** %s ***: done' % self.driver)
         return True
 
     def _write_header(self):
-        logger.debug('generating header')
+        # logger.debug('generating header')
 
         header = str()
 
@@ -39,7 +38,7 @@ class Hypack(AbstractTextWriter):
         self.fod.io.write(header)
 
     def _write_body(self):
-        logger.debug('generating body')
+        # logger.debug('generating body')
         vi = self.ssp.cur.proc_valid
         for idx in range(np.sum(vi)):
             self.fod.io.write("%.1f %.1f\n"

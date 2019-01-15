@@ -144,7 +144,7 @@ class Aoml(AbstractTextReader):
     def _parse_body(self):
         """Parsing samples: depth, speed, temp"""
         logger.debug('parsing body')
-        print(self.field_index)
+        # print(self.field_index)
 
         count = 0
         for line in self.lines[self.samples_offset:len(self.lines)]:

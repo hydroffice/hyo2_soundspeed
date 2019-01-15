@@ -21,7 +21,7 @@ class Client:
         self.port = int(client.split(":")[2])
         self.protocol = client.split(":")[3]
         self.alive = True
-        logger.info("client: %s(%s:%s) %s" % (self.name, self.ip, self.port, self.protocol))
+        # logger.info("client: %s(%s:%s) %s" % (self.name, self.ip, self.port, self.protocol))
 
     def send_cast(self, prj, server_mode=False):
         """Send a cast to the """

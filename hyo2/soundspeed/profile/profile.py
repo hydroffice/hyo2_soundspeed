@@ -767,7 +767,7 @@ class Profile:
         return cumulative_attenuation, depth
 
     def insert_proc_speed(self, depth, speed, src=Dicts.sources['user']):
-        logger.debug("insert speed to proc data: d:%s, vs:%s" % (depth, speed))
+        # logger.debug("insert speed to proc data: d:%s, vs:%s" % (depth, speed))
 
         # we need to take care of valid samples and user-invalidated samples (to avoid to brake in case un-flagged)
         valid = self.proc.flag == Dicts.flags['valid']  # valid samples
@@ -854,7 +854,7 @@ class Profile:
             self.proc.num_samples += 1
 
     def insert_sis_speed(self, depth, speed, src=Dicts.sources['user'], temp=None, cond=None, sal=None):
-        logger.debug("insert speed to sis data: d:%s, vs:%s" % (depth, speed))
+        # logger.debug("insert speed to sis data: d:%s, vs:%s" % (depth, speed))
 
         # we need to take care of valid samples and user-invalidated samples (to avoid to brake in case un-flagged)
         valid = self.sis_thinned  # valid samples
@@ -884,7 +884,7 @@ class Profile:
 
         # manipulate profile (linear interpolation)
         if d_exists:
-            logger.debug('sample already present with depth: %s -> modifying' % depth)
+            # logger.debug('sample already present with depth: %s -> modifying' % depth)
             self.sis.speed[i] = speed
             self.sis.source[i] = src
             self.sis.flag[i] = Dicts.flags['thin']
@@ -897,7 +897,7 @@ class Profile:
                 self.sis.sal[i] = sal
 
         else:
-            logger.debug("added new sample at depth: %s" % depth)
+            # logger.debug("added new sample at depth: %s" % depth)
             if depth < self.sis.depth[valid][0]:
                 m_ids = [0, 1]
                 # print('before beginning: %s' % j)
@@ -1151,7 +1151,7 @@ class Profile:
 
         The operation eliminates the direction-flagged samples
         """
-        logger.info("cloning raw data to proc samples")
+        # logger.info("cloning raw data to proc samples")
 
         if self.data.num_samples == 0:
             return
@@ -1172,7 +1172,7 @@ class Profile:
 
     def clone_proc_to_sis(self):
         """Clone the processed data samples into sis samples"""
-        logger.info("cloning proc data to sis samples")
+        # logger.info("cloning proc data to sis samples")
 
         if self.proc.num_samples == 0:
             return
@@ -1211,7 +1211,7 @@ class Profile:
 
     def thin(self, tolerance):
         """Thin the sis data"""
-        logger.info("thinning the sis samples")
+        # logger.info("thinning the sis samples")
 
         # if the profile is too short, we just pass it back
         if self.sis.depth[self.sis_valid].size < 100:

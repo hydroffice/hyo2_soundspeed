@@ -18,7 +18,7 @@ class Ixblue(AbstractTextWriter):
         self._ext.add('txt')
 
     def write(self, ssp, data_path, data_file=None, project=''):
-        logger.debug('*** %s ***: start' % self.driver)
+        # logger.debug('*** %s ***: start' % self.driver)
 
         self.ssp = ssp
         self._write(data_path=data_path, data_file=data_file)
@@ -28,14 +28,15 @@ class Ixblue(AbstractTextWriter):
 
         self.finalize()
 
-        logger.debug('*** %s ***: done' % self.driver)
+        # logger.debug('*** %s ***: done' % self.driver)
         return True
 
     def _write_header(self):
-        logger.debug('generating header')
+        # logger.debug('generating header')
+        pass
 
     def _write_body(self):
-        logger.debug('generating body')
+        # logger.debug('generating body')
         vi = self.ssp.cur.proc_valid
         for idx in range(np.sum(vi)):
             self.fod.io.write("%.2f %.2f\n"

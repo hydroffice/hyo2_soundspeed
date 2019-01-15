@@ -80,12 +80,12 @@ class Setup:
     @property
     def db(self):
         """Usually the data_folder is set when the project is instantiated, so this is safe"""
-        logger.debug("release_folder: %s, use setup: %s" % (self.release_folder, self.use_setup_name))
+        # logger.debug("release_folder: %s, use setup: %s" % (self.release_folder, self.use_setup_name))
         return SetupDb(self.release_folder, use_setup_name=self.use_setup_name)
 
     def load_from_db(self):
         """Load/reload the setting from the setup db"""
-        logger.info("*** > SETUP: loading ...")
+        # logger.info("*** > SETUP: loading ...")
 
         # try:
 
@@ -118,7 +118,7 @@ class Setup:
         for client in db.client_list:
             client_string = "%s:%s:%s:%s" % (client[1], client[2], client[3], client[4])
             self.client_list.add_client(client_string)
-            logger.debug('- load: %s' % client_string)
+            # logger.debug('- load: %s' % client_string)
 
         # listeners - sis
         self.sis_listen_port = db.sis_listen_port
@@ -164,7 +164,7 @@ class Setup:
         # except Exception as e:
         #     raise RuntimeError("while loading db setup, %s" % e)
 
-        logger.info("*** > SETUP: loaded!")
+        # logger.info("*** > SETUP: loaded!")
 
     def save_to_db(self):
         """Save setup to db"""

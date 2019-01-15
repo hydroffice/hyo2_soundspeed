@@ -40,7 +40,7 @@ class Ncei(AbstractWriter):
 
     def write(self, ssp, data_path, data_file=None, project=''):
         """Writing raw profile data to NetCDF4 file"""
-        logger.debug('*** %s ***: start' % self.driver)
+        # logger.debug('*** %s ***: start' % self.driver)
 
         self.ssp = ssp
         self._project = project
@@ -64,12 +64,12 @@ class Ncei(AbstractWriter):
 
         self.finalize()
 
-        logger.debug('*** %s ***: done' % self.driver)
+        # logger.debug('*** %s ***: done' % self.driver)
         return True
 
     def _write_header(self):
         """Write header"""
-        logger.debug('generating header')
+        # logger.debug('generating header')
 
         # set the 'z' dimension and the number of profiles (always 1)
         self.root_group.createDimension('z', np.sum(self.ssp.cur.data_valid))
@@ -210,7 +210,7 @@ class Ncei(AbstractWriter):
         self.root_group.product_version = 'Created using HydrOffice %s v.%s' % (ssp_name, ssp_version)
 
     def _write_body(self):
-        logger.debug('generating body')
+        # logger.debug('generating body')
 
         # valid indices
         vi = self.ssp.cur.data_valid

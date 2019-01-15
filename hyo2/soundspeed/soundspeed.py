@@ -36,7 +36,7 @@ class SoundSpeedLibrary:
 
     def __init__(self, data_folder=None, callbacks=CliCallbacks(), progress=CliProgress()):
         """Initialization for the library"""
-        logger.info("** > LIB: initializing ...")
+        # logger.info("** > LIB: initializing ...")
 
         # callbacks
         if not issubclass(type(callbacks), AbstractCallbacks):
@@ -72,10 +72,10 @@ class SoundSpeedLibrary:
 
         self.logging()  # Set on/off logging for user and server based on loaded settings
 
-        logger.info("** > LIB: initialized!")
+        # logger.info("** > LIB: initialized!")
 
     def check_custom_folders(self):
-        logger.info("Checking for custom folders")
+        # logger.info("Checking for custom folders")
 
         # projects folder
         if len(self.setup.custom_projects_folder):
@@ -1353,15 +1353,15 @@ class SoundSpeedLibrary:
             depth_end = self.cur.sis.depth[si][-1]
 
             if depth_end < 12000:
-                logger.debug('extending after last depth: %s' % depth_end)
+                # logger.debug('extending after last depth: %s' % depth_end)
                 self.cur.insert_sis_speed(depth=12000.0, speed=1675.8, src=Dicts.sources['sis'],
                                           cond=30.9, temp=2.46, sal=34.70)
 
             si = self.cur.sis_thinned
-            logger.debug('last sample: d: %s, temp: %s, sal: %s, speed: %s [%s|%s]'
-                         % (self.cur.sis.depth[si][-1], self.cur.sis.temp[si][-1],
-                            self.cur.sis.sal[si][-1], self.cur.sis.speed[si][-1],
-                            self.cur.sis.source[si][-1], self.cur.sis.flag[si][-1]))
+            # logger.debug('last sample: d: %s, temp: %s, sal: %s, speed: %s [%s|%s]'
+            #              % (self.cur.sis.depth[si][-1], self.cur.sis.temp[si][-1],
+            #                 self.cur.sis.sal[si][-1], self.cur.sis.speed[si][-1],
+            #                 self.cur.sis.source[si][-1], self.cur.sis.flag[si][-1]))
 
         return True
 

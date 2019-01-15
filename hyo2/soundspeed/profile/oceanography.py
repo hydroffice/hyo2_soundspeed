@@ -2,7 +2,9 @@ import math
 import numpy as np
 import gsw
 import logging
+import warnings
 
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 logger = logging.getLogger(__name__)
 
 

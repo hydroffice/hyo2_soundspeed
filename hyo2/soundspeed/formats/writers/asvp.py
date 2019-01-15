@@ -26,7 +26,7 @@ class Asvp(AbstractTextWriter):
         self.header = None  # required for checksum
 
     def write(self, ssp, data_path, data_file=None, project=''):
-        logger.debug('*** %s ***: start' % self.driver)
+        # logger.debug('*** %s ***: start' % self.driver)
 
         self.ssp = ssp
         self._write(data_path=data_path, data_file=data_file)
@@ -51,23 +51,23 @@ class Asvp(AbstractTextWriter):
         else:
             logger.warning("not temperature and/or salinity to create absorption files")
 
-        logger.debug('*** %s ***: done' % self.driver)
+        # logger.debug('*** %s ***: done' % self.driver)
         return True
 
     def _write_header(self):
-        logger.debug('generating header')
+        # logger.debug('generating header')
         header = self._convert_header(fmt=Dicts.kng_formats['ASVP'])
         self.fod.io.write(header)
         return header
 
     def _write_body(self):
-        logger.debug('generating body')
+        # logger.debug('generating body')
         body = self._convert_body(fmt=Dicts.kng_formats['ASVP'])
         self.fod.io.write(body)
         self.fod.io.close()
 
     def _write_header_abs(self, freq):
-        logger.debug('generating header for %d kHz' % freq)
+        # logger.debug('generating header for %d kHz' % freq)
 
         ti = self.ssp.cur.sis_thinned
 
@@ -82,7 +82,7 @@ class Asvp(AbstractTextWriter):
         self.fod.io.write(abs_header)
 
     def _write_body_abs(self, freq):
-        logger.debug('generating body for %d kHz' % freq)
+        # logger.debug('generating body for %d kHz' % freq)
 
         ti = self.ssp.cur.sis_thinned
 

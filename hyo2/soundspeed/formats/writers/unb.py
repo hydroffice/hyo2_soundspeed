@@ -19,7 +19,7 @@ class Unb(AbstractTextWriter):
 
     def write(self, ssp, data_path, data_file=None, project=''):
         """Writing version 2 since it holds T/S and flags"""
-        logger.debug('*** %s ***: start' % self.driver)
+        # logger.debug('*** %s ***: start' % self.driver)
 
         self.ssp = ssp
         self._write(data_path=data_path, data_file=data_file)
@@ -29,12 +29,12 @@ class Unb(AbstractTextWriter):
 
         self.finalize()
 
-        logger.debug('*** %s ***: done' % self.driver)
+        # logger.debug('*** %s ***: done' % self.driver)
         return True
 
     def _write_header(self):
         """Write header: 5 rows -> title, date, time, probe, comments"""
-        logger.debug('generating header')
+        # logger.debug('generating header')
         header = str()
         # row #0: version
         header += "2  # Generated using HydrOffice %s v.%s\n" % (ssp_name, ssp_version)
@@ -70,7 +70,7 @@ class Unb(AbstractTextWriter):
         self.fod.io.write(header)
 
     def _write_body(self):
-        logger.debug('generating body')
+        # logger.debug('generating body')
         vi = self.ssp.cur.proc_valid
         for idx in range(np.sum(vi)):
             self.fod.io.write("%d %.3f %.3f %.3f %.3f 0.000 0\n"

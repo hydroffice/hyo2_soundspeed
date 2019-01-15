@@ -1,7 +1,4 @@
-import os
 import numpy as np
-import math
-import datetime
 import logging
 
 logger = logging.getLogger(__name__)
@@ -19,7 +16,7 @@ class Csv(AbstractTextWriter):
         self._ext.add('csv')
 
     def write(self, ssp, data_path, data_file=None, project=''):
-        logger.debug('*** %s ***: start' % self.driver)
+        # logger.debug('*** %s ***: start' % self.driver)
 
         self.ssp = ssp
         self._write(data_path=data_path, data_file=data_file)
@@ -29,11 +26,11 @@ class Csv(AbstractTextWriter):
 
         self.finalize()
 
-        logger.debug('*** %s ***: done' % self.driver)
+        # logger.debug('*** %s ***: done' % self.driver)
         return True
 
     def _write_header(self):
-        logger.debug('generating header')
+        # logger.debug('generating header')
 
         header = str()
 
@@ -55,7 +52,7 @@ class Csv(AbstractTextWriter):
         self.fod.io.write(header)
 
     def _write_body(self):
-        logger.debug('generating body')
+        # logger.debug('generating body')
         vi = self.ssp.cur.proc_valid
         for idx in range(np.sum(vi)):
             self.fod.io.write("%.2f,%.2f\n"

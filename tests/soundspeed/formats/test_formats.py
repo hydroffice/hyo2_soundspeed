@@ -10,17 +10,23 @@ from hyo2.soundspeed.base.testing import SoundSpeedTesting
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+reduced_testing = True
+
 
 class TestSoundSpeedFormats(unittest.TestCase):
 
     def setUp(self):
-        self.formats = ["caris", "csv", "elac", "hypack", "ixblue", "asvp", "qps", "sonardyne", "unb", ]
+        self.output_formats = ["asvp", "caris", "csv", "elac", "hypack", "ixblue", "qps", "sonardyne", "unb", ]
         data_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir))
         self.testing = SoundSpeedTesting(root_folder=data_folder)
         self.data_output = self.testing.output_data_folder()
 
     def tearDown(self):
         pass
+
+    def test_read_store_and_write_aml(self):
+        filters = ["aml", ]
+        self._run(filters=filters)
 
     def test_read_store_and_write_aoml(self):
         filters = ["aoml", ]
@@ -70,6 +76,10 @@ class TestSoundSpeedFormats(unittest.TestCase):
         filters = ["saiv", ]
         self._run(filters=filters)
 
+    def test_read_store_and_write_seaandsun(self):
+        filters = ["seaandsun", ]
+        self._run(filters=filters)
+
     def test_read_store_and_write_seabird(self):
         filters = ["seabird", ]
         self._run(filters=filters)
@@ -103,18 +113,20 @@ class TestSoundSpeedFormats(unittest.TestCase):
 
         tests = self.testing.input_dict_test_files(inclusive_filters=filters)
         data_outputs = dict()
-        for format in self.formats:
+        for format in self.output_formats:
             data_outputs[format] = self.data_output
 
         for idx, testfile in enumerate(tests.keys()):
 
-            logger.info("test: * New profile: #%03d *" % idx)
+            if reduced_testing and (os.path.basename(testfile)[0] != "_"):
+                continue
+            logger.info("test: * New profile: #%03d * -> %s" % (idx, os.path.basename(testfile)))
 
             lib.import_data(data_path=testfile, data_format=tests[testfile].name)
 
             lib.store_data()
 
-            lib.export_data(data_paths=data_outputs, data_formats=self.formats)
+            lib.export_data(data_paths=data_outputs, data_formats=self.output_formats)
 
 
 def suite():

@@ -37,7 +37,7 @@ class SoundSpeedTesting(Testing):
 
                 pairs[folder] = reader
 
-        logger.info('pairs: %s' % pairs)
+        # logger.info('pairs: %s' % pairs)
         return pairs
 
     @classmethod
@@ -61,7 +61,7 @@ class SoundSpeedTesting(Testing):
 
                     tests[os.path.join(root, filename)] = reader
 
-        logger.info("tests (%d): %s" % (len(tests), tests))
+        # logger.info("tests (%d): %s" % (len(tests), tests))
         return tests
 
     def input_dict_test_files(self, inclusive_filters=None):

@@ -18,7 +18,7 @@ class Sonardyne(AbstractTextWriter):
         self._ext.add('pro')
 
     def write(self, ssp, data_path, data_file=None, project=''):
-        logger.debug('*** %s ***: start' % self.driver)
+        # logger.debug('*** %s ***: start' % self.driver)
 
         self._project = project
 
@@ -30,12 +30,12 @@ class Sonardyne(AbstractTextWriter):
 
         self.finalize()
 
-        logger.debug('*** %s ***: done' % self.driver)
+        # logger.debug('*** %s ***: done' % self.driver)
         return True
 
     def _write_header(self):
         """Write header: 5 rows -> title, date, time, probe, comments"""
-        logger.debug('generating header')
+        # logger.debug('generating header')
         header = str()
         # row #0: title
         if self._project:
@@ -68,7 +68,7 @@ class Sonardyne(AbstractTextWriter):
         self.fod.io.write(header)
 
     def _write_body(self):
-        logger.debug('generating body')
+        # logger.debug('generating body')
         vi = self.ssp.cur.proc_valid
         for idx in range(np.sum(vi)):
             self.fod.io.write("%12.4f%12.4f%12.4f%12.4f\n"

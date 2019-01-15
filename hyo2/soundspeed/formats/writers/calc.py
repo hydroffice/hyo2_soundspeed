@@ -1,15 +1,10 @@
-import functools
-import math
-import operator
-import os
 import logging
 import numpy as np
 
-logger = logging.getLogger(__name__)
-
 
 from hyo2.soundspeed.formats.writers.abstract import AbstractTextWriter
-from hyo2.soundspeed.profile.dicts import Dicts
+
+logger = logging.getLogger(__name__)
 
 
 class Calc(AbstractTextWriter):
@@ -78,7 +73,7 @@ class Calc(AbstractTextWriter):
 
         body += " 0  0  0\n"
         body += "*** NAV ****\n"
-        body += "Bottom Depth (m): %.1f\n" % last_depth
+        body += "Bottom Depth (m): %s\n" % last_depth
         body += "Ship's Log (N): 0.0\n"
 
         deg = abs(int(self.ssp.cur.meta.latitude))

@@ -18,7 +18,7 @@ class Qps(AbstractTextWriter):
         self._ext.add('bsvp')
 
     def write(self, ssp, data_path, data_file=None, project=''):
-        logger.debug('*** %s ***: start' % self.driver)
+        # logger.debug('*** %s ***: start' % self.driver)
 
         self.ssp = ssp
         self._write(data_path=data_path, data_file=data_file, encoding=None, binary=True)
@@ -28,11 +28,11 @@ class Qps(AbstractTextWriter):
 
         self.finalize()
 
-        logger.debug('*** %s ***: done' % self.driver)
+        # logger.debug('*** %s ***: done' % self.driver)
         return True
 
     def _write_header(self):
-        logger.debug('generating header')
+        # logger.debug('generating header')
 
         vi = self.ssp.cur.proc_valid
         epoch = int(calendar.timegm(self.ssp.cur.meta.utc_time.timetuple()))
@@ -52,7 +52,7 @@ class Qps(AbstractTextWriter):
         // 0x01 = Deleted
         // 0x02 = Added (by user)
         """
-        logger.debug('generating body')
+        # logger.debug('generating body')
         if self.ssp.cur.meta.sensor_type != Dicts.sensor_types['Unknown'] and \
                 self.ssp.cur.meta.sensor_type != Dicts.sensor_types['Synthetic']:
             _flags = 2**0 # Observed

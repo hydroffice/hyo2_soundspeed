@@ -18,7 +18,7 @@ class Caris(AbstractTextWriter):
         self._ext.add('svp')
 
     def write(self, ssp, data_path, data_file=None, project=''):
-        logger.debug('*** %s ***: start' % self.driver)
+        # logger.debug('*** %s ***: start' % self.driver)
 
         self._project = project
         self.ssp = ssp
@@ -31,11 +31,11 @@ class Caris(AbstractTextWriter):
 
         self.finalize()
 
-        logger.debug('*** %s ***: done' % self.driver)
+        # logger.debug('*** %s ***: done' % self.driver)
         return True
 
     def _write_header(self):
-        logger.debug('generating header')
+        # logger.debug('generating header')
 
         header = str()
 
@@ -76,7 +76,7 @@ class Caris(AbstractTextWriter):
         self.fod.io.write(header)
 
     def _write_body(self):
-        logger.debug('generating body')
+        # logger.debug('generating body')
         vi = self.ssp.cur.proc_valid
         # noinspection PyTypeChecker
         for idx in range(np.sum(vi)):
