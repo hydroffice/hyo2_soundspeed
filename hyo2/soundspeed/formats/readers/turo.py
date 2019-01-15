@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from hyo2.soundspeed.formats.readers.abstract import AbstractBinaryReader
-from hyo2.soundspeed.base.helper import FileInfo
+from hyo2.soundspeed.base.files import FileInfo
 from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 

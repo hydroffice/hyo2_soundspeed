@@ -4,9 +4,10 @@ import traceback
 import os
 import logging
 
+from hyo2.abc.lib.helper import Helper
+from hyo2.soundspeed import lib_info
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
 from hyo2.soundspeedmanager.dialogs.seacat_dialog import SeacatDialog
-from hyo2.soundspeed.base.helper import web_url
 
 logger = logging.getLogger(__name__)
 
@@ -167,7 +168,7 @@ class ImportSingleProfileDialog(AbstractDialog):
         settings.setValue("import_folders_%s" % name, os.path.dirname(selection))
         logger.debug('user selection: %s' % selection)
 
-        self.main_win.change_info_url(web_url(suffix="%s" % name))
+        self.main_win.change_info_url(Helper(lib_info=lib_info).web_url(suffix="%s" % name))
 
         self.progress.start()
         try:

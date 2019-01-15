@@ -10,13 +10,13 @@ from appdirs import user_data_dir
 from hyo2.abc.lib.progress.abstract_progress import AbstractProgress
 from hyo2.abc.lib.progress.cli_progress import CliProgress
 from hyo2.abc.lib.gdal_aux import GdalAux
+from hyo2.abc.lib.helper import Helper
 
 from hyo2.soundspeed import lib_info
 from hyo2.soundspeed import formats
 from hyo2.soundspeed.atlas.atlases import Atlases
 from hyo2.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
 from hyo2.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
-from hyo2.soundspeed.base.helper import explore_folder
 from hyo2.soundspeed.base.setup import Setup
 from hyo2.soundspeed.db.db import ProjectDb
 from hyo2.soundspeed.listener.listeners import Listeners
@@ -212,7 +212,7 @@ class SoundSpeedLibrary:
         self._data_folder = value
 
     def open_data_folder(self):
-        explore_folder(self.data_folder)
+        Helper.explore_folder(self.data_folder)
 
     # releases folder
 
@@ -227,7 +227,7 @@ class SoundSpeedLibrary:
         self._releases_folder = value
 
     def open_releases_folder(self):
-        explore_folder(self.releases_folder)
+        Helper.explore_folder(self.releases_folder)
 
     # release folder
 
@@ -249,7 +249,7 @@ class SoundSpeedLibrary:
         return self.atlases.atlases_folder
 
     def open_atlases_folder(self):
-        explore_folder(self.atlases_folder)
+        Helper.explore_folder(self.atlases_folder)
 
     @property
     def woa09_folder(self):
@@ -279,7 +279,7 @@ class SoundSpeedLibrary:
         self._projects_folder = value
 
     def open_projects_folder(self):
-        explore_folder(self.projects_folder)
+        Helper.explore_folder(self.projects_folder)
 
     # outputs
 
@@ -294,7 +294,7 @@ class SoundSpeedLibrary:
         self._outputs_folder = value
 
     def open_outputs_folder(self):
-        explore_folder(self.outputs_folder)
+        Helper.explore_folder(self.outputs_folder)
 
     # --- readers/writers
 

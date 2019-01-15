@@ -1,11 +1,11 @@
 import logging
 
-logger = logging.getLogger(__name__)
-
+from hyo2.abc.lib.helper import Helper
 from hyo2.soundspeed.base.setup_db import SetupDb
 from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeed.client.clientlist import ClientList
-from hyo2.soundspeed.base.helper import first_match
+
+logger = logging.getLogger(__name__)
 
 
 class Setup:
@@ -181,10 +181,10 @@ class Setup:
             db.use_woa09 = self.use_woa09
             db.use_woa13 = self.use_woa13
             db.use_rtofs = self.use_rtofs
-            db.ssp_extension_source = first_match(Dicts.atlases, self.ssp_extension_source)
-            db.ssp_salinity_source = first_match(Dicts.atlases, self.ssp_salinity_source)
-            db.ssp_temp_sal_source = first_match(Dicts.atlases, self.ssp_temp_sal_source)
-            db.ssp_up_or_down = first_match(Dicts.ssp_directions, self.ssp_up_or_down)
+            db.ssp_extension_source = Helper.first_match(Dicts.atlases, self.ssp_extension_source)
+            db.ssp_salinity_source = Helper.first_match(Dicts.atlases, self.ssp_salinity_source)
+            db.ssp_temp_sal_source = Helper.first_match(Dicts.atlases, self.ssp_temp_sal_source)
+            db.ssp_up_or_down = Helper.first_match(Dicts.ssp_directions, self.ssp_up_or_down)
 
             db.rx_max_wait_time = self.rx_max_wait_time
             db.use_sis = self.use_sis
@@ -252,7 +252,7 @@ class Setup:
     def __repr__(self):
         msg = "  <setup:%s:%s>\n" % (self.setup_id, self.setup_name)
 
-        msg += "    <setup version: %d>\n" % self.setup_version
+        msg += "    <setup version: %s>\n" % self.setup_version
 
         msg += "    <input>\n"
         msg += "      <use_woa09: %s>\n" % self.use_woa09

@@ -2,9 +2,9 @@ import os
 import logging
 import sqlite3
 
+from hyo2.abc.lib.helper import Helper
 from hyo2.soundspeed.base.basedb import BaseDb
 from hyo2.soundspeed.base.setup_sql import CREATE_SETTINGS, CREATE_SETTINGS_VIEW, CREATE_CLIENT_LIST
-from hyo2.soundspeed.base.helper import explore_folder
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ class SetupDb(BaseDb):
             return False
 
     def open_folder(self):
-        explore_folder(self.data_folder)
+        Helper.explore_folder(self.data_folder)
 
     # --- setup stuff
     

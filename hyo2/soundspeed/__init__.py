@@ -35,8 +35,13 @@ lib_info.lib_latest_url = "https://www.hydroffice.org/latest/soundspeed.txt"
 
 lib_info.lib_dep_dict = {
     "hyo2.abc": "hyo2.abc",
+    "hyo2.soundspeed": "hyo2.soundspeed",
+    "hyo.surveydatamonitor": "hyo.surveydatamonitor",
+    "gsw": "gsw",
+    "netCDF4": "netCDF4",
     "gdal": "osgeo",
     "numpy": "numpy",
     "pyproj": "pyproj",
+    "basemap": "mpl_toolkits.basemap",
     "PySide2": "PySide2"
 }

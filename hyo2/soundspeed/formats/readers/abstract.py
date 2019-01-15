@@ -4,7 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from hyo2.soundspeed.base.helper import FileManager
+from hyo2.soundspeed.base.files import FileManager
 from hyo2.soundspeed.formats.abstract import AbstractFormat
 from hyo2.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 
