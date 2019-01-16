@@ -23,6 +23,7 @@ class Dicts:
         ('WOA09', 2),
         ('WOA13', 3),
         ('SIS', 4),
+        ('GoMOFS', 5),
 
         ('SVP', 101),
         ('Castaway', 102),

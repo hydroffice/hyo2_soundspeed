@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 # - Indian Ocean: -19.1, 74.16
 # - middle of Africa (in land): 18.2648113, 16.1761115
 
-switch = "RTOFS"  # WOA09 or WOA13 or RTOFS
+switch = "RTOFS"  # WOA09 or WOA13 or RTOFS or GoMOFS
 
 app = QtWidgets.QApplication([])  # PySide stuff (start)
 mw = QtWidgets.QMainWindow()
@@ -63,6 +63,19 @@ elif switch == "RTOFS":
     # ask user for location and timestamp
     lib.retrieve_rtofs()
     logger.info("retrieved RTOFS profiles: %s" % lib.ssp)
+
+elif switch == "GoMOFS":
+
+    # download the RTOFS if not present
+    if not lib.has_gomofs():
+        success = lib.download_gomofs()
+        if not success:
+            raise RuntimeError("unable to download")
+    logger.info("has GoMOFS: %s" % lib.has_gomofs())
+
+    # ask user for location and timestamp
+    lib.retrieve_gomofs()
+    logger.info("retrieved GoMOFS profiles: %s" % lib.ssp)
 
 else:
     raise RuntimeError("invalid switch value: %s" % switch)

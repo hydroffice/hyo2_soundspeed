@@ -4,13 +4,13 @@ import shutil
 import logging
 
 from hyo2.soundspeedmanager import AppInfo
-from hyo2.soundspeed.atlas.rtofs import Rtofs
+from hyo2.soundspeed.atlas.gomofs import Gomofs
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger()
 
 
-class TestSoundSpeedAtlasRtofs(unittest.TestCase):
+class TestSoundSpeedAtlasGomofs(unittest.TestCase):
 
     def setUp(self):
         self.cur_dir = os.path.abspath(os.path.dirname(__file__))
@@ -23,21 +23,21 @@ class TestSoundSpeedAtlasRtofs(unittest.TestCase):
             if item == 'atlases':
                 shutil.rmtree(os.path.join(self.cur_dir, item))
 
-    def test_creation_of_Rtofs(self):
+    def test_creation_of_Gomofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        rtofs = Rtofs(data_folder=prj.rtofs_folder, prj=prj)
-        self.assertTrue('rtofs' in rtofs.data_folder)
-        self.assertFalse(rtofs.is_present())
+        gomofs = Gomofs(data_folder=prj.gomofs_folder, prj=prj)
+        self.assertTrue('gomofs' in gomofs.data_folder)
+        self.assertFalse(gomofs.is_present())
         prj.close()
 
-    def test_download_db_from_Rtofs(self):
+    def test_download_db_from_Gomofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        rtofs = Rtofs(data_folder=prj.data_folder, prj=prj)
-        rtofs.download_db(server_mode=True)
+        gomofs = Gomofs(data_folder=prj.data_folder, prj=prj)
+        gomofs.download_db(server_mode=True)
 
         # to avoid test failures
-        if not rtofs.is_present():
-            logger.warning("unable to download RTOFS data")
+        if not gomofs.is_present():
+            logger.warning("unable to download GoMOFS data")
         # self.assertTrue(rtofs.is_present())
 
         prj.close()
@@ -45,5 +45,5 @@ class TestSoundSpeedAtlasRtofs(unittest.TestCase):
 
 def suite():
     s = unittest.TestSuite()
-    s.addTests(unittest.TestLoader().loadTestsFromTestCase(TestSoundSpeedAtlasRtofs))
+    s.addTests(unittest.TestLoader().loadTestsFromTestCase(TestSoundSpeedAtlasGomofs))
     return s

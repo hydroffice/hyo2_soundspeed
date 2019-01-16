@@ -1,9 +1,10 @@
 import os
 import logging
 
-from hyo2.soundspeed.atlas.rtofs.rtofs import Rtofs
-from hyo2.soundspeed.atlas.woa09.woa09 import Woa09
-from hyo2.soundspeed.atlas.woa13.woa13 import Woa13
+from hyo2.soundspeed.atlas.woa09 import Woa09
+from hyo2.soundspeed.atlas.woa13 import Woa13
+from hyo2.soundspeed.atlas.rtofs import Rtofs
+from hyo2.soundspeed.atlas.gomofs import Gomofs
 
 logger = logging.getLogger(__name__)
 
@@ -17,12 +18,6 @@ class Atlases:
         self._atlases_folder = os.path.join(self.prj.data_folder, "atlases")
         if not os.path.exists(self._atlases_folder):
             os.makedirs(self._atlases_folder)
-
-        # rtofs
-        rtofs_folder = os.path.join(self._atlases_folder, "rtofs")
-        if not os.path.exists(rtofs_folder):
-            os.makedirs(rtofs_folder)
-        # logger.info("rtofs path: %s" % rtofs_folder)
 
         # woa09
         if (self.prj.setup.custom_woa09_folder is None) or (self.prj.setup.custom_woa09_folder == ""):
@@ -48,10 +43,23 @@ class Atlases:
             os.makedirs(woa13_folder)
         # logger.info("woa13 path: %s" % woa13_folder)
 
+        # rtofs
+        rtofs_folder = os.path.join(self._atlases_folder, "rtofs")
+        if not os.path.exists(rtofs_folder):
+            os.makedirs(rtofs_folder)
+        # logger.info("rtofs path: %s" % rtofs_folder)
+
+        # gomofs
+        gomofs_folder = os.path.join(self._atlases_folder, "gomofs")
+        if not os.path.exists(gomofs_folder):
+            os.makedirs(gomofs_folder)
+        # logger.info("gomofs path: %s" % gomofs_folder)
+
         # available atlases
-        self.rtofs = Rtofs(data_folder=rtofs_folder, prj=self.prj)
         self.woa09 = Woa09(data_folder=woa09_folder, prj=self.prj)
         self.woa13 = Woa13(data_folder=woa13_folder, prj=self.prj)
+        self.rtofs = Rtofs(data_folder=rtofs_folder, prj=self.prj)
+        self.gomofs = Gomofs(data_folder=gomofs_folder, prj=self.prj)
 
     @property
     def atlases_folder(self):
@@ -69,9 +77,14 @@ class Atlases:
     def rtofs_folder(self):
         return self.rtofs.data_folder
 
+    @property
+    def gomofs_folder(self):
+        return self.gomofs.data_folder
+
     def __repr__(self):
         msg = "  <atlases>\n"
-        msg += "  %s" % self.rtofs
         msg += "  %s" % self.woa09
         msg += "  %s" % self.woa13
+        msg += "  %s" % self.rtofs
+        msg += "  %s" % self.gomofs
         return msg

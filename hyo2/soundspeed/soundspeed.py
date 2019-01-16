@@ -266,6 +266,11 @@ class SoundSpeedLibrary:
         """Get the rtofs atlas folder"""
         return self.atlases.rtofs_folder
 
+    @property
+    def gomofs_folder(self):
+        """Get the gomofs atlas folder"""
+        return self.atlases.gomofs_folder
+
     # projects
 
     @property
@@ -501,6 +506,29 @@ class SoundSpeedLibrary:
             return None
 
         self.ssp = self.atlases.rtofs.query(lat=lat, lon=lon, datestamp=utc_time)
+
+    def retrieve_gomofs(self):
+        """Retrieve data from GoMOFS atlas"""
+
+        utc_time = self.cb.ask_date()
+        if utc_time is None:
+            logger.error("missing date required for database lookup")
+            return None
+
+        if not self.download_gomofs(datestamp=utc_time):
+            logger.error("unable to download GoMOFS atlas data set")
+            return None
+
+        if not self.has_gomofs():
+            logger.error("missing GoMOFS atlas data set")
+            return None
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return None
+
+        self.ssp = self.atlases.gomofs.query(lat=lat, lon=lon, datestamp=utc_time)
 
     def retrieve_sis(self):
         """Retrieve data from SIS"""
@@ -1442,23 +1470,29 @@ class SoundSpeedLibrary:
     def use_woa13(self):
         return self.setup.use_woa13
 
-    def has_rtofs(self):
-        return self.atlases.rtofs.is_present()
-
     def has_woa09(self):
         return self.atlases.woa09.is_present()
 
     def has_woa13(self):
         return self.atlases.woa13.is_present()
 
-    def download_rtofs(self, datestamp=None):
-        return self.atlases.rtofs.download_db(datestamp=datestamp)
+    def has_rtofs(self):
+        return self.atlases.rtofs.is_present()
+
+    def has_gomofs(self):
+        return self.atlases.gomofs.is_present()
 
     def download_woa09(self):
         return self.atlases.woa09.download_db()
 
     def download_woa13(self):
         return self.atlases.woa13.download_db()
+
+    def download_rtofs(self, datestamp=None):
+        return self.atlases.rtofs.download_db(datestamp=datestamp)
+
+    def download_gomofs(self, datestamp=None):
+        return self.atlases.gomofs.download_db(datestamp=datestamp)
 
     # --- listeners
 

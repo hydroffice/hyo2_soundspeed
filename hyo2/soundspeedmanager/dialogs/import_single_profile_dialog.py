@@ -110,6 +110,12 @@ class ImportSingleProfileDialog(AbstractDialog):
         btn.setToolTip("Retrieve synthetic data from RTOFS Atlas")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_click_rtofs)
+        # -- GoMOFS
+        btn = QtWidgets.QPushButton("GoMOFS")
+        self.retrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from GoMOFS Atlas")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_click_gomofs)
         # -- SIS
         btn = QtWidgets.QPushButton("SIS")
         self.retrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
@@ -286,6 +292,25 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = "Issue in importing the RTOFS data:\n\n> %s" % e
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            self.progress.end()
+            return
+
+        self.accept()
+        self.progress.end()
+
+    def on_click_gomofs(self):
+        """Retrieve RTOFS data"""
+
+        self.progress.start(text="Retrieve GoMOFS")
+        self.progress.update(value=30)
+
+        try:
+            self.lib.retrieve_gomofs()
+
+        except RuntimeError as e:
+            msg = "Issue in importing the GoMOFS data:\n\n> %s" % e
             # noinspection PyCallByClass
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()

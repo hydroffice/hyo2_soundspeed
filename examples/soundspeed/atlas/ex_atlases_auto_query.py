@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.DEBUG,
                     format="%(levelname)-9s %(name)s.%(funcName)s:%(lineno)d > %(message)s")
 logger = logging.getLogger(__name__)
 
-switch = "RTOFS"  # WOA09 or WOA13 or RTOFS
+switch = "GoMOFS"  # WOA09 or WOA13 or RTOFS or GoMOFS
 
 app = QtWidgets.QApplication([])  # PySide stuff (start)
 mw = QtWidgets.QMainWindow()
@@ -24,8 +24,8 @@ lib = SoundSpeedLibrary(progress=QtProgress(parent=mw), callbacks=QtCallbacks(pa
 
 tests = [
     (43.026480, -70.318824, dt.utcnow()),  # offshore Portsmouth
-    (-19.1, 74.16, dt.utcnow()),  # Indian Ocean
-    (18.2648113, 16.1761115, dt.utcnow()),  # in land -> middle of Africa
+    # (-19.1, 74.16, dt.utcnow()),  # Indian Ocean
+    # (18.2648113, 16.1761115, dt.utcnow()),  # in land -> middle of Africa
 ]
 
 if switch == "WOA09":
@@ -53,24 +53,47 @@ elif switch == "RTOFS":
         lib.download_rtofs()
     logger.info("has RTOFS: %s" % lib.has_rtofs())
 
+elif switch == "GoMOFS":
+
+    # download the current-time rtofs
+    if not lib.has_gomofs():
+        lib.download_gomofs()
+    logger.info("has GoMOFS: %s" % lib.has_gomofs())
+
 else:
     raise RuntimeError("invalid switch value: %s" % switch)
 
-# more stuff
-if switch == "RTOFS":
+# # more stuff
+# if switch == "RTOFS":
+#
+#     # test today urls
+#     # noinspection PyProtectedMember
+#     temp_url, sal_url = lib.atlases.rtofs._build_check_urls(dt.utcnow())
+#     # noinspection PyProtectedMember
+#     logger.info("urls:\n- %s [%s]\n%s [%s]"
+#                 % (temp_url, lib.atlases.rtofs._check_url(temp_url), sal_url, lib.atlases.rtofs._check_url(sal_url)))
+#     # test yesterday urls
+#     # noinspection PyProtectedMember
+#     temp_url, sal_url = lib.atlases.rtofs._build_check_urls(dt.utcnow() - timedelta(days=1))
+#     # noinspection PyProtectedMember
+#     logger.info("urls:\n- %s [%s]\n%s [%s]"
+#                 % (temp_url, lib.atlases.rtofs._check_url(temp_url), sal_url, lib.atlases.rtofs._check_url(sal_url)))
+#
+# elif switch == "GoMOFS":
+#
+#     # test today urls
+#     # noinspection PyProtectedMember
+#     url = lib.atlases.gomofs._build_check_url(dt.utcnow())
+#     # noinspection PyProtectedMember
+#     logger.info("url:\n- %s [%s]"
+#                 % (url, lib.atlases.gomofs._check_url(url)))
+#     # test yesterday urls
+#     # noinspection PyProtectedMember
+#     url = lib.atlases.gomofs._build_check_url(dt.utcnow() - timedelta(days=1))
+#     # noinspection PyProtectedMember
+#     logger.info("url:\n- %s [%s]"
+#                 % (url, lib.atlases.gomofs._check_url(url)))
 
-    # test today urls
-    # noinspection PyProtectedMember
-    temp_url, sal_url = lib.atlases.rtofs._build_check_urls(dt.utcnow())
-    # noinspection PyProtectedMember
-    logger.info("urls:\n- %s [%s]\n%s [%s]"
-                % (temp_url, lib.atlases.rtofs._check_url(temp_url), sal_url, lib.atlases.rtofs._check_url(sal_url)))
-    # test yesterday urls
-    # noinspection PyProtectedMember
-    temp_url, sal_url = lib.atlases.rtofs._build_check_urls(dt.utcnow() - timedelta(days=1))
-    # noinspection PyProtectedMember
-    logger.info("urls:\n- %s [%s]\n%s [%s]"
-                % (temp_url, lib.atlases.rtofs._check_url(temp_url), sal_url, lib.atlases.rtofs._check_url(sal_url)))
 
 # test for a few locations
 for test in tests:
@@ -83,6 +106,8 @@ for test in tests:
         logger.info("WOA13 profiles:\n%s" % lib.atlases.woa13.query(lat=test[0], lon=test[1], datestamp=test[2]))
     elif switch == "RTOFS":
         logger.info("RTOFS profiles:\n%s" % lib.atlases.rtofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+    elif switch == "GoMOFS":
+        logger.info("GoMOFS profiles:\n%s" % lib.atlases.gomofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
     else:
         raise RuntimeError("invalid switch value: %s" % switch)
     logger.info("execution time: %.3f s" % (time.time() - start_time))

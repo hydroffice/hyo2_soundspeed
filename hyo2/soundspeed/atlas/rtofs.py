@@ -3,6 +3,7 @@ from http import client
 from urllib import parse
 import socket
 import logging
+from typing import Optional, Union
 
 from netCDF4 import Dataset
 import numpy as np
@@ -21,7 +22,7 @@ logger = logging.getLogger(__name__)
 class Rtofs(AbstractAtlas):
     """RTOFS atlas"""
 
-    def __init__(self, data_folder, prj):
+    def __init__(self, data_folder: str, prj: 'hyo2.soundspeed.soundspeed import SoundSpeedLibrary') -> None:
         super(Rtofs, self).__init__(data_folder=data_folder, prj=prj)
         self.name = self.__class__.__name__
         self.desc = "Global Real-Time Ocean Forecast System"
@@ -47,11 +48,11 @@ class Rtofs(AbstractAtlas):
 
     # ### public API ###
 
-    def is_present(self):
+    def is_present(self) -> bool:
         """check the availability"""
         return self._has_data_loaded
 
-    def download_db(self, datestamp=None, server_mode=False):
+    def download_db(self, datestamp: Union[date, dt, None] = None, server_mode: bool = False) -> bool:
         """try to connect and load info from the data set"""
         if datestamp is None:
             datestamp = dt.utcnow()
@@ -68,9 +69,9 @@ class Rtofs(AbstractAtlas):
             self._d = self._file_temp.variables['lev'][:]
             self._lat = self._file_temp.variables['lat'][:]
             self._lon = self._file_temp.variables['lon'][:]
-            # logger.debug('d:(%s)\n%s' % (self.d.shape, self.d))
-            # logger.debug('lat:(%s)\n%s' % (self.lat.shape, self.lat))
-            # logger.debug('lon:(%s)\n%s' % (self.lon.shape, self.lon))
+            # logger.debug('d:(%s)\n%s' % (self._d.shape, self._d))
+            # logger.debug('lat:(%s)\n%s' % (self._lat.shape, self._lat))
+            # logger.debug('lon:(%s)\n%s' % (self._lon.shape, self._lon))
 
         except Exception as e:
             logger.error("troubles in variable lookup for lat/long grid and/or depth: %s" % e)
@@ -85,7 +86,8 @@ class Rtofs(AbstractAtlas):
         # logger.debug("0(%.3f, %.3f); step(%.3f, %.3f)" % (self.lat_0, self.lon_0, self.lat_step, self.lon_step))
         return True
 
-    def query(self, lat, lon, datestamp=None, server_mode=False):
+    def query(self, lat: Optional[float], lon: Optional[float], datestamp: Union[date, dt, None] = None,
+              server_mode: bool = False):
         """Query RTOFS for passed location and timestamp"""
         if datestamp is None:
             datestamp = dt.utcnow()
@@ -290,13 +292,15 @@ class Rtofs(AbstractAtlas):
 
         return profiles
 
-    def clear_data(self):
+    def clear_data(self) -> None:
         """Delete the data and reset the last loaded day"""
         logger.debug("clearing data")
         if self._has_data_loaded:
-            self._file_temp.close()
+            if self._file_temp:
+                self._file_temp.close()
             self._file_temp = None
-            self._file_sal.close()
+            if self._file_sal:
+                self._file_sal.close()
             self._file_sal = None
             self._lat = None
             self._lon = None
@@ -308,7 +312,7 @@ class Rtofs(AbstractAtlas):
         self._last_loaded_day = date(1900, 1, 1)  # some silly day in the past
         self._day_idx = None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         msg = "%s" % super(Rtofs, self).__repr__()
         msg += "      <has data loaded: %s>\n" % (self._has_data_loaded, )
         msg += "      <last loaded day: %s>\n" % (self._last_loaded_day.strftime(r"%d\%m\%Y"), )
@@ -317,13 +321,14 @@ class Rtofs(AbstractAtlas):
     # ### private methods ###
 
     @staticmethod
-    def _check_url(url):
+    def _check_url(url: str) -> bool:
         try:
             p = parse.urlparse(url)
             conn = client.HTTPConnection(p.netloc)
             conn.request('HEAD', p.path)
             resp = conn.getresponse()
             conn.close()
+            # logger.debug("passed url: %s -> %s" % (url, resp.status))
 
         except socket.error as e:
             logger.warning("while checking %s, %s" % (url, e))
@@ -332,26 +337,32 @@ class Rtofs(AbstractAtlas):
         return resp.status < 400
 
     @staticmethod
-    def _build_check_urls(input_date):
+    def _build_check_urls(input_date: date) -> tuple:
         """make up the url to use for salinity and temperature"""
         # Primary server: http://nomads.ncep.noaa.gov/pub/data/nccf/com/rtofs/prod/rtofs.20160410/
-        url_temp = 'http://nomads.ncep.noaa.gov/pub/data/nccf/com/rtofs/prod/rtofs.%s/rtofs_glo_3dz_n024_daily_3ztio.nc' \
+        url_temp = 'http://nomads.ncep.noaa.gov/pub/data/nccf/com/rtofs/prod/rtofs.%s/' \
+                   'rtofs_glo_3dz_n024_daily_3ztio.nc' \
                    % input_date.strftime("%Y%m%d")
-        url_sal = 'http://nomads.ncep.noaa.gov/pub/data/nccf/com/rtofs/prod/rtofs.%s/rtofs_glo_3dz_n024_daily_3zsio.nc' \
+        url_sal = 'http://nomads.ncep.noaa.gov/pub/data/nccf/com/rtofs/prod/rtofs.%s/' \
+                  'rtofs_glo_3dz_n024_daily_3zsio.nc' \
                   % input_date.strftime("%Y%m%d")
         return url_temp, url_sal
 
     @staticmethod
-    def _build_opendap_urls(input_date):
+    def _build_opendap_urls(input_date: date) -> tuple:
         """make up the url to use for salinity and temperature"""
         # Primary server: http://nomads.ncep.noaa.gov:9090/dods/rtofs
-        url_temp = 'http://nomads.ncep.noaa.gov:9090/dods/rtofs/rtofs_global%s/rtofs_glo_3dz_nowcast_daily_temp' \
+        url_temp = 'http://nomads.ncep.noaa.gov:9090/dods/rtofs/rtofs_global%s/' \
+                   'rtofs_glo_3dz_nowcast_daily_temp' \
                    % input_date.strftime("%Y%m%d")
-        url_sal = 'http://nomads.ncep.noaa.gov:9090/dods/rtofs/rtofs_global%s/rtofs_glo_3dz_nowcast_daily_salt' \
+        logger.debug("opendap temp: %s" % url_temp)
+        url_sal = 'http://nomads.ncep.noaa.gov:9090/dods/rtofs/rtofs_global%s/' \
+                  'rtofs_glo_3dz_nowcast_daily_salt' \
                   % input_date.strftime("%Y%m%d")
+        logger.debug("opendap sal: %s" % url_sal)
         return url_temp, url_sal
 
-    def _download_files(self, datestamp, server_mode=False):
+    def _download_files(self, datestamp: date, server_mode: bool = False):
         """Actually, just try to connect with the remote files
         For a given queried date, we may have to use the forecast from the previous
         day since the current nowcast doesn't hold data for today (solved?)
@@ -374,12 +385,12 @@ class Rtofs(AbstractAtlas):
 
         # check if the data are available on the RTOFS server
         url_ck_temp, url_ck_sal = self._build_check_urls(datestamp)
-        if not (self._check_url(url_ck_temp) and self._check_url(url_ck_sal)):
+        if not self._check_url(url_ck_temp) or not self._check_url(url_ck_sal):
 
             datestamp -= timedelta(days=1)
             url_ck_temp, url_ck_sal = self._build_check_urls(datestamp)
 
-            if not (self._check_url(url_ck_temp) and self._check_url(url_ck_sal)):
+            if not self._check_url(url_ck_temp) or not self._check_url(url_ck_sal):
                 logger.warning('unable to retrieve data from RTOFS server for date: %s and next day' % datestamp)
                 self.clear_data()
                 progress.end()
@@ -410,7 +421,7 @@ class Rtofs(AbstractAtlas):
         progress.end()
         return True
 
-    def _grid_coords(self, lat, lon, datestamp, server_mode=False):
+    def _grid_coords(self, lat: float, lon: float, datestamp: date, server_mode: bool = False) -> tuple:
         """Convert the passed position in RTOFS grid coords"""
 
         # check if we need to update the data set (new day!)

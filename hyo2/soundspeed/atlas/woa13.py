@@ -4,6 +4,7 @@ import numpy as np
 from netCDF4 import Dataset
 import logging
 from datetime import datetime as dt, date
+from typing import Optional, Union
 
 from hyo2.abc.lib.ftp import Ftp
 
@@ -18,7 +19,7 @@ logger = logging.getLogger(__name__)
 class Woa13(AbstractAtlas):
     """WOA13 atlas"""
 
-    def __init__(self, data_folder, prj):
+    def __init__(self, data_folder: str, prj: 'hyo2.soundspeed.soundspeed import SoundSpeedLibrary') -> None:
         super(Woa13, self).__init__(data_folder=data_folder, prj=prj)
         self.name = self.__class__.__name__
         self.desc = "World Ocean Atlas 2013 v2"
@@ -38,7 +39,7 @@ class Woa13(AbstractAtlas):
         self.month_idx = 0
         self.season_idx = 0
 
-    def is_present(self):
+    def is_present(self) -> bool:
         """Check the presence of one of the db file
 
         The default location is first checked. If not present, the search is enlarged to past installations"""
@@ -50,25 +51,11 @@ class Woa13(AbstractAtlas):
             return True
         # logger.info('unable to locate the WOA13 db at the default location: %s' % self.folder)
 
-        # TODO: currently unused since there is only a set of DB for all SSM releases
-        # # continue the search based on possible old installations
-        # parent_folder = os.path.abspath(os.path.join(self.data_folder, os.pardir, os.pardir, os.pardir))
-        # for folder in os.listdir(parent_folder):
-        #     candidate_path = os.path.join(parent_folder, folder)
-        #     if os.path.isdir(candidate_path) and "Sound Speed" in candidate_path:
-        #         candidate_folder = os.path.join(candidate_path, "atlases", "woa13")
-        #         check_woa13_temp = os.path.join(candidate_folder, 'temp', 'woa13_decav_t00_04v2.nc')
-        #         check_woa13_sal = os.path.join(candidate_folder, 'sal', 'woa13_decav_s01_04v2.nc')
-        #         if os.path.exists(check_woa13_temp) and os.path.exists(check_woa13_sal):
-        #             self.data_folder = candidate_folder
-        #             logger.info("identified WOA13 db at: %s" % self.data_folder)
-        #             return True
-
         # no way to find the database
         logger.warning("unable to locate the WOA13 db")
         return False
 
-    def download_db(self):
+    def download_db(self) -> bool:
         """try to download the data set"""
         logger.debug('downloading WOA13 atlas')
 
@@ -105,7 +92,7 @@ class Woa13(AbstractAtlas):
             logger.error('during WOA13 download and unzip: %s' % e)
             return False
 
-    def load_grids(self):
+    def load_grids(self) -> bool:
         """Load atlas grids"""
         try:
             for i in range(17):
@@ -139,7 +126,7 @@ class Woa13(AbstractAtlas):
 
         return True
 
-    def get_depth(self, lat, lon):
+    def get_depth(self, lat: float, lon: float) -> float:
         """This helper method retrieve the max valid depth based on location"""
         lat_idx, lon_idx = self.grid_coords(lat, lon)
         t_profile = self.t[0].variables['t_an'][0, :, lat_idx, lon_idx]
@@ -149,7 +136,7 @@ class Woa13(AbstractAtlas):
                 index = sample
         return self.t[0].variables['depth'][index]
 
-    def calc_indices(self, month):
+    def calc_indices(self, month: int) -> None:
         """Calculate the month index based on the julian day"""
         self.month_idx = month + 1
         if month < 3:
@@ -163,7 +150,7 @@ class Woa13(AbstractAtlas):
 
         # logger.debug("indices: %s, %s" % (self.month_idx, self.season_idx))
 
-    def grid_coords(self, lat, lon, server_mode=False):
+    def grid_coords(self, lat: float, lon: float) -> tuple:
         """This does a nearest neighbour lookup"""
 
         if not self.has_data_loaded:
@@ -175,7 +162,7 @@ class Woa13(AbstractAtlas):
         logger.debug("grid coords: %s %s" % (lat_idx, lon_idx))
         return lat_idx, lon_idx
 
-    def query(self, lat, lon, datestamp=None, server_mode=False):
+    def query(self, lat: float, lon: float, datestamp: Union[date, dt, None] = None, server_mode: bool = False):
         """Query WOA13 for passed location and timestamp"""
         if datestamp is None:
             datestamp = dt.utcnow()
@@ -187,7 +174,7 @@ class Woa13(AbstractAtlas):
 
         # check the inputs
         if (lat is None) or (lon is None) or (datestamp is None):
-            logger.error("invalid query: %s @ (%.6f, %.6f)" % (datestamp.strftime("%Y%m%d"), lon, lat))
+            logger.error("invalid query: %s @ (%s, %s)" % (datestamp.strftime("%Y%m%d"), lon, lat))
             return None
 
         if not self.has_data_loaded:
@@ -198,7 +185,7 @@ class Woa13(AbstractAtlas):
         self.calc_indices(month=datestamp.month)
 
         # Find the nearest grid node
-        lat_base_idx, lon_base_idx = self.grid_coords(lat=lat, lon=lon, server_mode=server_mode)
+        lat_base_idx, lon_base_idx = self.grid_coords(lat=lat, lon=lon)
         lat_offsets = range(lat_base_idx - self.search_radius, lat_base_idx + self.search_radius + 1)
         lon_offsets = range(lon_base_idx - self.search_radius, lon_base_idx + self.search_radius + 1)
 
@@ -387,7 +374,7 @@ class Woa13(AbstractAtlas):
 
         return profiles
 
-    def clear_data(self):
+    def clear_data(self) -> None:
         """Delete the data and reset the last loaded day"""
         logger.debug("clearing data")
         if self.has_data_loaded:
@@ -412,6 +399,6 @@ class Woa13(AbstractAtlas):
 
     # --- repr
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         msg = "%s" % super(Woa13, self).__repr__()
         return msg
