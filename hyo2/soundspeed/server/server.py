@@ -147,7 +147,10 @@ class Server(Thread):
             if (count % 100) == 0:
                 logger.debug("#%05d: running" % count)
 
-            self.check()
+            try:
+                self.check()
+            except Exception as e:
+                logger.warning("issue while retrieving synthetic data: %s" % e)
 
             time.sleep(3)
             count += 1
@@ -172,16 +175,21 @@ class Server(Thread):
 
         # ### Retrieve grid index ###
 
-        if self.prj.setup.server_source == 'RTOFS':  # RTOFS case
-            lat_idx, lon_idx = self.prj.atlases.rtofs.grid_coords(lat=lat, lon=lon, datestamp=tm, server_mode=True)
-        elif self.prj.setup.server_source == 'WOA09':  # WOA09 case
+        if self.prj.setup.server_source == 'WOA09':  # WOA09 case
             lat_idx, lon_idx = self.prj.atlases.woa09.grid_coords(lat=lat, lon=lon, server_mode=True)
-        elif self.prj.setup.server_source == 'WOA13':  # WOA09 case
+        elif self.prj.setup.server_source == 'WOA13':  # WOA13 case
             lat_idx, lon_idx = self.prj.atlases.woa13.grid_coords(lat=lat, lon=lon, server_mode=True)
+        elif self.prj.setup.server_source == 'RTOFS':  # RTOFS case
+            lat_idx, lon_idx = self.prj.atlases.rtofs.grid_coords(lat=lat, lon=lon, datestamp=tm, server_mode=True)
+        elif self.prj.setup.server_source == 'GoMOFS':  # GoMOFS case
+            lat_idx, lon_idx = self.prj.atlases.gomofs.grid_coords(lat=lat, lon=lon, datestamp=tm, server_mode=True)
         else:
             raise RuntimeError('unable to understand server source: %s' % self.prj.setup.server_source)
         # logger.debug('lat idx: %s [last: %s]' % (lat_idx, self.lat_idx_last))
         # logger.debug('lon idx: %s [last: %s]' % (lon_idx, self.lon_idx_last))
+        if (lat_idx is None) or (lon_idx is None):
+            logger.warning("grid index is invalid: (%s %s) -> out of model bounding box?" % (lat_idx, lon_idx))
+            return
 
         # ### Retrieve surface sound speed (optional) ###
 
@@ -218,14 +226,17 @@ class Server(Thread):
                 return
 
         # retrieve profile
-        if self.prj.setup.server_source == 'RTOFS':  # RTOFS case
-            self.prj.ssp = self.prj.atlases.rtofs.query(lat=lat, lon=lon, datestamp=tm, server_mode=True)
-
-        elif self.prj.setup.server_source == 'WOA09':  # WOA09 case
+        if self.prj.setup.server_source == 'WOA09':  # WOA09 case
             self.prj.ssp = self.prj.atlases.woa09.query(lat=lat, lon=lon, datestamp=tm, server_mode=True)
 
         elif self.prj.setup.server_source == 'WOA13':  # WOA09 case
             self.prj.ssp = self.prj.atlases.woa13.query(lat=lat, lon=lon, datestamp=tm, server_mode=True)
+
+        elif self.prj.setup.server_source == 'RTOFS':  # RTOFS case
+            self.prj.ssp = self.prj.atlases.rtofs.query(lat=lat, lon=lon, datestamp=tm, server_mode=True)
+
+        elif self.prj.setup.server_source == 'GoMOFS':  # GoMOFS case
+            self.prj.ssp = self.prj.atlases.gomofs.query(lat=lat, lon=lon, datestamp=tm, server_mode=True)
 
         else:
             raise RuntimeError('unable to understand server source: %s' % self.prj.setup.server_source)

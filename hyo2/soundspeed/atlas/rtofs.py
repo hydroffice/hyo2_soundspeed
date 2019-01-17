@@ -103,7 +103,7 @@ class Rtofs(AbstractAtlas):
             return None
 
         try:
-            lat_idx, lon_idx = self._grid_coords(lat, lon, datestamp=datestamp, server_mode=server_mode)
+            lat_idx, lon_idx = self.grid_coords(lat, lon, datestamp=datestamp, server_mode=server_mode)
         except TypeError as e:
             logger.critical("while converting location to grid coords, %s" % e)
             return None
@@ -421,7 +421,7 @@ class Rtofs(AbstractAtlas):
         progress.end()
         return True
 
-    def _grid_coords(self, lat: float, lon: float, datestamp: date, server_mode: bool = False) -> tuple:
+    def grid_coords(self, lat: float, lon: float, datestamp: date, server_mode: Optional[bool] = False) -> tuple:
         """Convert the passed position in RTOFS grid coords"""
 
         # check if we need to update the data set (new day!)

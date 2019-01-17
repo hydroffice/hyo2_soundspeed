@@ -387,9 +387,9 @@ class Editor(AbstractWidget):
         if not self.lib.extend_profile():
             msg = "Issue in extending the profile!\n\n" \
                   "Possible causes:\n" \
-                  "- The extension source is not active. Look at Setup/Input!" \
-                  "- The profile from the extension source is too short. Check it on the plots!" \
-                  "- The extension source does not have a profile at the geographic location. " \
+                  "- The extension source is not active. Look at Setup/Input!\n" \
+                  "- The profile from the extension source is too short. Check it on the plots!\n" \
+                  "- The extension source does not have a profile at the geographic location.\n" \
                   "Use another source or manually extend the profile!"
             # noinspection PyCallByClass
             QtWidgets.QMessageBox.warning(self, "Profile extension", msg, QtWidgets.QMessageBox.Ok)

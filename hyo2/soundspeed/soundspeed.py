@@ -446,12 +446,22 @@ class SoundSpeedLibrary:
                                                     datestamp=pr.meta.utc_time)
 
             if self.use_rtofs() and not skip_atlas:
+                # noinspection PyBroadException
                 try:
                     pr.rtofs = self.atlases.rtofs.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
                                                         datestamp=pr.meta.utc_time)
-                except RuntimeError:
+                except Exception:
                     pr.rtofs = None
                     logger.warning("unable to retrieve RTOFS data")
+
+            if self.use_gomofs() and not skip_atlas:
+                # noinspection PyBroadException
+                try:
+                    pr.gomofs = self.atlases.gomofs.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
+                                                          datestamp=pr.meta.utc_time)
+                except Exception:
+                    pr.gomofs = None
+                    logger.warning("unable to retrieve GOMOFS data")
 
     # --- receive data
 
@@ -670,6 +680,7 @@ class SoundSpeedLibrary:
         return str(self._noaa_project)
 
     def not_noaa_project(self, value, format_ok=False):
+        # noinspection PyBroadException
         try:
             self._noaa_project = self._noaa_project_validate.match(value).group(1)
             return False
@@ -951,6 +962,15 @@ class SoundSpeedLibrary:
                 self.ssp.cur.rtofs = None
                 logger.warning("unable to retrieve RTOFS data")
 
+        if self.use_gomofs() and not skip_atlas:
+            try:
+                self.ssp.cur.gomofs = self.atlases.gomofs.query(lat=self.ssp.cur.meta.latitude,
+                                                                lon=self.ssp.cur.meta.longitude,
+                                                                datestamp=self.ssp.cur.meta.utc_time)
+            except RuntimeError:
+                self.ssp.cur.gomofs = None
+                logger.warning("unable to retrieve GoMOFS data")
+
         return True
 
     def delete_db_profile(self, pk):
@@ -1188,6 +1208,14 @@ class SoundSpeedLibrary:
                 return False
             self.cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_RTOFS'])
 
+        elif self.setup.ssp_salinity_source == Dicts.atlases['GoMOFS']:
+            if not self.has_gomofs():
+                logger.warning("missing GoMOFS profile")
+                return False
+            if not self.cur.replace_proc_sal(self.cur.gomofs):
+                return False
+            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_GoMOFS'])
+
         elif self.setup.ssp_salinity_source == Dicts.atlases['WOA09']:
             if not self.has_woa09():
                 logger.warning("missing WOA09 profile")
@@ -1233,6 +1261,14 @@ class SoundSpeedLibrary:
             if not self.cur.replace_proc_temp_sal(self.cur.rtofs):
                 return False
             self.cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_RTOFS'])
+
+        elif self.setup.ssp_temp_sal_source == Dicts.atlases['GoMOFS']:
+            if not self.has_gomofs():
+                logger.warning("missing GoMOFS profile")
+                return False
+            if not self.cur.replace_proc_temp_sal(self.cur.gomofs):
+                return False
+            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_GoMOFS'])
 
         elif self.setup.ssp_temp_sal_source == Dicts.atlases['WOA09']:
             if not self.has_woa09():
@@ -1312,6 +1348,13 @@ class SoundSpeedLibrary:
                 logger.warning("missing RTOFS profile")
                 return False
             if not self.cur.extend_profile(self.cur.rtofs, ext_type=Dicts.sources['rtofs_ext']):
+                return False
+
+        elif self.setup.ssp_extension_source == Dicts.atlases['GoMOFS']:
+            if not self.has_gomofs():
+                logger.warning("missing GoMOFS profile")
+                return False
+            if not self.cur.extend_profile(self.cur.gomofs, ext_type=Dicts.sources['gomofs_ext']):
                 return False
 
         elif self.setup.ssp_extension_source == Dicts.atlases['WOA09']:
@@ -1472,6 +1515,9 @@ class SoundSpeedLibrary:
 
     def use_rtofs(self):
         return self.setup.use_rtofs
+
+    def use_gomofs(self):
+        return self.setup.use_gomofs
 
     def use_woa09(self):
         return self.setup.use_woa09

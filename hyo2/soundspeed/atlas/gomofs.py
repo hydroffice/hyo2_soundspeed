@@ -107,7 +107,7 @@ class Gomofs(AbstractAtlas):
             return None
 
         try:
-            lat_idx, lon_idx = self._grid_coords(lat, lon, datestamp=datestamp, server_mode=server_mode)
+            lat_idx, lon_idx = self.grid_coords(lat, lon, datestamp=datestamp, server_mode=server_mode)
             if lat_idx is None:
                 logger.info("location outside of GoMOFS coverage")
                 return None
@@ -361,7 +361,7 @@ class Gomofs(AbstractAtlas):
         progress.end()
         return True
 
-    def _grid_coords(self, lat: float, lon: float, datestamp: date, server_mode: bool = False) -> tuple:
+    def grid_coords(self, lat: float, lon: float, datestamp: date, server_mode: Optional[bool] = False) -> tuple:
         """Convert the passed position in GOMOFS grid coords"""
 
         # check if we need to update the data set (new day!)

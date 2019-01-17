@@ -221,19 +221,19 @@ class Dicts:
         ('EXT_WOA09', 'ext.from WOA09'),
         ('EXT_WOA13', 'ext.from WOA13'),
         ('EXT_RTOFS', 'ext.from RTOFS'),
-        ('EXT_GOMOFS', 'ext.from GoMOFS'),  # since DB v.3
+        ('EXT_GoMOFS', 'ext.from GoMOFS'),  # since DB v.3
         ('EXT_REF', 'ext.from ref'),
 
         ('REP_SAL_WOA09', 'sal.from WOA09'),
         ('REP_SAL_WOA13', 'sal.from WOA13'),
         ('REP_SAL_RTOFS', 'sal.from RTOFS'),
-        ('REP_SAL_GOMOFS', 'sal.from GoMOFS'),  # since DB v.3
+        ('REP_SAL_GoMOFS', 'sal.from GoMOFS'),  # since DB v.3
         ('REP_SAL_REF', 'sal.from ref'),
 
         ('REP_TEMP_SAL_WOA09', 'temp./sal.from WOA09'),
         ('REP_TEMP_SAL_WOA13', 'temp./sal.from WOA13'),
         ('REP_TEMP_SAL_RTOFS', 'temp./sal.from RTOFS'),
-        ('REP_TEMP_SAL_GOMOFS', 'temp./sal.from GoMOFS'),  # since DB v.3
+        ('REP_TEMP_SAL_GoMOFS', 'temp./sal.from GoMOFS'),  # since DB v.3
         ('REP_TEMP_SAL_REF', 'temp./sal.from ref'),
 
         ('RECALC_SPD', 'recalc.speed'),

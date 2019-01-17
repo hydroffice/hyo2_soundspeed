@@ -4,8 +4,6 @@ import math
 import numpy as np
 import logging
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeed import __version__ as soundspeed_version
 from hyo2.soundspeed.profile.metadata import Metadata
 from hyo2.soundspeed.profile.samples import Samples
@@ -15,6 +13,8 @@ from hyo2.soundspeed.profile.oceanography import Oceanography as Oc
 from hyo2.soundspeed.profile.ray_tracing.ray_tracing import RayTracing
 from hyo2.soundspeed.profile.ray_tracing.ray_path import RayPath
 from hyo2.soundspeed.profile.ray_tracing.tracedprofile import TracedProfile
+
+logger = logging.getLogger(__name__)
 
 
 class Profile:
@@ -30,6 +30,7 @@ class Profile:
         self.woa09 = None
         self.woa13 = None
         self.rtofs = None
+        self.gomofs = None
 
         # variable for listener since the data are populated in another thread
         self.listener_completed = False
@@ -1074,21 +1075,21 @@ class Profile:
             return True
 
         # stack the extending samples after the last valid (max depth) index
-        self.proc.pressure = np.hstack([self.proc.depth[:max_idx],
+        self.proc.pressure = np.hstack([self.proc.depth[:max_idx + 1],
                                         np.zeros_like(extender.cur.proc.depth[ext_vi][ind2:])])
-        self.proc.depth = np.hstack([self.proc.depth[:max_idx],
+        self.proc.depth = np.hstack([self.proc.depth[:max_idx + 1],
                                      extender.cur.proc.depth[ext_vi][ind2:]])
-        self.proc.speed = np.hstack([self.proc.speed[:max_idx],
+        self.proc.speed = np.hstack([self.proc.speed[:max_idx + 1],
                                      extender.cur.proc.speed[ext_vi][ind2:]])
-        self.proc.temp = np.hstack([self.proc.temp[:max_idx],
+        self.proc.temp = np.hstack([self.proc.temp[:max_idx + 1],
                                     extender.cur.proc.temp[ext_vi][ind2:]])
-        self.proc.conductivity = np.hstack([self.proc.sal[:max_idx],
+        self.proc.conductivity = np.hstack([self.proc.sal[:max_idx + 1],
                                             np.zeros_like(extender.cur.proc.sal[ext_vi][ind2:])])
-        self.proc.sal = np.hstack([self.proc.sal[:max_idx],
+        self.proc.sal = np.hstack([self.proc.sal[:max_idx + 1],
                                    extender.cur.proc.sal[ext_vi][ind2:]])
-        self.proc.source = np.hstack([self.proc.source[:max_idx],
+        self.proc.source = np.hstack([self.proc.source[:max_idx + 1],
                                       extender.cur.proc.source[ext_vi][ind2:]])
-        self.proc.flag = np.hstack([self.proc.flag[:max_idx],
+        self.proc.flag = np.hstack([self.proc.flag[:max_idx + 1],
                                     extender.cur.proc.flag[ext_vi][ind2:]])
         self.proc.num_samples = self.proc.depth.size
 
@@ -1096,14 +1097,17 @@ class Profile:
         if ext_type == Dicts.sources['ref_ext']:
             self.modify_proc_info(Dicts.proc_user_infos['EXT_REF'])
 
-        elif ext_type == Dicts.sources['rtofs_ext']:
-            self.modify_proc_info(Dicts.proc_user_infos['EXT_RTOFS'])
-
         elif ext_type == Dicts.sources['woa09_ext']:
             self.modify_proc_info(Dicts.proc_user_infos['EXT_WOA09'])
 
         elif ext_type == Dicts.sources['woa13_ext']:
             self.modify_proc_info(Dicts.proc_user_infos['EXT_WOA13'])
+
+        elif ext_type == Dicts.sources['rtofs_ext']:
+            self.modify_proc_info(Dicts.proc_user_infos['EXT_RTOFS'])
+
+        elif ext_type == Dicts.sources['gomofs_ext']:
+            self.modify_proc_info(Dicts.proc_user_infos['EXT_GoMOFS'])
 
         else:
             logger.warning("unknown atlases: %s" % ext_type)

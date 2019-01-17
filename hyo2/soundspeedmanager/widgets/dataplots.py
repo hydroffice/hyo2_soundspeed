@@ -1,27 +1,24 @@
 from datetime import datetime
-import os
 import logging
 
 import numpy as np
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2 import QtCore, QtWidgets
 
 import matplotlib
-matplotlib.use('qt5agg')
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib import rc_context
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeedmanager.widgets.widget import AbstractWidget
 from hyo2.soundspeedmanager.widgets.navtoolbar import NavToolbar
+
+logger = logging.getLogger(__name__)
+matplotlib.use('qt5agg')
 
 
 class DataPlots(AbstractWidget):
 
-    here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
-    media = os.path.join(here, os.pardir, 'media')
     font_size = 6
     rc_context = {
         'font.family': 'sans-serif',
@@ -59,6 +56,7 @@ class DataPlots(AbstractWidget):
         self.woa09_color = '#ffaaaa'
         self.woa13_color = '#ffcc66'
         self.rtofs_color = '#99cc00'
+        self.gomofs_color = '#6cbdbb'
         self.ref_color = '#ff6600'
         self.sis_color = '#0000e6'
         self.dot_style = "x"
@@ -117,6 +115,9 @@ class DataPlots(AbstractWidget):
         self.speed_rtofs = None
         self.temp_rtofs = None
         self.sal_rtofs = None
+        self.speed_gomofs = None
+        self.temp_gomofs = None
+        self.sal_gomofs = None
         self.speed_ref = None
         self.temp_ref = None
         self.sal_ref = None
@@ -193,6 +194,13 @@ class DataPlots(AbstractWidget):
                                                    linestyle='--',
                                                    label='RTOFS'
                                                    )
+        if self.lib.cur.gomofs:
+            self.speed_gomofs, = self.speed_ax.plot(self.lib.cur.gomofs.l[0].proc.speed,
+                                                    self.lib.cur.gomofs.l[0].proc.depth,
+                                                    color=self.gomofs_color,
+                                                    linestyle='--',
+                                                    label='GoMOFS'
+                                                    )
         if self.lib.has_ref():
             self.speed_ref, = self.speed_ax.plot(self.lib.ref.l[0].proc.speed,
                                                  self.lib.ref.l[0].proc.depth,
@@ -292,13 +300,19 @@ class DataPlots(AbstractWidget):
                                                          label='WOA13 max'
                                                          )
         if self.lib.cur.rtofs:
-
             self.temp_rtofs, = self.temp_ax.plot(self.lib.cur.rtofs.l[0].proc.temp,
                                                  self.lib.cur.rtofs.l[0].proc.depth,
                                                  color=self.rtofs_color,
                                                  linestyle='--',
                                                  label='RTOFS'
                                                  )
+        if self.lib.cur.gomofs:
+            self.temp_gomofs, = self.temp_ax.plot(self.lib.cur.gomofs.l[0].proc.temp,
+                                                  self.lib.cur.gomofs.l[0].proc.depth,
+                                                  color=self.gomofs_color,
+                                                  linestyle='--',
+                                                  label='GoMOFS'
+                                                  )
         if self.lib.has_ref():
             self.temp_ref, = self.temp_ax.plot(self.lib.ref.l[0].proc.temp,
                                                self.lib.ref.l[0].proc.depth,
@@ -375,6 +389,13 @@ class DataPlots(AbstractWidget):
                                                linestyle='--',
                                                label='RTOFS'
                                                )
+        if self.lib.cur.gomofs:
+            self.sal_gomofs, = self.sal_ax.plot(self.lib.cur.gomofs.l[0].proc.sal,
+                                                self.lib.cur.gomofs.l[0].proc.depth,
+                                                color=self.gomofs_color,
+                                                linestyle='--',
+                                                label='GoMOFS'
+                                                )
         if self.lib.has_ref():
             self.sal_ref, = self.sal_ax.plot(self.lib.ref.l[0].proc.sal,
                                              self.lib.ref.l[0].proc.depth,
@@ -521,7 +542,7 @@ class DataPlots(AbstractWidget):
                     if min_depth > 0:
                         min_depth = -5
 
-                    self.speed_ax.set_ylim([max_depth, min_depth])
+                    self.speed_ax.set_ylim(bottom=max_depth, top=min_depth)
 
             self.c.draw()
 
@@ -534,7 +555,7 @@ class DataPlots(AbstractWidget):
                     max_proc_speed = self.lib.cur.proc.speed[self.vi].max()
                     min_proc_speed = self.lib.cur.proc.speed[self.vi].min()
 
-                    self.speed_ax.set_xlim([min_proc_speed - 3.0, max_proc_speed + 3.0])
+                    self.speed_ax.set_xlim(left=(min_proc_speed - 3.0), right=(max_proc_speed + 3.0))
 
             self.c.draw()
 
@@ -547,7 +568,7 @@ class DataPlots(AbstractWidget):
                     max_proc_temp = self.lib.cur.proc.temp[self.vi].max()
                     min_proc_temp = self.lib.cur.proc.temp[self.vi].min()
 
-                    self.temp_ax.set_xlim([min_proc_temp - 3.0, max_proc_temp + 3.0])
+                    self.temp_ax.set_xlim(left=(min_proc_temp - 3.0), right=(max_proc_temp + 3.0))
 
             self.c.draw()
 
@@ -560,7 +581,7 @@ class DataPlots(AbstractWidget):
                     max_proc_sal = self.lib.cur.proc.sal[self.vi].max()
                     min_proc_sal = self.lib.cur.proc.sal[self.vi].min()
 
-                    self.sal_ax.set_xlim([min_proc_sal - 3.0, max_proc_sal + 3.0])
+                    self.sal_ax.set_xlim(left=(min_proc_sal - 3.0), right=(max_proc_sal + 3.0))
 
             self.c.draw()
 
