@@ -3,16 +3,13 @@ import logging
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeedsettings.widgets.widget import AbstractWidget
 from hyo2.soundspeed.base.setup import Setup
 
+logger = logging.getLogger(__name__)
+
 
 class Main(AbstractWidget):
-
-    here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
-    media = os.path.join(here, os.pardir, 'media')
 
     def __init__(self, main_win, db):
         AbstractWidget.__init__(self, main_win=main_win, db=db)
@@ -119,8 +116,8 @@ class Main(AbstractWidget):
             if self.db.setup_exists(name):
                 # noinspection PyCallByClass
                 QtWidgets.QMessageBox.information(self, "Invalid setup name",
-                                              "The input setup name already exists.\n"
-                                              "You entered: %s" % name)
+                                                  "The input setup name already exists.\n"
+                                                  "You entered: %s" % name)
                 continue
 
             self.db.add_setup(name)
@@ -133,9 +130,10 @@ class Main(AbstractWidget):
         # ask the file path to the user
         flt = "Setup DB (setup.db)"
         settings = QtCore.QSettings()
+        # noinspection PyCallByClass
         selection, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select input setup DB",
-                                                         settings.value("export_folder"),
-                                                         flt)
+                                                             settings.value("export_folder"),
+                                                             flt)
         if not selection:
             return
 
@@ -144,9 +142,10 @@ class Main(AbstractWidget):
             input_db = Setup(release_folder=os.path.dirname(selection))
             input_setups = input_db.db.setup_list
         except Exception as e:
+            # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "Importable setup",
-                                          "Unable to load the selected setup.\n"
-                                          "Reason: %s" % e)
+                                              "Unable to load the selected setup.\n"
+                                              "Reason: %s" % e)
             return
 
         # be sure that there is not naming crash
@@ -164,15 +163,17 @@ class Main(AbstractWidget):
             for stopped_setup in stopped_setups:
                 msg += "- %s\n" % stopped_setup
 
+            # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "Importable setup",
-                                          "No importable setups! Naming crash?\n\n"
-                                          "List of troublesome setups:\n%s" % msg)
+                                              "No importable setups! Naming crash?\n\n"
+                                              "List of troublesome setups:\n%s" % msg)
             return
 
         # ask the user which setup to import
+        # noinspection PyCallByClass
         sel, ok = QtWidgets.QInputDialog.getItem(self, 'Do you want to import an existing setup?',
-                                             'Select one (or click on Cancel to create a new one):',
-                                             importable_setups, 0, False)
+                                                 'Select one (or click on Cancel to create a new one):',
+                                                 importable_setups, 0, False)
         if ok:
             # add the new setup name
             self.db.add_setup(sel)
@@ -197,15 +198,16 @@ class Main(AbstractWidget):
 
         while True:
             # noinspection PyCallByClass
-            cloned_setup_name, ok = QtWidgets.QInputDialog.getText(self, "New setup", "Input a name for the cloned setup")
+            cloned_setup_name, ok = QtWidgets.QInputDialog.getText(self, "New setup",
+                                                                   "Input a name for the cloned setup")
             if not ok:
                 return
 
             if self.db.setup_exists(cloned_setup_name):
                 # noinspection PyCallByClass
                 QtWidgets.QMessageBox.information(self, "Invalid setup name",
-                                              "The name for the cloned setup already exists.\n"
-                                              "You entered: %s" % cloned_setup_name)
+                                                  "The name for the cloned setup already exists.\n"
+                                                  "You entered: %s" % cloned_setup_name)
                 continue
 
             self.main_win.lib.clone_setup(original_setup_name, cloned_setup_name)
@@ -221,7 +223,7 @@ class Main(AbstractWidget):
         if len(rows) == 0:
             # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "Setup renaming",
-                                          "You need to first select the setup to rename!")
+                                              "You need to first select the setup to rename!")
             return
 
         # check if the selected setup is active
@@ -230,21 +232,22 @@ class Main(AbstractWidget):
         if original_setup_id == self.db.active_setup_id:
             # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "Setup renaming",
-                                          "The setup \'%s\' is active!\n"
-                                          "You need to first activate another setup." % original_setup_name)
+                                              "The setup \'%s\' is active!\n"
+                                              "You need to first activate another setup." % original_setup_name)
             return
 
         while True:
             # noinspection PyCallByClass
-            cloned_setup_name, ok = QtWidgets.QInputDialog.getText(self, "New setup", "Input a name for the cloned setup")
+            cloned_setup_name, ok = QtWidgets.QInputDialog.getText(self, "New setup",
+                                                                   "Input a name for the cloned setup")
             if not ok:
                 return
 
             if self.db.setup_exists(cloned_setup_name):
                 # noinspection PyCallByClass
                 QtWidgets.QMessageBox.information(self, "Invalid setup name",
-                                              "The name for the cloned setup already exists.\n"
-                                              "You entered: %s" % cloned_setup_name)
+                                                  "The name for the cloned setup already exists.\n"
+                                                  "You entered: %s" % cloned_setup_name)
                 continue
 
             self.main_win.lib.rename_setup(original_setup_name, cloned_setup_name)
@@ -267,8 +270,9 @@ class Main(AbstractWidget):
         setup_id = self.db.setup_id_from_setup_name(setup_name)
         if setup_id == self.db.active_setup_id:
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.information(self, "Setup deletion", "The setup \'%s\' is active!\n"
-                                          "You need to first activate another setup." % setup_name)
+            QtWidgets.QMessageBox.information(self, "Setup deletion",
+                                              "The setup \'%s\' is active!\nYou need to first activate another setup."
+                                              % setup_name)
             return
 
         self.db.delete_setup(setup_name)
@@ -282,7 +286,7 @@ class Main(AbstractWidget):
         if len(rows) == 0:
             # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "Setup activation",
-                                          "You need to first select the setup to activate!")
+                                              "You need to first select the setup to activate!")
             return
 
         # check if the selected setup is active
@@ -291,7 +295,7 @@ class Main(AbstractWidget):
         if setup_id == self.db.active_setup_id:
             # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "Setup activation",
-                                          "The setup \'%s\' is already active!" % setup_name)
+                                              "The setup \'%s\' is already active!" % setup_name)
             return
 
         self.db.activate_setup(setup_name)
@@ -326,9 +330,6 @@ class Main(AbstractWidget):
 
         self.setup_list.setRowCount(len(setups))
         for i, setup in enumerate(setups):
-
-            # print(setup)
-            is_active = False
 
             for j, field in enumerate(setup):
 

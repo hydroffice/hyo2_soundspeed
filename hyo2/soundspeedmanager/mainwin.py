@@ -50,7 +50,7 @@ class MainWin(QtWidgets.QMainWindow):
 
         # set the minimum and the initial size
         self.setMinimumSize(640, 480)
-        self.resize(920, 600)
+        self.resize(920, 640)
 
         # set icons
         self.setWindowIcon(QtGui.QIcon(app_info.app_icon_path))

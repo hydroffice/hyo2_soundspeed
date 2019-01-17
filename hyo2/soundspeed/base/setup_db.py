@@ -4,7 +4,9 @@ import sqlite3
 
 from hyo2.abc.lib.helper import Helper
 from hyo2.soundspeed.base.basedb import BaseDb
-from hyo2.soundspeed.base.setup_sql import CREATE_SETTINGS, CREATE_SETTINGS_VIEW, CREATE_CLIENT_LIST
+from hyo2.soundspeed.base.setup_sql import CREATE_SETTINGS, CREATE_SETTINGS_VIEW, CREATE_CLIENT_LIST, \
+    RENAME_SETTINGS, RENAME_CLIENT_LIST, DROP_OLD_SETTINGS, DROP_OLD_CLIENT_LIST, DROP_SETTINGS_VIEW, \
+    V1_V2_COPY_SETTINGS, V1_V2_COPY_CLIENT_LIST
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +21,42 @@ class SetupDb(BaseDb):
         self.reconnect_or_create()
         self._check_default_setup()
         self.use_setup_name = use_setup_name
+
+    def update_from_v1_to_v2(self):
+        if not self.conn:
+            logger.error("Missing db connection")
+            return False
+
+        try:
+            with self.conn:
+                self.conn.execute(""" PRAGMA foreign_keys = 0""")
+
+            with self.conn:
+                self.conn.execute(RENAME_SETTINGS)
+                self.conn.execute(RENAME_CLIENT_LIST)
+                self.conn.execute(DROP_SETTINGS_VIEW)
+                self.conn.execute(CREATE_SETTINGS)
+                self.conn.execute(CREATE_CLIENT_LIST)
+                self.conn.execute(CREATE_SETTINGS_VIEW)
+
+            with self.conn:
+                self.conn.execute(V1_V2_COPY_SETTINGS)
+                self.conn.execute(V1_V2_COPY_CLIENT_LIST)
+                self.conn.execute(DROP_OLD_SETTINGS)
+                self.conn.execute(DROP_OLD_CLIENT_LIST)
+
+            with self.conn:
+                if self.conn.execute(""" PRAGMA foreign_keys """):
+                    # logger.info("foreign keys active")
+                    pass
+                else:
+                    logger.error("foreign keys not active")
+                    return False
+            return True
+
+        except sqlite3.Error as e:
+            logger.error("during building tables, %s: %s" % (type(e), e))
+            return False
 
     def build_tables(self):
         if not self.conn:
@@ -338,6 +376,15 @@ class SetupDb(BaseDb):
     def use_woa13(self, value):
         self._setter_bool("use_woa13", value)
 
+    # --- use_woa18
+    @property
+    def use_woa18(self):
+        return self._getter_bool("use_woa18")
+
+    @use_woa18.setter
+    def use_woa18(self, value):
+        self._setter_bool("use_woa18", value)
+
     # --- use_rtofs
     @property
     def use_rtofs(self):
@@ -346,6 +393,15 @@ class SetupDb(BaseDb):
     @use_rtofs.setter
     def use_rtofs(self, value):
         self._setter_bool("use_rtofs", value)
+
+    # --- use_gomofs
+    @property
+    def use_gomofs(self):
+        return self._getter_bool("use_gomofs")
+
+    @use_gomofs.setter
+    def use_gomofs(self, value):
+        self._setter_bool("use_gomofs", value)
 
     # --- ssp_extension_source
     @property
@@ -652,6 +708,15 @@ class SetupDb(BaseDb):
     @custom_woa13_folder.setter
     def custom_woa13_folder(self, value):
         self._setter_str("custom_woa13_folder", value)
+
+    # --- custom_woa18_folder
+    @property
+    def custom_woa18_folder(self):
+        return self._getter_str("custom_woa18_folder")
+
+    @custom_woa18_folder.setter
+    def custom_woa18_folder(self, value):
+        self._setter_str("custom_woa18_folder", value)
 
     # --- noaa tools
     @property

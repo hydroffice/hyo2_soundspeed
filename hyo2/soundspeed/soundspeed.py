@@ -164,7 +164,8 @@ class SoundSpeedLibrary:
             # if exists, attempt to load the setup
             try:
                 Setup(release_folder=release_path)
-            except Exception:
+            except Exception as e:
+                logger.debug("skipping %s: %s" % (release_path, e))
                 continue
 
             logger.debug("found setup: %s" % setup_path)
@@ -173,12 +174,20 @@ class SoundSpeedLibrary:
         return old_setups
 
     @classmethod
-    def copy_setup(cls, input_setup, data_folder=None):
+    def copy_setup(cls, input_setup: str) -> bool:
         from shutil import copyfile
         release_folder = cls.make_release_folder()
         output_setup = os.path.join(release_folder, "setup.db")
         copyfile(input_setup, output_setup)
-        logger.info("copied from: %s to: %s" % (input_setup, output_setup))
+        updates_required = Setup.are_updates_required(output_setup)
+        logger.debug("updates required: %s" % updates_required)
+        if updates_required:
+            success = Setup.apply_required_updates(output_setup)
+            if not success:
+                os.remove(output_setup)
+                return False
+        logger.info("copied content from: %s to: %s" % (input_setup, output_setup))
+        return True
 
     def set_folders(self, data_folder):
         """manage library folders creation"""

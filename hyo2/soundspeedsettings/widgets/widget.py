@@ -1,5 +1,4 @@
 import logging
-import os
 
 from PySide2 import QtWidgets
 
@@ -10,8 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 class AbstractWidget(QtWidgets.QMainWindow):
-
-    here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
 
     def __init__(self, main_win, db):
         super(AbstractWidget, self).__init__()

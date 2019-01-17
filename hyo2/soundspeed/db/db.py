@@ -1,11 +1,9 @@
 import sqlite3
 import os
 import datetime
-import traceback
+# import traceback
 import numpy as np
 import logging
-
-logger = logging.getLogger(__name__)
 
 from hyo2.soundspeed import __version__ as version
 from hyo2.soundspeed import __doc__ as name
@@ -14,6 +12,8 @@ from hyo2.soundspeed.db.plot import PlotDb
 from hyo2.soundspeed.db.export import ExportDb
 from hyo2.soundspeed.profile.profilelist import ProfileList
 from hyo2.soundspeed.profile.dicts import Dicts
+
+logger = logging.getLogger(__name__)
 
 
 class ProjectDb:
@@ -133,7 +133,7 @@ class ProjectDb:
 
                 self.conn.execute("""
                                   CREATE TABLE IF NOT EXISTS library(
-                                     version int PRIMARY KEY NOT NULL DEFAULT 1,
+                                     version int PRIMARY KEY NOT NULL DEFAULT 3,
                                      creator_info text,
                                      creation timestamp NOT NULL)
                                   """)
@@ -146,7 +146,7 @@ class ProjectDb:
                     # noinspection SqlResolve
                     self.conn.execute("""
                                       INSERT INTO library VALUES (?, ?, ?)
-                                      """, (2, "%s v.%s" % (name, version), datetime.datetime.utcnow(),))
+                                      """, (3, "%s v.%s" % (name, version), datetime.datetime.utcnow(),))
 
                 self.conn.execute("""
                                   CREATE TABLE IF NOT EXISTS ssp_pk(
@@ -339,7 +339,7 @@ class ProjectDb:
 
     def _get_ssp_pk(self):
 
-        datetime = self.tmp_data.meta.utc_time
+        utc_time = self.tmp_data.meta.utc_time
         point = Point(self.tmp_data.meta.longitude, self.tmp_data.meta.latitude)
 
         if not self.conn:
@@ -351,14 +351,14 @@ class ProjectDb:
             # noinspection SqlResolve
             ret = self.conn.execute("""
                                     SELECT COUNT(*) FROM ssp_pk WHERE cast_datetime=? AND cast_position=?
-                                    """, (datetime, point,)).fetchone()
+                                    """, (utc_time, point,)).fetchone()
             # if not present, add it
             if ret[0] == 0:
-                # logger.info("add new spp pk for %s @ %s" % (datetime, point))
+                # logger.info("add new spp pk for %s @ %s" % (utc_time, point))
                 # noinspection SqlResolve
                 self.conn.execute("""
                                   INSERT INTO ssp_pk VALUES (NULL, ?, ?)
-                                  """, (datetime, point,))
+                                  """, (utc_time, point,))
         except sqlite3.Error as e:
             logger.error("during ssp pk check, %s: %s" % (type(e), e))
             return False
@@ -368,7 +368,7 @@ class ProjectDb:
             # noinspection SqlResolve
             ret = self.conn.execute("""
                                     SELECT rowid FROM ssp_pk WHERE cast_datetime=? AND cast_position=?
-                                    """, (datetime, point,)).fetchone()
+                                    """, (utc_time, point,)).fetchone()
             # logger.info("spp pk: %s" % ret['id'])
             self.tmp_ssp_pk = ret['id']
 
@@ -613,17 +613,22 @@ class ProjectDb:
                         probe_type = Dicts.probe_types['Future']
 
                     # special handling for surface sound speed, min depth, max depth
+                    # noinspection SqlResolve
                     ssp_samples = self.conn.execute("SELECT * FROM proc WHERE ssp_pk=? AND flag=?",
                                                     (row['pk'], Dicts.flags['valid'])).fetchall()
-                    ss_at_min_depth = '%0.2f' %ssp_samples[0]['speed']
-                    min_depth = '%0.2f' %ssp_samples[0]['depth']
-                    max_depth = '%0.2f' %ssp_samples[-1]['depth']
+                    ss_at_min_depth = '%0.2f' % ssp_samples[0]['speed']
+                    min_depth = '%0.2f' % ssp_samples[0]['depth']
+                    max_depth = '%0.2f' % ssp_samples[-1]['depth']
 
+                    # noinspection SqlResolve
                     ssp_samples = self.conn.execute("SELECT * FROM proc WHERE ssp_pk=? AND flag=? "
-                                                    "AND source!=? AND source!=? AND source!=? AND source!=?",
+                                                    "AND source!=? AND source!=? AND source!=? AND source!=? "
+                                                    "AND source!=? AND source!=?",
                                                     (row['pk'], Dicts.flags['valid'],
                                                      Dicts.sources['woa09_ext'], Dicts.sources['woa13_ext'],
-                                                     Dicts.sources['rtofs_ext'], Dicts.sources['ref_ext'],
+                                                     Dicts.sources['woa18_ext'],
+                                                     Dicts.sources['rtofs_ext'], Dicts.sources['gomofs_ext'],
+                                                     Dicts.sources['ref_ext'],
                                                      )).fetchall()
                     max_raw_depth = '%0.2f' % ssp_samples[-1]['depth']
 

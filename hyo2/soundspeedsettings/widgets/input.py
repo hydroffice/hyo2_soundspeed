@@ -1,18 +1,14 @@
-import os
 import logging
 
 from PySide2 import QtGui, QtWidgets
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeedsettings.widgets.widget import AbstractWidget
 
+logger = logging.getLogger(__name__)
+
 
 class Input(AbstractWidget):
-
-    here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
-    media = os.path.join(here, os.pardir, 'media')
 
     def __init__(self, main_win, db):
         AbstractWidget.__init__(self, main_win=main_win, db=db)
@@ -115,6 +111,26 @@ class Input(AbstractWidget):
         self.use_rtofs = QtWidgets.QComboBox()
         self.use_rtofs.addItems(["True", "False"])
         vbox.addWidget(self.use_rtofs)
+        vbox.addStretch()
+
+        # - use gomofs
+        hbox = QtWidgets.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtWidgets.QLabel("Use GoMOFS:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- value
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.use_gomofs = QtWidgets.QComboBox()
+        self.use_gomofs.addItems(["True", "False"])
+        vbox.addWidget(self.use_gomofs)
         vbox.addStretch()
 
         # - ssp_extension_source
@@ -314,6 +330,8 @@ class Input(AbstractWidget):
         # noinspection PyUnresolvedReferences
         self.use_rtofs.currentIndexChanged.connect(self.apply_use_rtofs)
         # noinspection PyUnresolvedReferences
+        self.use_gomofs.currentIndexChanged.connect(self.apply_use_gomofs)
+        # noinspection PyUnresolvedReferences
         self.extension_source.currentIndexChanged.connect(self.apply_extension_source)
         # noinspection PyUnresolvedReferences
         self.salinity_source.currentIndexChanged.connect(self.apply_salinity_source)
@@ -357,6 +375,12 @@ class Input(AbstractWidget):
     def apply_use_rtofs(self):
         # logger.debug("apply use rtofs: %s" % self.use_rtofs.currentText())
         self.db.use_rtofs = self.use_rtofs.currentText() == "True"
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+    def apply_use_gomofs(self):
+        # logger.debug("apply use gomofs: %s" % self.use_gomofs.currentText())
+        self.db.use_gomofs = self.use_gomofs.currentText() == "True"
         self.setup_changed()
         self.main_win.reload_settings()
 
@@ -426,6 +450,12 @@ class Input(AbstractWidget):
             self.use_rtofs.setCurrentIndex(0)  # True
         else:
             self.use_rtofs.setCurrentIndex(1)  # False
+
+        # use gomofs
+        if self.db.use_gomofs:
+            self.use_gomofs.setCurrentIndex(0)  # True
+        else:
+            self.use_gomofs.setCurrentIndex(1)  # False
 
         # extension source
         _str = self.db.ssp_extension_source

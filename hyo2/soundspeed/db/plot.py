@@ -1,17 +1,15 @@
 import os
 import numpy as np
 
+from PySide2 import QtWidgets
 import matplotlib
-matplotlib.use('qt5agg')
-
 from matplotlib import rc_context
 
 from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
-from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 import logging
 
+matplotlib.use('qt5agg')
 logger = logging.getLogger(__name__)
 
 

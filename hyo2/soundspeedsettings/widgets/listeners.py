@@ -1,18 +1,14 @@
-import os
 import logging
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeedsettings.widgets.widget import AbstractWidget
 from hyo2.soundspeed.profile.dicts import Dicts
 
+logger = logging.getLogger(__name__)
+
 
 class Listeners(AbstractWidget):
-
-    here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
-    media = os.path.join(here, os.pardir, 'media')
 
     def __init__(self, main_win, db):
         AbstractWidget.__init__(self, main_win=main_win, db=db)
@@ -160,7 +156,7 @@ class Listeners(AbstractWidget):
         vbox.addStretch()
         self.mvp_ip_address = QtWidgets.QLineEdit()
         octet = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])"
-        reg_ex = QtCore.QRegExp("^%s\.%s\.%s\.%s$" % (octet, octet, octet, octet))
+        reg_ex = QtCore.QRegExp(r"^%s\.%s\.%s\.%s$" % (octet, octet, octet, octet))
         validator = QtGui.QRegExpValidator(reg_ex)
         self.mvp_ip_address.setValidator(validator)
         vbox.addWidget(self.mvp_ip_address)

@@ -23,7 +23,7 @@ class Dicts:
         ('WOA09', 2),
         ('WOA13', 3),
         ('SIS', 4),
-        ('GoMOFS', 5),
+        ('GoMOFS', 5),  # since DB v.3
 
         ('SVP', 101),
         ('Castaway', 102),
@@ -119,6 +119,9 @@ class Dicts:
         ('interp', 7),
         ('sis', 8),
         ('smoothing', 9),  # since DB v.2
+        ('gomofs_ext', 10),  # since DB v.3
+        ('woa18_ext', 11),  # since DB v.3
+
     ])
 
     booleans = OrderedDict([
@@ -143,6 +146,7 @@ class Dicts:
         ("WOA13", 1),
         ("RTOFS", 2),
         ("ref", 3),
+        ("GoMOFS", 4),  # since DB v.3
 
     ])
 
@@ -151,6 +155,7 @@ class Dicts:
         ("WOA09", 0),
         ("WOA13", 1),
         ("RTOFS", 2),
+        ("GoMOFS", 3),  # since DB v.3
 
     ])
 
@@ -216,20 +221,24 @@ class Dicts:
         ('EXT_WOA09', 'ext.from WOA09'),
         ('EXT_WOA13', 'ext.from WOA13'),
         ('EXT_RTOFS', 'ext.from RTOFS'),
+        ('EXT_GOMOFS', 'ext.from GoMOFS'),  # since DB v.3
         ('EXT_REF', 'ext.from ref'),
 
         ('REP_SAL_WOA09', 'sal.from WOA09'),
         ('REP_SAL_WOA13', 'sal.from WOA13'),
         ('REP_SAL_RTOFS', 'sal.from RTOFS'),
+        ('REP_SAL_GOMOFS', 'sal.from GoMOFS'),  # since DB v.3
         ('REP_SAL_REF', 'sal.from ref'),
 
         ('REP_TEMP_SAL_WOA09', 'temp./sal.from WOA09'),
         ('REP_TEMP_SAL_WOA13', 'temp./sal.from WOA13'),
         ('REP_TEMP_SAL_RTOFS', 'temp./sal.from RTOFS'),
+        ('REP_TEMP_SAL_GOMOFS', 'temp./sal.from GoMOFS'),  # since DB v.3
         ('REP_TEMP_SAL_REF', 'temp./sal.from ref'),
 
         ('RECALC_SPD', 'recalc.speed'),
         ('ADD_TSS', 'added tss'),
 
         ('PLOTTED', 'plotted'),
+
     ])

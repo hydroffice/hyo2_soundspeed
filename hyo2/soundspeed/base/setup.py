@@ -1,4 +1,6 @@
 import logging
+import os
+from typing import Optional
 
 from hyo2.abc.lib.helper import Helper
 from hyo2.soundspeed.base.setup_db import SetupDb
@@ -10,6 +12,24 @@ logger = logging.getLogger(__name__)
 
 class Setup:
 
+    @classmethod
+    def are_updates_required(cls, db_path):
+        logger.debug("check if version updates are required for %s" % db_path)
+        db = SetupDb(os.path.dirname(db_path))
+        if db.setup_version == 1:
+            return True
+        return False
+
+    @classmethod
+    def apply_required_updates(cls, db_path):
+        logger.debug("applying version updates %s" % db_path)
+        db = SetupDb(os.path.dirname(db_path))
+        if db.setup_version == 1:
+            success = db.update_from_v1_to_v2()
+            if success:
+                return True
+        return False
+
     def __init__(self, release_folder, use_setup_name=None):
         self.use_setup_name = use_setup_name
 
@@ -20,7 +40,9 @@ class Setup:
         # input
         self.use_woa09 = None
         self.use_woa13 = None
+        self.use_woa18 = None
         self.use_rtofs = None
+        self.use_gomofs = None
         self.ssp_extension_source = None
         self.ssp_salinity_source = None
         self.ssp_temp_sal_source = None
@@ -67,6 +89,7 @@ class Setup:
         self.custom_outputs_folder = None
         self.custom_woa09_folder = None
         self.custom_woa13_folder = None
+        self.custom_woa18_folder = None
         self.noaa_tools = None
         self.default_institution = None
         self.default_survey = None
@@ -83,14 +106,19 @@ class Setup:
         # logger.debug("release_folder: %s, use setup: %s" % (self.release_folder, self.use_setup_name))
         return SetupDb(self.release_folder, use_setup_name=self.use_setup_name)
 
-    def load_from_db(self):
+    def load_from_db(self, db_path: Optional[str] = None):
         """Load/reload the setting from the setup db"""
         # logger.info("*** > SETUP: loading ...")
 
         # try:
+        if db_path is None:
+            db = self.db
+        else:
+            logger.debug("loading db from %s" % db_path)
+            release_folder, _ = os.path.split(db_path)
+            db = SetupDb(release_folder)
 
-        db = self.db
-        if db.setup_version > 1:
+        if db.setup_version > 2:
             raise RuntimeError("unsupported setup version: %s" % db.setup_version)
 
         self.setup_version = db.setup_version
@@ -100,7 +128,15 @@ class Setup:
         # input
         self.use_woa09 = db.use_woa09
         self.use_woa13 = db.use_woa13
+        if db.setup_version == 1:
+            self.use_woa18 = False
+        else:
+            self.use_woa18 = db.use_woa18
         self.use_rtofs = db.use_rtofs
+        if db.setup_version == 1:
+            self.use_gomofs = False
+        else:
+            self.use_gomofs = db.use_gomofs
         self.ssp_extension_source = Dicts.atlases[db.ssp_extension_source]
         self.ssp_salinity_source = Dicts.atlases[db.ssp_salinity_source]
         self.ssp_temp_sal_source = Dicts.atlases[db.ssp_temp_sal_source]
@@ -153,6 +189,10 @@ class Setup:
         self.custom_outputs_folder = db.custom_outputs_folder
         self.custom_woa09_folder = db.custom_woa09_folder
         self.custom_woa13_folder = db.custom_woa13_folder
+        if db.setup_version == 1:
+            self.custom_woa18_folder = ""
+        else:
+            self.custom_woa18_folder = db.custom_woa18_folder
         self.noaa_tools = db.noaa_tools
         self.default_institution = db.default_institution
         self.default_survey = db.default_survey
@@ -172,7 +212,7 @@ class Setup:
 
         try:
             db = self.db
-            db.setup_version = self.setup_version
+            # db.setup_version = self.setup_version  # not overwrite the version since it implies different tables
             # db.active_setup_id = self.setup_id  # obviously, unactivated to avoid db logic corruption
             # db.setup_status  # only the current setup is visualized
             # db.setup_name = self.setup_name
@@ -180,7 +220,11 @@ class Setup:
             # input
             db.use_woa09 = self.use_woa09
             db.use_woa13 = self.use_woa13
+            if db.setup_version > 1:
+                db.use_woa18 = self.use_woa18
             db.use_rtofs = self.use_rtofs
+            if db.setup_version > 1:
+                db.use_gomofs = self.use_gomofs
             db.ssp_extension_source = Helper.first_match(Dicts.atlases, self.ssp_extension_source)
             db.ssp_salinity_source = Helper.first_match(Dicts.atlases, self.ssp_salinity_source)
             db.ssp_temp_sal_source = Helper.first_match(Dicts.atlases, self.ssp_temp_sal_source)
@@ -236,6 +280,8 @@ class Setup:
             db.custom_outputs_folder = self.custom_outputs_folder
             db.custom_woa09_folder = self.custom_woa09_folder
             db.custom_woa13_folder = self.custom_woa13_folder
+            if db.setup_version > 1:
+                db.custom_woa18_folder = self.custom_woa18_folder
             db.noaa_tools = self.noaa_tools
             db.default_institution = self.default_institution
             db.default_survey = self.default_survey
@@ -257,7 +303,9 @@ class Setup:
         msg += "    <input>\n"
         msg += "      <use_woa09: %s>\n" % self.use_woa09
         msg += "      <use_woa13: %s>\n" % self.use_woa13
+        msg += "      <use_woa18: %s>\n" % self.use_woa18
         msg += "      <use_rtofs: %s>\n" % self.use_rtofs
+        msg += "      <use_gomofs: %s>\n" % self.use_gomofs
         msg += "      <ssp_extension_source: %s>\n" % self.ssp_extension_source
         msg += "      <ssp_salinity_source: %s>\n" % self.ssp_salinity_source
         msg += "      <ssp_temp_sal_source: %s>\n" % self.ssp_temp_sal_source
@@ -292,6 +340,7 @@ class Setup:
         msg += "      <outputs folder: %s>\n" % self.custom_outputs_folder
         msg += "      <woa09 folder: %s>\n" % self.custom_woa09_folder
         msg += "      <woa13 folder: %s>\n" % self.custom_woa13_folder
+        msg += "      <woa18 folder: %s>\n" % self.custom_woa18_folder
         msg += "      <noaa tools: %s>\n" % self.noaa_tools
         msg += "      <default_institution: %s>\n" % self.default_institution
         msg += "      <default_survey: %s>\n" % self.default_survey

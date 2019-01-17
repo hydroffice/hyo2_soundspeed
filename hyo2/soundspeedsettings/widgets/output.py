@@ -1,18 +1,14 @@
-import os
 import logging
 
-from PySide2 import QtCore, QtGui, QtWidgets
-
-logger = logging.getLogger(__name__)
+from PySide2 import QtCore, QtWidgets
 
 from hyo2.soundspeedsettings.widgets.widget import AbstractWidget
 from hyo2.soundspeed.profile.dicts import Dicts
 
+logger = logging.getLogger(__name__)
+
 
 class Output(AbstractWidget):
-
-    here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
-    media = os.path.join(here, os.pardir, 'media')
 
     def __init__(self, main_win, db):
         AbstractWidget.__init__(self, main_win=main_win, db=db)
@@ -205,11 +201,6 @@ class Output(AbstractWidget):
     def new_client(self):
         logger.debug("new setup")
 
-        name = None
-        ip = None
-        port = None
-        protocol = None
-
         # name
         while True:
             # noinspection PyCallByClass
@@ -220,8 +211,8 @@ class Output(AbstractWidget):
             if self.db.client_exists(name):
                 # noinspection PyCallByClass
                 QtWidgets.QMessageBox.information(self, "Invalid client name",
-                                              "The input client name already exists.\n"
-                                              "You entered: %s" % name)
+                                                  "The input client name already exists.\n"
+                                                  "You entered: %s" % name)
                 continue
             break
 
@@ -235,8 +226,8 @@ class Output(AbstractWidget):
             if not self._valid_ip(ip):
                 # noinspection PyCallByClass
                 QtWidgets.QMessageBox.information(self, "Invalid client IP",
-                                              "The format input is not valid.\n"
-                                              "You entered: %s" % ip)
+                                                  "The format input is not valid.\n"
+                                                  "You entered: %s" % ip)
                 continue
             break
 
@@ -244,15 +235,15 @@ class Output(AbstractWidget):
         while True:
             # noinspection PyCallByClass
             port, ok = QtWidgets.QInputDialog.getInteger(self, "New client", "Input the port (e.g., 4001)",
-                                                     4001, 0, 65535)
+                                                         4001, 0, 65535)
             if not ok:
                 return
 
             if (port < 0) or (port > 65535):
                 # noinspection PyCallByClass
                 QtWidgets.QMessageBox.information(self, "Invalid client port",
-                                              "The port valus is outside validity range.\n"
-                                              "You entered: %s" % port)
+                                                  "The port valus is outside validity range.\n"
+                                                  "You entered: %s" % port)
                 continue
             break
 
@@ -260,16 +251,16 @@ class Output(AbstractWidget):
         while True:
             # noinspection PyCallByClass
             protocol, ok = QtWidgets.QInputDialog.getText(self, "New client",
-                                                      "Input the protocol (SIS, HYPACK, PDS2000, or QINSY)",
-                                                      QtWidgets.QLineEdit.Normal,
-                                                      "SIS")
+                                                          "Input the protocol (SIS, HYPACK, PDS2000, or QINSY)",
+                                                          QtWidgets.QLineEdit.Normal,
+                                                          "SIS")
             if not ok:
                 return
 
             if protocol not in Dicts.clients:
                 # noinspection PyCallByClass
                 QtWidgets.QMessageBox.information(self, "Invalid client protocol",
-                                              "You entered: %s" % protocol)
+                                                  "You entered: %s" % protocol)
                 continue
             break
 
@@ -385,4 +376,3 @@ class Output(AbstractWidget):
                 self.client_list.setItem(i, j - 1, item)
 
         self.client_list.resizeColumnsToContents()
-

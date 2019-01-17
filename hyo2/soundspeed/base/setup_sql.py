@@ -4,7 +4,6 @@ from hyo2.abc.lib.helper import Helper
 
 logger = logging.getLogger(__name__)
 
-
 vessel_list = [
     "RA Rainier (ship)",
     "R3 Rainier - Launch 2803",
@@ -46,30 +45,39 @@ if Helper.is_pydro():
     logger.debug("using pydro setup")
     default_use_woa_09 = 1
     default_use_woa_13 = 0
+    default_use_woa_18 = 0
     default_use_rtofs = 0
+    default_use_gomofs = 0
     default_custom_woa09_folder = Helper.hstb_woa09_folder()
     default_custom_woa13_folder = Helper.hstb_woa13_folder()
+    default_custom_woa18_folder = ""
     default_noaa_tools = 1
     default_default_institution = institution_list[0]
+
 else:
     default_use_woa_09 = 1
     default_use_woa_13 = 0
+    default_use_woa_18 = 0
     default_use_rtofs = 0
+    default_use_gomofs = 0
     default_custom_woa09_folder = ""
     default_custom_woa13_folder = ""
+    default_custom_woa18_folder = ""
     default_noaa_tools = 0
     default_default_institution = ""
 
 CREATE_SETTINGS = """-- noinspection SqlResolveForFile
  CREATE TABLE IF NOT EXISTS general(
      id integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
-     setup_version integer NOT NULL DEFAULT 1,
+     setup_version integer NOT NULL DEFAULT 2,
      setup_name text NOT NULL UNIQUE DEFAULT "default",
      setup_status text NOT NULL DEFAULT "inactive",
      /* input */
      use_woa09 integer NOT NULL DEFAULT %d,
      use_woa13 integer NOT NULL DEFAULT %d,
+     use_woa18 integer NOT NULL DEFAULT %d,
      use_rtofs integer NOT NULL DEFAULT %d,
+     use_gomofs integer NOT NULL DEFAULT %d,     
      ssp_extension_source text NOT NULL DEFAULT "WOA09",
      ssp_salinity_source text NOT NULL DEFAULT "WOA09",
      ssp_temp_sal_source text NOT NULL DEFAULT "WOA09",
@@ -111,21 +119,24 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      custom_outputs_folder text DEFAULT "",
      custom_woa09_folder text DEFAULT "%s",
      custom_woa13_folder text DEFAULT "%s",
+     custom_woa18_folder text DEFAULT "%s",     
      noaa_tools integer NOT NULL DEFAULT %d,
      default_institution text NOT NULL DEFAULT "%s",
      default_survey text NOT NULL DEFAULT "",
      default_vessel text NOT NULL DEFAULT "",
      auto_apply_default_metadata integer NOT NULL DEFAULT 1,
-
+     
      /* Checks */
      CHECK (setup_status IN ("active", "inactive")),
      /* input */
      CHECK (use_woa09 IN (0, 1)),
      CHECK (use_woa13 IN (0, 1)),
+     CHECK (use_woa18 IN (0, 1)),
      CHECK (use_rtofs IN (0, 1)),
-     CHECK (ssp_extension_source IN ("RTOFS", "WOA09", "WOA13", "ref")),
-     CHECK (ssp_salinity_source IN ("RTOFS", "WOA09", "WOA13", "ref")),
-     CHECK (ssp_temp_sal_source IN ("RTOFS", "WOA09", "WOA13", "ref")),
+     CHECK (use_gomofs IN (0, 1)),     
+     CHECK (ssp_extension_source IN ("GoMOFS", "RTOFS", "WOA09", "WOA13", "WOA18", "ref")),
+     CHECK (ssp_salinity_source IN ("GoMOFS", "RTOFS", "WOA09", "WOA13", "WOA18", "ref")),
+     CHECK (ssp_temp_sal_source IN ("GoMOFS", "RTOFS", "WOA09", "WOA13", "WOA18", "ref")),
      CHECK (ssp_up_or_down IN ("down", "up")),
      CHECK (rx_max_wait_time > 0),
      CHECK (use_sis IN (0, 1)),
@@ -148,15 +159,18 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      CHECK (mvp_listen_timeout > 0),
      CHECK (mvp_transmission_protocol IN ("NAVO_ISS60", "UNDEFINED")),
      CHECK (mvp_format IN ("S12", "CALC", "ASVP")),
-     CHECK (mvp_instrument IN ("AML_uSVP", "AML_uSVPT", "AML_Smart_SVP", "AML_uCTD", "AML_uCTD+", "Valeport_SVPT", "SBE_911+", "SBE_49")),
+     CHECK (mvp_instrument IN ("AML_uSVP", "AML_uSVPT", "AML_Smart_SVP", "AML_uCTD", "AML_uCTD+", "Valeport_SVPT", 
+     "SBE_911+", "SBE_49")),
      /* server */
-     CHECK (server_source IN ("RTOFS", "WOA09", "WOA13")),
+     CHECK (server_source IN ("RTOFS", "GoMOFS", "WOA09", "WOA13", "WOA18")),
      CHECK (server_apply_surface_sound_speed IN (0, 1)),
      /* user-defined */
      CHECK (noaa_tools IN (0, 1)),
      CHECK (auto_apply_default_metadata IN (0, 1))
-     ) """ % (default_use_woa_09, default_use_woa_13, default_use_rtofs,
-              default_custom_woa09_folder, default_custom_woa13_folder,
+     
+     ) """ % (default_use_woa_09, default_use_woa_13, default_use_woa_18,
+              default_use_rtofs, default_use_gomofs,
+              default_custom_woa09_folder, default_custom_woa13_folder, default_custom_woa18_folder,
               default_noaa_tools, default_default_institution)
 
 CREATE_CLIENT_LIST = """-- noinspection SqlResolveForFile
@@ -179,3 +193,123 @@ CREATE_SETTINGS_VIEW = """-- noinspection SqlResolveForFile
  CREATE VIEW IF NOT EXISTS settings_view AS
     SELECT * FROM general g
     LEFT OUTER JOIN client_list c ON g.id=c.setup_id """
+
+
+# RENAME TABLES/VIEWS
+
+RENAME_SETTINGS = """-- noinspection SqlResolveForFile
+    ALTER TABLE general RENAME TO general_old
+    """
+
+RENAME_CLIENT_LIST = """-- noinspection SqlResolveForFile
+    ALTER TABLE client_list RENAME TO client_list_old
+    """
+
+# DROP TABLES/VIEWS
+
+DROP_OLD_SETTINGS = """-- noinspection SqlResolveForFile
+    DROP TABLE general_old
+    """
+
+DROP_OLD_CLIENT_LIST = """-- noinspection SqlResolveForFile
+    DROP TABLE client_list_old
+    """
+
+DROP_SETTINGS_VIEW = """-- noinspection SqlResolveForFile
+    DROP VIEW settings_view
+    """
+
+# COPY V1 -> V2
+
+V1_V2_COPY_SETTINGS = """-- noinspection SqlResolveForFile
+    INSERT INTO  general 
+    (id, setup_name, setup_status, use_woa09, use_woa13, use_rtofs, 
+    ssp_extension_source, ssp_salinity_source, ssp_temp_sal_source, ssp_up_or_down, rx_max_wait_time,
+    use_sis, use_sippican, use_mvp, log_user, log_server, sis_listen_port, sis_listen_timeout,
+    sis_auto_apply_manual_casts, sippican_listen_port, sippican_listen_timeout, mvp_ip_address,
+    mvp_listen_port, mvp_listen_timeout, mvp_transmission_protocol, mvp_format, mvp_winch_port,
+    mvp_fish_port, mvp_nav_port, mvp_system_port, mvp_sw_version, mvp_instrument_id, mvp_instrument,
+    server_source, server_apply_surface_sound_speed, current_project, custom_projects_folder,
+    custom_outputs_folder, custom_woa09_folder, custom_woa13_folder, noaa_tools, default_institution,
+    default_survey, default_vessel, auto_apply_default_metadata) 
+    SELECT 
+    id, setup_name, setup_status, 
+    CASE WHEN typeof(use_woa09) == 'text' THEN
+        use_woa09 == 'True'
+    ELSE
+        use_woa09
+    END, 
+    CASE WHEN typeof(use_woa13) == 'text' THEN
+        use_woa13 == 'True'
+    ELSE
+        use_woa13
+    END, 
+    CASE WHEN typeof(use_rtofs) == 'text' THEN
+        use_rtofs == 'True'
+    ELSE
+        use_rtofs
+    END,      
+    ssp_extension_source, ssp_salinity_source, ssp_temp_sal_source, ssp_up_or_down, rx_max_wait_time,
+    CASE WHEN typeof(use_sis) == 'text' THEN
+        use_sis == 'True'
+    ELSE
+        use_sis
+    END,
+    CASE WHEN typeof(use_sippican) == 'text' THEN
+        use_sippican == 'True'
+    ELSE
+        use_sippican
+    END,
+    CASE WHEN typeof(use_mvp) == 'text' THEN
+        use_mvp == 'True'
+    ELSE
+        use_mvp
+    END, 
+    CASE WHEN typeof(log_user) == 'text' THEN
+        log_user == 'True'
+    ELSE
+        log_user
+    END, 
+    CASE WHEN typeof(log_server) == 'text' THEN
+        log_server == 'True'
+    ELSE
+        log_server
+    END, 
+    sis_listen_port, sis_listen_timeout,
+    CASE WHEN typeof(sis_auto_apply_manual_casts) == 'text' THEN
+        sis_auto_apply_manual_casts == 'True'
+    ELSE
+        sis_auto_apply_manual_casts
+    END, 
+    sippican_listen_port, sippican_listen_timeout, 
+    mvp_ip_address, mvp_listen_port, mvp_listen_timeout, mvp_transmission_protocol, mvp_format, mvp_winch_port,
+    mvp_fish_port, mvp_nav_port, mvp_system_port, mvp_sw_version, mvp_instrument_id, mvp_instrument,
+    server_source, 
+    CASE WHEN typeof(server_apply_surface_sound_speed) == 'text' THEN
+        server_apply_surface_sound_speed == 'True'
+    ELSE
+        server_apply_surface_sound_speed
+    END, 
+    current_project, custom_projects_folder,
+    custom_outputs_folder, custom_woa09_folder, custom_woa13_folder, 
+    CASE WHEN typeof(noaa_tools) == 'text' THEN
+        noaa_tools == 'True'
+    ELSE
+        noaa_tools
+    END, 
+    default_institution,
+    default_survey, default_vessel, 
+    CASE WHEN typeof(auto_apply_default_metadata) == 'text' THEN
+        auto_apply_default_metadata == 'True'
+    ELSE
+        auto_apply_default_metadata
+    END
+    FROM general_old
+    """
+
+V1_V2_COPY_CLIENT_LIST = """-- noinspection SqlResolveForFile
+    INSERT INTO client_list (id, setup_id, name, ip, port, protocol) 
+    SELECT 
+    id, setup_id, name, ip, port, protocol
+    FROM client_list_old
+    """

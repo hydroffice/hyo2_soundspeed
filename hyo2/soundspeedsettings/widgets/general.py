@@ -1,19 +1,14 @@
-import os
 import logging
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
-logger = logging.getLogger(__name__)
-
-from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeedsettings.widgets.widget import AbstractWidget
 from hyo2.soundspeed.base.setup_sql import vessel_list, institution_list
 
+logger = logging.getLogger(__name__)
+
 
 class General(AbstractWidget):
-
-    here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
-    media = os.path.join(here, os.pardir, 'media')
 
     def __init__(self, main_win, db):
         AbstractWidget.__init__(self, main_win=main_win, db=db)
@@ -189,7 +184,7 @@ class General(AbstractWidget):
         self.default_institution = QtWidgets.QComboBox()
         self.default_institution.setEditable(True)
         self.default_institution.addItems(institution_list)
-        rex = QtCore.QRegExp('[a-zA-Z0-9_.-\s]+')
+        rex = QtCore.QRegExp(r'[a-zA-Z0-9_.-\s]+')
         validator = QtGui.QRegExpValidator(rex)
         self.default_institution.setValidator(validator)
         hbox.addWidget(self.default_institution)
@@ -203,7 +198,7 @@ class General(AbstractWidget):
         hbox.addWidget(label)
         # -- value
         self.default_survey = QtWidgets.QLineEdit()
-        rex = QtCore.QRegExp('[a-zA-Z0-9_.-\s]+')
+        rex = QtCore.QRegExp(r'[a-zA-Z0-9_.-\s]+')
         validator = QtGui.QRegExpValidator(rex)
         self.default_survey.setValidator(validator)
         hbox.addWidget(self.default_survey)
@@ -219,7 +214,7 @@ class General(AbstractWidget):
         self.default_vessel = QtWidgets.QComboBox()
         self.default_vessel.setEditable(True)
         self.default_vessel.addItems(vessel_list)
-        rex = QtCore.QRegExp('[a-zA-Z0-9_.-\s]+')
+        rex = QtCore.QRegExp(r'[a-zA-Z0-9_.-\s]+')
         validator = QtGui.QRegExpValidator(rex)
         self.default_vessel.setValidator(validator)
         hbox.addWidget(self.default_vessel)
@@ -322,8 +317,9 @@ class General(AbstractWidget):
 
         # ask the file path to the user
         settings = QtCore.QSettings()
+        # noinspection PyCallByClass
         selection = QtWidgets.QFileDialog.getExistingDirectory(self, "Path to projects",
-                                                           settings.value("export_folder"))
+                                                               settings.value("export_folder"))
         if not selection:
             return
         logger.debug('user selection: %s' % selection)
@@ -338,8 +334,9 @@ class General(AbstractWidget):
 
         # ask the file path to the user
         settings = QtCore.QSettings()
+        # noinspection PyCallByClass
         selection = QtWidgets.QFileDialog.getExistingDirectory(self, "Path to outputs",
-                                                           settings.value("export_folder"))
+                                                               settings.value("export_folder"))
         if not selection:
             return
         logger.debug('user selection: %s' % selection)
@@ -354,11 +351,14 @@ class General(AbstractWidget):
 
         # ask the file path to the user
         settings = QtCore.QSettings()
+        # noinspection PyCallByClass
         selection = QtWidgets.QFileDialog.getExistingDirectory(self, "Path to WOA09",
-                                                           settings.value("export_folder"))
+                                                               settings.value("export_folder"))
         if not selection:
             msg = "Do you want to just clear the folder path?"
-            ret = QtWidgets.QMessageBox.information(self, "WOA09 Folder", msg, QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
+            # noinspection PyCallByClass
+            ret = QtWidgets.QMessageBox.information(self, "WOA09 Folder", msg,
+                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
             if ret == QtWidgets.QMessageBox.No:
                 return
             selection = ""
@@ -378,11 +378,14 @@ class General(AbstractWidget):
 
         # ask the file path to the user
         settings = QtCore.QSettings()
+        # noinspection PyCallByClass
         selection = QtWidgets.QFileDialog.getExistingDirectory(self, "Path to WOA13",
-                                                           settings.value("export_folder"))
+                                                               settings.value("export_folder"))
         if not selection:
             msg = "Do you want to just clear the folder path?"
-            ret = QtWidgets.QMessageBox.information(self, "WOA13 Folder", msg, QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
+            # noinspection PyCallByClass
+            ret = QtWidgets.QMessageBox.information(self, "WOA13 Folder", msg,
+                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
             if ret == QtWidgets.QMessageBox.No:
                 return
             selection = ""
