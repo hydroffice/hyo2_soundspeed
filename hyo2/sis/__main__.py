@@ -12,7 +12,7 @@ ch_formatter = logging.Formatter('%(levelname)-9s %(name)s.%(funcName)s:%(lineno
 ch.setFormatter(ch_formatter)
 logger.addHandler(ch)
 
-from hyo2.sis.gui import mainwin
+from hyo2.sis.app import mainwin
 
 
 def sis_gui():
