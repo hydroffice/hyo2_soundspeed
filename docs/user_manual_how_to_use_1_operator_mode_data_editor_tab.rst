@@ -233,12 +233,19 @@ Manual user insertions
 There are two methods to add points, after having selected the *Insert* mode in the right-click menu or in the plotting
 toolbar:
 
-1. *Adding sound speed points in the sound speed plot.* This method adds points to the sound speed profile only and it holds the last observed temperature and salinity constant (i.e., it makes no attempt to update the temperature/salinity profiles for the chosen sound speed). Thus, this method is well suited for output formats or transmission protocols in which the temperature/salinity values are not used.
+1. *Adding sound speed points in the sound speed plot.* This method adds points to the sound speed profile only and
+it holds the current temperature and salinity gradients constant (i.e., it makes no attempt to update the
+temperature/salinity profiles for the chosen sound speed). Thus, this method is well suited for output formats or transmission protocols in which the temperature/salinity values are not used.
 
-2. *Adding salinity and temperature points.* This method adds salinity and temperature points in their respective plots and then calculates the resulting sound speed based on the temperature/salinity plots. A first click in the salinity plot adds a salinity point. Then, a second click is required in the temperature profile (the depth of the first point in the salinity plot will be adjusted to match the depth of the second click). Finally, a third click in the sound speed plot computes the new sound speed point based on the previously selected depth/temperature/salinity values (the depth from the last click in the sound speed plot is NOT used, i.e., you can click anywhere in the sound speed plot).
+2. *Adding salinity and temperature points.* This method adds salinity and temperature points in their respective
+plots and then calculates the resulting sound speed based on the temperature/salinity plots. A first click in the
+salinity plot sets both the point depth and salinity. A second click in the temperature plot sets the temperature
+for the point depth selected in the prior step. The package will automatically calculate the sound speed based off the
+temperature/salinity points previously selected. The click order can be reversed (i.e., a first click in temperature
+sets the depth and temperature).
 
 Multipoint extensions are achieved through repeating the above sequence. If a deep extension that exceeds
-the view limits is required, repeatedly clicking near the bottom of the plots will automatically adjust the view bounds.
+the view limits is required, use the pan utility to adjust the view limits.
 
 Applying surface sound speed
 ----------------------------
