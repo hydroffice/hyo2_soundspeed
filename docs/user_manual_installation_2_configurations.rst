@@ -139,7 +139,7 @@ Method #1
 ---------
 
 This method is usually used for the case where the hydro-package and *SIS* are installed on the same machine.
-However, this method may not be suitable if this mechanism is already in used by another program.
+However, this method may not be suitable if this mechanism is already in use by another program.
 In such a case, the *DataDistrib.exe* program explored in :ref:`method_3` may be attempted.
 
 The configuration for this method is actually quite simple:
@@ -208,8 +208,8 @@ bundled with *SIS* and usually installed in *C:\\Program Files\\Kongsberg Mariti
 (together with a configuration file *DataDistrib.ini* with all the subscriptions).
 
 It is suggested to add the *DataDistrib.exe* to the *Startup* menu (so that it is automatically started).
-However, common backsides of this method is that the executable can be accidentally closed (stopping the data
-distribution to this package), or it can accidentally runs twice corrupting the configuration file
+However, common issues with this method are that the executable can be accidentally closed (stopping the data
+distribution to this package), or it can be accidentally run twice corrupting the configuration file
 (to prevent this, it could be made ‘read only’).
 
 The setup of this method is summarized as follows:

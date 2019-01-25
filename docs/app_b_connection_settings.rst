@@ -85,7 +85,7 @@ The following indications are useful for monitoring reception of sound speed pro
 * The SVP display window, if being viewed in *SIS*, will update with the new cast.
 * In the event that a cast is rejected, *SIS* will launch a warning dialog to indicate that the cast it received was rejected.
 
-Although *SIS* always will allow incoming sound speed transmissions, it has several restrictions
+Although *SIS* will always allow incoming sound speed transmissions, it has several restrictions
 that must be observed in order for the data to be accepted (see *Kongsberg manual*).
 As this particular transmission protocol is used by other acquisition systems, it is worth describing in detail
 what the *Sound Speed* package does to the cast data to satisfy the input criteria for *SIS*.

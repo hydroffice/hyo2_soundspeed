@@ -66,7 +66,7 @@ salinity profiles drawn in solid blue (left to right, respectively, in :numref:`
 During the import stage, the geographic position and date in the input file are used to query WOA or RTOFS
 atlases (if available) to obtain mean sound speed, temperature and salinity profiles (to provide a context
 during data editing), which are drawn in dashed colours. Thus, it is important that the cast positional metadata
-are correct for this lookup operation.
+is correct for this lookup operation.
 
 Furthemore, the position is also required by some formats to compute the pressure to depth conversion (since this
 has a latitudinal dependence). Since some file formats do not support recording of geographic position
@@ -199,8 +199,8 @@ with each of the temperature observations in the measured XBT profile.
 
     The *Retrieve salinity* button in the *Editor* toolbar.
 
-The salinity plot (right-most of the three panels) will update with a salinity profile and sound speed plot
-(the left-most panel) are updated with sound speed (recalculated using the new salinity estimates).
+The salinity plot (right-most of the three panels) will update with a salinity profile and the sound speed plot
+(left-most panel) is updated with sound speed (recalculated using the new salinity estimates).
 Sound speed values are calculated using the UNESCO equation (*Fofonoff and Millard, 1983*).
 
 XSV probes

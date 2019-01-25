@@ -9,7 +9,7 @@ Database Tab
 
 .. index:: database
 
-The package provides functionalities to permanently storage, delete and retrieve the sound speed profiles.
+The package provides functionalities to permanently store, delete and retrieve the sound speed profiles.
 Any time that a profile is exported or transmitted, its data content is stored in the database.
 A profile can also be stored in the database by using *Save to database* in the *Editor* toolbar (:numref:`save_to_database`).
 
@@ -24,8 +24,8 @@ A profile can also be stored in the database by using *Save to database* in the 
 
 In particular, each profile contains three types of stored data:
 
-1. The raw data (that makes possible to redo the processing from scratch).
-2. The processed samples (with flags to identify the various different source of data).
+1. The raw data (which makes it possible to redo the processing from scratch).
+2. The processed samples (with flags to identify the different sources of data).
 3. An optional SIS profile (that represents the result of the thinning process required by *Kongsberg SIS*).
 
 Once stored in the database, the *Database* tab provides analysis functions and tools to manage the collected profiles (:numref:`database_tab0`).
