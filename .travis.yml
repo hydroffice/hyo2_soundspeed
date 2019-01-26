@@ -35,7 +35,7 @@ install:
 
   - conda create -q -n test-environment python=$PYTHON_VERSION
   - source activate test-environment
-  - pip install PySide2 cython
+  - pip install PySide2 cython==0.29.2
   - conda install numpy matplotlib-base gdal pyproj scipy basemap netCDF4 pillow
   - pip install gsw==3.0.6
   - pip install coveralls
