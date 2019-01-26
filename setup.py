@@ -75,11 +75,13 @@ setup(
                   sources=["hyo2/soundspeed/profile/ray_tracing/tracedprofile.pyx"],
                   include_dirs=[np.get_include()],
                   language='c++',
-                  language_level='3',
                   # extra_compile_args=["-Zi", "/Od"],
                   # extra_link_args=["-debug"],
                   ),
-    ], annotate=True),
+        ],
+        annotate=True,
+        compiler_directives={'language_level': '3'}
+    ),
     python_requires='>=3.5',
     entry_points={
         "gui_scripts": [
