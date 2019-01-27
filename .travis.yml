@@ -37,9 +37,7 @@ install:
   - source activate test-environment
   - pip install PySide2
   - conda install numpy matplotlib-base gdal pyproj scipy basemap netCDF4 pillow cython
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      ;
-    else
+  - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then
       export LD_LIBRARY_PATH=$HOME/miniconda/envs/test-environment/lib:$LD_LIBRARY_PATH;
     fi
   - pip install gsw==3.0.6
