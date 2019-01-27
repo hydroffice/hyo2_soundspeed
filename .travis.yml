@@ -44,7 +44,7 @@ install:
   - pip install coveralls
   - pip install https://github.com/hydroffice/hyo2_abc/archive/master.zip
   - pip install .
-  # - conda remove --force PyQt Qt sip
+  - conda remove --force PyQt Qt sip
   - rm -f $HOME/miniconda/envs/test-environment/qt.conf
   - conda list --show-channel-urls
 
