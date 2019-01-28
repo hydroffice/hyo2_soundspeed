@@ -66,7 +66,7 @@ salinity profiles drawn in solid blue (left to right, respectively, in :numref:`
 During the import stage, the geographic position and date in the input file are used to query WOA or RTOFS
 atlases (if available) to obtain mean sound speed, temperature and salinity profiles (to provide a context
 during data editing), which are drawn in dashed colours. Thus, it is important that the cast positional metadata
-is correct for this lookup operation.
+are correct for this lookup operation.
 
 Furthemore, the position is also required by some formats to compute the pressure to depth conversion (since this
 has a latitudinal dependence). Since some file formats do not support recording of geographic position

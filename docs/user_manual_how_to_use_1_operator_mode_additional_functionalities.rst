@@ -23,7 +23,7 @@ This can be done by first selecting WOA09 atlas or RTOFS atlas under the *Input 
 
     The *Input data* button in the *Editor* toolbar.
 
-This will trigger a series of question dialogs for the query position that will either use the SIS data/position
+This will trigger a series of question dialogs for the query position that will use the SIS data/position
 input or a user provided input. After, a surface sound speed can be applied,
 and finally the resulting cast can be sent as described in :ref:`data_transmission`.
 
