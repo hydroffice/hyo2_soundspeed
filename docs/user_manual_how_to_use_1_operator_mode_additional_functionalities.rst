@@ -11,7 +11,7 @@ Create a WOA or RTOFS profile
 .. index:: RTOFS, synthetic profile
 
 It is possible to upload a single WOA or RTOFS profile to *SIS*.
-This can be done by first select WOA09 atlas or RTOFS atlas under the *Input data* button in the *Editor* toolbar
+This can be done by first selecting WOA09 atlas or RTOFS atlas under the *Input data* button in the *Editor* toolbar
 (:numref:`editor_tab12`).
 
 .. _editor_tab12:
@@ -23,8 +23,8 @@ This can be done by first select WOA09 atlas or RTOFS atlas under the *Input dat
 
     The *Input data* button in the *Editor* toolbar.
 
-This will trigger a series of question dialogs that will determine use of the SIS date/position input
-for the query position or an user provided input. After that, a surface sound speed can be applied,
+This will trigger a series of question dialogs for the query position that will use the SIS data/position
+input or a user provided input. After, a surface sound speed can be applied,
 and finally the resulting cast can be sent as described in :ref:`data_transmission`.
 
 The new cast will be given the filename YYYYMMDD_HHMMSS_WOA or YYYYMMDD_HHMMSS_RTOFS with the date/time
@@ -63,7 +63,7 @@ There are several scenarios where a CTD profile can be used as a reference cast 
 
 * To support XBT measurements by providing a salinity profile measurement in place of using an assumed constant salinity
 * To augment SVP/XSV casts with temperature and salinity profiles to improve seafloor backscatter attenuation corrections
-* Since CTD cast typically sample much deeper than most XBT probes, to provide an improved vertical extrapolation to the XBT cast.
+* Since CTD casts typically sample much deeper than most XBT probes, to provide an improved vertical extrapolation to the XBT cast.
 
 To establish a reference cast, the desired cast is imported using the same mechanism described in :ref:`data_import`.
 After that the profile is verified, edited and perhaps extended further in depth using an oceanographic database,
