@@ -11,7 +11,7 @@ HydrOffice Sound Speed
     :alt: Latest Documentation
 
 .. image:: https://ci.appveyor.com/api/projects/status/6krhsxkcqo0jrvu6?svg=true
-    :target: https://ci.appveyor.com/project/hydroffice/hyo-soundspeed
+    :target: https://ci.appveyor.com/project/giumas/hyo-soundspeed
     :alt: AppVeyor Status
 
 .. image:: https://travis-ci.org/hydroffice/hyo2_soundspeed.svg?branch=master
