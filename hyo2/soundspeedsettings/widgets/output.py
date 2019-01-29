@@ -234,7 +234,7 @@ class Output(AbstractWidget):
         # port
         while True:
             # noinspection PyCallByClass
-            port, ok = QtWidgets.QInputDialog.getInteger(self, "New client", "Input the port (e.g., 4001)",
+            port, ok = QtWidgets.QInputDialog.getInt(self, "New client", "Input the port (e.g., 4001)",
                                                          4001, 0, 65535)
             if not ok:
                 return
