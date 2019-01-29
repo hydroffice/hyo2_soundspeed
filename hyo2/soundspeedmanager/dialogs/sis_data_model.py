@@ -1,4 +1,5 @@
 from PySide2 import QtCore
+
 QVariant = lambda value=None: value
 
 from collections import OrderedDict
@@ -6,7 +7,6 @@ from hyo2.soundspeed.profile.dicts import Dicts
 
 
 class SisDataModel(QtCore.QAbstractTableModel):
-
     data_dict = OrderedDict([
         ("Pressure", 0),
         ("Depth", 1),
@@ -78,10 +78,10 @@ class SisDataModel(QtCore.QAbstractTableModel):
             return QVariant(str(self.prj.cur.sis.sal[index.row()]))
         elif index.column() == self.data_dict['Source']:
             return QVariant("%.0f [%s]" % (self.prj.cur.sis.source[index.row()],
-                                          Dicts.first_match(Dicts.sources, self.prj.cur.sis.source[index.row()])))
+                                           Dicts.first_match(Dicts.sources, self.prj.cur.sis.source[index.row()])))
         elif index.column() == self.data_dict['Flag']:
             return QVariant("%.0f [%s]" % (self.prj.cur.sis.flag[index.row()],
-                                          Dicts.first_match(Dicts.flags, self.prj.cur.sis.flag[index.row()])))
+                                           Dicts.first_match(Dicts.flags, self.prj.cur.sis.flag[index.row()])))
         else:
             return QVariant()
 

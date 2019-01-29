@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 
 def qt_custom_handler(error_type: QtCore.QtMsgType, error_context: QtCore.QMessageLogContext, message: str):
-
     if error_context.category == "js":
         logger.debug("ignoring js error")
         return

@@ -47,7 +47,10 @@ SSP_Formats = {}
 for fmt in ssp_fmts_doc.splitlines():
     m = re.match(r'\s*(?P<fmt>S\d\d)\s*(?P<fields>[\w,]*)\s', fmt)
     if m:
-        SSP_Formats[m.group('fmt')] = [t.replace('a', 'absorption').replace('c', 'soundspeed').replace('f', 'frequency').replace('D', 'depth').replace('T', 'temperature').replace('S', 'salinity') for t in m.group('fields').split(',')]
+        SSP_Formats[m.group('fmt')] = [
+            t.replace('a', 'absorption').replace('c', 'soundspeed').replace('f', 'frequency').replace('D',
+                                                                                                      'depth').replace(
+                'T', 'temperature').replace('S', 'salinity') for t in m.group('fields').split(',')]
 
 
 class Simrad(AbstractTextReader):

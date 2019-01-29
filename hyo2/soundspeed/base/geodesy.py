@@ -196,7 +196,7 @@ class Geodesy:
 
         dlon = long_2 - long_1
         dlat = lat_2 - lat_1
-        a = math.sin(dlat/2)**2 + math.cos(lat_1) * math.cos(lat_2) * math.sin(dlon / 2) ** 2
+        a = math.sin(dlat / 2) ** 2 + math.cos(lat_1) * math.cos(lat_2) * math.sin(dlon / 2) ** 2
         c = 2 * math.asin(math.sqrt(a))
         r = 6371000  # Radius of earth in meters. Use 3956 for miles
         return c * r

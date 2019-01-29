@@ -194,7 +194,6 @@ CREATE_SETTINGS_VIEW = """-- noinspection SqlResolveForFile
     SELECT * FROM general g
     LEFT OUTER JOIN client_list c ON g.id=c.setup_id """
 
-
 # RENAME TABLES/VIEWS
 
 RENAME_SETTINGS = """-- noinspection SqlResolveForFile

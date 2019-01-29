@@ -176,11 +176,11 @@ class Caris(AbstractTextReader):
                 self.ssp.cur.data.speed[count] = float(tokens[1])
 
             except ValueError:
-                logger.warning("invalid conversion parsing of line #%03d" % (self.cur_row_idx, ))
+                logger.warning("invalid conversion parsing of line #%03d" % (self.cur_row_idx,))
                 continue
 
             except IndexError:
-                logger.warning("invalid index parsing of line #%03d" % (self.cur_row_idx, ))
+                logger.warning("invalid index parsing of line #%03d" % (self.cur_row_idx,))
                 continue
 
             count += 1

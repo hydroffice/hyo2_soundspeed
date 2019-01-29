@@ -8,6 +8,7 @@ import matplotlib
 from matplotlib import rc_context
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT
 from matplotlib.backend_bases import cursors
+
 try:
     import matplotlib.backends.qt_editor.figureoptions as figureoptions
 except ImportError:
@@ -27,7 +28,6 @@ class Sample:
 
 
 class NavToolbar(NavigationToolbar2QT):
-
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
     font_size = 6
@@ -266,7 +266,7 @@ class NavToolbar(NavigationToolbar2QT):
             if self.mode == 'insert':
 
                 msg = str()
-                if self.insert_sample: # we are adding a 2-step sample
+                if self.insert_sample:  # we are adding a 2-step sample
 
                     if plt_label == "speed":
                         msg += "1-step insert [d:%.2f" % event.ydata

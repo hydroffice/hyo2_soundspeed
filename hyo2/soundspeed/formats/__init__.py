@@ -1,7 +1,7 @@
 import logging
+
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
-
 
 # readers
 from .readers.aml import Aml

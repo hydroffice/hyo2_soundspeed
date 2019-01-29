@@ -176,7 +176,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
 
         for block_count in range(len(self.file_content)):
             logger.info("%s block has length %.1f KB"
-                     % (block_count, len(self.file_content[block_count]) / 1024))
+                        % (block_count, len(self.file_content[block_count]) / 1024))
 
             if self.protocol == self.protocols["NAVO_ISS60"]:
                 block_header = struct.unpack('4s4sIIII20000s4s4s', self.file_content[block_count])
@@ -184,7 +184,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
                 total_num_packets = block_header[3]
                 num_bytes = block_header[4]
                 total_num_bytes = block_header[5]
-                packet_data = self.file_content[block_count][24:24+num_bytes]
+                packet_data = self.file_content[block_count][24:24 + num_bytes]
                 self.total_data += packet_data.decode()
                 logger.info("packet %s/%s [%.1f KB]"
                             % (packet_number + 1, total_num_packets, total_num_bytes / 1024))
@@ -285,7 +285,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
             lon_deg = int(lon_field[0:3])
             lon_min = float(lon_field[3:-1])
             lon_hemi = self.total_data.splitlines()[-3].split()[-1].split(",")[-1]
-            self.ssp.cur.meta.longitude = lon_deg + lon_min/60.0
+            self.ssp.cur.meta.longitude = lon_deg + lon_min / 60.0
             if lon_hemi == "W" or lon_hemi == "w":
                 self.ssp.cur.meta.longitude *= -1
             logger.info("longitude: %s" % self.ssp.cur.meta.longitude)
@@ -298,7 +298,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
             lat_deg = int(lat_field[0:2])
             lat_min = float(lat_field[2:-1])
             lat_hemi = self.total_data.splitlines()[-4].split()[-1].split(",")[-1]
-            self.ssp.cur.meta.latitude = lat_deg + lat_min/60.0
+            self.ssp.cur.meta.latitude = lat_deg + lat_min / 60.0
             if lat_hemi == "S" or lat_hemi == "s":
                 self.ssp.cur.meta.latitude *= -1
             logger.info("latitude: %s" % self.ssp.cur.meta.latitude)
@@ -382,7 +382,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
                     lon_deg = int(lon_field[0:3])
                     lon_min = float(lon_field[3:-1])
                     lon_hemi = line.split()[-1].split(",")[-1].strip()
-                    self.ssp.cur.meta.longitude = lon_deg + lon_min/60.0
+                    self.ssp.cur.meta.longitude = lon_deg + lon_min / 60.0
                     if lon_hemi == "W" or lon_hemi == "w":
                         self.ssp.cur.meta.longitude *= -1
                     logger.info("longitude: %s" % self.ssp.cur.meta.longitude)
@@ -398,7 +398,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
                     lat_deg = int(lat_field[0:2])
                     lat_min = float(lat_field[2:-1])
                     lat_hemi = line.split()[-1].split(",")[-1].strip()
-                    self.ssp.cur.meta.latitude = lat_deg + lat_min/60.0
+                    self.ssp.cur.meta.latitude = lat_deg + lat_min / 60.0
                     if lat_hemi == "S" or lat_hemi == "s":
                         self.ssp.cur.meta.latitude *= -1
                     logger.info("latitude: %s" % self.ssp.cur.meta.latitude)
@@ -561,7 +561,6 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
             count += 1
         self.ssp.cur.data_resize(count)
 
-
 # # This is the documentation provided by Steve Smyth of Rolls Royce (ODIM Brooke Ocean)
 # # as per an email communication with Shannon Byrne of SAIC, dated February 03, 2009
 # # to facilitate data transfer from MVP to ISS60.
@@ -673,4 +672,3 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
 #     footer = struct.pack('HHHH', *values)
 #
 #     return header, data_blocks, footer
-

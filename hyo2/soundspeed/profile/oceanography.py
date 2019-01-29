@@ -555,7 +555,7 @@ class Oceanography:
         dp_min = np.min(dp)
         dp_max = np.max(dp)
         if dp_min <= 0 or np.min(p) < 0:
-            #print(dp)
+            # print(dp)
             logger.warning("dp_min: %s, p min: %d" % (dp_min, np.min(p)))
             raise RuntimeError('pressure must be monotonic and non negative')
         p_min = p[0]
@@ -595,7 +595,7 @@ class Oceanography:
             # greater than max_dp_i, and that there is a "bottle" exactly at the
             # reference pressure.
             ii_data = np.zeros(nz + 1)
-            i_bpr = 0 # initialize
+            i_bpr = 0  # initialize
             if (dp_max <= max_dp_i) and (ip_ref >= 0):
 
                 # Vertical resolution is already good (no larger than max_dp_i), and

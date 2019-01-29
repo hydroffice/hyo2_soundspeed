@@ -72,7 +72,6 @@ class RayTracing:
         for ind, nr_end_layer in enumerate(nr_end_layers):
 
             if nr_end_layer == -1:
-
                 nr_end_layer = 0
 
             if nr_end_layer < nr_layers or b_project:  # SVP deep enough
@@ -109,10 +108,10 @@ class RayTracing:
                 else:
 
                     final_depth = radius[nr_end_layer] * (
-                    sin(2 * arctan(tan(gamma[nr_end_layer] / 2.0) * exp(gradient[nr_end_layer] * tau))) - sin(
+                            sin(2 * arctan(tan(gamma[nr_end_layer] / 2.0) * exp(gradient[nr_end_layer] * tau))) - sin(
                         gamma[nr_end_layer])) + depth[nr_end_layer]
                     final_range = radius[nr_end_layer] * (
-                    -cos(2 * arctan(tan(gamma[nr_end_layer] / 2.0) * exp(gradient[nr_end_layer] * tau))) + cos(
+                            -cos(2 * arctan(tan(gamma[nr_end_layer] / 2.0) * exp(gradient[nr_end_layer] * tau))) + cos(
                         gamma[nr_end_layer])) + total_range[nr_end_layer]
 
                 # this would translate to acrosstrack, alongtrack components if we passed in pitch, roll, launchangle

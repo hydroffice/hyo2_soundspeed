@@ -50,7 +50,6 @@ SEACAT_HEX_LON = r'Longitude\s*[:=]\s*(?P<lon>.*)'
 SEACAT_HEX_LATRE = re.compile(SEACAT_HEX_LAT)
 SEACAT_HEX_LONRE = re.compile(SEACAT_HEX_LON)
 
-
 SeacatHex_SBE19_NCASTS = r'(\s+ncasts[\s=]+)(?P<NumCasts>\d+)'
 SeacatHex_SBE19_NCASTSRE = re.compile(SeacatHex_SBE19_NCASTS, re.IGNORECASE)
 SeacatHex_SBE19PLUS_NCASTS = r'''samples  #start of line has samples
@@ -83,6 +82,8 @@ for n in range(7):
     SeacatCNV_SPAN_listRE.append(re.compile(SeacatCNV_SPAN_list[n], re.IGNORECASE))
 SeacatCNV_INTERVAL = r'interval\s=\s(?P<units>\w*):\s*(?P<interval>[\d.]*)'
 SeacatCNV_INTERVALRE = re.compile(SeacatCNV_INTERVAL, re.IGNORECASE)
+
+
 # SeacatCNV_DATA =r'\s+(?P<pressure>[e\+\-\d.]+)\s+(?P<conductivity>[e\+\-\d.]+)\s+(?P<temperature>[e\+\-\d.]+)\s+(?P<salinity>[e\+\-\d.]+)\s+(?P<density>[e\+\-\d.]+)\s+(?P<velocity>[e\+\-\d.]+)\s+(?P<voltage>[e\+\-\d.]+)'
 # SeacatCNV_DATA_types = [('P', scipy.float32), ('C', scipy.float32), ('T', scipy.float32), ('S', scipy.float32), ('D', scipy.float32), ('SV', scipy.float32), ('V', scipy.float32)]
 # scipy.fromregex(fname, SeacatCNV_DATA+r'\s*\n',  SeacatCNV_DATA_types)
@@ -336,7 +337,8 @@ class Seabird(AbstractTextReader):
             # see if there are duplicate names.  First try getting a second word from the column description and then add underscores if there is still duplication
             names_so_far = [coltype[0] for coltype in col_types]
             if col_name in names_so_far:
-                col_name = col_name + "_" + re.search("\w+", col[3]).group().lower()  # col[3].lower().replace(",", "").replace(" ", "_").replace("[", "").replace("]", "")
+                col_name = col_name + "_" + re.search("\w+", col[
+                    3]).group().lower()  # col[3].lower().replace(",", "").replace(" ", "_").replace("[", "").replace("]", "")
             while col_name in names_so_far:
                 col_name = col_name + "_"
             col_types.append((col_name, numpy.float32))

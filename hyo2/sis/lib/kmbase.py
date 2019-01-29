@@ -4,7 +4,6 @@ from typing.io import BinaryIO
 
 
 class KmBase:
-
     class Flags(enum.Enum):
         VALID = 0
         MISSING_FIRST_STX = 1

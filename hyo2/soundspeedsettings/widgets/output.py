@@ -235,14 +235,14 @@ class Output(AbstractWidget):
         while True:
             # noinspection PyCallByClass
             port, ok = QtWidgets.QInputDialog.getInt(self, "New client", "Input the port (e.g., 4001)",
-                                                         4001, 0, 65535)
+                                                     4001, 0, 65535)
             if not ok:
                 return
 
             if (port < 0) or (port > 65535):
                 # noinspection PyCallByClass
                 QtWidgets.QMessageBox.information(self, "Invalid client port",
-                                                  "The port valus is outside validity range.\n"
+                                                  "The port value is outside validity range.\n"
                                                   "You entered: %s" % port)
                 continue
             break

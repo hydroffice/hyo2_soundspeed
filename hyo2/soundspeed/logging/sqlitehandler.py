@@ -2,7 +2,6 @@ import sqlite3
 import logging
 import time
 
-
 initial_sql = """CREATE TABLE IF NOT EXISTS log(
                     TimeStamp TEXT,
                     Source TEXT,

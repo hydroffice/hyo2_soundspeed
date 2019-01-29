@@ -155,7 +155,6 @@ class Gomofs(AbstractAtlas):
         for i in range(lat_search_window):
 
             for j in range(lon_search_window):
-
                 dist = self.g.distance(longitudes[i, j], latitudes[i, j], lon, lat)
                 distances[:, i, j] = dist
                 # logger.info("node (%s %s), pos: %3.2f, %3.2f, dist: %3.1f"
@@ -264,8 +263,8 @@ class Gomofs(AbstractAtlas):
 
     def __repr__(self):
         msg = "%s" % super(Gomofs, self).__repr__()
-        msg += "      <has data loaded: %s>\n" % (self._has_data_loaded, )
-        msg += "      <last loaded day: %s>\n" % (self._last_loaded_day.strftime(r"%d\%m\%Y"), )
+        msg += "      <has data loaded: %s>\n" % (self._has_data_loaded,)
+        msg += "      <last loaded day: %s>\n" % (self._last_loaded_day.strftime(r"%d\%m\%Y"),)
         return msg
 
     # ### private methods ###

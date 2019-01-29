@@ -52,7 +52,7 @@ class AbstractTextWriter(AbstractWriter, metaclass=ABCMeta):
         if data_file:
 
             if len(data_file.split('.')) == 1:
-                data_file += (".%s" % (list(self.ext)[0], ))
+                data_file += (".%s" % (list(self.ext)[0],))
 
             file_path = os.path.join(data_path, data_file)
 
@@ -61,7 +61,7 @@ class AbstractTextWriter(AbstractWriter, metaclass=ABCMeta):
             if self.ssp.cur.meta.original_path:
                 data_file = "%s.%s" % (os.path.basename(self.ssp.cur.meta.original_path), list(self.ext)[0])
             else:
-                data_file = 'output.%s' % (list(self.ext)[0], )
+                data_file = 'output.%s' % (list(self.ext)[0],)
 
             file_path = os.path.join(data_path, data_file)
 

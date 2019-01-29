@@ -46,7 +46,7 @@ class Ncei(AbstractWriter):
         self._project = project
 
         ship_code = self.ssp.cur.meta.vessel[:2] if len(self.ssp.cur.meta.vessel) >= 2 else 'ZZ'
-        nc_file = '%s_%s.nc' %(self.ssp.cur.meta.utc_time.strftime('%Y%m%d%H%M%S'), ship_code)
+        nc_file = '%s_%s.nc' % (self.ssp.cur.meta.utc_time.strftime('%Y%m%d%H%M%S'), ship_code)
 
         # define the output file path
         if not os.path.exists(data_path):
@@ -287,12 +287,12 @@ class Ncei(AbstractWriter):
             # flag.standard_name = ''
             flag.flag_values = 0, 1
             flag.flag_meanings = 'valid invalid'
-            
+
         self.root_group.close()
 
     def _is_empty(self, data):
         return data.min() == data.max()
-    
+
     def _not_empty(self, data):
         return data.min() != data.max()
 
@@ -302,7 +302,8 @@ class Ncei(AbstractWriter):
 
         if self.ssp.cur.meta.sensor_type == Dicts.sensor_types['Unknown'] or \
                 self.ssp.cur.meta.sensor_type == Dicts.sensor_types['Synthetic']:
-            msg = '%s cannot export from sensor - %s, probe - %s' % (msg, self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
+            msg = '%s cannot export from sensor - %s, probe - %s' % (
+            msg, self.ssp.cur.meta.sensor, self.ssp.cur.meta.probe)
         elif self._is_empty(self.ssp.cur.data.depth[vi]) and self._is_empty(self.ssp.cur.data.pressure[vi]):
             msg = '%s missing depth or pressure' % msg
         elif self._is_empty(self.ssp.cur.data.speed[vi]) and self._is_empty(self.ssp.cur.data.temp[vi]) and \

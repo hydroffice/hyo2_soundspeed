@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 # Path to use for Velocipy source and config files
 def config_directory():
-    return os.path.join(os.path.dirname(__file__), "CONFIG")    # Default configuration files
+    return os.path.join(os.path.dirname(__file__), "CONFIG")  # Default configuration files
 
 
 class UTF8Serial(serial.Serial):
@@ -58,7 +58,8 @@ class SeacatComms:
     DISPLAY_CALIBRATION = ''
     SET_BAUD = ''
     HEXFORMAT = 'outputformat=0'
-    SUPPORTED_BAUDS = (600, 9600, 38400, 57600, 1200, 2400, 4800, 19200)  # put the most common baudrates first for auto-search
+    SUPPORTED_BAUDS = (
+    600, 9600, 38400, 57600, 1200, 2400, 4800, 19200)  # put the most common baudrates first for auto-search
 
     def __init__(self, port='COM1', baud=9600, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE,
                  stopbits=serial.STOPBITS_ONE, timeout=.1, parent=None, status=None,
@@ -73,7 +74,8 @@ class SeacatComms:
             self.comlink = UTF8Serial(port, baud, bytesize=bytesize, parity=parity, stopbits=stopbits, timeout=timeout)
             # serial module expects utf8 characters
             if progbar:
-                progbar.start(title="Communicating with Seacat", max_value=len(self.SUPPORTED_BAUDS) + 1, text="Trying %d" % baud)
+                progbar.start(title="Communicating with Seacat", max_value=len(self.SUPPORTED_BAUDS) + 1,
+                              text="Trying %d" % baud)
             r = self.wake()
             if not any([prompt in r for prompt in self.PROMPTS]):
                 # print('prompt is:', self.PROMPTS)
@@ -98,7 +100,8 @@ class SeacatComms:
                 if not bSuccess:
                     self.comlink.close()
                     if not quiet:
-                        logger.error("Did not get expected response from Seacat.  Is it connected?  Specified correct com port?")
+                        logger.error(
+                            "Did not get expected response from Seacat.  Is it connected?  Specified correct com port?")
             if self.comlink.isOpen() and any([prompt in r for prompt in self.PROMPTS]):
                 # print('getting status')
                 self.original_baud = self.comlink.baudrate
@@ -117,7 +120,9 @@ class SeacatComms:
             progbar.end()
 
     def get_com_str(self):
-        return self.comlink.port + ": " + ", ".join([str(self.comlink.baudrate), str(self.comlink.parity), str(self.comlink.bytesize), str(self.comlink.stopbits)])
+        return self.comlink.port + ": " + ", ".join(
+            [str(self.comlink.baudrate), str(self.comlink.parity), str(self.comlink.bytesize),
+             str(self.comlink.stopbits)])
 
     @staticmethod
     def portstr(port):
@@ -127,10 +132,12 @@ class SeacatComms:
         return ps
 
     @staticmethod
-    def open_seacat(port, dbaud, dbits, dparity, parent=None, progbar=None):  # try and figure out what Seacat it is on the port
+    def open_seacat(port, dbaud, dbits, dparity, parent=None,
+                    progbar=None):  # try and figure out what Seacat it is on the port
         # 19plus and 19plusV2 use the default 8,N,1 while the Original SBE19 uses 7,E,1
         if dbaud and dbits and dparity:  # if it was opened before then try those settings
-            cat = SeacatComms(port, baud=dbaud, bytesize=dbits, parity=dparity, quiet=True, scanbauds=False, prompts=["S>", '<Executed/>', "low battery voltage !!!"])  # check for SBE19
+            cat = SeacatComms(port, baud=dbaud, bytesize=dbits, parity=dparity, quiet=True, scanbauds=False,
+                              prompts=["S>", '<Executed/>', "low battery voltage !!!"])  # check for SBE19
             if not cat.isOpen():
                 print('did not find seacat at the last comm parameters', dbaud, dbits, dparity)
         else:
@@ -138,7 +145,8 @@ class SeacatComms:
         if not cat or not cat.isOpen():
             if progbar:
                 progbar.start(title='Scanning for SBE19')
-            cat = SeacatComms(port, bytesize=serial.SEVENBITS, parity=serial.PARITY_EVEN, quiet=True, progbar=progbar)  # check for SBE19
+            cat = SeacatComms(port, bytesize=serial.SEVENBITS, parity=serial.PARITY_EVEN, quiet=True,
+                              progbar=progbar)  # check for SBE19
             if not cat.isOpen():
                 if progbar:
                     progbar.start(title='Scanning for SBE19 Plus, V2')
@@ -180,10 +188,12 @@ class SeacatComms:
         import Seacat; c = Seacat.SBE19PlusV2Comm('COM1', self)
         reload(Seacat); c.__class__ = Seacat.SBE19PlusV2Comm
         '''
-        self.comlink.write(str('\r'))  # make sure the seacat isn't in standby adn clear any leftover stuff in the comport buffer
+        self.comlink.write(
+            str('\r'))  # make sure the seacat isn't in standby adn clear any leftover stuff in the comport buffer
         if cmd is not None:
             self.get_response(0.2, quiet=True)  # Seacats takes between 0.5 an 2.5 seconds to wake up.
-            self.comlink.write('\r')  # make sure the seacat isn't in standby adn clear any leftover stuff in the comport buffer
+            self.comlink.write(
+                '\r')  # make sure the seacat isn't in standby adn clear any leftover stuff in the comport buffer
             self.get_response(3.0, quiet=True)  # Seacats takes between 0.5 an 2.5 seconds to wake up.
             self.comlink.write(cmd + '\r')  # send our command and then get the repsonse
             print('sending command "%s"' % cmd)
@@ -218,12 +228,16 @@ class SeacatComms:
 
     def check_message(self, msg):
         if not any([msg[-len(prompt):] != prompt for prompt in self.PROMPTS]):
-            if any([re.search(prompt + "[\n\r\s]*$", msg) for prompt in self.PROMPTS]):  # let there be spaces or newlines after the prompt -- this is occuring on Seacat 19 v2.1e and v2.1n
-                print("WARNING!\nThere was a trailing newline or space\nThis is only expected on a Seacat 19, firmware 2.1e - 2.1n.\nIf this is not your model there may be problems\nWARNING!\n")
+            if any([re.search(prompt + "[\n\r\s]*$", msg) for prompt in
+                    self.PROMPTS]):  # let there be spaces or newlines after the prompt -- this is occuring on Seacat 19 v2.1e and v2.1n
+                print(
+                    "WARNING!\nThere was a trailing newline or space\nThis is only expected on a Seacat 19, firmware 2.1e - 2.1n.\nIf this is not your model there may be problems\nWARNING!\n")
                 return True
             else:
                 print(msg)
-                print("Something didn't seem right with message -- doesn't end with Seacat Prompt %s -- see above" % str(self.PROMPTS))
+                print(
+                    "Something didn't seem right with message -- doesn't end with Seacat Prompt %s -- see above" % str(
+                        self.PROMPTS))
                 return False
         else:
             return True
@@ -266,7 +280,8 @@ class SeacatComms:
         if not force and self.cache.get('status', None):
             r = self.cache['status']
         else:
-            r = self.send_command(self.DISPLAY_STATUS, maxwait=5.0)  # Display Status can be really slow -- Bob Ramsey was seeing a pause greater than 3sec
+            r = self.send_command(self.DISPLAY_STATUS,
+                                  maxwait=5.0)  # Display Status can be really slow -- Bob Ramsey was seeing a pause greater than 3sec
             if self.check_message(r):
                 self.cache['status'] = r
         return r
@@ -312,10 +327,13 @@ class SeacatComms:
         h = self.get_headers()
         casts_in_device = set(h.keys())
         if not casts_in_device.issuperset(cast_numbers):
-            raise ValueError("There is a bad cast number in the request %s.  Number of casts in the Seabird device = %s" % (str(cast_numbers), str(casts_in_device)))
+            raise ValueError(
+                "There is a bad cast number in the request %s.  Number of casts in the Seabird device = %s" % (
+                str(cast_numbers), str(casts_in_device)))
         ret = {}
         if progbar:
-            progbar.start(min_value=0, max_value=len(cast_numbers), title='Downloading', text="Download %d casts" % len(cast_numbers))
+            progbar.start(min_value=0, max_value=len(cast_numbers), title='Downloading',
+                          text="Download %d casts" % len(cast_numbers))
         for index, n in enumerate(cast_numbers):
             m = re.search("samples\s*(?P<start>\d+)\s*to\s*(?P<end>\d+)", h[n])
             if m:
@@ -337,7 +355,8 @@ class SeacatComms:
                         else:
                             logger.info('found corrupt data on try %d of %d\n' % (t, self.num_trys))
                     else:
-                        logger.info('Did not receive right amount of data lines (%d of %d) on try %d of %d\n' % (len(lines), expected_lines, t + 1, self.num_trys))
+                        logger.info('Did not receive right amount of data lines (%d of %d) on try %d of %d\n' % (
+                        len(lines), expected_lines, t + 1, self.num_trys))
         return ret
 
     def set_datetime(self, dt):
@@ -375,6 +394,7 @@ class SeacatComms:
                 def WriteHeaderLines(data):
                     for line in data.splitlines(True):
                         f.write(bytes(('* ' + line).encode('utf-8')))
+
                 WriteHeaderLines(self.get_hexheader(fname))
                 WriteHeaderLines(self.get_status())
                 if self.DISPLAY_CALIBRATION:
@@ -385,7 +405,8 @@ class SeacatComms:
                 f.close()
                 written.append(fname)
             else:
-                logger.info('Cast %d did not contain enough data -- header is shown on the next line\n%s\n' % (n, headers[n]))
+                logger.info(
+                    'Cast %d did not contain enough data -- header is shown on the next line\n%s\n' % (n, headers[n]))
         return written
 
     def get_num_casts_in_device(self):
@@ -417,6 +438,7 @@ class SeacatComms:
                 f.write(str(r))  # the data comes with newlines over the serial port
             except Exception as e:
                 f.write(str(e) + '\n')
+
         R(self.get_status)
         R(self.get_voltages)
         R(self.get_headers)
@@ -450,7 +472,8 @@ class SBE19Comm(SeacatComms):
     CTRL_Y = chr(25)
 
     def __init__(self, port, baud=600, parent=None, **kywds):
-        SeacatComms.__init__(self, port, baud=baud, bytesize=serial.SEVENBITS, parity=serial.PARITY_EVEN, parent=parent, **kywds)
+        SeacatComms.__init__(self, port, baud=baud, bytesize=serial.SEVENBITS, parity=serial.PARITY_EVEN, parent=parent,
+                             **kywds)
         status = self.get_status()
         m = re.search(r'SEACAT\sPROFILER\s*V(\d)(\.(\d))?', status)
         if m:
@@ -561,7 +584,8 @@ class SBE19Comm(SeacatComms):
     def get_cast_time(self, castnumber=1):
         n = self.get_num_casts_in_device()
         if castnumber > n:
-            raise ValueError("castnumber %d is higher than the number of casts in the Seabird device %d" % (castnumber, n))
+            raise ValueError(
+                "castnumber %d is higher than the number of casts in the Seabird device %d" % (castnumber, n))
         header = self.get_headers()[castnumber]
         cur_yr, cur_mon, _cur_day = time.gmtime()[:3]
         m = sbe_constants.SEACAT_SBE19_HEX_MONTHDAYRE.search(header)
@@ -574,6 +598,8 @@ class SBE19Comm(SeacatComms):
             yr = cur_yr
         doy = datetime.datetime(yr, mon, day).timetuple().tm_yday
         return (yr, doy, hour, minute, second)
+
+
 # status='DS\r\nSEACAT PROFILER  V2.0c  SN 219   03/28/10  18:55:10.689\r\npressure sensor: serial no = 133813,  range = 5000 psia,  tc = -131\r\nclk = 32768.172   iop = 121   vmain = 8.4   vlith = 5.4\r\nncasts = 2   samples = 0   free = 43315   lwait = 0 msec\r\nsample rate = 1 scan every 0.5 seconds\r\nbattery cutoff = 5.8 volts\r\nnumber of voltages sampled = 0\r\nS>'
 
 
@@ -631,7 +657,8 @@ class SBE19PlusComm(SeacatComms):
         status = self.get_status(True)
         m = re.search(sbe_constants.SEACAT_SBE19PLUS_STATUS_DATETIME, status)
         if m:
-            y, mon, d = time.strptime(' '.join([m.group('day'), m.group('month'), m.group('year')]), sbe_constants.SEACAT_SBE19PLUS_HEX_DATE_TXT_FORMAT)[:3]
+            y, mon, d = time.strptime(' '.join([m.group('day'), m.group('month'), m.group('year')]),
+                                      sbe_constants.SEACAT_SBE19PLUS_HEX_DATE_TXT_FORMAT)[:3]
             hr, minutes, sec = int(m.group('hour')), int(m.group('minute')), int(m.group('second'))
             dt = datetime.datetime(y, mon, d, hr, minutes, sec)
         else:
@@ -657,7 +684,8 @@ class SBE19PlusComm(SeacatComms):
     def get_cast_time(self, castnumber=1):
         n = self.get_num_casts_in_device()
         if castnumber > n:
-            raise ValueError("castnumber %d is higher than the number of casts in the Seabird device %d" % (castnumber, n))
+            raise ValueError(
+                "castnumber %d is higher than the number of casts in the Seabird device %d" % (castnumber, n))
         header = self.get_headers()[castnumber]
         m = sbe_constants.SEACAT_SBE19PLUS_HEX_DATE_TXTRE.search(header)
         if m:
@@ -695,7 +723,8 @@ class SBE19PlusV2Comm(SBE19PlusComm):
     Descriptions in Section 4: Deploying and Operating SBE 19plus V2).
     '''
     SET_BAUD = 'BaudRate='
-    SUPPORTED_BAUDS = (9600, 38400, 600, 57600, 19200, 1200, 2400, 4800)  # 115200 is claimed in the manual but it didn't work in testing.  Not certain if its the com port or the Seacat's problem
+    SUPPORTED_BAUDS = (9600, 38400, 600, 57600, 19200, 1200, 2400,
+                       4800)  # 115200 is claimed in the manual but it didn't work in testing.  Not certain if its the com port or the Seacat's problem
 
     def __init__(self, port, baud=9600, parent=None, **kywds):
         SBE19PlusComm.__init__(self, port, parent=parent, prompts=['S>', '<Executed/>'], **kywds)
@@ -711,7 +740,8 @@ class SBE19PlusV2Comm(SBE19PlusComm):
         status = self.get_status(True)
         m = re.search(sbe_constants.SEACAT_SBE19PLUSV2_STATUS_DATETIME, status)
         if m:
-            y, mon, d = time.strptime(' '.join([m.group('day'), m.group('month'), m.group('year')]), sbe_constants.SEACAT_SBE19PLUS_HEX_DATE_TXT_FORMAT)[:3]
+            y, mon, d = time.strptime(' '.join([m.group('day'), m.group('month'), m.group('year')]),
+                                      sbe_constants.SEACAT_SBE19PLUS_HEX_DATE_TXT_FORMAT)[:3]
             hr, minute, sec = int(m.group('hour')), int(m.group('minute')), int(m.group('second'))
             dt = datetime.datetime(y, mon, d, hr, minute, sec)
         else:
@@ -765,7 +795,7 @@ def scan_for_comports():
             port = 'COM' + str(i)
             s = serial.Serial(port)
             available.append(port)
-            s.close()   # explicit close 'cause of delayed GC in java
+            s.close()  # explicit close 'cause of delayed GC in java
         except serial.SerialException as e:
             if 'access is denied' in str(e).lower():
                 available.append(port)
@@ -780,7 +810,7 @@ def get_num_casts(strHexFile, strSeacatType):
     hexdata = open(strHexFile, 'rb').read()
     if strSeacatType == "SBE19":
         ncasts = sbe_constants.SeacatHex_SBE19_NCASTSRE.search(hexdata).group('NumCasts')
-    elif strSeacatType in ("SBE19Plus", ):
+    elif strSeacatType in ("SBE19Plus",):
         ncasts = sbe_constants.SeacatHex_SBE19PLUS_NCASTSRE.search(hexdata).group('NumCasts')
     return int(ncasts)
 
@@ -943,7 +973,7 @@ def convert_hexfile(hexfile_path, confile_path, seabird_utils_dir, parent=None):
             pass  # conversion failed??
         # Check that output file got there.
         if not os.path.exists(cnv_output_filename):
-            Msg = 'Error occurred running Data Processing Programs\n\n'\
+            Msg = 'Error occurred running Data Processing Programs\n\n' \
                   'If you are processing SEACAT data, please rerun SEACAT PostCast Data Retrieval'
             Title = "ERROR RUNNING SBEDataProcessing-Win32"
             return False, (Title, Msg)

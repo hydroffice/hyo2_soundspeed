@@ -10,7 +10,6 @@ from hyo2.soundspeedsettings.mainwin import MainWin
 
 
 class Settings(AbstractWidget):
-
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
 
@@ -71,7 +70,8 @@ class Settings(AbstractWidget):
         if self.editable.isChecked():
             msg = "Do you really want to change the settings?"
             # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.warning(self, "Settings", msg, QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
+            ret = QtWidgets.QMessageBox.warning(self, "Settings", msg,
+                                                QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
             if ret == QtWidgets.QMessageBox.No:
                 self.editable.setChecked(False)
                 return

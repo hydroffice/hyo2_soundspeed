@@ -10,7 +10,6 @@ from hyo2.soundspeed.profile.dicts import Dicts
 
 
 class Km:
-
     datagrams = {
         48: 'PU Id output',
         49: 'PU Status',

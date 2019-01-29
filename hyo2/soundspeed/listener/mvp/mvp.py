@@ -71,7 +71,7 @@ class Mvp(AbstractListener):
             if self.got_header and self.got_data and self.got_footer:
                 logger.info("Assembling the cast!")
                 logger.info("- lengths: %s %s %s"
-                         % (len(self.header), len(self.data_blocks), len(self.footer)))
+                            % (len(self.header), len(self.data_blocks), len(self.footer)))
                 logger.info("- nr. of data blocks: %s" % self.num_data_blocks)
 
                 rdr = mvp.Mvp()

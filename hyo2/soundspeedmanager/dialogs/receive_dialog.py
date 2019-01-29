@@ -3,6 +3,7 @@ from PySide import QtCore
 
 import os
 import logging
+
 logger = logging.getLogger(__name__)
 
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
@@ -95,4 +96,3 @@ class ReceiveDialog(AbstractDialog):
             return
 
         self.accept()
-

@@ -18,7 +18,6 @@ matplotlib.use('qt5agg')
 
 
 class DataPlots(AbstractWidget):
-
     font_size = 6
     rc_context = {
         'font.family': 'sans-serif',
@@ -72,7 +71,6 @@ class DataPlots(AbstractWidget):
 
         # figure and canvas
         with rc_context(self.rc_context):
-
             self.f = Figure(figsize=self.f_sz, dpi=self.f_dpi)
             self.f.patch.set_alpha(0.0)
             self.c = FigureCanvas(self.f)

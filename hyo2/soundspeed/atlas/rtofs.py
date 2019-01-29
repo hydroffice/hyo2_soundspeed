@@ -123,7 +123,7 @@ class Rtofs(AbstractAtlas):
 
             # Need +1 on the north and east indices since it is the "stop" value in these slices
             t = self._file_temp.variables['temperature'][self._day_idx, :, lat_s_idx:lat_n_idx + 1,
-                                                         lon_w_idx:lon_e_idx + 1]
+                lon_w_idx:lon_e_idx + 1]
             s = self._file_sal.variables['salinity'][self._day_idx, :, lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
             # Set 'unfilled' elements to NANs (BUT when the entire array has valid data, it returns numpy.ndarray)
             if isinstance(t, np.ma.core.MaskedArray):
@@ -150,9 +150,9 @@ class Rtofs(AbstractAtlas):
 
             # Need +1 on the north and east indices since it is the "stop" value in these slices
             t_left = self._file_temp.variables['temperature'][self._day_idx, :, lat_s_idx:lat_n_idx + 1,
-                                                              lon_w_idx:lon_e_idx + 1]
+                     lon_w_idx:lon_e_idx + 1]
             s_left = self._file_sal.variables['salinity'][self._day_idx, :, lat_s_idx:lat_n_idx + 1,
-                                                          lon_w_idx:lon_e_idx + 1]
+                     lon_w_idx:lon_e_idx + 1]
             # Set 'unfilled' elements to NANs (BUT when the entire array has valid data, it returns numpy.ndarray)
             if isinstance(t_left, np.ma.core.MaskedArray):
                 t_mask = t_left.mask
@@ -173,9 +173,9 @@ class Rtofs(AbstractAtlas):
 
             # Need +1 on the north and east indices since it is the "stop" value in these slices
             t_right = self._file_temp.variables['temperature'][self._day_idx, :, lat_s_idx:lat_n_idx + 1,
-                                                               lon_w_idx:lon_e_idx + 1]
+                      lon_w_idx:lon_e_idx + 1]
             s_right = self._file_sal.variables['salinity'][self._day_idx, :, lat_s_idx:lat_n_idx + 1,
-                                                           lon_w_idx:lon_e_idx + 1]
+                      lon_w_idx:lon_e_idx + 1]
             # Set 'unfilled' elements to NANs (BUT when the entire array has valid data, it returns numpy.ndarray)
             if isinstance(t_right, np.ma.core.MaskedArray):
                 t_mask = t_right.mask
@@ -314,8 +314,8 @@ class Rtofs(AbstractAtlas):
 
     def __repr__(self) -> str:
         msg = "%s" % super(Rtofs, self).__repr__()
-        msg += "      <has data loaded: %s>\n" % (self._has_data_loaded, )
-        msg += "      <last loaded day: %s>\n" % (self._last_loaded_day.strftime(r"%d\%m\%Y"), )
+        msg += "      <has data loaded: %s>\n" % (self._has_data_loaded,)
+        msg += "      <last loaded day: %s>\n" % (self._last_loaded_day.strftime(r"%d\%m\%Y"),)
         return msg
 
     # ### private methods ###

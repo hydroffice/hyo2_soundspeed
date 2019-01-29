@@ -48,7 +48,6 @@ class Sis(AbstractListener):
         # We try all of them in the hopes that one works.
         sensors = ["710", "122", "302", "3020", "2040"]
         for sensor in sensors:
-
             # talker ID, Roger Davis (HMRG) suggested SM based on something KM told him
             output = '$SMR20,EMX=%s,' % sensor
 
@@ -77,7 +76,7 @@ class Sis(AbstractListener):
             name = "Unknown name"
 
         logger.info("%s > DG %d/0x%x/%c [%s] > sz: %.2f KB"
-                    % (self.sender, self.id, self.id, self.id, name, len(this_data)/1024))
+                    % (self.sender, self.id, self.id, self.id, name, len(this_data) / 1024))
 
         if not (self.id in self.datagrams):
             return

@@ -451,7 +451,7 @@ class QtCallbacks(AbstractCallbacks):
         default_dir = self._settings.value(key_name) if key_name else ""
 
         output_folder = QtWidgets.QFileDialog.getExistingDirectory(self._parent, caption=title,
-                                                               dir=default_dir)
+                                                                   dir=default_dir)
         if output_folder and key_name:
             self._settings.setValue(key_name, output_folder)
             logger.debug('user selection: %s' % output_folder)

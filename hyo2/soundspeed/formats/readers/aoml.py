@@ -39,8 +39,8 @@ class Aoml(AbstractTextReader):
         # body tokens
         self.tk_depth = 'Depth'
         self.tk_temp = 'Temperature'
-        self.tk_speed = 'Sound' # UNUSED for the current format
-        self.tk_sal = 'Salinity' # UNUSED for the current format
+        self.tk_speed = 'Sound'  # UNUSED for the current format
+        self.tk_sal = 'Salinity'  # UNUSED for the current format
 
     def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
         logger.debug('*** %s ***: start' % self.driver)
@@ -126,7 +126,7 @@ class Aoml(AbstractTextReader):
                     self.ssp.cur.meta.probe_type = Dicts.probe_types['Unknown']
                     self.ssp.cur.meta.sensor_type = Dicts.sensor_types['Unknown']
                     logger.warning('reverted to unknown probe type at line #%s' % self.samples_offset)
-            elif line.startswith(self.tk_depth): # field headers
+            elif line.startswith(self.tk_depth):  # field headers
                 col = 0  # field column           
                 for field_type in line.split():
                     self.field_index[field_type] = col
@@ -169,22 +169,21 @@ class Aoml(AbstractTextReader):
                 self.ssp.cur.data.temp[count] = float(data[self.field_index[self.tk_temp]])
             except Exception as e:
                 logger.debug("issue in reading temperature: %s -> skipping" % e)
-                
+
             # salinity
             try:
                 self.ssp.cur.data.sal[count] = float(data[self.field_index[self.tk_sal]])
             except Exception as e:
                 pass
-                #logger.debug("issue in reading salinity: %s -> skipping" % e)
+                # logger.debug("issue in reading salinity: %s -> skipping" % e)
 
             # sound speed
             try:
                 self.ssp.cur.data.speed[count] = float(data[self.field_index[self.tk_speed]])
             except Exception as e:
                 pass
-                #logger.debug("issue in reading sound speed: %s -> skipping" % e)
+                # logger.debug("issue in reading sound speed: %s -> skipping" % e)
 
             count += 1
 
         self.ssp.cur.data_resize(count)
-

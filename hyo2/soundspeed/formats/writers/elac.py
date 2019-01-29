@@ -3,7 +3,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 from hyo2.soundspeed.formats.writers.abstract import AbstractTextWriter
 from hyo2.soundspeed.profile.oceanography import Oceanography as Oc
 

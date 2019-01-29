@@ -3,6 +3,7 @@ import os
 from PySide2 import QtCore, QtGui, QtWidgets
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 from hyo2.abc.app.qt_progress import QtProgress
@@ -10,7 +11,6 @@ from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
 
 class AbstractDialog(QtWidgets.QDialog):
-
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.abspath(os.path.join(here, os.pardir, "media"))
 

@@ -84,7 +84,7 @@ class SetupDb(BaseDb):
         Helper.explore_folder(self.data_folder)
 
     # --- setup stuff
-    
+
     def _check_default_setup(self):
         """Check for the presence of default settings, creating them if missing and not other setups. """
         if len(self.setup_list) == 0:
@@ -123,11 +123,11 @@ class SetupDb(BaseDb):
                 # logger.info("%s settings id: %s" % (setup_name, ret[0]))
 
                 # add default client list
-                self.conn.execute(""" INSERT INTO client_list (setup_id) VALUES(?) """, (ret[0], ))
+                self.conn.execute(""" INSERT INTO client_list (setup_id) VALUES(?) """, (ret[0],))
                 # logger.info("inserted %s settings values" % setup_name)
 
                 return True
-   
+
             except sqlite3.Error as e:
                 logger.error("%s: %s" % (type(e), e))
                 return False
@@ -143,11 +143,11 @@ class SetupDb(BaseDb):
                 # logger.info("%s settings status: %s" % (setup_name, ret))
                 if ret == "active":
                     raise RuntimeError("Attempt to delete active profile (%s)" % setup_name)
-   
+
                 # create a default settings record
                 self.conn.execute(""" DELETE FROM general WHERE setup_name=? """, (setup_name,))
                 # logger.info("deleted profile: %s" % setup_name)
-   
+
             except sqlite3.Error as e:
                 logger.error("%s: %s" % (type(e), e))
                 return False
@@ -157,13 +157,13 @@ class SetupDb(BaseDb):
         """Activate a profile, if it exists"""
         if not self.setup_exists(setup_name):
             return False
-   
+
         with self.conn:
             try:
                 # set all the values to inactive
                 self.conn.execute(""" UPDATE general SET setup_status="inactive" """)
                 # set active just the passed profile
-                self.conn.execute(""" UPDATE general SET setup_status="active" WHERE setup_name=? """, (setup_name, ))
+                self.conn.execute(""" UPDATE general SET setup_status="active" WHERE setup_name=? """, (setup_name,))
                 # logger.info("activated profile: %s" % setup_name)
             except sqlite3.Error as e:
                 logger.error("%s: %s" % (type(e), e))
@@ -179,13 +179,13 @@ class SetupDb(BaseDb):
 
         # logger.debug('using setup name: %s' % self.use_setup_name)
         ret = self.conn.execute(""" SELECT id FROM general WHERE setup_name=? """,
-                                (self.use_setup_name, )).fetchone()
+                                (self.use_setup_name,)).fetchone()
         return ret[0]
 
     # noinspection SqlResolve
     def setup_id_from_setup_name(self, setup_name):
         ret = self.conn.execute(""" SELECT id FROM general WHERE setup_name=? """,
-                                (setup_name, )).fetchone()
+                                (setup_name,)).fetchone()
         return ret[0]
 
     # --- clients list

@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 class SisProcess(Process):
     """SIS simulator"""
+
     def __init__(self, conn, replay_timing=1.0,
                  port_in=4001, port_out=26103, ip_out="localhost",
                  target=None, name="SIS", verbose=False):
@@ -110,7 +111,6 @@ class SisProcess(Process):
         while True:
 
             if self.shutdown.is_set():
-
                 self.conn.send("shutdown")
                 self.t_replay.stop()
                 self.t_svp.stop()

@@ -11,7 +11,6 @@ from hyo2.soundspeed.formats.writers.calc import Calc
 
 
 class Client:
-
     UDP_DATA_LIMIT = (2 ** 16) - 28
 
     def __init__(self, client):

@@ -7,7 +7,6 @@ import numpy as np
 
 logger = logging.getLogger(__name__)
 
-
 from hyo2.soundspeed import __version__
 from hyo2.soundspeed.formats.writers.abstract import AbstractTextWriter
 from hyo2.soundspeed.profile.dicts import Dicts
@@ -75,10 +74,10 @@ class Asvp(AbstractTextWriter):
         abs_header = "( Absorption  1.0 0 "
         abs_header += self.ssp.cur.meta.utc_time.strftime("%Y%m%d%H%M ")
         abs_header += "%.8f %.8f -1 0 0 SSM_%s P %04d )\n" \
-                       % (self.ssp.cur.meta.latitude,
-                          self.ssp.cur.meta.longitude,
-                          __version__,
-                          self.ssp.cur.sis.depth[ti].size)
+                      % (self.ssp.cur.meta.latitude,
+                         self.ssp.cur.meta.longitude,
+                         __version__,
+                         self.ssp.cur.sis.depth[ti].size)
         self.fod.io.write(abs_header)
 
     def _write_body_abs(self, freq):

@@ -383,7 +383,7 @@ class ProjectDb:
 
         try:
             # noinspection SqlResolve
-            self.conn.execute("""DELETE FROM data WHERE ssp_pk=?""", (self.tmp_ssp_pk, ))
+            self.conn.execute("""DELETE FROM data WHERE ssp_pk=?""", (self.tmp_ssp_pk,))
             # logger.info("deleted %s pk entries from data" % self.tmp_ssp_pk)
 
         except sqlite3.Error as e:
@@ -392,7 +392,7 @@ class ProjectDb:
 
         try:
             # noinspection SqlResolve
-            self.conn.execute("""DELETE FROM proc WHERE ssp_pk=?""", (self.tmp_ssp_pk, ))
+            self.conn.execute("""DELETE FROM proc WHERE ssp_pk=?""", (self.tmp_ssp_pk,))
             # logger.info("deleted %s pk entries from proc" % self.tmp_ssp_pk)
 
         except sqlite3.Error as e:
@@ -401,7 +401,7 @@ class ProjectDb:
 
         try:
             # noinspection SqlResolve
-            self.conn.execute("""DELETE FROM sis WHERE ssp_pk=?""", (self.tmp_ssp_pk, ))
+            self.conn.execute("""DELETE FROM sis WHERE ssp_pk=?""", (self.tmp_ssp_pk,))
             # logger.info("deleted %s pk entries from sis" % self.tmp_ssp_pk)
 
         except sqlite3.Error as e:
@@ -410,7 +410,7 @@ class ProjectDb:
 
         try:
             # noinspection SqlResolve
-            self.conn.execute("""DELETE FROM ssp WHERE pk=?""", (self.tmp_ssp_pk, ))
+            self.conn.execute("""DELETE FROM ssp WHERE pk=?""", (self.tmp_ssp_pk,))
             # logger.info("deleted %s pk entry from ssp" % self.tmp_ssp_pk)
 
         except sqlite3.Error as e:
@@ -420,7 +420,7 @@ class ProjectDb:
         if full:
             try:
                 # noinspection SqlResolve
-                self.conn.execute("""DELETE FROM ssp_pk WHERE id=?""", (self.tmp_ssp_pk, ))
+                self.conn.execute("""DELETE FROM ssp_pk WHERE id=?""", (self.tmp_ssp_pk,))
                 # logger.info("deleted %s id entry from ssp_pk" % self.tmp_ssp_pk)
 
             except sqlite3.Error as e:
@@ -676,7 +676,7 @@ class ProjectDb:
             try:
                 # ssp spatial timestamp
                 # noinspection SqlResolve
-                ssp_idx = self.conn.execute("SELECT * FROM ssp_pk WHERE id=?", (pk, )).fetchone()
+                ssp_idx = self.conn.execute("SELECT * FROM ssp_pk WHERE id=?", (pk,)).fetchone()
 
                 ssp.cur.meta.utc_time = ssp_idx['cast_datetime']
                 ssp.cur.meta.longitude = ssp_idx['cast_position'].x
@@ -689,7 +689,7 @@ class ProjectDb:
             try:
                 # ssp metadata
                 # noinspection SqlResolve
-                ssp_meta = self.conn.execute("SELECT * FROM ssp WHERE pk=?", (pk, )).fetchone()
+                ssp_meta = self.conn.execute("SELECT * FROM ssp WHERE pk=?", (pk,)).fetchone()
 
                 # special handling in case of unknown future sensor type
                 ssp.cur.meta.sensor_type = ssp_meta['sensor_type']
@@ -724,7 +724,7 @@ class ProjectDb:
             # raw data
             try:
                 # noinspection SqlResolve
-                ssp_samples = self.conn.execute("SELECT * FROM data WHERE ssp_pk=?", (pk, )).fetchall()
+                ssp_samples = self.conn.execute("SELECT * FROM data WHERE ssp_pk=?", (pk,)).fetchall()
                 num_samples = len(ssp_samples)
                 ssp.cur.init_data(num_samples)
                 # logger.debug("raw data samples: %s" % num_samples)
@@ -747,7 +747,7 @@ class ProjectDb:
             # proc data
             try:
                 # noinspection SqlResolve
-                ssp_samples = self.conn.execute("SELECT * FROM proc WHERE ssp_pk=?", (pk, )).fetchall()
+                ssp_samples = self.conn.execute("SELECT * FROM proc WHERE ssp_pk=?", (pk,)).fetchall()
                 num_samples = len(ssp_samples)
                 ssp.cur.init_proc(num_samples)
                 # logger.debug("proc data samples: %s" % num_samples)
@@ -769,7 +769,7 @@ class ProjectDb:
             # sis data
             try:
                 # noinspection SqlResolve
-                ssp_samples = self.conn.execute("SELECT * FROM sis WHERE ssp_pk=?", (pk, )).fetchall()
+                ssp_samples = self.conn.execute("SELECT * FROM sis WHERE ssp_pk=?", (pk,)).fetchall()
                 num_samples = len(ssp_samples)
                 ssp.cur.init_sis(num_samples)
                 # logger.debug("sis data samples: %s" % num_samples)

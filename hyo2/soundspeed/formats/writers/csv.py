@@ -3,7 +3,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 from hyo2.soundspeed.formats.writers.abstract import AbstractTextWriter
 
 

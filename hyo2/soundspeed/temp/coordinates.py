@@ -115,8 +115,8 @@ class BaseCoordinate:
             self.lat, self.lon = lat, lon
         else:
             self.lat, self.lon = map(float, (
-            str(lat).lower().replace('n', '').replace('s', '').replace('w', '').replace('e', ''),
-            str(lon).lower().replace('n', '').replace('s', '').replace('w', '').replace('e', '')))
+                str(lat).lower().replace('n', '').replace('s', '').replace('w', '').replace('e', ''),
+                str(lon).lower().replace('n', '').replace('s', '').replace('w', '').replace('e', '')))
             if 's' in str(lat).lower(): self.lat *= -1.0
             if 'w' in str(lon).lower(): self.lon *= -1.0
         self.sep = ' '  # space separation by default when printing DMS, DM formats
@@ -248,8 +248,8 @@ class DMCoordinate(BaseCoordinate):
 
     def __init__(self, lat, lon):
         for p in (
-        r"^(\d{2,3})(\d{2}(\.\d+)?)\s*\'?,?\s*([NSEWnsew])\s*$",  # check for 6032.0620000,N and 14656.8280000,W
-        r"^(\d{1,3})[\s/]+(\d{1,2}(\.\d+)?)\s*\'?,?\s*([NSEWnsew])\s*$"):  # check for other DD DD.ddd variants
+                r"^(\d{2,3})(\d{2}(\.\d+)?)\s*\'?,?\s*([NSEWnsew])\s*$",  # check for 6032.0620000,N and 14656.8280000,W
+                r"^(\d{1,3})[\s/]+(\d{1,2}(\.\d+)?)\s*\'?,?\s*([NSEWnsew])\s*$"):  # check for other DD DD.ddd variants
             if match(p, lat): break
         ma = match(p, lat)
         if ma:

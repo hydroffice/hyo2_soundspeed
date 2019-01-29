@@ -6,7 +6,6 @@ from hyo2.soundspeedmanager import gui
 class DebugFilter(logging.Filter):
 
     def filter(self, record):
-
         if record.name[:3] != "hyo":
             return False
 
@@ -25,6 +24,5 @@ ch_formatter = logging.Formatter('%(levelname)-9s %(name)s.%(funcName)s:%(lineno
 ch.setFormatter(ch_formatter)
 ch.addFilter(DebugFilter())
 logger.addHandler(ch)
-
 
 gui.gui()

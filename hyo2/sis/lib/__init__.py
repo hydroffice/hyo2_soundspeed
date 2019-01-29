@@ -8,7 +8,6 @@ from hyo2.abc.lib.lib_info import LibInfo
 from hyo2.sis import name, __version__
 import logging
 
-
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 

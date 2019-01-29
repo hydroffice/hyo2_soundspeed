@@ -198,7 +198,7 @@ class PlotTracedProfiles:
         logger.debug("timing: %s" % (datetime.now() - start_time))
 
         # create figure
-        plt.close("Across-swath bias plots") # if already open
+        plt.close("Across-swath bias plots")  # if already open
         fig = plt.figure(num="Across-swath bias plots",
                          figsize=(12, 8), dpi=80, facecolor='w', edgecolor='k')
 

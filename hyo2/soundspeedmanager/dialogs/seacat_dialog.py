@@ -1,6 +1,7 @@
 import os
 import datetime
 import shutil
+
 try:
     # TODO: winreg is windows-only, use QSettings instead
     import winreg  # python 3+
@@ -19,7 +20,6 @@ from hyo2.soundspeedmanager.dialogs.seacat import add_btn, get_last_comport, Aut
 
 
 class SeacatDialog(AbstractDialog):
-
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
 
@@ -154,14 +154,15 @@ class SeacatDialog(AbstractDialog):
                                 except Exception:
                                     # noinspection PyCallByClass
                                     QtWidgets.QMessageBox.warning(self, "Error",
-                                                              "Filtering failed on the file below\n  "
-                                                              "The raw data was loaded instead\n\n%s" % (pth, ))
+                                                                  "Filtering failed on the file below\n  "
+                                                                  "The raw data was loaded instead\n\n%s" % (pth,))
                                     self.reject()
                             except Exception:
                                 # noinspection PyCallByClass
                                 QtWidgets.QMessageBox.information(self, "Notice",
-                                                              "File downloaded from the Seacat instrument\n  "
-                                                              "but failed to load in SoundSpeedManager\n\n%s" % (pth, ))
+                                                                  "File downloaded from the Seacat instrument\n  "
+                                                                  "but failed to load in SoundSpeedManager\n\n%s" % (
+                                                                  pth,))
                                 self.reject()
                     else:
                         # noinspection PyCallByClass
@@ -195,7 +196,8 @@ class SeacatDialog(AbstractDialog):
                     if failed:
                         # noinspection PyCallByClass
                         QtWidgets.QMessageBox.information(self, "Error in Conversion",
-                                                      "The following casts failed to convert:\n\n" + "\n".join(failed))
+                                                          "The following casts failed to convert:\n\n" + "\n".join(
+                                                              failed))
                 else:
                     logger.info('Seabird DataCNV.exe not found\n')
             else:
@@ -210,7 +212,8 @@ class SeacatDialog(AbstractDialog):
         logger.debug('choosing comport ...')
         ports = sbe_serialcomms.scan_for_comports()
         old = get_last_comport()
-        port, ok = QtWidgets.QInputDialog.getItem(self, 'Choose COM', "Choose COM port to use, %s last used" % old, ports)
+        port, ok = QtWidgets.QInputDialog.getItem(self, 'Choose COM', "Choose COM port to use, %s last used" % old,
+                                                  ports)
         if ok:
             save_last_comport(port)
 
@@ -253,7 +256,7 @@ class SeacatDialog(AbstractDialog):
                     msg = "Do you want to set the clock to " + datetime.datetime.utcnow().isoformat()
                     # noinspection PyCallByClass
                     ret = QtWidgets.QMessageBox.question(self, "Confirm Seacat Time Change", msg,
-                                                     QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                                                         QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
                     if ret == QtWidgets.QMessageBox.Yes:
                         cat.set_datetime(datetime.datetime.utcnow())
                 except Exception:
@@ -279,7 +282,7 @@ class SeacatDialog(AbstractDialog):
                                                                                           dt_now.isoformat())
                         # noinspection PyCallByClass
                         ret = QtWidgets.QMessageBox.question(self, "Time Mismatch", msg,
-                                                         QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                                                             QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
                         if ret == QtWidgets.QMessageBox.Yes:
                             bSetTime = True
 
@@ -287,10 +290,10 @@ class SeacatDialog(AbstractDialog):
                     volt_messages = cat.get_voltages()
                     # noinspection PyCallByClass
                     ret = QtWidgets.QMessageBox.question(self, "Confirm Seacat Init",
-                                                     "Do you want to clear the Seacat memory now" +
-                                                     "\nAnd set the clock" * bSetTime + "?"
-                                                     "\n\nAlso - note the battery voltages:\n\n" + volt_messages,
-                                                     QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                                                         "Do you want to clear the Seacat memory now" +
+                                                         "\nAnd set the clock" * bSetTime + "?"
+                                                                                            "\n\nAlso - note the battery voltages:\n\n" + volt_messages,
+                                                         QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
                     if ret == QtWidgets.QMessageBox.Yes:
                         if bSetTime:
                             cat.set_datetime(datetime.datetime.utcnow())
@@ -358,7 +361,7 @@ class SeacatDialog(AbstractDialog):
                                   "will automatically be found next time?\n\nCopy+Rename to: %s" % better_name
                             # noinspection PyCallByClass
                             ret = QtWidgets.QMessageBox.question(self, "Copy and Rename?", msg,
-                                                             QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                                                                 QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
                             if ret == QtWidgets.QMessageBox.Yes:
                                 shutil.copyfile(conname, better_name)
                     else:

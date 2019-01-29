@@ -6,7 +6,6 @@ from hyo2.soundspeedsettings import gui
 class DebugFilter(logging.Filter):
 
     def filter(self, record):
-
         if record.name[:3] != "hyo":
             return False
 

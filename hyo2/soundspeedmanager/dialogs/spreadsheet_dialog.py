@@ -3,6 +3,7 @@ from PySide2 import QtCore, QtGui, QtWidgets
 import os
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
@@ -79,7 +80,8 @@ class SpreadSheetDialog(AbstractDialog):
         if self.editable.isChecked():
             msg = "Do you really want to manually edit the processed data?"
             # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.warning(self, "Spreadsheet", msg, QtWidgets.QMessageBox.Ok|QtWidgets.QMessageBox.No)
+            ret = QtWidgets.QMessageBox.warning(self, "Spreadsheet", msg,
+                                                QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
             if ret == QtWidgets.QMessageBox.No:
                 self.editable.setChecked(False)
                 return

@@ -3,6 +3,7 @@ from PySide2 import QtCore, QtGui, QtWidgets
 import os
 from datetime import datetime
 import logging
+
 logger = logging.getLogger(__name__)
 
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
@@ -197,7 +198,7 @@ class MetadataDialog(AbstractDialog):
         self.pressure_uom.setAutoFillBackground(True)
         # noinspection PyUnresolvedReferences
         self.pressure_uom.textChanged.connect(self.changed_pressure_uom)
-        
+
         # depth uom
         hbox = QtWidgets.QHBoxLayout()
         self.mainLayout.addLayout(hbox)
@@ -211,7 +212,7 @@ class MetadataDialog(AbstractDialog):
         self.depth_uom.setAutoFillBackground(True)
         # noinspection PyUnresolvedReferences
         self.depth_uom.textChanged.connect(self.changed_depth_uom)
-        
+
         # speed uom
         hbox = QtWidgets.QHBoxLayout()
         self.mainLayout.addLayout(hbox)
@@ -225,7 +226,7 @@ class MetadataDialog(AbstractDialog):
         self.speed_uom.setAutoFillBackground(True)
         # noinspection PyUnresolvedReferences
         self.speed_uom.textChanged.connect(self.changed_speed_uom)
-        
+
         # temperature uom
         hbox = QtWidgets.QHBoxLayout()
         self.mainLayout.addLayout(hbox)
@@ -239,7 +240,7 @@ class MetadataDialog(AbstractDialog):
         self.temperature_uom.setAutoFillBackground(True)
         # noinspection PyUnresolvedReferences
         self.temperature_uom.textChanged.connect(self.changed_temperature_uom)
-        
+
         # conductivity uom
         hbox = QtWidgets.QHBoxLayout()
         self.mainLayout.addLayout(hbox)
@@ -253,7 +254,7 @@ class MetadataDialog(AbstractDialog):
         self.conductivity_uom.setAutoFillBackground(True)
         # noinspection PyUnresolvedReferences
         self.conductivity_uom.textChanged.connect(self.changed_conductivity_uom)
-        
+
         # salinity uom
         hbox = QtWidgets.QHBoxLayout()
         self.mainLayout.addLayout(hbox)

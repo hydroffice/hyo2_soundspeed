@@ -2,6 +2,7 @@ from PySide2 import QtCore, QtGui, QtWidgets
 
 import os
 import logging
+
 logger = logging.getLogger(__name__)
 
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
@@ -56,7 +57,7 @@ class OutputFoldersDialog(AbstractDialog):
             self.mainLayout.addLayout(hbox)
             # hbox.addStretch()
             btn = QtWidgets.QPushButton("%s" % writer)
-            btn.setToolTip("Select output folder for %s format" % (writer, ))
+            btn.setToolTip("Select output folder for %s format" % (writer,))
             btn.setMinimumWidth(80)
             # noinspection PyUnresolvedReferences
             btn.clicked.connect(self.on_change_folder)
@@ -86,12 +87,12 @@ class OutputFoldersDialog(AbstractDialog):
     def on_change_folder(self):
         """Update the output folder"""
         btn = self.sender()
-        logger.debug("changing output folder for %s format" % (btn.text(), ))
+        logger.debug("changing output folder for %s format" % (btn.text(),))
 
         # ask user for output folder path
         # noinspection PyCallByClass
         output_folder = QtWidgets.QFileDialog.getExistingDirectory(self, "Select output folder",
-                                                               self.paths[btn.text()].text())
+                                                                   self.paths[btn.text()].text())
         if not output_folder:
             return
 

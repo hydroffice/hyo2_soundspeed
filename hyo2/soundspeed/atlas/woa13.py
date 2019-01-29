@@ -107,7 +107,7 @@ class Woa13(AbstractAtlas):
             # self.lon = np.hstack((lon[lon.size // 2:], lon[:lon.size // 2]))
             csv_iter = csv.reader(open((os.path.join(self.data_folder, "landsea_04.msk"))))
             next(csv_iter)  # skip firs header row
-            next(csv_iter)   # skip another header row
+            next(csv_iter)  # skip another header row
             landsea = np.asarray([float(data[2]) for data in csv_iter])
             # print(landsea.shape, lons.size, lats.size)
             landsea = landsea.reshape((self.lat.size, self.lon.size))
@@ -217,7 +217,6 @@ class Woa13(AbstractAtlas):
 
                 # Check to see if we're at sea or on land
                 if self.landsea[this_lat_index][this_lon_index] == 1:
-
                     # logger.debug("at land: %s, %s" % (this_lat_index, this_lon_index))
                     # from matplotlib import pyplot
                     # pyplot.imshow(self.landsea, origin='lower')
@@ -292,7 +291,6 @@ class Woa13(AbstractAtlas):
                 num_visited += 1
 
         if (lat_idx == -1) and (lon_idx == -1):
-
             logger.info("possible request on land")
             return None
 

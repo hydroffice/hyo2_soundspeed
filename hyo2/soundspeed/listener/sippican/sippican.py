@@ -4,6 +4,8 @@ from threading import Event
 logger = logging.getLogger(__name__)
 
 from hyo2.soundspeed.listener.abstract import AbstractListener
+
+
 # from hyo2.soundspeed.formats.readers import sippican
 
 

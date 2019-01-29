@@ -14,7 +14,6 @@ name = "Sound Speed Manager"
 __version__ = "2019.0.0"
 __copyright__ = "Copyright 2019 University of New Hampshire, Center for Coastal and Ocean Mapping"
 
-
 app_info = AppInfo()
 
 app_info.app_name = name

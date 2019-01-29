@@ -51,7 +51,6 @@ So to be most stringent in the parsing of data we have to loop the lines of the 
         Both corrections follow the same procedure as for XBTs.
 '''
 
-
 robust_re_number = r'[\-+]?(\d+(\.\d*)?|\.\d+)([Ee][+\-]?\d+)?'
 named_re_number = r'(?P<%s>' + robust_re_number + ')'
 
@@ -110,7 +109,8 @@ def getMetaFromTimeRE(m):
     except:
         meta['Day'] = m.group('doy')
     meta['Time'] = m.group('hour') + ':' + m.group('minute')
-    meta['timestamp'] = datetime.datetime.strptime("%s %s %s" % (meta['Year'], meta['Day'], meta['Time']), "%Y %j %H:%M")
+    meta['timestamp'] = datetime.datetime.strptime("%s %s %s" % (meta['Year'], meta['Day'], meta['Time']),
+                                                   "%Y %j %H:%M")
     return meta
 
 
@@ -176,7 +176,9 @@ class Profile(numpy.recarray):
     # header_keys are based on the 13 standard headers from VelocWin Visual Basic code that were written into the edited/processed Q, B files.
     # Name_Date_SN was Header(7) in VelocWin which held name and date in a text string  -- "CREATED ON " + Date$ + " BY " + LTrim(txtName.Text)
     # or the SML/Minitroll diver gauge serial number.  Should be Name_Date only for cast data since diver gauges don't make cast profiles.
-    header_keys = ('Ship', 'Year', 'Day', 'Time', 'Latitude', 'Longitude', 'Instrument', 'Name_Date_SN', 'Format', 'Project', 'Survey', 'DataSetID', 'DateStamp', 'Draft')
+    header_keys = (
+    'Ship', 'Year', 'Day', 'Time', 'Latitude', 'Longitude', 'Instrument', 'Name_Date_SN', 'Format', 'Project', 'Survey',
+    'DataSetID', 'DateStamp', 'Draft')
     # the following header keys are other metadata keys added in the Python conversion that contain
     #  class instances (e.g. Coordinate) or strings used to make the standard headers (UserName, ProcessDate
     header_keys_strings = ('UserName', 'ProcessDate', 'Filename', 'Path', 'SurveyUnits', 'ImportFormat')
@@ -184,7 +186,8 @@ class Profile(numpy.recarray):
     # timestamp is a datetime object for the cast time, as opposed to the ProcessDate which is when the user downloaded/processed the data
     header_keys_objects = ('location', 'timestamp')
 
-    def __new__(cls, data, **kwargs):  # data (NxM list or array), names=('depth', 'temperature', 'soundspeed'), ymetric='depth', attribute='soundspeed', metadata={}):
+    def __new__(cls, data,
+                **kwargs):  # data (NxM list or array), names=('depth', 'temperature', 'soundspeed'), ymetric='depth', attribute='soundspeed', metadata={}):
         '''data should be one NxM list or array (N>=2).
         Using numpy.fromarrays -- so data that is in list form should be list of arrays [[d1,d2,d3...], [ss1,ss2,ss3...]] instead of [(d1, ss1), (d2, ss2), (d3, ss3)...] like zip would produce
         If a structured array is supplied then the names are preserved.  Otherwise an optional names list is used.
@@ -205,14 +208,16 @@ class Profile(numpy.recarray):
         if isinstance(data, numpy.ndarray) and data.dtype.names:
             r = numpy.rec.fromarrays([data[n] for n in data.dtype.names], dtype=data.dtype)
         else:
-            r = numpy.rec.fromarrays(data, names=kwargs.get('names', ()))  # defaults to numpy f#   -- ex: dtype=[('f0', '<f8'), ('f1', '<f8')])
+            r = numpy.rec.fromarrays(data, names=kwargs.get('names',
+                                                            ()))  # defaults to numpy f#   -- ex: dtype=[('f0', '<f8'), ('f1', '<f8')])
 
         r.__class__ = cls
         # FIXME: Deprecate these
         for ym in (kwargs.get('ymetric'), 'depth', 'pressure', r.dtype.names[0]):
             if ym in r.dtype.names:
                 break
-        for attr in (kwargs.get('attribute'), 'soundspeed', 'salinity', 'time', 'conductivity', 'temperature', r.dtype.names[1]):
+        for attr in (
+        kwargs.get('attribute'), 'soundspeed', 'salinity', 'time', 'conductivity', 'temperature', r.dtype.names[1]):
             if attr in r.dtype.names:
                 break
         r.SetAttributeName(attr)
@@ -350,7 +355,7 @@ class Profile(numpy.recarray):
         col_types = []
         prof_data = []
         for data, name in ((p.data.pressure, 'pressure'), (p.data.depth, 'depth')
-                           (p.data.speed, 'soundspeed'), (p.data.temp, 'temperature'),
+            (p.data.speed, 'soundspeed'), (p.data.temp, 'temperature'),
                            (p.data.sal, 'salinity'), (p.data.conductivity, 'conductivity')):
             if data is not None:
                 col_types.append((name, numpy.float32))
@@ -364,8 +369,10 @@ class Profile(numpy.recarray):
     def ConvertToSoundSpeedProfile(self):
         p = hyo2.soundspeed.profile.profile.Profile()
         # translate metadata
-        p.meta.sensor_type = dicts.Dicts.sensor_types.get(self.metadata.get('ImportFormat', ''), dicts.Dicts.sensor_types['Unknown'])
-        p.meta.probe_type = dicts.Dicts.probe_types.get(self.metadata.get('ImportFormat', ''), dicts.Dicts.probe_types['Unknown'])
+        p.meta.sensor_type = dicts.Dicts.sensor_types.get(self.metadata.get('ImportFormat', ''),
+                                                          dicts.Dicts.sensor_types['Unknown'])
+        p.meta.probe_type = dicts.Dicts.probe_types.get(self.metadata.get('ImportFormat', ''),
+                                                        dicts.Dicts.probe_types['Unknown'])
 
         try:
             p.meta.latitude = coordinates.LatStrToDec(self.metadata['Latitude'], assume_S=False)
@@ -418,4 +425,3 @@ class Profile(numpy.recarray):
             pass
         # return the finised profile
         return p
-

@@ -1,4 +1,5 @@
 from PySide2 import QtCore, QtGui, QtWidgets
+
 QVariant = lambda value=None: value
 
 from collections import OrderedDict
@@ -6,7 +7,6 @@ from hyo2.soundspeed.profile.dicts import Dicts
 
 
 class ProcDataModel(QtCore.QAbstractTableModel):
-
     data_dict = OrderedDict([
         ("Pressure", 0),
         ("Depth", 1),
@@ -78,10 +78,10 @@ class ProcDataModel(QtCore.QAbstractTableModel):
             return QVariant(str(self.prj.cur.proc.sal[index.row()]))
         elif index.column() == self.data_dict['Source']:
             return QVariant("%.0f [%s]" % (self.prj.cur.proc.source[index.row()],
-                                          Dicts.first_match(Dicts.sources, self.prj.cur.proc.source[index.row()])))
+                                           Dicts.first_match(Dicts.sources, self.prj.cur.proc.source[index.row()])))
         elif index.column() == self.data_dict['Flag']:
             return QVariant("%.0f [%s]" % (self.prj.cur.proc.flag[index.row()],
-                                          Dicts.first_match(Dicts.flags, self.prj.cur.proc.flag[index.row()])))
+                                           Dicts.first_match(Dicts.flags, self.prj.cur.proc.flag[index.row()])))
         else:
             return QVariant()
 
@@ -103,8 +103,8 @@ class ProcDataModel(QtCore.QAbstractTableModel):
         if c == self.data_dict['Pressure']:
             if (user_value > 20000) or (user_value < 0):
                 ret = QtWidgets.QMessageBox.warning(self.table, "Spreadsheet",
-                                                "Do you really want to set the pressure to %s?" % user_value,
-                                                QtWidgets.QMessageBox.Ok|QtWidgets.QMessageBox.No)
+                                                    "Do you really want to set the pressure to %s?" % user_value,
+                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
                 if ret == QtWidgets.QMessageBox.No:
                     return False
             self.prj.cur.proc.pressure[r] = user_value
@@ -114,28 +114,28 @@ class ProcDataModel(QtCore.QAbstractTableModel):
             if r == 0:  # first sample
                 if self.prj.cur.proc.depth[1] < user_value:
                     QtWidgets.QMessageBox.critical(self.table, "Spreadsheet",
-                                               "Invalid input: %s" % user_value,
-                                               QtWidgets.QMessageBox.Ok)
+                                                   "Invalid input: %s" % user_value,
+                                                   QtWidgets.QMessageBox.Ok)
                     return False
             elif r == (self.prj.cur.proc.num_samples - 1):  # last sample
                 if self.prj.cur.proc.depth[-2] > user_value:
                     QtWidgets.QMessageBox.critical(self.table, "Spreadsheet",
-                                               "Invalid input: %s" % user_value,
-                                               QtWidgets.QMessageBox.Ok)
+                                                   "Invalid input: %s" % user_value,
+                                                   QtWidgets.QMessageBox.Ok)
                     return False
             else:
                 if (self.prj.cur.proc.depth[r - 1] > user_value) or (self.prj.cur.proc.depth[r + 1] < user_value):
                     QtWidgets.QMessageBox.critical(self.table, "Spreadsheet",
-                                               "Invalid input: %s" % user_value,
-                                               QtWidgets.QMessageBox.Ok)
+                                                   "Invalid input: %s" % user_value,
+                                                   QtWidgets.QMessageBox.Ok)
                     return False
             self.prj.cur.proc.depth[r] = user_value
 
         elif c == self.data_dict['Speed']:
             if (user_value > 2000) or (user_value < 1000):
                 ret = QtWidgets.QMessageBox.warning(self.table, "Spreadsheet",
-                                                "Do you really want to set the speed to %s?" % user_value,
-                                                QtWidgets.QMessageBox.Ok|QtWidgets.QMessageBox.No)
+                                                    "Do you really want to set the speed to %s?" % user_value,
+                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
                 if ret == QtWidgets.QMessageBox.No:
                     return False
             self.prj.cur.proc.speed[r] = user_value
@@ -143,8 +143,8 @@ class ProcDataModel(QtCore.QAbstractTableModel):
         elif c == self.data_dict['Temp']:
             if (user_value < 0) or (user_value > 100):
                 ret = QtWidgets.QMessageBox.warning(self.table, "Spreadsheet",
-                                                "Do you really want to set the temperature to %s?" % user_value,
-                                                QtWidgets.QMessageBox.Ok|QtWidgets.QMessageBox.No)
+                                                    "Do you really want to set the temperature to %s?" % user_value,
+                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
                 if ret == QtWidgets.QMessageBox.No:
                     return False
             self.prj.cur.proc.temp[r] = user_value
@@ -152,8 +152,8 @@ class ProcDataModel(QtCore.QAbstractTableModel):
         elif c == self.data_dict['Cond']:
             if (user_value < 0) or (user_value > 10000):
                 ret = QtWidgets.QMessageBox.warning(self.table, "Spreadsheet",
-                                                "Do you really want to set the conductivity to %s?" % user_value,
-                                                QtWidgets.QMessageBox.Ok|QtWidgets.QMessageBox.No)
+                                                    "Do you really want to set the conductivity to %s?" % user_value,
+                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
                 if ret == QtWidgets.QMessageBox.No:
                     return False
             self.prj.cur.proc.conductivity[r] = user_value
@@ -161,8 +161,8 @@ class ProcDataModel(QtCore.QAbstractTableModel):
         elif c == self.data_dict['Sal']:
             if (user_value < 0) or (user_value > 100):
                 ret = QtWidgets.QMessageBox.warning(self.table, "Spreadsheet",
-                                                "Do you really want to set the salinity to %s?" % user_value,
-                                                QtWidgets.QMessageBox.Ok|QtWidgets.QMessageBox.No)
+                                                    "Do you really want to set the salinity to %s?" % user_value,
+                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
                 if ret == QtWidgets.QMessageBox.No:
                     return False
             self.prj.cur.proc.sal[r] = user_value
@@ -170,8 +170,8 @@ class ProcDataModel(QtCore.QAbstractTableModel):
         elif c == self.data_dict['Source']:
             if (user_value < 0) or (user_value >= len(Dicts.sources)):
                 ret = QtWidgets.QMessageBox.warning(self.table, "Spreadsheet",
-                                                "Do you really want to set the data source to %s?" % user_value,
-                                                QtWidgets.QMessageBox.Ok|QtWidgets.QMessageBox.No)
+                                                    "Do you really want to set the data source to %s?" % user_value,
+                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
                 if ret == QtWidgets.QMessageBox.No:
                     return False
             self.prj.cur.proc.source[r] = user_value
@@ -179,8 +179,8 @@ class ProcDataModel(QtCore.QAbstractTableModel):
         elif c == self.data_dict['Flag']:
             if (user_value < 0) or (user_value >= len(Dicts.flags)):
                 ret = QtWidgets.QMessageBox.warning(self.table, "Spreadsheet",
-                                                "Do you really want to set the data flag to %s?" % user_value,
-                                                QtWidgets.QMessageBox.Ok|QtWidgets.QMessageBox.No)
+                                                    "Do you really want to set the data flag to %s?" % user_value,
+                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
                 if ret == QtWidgets.QMessageBox.No:
                     return False
             self.prj.cur.proc.flag[r] = user_value
