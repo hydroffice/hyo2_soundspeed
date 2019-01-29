@@ -68,7 +68,7 @@ atlases (if available) to obtain mean sound speed, temperature and salinity prof
 during data editing), which are drawn in dashed colours. Thus, it is important that the cast positional metadata
 are correct for this lookup operation.
 
-Furthemore, the position is also required by some formats to compute the pressure to depth conversion (since this
+Furthermore, the position is also required by some formats to compute the pressure to depth conversion (since this
 has a latitudinal dependence). Since some file formats do not support recording of geographic position
 (e.g., *Valeport* ``.000``) the user must enter these manually during import (if the SIS position datagram is
 not available).
@@ -252,7 +252,7 @@ Applying surface sound speed
 
 If configured to receive data from SIS, the surface sound speed and transducer draft from the depth datagram broadcast
 can be used to create a surface layer of thickness equal to the transducer draft and of sound speed equal
-to the value used in beam forming (this is based on the assuption that the value comes
+to the value used in beam forming (this is based on the assumption that the value comes
 from the surface sound speed probe).
 This operation can be achieved by selecting *Retrieve Surface Sound Speed* from the *Editor* toolbar
 (:numref:`editor_tab8`).
