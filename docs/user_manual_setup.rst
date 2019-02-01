@@ -83,14 +83,14 @@ For NOAA field, it is recommended to turn on the *NOAA tools* flag in the *Gener
 
 Currently, the *NOAA Tools* flag is mainly used for NCEI format output. When NOAA tools flag is on:
 
-* The default institution is uneditable.
-* The vessel name is uneditable in the metadata dialog.
-* The NOAA-specific project naming format is enforced during NCEI files exporting.
+* In the *Setup* tab, The default institution is not editable.
+* In the *Metadata* dialog, The vessel name is not editable
+* During NCEI files exporting, the NOAA-specific project naming format is enforced.
 
-Sound Speed Manager - SISv4 interaction
-=======================================
+Sound Speed Manager - SIS v4 interaction
+========================================
 
-.. index:: SIS
+.. index:: SIS; v4
 
 As with any communication between any software, whether it is on the same computer or between different computers on a
 network, some setup is required. For SIS and Sound Speed Manager, all communication is done across User Datagram Protocol (UDP). UDP on
@@ -122,16 +122,16 @@ hydro-package (identification codes in parentheses):
     :alt: figure with ssm_sis_interaction
     :figclass: align-center
 
-    *Kongsberg SIS* can be configured to broadcast datagrams in three different ways as discussed in Methods A, B, and C.
+    *Kongsberg SIS v4* can be configured to broadcast datagrams in three different ways as discussed in Methods A, B, and C.
 
 .. _method_A:
 
-Method A: Sound Speed Manager and SIS Installed on the same Computer
---------------------------------------------------------------------
+Method A: Sound Speed Manager and SIS v4 Installed on the same Computer
+-----------------------------------------------------------------------
 
-This method is usually used for the case where the hydro-package and *SIS* are installed on the same machine.
+This method is usually used for the case where *Sound Speed Manager* and *SIS* are installed on the same machine.
 However, this method may not be suitable if this mechanism is already in used by another program.
-In such a case, the *DataDistrib.exe* program explored in :ref:`method_C` may be attempted.
+In such a case, the *DataDistrib.exe* program explored in :ref:`method_C` should be attempted.
 
 The configuration for this method is actually quite simple:
 
@@ -211,8 +211,8 @@ You will now be able to send a sound speed profile from Sound Speed Manager to S
 
 .. _method_B:
 
-Method B: Sound Speed Manager and SIS Installed on Separate Computers within a Network
---------------------------------------------------------------------------------------
+Method B: Sound Speed Manager and SIS v4 Installed on Separate Computers within a Network
+-----------------------------------------------------------------------------------------
 
 This method is more general, and it can be used for data transmission to other computers on the network
 (by specifying IP address and port, as well as transmission rate).
@@ -241,7 +241,7 @@ This method is more general, and it can be used for data transmission to other c
   * In *Output*, create a new Client. Enter the SIS computer IP Address, use default port "4001", and protocol "SIS". Sound Speed Manager
     will send your cast from the acquisition computer, to this SIS connection.
 
-.. note:: Local test should be removed from the Client list if you add an additional Client. This will caused a failed
+.. note:: Local test should be removed from the Client list if you add an additional Client. Otherwise, this will cause a failed
    receipt message.
 
 .. _method_B_ssm_output_fig:
@@ -256,7 +256,7 @@ This method is more general, and it can be used for data transmission to other c
     *Sound Speed Manager Setup Output* dialog, with key settings in red for :ref:`method_B`.
 
 * Under Listeners, in the Listen port, enter the Port Address noted from Request datagrams from EM and the Enter the Listen
-  port number (e.g. 16103). This is where Sound Speed Manager will be receiving messages from(see :numref:`method_B_ssm_listeners_fig`).
+  port number (e.g. 16103). This is where Sound Speed Manager will be receiving messages from (see :numref:`method_B_ssm_listeners_fig`).
 
 .. _method_B_ssm_listeners_fig:
 
@@ -291,11 +291,11 @@ You will now be able to send a sound speed profile from Sound Speed Manager to S
 
 .. _method_C:
 
-Method C: Managing Multiple Software Connections to SIS, Including Sound Speed Manager 
---------------------------------------------------------------------------------------
+Method C: Managing Multiple Software Connections to SIS v4, Including Sound Speed Manager
+-----------------------------------------------------------------------------------------
 
-This method is required when multiple software packages need to receive data from SIS, and it represents an extension of
-the previous two methods. **Methods A and B are not required in addition to Method C.** SIS uses a standalone program, named
+This method is required when multiple software packages need to receive data from SIS v4, and it represents an extension of
+the previous two methods. **Methods A and B are not required in addition to Method C.** SIS v4 uses a standalone program, named
 *DataDistrib.exe*, bundled with SIS and usually installed in "C:/Program Files/Kongsberg Maritime/SIS/bin" (together with a
 configuration file "DataDistrib.ini" with all the subscriptions).
 
@@ -415,6 +415,6 @@ You will now be able to send a sound speed profile from Sound Speed Manager to S
 Sound Speed Manager - SIS v5 interaction
 ========================================
 
-.. index:: SIS 5
+.. index:: SIS; v5
 
-SIS v5 is not currently supported by Sound Speed Manager.
+The support of SIS v5 is currently in development.

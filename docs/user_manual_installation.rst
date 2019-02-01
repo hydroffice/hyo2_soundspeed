@@ -32,19 +32,20 @@ If you decide to install the package in a Python environment, the dependencies a
 * `gsw <https://github.com/TEOS-10/python-gsw>`_ *(version == 3.0.6)*
 * `matplotlib <https://github.com/matplotlib/matplotlib>`_
 * `pillow <https://github.com/python-pillow/Pillow>`_
-* `netcdf4 <https://github.com/Unidata/netcdf4-python>`_
+* `netCDF4 <https://github.com/Unidata/netcdf4-python>`_
 * `numpy <https://github.com/numpy/numpy>`_
+* `scipy <https://github.com/scipy/scipy>`_
 * `pyproj <https://github.com/jswhit/pyproj>`_
 * `pyserial <https://github.com/pyserial/pyserial>`_
-* `PySide <https://github.com/PySide/PySide>`_ *(only for the application)*
+* `PySide2 <https://github.com/pyside/pyside2-setup>`_ *(only for the application)*
 
 If you want to install the last stable version (from PyPI):
 
 * `pip install hyo2.soundspeed`
 
-Or, if you prefer the last bleeding edge code:
+Or, if you prefer the bleeding edge code:
 
-* `pip install https://github.com/hydroffice/hyo_soundspeed/archive/master.zip`
+* `pip install https://github.com/hydroffice/hyo2_soundspeed/archive/master.zip`
 
 Supplemental Data Space Requirements
 ====================================
@@ -59,7 +60,7 @@ to point to the correct path (see :ref:`possible_configurations`).
 
 By default, SSM looks for databases at:
 
-* "C:/Documents and Settings/**<username>**/Application Data/HydrOffice/Sound Speed/atlases/**[woa09 or woa13]**" (WinXP), or
+* "C:/Documents and Settings/**<username>**/Application Data/HydrOffice/Sound Speed/atlases/**[woa09 or woa13]**" (Windows XP), or
 * "C:/Users/**<username>**/AppData/Local/HydrOffice/Sound Speed/atlases/**[woa09 or woa13]**" (newer Windows OS)
 
 .. index:: WOA; WOA13

@@ -10,4 +10,4 @@ How to use
    user_manual_how_to_use_3_data_monitor
    user_manual_how_to_use_4_list_of_references
 
-.. note:: For some examples on how to use the library: `https://github.com/hydroffice/hyo_soundspeed/tree/master/examples <https://github.com/hydroffice/hyo_soundspeed/tree/master/examples>`_
+.. note:: For some examples on how to use the library: `https://github.com/hydroffice/hyo2_soundspeed/tree/master/examples <https://github.com/hydroffice/hyo2_soundspeed/tree/master/examples>`_

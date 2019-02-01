@@ -1,5 +1,5 @@
-Todolist
---------
+Todo List
+---------
 
 Sound Speed
 ^^^^^^^^^^^
@@ -19,7 +19,9 @@ Atlases
 ^^^^^^^
 
 * Add World Ocean Database 2013 (same data as WOA BUT preserved record of input data)
+* Add `World Ocean Atlas 2018 <https://www.nodc.noaa.gov/OC5/woa18/woa18-preliminary-notes.html>`_
 * Add HYCOM (near real time global prediction system)
+* Add more NOAA OFS models
 
 
 Research
