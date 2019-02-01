@@ -378,7 +378,7 @@ Data transmission is triggered by selecting the *Transmit data* from the *Editor
 
     The *Transmit data* button in the *Editor* toolbar.
 
-The recipients of such a transmission are configured in the configuration file (see :ref:`package_configuration`).
+The recipients of such a transmission are configured in the configuration file (see :ref:`possible_configurations`).
 
 
 Data storage

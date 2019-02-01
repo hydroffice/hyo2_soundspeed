@@ -23,9 +23,9 @@ This can be done by first selecting WOA09 atlas or RTOFS atlas under the *Input 
 
     The *Input data* button in the *Editor* toolbar.
 
-This will trigger a series of question dialogs for the query position that will use the SIS timestamp/position
-input or a user provided input. After, a surface sound speed can be applied,
-and finally the resulting cast can be sent as described in :ref:`data_transmission`.
+This will trigger a series of question dialogs about timestamp and position to apply a spatio-temporal search.
+The user can decide to use the SIS timestamp/position input (when available) or manually set these inputs.
+After, a surface sound speed can be applied, and finally the resulting cast can be sent as described in :ref:`data_transmission`.
 
 The new cast will be given the filename YYYYMMDD_HHMMSS_WOA or YYYYMMDD_HHMMSS_RTOFS with the date/time
 in the filename based on the query time of the cast.
@@ -54,7 +54,7 @@ There are a number of shortcomings regarding the Kongsberg datagram format for s
 
 These shortcomings are overcome through the use of the “W” datagram in *SIS*, however, it is not currently possible
 to dynamically request this datagram from *SIS* (though it is possible to have *SIS* broadcast it
-as discussed in the section :ref:`method_2`).
+as discussed in the section :ref:`method_B`).
 
 Using a reference cast
 ----------------------
