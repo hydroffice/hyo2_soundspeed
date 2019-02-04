@@ -6,7 +6,7 @@ import time
 from threading import Lock
 from typing import Optional
 
-from hyo2.sis.lib.kmbase import KmBase
+from hyo2.sis.lib.kng_all import KngAll
 
 logger = logging.getLogger(__name__)
 
@@ -118,31 +118,31 @@ class ReplayThread(threading.Thread):
                         logger.debug("EOF")
                     break
 
-                base = KmBase(verbose=True)
+                base = KngAll(verbose=True)
                 ret = base.read(f, f_sz)
-                if ret == KmBase.Flags.MISSING_FIRST_STX:
+                if ret == KngAll.Flags.MISSING_FIRST_STX:
 
                     if self.verbose:
                         logger.debug("troubles in reading file > SKIP")
                     break
 
-                elif ret == KmBase.Flags.CORRUPTED_START_DATAGRAM:
+                elif ret == KngAll.Flags.CORRUPTED_START_DATAGRAM:
 
                     f.seek(-15, 1)  # +1 byte from initial header position
                     logger.debug("troubles in reading initial datagram part > REALIGN to position: %s" % f.tell())
                     continue
 
-                elif ret == KmBase.Flags.UNEXPECTED_EOF:
+                elif ret == KngAll.Flags.UNEXPECTED_EOF:
 
                     logger.debug("troubles in reading file > SKIP (reason: unexpected EOF)")
                     break
 
-                elif ret == KmBase.Flags.CORRUPTED_START_DATAGRAM:
+                elif ret == KngAll.Flags.CORRUPTED_START_DATAGRAM:
 
                     f.seek(-(base.length + 3), 1)
                     logger.debug("troubles in reading final datagram part > REALIGN to position: %s" % f.tell())
 
-                elif ret == KmBase.Flags.VALID:
+                elif ret == KngAll.Flags.VALID:
 
                     self.dg_counter += 1
 

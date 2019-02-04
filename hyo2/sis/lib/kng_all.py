@@ -1,9 +1,9 @@
-import struct
 import enum
+import struct
 from typing.io import BinaryIO
 
 
-class KmBase:
+class KngAll:
     class Flags(enum.Enum):
         VALID = 0
         MISSING_FIRST_STX = 1

@@ -1,9 +1,10 @@
+import enum
 import struct
 from typing.io import BinaryIO
 
 
-class KmallBase
-    class Flags()
+class KngKmall:
+    class Flags(enum.Enum):
         VALID = 0
         MISSING_FIRST_STX = 1
         CORRUPTED_START_DATAGRAM = 2
@@ -24,4 +25,6 @@ class KmallBase
 
         chunk = datagram[0:20]
         hdr_data = struct.unpack("<I4BBBHII", chunk)
-        self.length = hdr_data[0];
+        self.length = hdr_data[0]
+
+        return self.Flags.VALID

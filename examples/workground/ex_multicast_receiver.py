@@ -29,5 +29,3 @@ while True:
     logger.debug('received %d bytes from %s' % (len(data), address))
     logger.debug('received data: %s' % data)
 
-    sock.sendto(b'ack', address)
-    logger.debug('sent ack to %s' % (address, ))
