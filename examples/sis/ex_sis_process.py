@@ -33,7 +33,7 @@ if __name__ == '__main__':
         if not p.is_alive():
             break
 
-        if count == 30:
+        if count == 10:
             logger.debug("trigger termination")
             p.stop()
 

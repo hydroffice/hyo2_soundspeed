@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 message = b'test data'
-multicast_group = ('225.1.20.40', 6020)
+multicast_group = ('224.1.20.40', 6020)
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 

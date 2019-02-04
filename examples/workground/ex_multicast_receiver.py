@@ -67,7 +67,11 @@ while True:
     logger.debug('size: %s' % dgm_size)
     dgm_type_as_bytes_list = struct.unpack("<cccc", data[4:8])
     dgm_type = b''.join(dgm_type_as_bytes_list)
-    logger.debug('type: %s -> %s' % (dgm_type, kmall_datagrams[dgm_type]))
+    try:
+        logger.debug('type: %s -> %s' % (dgm_type, kmall_datagrams[dgm_type]))
+    except KeyError as e:
+        logger.debug("invalid Kmall datagram type: %s" % e)
+        break
     dgm_version = struct.unpack("<B", data[8:9])
     logger.debug('version: %s' % dgm_version)
     dgm_system_id = struct.unpack("<B", data[9:10])

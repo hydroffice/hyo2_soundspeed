@@ -92,7 +92,6 @@ class ReplayThread(threading.Thread):
         """Initialize UDP sockets"""
 
         self.sock_out = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
         if self.sis_5_mode:
             # allow reuse of addresses
             self.sock_out.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -100,9 +99,7 @@ class ReplayThread(threading.Thread):
             # Messages time-to-live to 1 to avoid forwarding beyond current network segment.
             ttl = struct.pack('b', 1)  # TODO: How does K-Controller control this?
             self.sock_out.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
-
-        else:
-            self.sock_out.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 2 ** 16)
+        self.sock_out.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 2 ** 16)
 
         logger.debug("sock_out > buffer %sKB" %
                      (self.sock_out.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF) / 1024))

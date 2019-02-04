@@ -63,11 +63,29 @@ class SvpThread(threading.Thread):
         """Initialize UDP sockets"""
 
         self.sock_in = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock_in.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock_in.settimeout(10)
-        self.sock_in.bind(("0.0.0.0", self.port_in))
+        if self.sis_5_mode:
+            self.sock_in.bind(("", self.port_in))
+
+            # Tell the operating system to add the socket to
+            # the multicast group on all interfaces.
+            group = socket.inet_aton(self.ip_out)
+            mreq = struct.pack('4sL', group, socket.INADDR_ANY)
+            self.sock_in.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+
+        else:  # sis 4
+            self.sock_in.bind(("0.0.0.0", self.port_in))
 
         self.sock_out = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock_out.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 2 ** 16)
+        if self.sis_5_mode:
+            # allow reuse of addresses
+            self.sock_out.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+            # Messages time-to-live to 1 to avoid forwarding beyond current network segment.
+            ttl = struct.pack('b', 1)  # TODO: How does K-Controller control this?
+            self.sock_out.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
 
         logger.debug("sock_out > buffer %sKB" %
                      (self.sock_out.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF) / 1024))
@@ -84,6 +102,61 @@ class SvpThread(threading.Thread):
 
         logger.debug("msg from %s [sz: %sB]" % (address, len(data)))
 
+        if self.sis_5_mode:
+            ssp = self._sis_5(data)
+        else:
+            ssp = self._sis_4(data)
+
+        if ssp:
+            if self.verbose:
+                logger.debug("sending data: %s" % repr(ssp))
+            time.sleep(1.5)
+
+            self.sock_out.sendto(ssp, (self.ip_out, self.port_out))
+            with self.lists_lock:
+                self.ssp.append(ssp)
+
+            if self.verbose:
+                logger.debug("data sent")
+
+    def _sis_5(self, data):
+        raise RuntimeError("not implemented")
+
+    def _create_all_ssp(self, depths: np.ndarray, speeds: np.ndarray,
+                        date: Optional[int] = None, secs: Optional[int] = None):
+        if self.verbose:
+            logger.debug('creating a binary ssp')
+
+        d_res = 1  # depth resolution
+        # TODO: improve it with the received metadata
+        now = datetime.datetime.utcnow()
+        if not date:
+            date = int(now.strftime("%Y%m%d"))
+        if not isinstance(date, int):
+            date = int(date)
+        if not secs:
+            secs = (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()
+        if not isinstance(secs, int):
+            secs = int(secs)
+
+        # -- header
+        # logger.debug("types: %s %s %s %s" % (type(date), type(secs), type(depths.size), type(d_res)))
+        svp = struct.pack("<BBHIIHHIIHH", 2, 0x55, 122, date, secs * 1000, 1, 123, date, secs, depths.size, d_res)
+
+        # -- body
+        for count in range(depths.size):
+            depth = int(depths[count] * d_res / 0.01)
+            speed = int(speeds[count] * 10)
+            pair = struct.pack("<II", depth, speed)
+            svp += pair
+
+        # -- footer
+        footer = struct.pack("<BH", 3, 0)  # Not bothering with checksum since SVP Editor ignores it anyway
+        svp += footer
+
+        return svp
+
+    def _sis_4(self, data):
         date = None
         secs = None
 
@@ -194,48 +267,5 @@ class SvpThread(threading.Thread):
 
                 count += 1
 
-        ssp = self.create_binary_ssp(depths=depths, speeds=speeds, date=date, secs=secs)
-
-        if self.verbose:
-            logger.debug("sending data: %s" % repr(ssp))
-        time.sleep(1.5)
-        self.sock_out.sendto(ssp, (self.ip_out, self.port_out))
-        with self.lists_lock:
-            self.ssp.append(ssp)
-
-        if self.verbose:
-            logger.debug("data sent")
-
-    def create_binary_ssp(self, depths: np.ndarray, speeds: np.ndarray,
-                          date: Optional[int] = None, secs: Optional[int] = None):
-        if self.verbose:
-            logger.debug('creating a binary ssp')
-
-        d_res = 1  # depth resolution
-        # TODO: improve it with the received metadata
-        now = datetime.datetime.utcnow()
-        if not date:
-            date = int(now.strftime("%Y%m%d"))
-        if not isinstance(date, int):
-            date = int(date)
-        if not secs:
-            secs = (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()
-        if not isinstance(secs, int):
-            secs = int(secs)
-
-        # -- header
-        # logger.debug("types: %s %s %s %s" % (type(date), type(secs), type(depths.size), type(d_res)))
-        svp = struct.pack("<BBHIIHHIIHH", 2, 0x55, 122, date, secs * 1000, 1, 123, date, secs, depths.size, d_res)
-
-        # -- body
-        for count in range(depths.size):
-            depth = int(depths[count] * d_res / 0.01)
-            speed = int(speeds[count] * 10)
-            pair = struct.pack("<II", depth, speed)
-            svp += pair
-
-        # -- footer
-        footer = struct.pack("<BH", 3, 0)  # Not bothering with checksum since SVP Editor ignores it anyway
-        svp += footer
-
-        return svp
+        ssp = self._create_all_ssp(depths=depths, speeds=speeds, date=date, secs=secs)
+        return ssp
