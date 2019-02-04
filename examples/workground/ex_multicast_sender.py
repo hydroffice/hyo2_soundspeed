@@ -16,6 +16,9 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 # Set a timeout to avoid socket blocking while waiting
 sock.settimeout(3)
 
+# allow reuse of addresses
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
 # Messages time-to-live to 1 to avoid forwarding beyond current network segment.
 ttl = struct.pack('b', 1)
 sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)

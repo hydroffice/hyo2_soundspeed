@@ -27,6 +27,10 @@ class SisProcess(Process):
         self.port_out = port_out
         self.ip_out = ip_out
 
+        # SIS 5 mode
+        self.sis_5_mode = ip_out[:4] in ["224.", "225."]
+        logger.debug("SIS 5 mode: %s" % self.sis_5_mode)
+
         # threads
         self.t_svp = None
         self.t_replay = None
@@ -73,7 +77,8 @@ class SisProcess(Process):
                                port_in=self.port_in,
                                port_out=self.port_out,
                                ip_out=self.ip_out,
-                               verbose=self.verbose)
+                               verbose=self.verbose,
+                               sis_5_mode=self.sis_5_mode)
         self.t_svp.start()
 
         self.t_replay = ReplayThread(runtime=self.runtime,
@@ -85,7 +90,8 @@ class SisProcess(Process):
                                      port_in=self.port_in,
                                      port_out=self.port_out,
                                      ip_out=self.ip_out,
-                                     verbose=self.verbose)
+                                     verbose=self.verbose,
+                                     sis_5_mode=self.sis_5_mode)
         self.t_replay.start()
 
     @staticmethod

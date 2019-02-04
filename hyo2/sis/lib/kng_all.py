@@ -1,6 +1,9 @@
 import enum
+import logging
 import struct
 from typing.io import BinaryIO
+
+logger = logging.getLogger(__name__)
 
 
 class KngAll:
@@ -39,12 +42,12 @@ class KngAll:
 
         if first_dg and self.stx != 2:
             if self.verbose:
-                print("KmBase > invalid Kongberg file > STX: %s" % self.stx)
+                logger.warning("invalid Kongberg file > STX: %s" % self.stx)
             return self.Flags.MISSING_FIRST_STX
 
         if (self.stx != 2) or (self.id == 0):
             if self.verbose:
-                print("SIS > corrupted datagram")
+                logger.warning("corrupted datagram")
             return self.Flags.CORRUPTED_START_DATAGRAM
 
         # try to read ETX
@@ -52,8 +55,8 @@ class KngAll:
         # Make sure we don't try to read beyond the EOF (-13 since 16 for header and 3 for ender)
         if (file_input.tell() + (self.length - 13)) >= file_size:
             if self.verbose:
-                print("KmBase > unexpected EOF > current pos: %s, datagram length: %s, file size: %s"
-                      % (file_input.tell(), self.length, file_size))
+                logger.warning("unexpected EOF > current pos: %s, datagram length: %s, file size: %s"
+                               % (file_input.tell(), self.length, file_size))
             return self.Flags.UNEXPECTED_EOF
 
         # move file cursor to the end of the datagram

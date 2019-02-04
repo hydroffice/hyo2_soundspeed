@@ -14,14 +14,16 @@ logger = logging.getLogger(__name__)
 
 class SvpThread(threading.Thread):
     def __init__(self, installation: list, runtime: list, ssp: list, lists_lock: threading.Lock,
-                 port_in: Optional[int] = 4001, port_out: Optional[int] = 26103, ip_out: Optional[str] = "localhost",
-                 target: Optional[object] = None, name: Optional[str] = "SVP", verbose: Optional[bool] = False) -> None:
+                 port_in: int = 4001, port_out: int = 26103, ip_out: str = "localhost",
+                 target: Optional[object] = None, name: str = "SVP", verbose: bool = False,
+                 sis_5_mode: bool = False) -> None:
         threading.Thread.__init__(self, target=target, name=name)
         self.verbose = verbose
 
         self.port_in = port_in
         self.port_out = port_out
         self.ip_out = ip_out
+        self.sis_5_mode = sis_5_mode
 
         self.sock_in = None
         self.sock_out = None
@@ -33,11 +35,20 @@ class SvpThread(threading.Thread):
 
         self.shutdown = threading.Event()
 
+    def _close_sockets(self):
+        if self.sock_in:
+            self.sock_in.close()
+            self.sock_in = None
+        if self.sock_out:
+            self.sock_out.close()
+            self.sock_out = None
+
     def run(self) -> None:
         logger.debug("%s started -> in %s, out %s:%s" % (self.name, self.port_in, self.ip_out, self.port_out))
         self.init_sockets()
         while True:
             if self.shutdown.is_set():
+                self._close_sockets()
                 break
             self.interaction()
             time.sleep(1)

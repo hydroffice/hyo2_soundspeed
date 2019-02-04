@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 kmall_mode = True
 
-kng_datagrams = {
+kmall_datagrams = {
     b'#IIP': 'Installation parameters and sensor setup',
     b'#IOP': 'Runtime parameters as chosen by operator',
     b'#IBE': 'Built in test (BIST) error report',
@@ -45,6 +45,8 @@ group = socket.inet_aton(multicast_group)
 mreq = struct.pack('4sL', group, socket.INADDR_ANY)
 sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
+logger.debug("multicast settings: %s:%s" % (multicast_group, server_address[1]))
+
 # Receive/respond loop
 while True:
 
@@ -65,7 +67,7 @@ while True:
     logger.debug('size: %s' % dgm_size)
     dgm_type_as_bytes_list = struct.unpack("<cccc", data[4:8])
     dgm_type = b''.join(dgm_type_as_bytes_list)
-    logger.debug('type: %s -> %s' % (dgm_type, kng_datagrams[dgm_type]))
+    logger.debug('type: %s -> %s' % (dgm_type, kmall_datagrams[dgm_type]))
     dgm_version = struct.unpack("<B", data[8:9])
     logger.debug('version: %s' % dgm_version)
     dgm_system_id = struct.unpack("<B", data[9:10])
