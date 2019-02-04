@@ -29,3 +29,8 @@ while True:
     logger.debug('received %d bytes from %s' % (len(data), address))
     logger.debug('received data: %s' % data)
 
+    dgm_size = struct.unpack("<I", data[:4])
+    logger.debug('datagram size: %s' % dgm_size)
+    dgm_type_as_bytes_list = struct.unpack("<cccc", data[4:8])
+    dgm_type = b''.join(dgm_type_as_bytes_list)
+    logger.debug('datagram type: %s' % (dgm_type, ))
