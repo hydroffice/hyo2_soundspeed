@@ -4,9 +4,9 @@ import struct
 
 import numpy as np
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeed.profile.dicts import Dicts
+
+logger = logging.getLogger(__name__)
 
 
 class Km:
@@ -111,56 +111,6 @@ class Km:
 
         self.counter = header[self.counter_i]
         self.serial_number = header[self.serial_number_i]
-
-    def serialize(self):
-        """Serialize header"""
-        loc_data = bytearray(self.data)
-
-        b_count = 0
-        if not self.remote:
-            b_data = struct.pack("<I", self.length)
-            b_size = len(b_data)
-            loc_data[b_count:b_count + b_size] = b_data
-            b_count += b_size
-
-        b_data = struct.pack("<B", self.stx)
-        b_size = len(b_data)
-        loc_data[b_count:b_count + b_size] = b_data
-        b_count += b_size
-
-        b_data = struct.pack("<B", self.id)
-        b_size = len(b_data)
-        loc_data[b_count:b_count + b_size] = b_data
-        b_count += b_size
-
-        b_data = struct.pack("<H", self.model)
-        b_size = len(b_data)
-        loc_data[b_count:b_count + b_size] = b_data
-        b_count += b_size
-
-        b_data = struct.pack("<I", self.date)
-        b_size = len(b_data)
-        loc_data[b_count:b_count + b_size] = b_data
-        b_count += b_size
-
-        b_data = struct.pack("<I", self.time)
-        b_size = len(b_data)
-        loc_data[b_count:b_count + b_size] = b_data
-        b_count += b_size
-
-        b_data = struct.pack("<H", self.counter)
-        b_size = len(b_data)
-        loc_data[b_count:b_count + b_size] = b_data
-        b_count += b_size
-
-        b_data = struct.pack("<H", self.serial_number)
-        b_size = len(b_data)
-        loc_data[b_count:b_count + b_size] = b_data
-        b_count += b_size
-
-        print('serialized: %s B' % b_count)
-
-        return loc_data
 
     @classmethod
     def calc_2bytes_checksum(cls, bytes_data):
@@ -678,88 +628,6 @@ class KmSeabedImage89(Km):
                 samples[s] = float(raw_samples[s]) / 10.0
             self.snippets.append(samples)
             offset += bytes_to_read
-
-    def serialize(self):
-        loc_data = super(KmSeabedImage89, self).serialize()
-
-        if self.remote:
-            b_count = 16
-        else:
-            b_count = 20
-
-        b_data = struct.pack("<f", self.sampling_frequency)
-        b_size = len(b_data)
-        loc_data[b_count:b_count + b_size] = b_data
-        b_count += b_size
-
-        b_data = struct.pack("<H", self.range_to_normal_incidence)
-        b_size = len(b_data)
-        loc_data[b_count:b_count + b_size] = b_data
-        b_count += b_size
-
-        b_data = struct.pack("<h", int(self.BSN * 10))
-        b_size = len(b_data)
-        loc_data[b_count:b_count + b_size] = b_data
-        b_count += b_size
-
-        b_data = struct.pack("<h", int(self.BSO * 10))
-        b_size = len(b_data)
-        loc_data[b_count:b_count + b_size] = b_data
-        b_count += b_size
-
-        b_data = struct.pack("<H", int(self.tx_beamwidth * 10))
-        b_size = len(b_data)
-        loc_data[b_count:b_count + b_size] = b_data
-        b_count += b_size
-
-        b_data = struct.pack("<H", int(self.tvg_crossover_angle * 10))
-        b_size = len(b_data)
-        loc_data[b_count:b_count + b_size] = b_data
-        b_count += b_size
-
-        b_data = struct.pack("<H", self.number_beams)
-        b_size = len(b_data)
-        loc_data[b_count:b_count + b_size] = b_data
-        b_count += b_size
-
-        # beams
-        for b in range(self.number_beams):
-            b_data = struct.pack("<b", self.sorting_direction[b])
-            b_size = len(b_data)
-            loc_data[b_count:b_count + b_size] = b_data
-            b_count += b_size
-
-            b_data = struct.pack("<B", self.detection_information[b])
-            b_size = len(b_data)
-            loc_data[b_count:b_count + b_size] = b_data
-            b_count += b_size
-
-            b_data = struct.pack("<H", self.number_samples[b])
-            b_size = len(b_data)
-            loc_data[b_count:b_count + b_size] = b_data
-            b_count += b_size
-
-            b_data = struct.pack("<H", self.center_sample[b])
-            b_size = len(b_data)
-            loc_data[b_count:b_count + b_size] = b_data
-            b_count += b_size
-
-        # samples
-        for b in range(self.number_beams):
-            for s in range(int(self.number_samples[b])):
-                b_data = struct.pack("<h", int(self.snippets[b][s] * 10))
-                b_size = len(b_data)
-                loc_data[b_count:b_count + b_size] = b_data
-                b_count += b_size
-        # log.debug(self.snippets[0][402], self.snippets[0][403])
-        logger.debug("serialized: %s B" % b_count)
-
-        # fix checksum
-        b_data = struct.pack("<H", KmSeabedImage89.calc_2bytes_checksum(loc_data))
-        b_size = len(b_data)
-        loc_data[-b_size:] = b_data
-
-        return loc_data
 
     def __str__(self):
 

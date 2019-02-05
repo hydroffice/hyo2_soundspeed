@@ -75,7 +75,8 @@ class MainWin(QtWidgets.QMainWindow):
         self.check_woa09()
         self.check_woa13()
         # self.check_rtofs()  # no need to wait for the download at the beginning
-        self.check_sis()
+        self.check_sis4()
+        self.check_sis5()
         self.check_sippican()
         self.check_mvp()
 
@@ -342,18 +343,32 @@ class MainWin(QtWidgets.QMainWindow):
 
         logger.debug('RTOFS: enabled')
 
-    def check_sis(self):
-        if self.lib.use_sis():
-            if not self.lib.listen_sis():
-                msg = 'Unable to listen SIS.'
+    def check_sis4(self):
+        if self.lib.use_sis4():
+            if not self.lib.listen_sis4():
+                msg = 'Unable to listen SIS4.'
                 # noinspection PyCallByClass
-                QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - SIS", msg,
+                QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - SIS4", msg,
                                               QtWidgets.QMessageBox.Ok)
         else:
-            if not self.lib.stop_listen_sis():
+            if not self.lib.stop_listen_sis4():
                 msg = 'Unable to stop listening SIS.'
                 # noinspection PyCallByClass
-                QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - SIS", msg,
+                QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - SIS4", msg,
+                                              QtWidgets.QMessageBox.Ok)
+
+    def check_sis5(self):
+        if self.lib.use_sis5():
+            if not self.lib.listen_sis5():
+                msg = 'Unable to listen SIS5.'
+                # noinspection PyCallByClass
+                QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - SIS5", msg,
+                                              QtWidgets.QMessageBox.Ok)
+        else:
+            if not self.lib.stop_listen_sis5():
+                msg = 'Unable to stop listening SIS5.'
+                # noinspection PyCallByClass
+                QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - SIS5", msg,
                                               QtWidgets.QMessageBox.Ok)
 
     def check_sippican(self):
@@ -495,6 +510,8 @@ class MainWin(QtWidgets.QMainWindow):
             tokens.append("REF")
         if self.lib.use_rtofs():
             tokens.append("RTF")
+        if self.lib.use_gomofs():
+            tokens.append("GoM")
         if self.lib.use_woa09():
             tokens.append("W09")
         if self.lib.use_woa13():
@@ -503,67 +520,127 @@ class MainWin(QtWidgets.QMainWindow):
             tokens.append("SIP")
         if self.lib.use_mvp():
             tokens.append("MVP")
-        if self.lib.use_sis():
-            tokens.append("SIS")
+        if self.lib.use_sis4():
+            tokens.append("SIS4")
+        if self.lib.use_sis5():
+            tokens.append("SIS5")
         msg += "|".join(tokens)
 
-        if not self.lib.use_sis():  # in case that SIS was disabled
+        if (not self.lib.use_sis4()) and (not self.lib.use_sis5()):  # in case that SIS was disabled
             self.statusBar().showMessage(msg, 1000)
             return
 
         msg += "  -  "  # add some spacing
 
-        if self.lib.listeners.sis.nav is not None:
-            # time stamp
-            msg += "time:"
-            if self.lib.listeners.sis.nav.dg_time is not None:
-                msg += "%s, " % (self.lib.listeners.sis.nav.dg_time.strftime("%H:%M:%S"))
+        if self.lib.use_sis4():
 
-            else:
-                msg += "NA, "
+            if self.lib.listeners.sis4.nav is not None:
+                # time stamp
+                msg += "time:"
+                if self.lib.listeners.sis4.nav.dg_time is not None:
+                    msg += "%s, " % (self.lib.listeners.sis4.nav.dg_time.strftime("%H:%M:%S"))
 
-            # position
-            msg += "pos:"
-            if (self.lib.listeners.sis.nav.latitude is not None) and (self.lib.listeners.sis.nav.longitude is not None):
-
-                latitude = self.lib.listeners.sis.nav.latitude
-                if latitude >= 0:
-                    letter = "N"
                 else:
-                    letter = "S"
-                lat_min = float(60 * math.fabs(latitude - int(latitude)))
-                lat_str = "%02d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(latitude)), lat_min, letter)
+                    msg += "NA, "
 
-                longitude = self.lib.listeners.sis.nav.longitude
-                if longitude < 0:
-                    letter = "W"
+                # position
+                msg += "pos:"
+                if (self.lib.listeners.sis4.nav.latitude is not None) and \
+                        (self.lib.listeners.sis4.nav.longitude is not None):
+
+                    latitude = self.lib.listeners.sis4.nav.latitude
+                    if latitude >= 0:
+                        letter = "N"
+                    else:
+                        letter = "S"
+                    lat_min = float(60 * math.fabs(latitude - int(latitude)))
+                    lat_str = "%02d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(latitude)), lat_min, letter)
+
+                    longitude = self.lib.listeners.sis4.nav.longitude
+                    if longitude < 0:
+                        letter = "W"
+                    else:
+                        letter = "E"
+                    lon_min = float(60 * math.fabs(longitude - int(longitude)))
+                    lon_str = "%03d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(longitude)), lon_min, letter)
+
+                    msg += "(%s, %s),  " % (lat_str, lon_str)
+
                 else:
-                    letter = "E"
-                lon_min = float(60 * math.fabs(longitude - int(longitude)))
-                lon_str = "%03d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(longitude)), lon_min, letter)
+                    msg += "(NA, NA),  "
 
-                msg += "(%s, %s),  " % (lat_str, lon_str)
+            if self.lib.listeners.sis4.xyz88 is not None:
+                msg += 'tss:'
+                if self.lib.listeners.sis4.xyz88.sound_speed is not None:
+                    msg += '%.1f m/s,  ' % self.lib.listeners.sis4.xyz88.sound_speed
+
+                else:
+                    msg += 'NA m/s,  '
+
+                msg += 'avg.depth:'
+                mean_depth = self.lib.listeners.sis4.xyz88.mean_depth
+                if mean_depth:
+                    msg += '%.1f m' % mean_depth
+                else:
+                    msg += 'NA m'
 
             else:
-                msg += "(NA, NA),  "
+                msg += 'XYZ88 NA [pinging?]'
 
-        if self.lib.listeners.sis.xyz88 is not None:
-            msg += 'tss:'
-            if self.lib.listeners.sis.xyz88.sound_speed is not None:
-                msg += '%.1f m/s,  ' % self.lib.listeners.sis.xyz88.sound_speed
+        if self.lib.use_sis5():
+
+            if self.lib.listeners.sis5.nav is not None:
+                # time stamp
+                msg += "time:"
+                if self.lib.listeners.sis5.nav.dg_time is not None:
+                    msg += "%s, " % (self.lib.listeners.sis5.nav.dg_time.strftime("%H:%M:%S"))
+
+                else:
+                    msg += "NA, "
+
+                # position
+                msg += "pos:"
+                if (self.lib.listeners.sis5.nav.latitude is not None) and \
+                        (self.lib.listeners.sis5.nav.longitude is not None):
+
+                    latitude = self.lib.listeners.sis5.nav.latitude
+                    if latitude >= 0:
+                        letter = "N"
+                    else:
+                        letter = "S"
+                    lat_min = float(60 * math.fabs(latitude - int(latitude)))
+                    lat_str = "%02d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(latitude)), lat_min, letter)
+
+                    longitude = self.lib.listeners.sis5.nav.longitude
+                    if longitude < 0:
+                        letter = "W"
+                    else:
+                        letter = "E"
+                    lon_min = float(60 * math.fabs(longitude - int(longitude)))
+                    lon_str = "%03d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(longitude)), lon_min, letter)
+
+                    msg += "(%s, %s),  " % (lat_str, lon_str)
+
+                else:
+                    msg += "(NA, NA),  "
+
+            if self.lib.listeners.sis5.xyz88 is not None:
+                msg += 'tss:'
+                if self.lib.listeners.sis5.xyz88.sound_speed is not None:
+                    msg += '%.1f m/s,  ' % self.lib.listeners.sis5.xyz88.sound_speed
+
+                else:
+                    msg += 'NA m/s,  '
+
+                msg += 'avg.depth:'
+                mean_depth = self.lib.listeners.sis5.xyz88.mean_depth
+                if mean_depth:
+                    msg += '%.1f m' % mean_depth
+                else:
+                    msg += 'NA m'
 
             else:
-                msg += 'NA m/s,  '
-
-            msg += 'avg.depth:'
-            mean_depth = self.lib.listeners.sis.xyz88.mean_depth
-            if mean_depth:
-                msg += '%.1f m' % mean_depth
-            else:
-                msg += 'NA m'
-
-        else:
-            msg += 'XYZ88 NA [pinging?]'
+                msg += 'MRZ NA [pinging?]'
 
         self.statusBar().showMessage(msg, 2000)
         if self.lib.has_ssp():

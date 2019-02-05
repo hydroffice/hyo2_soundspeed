@@ -3,11 +3,11 @@ import socket
 import traceback
 import logging
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeed.formats.writers.asvp import Asvp
 from hyo2.soundspeed.formats.writers.calc import Calc
+
+logger = logging.getLogger(__name__)
 
 
 class Client:
@@ -105,12 +105,12 @@ class Client:
         if self.protocol != "SIS":
             return
 
-        prj.listeners.sis.request_iur(ip=self.ip, port=self.port)
+        prj.listeners.sis4.request_iur(ip=self.ip, port=self.port)
         wait = prj.setup.rx_max_wait_time
         count = 0
         quantum = 2
         logger.info("Waiting ..")
-        while (count < wait) and (not prj.listeners.sis.ssp):
+        while (count < wait) and (not prj.listeners.sis4.ssp):
             time.sleep(quantum)
             count += quantum
             logger.info(".. %s sec" % count)

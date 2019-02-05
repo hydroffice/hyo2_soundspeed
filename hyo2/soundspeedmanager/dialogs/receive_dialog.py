@@ -82,13 +82,13 @@ class ReceiveDialog(AbstractDialog):
 
     def on_click_sis(self):
         """Retrieve SIS data"""
-        if not self.lib.use_sis():
+        if not self.lib.use_sis4():
             msg = "The SIS listening is not activated!\n\nGo to Settings/Input/Listen SIS"
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             return
 
         try:
-            self.lib.retrieve_sis()
+            self.lib.retrieve_sis4()
 
         except RuntimeError as e:
             msg = "Issue in retrieving data from SIS:\n\n%s" % e

@@ -80,7 +80,8 @@ while True:
     logger.debug('sounder id: %s' % dgm_sounder_id)
     dgm_time_sec = struct.unpack("<I", data[12:16])[0]
     logger.debug('time sec: %s' % dgm_time_sec)
-    dgm_time_microsec = struct.unpack("<I", data[16:20])[0] * 10e-3
-    logger.debug('time microsec: %s' % dgm_time_microsec)
-    dgm_datetime = datetime.utcfromtimestamp(dgm_time_sec) + timedelta(microseconds=dgm_time_microsec)
+    dgm_time_nanosec = struct.unpack("<I", data[16:20])[0]
+    logger.debug('time nanosec: %s' % dgm_time_nanosec)
+    dgm_datetime = datetime.utcfromtimestamp(dgm_time_sec) + \
+                   timedelta(microseconds=(dgm_time_nanosec / 1000.0))
     logger.debug('datetime: %s' % dgm_datetime.strftime('%Y-%m-%d %H:%M:%S.%f'))

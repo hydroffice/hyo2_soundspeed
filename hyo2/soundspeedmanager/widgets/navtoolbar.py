@@ -250,7 +250,7 @@ class NavToolbar(NavigationToolbar2QT):
                 self.set_message('%s' % self.mode)
                 return
 
-            artists = [a for a in event.inaxes.mouseover_set if a.contains(event)]
+            artists = [a for a in event.inaxes.get_children() if a.contains(event)]
             if artists:
                 a = max(enumerate(artists), key=lambda x: x[1].zorder)[1]
                 if a is not event.inaxes.patch:

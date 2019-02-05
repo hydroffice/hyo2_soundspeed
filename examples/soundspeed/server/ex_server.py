@@ -8,7 +8,7 @@ from hyo2.soundspeed.server.server import Server
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
 lib = SoundSpeedLibrary()
-lib.listen_sis()
+lib.listen_sis4()
 time.sleep(3)  # for SIS emulator
 
 server = Server(prj=lib)

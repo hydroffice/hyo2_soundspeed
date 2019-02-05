@@ -2,9 +2,9 @@ import numpy as np
 import time
 import logging
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeed.client.client import Client
+
+logger = logging.getLogger(__name__)
 
 
 class ClientList:
@@ -29,7 +29,7 @@ class ClientList:
 
             # clean previously received profile from SIS
             if client.protocol == "SIS":
-                prj.listeners.sis.ssp = None
+                prj.listeners.sis4.ssp = None
 
             prj.progress.add(prog_quantum)
 
@@ -56,7 +56,7 @@ class ClientList:
             wait = 0
             wait_max = prj.setup.rx_max_wait_time
             # For multiple SIS clients, make sure the client IP match with the sender IP.
-            while (not prj.listeners.sis.ssp or client.ip != prj.listeners.sis.sender[0]) and (wait < wait_max):
+            while (not prj.listeners.sis4.ssp or client.ip != prj.listeners.sis4.sender[0]) and (wait < wait_max):
                 time.sleep(1)
                 wait += 1
                 logger.debug("waiting for %s sec" % wait)
@@ -66,17 +66,17 @@ class ClientList:
                     logger.info("canceled by user")
                     wait = wait_max
 
-            if prj.listeners.sis.ssp:
+            if prj.listeners.sis4.ssp:
                 # The KM SVP datagrams have a bug in their time reporting and
                 # have a 100 second granularity so can't compare times
                 # to ensure it's the same profile.  Comparing the sound speeds instead
                 d_tx = prj.cur.sis.depth[prj.cur.sis_thinned]
                 s_tx = prj.cur.sis.speed[prj.cur.sis_thinned]
                 # print(d_tx, s_tx)
-                s_rx = np.interp(d_tx, prj.listeners.sis.ssp.depth, prj.listeners.sis.ssp.speed)
+                s_rx = np.interp(d_tx, prj.listeners.sis4.ssp.depth, prj.listeners.sis4.ssp.speed)
                 max_diff = max(abs(s_tx - s_rx))
                 if max_diff < 0.2:
-                    self.last_tx_time = prj.listeners.sis.ssp.acquisition_time
+                    self.last_tx_time = prj.listeners.sis4.ssp.acquisition_time
                     logger.debug("reception confirmed: %s" % self.last_tx_time.strftime("%d/%m/%Y, %H:%M:%S"))
                     if not server_mode:
                         prj.cb.msg_tx_sis_confirmed(name=client.name)

@@ -48,7 +48,8 @@ class Setup:
         self.ssp_temp_sal_source = None
         self.ssp_up_or_down = None
         self.rx_max_wait_time = None
-        self.use_sis = None
+        self.use_sis4 = None
+        self.use_sis5 = None
         self.use_sippican = None
         self.use_mvp = None
 
@@ -57,10 +58,15 @@ class Setup:
         self.log_server = None
         self.client_list = ClientList()
 
-        # listeners - sis
-        self.sis_listen_port = None
-        self.sis_listen_timeout = None
-        self.sis_auto_apply_manual_casts = None
+        # listeners - sis4
+        self.sis4_listen_port = None
+        self.sis4_listen_timeout = None
+        self.sis4_auto_apply_manual_casts = None
+        # listeners - sis5
+        self.sis5_listen_ip = None
+        self.sis5_listen_port = None
+        self.sis5_listen_timeout = None
+        self.sis5_auto_apply_manual_casts = None
         # listeners - sippican
         self.sippican_listen_port = None
         self.sippican_listen_timeout = None
@@ -142,7 +148,11 @@ class Setup:
         self.ssp_temp_sal_source = Dicts.atlases[db.ssp_temp_sal_source]
         self.ssp_up_or_down = Dicts.ssp_directions[db.ssp_up_or_down]
         self.rx_max_wait_time = db.rx_max_wait_time
-        self.use_sis = db.use_sis
+        self.use_sis4 = db.use_sis4
+        if db.setup_version == 1:
+            self.use_sis5 = False
+        else:
+            self.use_sis5 = db.use_sis5
         self.use_sippican = db.use_sippican
         self.use_mvp = db.use_mvp
 
@@ -156,10 +166,21 @@ class Setup:
             self.client_list.add_client(client_string)
             # logger.debug('- load: %s' % client_string)
 
-        # listeners - sis
-        self.sis_listen_port = db.sis_listen_port
-        self.sis_listen_timeout = db.sis_listen_timeout
-        self.sis_auto_apply_manual_casts = db.sis_auto_apply_manual_casts
+        # listeners - sis4
+        self.sis4_listen_port = db.sis4_listen_port
+        self.sis4_listen_timeout = db.sis4_listen_timeout
+        self.sis4_auto_apply_manual_casts = db.sis4_auto_apply_manual_casts
+        # listeners - sis5
+        if db.setup_version == 1:
+            self.sis5_listen_ip = '224.1.20.40'
+            self.sis5_listen_port = 6020
+            self.sis5_listen_timeout = 10
+            self.sis5_auto_apply_manual_casts = True
+        else:
+            self.sis5_listen_ip = db.sis5_listen_ip
+            self.sis5_listen_port = db.sis5_listen_port
+            self.sis5_listen_timeout = db.sis5_listen_timeout
+            self.sis5_auto_apply_manual_casts = db.sis5_auto_apply_manual_casts
 
         # listeners - sippican
         self.sippican_listen_port = db.sippican_listen_port
@@ -231,7 +252,9 @@ class Setup:
             db.ssp_up_or_down = Helper.first_match(Dicts.ssp_directions, self.ssp_up_or_down)
 
             db.rx_max_wait_time = self.rx_max_wait_time
-            db.use_sis = self.use_sis
+            db.use_sis4 = self.use_sis4
+            if db.setup_version > 1:
+                db.use_sis5 = self.use_sis5
             db.use_sippican = self.use_sippican
             db.use_mvp = self.use_mvp
 
@@ -247,10 +270,17 @@ class Setup:
                               client_ip=client.ip, client_port=client.port,
                               client_protocol=client.protocol)
 
-            # listeners - sis
-            db.sis_listen_port = self.sis_listen_port
-            db.sis_listen_timeout = self.sis_listen_timeout
-            db.sis_auto_apply_manual_casts = self.sis_auto_apply_manual_casts
+            # listeners - sis4
+            db.sis4_listen_port = self.sis4_listen_port
+            db.sis4_listen_timeout = self.sis4_listen_timeout
+            db.sis4_auto_apply_manual_casts = self.sis4_auto_apply_manual_casts
+
+            # listeners - sis5
+            if db.setup_version > 1:
+                db.sis5_listen_ip = self.sis5_listen_ip
+                db.sis5_listen_port = self.sis5_listen_port
+                db.sis5_listen_timeout = self.sis5_listen_timeout
+                db.sis5_auto_apply_manual_casts = self.sis5_auto_apply_manual_casts
 
             # listeners - sippican
             db.sippican_listen_port = self.sippican_listen_port
@@ -311,7 +341,8 @@ class Setup:
         msg += "      <ssp_temp_sal_source: %s>\n" % self.ssp_temp_sal_source
         msg += "      <up_or_down: %s>\n" % self.ssp_up_or_down
         msg += "      <rx_max_wait_time: %s>\n" % self.rx_max_wait_time
-        msg += "      <use_sis: %s>\n" % self.use_sis
+        msg += "      <use_sis4: %s>\n" % self.use_sis4
+        msg += "      <use_sis5: %s>\n" % self.use_sis5
         msg += "      <use_sippican: %s>\n" % self.use_sippican
         msg += "      <use_mvp: %s>\n" % self.use_mvp
         msg += "    <output>\n"
@@ -320,10 +351,15 @@ class Setup:
         msg += "      <clients>\n"
         for c in self.client_list.clients:
             msg += "        <%s>\n" % c
-        msg += "    <listeners - sis>\n"
-        msg += "      <sis_listen_port: %s>\n" % self.sis_listen_port
-        msg += "      <sis_listen_timeout: %s>\n" % self.sis_listen_timeout
-        msg += "      <sis_auto_apply_manual_casts: %s>\n" % self.sis_auto_apply_manual_casts
+        msg += "    <listeners - sis4>\n"
+        msg += "      <sis4_listen_port: %s>\n" % self.sis4_listen_port
+        msg += "      <sis4_listen_timeout: %s>\n" % self.sis4_listen_timeout
+        msg += "      <sis4_auto_apply_manual_casts: %s>\n" % self.sis4_auto_apply_manual_casts
+        msg += "    <listeners - sis5>\n"
+        msg += "      <sis5_listen_ip: %s>\n" % self.sis5_listen_ip
+        msg += "      <sis5_listen_port: %s>\n" % self.sis5_listen_port
+        msg += "      <sis5_listen_timeout: %s>\n" % self.sis5_listen_timeout
+        msg += "      <sis5_auto_apply_manual_casts: %s>\n" % self.sis5_auto_apply_manual_casts
         msg += "    <listeners - sippican>\n"
         msg += "      <sippican_listen_port: %s>\n" % self.sippican_listen_port
         msg += "      <sippican_listen_timeout: %s>\n" % self.sippican_listen_timeout

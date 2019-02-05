@@ -45,11 +45,11 @@ class Listeners(AbstractWidget):
 
         # LEFT
 
-        # - Editor settings
+        # SIS4
         hbox = QtWidgets.QHBoxLayout()
         self.left_layout.addLayout(hbox)
         hbox.addStretch()
-        self.label = QtWidgets.QLabel("SIS(*):")
+        self.label = QtWidgets.QLabel("SIS4(*):")
         hbox.addWidget(self.label)
         hbox.addStretch()
 
@@ -61,10 +61,10 @@ class Listeners(AbstractWidget):
         label.setFixedWidth(lbl_width)
         hbox.addWidget(label)
         # -- value
-        self.sis_listen_port = QtWidgets.QLineEdit()
+        self.sis4_listen_port = QtWidgets.QLineEdit()
         validator = QtGui.QIntValidator(0, 65535)
-        self.sis_listen_port.setValidator(validator)
-        hbox.addWidget(self.sis_listen_port)
+        self.sis4_listen_port.setValidator(validator)
+        hbox.addWidget(self.sis4_listen_port)
 
         # - sis_listen_timeout
         hbox = QtWidgets.QHBoxLayout()
@@ -74,10 +74,10 @@ class Listeners(AbstractWidget):
         label.setFixedWidth(lbl_width)
         hbox.addWidget(label)
         # -- value
-        self.sis_listen_timeout = QtWidgets.QLineEdit()
+        self.sis4_listen_timeout = QtWidgets.QLineEdit()
         validator = QtGui.QIntValidator(0, 9999)
-        self.sis_listen_timeout.setValidator(validator)
-        hbox.addWidget(self.sis_listen_timeout)
+        self.sis4_listen_timeout.setValidator(validator)
+        hbox.addWidget(self.sis4_listen_timeout)
 
         # - sis_auto_apply_manual_casts
         hbox = QtWidgets.QHBoxLayout()
@@ -87,13 +87,84 @@ class Listeners(AbstractWidget):
         label.setFixedWidth(lbl_width)
         hbox.addWidget(label)
         # -- value
-        self.sis_auto_apply_manual_casts = QtWidgets.QComboBox()
-        self.sis_auto_apply_manual_casts.addItems(["True", "False"])
-        hbox.addWidget(self.sis_auto_apply_manual_casts)
+        self.sis4_auto_apply_manual_casts = QtWidgets.QComboBox()
+        self.sis4_auto_apply_manual_casts.addItems(["True", "False"])
+        hbox.addWidget(self.sis4_auto_apply_manual_casts)
 
         self.left_layout.addSpacing(12)
 
-        # - Editor settings
+        # SIS5
+        hbox = QtWidgets.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        hbox.addStretch()
+        self.label = QtWidgets.QLabel("SIS5(*):")
+        hbox.addWidget(self.label)
+        hbox.addStretch()
+
+        # - sis5_listen_ip
+        hbox = QtWidgets.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtWidgets.QLabel("Listen IP:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- value
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.sis5_listen_ip = QtWidgets.QLineEdit()
+        octet = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])"
+        reg_ex = QtCore.QRegExp(r"^%s\.%s\.%s\.%s$" % (octet, octet, octet, octet))
+        validator = QtGui.QRegExpValidator(reg_ex)
+        self.sis5_listen_ip.setValidator(validator)
+        vbox.addWidget(self.sis5_listen_ip)
+        vbox.addStretch()
+
+        # - sis5_listen_port
+        hbox = QtWidgets.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        label = QtWidgets.QLabel("Listen port:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.sis5_listen_port = QtWidgets.QLineEdit()
+        validator = QtGui.QIntValidator(0, 65535)
+        self.sis5_listen_port.setValidator(validator)
+        hbox.addWidget(self.sis5_listen_port)
+
+        # - sis5_listen_timeout
+        hbox = QtWidgets.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        label = QtWidgets.QLabel("Listen timeout:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.sis5_listen_timeout = QtWidgets.QLineEdit()
+        validator = QtGui.QIntValidator(0, 9999)
+        self.sis5_listen_timeout.setValidator(validator)
+        hbox.addWidget(self.sis5_listen_timeout)
+
+        # - sis5_auto_apply_manual_casts
+        hbox = QtWidgets.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        label = QtWidgets.QLabel("Auto apply profile:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.sis5_auto_apply_manual_casts = QtWidgets.QComboBox()
+        self.sis5_auto_apply_manual_casts.addItems(["True", "False"])
+        hbox.addWidget(self.sis5_auto_apply_manual_casts)
+
+        self.left_layout.addSpacing(12)
+
+        # SIPPICAN
         hbox = QtWidgets.QHBoxLayout()
         self.left_layout.addLayout(hbox)
         hbox.addStretch()
@@ -405,11 +476,19 @@ class Listeners(AbstractWidget):
         # -- functions
         # --- left
         # noinspection PyUnresolvedReferences
-        self.sis_listen_port.textChanged.connect(self.apply_sis_listen_port)
+        self.sis4_listen_port.textChanged.connect(self.apply_sis4_listen_port)
         # noinspection PyUnresolvedReferences
-        self.sis_listen_timeout.textChanged.connect(self.apply_sis_listen_timeout)
+        self.sis4_listen_timeout.textChanged.connect(self.apply_sis4_listen_timeout)
         # noinspection PyUnresolvedReferences
-        self.sis_auto_apply_manual_casts.currentIndexChanged.connect(self.apply_sis_auto_apply_manual_casts)
+        self.sis4_auto_apply_manual_casts.currentIndexChanged.connect(self.apply_sis4_auto_apply_manual_casts)
+        # noinspection PyUnresolvedReferences
+        self.sis5_listen_ip.textChanged.connect(self.apply_sis5_listen_ip)
+        # noinspection PyUnresolvedReferences
+        self.sis5_listen_port.textChanged.connect(self.apply_sis5_listen_port)
+        # noinspection PyUnresolvedReferences
+        self.sis5_listen_timeout.textChanged.connect(self.apply_sis5_listen_timeout)
+        # noinspection PyUnresolvedReferences
+        self.sis5_auto_apply_manual_casts.currentIndexChanged.connect(self.apply_sis5_auto_apply_manual_casts)
         # noinspection PyUnresolvedReferences
         self.sippican_listen_port.textChanged.connect(self.apply_sippican_listen_port)
         # noinspection PyUnresolvedReferences
@@ -440,21 +519,45 @@ class Listeners(AbstractWidget):
         # noinspection PyUnresolvedReferences
         self.mvp_instrument.currentIndexChanged.connect(self.apply_mvp_instrument)
 
-    def apply_sis_listen_port(self):
+    def apply_sis4_listen_port(self):
         # logger.debug("listen SIS port")
-        self.db.sis_listen_port = int(self.sis_listen_port.text())
+        self.db.sis4_listen_port = int(self.sis4_listen_port.text())
         self.setup_changed()
         self.main_win.reload_settings()
 
-    def apply_sis_listen_timeout(self):
+    def apply_sis4_listen_timeout(self):
         # logger.debug("listen SIS timeout")
-        self.db.sis_listen_timeout = int(self.sis_listen_timeout.text())
+        self.db.sis4_listen_timeout = int(self.sis4_listen_timeout.text())
         self.setup_changed()
         self.main_win.reload_settings()
 
-    def apply_sis_auto_apply_manual_casts(self):
+    def apply_sis4_auto_apply_manual_casts(self):
         # logger.debug("auto-apply cast")
-        self.db.sis_auto_apply_manual_casts = self.sis_auto_apply_manual_casts.currentText() == "True"
+        self.db.sis4_auto_apply_manual_casts = self.sis4_auto_apply_manual_casts.currentText() == "True"
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+    def apply_sis5_listen_ip(self):
+        # logger.debug("SIS5 listen IP")
+        self.db.sis5_listen_ip = self.sis5_listen_ip.text()
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+    def apply_sis5_listen_port(self):
+        # logger.debug("listen SIS port")
+        self.db.sis5_listen_port = int(self.sis5_listen_port.text())
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+    def apply_sis5_listen_timeout(self):
+        # logger.debug("listen SIS timeout")
+        self.db.sis5_listen_timeout = int(self.sis5_listen_timeout.text())
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+    def apply_sis5_auto_apply_manual_casts(self):
+        # logger.debug("auto-apply cast")
+        self.db.sis5_auto_apply_manual_casts = self.sis5_auto_apply_manual_casts.currentText() == "True"
         self.setup_changed()
         self.main_win.reload_settings()
 
@@ -549,18 +652,33 @@ class Listeners(AbstractWidget):
         # set the top label
         self.active_label.setText("<b>Current setup: %s [#%02d]</b>" % (self.db.setup_name, self.db.active_setup_id))
 
-        # - SIS
+        # - SIS4
 
-        # sis_listen_port
-        self.sis_listen_port.setText("%d" % self.db.sis_listen_port)
-        # sis_listen_timeout
-        self.sis_listen_timeout.setText("%d" % self.db.sis_listen_timeout)
+        # sis4_listen_port
+        self.sis4_listen_port.setText("%d" % self.db.sis4_listen_port)
+        # sis4_listen_timeout
+        self.sis4_listen_timeout.setText("%d" % self.db.sis4_listen_timeout)
 
-        # sis_auto_apply_manual_casts
-        if self.db.sis_auto_apply_manual_casts:
-            self.sis_auto_apply_manual_casts.setCurrentIndex(0)  # True
+        # sis4_auto_apply_manual_casts
+        if self.db.sis4_auto_apply_manual_casts:
+            self.sis4_auto_apply_manual_casts.setCurrentIndex(0)  # True
         else:
-            self.sis_auto_apply_manual_casts.setCurrentIndex(1)  # False
+            self.sis4_auto_apply_manual_casts.setCurrentIndex(1)  # False
+
+        # - SIS5
+
+        # sis5_listen_ip
+        self.sis5_listen_ip.setText(self.db.sis5_listen_ip)
+        # sis5_listen_port
+        self.sis5_listen_port.setText("%d" % self.db.sis5_listen_port)
+        # sis5_listen_timeout
+        self.sis5_listen_timeout.setText("%d" % self.db.sis5_listen_timeout)
+
+        # sis5_auto_apply_manual_casts
+        if self.db.sis5_auto_apply_manual_casts:
+            self.sis5_auto_apply_manual_casts.setCurrentIndex(0)  # True
+        else:
+            self.sis5_auto_apply_manual_casts.setCurrentIndex(1)  # False
 
         # - SIPPICAN
 

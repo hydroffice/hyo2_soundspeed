@@ -205,14 +205,14 @@ class Input(AbstractWidget):
         hbox.addWidget(self.label)
         hbox.addStretch()
 
-        # - use sis
+        # - use sis4
         hbox = QtWidgets.QHBoxLayout()
         self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtWidgets.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
-        label = QtWidgets.QLabel("Listen SIS:")
+        label = QtWidgets.QLabel("Listen SIS4:")
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
@@ -220,9 +220,29 @@ class Input(AbstractWidget):
         vbox = QtWidgets.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
-        self.use_sis = QtWidgets.QComboBox()
-        self.use_sis.addItems(["True", "False"])
-        vbox.addWidget(self.use_sis)
+        self.use_sis4 = QtWidgets.QComboBox()
+        self.use_sis4.addItems(["True", "False"])
+        vbox.addWidget(self.use_sis4)
+        vbox.addStretch()
+
+        # - use sis5
+        hbox = QtWidgets.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        # -- label
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtWidgets.QLabel("Listen SIS5:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- value
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.use_sis5 = QtWidgets.QComboBox()
+        self.use_sis5.addItems(["True", "False"])
+        vbox.addWidget(self.use_sis5)
         vbox.addStretch()
 
         # - use sippican
@@ -338,7 +358,9 @@ class Input(AbstractWidget):
         # noinspection PyUnresolvedReferences
         self.temp_sal_source.currentIndexChanged.connect(self.apply_temp_sal_source)
         # noinspection PyUnresolvedReferences
-        self.use_sis.currentIndexChanged.connect(self.apply_use_sis)
+        self.use_sis4.currentIndexChanged.connect(self.apply_use_sis4)
+        # noinspection PyUnresolvedReferences
+        self.use_sis5.currentIndexChanged.connect(self.apply_use_sis5)
         # noinspection PyUnresolvedReferences
         self.use_sippican.currentIndexChanged.connect(self.apply_use_sippican)
         # noinspection PyUnresolvedReferences
@@ -402,9 +424,15 @@ class Input(AbstractWidget):
         self.setup_changed()
         self.main_win.reload_settings()
 
-    def apply_use_sis(self):
+    def apply_use_sis4(self):
         # logger.debug("apply use SIS")
-        self.db.use_sis = self.use_sis.currentText() == "True"
+        self.db.use_sis4 = self.use_sis4.currentText() == "True"
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+    def apply_use_sis5(self):
+        # logger.debug("apply use SIS")
+        self.db.use_sis5 = self.use_sis5.currentText() == "True"
         self.setup_changed()
         self.main_win.reload_settings()
 
@@ -472,11 +500,17 @@ class Input(AbstractWidget):
         _idx = Dicts.atlases[_str]
         self.temp_sal_source.setCurrentIndex(_idx)
 
-        # use sis
-        if self.db.use_sis:
-            self.use_sis.setCurrentIndex(0)  # True
+        # use sis4
+        if self.db.use_sis4:
+            self.use_sis4.setCurrentIndex(0)  # True
         else:
-            self.use_sis.setCurrentIndex(1)  # False
+            self.use_sis4.setCurrentIndex(1)  # False
+
+        # use sis5
+        if self.db.use_sis5:
+            self.use_sis5.setCurrentIndex(0)  # True
+        else:
+            self.use_sis5.setCurrentIndex(1)  # False
 
         # use sippican
         if self.db.use_sippican:

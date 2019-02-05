@@ -1,12 +1,11 @@
 import time
-from multiprocessing import Queue
 import logging
-
-logger = logging.getLogger(__name__)
 
 from hyo2.soundspeed.listener.sis.sis import Sis
 from hyo2.soundspeed.listener.sippican.sippican import Sippican
 from hyo2.soundspeed.listener.mvp.mvp import Mvp
+
+logger = logging.getLogger(__name__)
 
 
 class Listeners:
@@ -18,8 +17,11 @@ class Listeners:
         self.prj = prj
 
         # available listeners
-        self.sis = Sis(port=self.prj.setup.sis_listen_port, datagrams=[0x50, 0x52, 0x55, 0x58],
-                       timeout=self.prj.setup.sis_listen_timeout)
+        self.sis4 = Sis(port=self.prj.setup.sis4_listen_port, datagrams=[0x50, 0x52, 0x55, 0x58],
+                        timeout=self.prj.setup.sis4_listen_timeout, name="SIS4")
+        self.sis5 = Sis(ip=self.prj.setup.sis5_listen_ip, port=self.prj.setup.sis5_listen_port,
+                        datagrams=[b'#SPO', ],
+                        timeout=self.prj.setup.sis5_listen_timeout, name="SIS5")
         self.sippican = Sippican(port=self.prj.setup.sippican_listen_port, prj=prj)
         self.mvp = Mvp(port=self.prj.setup.mvp_listen_port, prj=prj)
 
@@ -41,19 +43,33 @@ class Listeners:
         if not to_process:
             self.mvp.new_ssp.clear()
 
-    def listen_sis(self):
-        if not self.sis.is_alive():
-            self.sis.start()
+    def listen_sis4(self):
+        if not self.sis4.is_alive():
+            self.sis4.start()
             time.sleep(0.1)
             logger.debug("start")
-        return self.sis.is_alive()
+        return self.sis4.is_alive()
 
-    def stop_listen_sis(self):
-        if self.sis.is_alive():
-            self.sis.stop()
-            self.sis.join(2)
+    def stop_listen_sis4(self):
+        if self.sis4.is_alive():
+            self.sis4.stop()
+            self.sis4.join(2)
             logger.debug("stop")
-        return not self.sis.is_alive()
+        return not self.sis4.is_alive()
+
+    def listen_sis5(self):
+        if not self.sis5.is_alive():
+            self.sis5.start()
+            time.sleep(0.1)
+            logger.debug("start")
+        return self.sis5.is_alive()
+
+    def stop_listen_sis5(self):
+        if self.sis5.is_alive():
+            self.sis5.stop()
+            self.sis5.join(2)
+            logger.debug("stop")
+        return not self.sis5.is_alive()
 
     def listen_sippican(self):
         if not self.sippican.is_alive():
@@ -84,13 +100,15 @@ class Listeners:
         return not self.mvp.is_alive()
 
     def stop(self):
-        self.stop_listen_sis()
+        self.stop_listen_sis4()
+        self.stop_listen_sis5()
         self.stop_listen_sippican()
         self.stop_listen_mvp()
 
     def __repr__(self):
         msg = "<Listeners>\n"
-        msg += "%s" % self.sis
+        msg += "%s" % self.sis4
+        msg += "%s" % self.sis5
         msg += "%s" % self.sippican
         msg += "%s" % self.mvp
         return msg

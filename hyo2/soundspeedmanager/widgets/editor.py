@@ -723,7 +723,7 @@ class Editor(AbstractWidget):
         else:
             self.temp_sal_act.setVisible(False)
 
-        if self.lib.use_sis():
+        if self.lib.use_sis4():
             self.tss_act.setVisible(True)
         else:
             self.tss_act.setVisible(False)

@@ -22,7 +22,7 @@ class ControlPanel(QtWidgets.QWidget):
         self.default_sis4_input_port = "4001"
         self.default_sis4_output_ip = "127.0.0.1"
         self.default_sis4_output_port = "16103"
-        self.default_sis5_input_port = "6020"
+        self.default_sis5_input_port = "4001"
         self.default_sis5_output_ip = "224.1.20.40"
         self.default_sis5_output_port = "6020"
 

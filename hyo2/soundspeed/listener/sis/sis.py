@@ -5,16 +5,16 @@ import functools
 import time
 import struct
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeed.listener.abstract import AbstractListener
-from hyo2.soundspeed.formats import km
+from hyo2.soundspeed.formats import km, kmall
+
+logger = logging.getLogger(__name__)
 
 
 class Sis(AbstractListener):
-    """Konsberg SIS listener"""
+    """Kongsberg SIS listener"""
 
-    def __init__(self, port, datagrams, timeout=1, ip="0.0.0.0", target=None, name="Km"):
+    def __init__(self, port, datagrams, timeout=1, ip="0.0.0.0", target=None, name="Kng"):
         super(Sis, self).__init__(port=port, datagrams=datagrams, ip=ip, timeout=timeout,
                                   target=target, name=name)
         self.desc = "Kongsberg SIS"
@@ -46,7 +46,7 @@ class Sis(AbstractListener):
         sock_out = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         # We try all of them in the hopes that one works.
-        sensors = ["710", "122", "302", "3020", "2040"]
+        sensors = ["710", "122", "302", "3020", "2040", "124"]
         for sensor in sensors:
             # talker ID, Roger Davis (HMRG) suggested SM based on something KM told him
             output = '$SMR20,EMX=%s,' % sensor
@@ -66,6 +66,34 @@ class Sis(AbstractListener):
         sock_out.close()
 
     def parse(self):
+        if self.is_multicast:
+            self._parse_sis_5()
+        else:
+            self._parse_sis_4()
+
+    def _parse_sis_5(self):
+        this_data = self.data[:]
+        # logger.debug("SIS 5: %s" % this_data)
+
+        self.id = b''.join(struct.unpack("<I4c", this_data[:8])[1:5])
+        try:
+            name = kmall.Kmall.datagrams[self.id]
+        except KeyError:
+            name = "Unknown name"
+
+        logger.info("%s > DG %s [%s] > sz: %.2f KB"
+                    % (self.sender, self.id, name, len(this_data) / 1024))
+
+        if self.id not in self.datagrams:
+            return
+
+        if self.id == b'#SPO':
+            self.nav = kmall.KmallSPO(this_data)
+
+        else:
+            logger.error("Missing parser for datagram type: %s" % self.id)
+
+    def _parse_sis_4(self):
         this_data = self.data[:]
 
         self.id = struct.unpack("<BB", this_data[0:2])[1]

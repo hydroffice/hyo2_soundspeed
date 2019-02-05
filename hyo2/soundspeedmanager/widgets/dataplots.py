@@ -425,7 +425,7 @@ class DataPlots(AbstractWidget):
         msg = str()
         if self.lib.cur_file:
             msg += self.lib.cur_file
-        if self.lib.setup.client_list.last_tx_time and self.lib.use_sis():
+        if self.lib.setup.client_list.last_tx_time and self.lib.use_sis4():
             if len(msg) > 0:
                 msg += " "
             delta = datetime.utcnow() - self.lib.setup.client_list.last_tx_time
@@ -479,7 +479,7 @@ class DataPlots(AbstractWidget):
                 self.sal_invalid.set_xdata(self.lib.cur.proc.sal[self.ii])
                 self.sal_invalid.set_ydata(self.lib.cur.proc.depth[self.ii])
 
-            if not self.lib.use_sis():  # in case that SIS was disabled
+            if not self.lib.use_sis4():  # in case that SIS was disabled
                 if self.speed_draft:
                     self.speed_draft.set_ydata(None)
                 if self.speed_sensor:
@@ -493,22 +493,22 @@ class DataPlots(AbstractWidget):
             if (not self.speed_draft) or (not self.speed_sensor) or (not self.speed_seafloor):
                 return
 
-            if self.lib.listeners.sis.xyz88 is None:
+            if self.lib.listeners.sis4.xyz88 is None:
                 self.speed_draft.set_ydata(None)
                 self.speed_sensor.set_xdata(None)
             else:
                 # sensor speed
-                if self.lib.listeners.sis.xyz88.sound_speed is None:
+                if self.lib.listeners.sis4.xyz88.sound_speed is None:
                     self.speed_sensor.set_xdata(None)
                 else:
-                    self.speed_sensor.set_xdata([self.lib.listeners.sis.xyz88.sound_speed, ])
+                    self.speed_sensor.set_xdata([self.lib.listeners.sis4.xyz88.sound_speed, ])
                 # draft
-                if self.lib.listeners.sis.xyz88.transducer_draft is None:
+                if self.lib.listeners.sis4.xyz88.transducer_draft is None:
                     self.speed_draft.set_ydata(None)
                 else:
-                    self.speed_draft.set_ydata([self.lib.listeners.sis.xyz88.transducer_draft, ])
+                    self.speed_draft.set_ydata([self.lib.listeners.sis4.xyz88.transducer_draft, ])
                 # seafloor
-                mean_depth = self.lib.listeners.sis.xyz88.mean_depth
+                mean_depth = self.lib.listeners.sis4.xyz88.mean_depth
                 if mean_depth:
                     self.speed_seafloor.set_ydata([mean_depth, ])
                 else:
@@ -529,10 +529,10 @@ class DataPlots(AbstractWidget):
 
                     max_proc_depth = self.lib.cur.proc.depth[self.vi].max()
                     mean_sis_depth = 0
-                    if self.lib.use_sis():
-                        if self.lib.listeners.sis.xyz88:
-                            if self.lib.listeners.sis.xyz88.mean_depth:
-                                mean_sis_depth = self.lib.listeners.sis.xyz88.mean_depth
+                    if self.lib.use_sis4():
+                        if self.lib.listeners.sis4.xyz88:
+                            if self.lib.listeners.sis4.xyz88.mean_depth:
+                                mean_sis_depth = self.lib.listeners.sis4.xyz88.mean_depth
                     max_proc_sis_depth = max(max_proc_depth, mean_sis_depth)
 
                     max_depth = max(30. + max_proc_sis_depth, 1.1 * max_proc_sis_depth)

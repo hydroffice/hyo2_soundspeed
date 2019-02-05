@@ -1,16 +1,15 @@
 import functools
 import math
 import operator
-import os
 import logging
 import numpy as np
-
-logger = logging.getLogger(__name__)
 
 from hyo2.soundspeed import __version__
 from hyo2.soundspeed.formats.writers.abstract import AbstractTextWriter
 from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeed.profile.oceanography import Oceanography as Oc
+
+logger = logging.getLogger(__name__)
 
 
 class Asvp(AbstractTextWriter):

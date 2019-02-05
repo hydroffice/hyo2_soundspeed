@@ -14,6 +14,12 @@ logger = logging.getLogger(__name__)
 
 
 class ReplayThread(threading.Thread):
+    """Mimic the interaction with a real SIS
+
+    To check who is listening on port 4001: netstat -a -n -o | find "4001"
+    then to know the process name: tasklist /fi "pid eq 2216"
+    """
+
     def __init__(self, installation: list, runtime: list, ssp: list, lists_lock: threading.Lock, files: list,
                  replay_timing: float = 1.0, port_in: int = 4001, port_out: int = 26103,
                  ip_out: str = "localhost", target: Optional[object] = None, name: str = "REP",

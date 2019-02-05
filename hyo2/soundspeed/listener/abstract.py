@@ -1,6 +1,7 @@
 import logging
 import time
 import socket
+import struct
 from threading import Thread, Event
 
 logger = logging.getLogger(__name__)
@@ -15,6 +16,7 @@ class AbstractListener(Thread):
         self.desc = "Abstract listener"  # a human-readable description
         self.ip = ip
         self.port = port
+        self.is_multicast = False
         self.timeout = timeout
         self.datagrams = datagrams
         if not self.datagrams:
@@ -56,19 +58,32 @@ class AbstractListener(Thread):
 
     def init_sockets(self):
         self.sock_in = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock_in.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock_in.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 2 ** 16)
 
         if self.timeout > 0:
             self.sock_in.settimeout(self.timeout)
 
-        try:
-            self.sock_in.bind((self.ip, self.port))
+        self.is_multicast = self.ip[:4] in ["224.", "225."]
+        if self.is_multicast:
+            # Tell the operating system to add the socket to
+            # the multicast group on all interfaces.
+            group = socket.inet_aton(self.ip)
+            mreq = struct.pack('4sL', group, socket.INADDR_ANY)
+            self.sock_in.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
-        except socket.error as e:
-            self.sock_in.close()
-            logger.warning("port %d already bound? Not listening anymore. Error: %s"
-                           % (self.port, e))
-            return False
+            self.sock_in.bind(('', self.port))
+
+        else:
+
+            try:
+                self.sock_in.bind((self.ip, self.port))
+
+            except socket.error as e:
+                self.sock_in.close()
+                logger.warning("port %d already bound? Not listening anymore. Error: %s"
+                               % (self.port, e))
+                return False
 
         return True
 

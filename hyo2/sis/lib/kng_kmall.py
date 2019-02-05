@@ -49,7 +49,6 @@ class KngKmall:
     def read(self, file_input: BinaryIO, file_size:int) -> Flags:
         """populate header data"""
 
-        first_dg = (file_input.tell() == 0)
         chunk = file_input.read(20)
         hdr_data = struct.unpack("<I4cBBHII", chunk)
 

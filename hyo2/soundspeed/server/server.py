@@ -63,13 +63,13 @@ class Server(Thread):
 
         # ### Now checks for SIS settings ###
 
-        if not self.prj.use_sis():
+        if not self.prj.use_sis4():
             logger.error("SIS-use check: KO")
             self.prj.progress.end()
             return False
 
         # - navigation datagram
-        if self.prj.listeners.sis.nav:
+        if self.prj.listeners.sis4.nav:
             logger.info("SIS NAV broadcast: OK")
 
         else:
@@ -78,7 +78,7 @@ class Server(Thread):
             return False
 
         # - depth datagram
-        if self.prj.listeners.sis.xyz88:
+        if self.prj.listeners.sis4.xyz88:
             logger.info("SIS DEPTH broadcast: OK")
 
         else:
@@ -99,7 +99,7 @@ class Server(Thread):
 
             client.request_profile_from_sis(self.prj)
 
-            if self.prj.listeners.sis.ssp:
+            if self.prj.listeners.sis4.ssp:
                 logger.info("Interaction test: OK")
                 client.alive = True
                 num_live_clients += 1
@@ -160,9 +160,9 @@ class Server(Thread):
     def check(self) -> None:
         # ### Retrieve current location/time ###
 
-        lat = self.prj.listeners.sis.nav.latitude
-        lon = self.prj.listeners.sis.nav.longitude
-        tm = self.prj.listeners.sis.nav.dg_time
+        lat = self.prj.listeners.sis4.nav.latitude
+        lon = self.prj.listeners.sis4.nav.longitude
+        tm = self.prj.listeners.sis4.nav.dg_time
         if (lat is None) or (lon is None) or (tm is None):
             logger.warning("Possible corrupted reception of spatial timestamp > Waiting %s secs"
                            % self.wait_time)
@@ -198,7 +198,7 @@ class Server(Thread):
         tss_diff = 0.0
         if self.prj.setup.server_apply_surface_sound_speed:
 
-            if self.prj.listeners.sis.xyz88 is None:
+            if self.prj.listeners.sis4.xyz88 is None:
                 logger.warning("Unable to retrieve xyz88 datagram > Waiting %s secs"
                                % self.wait_time)
                 count = 0
@@ -207,12 +207,12 @@ class Server(Thread):
                     count += 1
                 return
 
-            if self.prj.listeners.sis.xyz88.sound_speed:
-                tss = self.prj.listeners.sis.xyz88.sound_speed
+            if self.prj.listeners.sis4.xyz88.sound_speed:
+                tss = self.prj.listeners.sis4.xyz88.sound_speed
                 if self.tss_last:
                     tss_diff = abs(tss - self.tss_last)
-            if self.prj.listeners.sis.xyz88.transducer_draft:
-                draft = self.prj.listeners.sis.xyz88.transducer_draft
+            if self.prj.listeners.sis4.xyz88.transducer_draft:
+                draft = self.prj.listeners.sis4.xyz88.transducer_draft
 
         logger.debug('TSS delta: %s' % tss_diff)
 
@@ -264,7 +264,7 @@ class Server(Thread):
                     continue
 
                 client.request_profile_from_sis(prj=self.prj)
-                if not self.prj.listeners.sis.ssp:
+                if not self.prj.listeners.sis4.ssp:
                     logger.info("client %s dead since last tx" % client.name)
                     client.alive = False
                     continue
@@ -273,10 +273,10 @@ class Server(Thread):
                 num_live_clients += 1
 
                 # test by comparing the times
-                if self.prj.setup.client_list.last_tx_time != self.prj.listeners.sis.ssp.acquisition_time:
+                if self.prj.setup.client_list.last_tx_time != self.prj.listeners.sis4.ssp.acquisition_time:
                     logger.error("Times mismatch > %s != %s"
                                  % (self.prj.setup.client_list.last_tx_time,
-                                    self.prj.listeners.sis.ssp.acquisition_time))
+                                    self.prj.listeners.sis4.ssp.acquisition_time))
                     self.shutdown.set()
                     return
 

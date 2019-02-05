@@ -84,15 +84,21 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      ssp_up_or_down text NOT NULL DEFAULT "down",
      rx_max_wait_time integer NOT NULL DEFAULT 20,
      use_sis integer NOT NULL DEFAULT 1,
+     use_sis5 integer NOT NULL DEFAULT 0,
      use_sippican integer NOT NULL DEFAULT 0,
      use_mvp integer NOT NULL DEFAULT 0,
      /* output */
      log_user integer NOT NULL DEFAULT 0,
      log_server integer NOT NULL DEFAULT 0,
-     /* listeners - sis */
+     /* listeners - sis4 */
      sis_listen_port integer NOT NULL DEFAULT 16103,
      sis_listen_timeout integer NOT NULL DEFAULT 10,
      sis_auto_apply_manual_casts integer NOT NULL DEFAULT 1,
+     /* listeners - sis5 */
+     sis5_listen_ip text NOT NULL DEFAULT "224.1.20.40",
+     sis5_listen_port integer NOT NULL DEFAULT 6020,
+     sis5_listen_timeout integer NOT NULL DEFAULT 10,
+     sis5_auto_apply_manual_casts integer NOT NULL DEFAULT 1,
      /* listeners - sippican */
      sippican_listen_port integer NOT NULL DEFAULT 2002,
      sippican_listen_timeout integer NOT NULL DEFAULT 10,
@@ -140,6 +146,7 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      CHECK (ssp_up_or_down IN ("down", "up")),
      CHECK (rx_max_wait_time > 0),
      CHECK (use_sis IN (0, 1)),
+     CHECK (use_sis5 IN (0, 1)),
      CHECK (use_sippican IN (0, 1)),
      CHECK (use_mvp IN (0, 1)),
      /* output */
@@ -151,6 +158,12 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      CHECK (sis_listen_port < 65536),
      CHECK (sis_listen_timeout < 65536),
      CHECK (sis_auto_apply_manual_casts IN (0, 1)),
+     /* listeners - sis5 */
+     CHECK (sis5_listen_port > 0),
+     CHECK (sis5_listen_timeout > 0),
+     CHECK (sis5_listen_port < 65536),
+     CHECK (sis5_listen_timeout < 65536),
+     CHECK (sis5_auto_apply_manual_casts IN (0, 1)),     
      /* listeners - sippican */
      CHECK (sippican_listen_port > 0),
      CHECK (sippican_listen_timeout > 0),
