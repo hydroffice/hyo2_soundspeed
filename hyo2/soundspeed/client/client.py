@@ -42,7 +42,7 @@ class Client:
         logger.info("using kng format")
         kng_fmt = None
         if self.protocol == "SIS":
-            if prj.setup.sis_auto_apply_manual_casts or server_mode:
+            if prj.setup.sis4_auto_apply_manual_casts or prj.setup.sis5_auto_apply_manual_casts or server_mode:
                 kng_fmt = Dicts.kng_formats['S01']
             else:
                 kng_fmt = Dicts.kng_formats['S12']

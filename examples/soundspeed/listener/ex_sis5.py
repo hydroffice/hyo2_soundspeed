@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 listen_ip = "224.1.20.40"
 listen_port = 6020
-datagrams = [b'#SPO', ]
+datagrams = [b'#MRZ', b'#SPO', b'#SVP']
 
 sis5 = Sis(ip=listen_ip, port=listen_port,
            datagrams=datagrams,
@@ -20,7 +20,7 @@ if not sis5.is_alive():
     time.sleep(0.1)
     logger.debug("start")
 
-time.sleep(10)
+time.sleep(100)
 
 if sis5.is_alive():
     sis5.stop()

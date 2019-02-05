@@ -589,21 +589,21 @@ class MainWin(QtWidgets.QMainWindow):
 
         if self.lib.use_sis5():
 
-            if self.lib.listeners.sis5.nav is not None:
+            if self.lib.listeners.sis5.spo is not None:
                 # time stamp
                 msg += "time:"
-                if self.lib.listeners.sis5.nav.dg_time is not None:
-                    msg += "%s, " % (self.lib.listeners.sis5.nav.dg_time.strftime("%H:%M:%S"))
+                if self.lib.listeners.sis5.spo.dg_time is not None:
+                    msg += "%s, " % (self.lib.listeners.sis5.spo.dg_time.strftime("%H:%M:%S"))
 
                 else:
                     msg += "NA, "
 
                 # position
                 msg += "pos:"
-                if (self.lib.listeners.sis5.nav.latitude is not None) and \
-                        (self.lib.listeners.sis5.nav.longitude is not None):
+                if (self.lib.listeners.sis5.spo.latitude is not None) and \
+                        (self.lib.listeners.sis5.spo.longitude is not None):
 
-                    latitude = self.lib.listeners.sis5.nav.latitude
+                    latitude = self.lib.listeners.sis5.spo.latitude
                     if latitude >= 0:
                         letter = "N"
                     else:
@@ -611,7 +611,7 @@ class MainWin(QtWidgets.QMainWindow):
                     lat_min = float(60 * math.fabs(latitude - int(latitude)))
                     lat_str = "%02d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(latitude)), lat_min, letter)
 
-                    longitude = self.lib.listeners.sis5.nav.longitude
+                    longitude = self.lib.listeners.sis5.spo.longitude
                     if longitude < 0:
                         letter = "W"
                     else:
@@ -624,16 +624,16 @@ class MainWin(QtWidgets.QMainWindow):
                 else:
                     msg += "(NA, NA),  "
 
-            if self.lib.listeners.sis5.xyz88 is not None:
+            if self.lib.listeners.sis5.mrz is not None:
                 msg += 'tss:'
-                if self.lib.listeners.sis5.xyz88.sound_speed is not None:
-                    msg += '%.1f m/s,  ' % self.lib.listeners.sis5.xyz88.sound_speed
+                if self.lib.listeners.sis5.mrz.tss is not None:
+                    msg += '%.1f m/s,  ' % self.lib.listeners.sis5.mrz.tss
 
                 else:
                     msg += 'NA m/s,  '
 
                 msg += 'avg.depth:'
-                mean_depth = self.lib.listeners.sis5.xyz88.mean_depth
+                mean_depth = self.lib.listeners.sis5.mrz.mean_depth
                 if mean_depth:
                     msg += '%.1f m' % mean_depth
                 else:

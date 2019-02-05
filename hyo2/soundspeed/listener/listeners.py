@@ -20,7 +20,7 @@ class Listeners:
         self.sis4 = Sis(port=self.prj.setup.sis4_listen_port, datagrams=[0x50, 0x52, 0x55, 0x58],
                         timeout=self.prj.setup.sis4_listen_timeout, name="SIS4")
         self.sis5 = Sis(ip=self.prj.setup.sis5_listen_ip, port=self.prj.setup.sis5_listen_port,
-                        datagrams=[b'#SPO', ],
+                        datagrams=[b'#MRZ', b'#SPO', b'#SVP'],
                         timeout=self.prj.setup.sis5_listen_timeout, name="SIS5")
         self.sippican = Sippican(port=self.prj.setup.sippican_listen_port, prj=prj)
         self.mvp = Mvp(port=self.prj.setup.mvp_listen_port, prj=prj)

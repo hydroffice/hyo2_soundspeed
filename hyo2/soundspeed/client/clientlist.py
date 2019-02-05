@@ -46,7 +46,7 @@ class ClientList:
                     prj.cb.msg_tx_no_verification(name=client.name, protocol=client.protocol)
                 continue
 
-            if not prj.setup.sis_auto_apply_manual_casts:
+            if not prj.setup.sis4_auto_apply_manual_casts and not prj.setup.sis5_auto_apply_manual_casts:
                 logger.info("transmitted cast, SIS is waiting for operator confirmation")
                 if not server_mode:
                     prj.cb.msg_tx_sis_wait(name=client.name)

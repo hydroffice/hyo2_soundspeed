@@ -4,6 +4,7 @@ import logging
 import functools
 import time
 import struct
+from typing import Optional
 
 from hyo2.soundspeed.listener.abstract import AbstractListener
 from hyo2.soundspeed.formats import km, kmall
@@ -14,13 +15,16 @@ logger = logging.getLogger(__name__)
 class Sis(AbstractListener):
     """Kongsberg SIS listener"""
 
-    def __init__(self, port, datagrams, timeout=1, ip="0.0.0.0", target=None, name="Kng"):
+    def __init__(self, port: int, datagrams: list, timeout: int = 1, ip: str = "0.0.0.0",
+                 target: Optional[object] = None, name: str = "Kng") -> None:
         super(Sis, self).__init__(port=port, datagrams=datagrams, ip=ip, timeout=timeout,
                                   target=target, name=name)
         self.desc = "Kongsberg SIS"
 
         # A few Nones to accommodate the potential types of datagrams that are currently supported
         self.id = None
+
+        # SIS4
         self.surface_ssp = None
         self.nav = None
         self.installation = None
@@ -33,13 +37,17 @@ class Sis(AbstractListener):
         self.watercolumn = None
         self.bist = None
 
-    def __repr__(self):
+        # SIS5
+        self.mrz = None
+        self.spo = None
+
+    def __repr__(self) -> str:
         msg = "%s" % super(Sis, self).__repr__()
         # msg += "  <has data loaded: %s>\n" % self.has_data_loaded
         return msg
 
     @classmethod
-    def request_iur(cls, ip, port=4001):
+    def request_iur(cls, ip: str, port: int = 4001) -> None:
         # Leaving this statement on until I have a chance to test with all systems.
         logger.info("Requesting profile from %s:%s" % (ip, port))
 
@@ -65,13 +73,13 @@ class Sis(AbstractListener):
 
         sock_out.close()
 
-    def parse(self):
+    def parse(self) -> None:
         if self.is_multicast:
             self._parse_sis_5()
         else:
             self._parse_sis_4()
 
-    def _parse_sis_5(self):
+    def _parse_sis_5(self) -> None:
         this_data = self.data[:]
         # logger.debug("SIS 5: %s" % this_data)
 
@@ -81,19 +89,25 @@ class Sis(AbstractListener):
         except KeyError:
             name = "Unknown name"
 
-        logger.info("%s > DG %s [%s] > sz: %.2f KB"
-                    % (self.sender, self.id, name, len(this_data) / 1024))
-
         if self.id not in self.datagrams:
             return
 
-        if self.id == b'#SPO':
-            self.nav = kmall.KmallSPO(this_data)
+        logger.info("%s > DG %s [%s] > sz: %.2f KB"
+                    % (self.sender, self.id, name, len(this_data) / 1024))
+
+        if self.id == b'#MRZ':
+            self.mrz = kmall.KmallMRZ(this_data)
+
+        elif self.id == b'#SPO':
+            self.spo = kmall.KmallSPO(this_data)
+
+        elif self.id == b'#SVP':
+            self.vsp = kmall.KmallSVP(this_data)
 
         else:
             logger.error("Missing parser for datagram type: %s" % self.id)
 
-    def _parse_sis_4(self):
+    def _parse_sis_4(self) -> None:
         this_data = self.data[:]
 
         self.id = struct.unpack("<BB", this_data[0:2])[1]
@@ -145,7 +159,7 @@ class Sis(AbstractListener):
         else:
             logger.error("Missing parser for datagram type: %s" % self.id)
 
-    def dump_to_file(self):
+    def dump_to_file(self) -> None:
         """Overloaded function to write data as Kongsberg .all format."""
 
         # Writing the length of each datagram as a 4-byte unsigned integer before the datagram.
