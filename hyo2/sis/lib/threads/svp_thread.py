@@ -101,6 +101,10 @@ class SvpThread(threading.Thread):
             return
 
         logger.debug("msg from %s [sz: %sB]" % (address, len(data)))
+        if len(data) < 6:
+            logger.debug("Too short data: %s" % data)
+            return
+        logger.debug("received: %s" % data)
 
         if self.sis_5_mode:
             ssp = self._sis_5(data)
@@ -190,8 +194,7 @@ class SvpThread(threading.Thread):
                 data = data.decode("utf-8")
 
             if self.verbose and (len(data) > 8):
-                logger.debug("received %s" % data[:6])
-            logger.debug("received data:\n%s" % data)
+                logger.debug("received %s[...]" % data[:6])
 
             depths = None
             speeds = None

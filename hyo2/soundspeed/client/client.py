@@ -110,7 +110,7 @@ class Client:
         count = 0
         quantum = 2
         logger.info("Waiting ..")
-        while (count < wait) and (not prj.listeners.sis4.ssp):
+        while (count < wait) and (not prj.listeners.sis4.ssp) and (not prj.listeners.sis5.svp):
             time.sleep(quantum)
             count += quantum
             logger.info(".. %s sec" % count)

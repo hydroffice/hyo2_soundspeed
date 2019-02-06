@@ -42,6 +42,7 @@ lib_info.lib_dep_dict = {
     "gdal": "osgeo",
     "numpy": "numpy",
     "pyproj": "pyproj",
+    "matplotlib": "matplotlib",
     "basemap": "mpl_toolkits.basemap",
     "PySide2": "PySide2"
 }

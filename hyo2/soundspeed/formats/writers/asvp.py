@@ -166,7 +166,7 @@ class Asvp(AbstractTextWriter):
             if (fmt == Dicts.kng_formats['S00']) or (fmt == Dicts.kng_formats['S10']):
                 body += "%.2f,%.1f,,,\r\n" % (depths[i], speeds[i])
             elif (fmt == Dicts.kng_formats['S01']) or (fmt == Dicts.kng_formats['S12']):
-                body += "%.2f,%1f,%.2f,%.2f,\r\n" % (depths[i], speeds[i], temps[i], sals[i])
+                body += "%.2f,%.1f,%.2f,%.2f,\r\n" % (depths[i], speeds[i], temps[i], sals[i])
             elif (fmt == Dicts.kng_formats['S02']) or (fmt == Dicts.kng_formats['S22']):
                 body += "%.2f,,%.2f,%.2f,\r\n" % (depths[i], temps[i], sals[i])
             elif fmt == Dicts.kng_formats['ASVP']:
