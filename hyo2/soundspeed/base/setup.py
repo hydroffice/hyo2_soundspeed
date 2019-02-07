@@ -61,7 +61,8 @@ class Setup:
         # listeners - sis4
         self.sis4_listen_port = None
         self.sis4_listen_timeout = None
-        self.sis4_auto_apply_manual_casts = None
+        # output - sis 4 and 5
+        self.sis_auto_apply_manual_casts = None
         # listeners - sis5
         self.sis5_listen_ip = None
         self.sis5_listen_port = None
@@ -169,18 +170,17 @@ class Setup:
         # listeners - sis4
         self.sis4_listen_port = db.sis4_listen_port
         self.sis4_listen_timeout = db.sis4_listen_timeout
-        self.sis4_auto_apply_manual_casts = db.sis4_auto_apply_manual_casts
+        # output - sis 4 and 5
+        self.sis_auto_apply_manual_casts = db.sis_auto_apply_manual_casts
         # listeners - sis5
         if db.setup_version == 1:
             self.sis5_listen_ip = '224.1.20.40'
             self.sis5_listen_port = 6020
             self.sis5_listen_timeout = 10
-            self.sis5_auto_apply_manual_casts = True
         else:
             self.sis5_listen_ip = db.sis5_listen_ip
             self.sis5_listen_port = db.sis5_listen_port
             self.sis5_listen_timeout = db.sis5_listen_timeout
-            self.sis5_auto_apply_manual_casts = db.sis5_auto_apply_manual_casts
 
         # listeners - sippican
         self.sippican_listen_port = db.sippican_listen_port
@@ -273,14 +273,15 @@ class Setup:
             # listeners - sis4
             db.sis4_listen_port = self.sis4_listen_port
             db.sis4_listen_timeout = self.sis4_listen_timeout
-            db.sis4_auto_apply_manual_casts = self.sis4_auto_apply_manual_casts
+
+            # output - sis 4 and 5
+            db.sis_auto_apply_manual_casts = self.sis_auto_apply_manual_casts
 
             # listeners - sis5
             if db.setup_version > 1:
                 db.sis5_listen_ip = self.sis5_listen_ip
                 db.sis5_listen_port = self.sis5_listen_port
                 db.sis5_listen_timeout = self.sis5_listen_timeout
-                db.sis5_auto_apply_manual_casts = self.sis5_auto_apply_manual_casts
 
             # listeners - sippican
             db.sippican_listen_port = self.sippican_listen_port
@@ -354,7 +355,8 @@ class Setup:
         msg += "    <listeners - sis4>\n"
         msg += "      <sis4_listen_port: %s>\n" % self.sis4_listen_port
         msg += "      <sis4_listen_timeout: %s>\n" % self.sis4_listen_timeout
-        msg += "      <sis4_auto_apply_manual_casts: %s>\n" % self.sis4_auto_apply_manual_casts
+        msg += "    <output - sis 4 and 5>\n"
+        msg += "      <sis_auto_apply_manual_casts: %s>\n" % self.sis_auto_apply_manual_casts
         msg += "    <listeners - sis5>\n"
         msg += "      <sis5_listen_ip: %s>\n" % self.sis5_listen_ip
         msg += "      <sis5_listen_port: %s>\n" % self.sis5_listen_port

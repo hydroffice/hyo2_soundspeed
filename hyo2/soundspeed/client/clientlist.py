@@ -30,6 +30,7 @@ class ClientList:
             # clean previously received profile from SIS
             if client.protocol == "SIS":
                 prj.listeners.sis4.ssp = None
+                prj.listeners.sis5.svp = None
 
             prj.progress.add(prog_quantum)
 
@@ -46,7 +47,7 @@ class ClientList:
                     prj.cb.msg_tx_no_verification(name=client.name, protocol=client.protocol)
                 continue
 
-            if not prj.setup.sis4_auto_apply_manual_casts and not prj.setup.sis5_auto_apply_manual_casts:
+            if not prj.setup.sis_auto_apply_manual_casts:
                 logger.info("transmitted cast, SIS is waiting for operator confirmation")
                 if not server_mode:
                     prj.cb.msg_tx_sis_wait(name=client.name)
@@ -56,7 +57,10 @@ class ClientList:
             wait = 0
             wait_max = prj.setup.rx_max_wait_time
             # For multiple SIS clients, make sure the client IP match with the sender IP.
-            while (not prj.listeners.sis4.ssp or client.ip != prj.listeners.sis4.sender[0]) and (wait < wait_max):
+            while True:
+                if (wait > wait_max) or (prj.listeners.sis4.ssp is not None) or (prj.listeners.sis5.svp is not None):
+                    break
+
                 time.sleep(1)
                 wait += 1
                 logger.debug("waiting for %s sec" % wait)
@@ -67,7 +71,7 @@ class ClientList:
                     wait = wait_max
 
             if prj.listeners.sis4.ssp:
-                # The KM SVP datagrams have a bug in their time reporting and
+                # The KM .all SVP datagrams have a bug in their time reporting and
                 # have a 100 second granularity so can't compare times
                 # to ensure it's the same profile.  Comparing the sound speeds instead
                 d_tx = prj.cur.sis.depth[prj.cur.sis_thinned]
@@ -87,6 +91,27 @@ class ClientList:
                         prj.cb.msg_tx_sis_not_confirmed(name=client.name, ip=prj.setup.sis4_listen_port)
                     success = False
                     continue
+
+            elif prj.listeners.sis5.svp:
+                # Comparing the sound speeds instead
+                d_tx = prj.cur.sis.depth[prj.cur.sis_thinned]
+                s_tx = prj.cur.sis.speed[prj.cur.sis_thinned]
+                # print(d_tx, s_tx)
+                s_rx = np.interp(d_tx, prj.listeners.sis5.svp.depth, prj.listeners.sis5.svp.speed)
+                max_diff = max(abs(s_tx - s_rx))
+                if max_diff < 0.2:
+                    self.last_tx_time = prj.listeners.sis5.svp.acquisition_time
+                    logger.debug("reception confirmed: %s" % self.last_tx_time.strftime("%d/%m/%Y, %H:%M:%S"))
+                    if not server_mode:
+                        prj.cb.msg_tx_sis_confirmed(name=client.name)
+                    continue
+                else:
+                    logger.info("casts differ by %.2f m/s" % max_diff)
+                    if not server_mode:
+                        prj.cb.msg_tx_sis_not_confirmed(name=client.name, ip=prj.setup.sis5_listen_port)
+                    success = False
+                    continue
+
             else:
                 logger.warning("reception NOT confirmed: unable to catch the back datagram")
                 if not server_mode:

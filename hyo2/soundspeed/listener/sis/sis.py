@@ -40,6 +40,7 @@ class Sis(AbstractListener):
         # SIS5
         self.mrz = None
         self.spo = None
+        self.svp = None
 
     def __repr__(self) -> str:
         msg = "%s" % super(Sis, self).__repr__()
@@ -102,7 +103,7 @@ class Sis(AbstractListener):
             self.spo = kmall.KmallSPO(this_data)
 
         elif self.id == b'#SVP':
-            self.vsp = kmall.KmallSVP(this_data)
+            self.svp = kmall.KmallSVP(this_data)
 
         else:
             logger.error("Missing parser for datagram type: %s" % self.id)

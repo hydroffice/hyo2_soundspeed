@@ -81,57 +81,25 @@ class Output(AbstractWidget):
         hbox = QtWidgets.QHBoxLayout()
         self.left_layout.addLayout(hbox)
         hbox.addStretch()
-        self.label = QtWidgets.QLabel("SQLite logging:")
+        self.label = QtWidgets.QLabel("SIS protocol:")
         hbox.addWidget(self.label)
         hbox.addStretch()
 
-        # - log_user
+        # - sis_auto_apply_manual_casts
         hbox = QtWidgets.QHBoxLayout()
         self.left_layout.addLayout(hbox)
         # -- label
-        vbox = QtWidgets.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        label = QtWidgets.QLabel("User logging:")
+        label = QtWidgets.QLabel("SIS auto apply profile:")
         label.setFixedWidth(lbl_width)
-        vbox.addWidget(label)
-        vbox.addStretch()
+        hbox.addWidget(label)
         # -- value
-        vbox = QtWidgets.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        self.log_user = QtWidgets.QComboBox()
-        self.log_user.addItems(["True", "False"])
-        vbox.addWidget(self.log_user)
-        vbox.addStretch()
-
-        # - log_server
-        hbox = QtWidgets.QHBoxLayout()
-        self.left_layout.addLayout(hbox)
-        # -- label
-        vbox = QtWidgets.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        label = QtWidgets.QLabel("Server logging:")
-        label.setFixedWidth(lbl_width)
-        vbox.addWidget(label)
-        vbox.addStretch()
-        # -- value
-        vbox = QtWidgets.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        self.log_server = QtWidgets.QComboBox()
-        self.log_server.addItems(["True", "False"])
-        vbox.addWidget(self.log_server)
-        vbox.addStretch()
-
-        self.left_layout.addStretch()
-
-        # RIGHT
+        self.sis_auto_apply_manual_casts = QtWidgets.QComboBox()
+        self.sis_auto_apply_manual_casts.addItems(["True", "False"])
+        hbox.addWidget(self.sis_auto_apply_manual_casts)
 
         # - server
         hbox = QtWidgets.QHBoxLayout()
-        self.right_layout.addLayout(hbox)
+        self.left_layout.addLayout(hbox)
         hbox.addStretch()
         self.label = QtWidgets.QLabel("Server settings:")
         hbox.addWidget(self.label)
@@ -139,7 +107,7 @@ class Output(AbstractWidget):
 
         # - server_source
         hbox = QtWidgets.QHBoxLayout()
-        self.right_layout.addLayout(hbox)
+        self.left_layout.addLayout(hbox)
         # -- label
         vbox = QtWidgets.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -159,7 +127,7 @@ class Output(AbstractWidget):
 
         # - server_apply_surface_sound_speed
         hbox = QtWidgets.QHBoxLayout()
-        self.right_layout.addLayout(hbox)
+        self.left_layout.addLayout(hbox)
         # -- label
         vbox = QtWidgets.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -177,6 +145,58 @@ class Output(AbstractWidget):
         vbox.addWidget(self.server_apply_surface_sound_speed)
         vbox.addStretch()
 
+        self.left_layout.addStretch()
+
+        # RIGHT
+
+        # - Logging settings
+        hbox = QtWidgets.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        hbox.addStretch()
+        self.label = QtWidgets.QLabel("SQLite logging:")
+        hbox.addWidget(self.label)
+        hbox.addStretch()
+
+        # - log_user
+        hbox = QtWidgets.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        # -- label
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtWidgets.QLabel("User logging:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- value
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.log_user = QtWidgets.QComboBox()
+        self.log_user.addItems(["True", "False"])
+        vbox.addWidget(self.log_user)
+        vbox.addStretch()
+
+        # - log_server
+        hbox = QtWidgets.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        # -- label
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtWidgets.QLabel("Server logging:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- value
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.log_server = QtWidgets.QComboBox()
+        self.log_server.addItems(["True", "False"])
+        vbox.addWidget(self.log_server)
+        vbox.addStretch()
+
         self.right_layout.addStretch()
 
         self.main_layout.addStretch()
@@ -189,6 +209,8 @@ class Output(AbstractWidget):
         self.btn_delete_client.clicked.connect(self.delete_client)
         # noinspection PyUnresolvedReferences
         self.btn_refresh_list.clicked.connect(self.setup_changed)
+        # noinspection PyUnresolvedReferences
+        self.sis_auto_apply_manual_casts.currentIndexChanged.connect(self.apply_sis_auto_apply_manual_casts)
         # noinspection PyUnresolvedReferences
         self.log_user.currentIndexChanged.connect(self.apply_log_user)
         # noinspection PyUnresolvedReferences
@@ -299,6 +321,12 @@ class Output(AbstractWidget):
         self.setup_changed()
         self.main_win.reload_settings()
 
+    def apply_sis_auto_apply_manual_casts(self):
+        # logger.debug("auto-apply cast")
+        self.db.sis_auto_apply_manual_casts = self.sis_auto_apply_manual_casts.currentText() == "True"
+        self.setup_changed()
+        self.main_win.reload_settings()
+
     def apply_log_user(self):
         # logger.debug("apply log user")
         self.db.log_user = self.log_user.currentText() == "True"
@@ -342,6 +370,12 @@ class Output(AbstractWidget):
         _str = self.db.server_source
         _idx = Dicts.server_sources[_str]
         self.server_source.setCurrentIndex(_idx)
+
+        # sis_auto_apply_manual_casts
+        if self.db.sis_auto_apply_manual_casts:
+            self.sis_auto_apply_manual_casts.setCurrentIndex(0)  # True
+        else:
+            self.sis_auto_apply_manual_casts.setCurrentIndex(1)  # False
 
         # server_apply_surface_sound_speed
         if self.db.server_apply_surface_sound_speed:

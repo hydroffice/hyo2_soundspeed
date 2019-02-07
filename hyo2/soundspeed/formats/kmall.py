@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import logging
 import struct
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +51,7 @@ class Kmall:
         hdr_data = struct.unpack("<I4cBBHII", self.data[:20])
         self.length = hdr_data[0]
         # logger.debug('length: %s' % self.length)
-        self.type = b''.join(hdr_data[1:5])
+        self.id = b''.join(hdr_data[1:5])
         # logger.debug('type: %s -> %s' % (self.type, self.kmall_datagrams[self.type]))
         self.version = hdr_data[5]
         # logger.debug('version: %s' % self.version)
@@ -66,12 +67,12 @@ class Kmall:
         # logger.debug('datetime: %s' % self.dg_time.strftime('%Y-%m-%d %H:%M:%S.%f'))
 
     @classmethod
-    def kmall_datetime(cls, dgm_time_sec, dgm_time_nanosec):
+    def kmall_datetime(cls, dgm_time_sec: int, dgm_time_nanosec: int = 0):
         return datetime.utcfromtimestamp(dgm_time_sec) + \
                timedelta(microseconds=(dgm_time_nanosec / 1000.0))
 
     def __str__(self):
-        return 'ID: %d, Date: %s, Model: %d\n' \
+        return 'ID: %s, Date: %s, Model: %d\n' \
                % (self.id, self.dg_time, self.sounder_id)
 
 
@@ -230,24 +231,26 @@ class KmallSVP(Kmall):
 
         svp_struct = '<2H4BIdd'
         svp_header = struct.unpack(svp_struct, self.data[20:48])
-        nr_of_samples = svp_header[1]
-        logger.debug("svp samples: %s" % (nr_of_samples,))
+        self.num_entries = svp_header[1]
+        logger.debug("svp samples: %s" % (self.num_entries,))
+        self.acquisition_time = Kmall.kmall_datetime(svp_header[3])
+        logger.debug("acquisition time: %s" % self.acquisition_time.strftime('%Y-%m-%d %H:%M:%S.%f'))
 
         fields_struct = '<2fI2f'  # 20B
-        depths = list()
-        sound_speeds = list()
-        temps = list()
-        sals = list()
-        for i in range(nr_of_samples):
+        self.depth = np.zeros(self.num_entries)
+        self.speed = np.zeros(self.num_entries)
+        self.temp = np.zeros(self.num_entries)
+        self.sal = np.zeros(self.num_entries)
+        for i in range(self.num_entries):
             start_field = 48 + i * 20
             end_field = 48 + (i + 1) * 20
             svp_field = struct.unpack(fields_struct, self.data[start_field:end_field])
-            depths.append(svp_field[0])
-            sound_speeds.append(svp_field[1])
-            temps.append(svp_field[3])
-            sals.append(svp_field[4])
-        logger.debug("depths: %s" % (depths, ))
-        logger.debug("speeds: %s" % (sound_speeds, ))
+            self.depth[i] = svp_field[0]
+            self.speed[i] = svp_field[1]
+            self.temp[i] = svp_field[3]
+            self.sal[i] = svp_field[4]
+        logger.debug("depths: %s" % (self.depth, ))
+        logger.debug("speeds: %s" % (self.speed, ))
 
         final_length = struct.unpack("<I", self.data[-4:])
         self.is_valid = final_length != self.length

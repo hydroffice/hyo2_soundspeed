@@ -520,13 +520,13 @@ class SetupDb(BaseDb):
     def sis4_listen_timeout(self, value):
         self._setter_int("sis_listen_timeout", value)
 
-    # --- sis4_auto_apply_manual_casts
+    # --- sis_auto_apply_manual_casts
     @property
-    def sis4_auto_apply_manual_casts(self):
+    def sis_auto_apply_manual_casts(self):
         return self._getter_bool("sis_auto_apply_manual_casts")
 
-    @sis4_auto_apply_manual_casts.setter
-    def sis4_auto_apply_manual_casts(self, value):
+    @sis_auto_apply_manual_casts.setter
+    def sis_auto_apply_manual_casts(self, value):
         self._setter_bool("sis_auto_apply_manual_casts", value)
 
     # --- sis5_listen_ip
@@ -555,15 +555,6 @@ class SetupDb(BaseDb):
     @sis5_listen_timeout.setter
     def sis5_listen_timeout(self, value):
         self._setter_int("sis5_listen_timeout", value)
-
-    # --- sis5_auto_apply_manual_casts
-    @property
-    def sis5_auto_apply_manual_casts(self):
-        return self._getter_bool("sis5_auto_apply_manual_casts")
-
-    @sis5_auto_apply_manual_casts.setter
-    def sis5_auto_apply_manual_casts(self, value):
-        self._setter_bool("sis5_auto_apply_manual_casts", value)
 
     # --- sippican_listen_port
     @property
