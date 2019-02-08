@@ -38,13 +38,13 @@ install:
   - pip install PySide2
   - conda install numpy matplotlib-base gdal pyproj scipy basemap netCDF4 pillow cython
   - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then
+      conda remove --force PyQt Qt sip;
       export LD_LIBRARY_PATH=$HOME/miniconda/envs/test-environment/lib:$LD_LIBRARY_PATH;
     fi
   - pip install gsw==3.0.6
   - pip install coveralls
   - pip install https://github.com/hydroffice/hyo2_abc/archive/master.zip
   - pip install .
-  - conda remove --force PyQt Qt sip
   - rm -f $HOME/miniconda/envs/test-environment/qt.conf
   - conda list --show-channel-urls
 
