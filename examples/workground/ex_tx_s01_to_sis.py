@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.DEBUG,
 logger = logging.getLogger(__name__)
 
 sis_svp_ip = '127.0.0.1'
-sis_svp_port = 4001
+sis_svp_port = 4002  # 4001 ?
 
 # a short profile
 depths = [0.00, 2.60, 24.60, 81.80, 203.60, 500.00, 1000.00, 2000.00, 4000.00, 12000.00]
