@@ -21,7 +21,7 @@ import sys
 from PyInstaller.building.build_main import Analysis, PYZ, EXE, COLLECT, TOC
 from PyInstaller.compat import is_darwin, is_win
 
-from hyo2.sis import __version__ as sis_version
+from hyo2.sis4 import __version__ as sis_version
 
 is_beta = True
 if is_beta:
@@ -99,16 +99,22 @@ share_folder = os.path.join(python_path(), "Library", "share")
 output_folder = os.path.join("Library", "share")
 pyproj_data = collect_folder_data(input_data_folder=share_folder, relative_output_folder=output_folder)
 pyside2_data = collect_pkg_data('PySide2')
+share_folder = os.path.join(python_path(), "Lib", "site-packages", "shiboken2", "support", "signature")
+output_folder = os.path.join("shiboken2", "support", "signature")
+shiboken2_data = collect_folder_data(input_data_folder=share_folder, relative_output_folder=output_folder)
+share_folder = os.path.join(python_path(), "Lib", "site-packages", "shiboken2", "support", "signature", "lib")
+output_folder = os.path.join("shiboken2", "support", "signature", "lib")
+shiboken2_data2 = collect_folder_data(input_data_folder=share_folder, relative_output_folder=output_folder)
 abc_data = collect_pkg_data('hyo2.abc')
-sis_data = collect_pkg_data('hyo2.sis')
+sis_data = collect_pkg_data('hyo2.sis4')
 
-icon_file = os.path.join('freeze', 'SIS.ico')
+icon_file = os.path.join('freeze', 'SIS4.ico')
 if is_darwin:
-    icon_file = os.path.join('freeze', 'SIS.icns')
+    icon_file = os.path.join('freeze', 'SIS4.icns')
 
-a = Analysis(['SIS.py'],
+a = Analysis(['SIS4.py'],
              pathex=[],
-             hiddenimports=["PIL"],
+             hiddenimports=["PIL", ],
              excludes=["IPython", "PyQt4", "PyQt5", "pandas", "scipy", "sphinx", "sphinx_rtd_theme",
                        "OpenGL_accelerate", "FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter",
                        "wx"],
@@ -119,7 +125,7 @@ pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=True,
-          name='SIS.%s%s' % (sis_version, beta),
+          name='SIS4.%s%s' % (sis_version, beta),
           debug=False,
           strip=None,
           upx=True,
@@ -131,8 +137,10 @@ coll = COLLECT(exe,
                a.datas,
                pyproj_data,
                pyside2_data,
+               shiboken2_data,
+               shiboken2_data2,
                abc_data,
                sis_data,
                strip=None,
                upx=True,
-               name='SIS.%s%s' % (sis_version, beta))
+               name='SIS4.%s%s' % (sis_version, beta))

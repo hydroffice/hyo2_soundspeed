@@ -1,11 +1,11 @@
 """
 Hydro-Package
-Sound Speed
+SIS4
 """
 
 import os
 from hyo2.abc.lib.lib_info import LibInfo
-from hyo2.sis import name, __version__
+from hyo2.sis4 import name, __version__
 import logging
 
 log = logging.getLogger(__name__)

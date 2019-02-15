@@ -1,8 +1,6 @@
 import logging
-
 from PySide2 import QtCore, QtGui, QtWidgets
-
-from hyo2.sis.app import app_info, controlpanel
+from hyo2.sis4.app import app_info, controlpanel
 
 logger = logging.getLogger(__name__)
 

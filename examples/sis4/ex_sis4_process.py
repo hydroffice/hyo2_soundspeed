@@ -2,7 +2,7 @@ import logging
 import time
 from multiprocessing import Pipe, freeze_support
 
-from hyo2.sis.lib.process import SisProcess
+from hyo2.sis4.lib.process import SisProcess
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -18,10 +18,10 @@ test_files = [
 if __name__ == '__main__':
     freeze_support()
 
-    ip_out = "224.1.20.40"  # "localhost"
-    port_out = 6020  # 26103
+    ip_out = "localhost"
+    port_out = 26103
 
-    logger.debug("starting SIS process ...")
+    logger.debug("starting SIS4 process ...")
     parent_conn, child_conn = Pipe()
     p = SisProcess(conn=child_conn, ip_out=ip_out, port_out=port_out)
     p.set_files(test_files)
