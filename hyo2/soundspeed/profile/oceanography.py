@@ -533,6 +533,15 @@ class Oceanography:
 
     @classmethod
     def geo_strf_dyn_height(cls, sa, ct, p, p_ref):
+        try:
+            # using new gsw 3.3.0+
+            return gsw.geostrophy.geo_strf_dyn_height(sa, ct, p, p_ref, interp_method='linear')
+        except:
+            # using old gsw 3.0.3
+            return cls.geo_strf_dyn_height_gsw303(sa, ct, p, p_ref)
+
+    @classmethod
+    def geo_strf_dyn_height_gsw303(cls, sa, ct, p, p_ref):
         """ Calculates dynamic height anomaly.
 
         Converted from gsw_geo_strf_dyn_height.c by C.Z. HSTB in Nov 2015
