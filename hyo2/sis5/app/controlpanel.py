@@ -5,8 +5,8 @@ from threading import Timer
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
-from hyo2.sis4.lib.process import SisProcess
-from hyo2.sis4.app.infoviewer import InfoViewerDialog
+from hyo2.sis5.lib.process import SisProcess
+from hyo2.sis5.app.infoviewer import InfoViewerDialog
 from hyo2.abc.app.qt_progress import QtProgress
 
 logger = logging.getLogger(__name__)
@@ -19,10 +19,10 @@ class ControlPanel(QtWidgets.QWidget):
         super(ControlPanel, self).__init__()
         self.sis = None
 
-        # default values SIS 4 vs. 5
-        self.default_sis4_input_port = "4001"
-        self.default_sis4_output_ip = "127.0.0.1"
-        self.default_sis4_output_port = "16103"
+        # default values SIS 5
+        self.default_sis5_input_port = "4001"
+        self.default_sis5_output_ip = "224.1.20.40"
+        self.default_sis5_output_port = "6020"
 
         self.vbox = QtWidgets.QVBoxLayout()
         self.setLayout(self.vbox)
@@ -111,12 +111,12 @@ class ControlPanel(QtWidgets.QWidget):
         hbox = QtWidgets.QHBoxLayout()
         vbox.addLayout(hbox)
         hbox.addStretch()
-        button_sis_4 = QtWidgets.QPushButton()
-        hbox.addWidget(button_sis_4)
-        button_sis_4.setText("SIS 4 Defaults")
-        button_sis_4.setToolTip('Set default values for SIS 4')
+        button_sis_5 = QtWidgets.QPushButton()
+        hbox.addWidget(button_sis_5)
+        button_sis_5.setText("SIS 5 Defaults")
+        button_sis_5.setToolTip('Set default values for SIS 5')
         # noinspection PyUnresolvedReferences
-        button_sis_4.clicked.connect(self.set_defaults_sis_4)
+        button_sis_5.clicked.connect(self.set_defaults_sis_5)
         hbox.addStretch()
 
         vbox.addSpacing(12)
@@ -150,12 +150,17 @@ class ControlPanel(QtWidgets.QWidget):
         hbox.addWidget(self.set_verbose)
         hbox.addStretch()
 
-        self.set_defaults_sis_4()
+        self.set_defaults_sis_5()
 
     def set_defaults_sis_4(self):
         self.set_input_port.setText(self.default_sis4_input_port)
         self.set_output_ip.setText(self.default_sis4_output_ip)
         self.set_output_port.setText(self.default_sis4_output_port)
+
+    def set_defaults_sis_5(self):
+        self.set_input_port.setText(self.default_sis5_input_port)
+        self.set_output_ip.setText(self.default_sis5_output_ip)
+        self.set_output_port.setText(self.default_sis5_output_port)
 
     def _make_sis_inputs(self):
 
@@ -223,7 +228,7 @@ class ControlPanel(QtWidgets.QWidget):
         # ask the file path to the user
         # noinspection PyCallByClass
         selections, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "Add Kongsberg data files", source_folder,
-                                                               "EM .all files (*.all *.wcd);;"
+                                                               "EM .kmall files (*.kmall *.kmwcd);;"
                                                                "All files (*.*)", "")
         if not selections:
             logger.debug('no selection')

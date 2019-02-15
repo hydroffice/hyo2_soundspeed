@@ -1,6 +1,6 @@
 import os
 from hyo2.abc.app.app_info import AppInfo
-from hyo2.sis4 import name, __version__
+from hyo2.sis5 import name, __version__
 
 app_info = AppInfo()
 
@@ -17,7 +17,7 @@ app_info.app_path = os.path.abspath(os.path.dirname(__file__))
 app_info.app_url = "https://www.hydroffice.org/soundspeed/"
 app_info.app_manual_url = "https://www.hydroffice.org/manuals/soundspeed/index.html"
 app_info.app_support_email = "sis_emulator@hydroffice.org"
-app_info.app_latest_url = "https://www.hydroffice.org/latest/sis4.txt"
+app_info.app_latest_url = "https://www.hydroffice.org/latest/sis5.txt"
 
 app_info.app_media_path = os.path.join(app_info.app_path, "media")
 app_info.app_main_window_object_name = "MainWindow"

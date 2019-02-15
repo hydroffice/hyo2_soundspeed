@@ -3,9 +3,8 @@ import os
 import time
 from multiprocessing import Process, Event
 import threading
-
-from hyo2.sis4.lib.threads.svp_thread import SvpThread
-from hyo2.sis4.lib.threads.replay_thread import ReplayThread
+from hyo2.sis5.lib.threads.svp_thread import SvpThread
+from hyo2.sis5.lib.threads.replay_thread import ReplayThread
 
 logger = logging.getLogger(__name__)
 
@@ -13,8 +12,9 @@ logger = logging.getLogger(__name__)
 class SisProcess(Process):
     """SIS simulator"""
 
-    def __init__(self, conn, replay_timing=1.0, port_in=4001, port_out=26103, ip_out="localhost",
-                 target=None, name="SIS4", verbose=False):
+    def __init__(self, conn, replay_timing=1.0,
+                 port_in=6020, port_out=26103, ip_out="224.1.20.40",
+                 target=None, name="SIS5", verbose=False):
         Process.__init__(self, target=target, name=name)
         self.conn = conn
         self.daemon = True
@@ -25,6 +25,10 @@ class SisProcess(Process):
         self.port_in = port_in
         self.port_out = port_out
         self.ip_out = ip_out
+
+        # SIS 5 mode
+        self.sis_5_mode = ip_out[:4] in ["224.", "225."]
+        logger.debug("SIS 5 mode: %s" % self.sis_5_mode)
 
         # threads
         self.t_svp = None

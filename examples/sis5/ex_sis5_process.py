@@ -2,7 +2,7 @@ import logging
 import time
 from multiprocessing import Pipe, freeze_support
 
-from hyo2.sis4.lib.process import SisProcess
+from hyo2.sis5.lib.process import SisProcess
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -18,10 +18,10 @@ test_files = [
 if __name__ == '__main__':
     freeze_support()
 
-    ip_out = "localhost"
-    port_out = 26103
+    ip_out = "224.1.20.40"
+    port_out = 6020
 
-    logger.debug("starting SIS4 process ...")
+    logger.debug("starting SIS5 process ...")
     parent_conn, child_conn = Pipe()
     p = SisProcess(conn=child_conn, ip_out=ip_out, port_out=port_out)
     p.set_files(test_files)
@@ -41,5 +41,5 @@ if __name__ == '__main__':
         logger.debug(" ... %d ..." % count)
         time.sleep(0.5)
 
-    logger.debug("SIS4 process is alive? %s" % p.is_alive())
+    logger.debug("SIS5 process is alive? %s" % p.is_alive())
     logger.debug('%s.exitcode = %s' % (p.name, p.exitcode))  # <0: killed with signal; >0: exited with error
