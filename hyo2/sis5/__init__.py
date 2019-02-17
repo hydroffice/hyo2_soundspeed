@@ -1,6 +1,6 @@
 """
 Hydro-Package
-SIS
+SIS5
 """
 
 import logging
@@ -8,7 +8,7 @@ import logging
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
-name = "SIS"
+name = "SIS5"
 __version__ = '1.0.0'
 __author__ = 'gmasetti@ccom.unh.edu'
 __license__ = 'LGPLv3 license'
