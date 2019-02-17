@@ -21,6 +21,7 @@ class Metadata:
         self._sn = str()  # serial number
         self.proc_time = None  # last processing time
         self.proc_info = str()  # info about processing
+        self.surveylines = str()
         self.comments = str()
         self.pressure_uom = 'dbar'
         self.depth_uom = 'm'
@@ -86,6 +87,7 @@ class Metadata:
         msg += "    <sn:%s>\n" % self.sn
         msg += "    <proc_time:%s>\n" % self.proc_time
         msg += "    <proc_info:%s>\n" % self.proc_info
+        msg += "    <surveylines:%s>\n" % self.comments
         msg += "    <comments:%s>\n" % self.comments
         msg += "    <pressure_uom:%s>\n" % self.pressure_uom
         msg += "    <depth_uom:%s>\n" % self.depth_uom

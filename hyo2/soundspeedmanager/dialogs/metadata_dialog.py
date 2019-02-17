@@ -1,13 +1,11 @@
 from PySide2 import QtCore, QtGui, QtWidgets
-
 import os
 from datetime import datetime
 import logging
-
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
 from hyo2.soundspeed.base.setup_sql import vessel_list
+
+logger = logging.getLogger(__name__)
 
 
 class MetadataDialog(AbstractDialog):
@@ -168,6 +166,22 @@ class MetadataDialog(AbstractDialog):
         self.sn.setAutoFillBackground(True)
         # noinspection PyUnresolvedReferences
         self.sn.textChanged.connect(self.changed_sn)
+
+        # surveylines
+        hbox = QtWidgets.QHBoxLayout()
+        self.mainLayout.addLayout(hbox)
+        label = QtWidgets.QLabel("Surveylines:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        self.surveylines = QtWidgets.QTextEdit()
+        self.surveylines.setMinimumHeight(24)
+        self.surveylines.setMaximumHeight(60)
+        self.surveylines.setDisabled(True)
+        self.surveylines.setText("%s" % self.lib.cur.meta.surveylines)
+        hbox.addWidget(self.surveylines)
+        self.surveylines.setAutoFillBackground(True)
+        # noinspection PyUnresolvedReferences
+        self.surveylines.textChanged.connect(self.changed_surveylines)
 
         # comments
         hbox = QtWidgets.QHBoxLayout()
@@ -344,6 +358,9 @@ class MetadataDialog(AbstractDialog):
     def changed_sn(self):
         self.sn.setStyleSheet("background-color: rgba(255,255,153, 255);")
 
+    def changed_surveylines(self):
+        self.surveylines.setStyleSheet("background-color: rgba(255,255,153, 255);")
+
     def changed_comments(self):
         self.comments.setStyleSheet("background-color: rgba(255,255,153, 255);")
 
@@ -379,6 +396,7 @@ class MetadataDialog(AbstractDialog):
             self.survey.setEnabled(True)
             self.vessel.setEnabled(True)
             self.sn.setEnabled(True)
+            self.surveylines.setEnabled(True)
             self.comments.setEnabled(True)
             # self.pressure_uom.setEnabled(True)
             # self.depth_uom.setEnabled(True)
@@ -398,6 +416,7 @@ class MetadataDialog(AbstractDialog):
             self.survey.setDisabled(True)
             self.vessel.setDisabled(True)
             self.sn.setDisabled(True)
+            self.surveylines.setDisabled(True)
             self.comments.setDisabled(True)
             self.pressure_uom.setDisabled(True)
             self.depth_uom.setDisabled(True)
@@ -469,6 +488,7 @@ class MetadataDialog(AbstractDialog):
             self.lib.cur.meta.survey = self.survey.text()
             self.lib.cur.meta.vessel = self.vessel.currentText()
             self.lib.cur.meta.sn = self.sn.text()
+            self.lib.cur.meta.surveylines = self.surveylines.toPlainText()
             self.lib.cur.meta.comments = self.comments.toPlainText()
             self.lib.cur.meta.pressure_uom = self.pressure_uom.text()
             self.lib.cur.meta.depth_uom = self.depth_uom.text()
@@ -504,6 +524,7 @@ class MetadataDialog(AbstractDialog):
         self.survey.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
         self.vessel.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
         self.sn.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
+        self.surveylines.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
         self.comments.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
         self.pressure_uom.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
         self.depth_uom.setStyleSheet("background-color: rgba(255, 255, 255, 255);")

@@ -5,8 +5,7 @@ import datetime
 import numpy as np
 import logging
 
-from hyo2.soundspeed import __version__ as version
-from hyo2.soundspeed import __doc__ as name
+from hyo2.soundspeed import lib_info
 from hyo2.soundspeed.db.point import Point, convert_point, adapt_point
 from hyo2.soundspeed.db.plot import PlotDb
 from hyo2.soundspeed.db.export import ExportDb
@@ -43,6 +42,8 @@ class ProjectDb:
 
         self.tmp_data = None
         self.tmp_ssp_pk = None
+
+        self.cur_version = 3
 
         self.reconnect_or_create()
 
@@ -133,20 +134,29 @@ class ProjectDb:
 
                 self.conn.execute("""
                                   CREATE TABLE IF NOT EXISTS library(
-                                     version int PRIMARY KEY NOT NULL DEFAULT 3,
+                                     version int PRIMARY KEY NOT NULL DEFAULT %d,
                                      creator_info text,
                                      creation timestamp NOT NULL)
-                                  """)
+                                  """ % self.cur_version)
 
                 # check if the library table is empty
                 # noinspection SqlResolve
                 ret = self.conn.execute("""SELECT COUNT(*) FROM library""").fetchone()
+                # logger.debug("library content: %s" % (list(ret), ))
                 # if not present, add it
                 if ret[0] == 0:
                     # noinspection SqlResolve
                     self.conn.execute("""
                                       INSERT INTO library VALUES (?, ?, ?)
-                                      """, (3, "%s v.%s" % (name, version), datetime.datetime.utcnow(),))
+                                      """, (self.cur_version, "%s v.%s" % (lib_info.lib_name, lib_info.lib_version),
+                                            datetime.datetime.utcnow(),))
+
+                # check if the library version is old
+                # noinspection SqlResolve
+                ret = self.conn.execute("""SELECT version FROM library""").fetchone()
+                if ret[0] < 3:
+                    logger.debug("updated old library version from %s to %s" % (ret[0], self.cur_version))
+                    self._updates_to_version_3(old_version=ret[0])
 
                 self.conn.execute("""
                                   CREATE TABLE IF NOT EXISTS ssp_pk(
@@ -161,20 +171,21 @@ class ProjectDb:
                                      pk integer NOT NULL,
                                      sensor_type integer NOT NULL,
                                      probe_type integer NOT NULL,
-                                     original_path text,
-                                     institution text,
-                                     survey text,
-                                     vessel text,
-                                     sn text,
+                                     original_path text NOT NULL DEFAULT '',
+                                     institution text NOT NULL DEFAULT '',
+                                     survey text NOT NULL DEFAULT '',
+                                     vessel text NOT NULL DEFAULT '',
+                                     sn text NOT NULL DEFAULT '',
                                      proc_time timestamp,
-                                     proc_info text,
-                                     comments text,
-                                     pressure_uom text,
-                                     depth_uom text,
-                                     speed_uom text,
-                                     temperature_uom text,
-                                     conductivity_uom text,
-                                     salinity_uom text,
+                                     proc_info text NOT NULL DEFAULT '',
+                                     surveylines text NOT NULL DEFAULT '',                                     
+                                     comments text NOT NULL DEFAULT '',
+                                     pressure_uom text NOT NULL DEFAULT '',
+                                     depth_uom text NOT NULL DEFAULT '',
+                                     speed_uom text NOT NULL DEFAULT '',
+                                     temperature_uom text NOT NULL DEFAULT '',
+                                     conductivity_uom text NOT NULL DEFAULT '',
+                                     salinity_uom text NOT NULL DEFAULT '',
                                      PRIMARY KEY (pk),
                                      FOREIGN KEY(pk) REFERENCES ssp_pk(id))
                                   """)
@@ -239,6 +250,7 @@ class ProjectDb:
                                         sn,
                                         proc_time,
                                         proc_info,
+                                        surveylines,
                                         comments,
                                         pressure_uom,
                                         depth_uom,
@@ -434,7 +446,11 @@ class ProjectDb:
         try:
             # noinspection SqlResolve
             self.conn.execute("""
-                              INSERT INTO ssp VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                              INSERT INTO ssp (pk, sensor_type, probe_type, original_path, institution, 
+                                               survey, vessel, sn, proc_time, proc_info, surveylines, comments, 
+                                               pressure_uom, depth_uom, speed_uom, 
+                                               temperature_uom, conductivity_uom, salinity_uom)
+                              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                               """, (self.tmp_ssp_pk,
                                     self.tmp_data.meta.sensor_type,
                                     self.tmp_data.meta.probe_type,
@@ -445,6 +461,7 @@ class ProjectDb:
                                     self.tmp_data.meta.sn,
                                     self.tmp_data.meta.proc_time,
                                     self.tmp_data.meta.proc_info,
+                                    self.tmp_data.meta.surveylines,
                                     self.tmp_data.meta.comments,
                                     self.tmp_data.meta.pressure_uom,
                                     self.tmp_data.meta.depth_uom,
@@ -644,17 +661,18 @@ class ProjectDb:
                                      row['sn'],  # 9
                                      row['proc_time'],  # 10
                                      row['proc_info'],  # 11
-                                     row['comments'],  # 12
-                                     row['pressure_uom'],  # 13
-                                     row['depth_uom'],  # 14
-                                     row['speed_uom'],  # 15
-                                     row['temperature_uom'],  # 16
-                                     row['conductivity_uom'],  # 17
-                                     row['salinity_uom'],  # 18
-                                     ss_at_min_depth,  # 19
-                                     min_depth,  # 20
-                                     max_depth,  # 21
-                                     max_raw_depth,  # 22
+                                     row['surveylines'],  # 12
+                                     row['comments'],  # 13
+                                     row['pressure_uom'],  # 14
+                                     row['depth_uom'],  # 15
+                                     row['speed_uom'],  # 16
+                                     row['temperature_uom'],  # 17
+                                     row['conductivity_uom'],  # 18
+                                     row['salinity_uom'],  # 19
+                                     ss_at_min_depth,  # 20
+                                     min_depth,  # 21
+                                     max_depth,  # 22
+                                     max_raw_depth,  # 23
                                      ))
             return ssp_list
 
@@ -709,6 +727,7 @@ class ProjectDb:
                 ssp.cur.meta.proc_time = ssp_meta['proc_time']
                 ssp.cur.meta.proc_info = ssp_meta['proc_info']
                 ssp.cur.meta.comments = ssp_meta['comments']
+                ssp.cur.meta.surveylines = ssp_meta['surveylines']
 
                 ssp.cur.meta.pressure_uom = ssp_meta['pressure_uom']
                 ssp.cur.meta.depth_uom = ssp_meta['depth_uom']
@@ -803,6 +822,26 @@ class ProjectDb:
 
         self.tmp_ssp_pk = None
         return True
+
+    def _updates_to_version_3(self, old_version):
+        # noinspection SqlResolve
+
+        # - 'ssp' table
+        # noinspection SqlResolve
+        self.conn.execute("""ALTER TABLE ssp ADD COLUMN surveylines text NOT NULL DEFAULT ''""")
+
+        # - 'ssp_view' view
+        # noinspection SqlResolve
+        self.conn.execute("""DROP VIEW ssp_view""")
+
+        # - 'library' table
+        # noinspection SqlResolve
+        self.conn.execute("""DELETE FROM library WHERE version=?""", (old_version,))
+        # noinspection SqlResolve
+        self.conn.execute("""
+                          INSERT INTO library VALUES (?, ?, ?)
+                          """, (self.cur_version, "%s v.%s" % (lib_info.lib_name, lib_info.lib_version),
+                                datetime.datetime.utcnow(),))
 
     def __repr__(self):
         msg = "<%s>\n" % self.__class__.__name__

@@ -1154,12 +1154,14 @@ class SoundSpeedLibrary:
 
     # exporting
 
-    def export_db_profiles_metadata(self, ogr_format=GdalAux.ogr_formats['ESRI Shapefile']):
+    def export_db_profiles_metadata(self, ogr_format=GdalAux.ogr_formats['ESRI Shapefile'],
+                                    filter_fields=None):
         """Export the db profile metadata"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         lst = db.export.export_profiles_metadata(project_name=self.current_project,
                                                  output_folder=self.outputs_folder,
-                                                 ogr_format=ogr_format)
+                                                 ogr_format=ogr_format,
+                                                 filter_fields=filter_fields)
         db.disconnect()
         return lst
 
