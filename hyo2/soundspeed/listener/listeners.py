@@ -1,7 +1,8 @@
 import time
 import logging
 
-from hyo2.soundspeed.listener.sis.sis import Sis
+from hyo2.soundspeed.listener.sis.sis4 import Sis4
+from hyo2.soundspeed.listener.sis.sis5 import Sis5
 from hyo2.soundspeed.listener.sippican.sippican import Sippican
 from hyo2.soundspeed.listener.mvp.mvp import Mvp
 
@@ -17,11 +18,11 @@ class Listeners:
         self.prj = prj
 
         # available listeners
-        self.sis4 = Sis(port=self.prj.setup.sis4_listen_port, datagrams=[0x50, 0x52, 0x55, 0x58],
-                        timeout=self.prj.setup.sis4_listen_timeout, name="SIS4")
-        self.sis5 = Sis(ip=self.prj.setup.sis5_listen_ip, port=self.prj.setup.sis5_listen_port,
-                        datagrams=[b'#MRZ', b'#SPO', b'#SVP'],
-                        timeout=self.prj.setup.sis5_listen_timeout, name="SIS5")
+        self.sis4 = Sis4(port=self.prj.setup.sis4_listen_port, datagrams=[0x50, 0x52, 0x55, 0x58],
+                         timeout=self.prj.setup.sis4_listen_timeout)
+        self.sis5 = Sis5(ip=self.prj.setup.sis5_listen_ip, port=self.prj.setup.sis5_listen_port,
+                         datagrams=[b'#MRZ', b'#SPO', b'#SVP'],
+                         timeout=self.prj.setup.sis5_listen_timeout)
         self.sippican = Sippican(port=self.prj.setup.sippican_listen_port, prj=prj)
         self.mvp = Mvp(port=self.prj.setup.mvp_listen_port, prj=prj)
 

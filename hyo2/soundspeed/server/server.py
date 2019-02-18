@@ -97,7 +97,7 @@ class Server(Thread):
                 client.alive = False
                 continue
 
-            client.request_profile_from_sis(self.prj)
+            client.request_profile_from_sis4(self.prj)
 
             if self.prj.listeners.sis4.ssp:
                 logger.info("Interaction test: OK")
@@ -263,7 +263,7 @@ class Server(Thread):
                     logger.info("Dead client: %s > Skipping" % client.ip)
                     continue
 
-                client.request_profile_from_sis(prj=self.prj)
+                client.request_profile_from_sis4(prj=self.prj)
                 if not self.prj.listeners.sis4.ssp:
                     logger.info("client %s dead since last tx" % client.name)
                     client.alive = False

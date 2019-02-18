@@ -12,14 +12,14 @@ from hyo2.soundspeed.formats import km, kmall
 logger = logging.getLogger(__name__)
 
 
-class Sis(AbstractListener):
+class Sis4(AbstractListener):
     """Kongsberg SIS listener"""
 
     def __init__(self, port: int, datagrams: list, timeout: int = 1, ip: str = "0.0.0.0",
-                 target: Optional[object] = None, name: str = "Kng") -> None:
-        super(Sis, self).__init__(port=port, datagrams=datagrams, ip=ip, timeout=timeout,
+                 target: Optional[object] = None, name: str = "SIS4") -> None:
+        super(Sis4, self).__init__(port=port, datagrams=datagrams, ip=ip, timeout=timeout,
                                   target=target, name=name)
-        self.desc = "Kongsberg SIS"
+        self.desc = "Kongsberg SIS4"
 
         # A few Nones to accommodate the potential types of datagrams that are currently supported
         self.id = None
@@ -43,19 +43,19 @@ class Sis(AbstractListener):
         self.svp = None
 
     def __repr__(self) -> str:
-        msg = "%s" % super(Sis, self).__repr__()
+        msg = "%s" % super(Sis4, self).__repr__()
         # msg += "  <has data loaded: %s>\n" % self.has_data_loaded
         return msg
 
     @classmethod
-    def request_iur(cls, ip: str, port: int = 4001) -> None:
+    def request_cur_profile(cls, ip: str, port: int = 4001) -> None:
         # Leaving this statement on until I have a chance to test with all systems.
         logger.info("Requesting profile from %s:%s" % (ip, port))
 
         sock_out = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         # We try all of them in the hopes that one works.
-        sensors = ["710", "122", "302", "3020", "2040", "124"]
+        sensors = ["710", "122", "302", "3020", "2040"]
         for sensor in sensors:
             # talker ID, Roger Davis (HMRG) suggested SM based on something KM told him
             output = '$SMR20,EMX=%s,' % sensor

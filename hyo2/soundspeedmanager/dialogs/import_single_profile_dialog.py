@@ -38,12 +38,15 @@ class ImportSingleProfileDialog(AbstractDialog):
         self.fmtLayout = QtWidgets.QHBoxLayout()
         self.importLayout.addLayout(self.fmtLayout)
         # -- left
+        # noinspection PyUnresolvedReferences
         self.leftButtonBox = QtWidgets.QDialogButtonBox(QtCore.Qt.Vertical)
         self.fmtLayout.addWidget(self.leftButtonBox)
         # -- middle
+        # noinspection PyUnresolvedReferences
         self.midButtonBox = QtWidgets.QDialogButtonBox(QtCore.Qt.Vertical)
         self.fmtLayout.addWidget(self.midButtonBox)
         # -- right
+        # noinspection PyUnresolvedReferences
         self.rightButtonBox = QtWidgets.QDialogButtonBox(QtCore.Qt.Vertical)
         self.fmtLayout.addWidget(self.rightButtonBox)
         # --- add buttons
@@ -82,6 +85,7 @@ class ImportSingleProfileDialog(AbstractDialog):
         retrieve_hbox.addWidget(retrieve_label)
         retrieve_hbox.addStretch()
         # - button box
+        # noinspection PyUnresolvedReferences
         self.retrieveButtonBox = QtWidgets.QDialogButtonBox(QtCore.Qt.Vertical)
         self.retrieveButtonBox.setMinimumWidth(self.botton_min_width)
         self.retrieveLayout.addWidget(self.retrieveButtonBox)
@@ -116,12 +120,18 @@ class ImportSingleProfileDialog(AbstractDialog):
         btn.setToolTip("Retrieve synthetic data from GoMOFS Atlas")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_click_gomofs)
-        # -- SIS
-        btn = QtWidgets.QPushButton("SIS")
+        # -- SIS4
+        btn = QtWidgets.QPushButton("SIS4")
         self.retrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
-        btn.setToolTip("Retrieve current profile from SIS")
+        btn.setToolTip("Retrieve current profile from SIS4")
         # noinspection PyUnresolvedReferences
-        btn.clicked.connect(self.on_click_sis)
+        btn.clicked.connect(self.on_click_sis4)
+        # -- SIS5
+        btn = QtWidgets.QPushButton("SIS5")
+        self.retrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve current profile from SIS5")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_click_sis5)
         # -- Seabird CTD
         btn = QtWidgets.QPushButton("Seabird CTD")
         self.retrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
@@ -319,10 +329,10 @@ class ImportSingleProfileDialog(AbstractDialog):
         self.accept()
         self.progress.end()
 
-    def on_click_sis(self):
-        """Retrieve SIS data"""
+    def on_click_sis4(self):
+        """Retrieve SIS4 data"""
         if not self.lib.use_sis4():
-            msg = "The SIS listening is not activated!\n\nGo to Settings/Input/Listen SIS"
+            msg = "The SIS4 listening is not activated!\n\nGo to Settings/Input/Listen SIS4"
             # noinspection PyCallByClass
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             return
@@ -331,7 +341,26 @@ class ImportSingleProfileDialog(AbstractDialog):
             self.lib.retrieve_sis4()
 
         except RuntimeError as e:
-            msg = "Issue in retrieving data from SIS:\n\n%s" % e
+            msg = "Issue in retrieving data from SIS4:\n\n%s" % e
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            return
+
+        self.accept()
+
+    def on_click_sis5(self):
+        """Retrieve SIS5 data"""
+        if not self.lib.use_sis5():
+            msg = "The SIS5 listening is not activated!\n\nGo to Settings/Input/Listen SIS5"
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            return
+
+        try:
+            self.lib.retrieve_sis5()
+
+        except RuntimeError as e:
+            msg = "Issue in retrieving data from SIS5:\n\n%s" % e
             # noinspection PyCallByClass
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             return

@@ -550,7 +550,7 @@ class SoundSpeedLibrary:
         self.ssp = self.atlases.gomofs.query(lat=lat, lon=lon, datestamp=utc_time)
 
     def retrieve_sis4(self):
-        """Retrieve data from SIS"""
+        """Retrieve data from SIS4"""
         if not self.use_sis4():
             logger.warning("use SIS4 option is disabled")
             return
@@ -562,7 +562,7 @@ class SoundSpeedLibrary:
         prog_quantum = 50 / len(self.setup.client_list.clients)
 
         for client in self.setup.client_list.clients:
-            client.request_profile_from_sis(prj=self)
+            client.request_profile_from_sis4(prj=self)
             self.progress.add(prog_quantum)
 
         if not self.listeners.sis4.ssp:
@@ -595,6 +595,54 @@ class SoundSpeedLibrary:
         ssp_list = ProfileList()
         ssp_list.append_profile(ssp)
         self.ssp = ssp_list
+        self.progress.end()
+
+    def retrieve_sis5(self):
+        """Retrieve data from SIS5"""
+        if not self.use_sis5():
+            logger.warning("use SIS5 option is disabled")
+            return
+
+        self.progress.start(text="Retrieve from SIS5")
+
+        self.listen_sis5()
+
+        prog_quantum = 50 / len(self.setup.client_list.clients)
+
+        for client in self.setup.client_list.clients:
+            client.request_profile_from_sis4(prj=self)
+            self.progress.add(prog_quantum)
+
+        # if not self.listeners.sis4.ssp:
+        #     self.progress.end()
+        #     raise RuntimeError("Unable to get SIS4 cast from any clients")
+        #
+        # # logger.info("got SSP from SIS4: %s" % self.listeners.sis4.ssp)
+        # self.progress.update(80)
+        #
+        # # try to retrieve the location from SIS
+        # lat = None
+        # lon = None
+        # if self.listeners.sis4.nav:
+        #     from_sis = self.cb.ask_location_from_sis()
+        #     if from_sis:
+        #         lat, lon = self.listeners.sis4.nav.latitude, self.listeners.sis4.nav.longitude
+        # # if we don't have a location, ask user
+        # if (lat is None) or (lon is None):
+        #     lat, lon = self.cb.ask_location()
+        #     if (lat is None) or (lon is None):
+        #         logger.error("missing geographic location required for database lookup")
+        #         self.progress.end()
+        #         return None
+        #
+        # ssp = self.listeners.sis4.ssp.convert_ssp()
+        # ssp.meta.latitude = lat
+        # ssp.meta.longitude = lon
+        # ssp.clone_data_to_proc()
+        # ssp.init_sis()  # initialize to zero
+        # ssp_list = ProfileList()
+        # ssp_list.append_profile(ssp)
+        # self.ssp = ssp_list
         self.progress.end()
 
     # --- export data

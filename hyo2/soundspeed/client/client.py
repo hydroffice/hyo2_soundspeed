@@ -101,11 +101,11 @@ class Client:
         sock_out.close()
         return True
 
-    def request_profile_from_sis(self, prj):
+    def request_profile_from_sis4(self, prj):
         if self.protocol != "SIS":
             return
 
-        prj.listeners.sis4.request_iur(ip=self.ip, port=self.port)
+        prj.listeners.sis4.request_cur_profile(ip=self.ip, port=self.port)
         wait = prj.setup.rx_max_wait_time
         count = 0
         quantum = 2
