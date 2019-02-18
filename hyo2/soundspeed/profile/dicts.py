@@ -136,8 +136,8 @@ class Dicts:
         ("SIS", 0),
         ("HYPACK", 1),
         ("PDS2000", 2),
-        ("QINSY", 3)
-
+        ("QINSY", 3),
+        ("KCTRL", 4),
     ])
 
     atlases = OrderedDict([

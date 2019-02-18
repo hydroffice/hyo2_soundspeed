@@ -39,7 +39,7 @@ class ClientList:
                 success = False
                 continue
 
-            if client.protocol != "SIS":
+            if client.protocol not in ["SIS", "KCTRL"]:
                 logger.info("transmitted cast, protocol %s does not allow verification"
                             % client.protocol)
                 time.sleep(1)

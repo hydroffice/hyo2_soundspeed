@@ -46,6 +46,7 @@ class Output(AbstractWidget):
         # -- button box
         vbox = QtWidgets.QVBoxLayout()
         hbox.addLayout(vbox)
+        # noinspection PyUnresolvedReferences
         self.btn_box = QtWidgets.QDialogButtonBox(QtCore.Qt.Vertical)
         vbox.addWidget(self.btn_box)
         vbox.addStretch()
@@ -256,7 +257,7 @@ class Output(AbstractWidget):
         # port
         while True:
             # noinspection PyCallByClass
-            port, ok = QtWidgets.QInputDialog.getInt(self, "New client", "Input the port (e.g., 4001)",
+            port, ok = QtWidgets.QInputDialog.getInt(self, "New client", "Input the port (e.g., 4001, 14002)",
                                                      4001, 0, 65535)
             if not ok:
                 return
@@ -273,7 +274,7 @@ class Output(AbstractWidget):
         while True:
             # noinspection PyCallByClass
             protocol, ok = QtWidgets.QInputDialog.getText(self, "New client",
-                                                          "Input the protocol (SIS, HYPACK, PDS2000, or QINSY)",
+                                                          "Input the protocol (SIS, KCTRL, HYPACK, PDS2000, or QINSY)",
                                                           QtWidgets.QLineEdit.Normal,
                                                           "SIS")
             if not ok:

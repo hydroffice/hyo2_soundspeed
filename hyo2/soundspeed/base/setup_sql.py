@@ -198,7 +198,7 @@ CREATE_CLIENT_LIST = """-- noinspection SqlResolveForFile
      ON DELETE CASCADE,
      /* Checks */
      CHECK (port > 0),
-     CHECK (protocol IN ("SIS", "HYPACK", "PDS2000", "QINSY"))
+     CHECK (protocol IN ("SIS", "HYPACK", "PDS2000", "QINSY", "KCTRL"))
      ) """
 
 CREATE_SETTINGS_VIEW = """-- noinspection SqlResolveForFile

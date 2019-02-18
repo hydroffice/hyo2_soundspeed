@@ -41,7 +41,7 @@ class Client:
     def send_kng_format(self, prj, server_mode=False):
         logger.info("using kng format")
         kng_fmt = None
-        if self.protocol == "SIS":
+        if self.protocol in ["SIS", "KCTRL"]:
             if prj.setup.sis_auto_apply_manual_casts or server_mode:
                 kng_fmt = Dicts.kng_formats['S01']
             else:
