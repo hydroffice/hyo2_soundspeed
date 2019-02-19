@@ -63,7 +63,7 @@ setup(
     ],
     install_requires=[
         "hyo2.abc",
-        "gsw==3.0.6",  # install it from github without scipy dependency, version == 3.0.6
+        "gsw>=3.3.0",
         "netCDF4",
         "pillow",
         "pyserial",
