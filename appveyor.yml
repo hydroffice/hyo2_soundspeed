@@ -38,7 +38,7 @@ install:
   - pip install coveralls
   - pip install PySide2
   - pip install gsw==3.0.6
-  - conda install numpy matplotlib-base gdal pyproj scipy basemap netCDF4 pillow cython
+  - conda install numpy=1.16.0 matplotlib-base gdal pyproj scipy basemap netCDF4 pillow cython
   - pip install https://github.com/hydroffice/hyo2_abc/archive/master.zip
 
 build: off
