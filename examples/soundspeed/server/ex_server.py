@@ -1,4 +1,4 @@
-from hyo2.soundspeed.logging import test_logging
+from hyo2.soundspeed.logger import test_logging
 
 import time
 import logging

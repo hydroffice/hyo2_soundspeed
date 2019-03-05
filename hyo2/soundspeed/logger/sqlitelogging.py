@@ -3,8 +3,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from hyo2.soundspeed.logging.sqlitehandler import SQLiteHandler
-from hyo2.soundspeed.logging.filters import NotServerFilter, ServerFilter
+from hyo2.soundspeed.logger.sqlitehandler import SQLiteHandler
+from hyo2.soundspeed.logger.filters import NotServerFilter, ServerFilter
 
 
 class SqliteLogging:

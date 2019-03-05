@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from hyo2.soundspeed.logging import sqlitelogging
+from hyo2.soundspeed.logger import sqlitelogging
 
 
 class TestSoundSpeedLoggingSqliteLogging(unittest.TestCase):

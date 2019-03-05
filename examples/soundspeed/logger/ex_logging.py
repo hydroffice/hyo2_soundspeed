@@ -1,7 +1,7 @@
 import os
 import logging
 
-from hyo2.soundspeed.logging.sqlitelogging import SqliteLogging
+from hyo2.soundspeed.logger.sqlitelogging import SqliteLogging
 from hyo2.soundspeed.base.testing import SoundSpeedTesting
 
 logging.basicConfig(level=logging.DEBUG)

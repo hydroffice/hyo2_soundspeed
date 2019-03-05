@@ -20,7 +20,7 @@ from hyo2.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 from hyo2.soundspeed.base.setup import Setup
 from hyo2.soundspeed.db.db import ProjectDb
 from hyo2.soundspeed.listener.listeners import Listeners
-from hyo2.soundspeed.logging.sqlitelogging import SqliteLogging
+from hyo2.soundspeed.logger.sqlitelogging import SqliteLogging
 from hyo2.soundspeed.profile.profilelist import ProfileList
 from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeed.server.server import Server
