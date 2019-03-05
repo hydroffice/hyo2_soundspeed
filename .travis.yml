@@ -47,7 +47,7 @@ install:
   - conda create -q -n test-environment python=$PYTHON_VERSION
   - source activate test-environment
   - pip install PySide2
-  - conda install numpy=1.15.3 matplotlib-base gdal pyproj scipy basemap netCDF4 pillow
+  - conda install numpy matplotlib-base gdal pyproj scipy basemap netCDF4 pillow
   - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then
       conda remove --force PyQt Qt sip;
       export LD_LIBRARY_PATH=$HOME/miniconda/envs/test-environment/lib:$LD_LIBRARY_PATH;
