@@ -1,18 +1,29 @@
 language: cpp  # Travis-CI does not currently support Python and Mac OS X
 
-os:
-  - linux
-  - osx
-
-env:
-  - PYTHON_VERSION=3.6
-  - PYTHON_VERSION=3.7
-
 matrix:
+  include:
+    - os: linux
+      dist: xenial
+      env: PYTHON_VERSION=3.6
+    - os: linux
+      dist: trusty
+      env: PYTHON_VERSION=3.6
+    - os: linux
+      dist: xenial
+      env: PYTHON_VERSION=3.7
+    - os: osx
+      env: PYTHON_VERSION=3.6
+
   fast_finish: true
   allow_failures:
-  - os: osx
-  - env: PYTHON_VERSION=3.7
+    - os: linux
+      dist: trusty
+      env: PYTHON_VERSION=3.6
+    - os: linux
+      dist: xenial
+      env: PYTHON_VERSION=3.7
+    - os: osx
+      env: PYTHON_VERSION=3.6
 
 install:
   - "export DISPLAY=:99.0"
@@ -46,10 +57,14 @@ install:
   - pip install https://github.com/hydroffice/hyo2_abc/archive/master.zip
   - pip install .
   - rm -f $HOME/miniconda/envs/test-environment/qt.conf
+  - pip install pytest pytest-cov
   - conda list --show-channel-urls
 
 script:
-  - coverage run --source hyo2 setup.py test
+  - py.test --cov=hyo2 tests/
+
+after_script:
+  - coverage report -m
 
 after_success:
   - coveralls
