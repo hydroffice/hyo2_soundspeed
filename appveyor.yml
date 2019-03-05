@@ -52,6 +52,7 @@ test: off
 test_script:
   - coverage run --source hyo2 setup.py test
   - coverage report -m
+  - coveralls
 
 after_test:
   - python setup.py bdist_wheel
