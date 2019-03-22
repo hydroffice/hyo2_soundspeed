@@ -66,12 +66,17 @@ class OceanScience(AbstractTextReader):
         lat_meta = re.search(r'/*\*Lat (?P<lat>[\d/]+)', s)
         lon_meta = re.search(r'/*\*Lon (?P<lon>[\d/]+)', s)
 
+        if (lat_meta is None) or (lon_meta is None):
+            lat_meta = re.search(r'/*\*Lat (?P<lat>[\d.-]+)', s)
+            lon_meta = re.search(r'/*\*Lon (?P<lon>[\d.-]+)', s)
+            # logger.debug("lat: %s" % lat_meta.group('lat'))
+
         try:
             location = coordinates.Coordinate(lat_meta.group('lat'), lon_meta.group('lon'))
             meta.update(getMetaFromCoord(location))
 
         except Exception as e:
-            logger.warning("unable to retrieve cast location: newer format? or lat/lon is blank?")
+            logger.warning("unable to retrieve cast location: %s" % e)
 
         device_meta = re.search(r'/*\*DeviceType=\s*(?P<TYPE>\w+)', s)
         sn_meta = re.search(r'/*\*SerialNumber=\s*(?P<SN>\w+)', s)
