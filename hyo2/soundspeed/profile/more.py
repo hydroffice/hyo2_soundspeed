@@ -36,7 +36,7 @@ class More:
         if self.sa.shape[0] == count:
             return
 
-        self.sa.resize((count, self.sa.shape[1]))
+        self.sa = np.resize(self.sa, (count, self.sa.shape[1]))
 
     def debug_plot(self):
         """Create a debug plot with the data, optionally with the extra data if available"""
