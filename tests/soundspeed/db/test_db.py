@@ -42,7 +42,7 @@ class TestSoundSpeedDb(unittest.TestCase):
         if os.path.exists(self.db_path):
             os.remove(self.db_path)
 
-    @unittest.skipUnless(sys.platform.startswith("win"), "only works with GDAL < 2.0 on Windows")
+    # @unittest.skipUnless(sys.platform.startswith("win"), "only works with GDAL < 2.0 on Windows")
     def test_save_load_cast(self):
         def test_pk(pk):
             self.lib.ssp = self.lib.db_retrieve_profile(pk)

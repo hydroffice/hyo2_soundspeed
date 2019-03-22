@@ -69,4 +69,5 @@ after_script:
   - coverage report -m
 
 after_success:
+  - pip install PyYAML
   - coveralls

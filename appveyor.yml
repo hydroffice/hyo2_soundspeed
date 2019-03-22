@@ -52,6 +52,7 @@ test: off
 test_script:
   - coverage run --source hyo2 setup.py test
   - coverage report -m
+  - pip install PyYAML
   - coveralls
 
 after_test:

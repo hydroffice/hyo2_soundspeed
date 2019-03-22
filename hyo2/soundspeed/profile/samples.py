@@ -47,21 +47,21 @@ class Samples:
         self.num_samples = count
 
         if self.pressure is not None:
-            self.pressure.resize(count)
+            self.pressure = np.resize(self.pressure, count)
         if self.depth is not None:
-            self.depth.resize(count)
+            self.depth = np.resize(self.depth, count)
         if self.speed is not None:
-            self.speed.resize(count)
+            self.speed = np.resize(self.speed, count)
         if self.temp is not None:
-            self.temp.resize(count)
+            self.temp = np.resize(self.temp, count)
         if self.conductivity is not None:
-            self.conductivity.resize(count)
+            self.conductivity = np.resize(self.conductivity, count)
         if self.sal is not None:
-            self.sal.resize(count)
+            self.sal = np.resize(self.sal, count)
         if self.source is not None:
-            self.source.resize(count)
+            self.source = np.resize(self.source, count)
         if self.flag is not None:
-            self.flag.resize(count)
+            self.flag = np.resize(self.flag, count)
 
     def __repr__(self):
         msg = "  <Samples>\n"
