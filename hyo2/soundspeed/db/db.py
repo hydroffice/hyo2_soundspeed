@@ -635,14 +635,11 @@ class ProjectDb:
                                                     (row['pk'], Dicts.flags['valid'])).fetchall()
                     try:
                         ss_at_min_depth = '%0.2f' % ssp_samples[0]['speed']
-                    except:
-                        ss_at_min_depth = ''
-                    try:
                         min_depth = '%0.2f' % ssp_samples[0]['depth']
                         max_depth = '%0.2f' % ssp_samples[-1]['depth']
-                    except:
-                        min_depth = ''
-                        max_depth = ''
+                    except Exception as e:
+                        logger.warning("unable to import profile: %s -> skipping" % row['pk'])
+                        continue
 
                     # noinspection SqlResolve
                     ssp_samples = self.conn.execute("SELECT * FROM proc WHERE ssp_pk=? AND flag=? "
