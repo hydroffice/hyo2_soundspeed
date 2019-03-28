@@ -633,9 +633,16 @@ class ProjectDb:
                     # noinspection SqlResolve
                     ssp_samples = self.conn.execute("SELECT * FROM proc WHERE ssp_pk=? AND flag=?",
                                                     (row['pk'], Dicts.flags['valid'])).fetchall()
-                    ss_at_min_depth = '%0.2f' % ssp_samples[0]['speed']
-                    min_depth = '%0.2f' % ssp_samples[0]['depth']
-                    max_depth = '%0.2f' % ssp_samples[-1]['depth']
+                    try:
+                        ss_at_min_depth = '%0.2f' % ssp_samples[0]['speed']
+                    except:
+                        ss_at_min_depth = ''
+                    try:
+                        min_depth = '%0.2f' % ssp_samples[0]['depth']
+                        max_depth = '%0.2f' % ssp_samples[-1]['depth']
+                    except:
+                        min_depth = ''
+                        max_depth = ''
 
                     # noinspection SqlResolve
                     ssp_samples = self.conn.execute("SELECT * FROM proc WHERE ssp_pk=? AND flag=? "
@@ -647,7 +654,10 @@ class ProjectDb:
                                                      Dicts.sources['rtofs_ext'], Dicts.sources['gomofs_ext'],
                                                      Dicts.sources['ref_ext'],
                                                      )).fetchall()
-                    max_raw_depth = '%0.2f' % ssp_samples[-1]['depth']
+                    try:
+                        max_raw_depth = '%0.2f' % ssp_samples[-1]['depth']
+                    except:
+                        max_raw_depth = ''
 
                     ssp_list.append((row['pk'],  # 0
                                      row['cast_datetime'],  # 1
