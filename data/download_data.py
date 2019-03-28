@@ -1,48 +1,45 @@
-"""Script to download data files from the BitBucket repository"""
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-
-import sys
+import logging
 import os.path
 import shutil
-import zipfile
-try:
-    import wget
-except ImportError as e:
-    print("> missing wget, trying to install it: %s" % e)
-    try:
-        import pip
-        pip.main(['install', 'wget'])
-        import wget
-    except Exception as e:
-        print("  - unable to install wget: %s" % e)
-        sys.exit(1)
+from hyo2.abc.lib.ftp import Ftp
 
-# list of archives to download
+logging.basicConfig(level=logging.DEBUG,
+                    format="%(levelname)-9s %(name)s.%(funcName)s:%(lineno)d > %(message)s")
+logger = logging.getLogger(__name__)
+
+clear_download_folder = False
+
+# list of files to download
 data_files = [
-
+    "rtofs_glo_3dz_f024_daily_3zsio.nc",
+    "rtofs_glo_3dz_f024_daily_3ztio.nc"
 ]
+
+# create an empty `download` folder
+download_folder = os.path.join(os.path.abspath(os.path.dirname(__file__)), "download")
+if not os.path.exists(download_folder):
+    os.makedirs(download_folder)
+elif clear_download_folder:
+    shutil.rmtree(download_folder)
+    os.makedirs(download_folder)
+rtofs_folder = os.path.join(download_folder, "rtofs")
+if not os.path.exists(rtofs_folder):
+    os.makedirs(rtofs_folder)
+elif clear_download_folder:
+    shutil.rmtree(rtofs_folder)
+    os.makedirs(rtofs_folder)
 
 # actually downloading the file with wget
 for fid in data_files:
-    uri = 'https://bitbucket.org/ccomjhc/hyo_base/downloads/' + fid
-    print("> downloading %s" % uri)
-    if os.path.isfile(fid):
-        print("  - already downloaded: skipping!")
-    else:
-        wget.download(uri, bar=wget.bar_thermometer)
-        print("  - OK")
 
-# create an empty `downloaded` folder
-downloaded_folder = os.path.join(os.path.abspath(os.path.dirname(__file__)), "download")
-if os.path.exists(downloaded_folder):
-    shutil.rmtree(downloaded_folder)
-os.makedirs(downloaded_folder)
+    data_src = os.path.join("fromccom/hydroffice/smartmap", fid)
+    data_dst = os.path.abspath(os.path.join(rtofs_folder, fid))
+    print("> downloading %s to %s" % (data_src, data_dst))
 
-# actually unzipping the archives (then delete them)
-for fid in data_files:
-    with zipfile.ZipFile(fid) as zf:
-        zf.extractall(downloaded_folder)
-    os.remove(fid)
+    try:
+        ftp = Ftp("ftp.ccom.unh.edu", show_progress=True, debug_mode=False)
+        ftp.get_file(data_src, data_dst, unzip_it=False)
+        ftp.disconnect()
 
-print("--- DONE")
+    except Exception as e:
+        logger.error('while downloading %s: %s' % (fid, e))

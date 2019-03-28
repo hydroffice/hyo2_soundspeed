@@ -1,11 +1,13 @@
-from hyo2.soundspeed.logger import test_logging
-
 import time
 import logging
-logger = logging.getLogger()
 
-from hyo2.soundspeed.server.server import Server
+from hyo2.soundspeedmanager import app_info
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+from hyo2.soundspeed.server.server import Server
+
+logging.basicConfig(level=logging.DEBUG,
+                    format="%(levelname)-9s %(name)s.%(funcName)s:%(lineno)d > %(message)s")
+logger = logging.getLogger()
 
 lib = SoundSpeedLibrary()
 lib.listen_sis4()

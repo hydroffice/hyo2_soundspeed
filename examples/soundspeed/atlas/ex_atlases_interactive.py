@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 # - Indian Ocean: -19.1, 74.16
 # - middle of Africa (in land): 18.2648113, 16.1761115
 
-switch = "RTOFS"  # WOA09 or WOA13 or RTOFS or GoMOFS
+switch = "WOA09"  # WOA09 or WOA13 or RTOFS or GoMOFS
 
 app = QtWidgets.QApplication([])  # PySide stuff (start)
 mw = QtWidgets.QMainWindow()

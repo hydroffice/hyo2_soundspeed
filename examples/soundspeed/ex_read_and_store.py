@@ -9,7 +9,8 @@ from hyo2.soundspeed.base.testing import SoundSpeedTesting
 from hyo2.soundspeed.base.callbacks.test_callbacks import TestCallbacks
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG,
+                    format="%(levelname)-9s %(name)s.%(funcName)s:%(lineno)d > %(message)s")
 logger = logging.getLogger(__name__)
 
 # create a project with test-callbacks

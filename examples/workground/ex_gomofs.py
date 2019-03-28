@@ -3,16 +3,14 @@ from http import client
 from urllib import parse
 import socket
 import logging
-from typing import Optional, Union
 
 from netCDF4 import Dataset
-import numpy as np
 
 logging.basicConfig(level=logging.DEBUG,
                     format="%(levelname)-9s %(name)s.%(funcName)s:%(lineno)d > %(message)s")
 logger = logging.getLogger(__name__)
 
-url = r"https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/GOMOFS/MODELS/201901/nos.gomofs.regulargrid.n003.20190115.t00z.nc"
+url = r"https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/GOMOFS/MODELS/201903/nos.gomofs.regulargrid.n003.20190327.t00z.nc"
 
 try:
     p = parse.urlparse(url)
