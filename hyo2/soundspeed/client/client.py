@@ -2,10 +2,13 @@ import time
 import socket
 import traceback
 import logging
+from typing import TYPE_CHECKING, Union
 
 from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeed.formats.writers.asvp import Asvp
 from hyo2.soundspeed.formats.writers.calc import Calc
+if TYPE_CHECKING:
+    from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +16,7 @@ logger = logging.getLogger(__name__)
 class Client:
     UDP_DATA_LIMIT = (2 ** 16) - 28
 
-    def __init__(self, client):
+    def __init__(self, client: str) -> None:
         # print(client)
         self.name = client.split(":")[0]
         self.ip = client.split(":")[1]
@@ -22,7 +25,7 @@ class Client:
         self.alive = True
         # logger.info("client: %s(%s:%s) %s" % (self.name, self.ip, self.port, self.protocol))
 
-    def send_cast(self, prj, server_mode=False):
+    def send_cast(self, prj: 'SoundSpeedLibrary', server_mode: bool = False) -> bool:
         """Send a cast to the """
         if not self.alive:
             logger.debug("%s[%s:%s:%s] is NOT alive" % (self.name, self.ip, self.port, self.protocol))
@@ -30,7 +33,6 @@ class Client:
 
         logger.info("transmitting to %s: [%s:%s:%s]" % (self.name, self.ip, self.port, self.protocol))
 
-        success = False
         if self.protocol == "HYPACK":
             success = self.send_hyp_format(prj=prj)
         else:
@@ -38,7 +40,7 @@ class Client:
 
         return success
 
-    def send_kng_format(self, prj, server_mode=False):
+    def send_kng_format(self, prj: 'SoundSpeedLibrary', server_mode: bool = False) -> bool:
         logger.info("using kng format")
         kng_fmt = None
         if self.protocol in ["SIS", "KCTRL"]:
@@ -74,13 +76,13 @@ class Client:
 
         return self._transmit(tx_data)
 
-    def send_hyp_format(self, prj):
+    def send_hyp_format(self, prj: 'SoundSpeedLibrary') -> bool:
         logger.info("using hyp format")
         calc = Calc()
         tx_data = calc.convert(prj.ssp)
         return self._transmit(tx_data)
 
-    def _transmit(self, tx_data):
+    def _transmit(self, tx_data: Union[bytes, str]) -> bool:
         sock_out = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         try:
@@ -101,7 +103,7 @@ class Client:
         sock_out.close()
         return True
 
-    def request_profile_from_sis4(self, prj):
+    def request_profile_from_sis4(self, prj: 'SoundSpeedLibrary') -> None:
         if self.protocol != "SIS":
             return
 
@@ -110,7 +112,21 @@ class Client:
         count = 0
         quantum = 2
         logger.info("Waiting ..")
-        while (count < wait) and (not prj.listeners.sis4.ssp) and (not prj.listeners.sis5.svp):
+        while (count < wait) and (not prj.listeners.sis4.ssp):
+            time.sleep(quantum)
+            count += quantum
+            logger.info(".. %s sec" % count)
+
+    def request_profile_from_sis5(self, prj: 'SoundSpeedLibrary') -> None:
+        if self.protocol != "KCTRL":
+            return
+
+        prj.listeners.sis5.request_cur_profile(ip=self.ip, port=self.port)
+        wait = prj.setup.rx_max_wait_time
+        count = 0
+        quantum = 2
+        logger.info("Waiting ..")
+        while (count < wait) and (not prj.listeners.sis5.svp):
             time.sleep(quantum)
             count += quantum
             logger.info(".. %s sec" % count)

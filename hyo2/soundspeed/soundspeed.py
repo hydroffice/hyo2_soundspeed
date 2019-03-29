@@ -549,15 +549,15 @@ class SoundSpeedLibrary:
 
         self.ssp = self.atlases.gomofs.query(lat=lat, lon=lon, datestamp=utc_time)
 
-    def retrieve_sis4(self):
+    def retrieve_sis4(self) -> None:
         """Retrieve data from SIS4"""
         if not self.use_sis4():
-            logger.warning("use SIS4 option is disabled")
-            return
+            raise RuntimeError("use SIS4 option is disabled")
 
         self.progress.start(text="Retrieve from SIS4")
 
-        self.listen_sis4()
+        if not self.listen_sis4():
+            raise RuntimeError("unable to listen SIS4")
 
         prog_quantum = 50 / len(self.setup.client_list.clients)
 
@@ -572,7 +572,7 @@ class SoundSpeedLibrary:
         # logger.info("got SSP from SIS4: %s" % self.listeners.sis4.ssp)
         self.progress.update(80)
 
-        # try to retrieve the location from SIS
+        # try to retrieve the location from SIS4
         lat = None
         lon = None
         if self.listeners.sis4.nav:
@@ -583,9 +583,8 @@ class SoundSpeedLibrary:
         if (lat is None) or (lon is None):
             lat, lon = self.cb.ask_location()
             if (lat is None) or (lon is None):
-                logger.error("missing geographic location required for database lookup")
                 self.progress.end()
-                return None
+                raise RuntimeError("missing geographic location required for database lookup")
 
         ssp = self.listeners.sis4.ssp.convert_ssp()
         ssp.meta.latitude = lat
@@ -597,52 +596,51 @@ class SoundSpeedLibrary:
         self.ssp = ssp_list
         self.progress.end()
 
-    def retrieve_sis5(self):
+    def retrieve_sis5(self) -> None:
         """Retrieve data from SIS5"""
         if not self.use_sis5():
-            logger.warning("use SIS5 option is disabled")
-            return
+            raise RuntimeError("use SIS5 option is disabled")
 
         self.progress.start(text="Retrieve from SIS5")
 
-        self.listen_sis5()
+        if not self.listen_sis5():
+            raise RuntimeError("unable to listen SIS5")
 
         prog_quantum = 50 / len(self.setup.client_list.clients)
 
         for client in self.setup.client_list.clients:
-            client.request_profile_from_sis4(prj=self)
+            client.request_profile_from_sis5(prj=self)
             self.progress.add(prog_quantum)
 
-        # if not self.listeners.sis4.ssp:
-        #     self.progress.end()
-        #     raise RuntimeError("Unable to get SIS4 cast from any clients")
-        #
-        # # logger.info("got SSP from SIS4: %s" % self.listeners.sis4.ssp)
-        # self.progress.update(80)
-        #
-        # # try to retrieve the location from SIS
-        # lat = None
-        # lon = None
-        # if self.listeners.sis4.nav:
-        #     from_sis = self.cb.ask_location_from_sis()
-        #     if from_sis:
-        #         lat, lon = self.listeners.sis4.nav.latitude, self.listeners.sis4.nav.longitude
-        # # if we don't have a location, ask user
-        # if (lat is None) or (lon is None):
-        #     lat, lon = self.cb.ask_location()
-        #     if (lat is None) or (lon is None):
-        #         logger.error("missing geographic location required for database lookup")
-        #         self.progress.end()
-        #         return None
-        #
-        # ssp = self.listeners.sis4.ssp.convert_ssp()
-        # ssp.meta.latitude = lat
-        # ssp.meta.longitude = lon
-        # ssp.clone_data_to_proc()
-        # ssp.init_sis()  # initialize to zero
-        # ssp_list = ProfileList()
-        # ssp_list.append_profile(ssp)
-        # self.ssp = ssp_list
+        if not self.listeners.sis5.svp:
+            self.progress.end()
+            raise RuntimeError("Unable to get SIS5 cast from any clients")
+
+        # logger.info("got SSP from SIS5: %s" % self.listeners.sis5.svp)
+        self.progress.update(80)
+
+        # try to retrieve the location from SIS5
+        lat = None
+        lon = None
+        if self.listeners.sis5.spo:
+            from_sis = self.cb.ask_location_from_sis()
+            if from_sis:
+                lat, lon = self.listeners.sis5.spo.latitude, self.listeners.sis5.spo.longitude
+        # if we don't have a location, ask user
+        if (lat is None) or (lon is None):
+            lat, lon = self.cb.ask_location()
+            if (lat is None) or (lon is None):
+                self.progress.end()
+                raise RuntimeError("missing geographic location required for database lookup")
+
+        ssp = self.listeners.sis5.svp.convert_ssp()
+        ssp.meta.latitude = lat
+        ssp.meta.longitude = lon
+        ssp.clone_data_to_proc()
+        ssp.init_sis()  # initialize to zero
+        ssp_list = ProfileList()
+        ssp_list.append_profile(ssp)
+        self.ssp = ssp_list
         self.progress.end()
 
     # --- export data
@@ -1601,40 +1599,40 @@ class SoundSpeedLibrary:
 
     # --- listeners
 
-    def use_sis4(self):
+    def use_sis4(self) -> bool:
         return self.setup.use_sis4
 
-    def use_sis5(self):
+    def use_sis5(self) -> bool:
         return self.setup.use_sis5
 
-    def use_sippican(self):
+    def use_sippican(self) -> bool:
         return self.setup.use_sippican
 
-    def use_mvp(self):
+    def use_mvp(self) -> bool :
         return self.setup.use_mvp
 
-    def listen_sis4(self):
+    def listen_sis4(self) -> bool:
         return self.listeners.listen_sis4()
 
-    def listen_sis5(self):
+    def listen_sis5(self) -> bool:
         return self.listeners.listen_sis5()
 
-    def listen_sippican(self):
+    def listen_sippican(self) -> bool:
         return self.listeners.listen_sippican()
 
-    def listen_mvp(self):
+    def listen_mvp(self) -> bool:
         return self.listeners.listen_mvp()
 
-    def stop_listen_sis4(self):
+    def stop_listen_sis4(self) -> bool:
         return self.listeners.stop_listen_sis4()
 
-    def stop_listen_sis5(self):
+    def stop_listen_sis5(self) -> bool:
         return self.listeners.stop_listen_sis5()
 
-    def stop_listen_sippican(self):
+    def stop_listen_sippican(self) -> bool:
         return self.listeners.stop_listen_sippican()
 
-    def stop_listen_mvp(self):
+    def stop_listen_mvp(self) -> bool:
         return self.listeners.stop_listen_mvp()
 
     # --- clients

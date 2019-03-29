@@ -1,8 +1,11 @@
 import numpy as np
 import time
 import logging
+from typing import TYPE_CHECKING, Union
 
 from hyo2.soundspeed.client.client import Client
+if TYPE_CHECKING:
+    from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 
@@ -13,12 +16,12 @@ class ClientList:
         self.clients = list()
         self.last_tx_time = None
 
-    def add_client(self, client):
+    def add_client(self, client: str):
         client = Client(client)
         self.clients.append(client)
         self.num_clients += 1
 
-    def transmit_ssp(self, prj, server_mode=False):
+    def transmit_ssp(self, prj: 'SoundSpeedLibrary', server_mode: bool = False):
 
         prj.progress.start(text='Transmitting', is_disabled=server_mode, has_abortion=True)
 
@@ -30,6 +33,7 @@ class ClientList:
             # clean previously received profile from SIS
             if client.protocol == "SIS":
                 prj.listeners.sis4.ssp = None
+            elif client.protocol == "KCTRL":
                 prj.listeners.sis5.svp = None
 
             prj.progress.add(prog_quantum)
@@ -70,7 +74,7 @@ class ClientList:
                     logger.info("canceled by user")
                     wait = wait_max
 
-            if prj.listeners.sis4.ssp:
+            if (client.protocol == "SIS") and prj.listeners.sis4.ssp:
                 # The KM .all SVP datagrams have a bug in their time reporting and
                 # have a 100 second granularity so can't compare times
                 # to ensure it's the same profile.  Comparing the sound speeds instead
@@ -92,7 +96,7 @@ class ClientList:
                     success = False
                     continue
 
-            elif prj.listeners.sis5.svp:
+            elif (client.protocol == "KCTRL") and prj.listeners.sis5.svp:
                 # Comparing the sound speeds instead
                 d_tx = prj.cur.sis.depth[prj.cur.sis_thinned]
                 s_tx = prj.cur.sis.speed[prj.cur.sis_thinned]

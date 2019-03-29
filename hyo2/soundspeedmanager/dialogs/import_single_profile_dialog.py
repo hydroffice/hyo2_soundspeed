@@ -130,6 +130,8 @@ class ImportSingleProfileDialog(AbstractDialog):
         btn = QtWidgets.QPushButton("SIS5")
         self.retrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
         btn.setToolTip("Retrieve current profile from SIS5")
+        # TODO: Kongsberg does not support MR20 datagram with KCtrl
+        btn.setDisabled(True)
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_click_sis5)
         # -- Seabird CTD
@@ -329,8 +331,9 @@ class ImportSingleProfileDialog(AbstractDialog):
         self.accept()
         self.progress.end()
 
-    def on_click_sis4(self):
+    def on_click_sis4(self) -> None:
         """Retrieve SIS4 data"""
+        logger.debug("user wants to retrieve SIS4 profile")
         if not self.lib.use_sis4():
             msg = "The SIS4 listening is not activated!\n\nGo to Settings/Input/Listen SIS4"
             # noinspection PyCallByClass
@@ -348,7 +351,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         self.accept()
 
-    def on_click_sis5(self):
+    def on_click_sis5(self) -> None:
         """Retrieve SIS5 data"""
         if not self.lib.use_sis5():
             msg = "The SIS5 listening is not activated!\n\nGo to Settings/Input/Listen SIS5"

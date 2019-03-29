@@ -229,8 +229,8 @@ class KmallSVP(Kmall):
     def __init__(self, data):
         super().__init__(data)
 
-        svp_struct = '<2H4BIdd'
-        svp_header = struct.unpack(svp_struct, self.data[20:48])
+        header_struct = '<2H4BIdd'
+        svp_header = struct.unpack(header_struct, self.data[20:48])
         self.num_entries = svp_header[1]
         logger.debug("svp samples: %s" % (self.num_entries,))
         self.acquisition_time = Kmall.kmall_datetime(svp_header[3])
@@ -254,4 +254,4 @@ class KmallSVP(Kmall):
 
         final_length = struct.unpack("<I", self.data[-4:])
         self.is_valid = final_length != self.length
-        logger.debug('#SPO is valid: %s' % self.is_valid)
+        logger.debug('#SVP is valid: %s' % self.is_valid)

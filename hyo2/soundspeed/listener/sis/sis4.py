@@ -49,7 +49,6 @@ class Sis4(AbstractListener):
 
     @classmethod
     def request_cur_profile(cls, ip: str, port: int = 4001) -> None:
-        # Leaving this statement on until I have a chance to test with all systems.
         logger.info("Requesting profile from %s:%s" % (ip, port))
 
         sock_out = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -75,38 +74,7 @@ class Sis4(AbstractListener):
         sock_out.close()
 
     def parse(self) -> None:
-        if self.is_multicast:
-            self._parse_sis_5()
-        else:
-            self._parse_sis_4()
-
-    def _parse_sis_5(self) -> None:
-        this_data = self.data[:]
-        # logger.debug("SIS 5: %s" % this_data)
-
-        self.id = b''.join(struct.unpack("<I4c", this_data[:8])[1:5])
-        try:
-            name = kmall.Kmall.datagrams[self.id]
-        except KeyError:
-            name = "Unknown name"
-
-        if self.id not in self.datagrams:
-            return
-
-        logger.info("%s > DG %s [%s] > sz: %.2f KB"
-                    % (self.sender, self.id, name, len(this_data) / 1024))
-
-        if self.id == b'#MRZ':
-            self.mrz = kmall.KmallMRZ(this_data)
-
-        elif self.id == b'#SPO':
-            self.spo = kmall.KmallSPO(this_data)
-
-        elif self.id == b'#SVP':
-            self.svp = kmall.KmallSVP(this_data)
-
-        else:
-            logger.error("Missing parser for datagram type: %s" % self.id)
+        self._parse_sis_4()
 
     def _parse_sis_4(self) -> None:
         this_data = self.data[:]
@@ -159,12 +127,3 @@ class Sis4(AbstractListener):
 
         else:
             logger.error("Missing parser for datagram type: %s" % self.id)
-
-    def dump_to_file(self) -> None:
-        """Overloaded function to write data as Kongsberg .all format."""
-
-        # Writing the length of each datagram as a 4-byte unsigned integer before the datagram.
-        l = struct.pack("<I", len(self.data))  # hard-wired for little-endian byte-ordering
-        self.raw_file.write(l)
-
-        self.raw_file.write(self.data)

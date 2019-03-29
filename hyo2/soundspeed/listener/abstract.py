@@ -3,6 +3,7 @@ import time
 import socket
 import struct
 from threading import Thread, Event
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -10,53 +11,26 @@ logger = logging.getLogger(__name__)
 class AbstractListener(Thread):
     """Common abstract listener"""
 
-    def __init__(self, port=4001, ip="0.0.0.0", timeout=1, datagrams=None, target=None, name="Abstract"):
+    def __init__(self, port: int = 4001, ip: str = "0.0.0.0", timeout: int = 1,
+                 datagrams: Optional[list] = None,
+                 target: Optional[object] = None, name: Optional[str] = "Abstract") -> None:
         Thread.__init__(self, target=target, name=name)
         self.name = self.__class__.__name__
         self.desc = "Abstract listener"  # a human-readable description
         self.ip = ip
         self.port = port
-        self.is_multicast = False
+        self.is_multicast = False  # True for SIS5/K-Ctrl
         self.timeout = timeout
         self.datagrams = datagrams
         if not self.datagrams:
             self.datagrams = list()
 
         self.shutdown = Event()
-
         self.sock_in = None
         self.data = None
         self.sender = None
 
-        # storing raw data
-        self._store_disk = False
-        self.raw_file = None
-        self._store_memory = False
-        self.raw_memory = list()
-
-    def start_raw_to_disk(self, filename):
-        if self.raw_file:
-            self.stop_raw_to_disk()
-        self._store_disk = True
-        self.raw_file = open(filename, "wb")
-        return
-
-    def stop_raw_to_disk(self):
-        if self.raw_file:
-            self.raw_file.close()
-            self._store_disk = False
-            self.raw_file = None
-        return
-
-    def start_raw_to_memory(self):
-        self.stop_raw_to_memory()
-        self._store_memory = True
-
-    def stop_raw_to_memory(self):
-        self.raw_memory = list()
-        self._store_memory = False
-
-    def init_sockets(self):
+    def init_sockets(self) -> bool:
         self.sock_in = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock_in.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock_in.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 2 ** 16)
@@ -75,7 +49,6 @@ class AbstractListener(Thread):
             self.sock_in.bind(('', self.port))
 
         else:
-
             try:
                 self.sock_in.bind((self.ip, self.port))
 
@@ -87,11 +60,11 @@ class AbstractListener(Thread):
 
         return True
 
-    def stop(self):
+    def stop(self) -> None:
         """Stop the process"""
         self.shutdown.set()
 
-    def run(self):
+    def run(self) -> None:
         """Start the simulation"""
 
         # logger.debug("%s start" % self.name)
@@ -115,11 +88,6 @@ class AbstractListener(Thread):
                 time.sleep(0.1)
                 continue
 
-            if self._store_disk:
-                self.dump_to_file()
-            if self._store_memory:
-                self.raw_memory.append(self.data)
-
             self.parse()
 
         self.data = None
@@ -127,14 +95,13 @@ class AbstractListener(Thread):
         self.sock_in.close()
         # logger.debug("%s end" % self.name)
 
-    def parse(self):
+    def parse(self) -> None:
         raise Exception("Unimplemented function")
 
-    def dump_to_file(self):
-        """Default dumper"""
-        self.raw_file.write(self.data)
-
-    def __repr__(self):
+    def __repr__(self) -> str:
         msg = "<%s>\n" % self.__class__.__name__
         msg += "  <desc: %s>\n" % self.desc
+        msg += "  <ip: %s>\n" % self.ip
+        msg += "  <port: %s>\n" % self.port
+        msg += "  <multicast: %s>\n" % self.is_multicast
         return msg

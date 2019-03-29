@@ -16,15 +16,15 @@ class Sis5(AbstractListener):
     """Kongsberg SIS5 listener"""
 
     def __init__(self, port: int, datagrams: list, timeout: int = 1, ip: str = "0.0.0.0",
-                 target: Optional[object] = None, name: str = "SIS5") -> None:
+                 target: Optional[object] = None, name: Optional[str] = "SIS5") -> None:
         super(Sis5, self).__init__(port=port, datagrams=datagrams, ip=ip, timeout=timeout,
                                    target=target, name=name)
         self.desc = "Kongsberg SIS5"
 
-        # A few Nones to accommodate the potential types of datagrams that are currently supported
+        # Datagram id
         self.id = None
 
-        # SIS5
+        # Datagrams
         self.mrz = None
         self.spo = None
         self.svp = None
@@ -35,10 +35,9 @@ class Sis5(AbstractListener):
         return msg
 
     @classmethod
-    def request_cur_profile(cls, ip: str, port: int = 4001) -> None:
-        # # Leaving this statement on until I have a chance to test with all systems.
-        # logger.info("Requesting profile from %s:%s" % (ip, port))
-        #
+    def request_cur_profile(cls, ip: str, port: int = 14002) -> None:
+        logger.info("Requesting profile from %s:%s" % (ip, port))
+
         # sock_out = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         #
         # # We try all of them in the hopes that one works.
@@ -60,6 +59,7 @@ class Sis5(AbstractListener):
         #     time.sleep(0.5)
         #
         # sock_out.close()
+
         raise RuntimeError("Not implemented")
 
     def parse(self) -> None:

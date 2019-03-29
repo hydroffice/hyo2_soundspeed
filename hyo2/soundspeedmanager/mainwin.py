@@ -526,7 +526,7 @@ class MainWin(QtWidgets.QMainWindow):
             tokens.append("SIS5")
         msg += "|".join(tokens)
 
-        if (not self.lib.use_sis4()) and (not self.lib.use_sis5()):  # in case that SIS was disabled
+        if (not self.lib.use_sis4()) and (not self.lib.use_sis5()):  # in case that SIS4 and SIS5 were disabled
             self.statusBar().showMessage(msg, 1000)
             return
 
@@ -588,6 +588,9 @@ class MainWin(QtWidgets.QMainWindow):
                 msg += 'XYZ88 NA [pinging?]'
 
         if self.lib.use_sis5():
+
+            if self.lib.use_sis4():
+                msg += " | "
 
             if self.lib.listeners.sis5.spo is not None:
                 # time stamp
