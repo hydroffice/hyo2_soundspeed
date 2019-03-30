@@ -1,7 +1,7 @@
 import os
 import logging
-
 import ogr
+from typing import Optional
 
 from hyo2.abc.lib.gdal_aux import GdalAux
 from hyo2.soundspeed.profile.dicts import Dicts
@@ -206,8 +206,9 @@ class ExportDb:
 
         return lyr
 
-    def export_profiles_metadata(self, project_name, output_folder, ogr_format=GdalAux.ogr_formats['ESRI Shapefile'],
-                                 filter_fields=None):
+    def export_profiles_metadata(self, project_name: str, output_folder: str,
+                                 ogr_format: Optional[int] = GdalAux.ogr_formats['ESRI Shapefile'],
+                                 filter_fields: Optional[ExportDbFields] = None) -> bool:
         self.filter_fields = filter_fields
         if self.filter_fields is None:
             self.filter_fields = ExportDbFields()
@@ -222,7 +223,7 @@ class ExportDb:
 
         except RuntimeError as e:
             logger.error("%s" % e)
-            return
+            return False
 
         rows = self.db.list_profiles()
         if rows is None:

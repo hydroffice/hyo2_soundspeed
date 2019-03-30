@@ -819,7 +819,7 @@ class ProjectDb:
 
         return ssp
 
-    def delete_profile_by_pk(self, pk):
+    def delete_profile_by_pk(self, pk: int) -> bool:
         """Delete all the entries related to a SSP primary key"""
         self.tmp_ssp_pk = pk
 

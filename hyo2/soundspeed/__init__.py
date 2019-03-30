@@ -4,11 +4,12 @@ Sound Speed
 """
 
 import os
-from hyo2.abc.lib.lib_info import LibInfo
 import logging
+from hyo2.abc.lib.lib_info import LibInfo
 
-log = logging.getLogger(__name__)
-log.addHandler(logging.NullHandler())
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 name = "Sound Speed"
 __version__ = '2019.0.0'

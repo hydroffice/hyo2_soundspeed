@@ -5,6 +5,7 @@ import copy
 import shutil
 import traceback
 import logging
+from typing import Optional, TYPE_CHECKING
 from appdirs import user_data_dir
 
 from hyo2.abc.lib.progress.abstract_progress import AbstractProgress
@@ -28,13 +29,20 @@ from hyo2.soundspeed.profile.ray_tracing.tracedprofile import TracedProfile
 from hyo2.soundspeed.profile.ray_tracing.diff_tracedprofiles import DiffTracedProfiles
 from hyo2.soundspeed.profile.ray_tracing.plot_tracedprofiles import PlotTracedProfiles
 
+if TYPE_CHECKING:
+    from datetime import datetime
+    from hyo2.soundspeed.profile.profile import Profile
+    from hyo2.soundspeed.db.export import ExportDbFields
+
+
 logger = logging.getLogger(__name__)
 
 
 class SoundSpeedLibrary:
     """Sound Speed library"""
 
-    def __init__(self, data_folder=None, callbacks=CliCallbacks(), progress=CliProgress()):
+    def __init__(self, data_folder: Optional[str] = None,
+                 callbacks: AbstractCallbacks = CliCallbacks(), progress: AbstractProgress = CliProgress()) -> None:
         """Initialization for the library"""
         # logger.info("** > LIB: initializing ...")
 
@@ -74,7 +82,7 @@ class SoundSpeedLibrary:
 
         # logger.info("** > LIB: initialized!")
 
-    def check_custom_folders(self):
+    def check_custom_folders(self) -> None:
         # logger.info("Checking for custom folders")
 
         # projects folder
@@ -95,7 +103,7 @@ class SoundSpeedLibrary:
                 self.setup.custom_outputs_folder = str()
                 self.setup.save_to_db()
 
-    def close(self):
+    def close(self) -> None:
         """Destructor"""
         logger.info("** > LIB: closing ...")
 
@@ -110,7 +118,7 @@ class SoundSpeedLibrary:
     # --- library, release, atlases, and projects folders
 
     @classmethod
-    def make_data_folder(cls, data_folder=None):
+    def make_data_folder(cls, data_folder: Optional[str] = None) -> str:
 
         # output data folder: where all the library data are written
         if data_folder is None:
@@ -121,7 +129,7 @@ class SoundSpeedLibrary:
         return data_folder
 
     @classmethod
-    def make_releases_folder(cls, data_folder=None):
+    def make_releases_folder(cls, data_folder: Optional[str] = None) -> str:
 
         data_folder = cls.make_data_folder(data_folder=data_folder)
 
@@ -134,7 +142,7 @@ class SoundSpeedLibrary:
         return releases_folder
 
     @classmethod
-    def make_release_folder(cls, data_folder=None):
+    def make_release_folder(cls, data_folder: Optional[str] = None) -> str:
         # release data folder: release-specific data (as settings)
         releases_folder = cls.make_releases_folder(data_folder=data_folder)
         release_folder = os.path.join(releases_folder, lib_info.lib_version[:lib_info.lib_version.rindex('.')])
@@ -145,12 +153,12 @@ class SoundSpeedLibrary:
         return release_folder
 
     @classmethod
-    def setup_exists(cls):
+    def setup_exists(cls) -> bool:
         release_folder = cls.make_release_folder()
         return os.path.exists(os.path.join(release_folder, "setup.db"))
 
     @classmethod
-    def list_other_setups(cls):
+    def list_other_setups(cls) -> list:
         releases_folder = cls.make_releases_folder()
         old_setups = list()
         for release in os.listdir(releases_folder):
@@ -189,7 +197,7 @@ class SoundSpeedLibrary:
         logger.info("copied content from: %s to: %s" % (input_setup, output_setup))
         return True
 
-    def set_folders(self, data_folder):
+    def set_folders(self, data_folder: str) -> None:
         """manage library folders creation"""
 
         self._data_folder = self.make_data_folder(data_folder=data_folder)
@@ -211,154 +219,154 @@ class SoundSpeedLibrary:
     # library data folder
 
     @property
-    def data_folder(self):
+    def data_folder(self) -> str:
         """Get the library data folder"""
         return self._data_folder
 
     @data_folder.setter
-    def data_folder(self, value):
+    def data_folder(self, value: str) -> None:
         """ Set the library data folder"""
         self._data_folder = value
 
-    def open_data_folder(self):
+    def open_data_folder(self) -> None:
         Helper.explore_folder(self.data_folder)
 
     # releases folder
 
     @property
-    def releases_folder(self):
+    def releases_folder(self) -> str:
         """Get the releases data folder"""
         return self._releases_folder
 
     @releases_folder.setter
-    def releases_folder(self, value):
+    def releases_folder(self, value: str) -> None:
         """ Set the releases data folder"""
         self._releases_folder = value
 
-    def open_releases_folder(self):
+    def open_releases_folder(self) -> None:
         Helper.explore_folder(self.releases_folder)
 
     # release folder
 
     @property
-    def release_folder(self):
+    def release_folder(self) -> str:
         """Get the release data folder"""
         return self._release_folder
 
     @release_folder.setter
-    def release_folder(self, value):
+    def release_folder(self, value: str) -> None:
         """ Set the release data folder"""
         self._release_folder = value
 
     # atlases
 
     @property
-    def atlases_folder(self):
+    def atlases_folder(self) -> str:
         """Get the atlases folder"""
         return self.atlases.atlases_folder
 
-    def open_atlases_folder(self):
+    def open_atlases_folder(self) -> None:
         Helper.explore_folder(self.atlases_folder)
 
     @property
-    def woa09_folder(self):
+    def woa09_folder(self) -> str:
         """Get the woa09 atlas folder"""
         return self.atlases.woa09_folder
 
     @property
-    def woa13_folder(self):
+    def woa13_folder(self) -> str:
         """Get the woa13 atlas folder"""
         return self.atlases.woa13_folder
 
     @property
-    def rtofs_folder(self):
+    def rtofs_folder(self) -> str:
         """Get the rtofs atlas folder"""
         return self.atlases.rtofs_folder
 
     @property
-    def gomofs_folder(self):
+    def gomofs_folder(self) -> str:
         """Get the gomofs atlas folder"""
         return self.atlases.gomofs_folder
 
     # projects
 
     @property
-    def projects_folder(self):
+    def projects_folder(self) -> str:
         """Get the projects folder"""
         return self._projects_folder
 
     @projects_folder.setter
-    def projects_folder(self, value):
+    def projects_folder(self, value: str) -> None:
         """ Set the projects folder"""
         self._projects_folder = value
 
-    def open_projects_folder(self):
+    def open_projects_folder(self) -> None:
         Helper.explore_folder(self.projects_folder)
 
     # outputs
 
     @property
-    def outputs_folder(self):
+    def outputs_folder(self) -> str:
         """Get the outputs folder"""
         return self._outputs_folder
 
     @outputs_folder.setter
-    def outputs_folder(self, value):
+    def outputs_folder(self, value: str) -> None:
         """ Set the outputs folder"""
         self._outputs_folder = value
 
-    def open_outputs_folder(self):
+    def open_outputs_folder(self) -> None:
         Helper.explore_folder(self.outputs_folder)
 
     # --- readers/writers
 
     @property
-    def readers(self):
+    def readers(self) -> list:
         return formats.readers
 
     @property
-    def name_readers(self):
+    def name_readers(self) -> list:
         return formats.name_readers
 
     @property
-    def ext_readers(self):
+    def ext_readers(self) -> list:
         return formats.ext_readers
 
     @property
-    def desc_readers(self):
+    def desc_readers(self) -> list:
         return formats.desc_readers
 
     @property
-    def writers(self):
+    def writers(self) -> list:
         return formats.writers
 
     @property
-    def name_writers(self):
+    def name_writers(self) -> list:
         return formats.name_writers
 
     @property
-    def ext_writers(self):
+    def ext_writers(self) -> list:
         return formats.ext_writers
 
     @property
-    def desc_writers(self):
+    def desc_writers(self) -> list:
         return formats.desc_writers
 
     # --- sqlite logging
 
-    def has_active_user_logger(self):
+    def has_active_user_logger(self) -> bool:
         return self.logs.user_active
 
-    def activate_user_logger(self, flag):
+    def activate_user_logger(self, flag: bool) -> None:
         if flag:
             self.logs.activate_user_db()
         else:
             self.logs.deactivate_user_db()
 
-    def has_active_server_logger(self):
+    def has_active_server_logger(self) -> bool:
         return self.logs.server_active
 
-    def activate_server_logger(self, flag):
+    def activate_server_logger(self, flag: bool) -> None:
         if flag:
             self.logs.activate_server_db()
         else:
@@ -367,50 +375,51 @@ class SoundSpeedLibrary:
     # --- ssp profile
 
     @property
-    def ssp_list(self):
+    def ssp_list(self) -> ProfileList:
         return self.ssp
 
     @property
-    def cur(self):
+    def cur(self) -> Optional['Profile']:
         if self.ssp is None:
             return None
         return self.ssp.cur
 
     @property
-    def cur_basename(self):
+    def cur_basename(self) -> str:
         if self.cur is None:
             return "output"
         if self.cur.meta.original_path is None:
             return "output"
+        # noinspection PyTypeChecker
         return os.path.basename(self.cur.meta.original_path).split('.')[0]
 
     @property
-    def cur_file(self):
+    def cur_file(self) -> Optional[str]:
         if self.cur is None:
             return None
         if self.cur.meta.original_path is None:
             return None
         return os.path.basename(self.cur.meta.original_path)
 
-    def has_ssp(self):
+    def has_ssp(self) -> bool:
         if self.cur is None:
             return False
         return True
 
-    def has_ref(self):
+    def has_ref(self) -> bool:
         if self.ref is None:
             return False
         return True
 
     # --- listeners
 
-    def has_mvp_to_process(self):
+    def has_mvp_to_process(self) -> bool:
         if not self.use_mvp():
             return False
 
         return self.listeners.mvp_to_process
 
-    def has_sippican_to_process(self):
+    def has_sippican_to_process(self) -> bool:
         if not self.use_sippican():
             return False
 
@@ -418,7 +427,7 @@ class SoundSpeedLibrary:
 
     # --- import data
 
-    def import_data(self, data_path, data_format, skip_atlas=False):
+    def import_data(self, data_path: str, data_format: str, skip_atlas: bool = False) -> None:
         """Import data using a specific format name"""
 
         # identify reader to use
@@ -465,7 +474,7 @@ class SoundSpeedLibrary:
 
     # --- receive data
 
-    def retrieve_woa09(self):
+    def retrieve_woa09(self) -> None:
         """Retrieve data from WOA09 atlas"""
 
         if not self.has_woa09():
@@ -484,7 +493,7 @@ class SoundSpeedLibrary:
 
         self.ssp = self.atlases.woa09.query(lat=lat, lon=lon, datestamp=utc_time)
 
-    def retrieve_woa13(self):
+    def retrieve_woa13(self) -> None:
         """Retrieve data from WOA13 atlas"""
 
         if not self.has_woa13():
@@ -503,49 +512,49 @@ class SoundSpeedLibrary:
 
         self.ssp = self.atlases.woa13.query(lat=lat, lon=lon, datestamp=utc_time)
 
-    def retrieve_rtofs(self):
+    def retrieve_rtofs(self) -> None:
         """Retrieve data from RTOFS atlas"""
 
         utc_time = self.cb.ask_date()
         if utc_time is None:
             logger.error("missing date required for database lookup")
-            return None
+            return
 
         if not self.download_rtofs(datestamp=utc_time):
             logger.error("unable to download RTOFS atlas data set")
-            return None
+            return
 
         if not self.has_rtofs():
             logger.error("missing RTOFS atlas data set")
-            return None
+            return
 
         lat, lon = self.cb.ask_location()
         if (lat is None) or (lon is None):
             logger.error("missing geographic location required for database lookup")
-            return None
+            return
 
         self.ssp = self.atlases.rtofs.query(lat=lat, lon=lon, datestamp=utc_time)
 
-    def retrieve_gomofs(self):
+    def retrieve_gomofs(self) -> None:
         """Retrieve data from GoMOFS atlas"""
 
         utc_time = self.cb.ask_date()
         if utc_time is None:
             logger.error("missing date required for database lookup")
-            return None
+            return
 
         if not self.download_gomofs(datestamp=utc_time):
             logger.error("unable to download GoMOFS atlas data set")
-            return None
+            return
 
         if not self.has_gomofs():
             logger.error("missing GoMOFS atlas data set")
-            return None
+            return
 
         lat, lon = self.cb.ask_location()
         if (lat is None) or (lon is None):
             logger.error("missing geographic location required for database lookup")
-            return None
+            return
 
         self.ssp = self.atlases.gomofs.query(lat=lat, lon=lon, datestamp=utc_time)
 
@@ -645,14 +654,13 @@ class SoundSpeedLibrary:
 
     # --- export data
 
-    def export_data(self, data_formats, data_paths, data_files=None, custom_writer_instrument=None):
+    def export_data(self, data_formats: list, data_paths: Optional[dict],
+                    data_files: Optional[dict] = None, custom_writer_instrument: Optional[str] = None):
         """Export data using a list of formats name"""
 
         # checks
         if not self.has_ssp():
             raise RuntimeError("Data not loaded")
-        if type(data_formats) is not list:
-            raise RuntimeError("Passed %s in place of list" % type(data_formats))
 
         has_data_files = False
         if data_files is not None:
@@ -721,11 +729,11 @@ class SoundSpeedLibrary:
     # --- project db
 
     @property
-    def noaa_project(self):
+    def noaa_project(self) -> str:
         """temporary NOAA project name for NCEI"""
         return str(self._noaa_project)
 
-    def not_noaa_project(self, value, format_ok=False):
+    def not_noaa_project(self, value: str, format_ok: bool = False) -> bool:
         # noinspection PyBroadException
         try:
             self._noaa_project = self._noaa_project_validate.match(value).group(1)
@@ -739,14 +747,14 @@ class SoundSpeedLibrary:
                 return True
 
     @property
-    def current_project(self):
+    def current_project(self) -> str:
         return self.setup.current_project
 
     @current_project.setter
-    def current_project(self, value):
+    def current_project(self, value: str) -> None:
         self.setup.current_project = value
 
-    def rename_current_project(self, name):
+    def rename_current_project(self, name: str) -> None:
         old_db_path = os.path.join(self.projects_folder, self.current_project + ".db")
         if not os.path.exists(old_db_path):
             raise RuntimeError("unable to locate the current project: %s" % old_db_path)
@@ -765,7 +773,7 @@ class SoundSpeedLibrary:
 
         os.remove(old_db_path)
 
-    def remove_project(self, name):
+    def remove_project(self, name: str) -> None:
         if name == self.current_project:
             raise RuntimeError("unable to remove the current project: %s" % self.current_project)
 
@@ -775,7 +783,7 @@ class SoundSpeedLibrary:
 
         os.remove(db_path)
 
-    def list_projects(self):
+    def list_projects(self) -> list:
         """Return a list with all the available projects"""
         prj_list = list()
         for root, dirs, files in os.walk(self.projects_folder):
@@ -787,7 +795,7 @@ class SoundSpeedLibrary:
             break
         return prj_list
 
-    def remove_data(self):
+    def remove_data(self) -> bool:
         """Remove the current profile in the project db"""
 
         # checks
@@ -817,7 +825,7 @@ class SoundSpeedLibrary:
 
         return success
 
-    def store_data(self):
+    def store_data(self) -> bool:
         """Store the current profile in the project db"""
 
         # checks
@@ -847,7 +855,7 @@ class SoundSpeedLibrary:
 
         return success
 
-    def db_list_profiles(self, project=None):
+    def db_list_profiles(self, project: Optional[str] = None) -> list:
         """List the profile on the db"""
         if project is None:
             project = self.current_project
@@ -857,14 +865,14 @@ class SoundSpeedLibrary:
         db.disconnect()
         return lst
 
-    def db_retrieve_profile(self, pk):
+    def db_retrieve_profile(self, pk: int) -> ProfileList:
         """Retrieve a profile by primary key"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         ssp = db.profile_by_pk(pk=pk)
         db.disconnect()
         return ssp
 
-    def db_import_data_from_db(self, input_db_path):
+    def db_import_data_from_db(self, input_db_path: str) -> tuple:
         """Import profiles from another db"""
         in_projects_folder = os.path.dirname(input_db_path)
         in_project_name = os.path.splitext(os.path.basename(input_db_path))[0]
@@ -915,14 +923,14 @@ class SoundSpeedLibrary:
 
         return pk_issues, pk_done
 
-    def db_timestamp_list(self):
+    def db_timestamp_list(self) -> list:
         """Retrieve a list with the timestamp of all the profiles"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         lst = db.timestamp_list()
         db.disconnect()
         return lst
 
-    def profile_stats(self):
+    def profile_stats(self) -> str:
         msg = str()
         if not self.has_ssp():
             return "Profile not loaded"
@@ -980,7 +988,7 @@ class SoundSpeedLibrary:
 
         return msg
 
-    def load_profile(self, pk, skip_atlas=False):
+    def load_profile(self, pk: int, skip_atlas: Optional[bool] = False) -> bool:
         ssp = self.db_retrieve_profile(pk)
         if not ssp:
             return False
@@ -1019,14 +1027,14 @@ class SoundSpeedLibrary:
 
         return True
 
-    def delete_db_profile(self, pk):
+    def delete_db_profile(self, pk: int) -> bool:
         """Retrieve a profile by primary key"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         ret = db.delete_profile_by_pk(pk=pk)
         db.disconnect()
         return ret
 
-    def ray_tracing_comparison(self, pk1, pk2):
+    def ray_tracing_comparison(self, pk1: int, pk2: int) -> None:
 
         avg_depth = 10000.0  # just a very deep value
         half_swath_angle = 70.0  # a safely large angle
@@ -1045,7 +1053,7 @@ class SoundSpeedLibrary:
         plot = PlotTracedProfiles(diff_tps=diff)
         plot.make_comparison_plots()
 
-    def bias_plots(self, pk1, pk2):
+    def bias_plots(self, pk1: int, pk2: int) -> None:
 
         avg_depth = 10000.0  # just a very deep value
         half_swath_angle = 70.0  # a safely large angle
@@ -1080,7 +1088,7 @@ class SoundSpeedLibrary:
             logger.error(e)
             return
 
-    def dqa_at_surface(self, pk):
+    def dqa_at_surface(self, pk: int) -> Optional[str]:
         """Check the sound speed difference between a point measure and the current profile"""
 
         sn = self.cb.ask_text(title="Enter text", msg="Serial number of surface sound speed instrument")
@@ -1129,7 +1137,7 @@ class SoundSpeedLibrary:
 
         return msg
 
-    def dqa_full_profile(self, pk, pk_ref=None, angle=None):
+    def dqa_full_profile(self, pk: int, pk_ref: Optional[int] = None, angle: Optional[float] = None) -> Optional[str]:
 
         if angle is None:
             angle = self.cb.ask_number(title="Enter number", msg="What launch angle(deg) should be checked",
@@ -1149,40 +1157,40 @@ class SoundSpeedLibrary:
 
     # plotting
 
-    def raise_plot_window(self):
+    def raise_plot_window(self) -> None:
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         _ = db.plot.raise_window()
         db.disconnect()
 
-    def map_db_profiles(self, pks=None):
+    def map_db_profiles(self, pks: Optional[list] = None) -> bool:
         """List the profile on the db"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         ret = db.plot.map_profiles(pks=pks)
         db.disconnect()
         return ret
 
-    def save_map_db_profiles(self):
+    def save_map_db_profiles(self) -> bool:
         """List the profile on the db"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         ret = db.plot.map_profiles(save_fig=True, output_folder=self.outputs_folder)
         db.disconnect()
         return ret
 
-    def aggregate_plot(self, dates):
+    def aggregate_plot(self, dates: list) -> bool:
         """Create an aggregate plot"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         success = db.plot.aggregate_plot(dates=dates, output_folder=self.outputs_folder, save_fig=False)
         db.disconnect()
         return success
 
-    def save_aggregate_plot(self, dates):
+    def save_aggregate_plot(self, dates: list) -> bool:
         """Create an aggregate plot"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         success = db.plot.aggregate_plot(dates=dates, output_folder=self.outputs_folder, save_fig=True)
         db.disconnect()
         return success
 
-    def plot_daily_db_profiles(self):
+    def plot_daily_db_profiles(self) -> bool:
         """Plot the profile on the db by day"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         success = db.plot.daily_plots(project_name=self.current_project,
@@ -1190,7 +1198,7 @@ class SoundSpeedLibrary:
         db.disconnect()
         return success
 
-    def save_daily_db_profiles(self):
+    def save_daily_db_profiles(self) -> bool:
         """Save figure with the profile on the db by day"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         success = db.plot.daily_plots(project_name=self.current_project,
@@ -1200,20 +1208,20 @@ class SoundSpeedLibrary:
 
     # exporting
 
-    def export_db_profiles_metadata(self, ogr_format=GdalAux.ogr_formats['ESRI Shapefile'],
-                                    filter_fields=None):
+    def export_db_profiles_metadata(self, ogr_format: Optional[int] = GdalAux.ogr_formats['ESRI Shapefile'],
+                                    filter_fields: Optional['ExportDbFields'] = None) -> bool:
         """Export the db profile metadata"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
-        lst = db.export.export_profiles_metadata(project_name=self.current_project,
-                                                 output_folder=self.outputs_folder,
-                                                 ogr_format=ogr_format,
-                                                 filter_fields=filter_fields)
+        success = db.export.export_profiles_metadata(project_name=self.current_project,
+                                                     output_folder=self.outputs_folder,
+                                                     ogr_format=ogr_format,
+                                                     filter_fields=filter_fields)
         db.disconnect()
-        return lst
+        return success
 
     # --- filter
 
-    def filter_cur_data(self):
+    def filter_cur_data(self) -> bool:
         """Filter/smooth the current profile"""
         if not self.has_ssp():
             logger.warning("no profile!")
@@ -1234,7 +1242,7 @@ class SoundSpeedLibrary:
 
     # --- replace
 
-    def replace_cur_salinity(self):
+    def replace_cur_salinity(self) -> bool:
         """Replace salinity using atlases for the current profile"""
         if not self.has_ssp():
             logger.warning("no profile!")
@@ -1288,7 +1296,7 @@ class SoundSpeedLibrary:
 
         return True
 
-    def replace_cur_temp_sal(self):
+    def replace_cur_temp_sal(self) -> bool:
         """Replace temperature/salinity using atlases for the current profile"""
         if not self.has_ssp():
             logger.warning("no profile!")
@@ -1342,7 +1350,7 @@ class SoundSpeedLibrary:
 
         return True
 
-    def add_cur_tss(self, server_mode=False):
+    def add_cur_tss(self, server_mode: Optional[bool] = False) -> bool:
         """Add the transducer sound speed to the current profile"""
         if not self.has_ssp():
             logger.warning("no profile!")
@@ -1376,10 +1384,10 @@ class SoundSpeedLibrary:
         self.cur.modify_proc_info(Dicts.proc_user_infos['ADD_TSS'])
         return True
 
-    def cur_plotted(self):
+    def cur_plotted(self) -> None:
         self.cur.modify_proc_info(Dicts.proc_user_infos['PLOTTED'])
 
-    def extend_profile(self):
+    def extend_profile(self) -> bool:
         if not self.has_ssp():
             logger.warning("no profile!")
             return False
@@ -1425,7 +1433,8 @@ class SoundSpeedLibrary:
 
         return True
 
-    def prepare_sis(self, apply_thin=True, apply_12k=True, thin_tolerance=0.01):
+    def prepare_sis(self, apply_thin: Optional[bool] = True, apply_12k: Optional[bool] = True,
+                    thin_tolerance: Optional[float] = 0.01) -> bool:
         if not self.has_ssp():
             logger.warning("no profile!")
             return False
@@ -1485,7 +1494,7 @@ class SoundSpeedLibrary:
                 self.cur.insert_sis_speed(depth=12000.0, speed=1675.8, src=Dicts.sources['sis'],
                                           cond=30.9, temp=2.46, sal=34.70)
 
-            si = self.cur.sis_thinned
+            # si = self.cur.sis_thinned
             # logger.debug('last sample: d: %s, temp: %s, sal: %s, speed: %s [%s|%s]'
             #              % (self.cur.sis.depth[si][-1], self.cur.sis.temp[si][-1],
             #                 self.cur.sis.sal[si][-1], self.cur.sis.speed[si][-1],
@@ -1495,13 +1504,13 @@ class SoundSpeedLibrary:
 
     # --- clear data
 
-    def clear_data(self):
+    def clear_data(self) -> None:
         """Clear current data"""
         if self.has_ssp():
             logger.debug("Clear SSP data")
             self.ssp = None
 
-    def restart_proc(self):
+    def restart_proc(self) -> None:
         """Clear current data"""
         if self.has_ssp():
             for profile in self.ssp.l:  # we may have multiple profiles
@@ -1511,7 +1520,7 @@ class SoundSpeedLibrary:
 
     # --- plot data
 
-    def plot_ssp(self, more=False, show=True):
+    def plot_ssp(self, more: Optional[bool] = False, show: Optional[bool] = True) -> None:
         """Plot the profiles (mainly for debug)"""
         if self.cur is None:
             return
@@ -1522,19 +1531,19 @@ class SoundSpeedLibrary:
 
     # --- settings
 
-    def settings_db(self):
+    def settings_db(self) -> ProjectDb:
         return self.setup.db
 
-    def reload_settings_from_db(self):
+    def reload_settings_from_db(self) -> None:
         """Reload the current setup from the settings db"""
         self.setup.load_from_db()
         self.check_custom_folders()
 
-    def save_settings_to_db(self):
+    def save_settings_to_db(self) -> None:
         """Save the current setup to settings db"""
         self.setup.save_to_db()
 
-    def clone_setup(self, original_setup_name, cloned_setup_name):
+    def clone_setup(self, original_setup_name: str, cloned_setup_name: str) -> None:
         """Clone the passed setup using the passed output name"""
 
         # first check if the new name is valid
@@ -1554,47 +1563,47 @@ class SoundSpeedLibrary:
         # store to db
         original_setup.save_to_db()
 
-    def rename_setup(self, original_setup_name, cloned_setup_name):
+    def rename_setup(self, original_setup_name: str, cloned_setup_name: str) -> None:
         """Rename by cloning the passed setup (using the passed output name), then deleting"""
         self.clone_setup(original_setup_name=original_setup_name, cloned_setup_name=cloned_setup_name)
         self.setup.db.delete_setup(original_setup_name)
 
     # --- atlases
 
-    def use_rtofs(self):
+    def use_rtofs(self) -> bool:
         return self.setup.use_rtofs
 
-    def use_gomofs(self):
+    def use_gomofs(self) -> bool:
         return self.setup.use_gomofs
 
-    def use_woa09(self):
+    def use_woa09(self) -> bool:
         return self.setup.use_woa09
 
-    def use_woa13(self):
+    def use_woa13(self) -> bool:
         return self.setup.use_woa13
 
-    def has_woa09(self):
+    def has_woa09(self) -> bool:
         return self.atlases.woa09.is_present()
 
-    def has_woa13(self):
+    def has_woa13(self) -> bool:
         return self.atlases.woa13.is_present()
 
-    def has_rtofs(self):
+    def has_rtofs(self) -> bool:
         return self.atlases.rtofs.is_present()
 
-    def has_gomofs(self):
+    def has_gomofs(self) -> bool:
         return self.atlases.gomofs.is_present()
 
-    def download_woa09(self):
+    def download_woa09(self) -> bool:
         return self.atlases.woa09.download_db()
 
-    def download_woa13(self):
+    def download_woa13(self) -> bool:
         return self.atlases.woa13.download_db()
 
-    def download_rtofs(self, datestamp=None):
+    def download_rtofs(self, datestamp: Optional['datetime'] = None) -> bool:
         return self.atlases.rtofs.download_db(datestamp=datestamp)
 
-    def download_gomofs(self, datestamp=None):
+    def download_gomofs(self, datestamp: Optional['datetime'] = None) -> bool:
         return self.atlases.gomofs.download_db(datestamp=datestamp)
 
     # --- listeners
@@ -1608,7 +1617,7 @@ class SoundSpeedLibrary:
     def use_sippican(self) -> bool:
         return self.setup.use_sippican
 
-    def use_mvp(self) -> bool :
+    def use_mvp(self) -> bool:
         return self.setup.use_mvp
 
     def listen_sis4(self) -> bool:
@@ -1637,7 +1646,7 @@ class SoundSpeedLibrary:
 
     # --- clients
 
-    def transmit_ssp(self):
+    def transmit_ssp(self) -> bool:
         """Add the transducer sound speed to the current profile"""
 
         if not self.has_ssp():
@@ -1657,17 +1666,17 @@ class SoundSpeedLibrary:
 
     # --- server
 
-    def server_is_alive(self):
+    def server_is_alive(self) -> bool:
         return self.server.is_alive()
 
-    def start_server(self):
+    def start_server(self) -> bool:
         if not self.server.is_alive():
             self.server = Server(prj=self)
             self.server.start()
             time.sleep(0.1)
         return self.server.is_alive()
 
-    def force_server(self):
+    def force_server(self) -> bool:
         if not self.server.is_alive():
             raise RuntimeError("Server is not alive")
 
@@ -1676,7 +1685,7 @@ class SoundSpeedLibrary:
 
         return self.server.is_alive()
 
-    def stop_server(self):
+    def stop_server(self) -> bool:
         logger.debug("stop server")
         if self.server.is_alive():
             self.server.stop()
@@ -1685,7 +1694,7 @@ class SoundSpeedLibrary:
 
     # --- logging
 
-    def logging(self):
+    def logging(self) -> None:
         """Set on/off logging for user and server"""
         if self.setup.log_user:
             if not self.logs.user_active:
@@ -1703,7 +1712,7 @@ class SoundSpeedLibrary:
 
     # --- repr
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         msg = "<%s>\n" % self.__class__.__name__
         msg += "\n  <library data folder: %s>\n" % self.data_folder
         msg += "  <projects folder: %s>\n" % self.projects_folder
@@ -1714,4 +1723,5 @@ class SoundSpeedLibrary:
         msg += "\n  <sqlite_loggers: user %s; server %s>\n" \
                % (self.has_active_user_logger(), self.has_active_server_logger())
         msg += "\n%s" % self.setup
+
         return msg

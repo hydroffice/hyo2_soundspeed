@@ -1,8 +1,8 @@
 import logging
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeed.profile.profile import Profile
+
+logger = logging.getLogger(__name__)
 
 
 class ProfileList:
