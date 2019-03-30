@@ -22,9 +22,8 @@ class RayPath:
             raise TypeError("Raypath data must be a list of some type (python list or numpy.ndarray")
 
         if data.shape[1] != 3:
-            raise TypeError(
-                "A ray path must be a list of 3-tuples... the shape of this array is '%s' when it should be '([len], 3)'" % str(
-                    data.shape))
+            raise TypeError("A ray path must be a list of 3-tuples... the shape of this array is '%s' "
+                            "when it should be '([len], 3)'" % str(data.shape))
 
         self.data = data
 
@@ -45,8 +44,10 @@ class RayPath:
         a = self.data
         b = other.data
         minlength = min(a.shape[0], b.shape[0])  # dimension 1 should _always_ be 3
-        assert (a[:minlength, 0] == b[:minlength,
-                                    0]).all()  # == returns a list of bools and .all() asks whether they are "all" True
+        # == returns a list of bools and .all() asks whether they are "all" True
+        # noinspection PyUnresolvedReferences
+        if not (a[:minlength, 0] == b[:minlength, 0]).all():
+            raise RuntimeError("not all bools are True")
         newtimes = a[:minlength, 0]
         newdepths = a[:minlength, 1]
         newxt = a[:minlength, 2]

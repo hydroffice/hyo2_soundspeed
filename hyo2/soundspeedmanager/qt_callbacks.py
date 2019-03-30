@@ -1,51 +1,54 @@
 from datetime import datetime, timedelta
 import os
 import re
-
-from PySide2 import QtCore, QtGui, QtWidgets
-
 import logging
-
-logger = logging.getLogger(__name__)
+from typing import Optional
+from PySide2 import QtCore, QtWidgets
 
 from hyo2.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
 from hyo2.soundspeedmanager.dialogs.formatted_input_dialog import FormattedInputDialog
 from hyo2.soundspeedmanager.dialogs.flaggable_input_dialog import FlaggableInputDialog
 
+logger = logging.getLogger(__name__)
+
 
 class QtCallbacks(AbstractCallbacks):
     """Qt-based callbacks"""
 
-    def __init__(self, parent, sis_listener=None):
-        super(QtCallbacks, self).__init__(sis_listener=sis_listener)
+    def __init__(self, parent: QtWidgets.QWidget) -> None:
+        super(QtCallbacks, self).__init__()
         self._parent = parent
         self._settings = QtCore.QSettings()
 
-    def ask_number(self, title="", msg="Enter number", default=0.0,
-                   min_value=-2147483647.0, max_value=2147483647.0, decimals=7):
-        val, ok = QtWidgets.QInputDialog.getDouble(self._parent, title, msg,
-                                                   default, min_value, max_value, decimals)
+    def ask_number(self, title: Optional[str] = "", msg: Optional[str] = "Enter number", default: Optional[float] = 0.0,
+                   min_value: Optional[float] = -2147483647.0, max_value: Optional[float] = 2147483647.0,
+                   decimals: Optional[int] = 7) -> Optional[float]:
+        # noinspection PyArgumentList,PyCallByClass
+        val, ok = QtWidgets.QInputDialog.getDouble(self._parent, title, msg, default, min_value, max_value, decimals)
         if not ok:
             val = None
         return val
 
-    def ask_text(self, title="", msg="Enter text"):
+    def ask_text(self, title: Optional[str] = "", msg: Optional[str] = "Enter text") -> Optional[str]:
+        # noinspection PyArgumentList,PyCallByClass
         txt, ok = QtWidgets.QInputDialog.getText(self._parent, title, msg)
         if not ok:
             txt = None
         return txt
 
-    def ask_text_with_flag(self, title="", msg="Enter text", flag_label="Flag"):
+    def ask_text_with_flag(self, title: Optional[str] = "", msg: Optional[str] = "Enter text",
+                           flag_label: Optional[str] = "Flag") -> tuple:
         """Ask user for text with a flag optional"""
         return FlaggableInputDialog.get_text_with_flag(self._parent, title, msg, flag_label=flag_label)
 
-    def ask_formatted_text(self, title="Input", msg="NOAA Project Name (OPR-XNNN-XX-YR)", default="",
-                           fmt="^OPR-[A-Z]\d{3}-[A-Z]{2}-\d{2}$"):
+    def ask_formatted_text(self, title: Optional[str] = "Input",
+                           msg: Optional[str] = "NOAA Project Name (OPR-XNNN-XX-YR)", default: Optional[str] = "",
+                           fmt: Optional[str] = r"^OPR-[A-Z]\d{3}-[A-Z]{2}-\d{2}$") -> tuple:
         """Ask user for formatted text"""
         return FormattedInputDialog.get_format_text(self._parent, title, msg, default, fmt)
 
     @classmethod
-    def dms2dd(cls, degrees, minutes, seconds, direction=''):
+    def dms2dd(cls, degrees: str, minutes: str, seconds: str, direction: Optional[str] = '') -> Optional[float]:
 
         dd_deg = float(degrees)
         min_float = float(minutes)
@@ -75,7 +78,7 @@ class QtCallbacks(AbstractCallbacks):
         return dd
 
     @classmethod
-    def dm2dd(cls, degrees, minutes, direction=''):
+    def dm2dd(cls, degrees: str, minutes: str, direction: Optional[str] = '') -> Optional[float]:
 
         dd_deg = float(degrees)
         min_float = float(minutes)
@@ -100,11 +103,12 @@ class QtCallbacks(AbstractCallbacks):
         return dd
 
     @classmethod
-    def interpret_latitude(cls, str_value):
+    def interpret_latitude(cls, str_value: str) -> Optional[float]:
 
+        # noinspection PyBroadException
         try:
             # this regex split the string if not a number, not a letter ,not . or -
-            lat_tokens = re.split('[^\d\w.-]+', str_value)
+            lat_tokens = re.split(r'[^\d\w.-]+', str_value)
             logger.debug("lat tokens: %s" % (lat_tokens,))
 
             # manage the different kind of input by nr. of tokens
@@ -194,12 +198,13 @@ class QtCallbacks(AbstractCallbacks):
         return lat
 
     @classmethod
-    def interpret_longitude(cls, str_value):
+    def interpret_longitude(cls, str_value: str) -> Optional[float]:
 
+        # noinspection PyBroadException
         try:
 
             # this regex split the string if not a number, not a letter ,not . or -
-            lon_tokens = re.split('[^\d\w.-]+', str_value)
+            lon_tokens = re.split(r'[^\d\w.-]+', str_value)
             logger.debug("lon tokens: %s" % (lon_tokens,))
 
             # manage the different kind of input by nr. of tokens
@@ -288,7 +293,7 @@ class QtCallbacks(AbstractCallbacks):
         logger.debug("longitude: %s" % lon)
         return lon
 
-    def ask_location(self, default_lat=None, default_lon=None):
+    def ask_location(self, default_lat: Optional[float] = None, default_lon: Optional[float] = None) -> tuple:
         """Ask user for location (it is not an abstract method because it is based on ask_number)"""
 
         settings = QtCore.QSettings()
@@ -296,6 +301,7 @@ class QtCallbacks(AbstractCallbacks):
         # try to convert the passed default values
         if (default_lat is not None) and (default_lon is not None):
 
+            # noinspection PyBroadException
             try:
                 _ = float(default_lat)
                 _ = float(default_lon)
@@ -313,8 +319,15 @@ class QtCallbacks(AbstractCallbacks):
                         default_lat = self.sis_listener.nav.latitude
                         default_lon = self.sis_listener.nav.longitude
 
+            if self.kctrl_listener is not None:
+                if self.kctrl_listener.spo is not None:
+                    if (self.kctrl_listener.spo.latitude is not None) and (self.kctrl_listener.spo.longitude is not None):
+                        default_lat = self.kctrl_listener.spo.latitude
+                        default_lon = self.kctrl_listener.spo.longitude
+
             if (default_lat is None) or (default_lon is None):
 
+                # noinspection PyBroadException
                 try:
                     default_lat = float(settings.value("last_lat"))
                     default_lon = float(settings.value("last_lon"))
@@ -323,14 +336,13 @@ class QtCallbacks(AbstractCallbacks):
                     default_lon = -70.9395
 
         # ask user for both lat and long
-        lat = None
         lon = None
 
         # first latitude
         while True:
 
-            lat, ok = QtWidgets.QInputDialog.getText(self._parent, "Location",
-                                                     "Enter latitude as DD, DM, or DMS:",
+            # noinspection PyArgumentList,PyCallByClass
+            lat, ok = QtWidgets.QInputDialog.getText(self._parent, "Location", "Enter latitude as DD, DM, or DMS:",
                                                      text="%s" % default_lat)
             if not ok:
                 lat = None
@@ -345,6 +357,7 @@ class QtCallbacks(AbstractCallbacks):
 
             while True:
 
+                # noinspection PyCallByClass
                 lon, ok = QtWidgets.QInputDialog.getText(self._parent, "Location",
                                                          "Enter longitude as DD, DM, or DMS:",
                                                          text="%s" % default_lon)
@@ -364,7 +377,7 @@ class QtCallbacks(AbstractCallbacks):
 
         return lat, lon
 
-    def ask_date(self):
+    def ask_date(self) -> Optional[datetime]:
         """Ask user for date"""
         now = datetime.utcnow()
         date_msg = "Enter date as DD/MM/YYYY [default: %s]:" % now.strftime("%d/%m/%Y")
@@ -373,6 +386,7 @@ class QtCallbacks(AbstractCallbacks):
 
         # date
         while True:
+            # noinspection PyArgumentList,PyCallByClass
             date, ok = QtWidgets.QInputDialog.getText(self._parent, "Date", date_msg)
             if not ok:
                 return None
@@ -386,6 +400,7 @@ class QtCallbacks(AbstractCallbacks):
                 break
 
             except ValueError:
+                # noinspection PyArgumentList,PyCallByClass
                 QtWidgets.QMessageBox.information(self._parent, "Invalid input",
                                                   "The input date format is DD/MM/YYYY (e.g., 08/08/1980).\n"
                                                   "You entered: %s" % date)
@@ -393,6 +408,7 @@ class QtCallbacks(AbstractCallbacks):
 
         # time
         while True:
+            # noinspection PyArgumentList,PyCallByClass
             time, ok = QtWidgets.QInputDialog.getText(self._parent, "Time", time_msg)
             if not ok:
                 return None
@@ -408,6 +424,7 @@ class QtCallbacks(AbstractCallbacks):
                 break
 
             except ValueError:
+                # noinspection PyArgumentList,PyCallByClass
                 QtWidgets.QMessageBox.information(self._parent, "Invalid input",
                                                   "The input time format is HH:MM:SS (e.g., 10:30:00).\n"
                                                   "You entered: %s" % time)
@@ -415,10 +432,11 @@ class QtCallbacks(AbstractCallbacks):
 
         return dt
 
-    def ask_filename(self, saving=True, key_name=None, default_path=".",
-                     title="Choose a path/filename", default_file="",
-                     file_filter="All Files (*.*)", multi_file=False):
-        '''key_name is used to save/restore the last directory a file was selected in'''
+    def ask_filename(self, saving: Optional[bool] = True, key_name: Optional[str] = None,
+                     default_path: Optional[str] = ".",
+                     title: Optional[str] = "Choose a path/filename", default_file: Optional[str] = "",
+                     file_filter: Optional[str] = "All Files (*.*)", multi_file: Optional[bool] = False) -> str:
+        """key_name is used to save/restore the last directory a file was selected in"""
 
         # flt = "Format %s(*.%s);;All files (*.*)" % (desc, " *.".join(ext))
         dlg_options = {'parent': self._parent, 'caption': title, 'filter': file_filter}
@@ -442,14 +460,15 @@ class QtCallbacks(AbstractCallbacks):
 
         return selection
 
-    def ask_directory(self, key_name=None, default_path=".",
-                      title="Browse for folder", message=""):
+    def ask_directory(self, key_name: Optional[str] = None, default_path: Optional[str] = ".",
+                      title: Optional[str] = "Browse for folder", message: Optional[str] = "") -> str:
         """Ask a directory to the user.
         key_name is used to save/restore the last directory selected
         """
 
         default_dir = self._settings.value(key_name) if key_name else ""
 
+        # noinspection PyCallByClass
         output_folder = QtWidgets.QFileDialog.getExistingDirectory(self._parent, caption=title,
                                                                    dir=default_dir)
         if output_folder and key_name:
@@ -458,24 +477,27 @@ class QtCallbacks(AbstractCallbacks):
 
         return output_folder
 
-    def ask_location_from_sis(self):
+    def ask_location_from_sis(self) -> bool:
         """Ask user whether retrieving location from SIS"""
         msg = "Geographic location required for pressure/depth conversion and atlas lookup.\n" \
               "Use geographic position from SIS?\nChoose 'no' to enter position manually."
+        # noinspection PyArgumentList,PyCallByClass
         ret = QtWidgets.QMessageBox.information(self._parent, "Location", msg,
                                                 QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
         if ret == QtWidgets.QMessageBox.No:
             return False
         return True
 
-    def ask_tss(self):
+    def ask_tss(self) -> Optional[float]:
         """Ask user for transducer sound speed"""
         settings = QtCore.QSettings()
+        # noinspection PyBroadException
         try:
             last_tss = float(settings.value("last_tss"))
         except Exception:
             last_tss = 1500.0
 
+        # noinspection PyArgumentList,PyCallByClass
         tss, ok = QtWidgets.QInputDialog.getDouble(self._parent, "TSS", "Enter transducer sound speed:",
                                                    last_tss, 1000.0, 20000.0, 2)
 
@@ -485,14 +507,16 @@ class QtCallbacks(AbstractCallbacks):
             settings.setValue("last_tss", tss)
         return tss
 
-    def ask_draft(self):
+    def ask_draft(self) -> Optional[float]:
         """Ask user for draft"""
         settings = QtCore.QSettings()
+        # noinspection PyBroadException
         try:
             last_draft = float(settings.value("last_draft"))
         except Exception:
             last_draft = 8.0
 
+        # noinspection PyArgumentList,PyCallByClass
         draft, ok = QtWidgets.QInputDialog.getDouble(self._parent, "Draft", "Enter transducer draft:",
                                                      last_draft, -1000.0, 1000.0, 3)
         if not ok:
@@ -501,31 +525,36 @@ class QtCallbacks(AbstractCallbacks):
             settings.setValue("last_draft", draft)
         return draft
 
-    def msg_tx_no_verification(self, name, protocol):
+    def msg_tx_no_verification(self, name: str, protocol: str) -> None:
         """Profile transmitted but not verification available"""
+        # noinspection PyArgumentList,PyCallByClass
         QtWidgets.QMessageBox.information(self._parent, "Profile transmitted",
                                           "Profile transmitted to \'%s\'.\n\n"
                                           "The %s protocol does not allow verification." %
                                           (name, protocol))
 
-    def msg_tx_sis_wait(self, name):
+    def msg_tx_sis_wait(self, name: str) -> None:
         """Profile transmitted, SIS is waiting for confirmation"""
+        # noinspection PyArgumentList,PyCallByClass
         QtWidgets.QMessageBox.information(self._parent, "Profile Transmitted",
                                           "Profile transmitted to \'%s\'.\n\n"
                                           "SIS is waiting for operator confirmation." % name)
 
-    def msg_tx_sis_confirmed(self, name):
+    def msg_tx_sis_confirmed(self, name: str) -> None:
         """Profile transmitted, SIS confirmed"""
+        # noinspection PyArgumentList,PyCallByClass
         QtWidgets.QMessageBox.information(self._parent, "Transmitted",
                                           "Reception confirmed from \'%s\'!" % name)
 
-    def msg_tx_sis_not_confirmed(self, name, ip):
+    def msg_tx_sis_not_confirmed(self, name: str, port: int) -> None:
         """Profile transmitted, SIS not confirmed"""
+        # noinspection PyCallByClass
         QtWidgets.QMessageBox.warning(self._parent, "Transmitted",
                                       "Profile transmitted, but \'%s\' did not confirm the reception\n\n"
                                       "Please do the following checks on SIS:\n"
                                       "1) Check sound speed file name in SIS run-time parameters "
-                                      "and match date/time in SIS .asvp filename with cast date/time to ensure receipt\n"
+                                      "and match date/time in SIS .asvp filename with cast date/time "
+                                      "to ensure receipt\n"
                                       "2) Ensure SVP datagram is being distributed to this IP "
                                       "on port %d to enable future confirmations"
-                                      % (name, ip))
+                                      % (name, port))

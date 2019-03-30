@@ -17,7 +17,6 @@ class SetupDb(BaseDb):
         self.data_folder = data_folder
         db_path = os.path.join(data_folder, db_file)
         super(SetupDb, self).__init__(db_path=db_path)
-        is_new_db = not os.path.exists(db_path)
         self.reconnect_or_create()
         self._check_default_setup()
         self.use_setup_name = use_setup_name
@@ -292,7 +291,8 @@ class SetupDb(BaseDb):
                 logger.error("while setting %s, %s: %s" % (attrib, type(e), e))
         # logger.info("%s = %s" % (attrib, value))
 
-    def _getter_bool(self, attrib):
+    def _getter_bool(self, attrib: str):
+        # logger.error("bool attrib: %s" % type(attrib))
         r = self.conn.execute(""" SELECT """ + attrib + """ FROM general WHERE id=? """,
                               (self.active_setup_id,)).fetchone()
         # logger.info("%s = %s" % (attrib, r[0]))
@@ -301,11 +301,7 @@ class SetupDb(BaseDb):
         else:
             return r[0] == 1
 
-    def _setter_bool(self, attrib, value):
-
-        if type(value) is not bool:
-            logger.error("passed a %s in place of a boolean" % type(value))
-            return
+    def _setter_bool(self, attrib: str, value: bool) -> None:
 
         # required to check whether we are using the old str boolean
         r = self.conn.execute(""" SELECT """ + attrib + """ FROM general WHERE id=? """,

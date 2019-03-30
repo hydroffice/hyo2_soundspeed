@@ -47,12 +47,8 @@ class SoundSpeedLibrary:
         # logger.info("** > LIB: initializing ...")
 
         # callbacks
-        if not issubclass(type(callbacks), AbstractCallbacks):
-            raise RuntimeError("invalid callbacks object")
         self.cb = callbacks
         # progress bar
-        if not issubclass(type(progress), AbstractProgress):
-            raise RuntimeError("invalid progress object")
         self.progress = progress
 
         self.ssp = None  # current profile
@@ -74,7 +70,8 @@ class SoundSpeedLibrary:
         self.atlases = Atlases(prj=self)
         self.check_custom_folders()
         self.listeners = Listeners(prj=self)
-        self.cb.sis_listener = self.listeners.sis4  # to provide default values from SIS4 (if available)  #TODO: SIS5?
+        self.cb.sis_listener = self.listeners.sis4  # to provide default values from SIS4 (if available)
+        self.cb.kctrl_listener = self.listeners.sis5  # to provide default values from SIS5 (if available)
         self.server = Server(prj=self)
         self.logs = SqliteLogging(self._release_folder)  # (user and server) loggers
 

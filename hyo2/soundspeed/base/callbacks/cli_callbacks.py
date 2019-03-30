@@ -1,20 +1,22 @@
 from datetime import datetime, timedelta
 import os
 import logging
-
-logger = logging.getLogger(__name__)
+from typing import Optional, TYPE_CHECKING
 
 from hyo2.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
+
+logger = logging.getLogger(__name__)
 
 
 class CliCallbacks(AbstractCallbacks):
     """CLI-based callbacks"""
 
-    def __init__(self, sis_listener=None):
-        super(CliCallbacks, self).__init__(sis_listener=sis_listener)
+    def __init__(self) -> None:
+        super(CliCallbacks, self).__init__()
 
-    def ask_number(self, title="", msg="Enter number", default=0.0,
-                   min_value=-2147483647.0, max_value=2147483647.0, decimals=7):
+    def ask_number(self, title: Optional[str] = "", msg: Optional[str] = "Enter number", default: Optional[float] = 0.0,
+                   min_value: Optional[float] = -2147483647.0, max_value: Optional[float] = 2147483647.0,
+                   decimals: Optional[int] = 7) -> Optional[float]:
         val = None
         while val is None:
             raw = input(msg)
@@ -34,18 +36,19 @@ class CliCallbacks(AbstractCallbacks):
                 val = testval
         return val
 
-    def ask_text(self, title="", msg="Enter text"):
+    def ask_text(self, title: Optional[str] = "", msg: Optional[str] = "Enter text") -> Optional[str]:
         val = input(msg)
         return val
 
-    def ask_text_with_flag(self, title="", msg="Enter text", flag_label=""):
+    def ask_text_with_flag(self, title: Optional[str] = "", msg: Optional[str] = "Enter text",
+                           flag_label: Optional[str] = "") -> tuple:
         """Ask user for text with a flag optional"""
         val = input(msg)
         val2 = input("%s? Y for Yes, otherwise No" % flag_label)
         flag = val2.lower() == "y"
         return val, flag
 
-    def ask_date(self):
+    def ask_date(self) -> Optional[datetime]:
         """Ask user for date"""
         now = datetime.utcnow()
         date_msg = "Enter date as DD/MM/YYYY [default: %s]:" % now.strftime("%d/%m/%Y")
@@ -88,9 +91,10 @@ class CliCallbacks(AbstractCallbacks):
 
         return dt
 
-    def ask_location(self, default_lat=43.13555, default_lon=-70.9395):
+    def ask_location(self, default_lat: Optional[float] = 43.13555, default_lon: Optional[float] = -70.9395) -> tuple:
         """Ask user for location"""
 
+        # noinspection PyBroadException
         try:
             _ = float(default_lat)
             _ = float(default_lon)
@@ -138,9 +142,10 @@ class CliCallbacks(AbstractCallbacks):
 
         return lat, lon
 
-    def ask_filename(self, saving=True, key_name=None, default_path=".",
-                     title="Choose a path/filename", default_file="",
-                     file_filter="All Files|*.*", multi_file=False):
+    def ask_filename(self, saving: Optional[bool] = True, key_name: Optional[str] = None,
+                     default_path: Optional[str] = ".",
+                     title: Optional[str] = "Choose a path/filename", default_file: Optional[str] = "",
+                     file_filter: Optional[str] = "All Files (*.*)", multi_file: Optional[bool] = False) -> str:
         raw = " "
         if not saving:
             filemsg = "Enter existing filename:"
@@ -150,11 +155,11 @@ class CliCallbacks(AbstractCallbacks):
             raw = input(filemsg)
         return os.path.normpath(raw)
 
-    def ask_directory(self, key_name=None, default_path=".",
-                      title="Browse for folder", message=""):
+    def ask_directory(self, key_name: Optional[str] = None, default_path: Optional[str] = ".",
+                      title: Optional[str] = "Browse for folder", message: Optional[str] = "") -> str:
         return os.path.normpath("c:/test/")
 
-    def ask_location_from_sis(self):
+    def ask_location_from_sis(self) -> bool:
         """Ask user whether retrieving location from SIS"""
         bool_msg = "Geographic location required for pressure/depth conversion and atlas lookup.\n" \
                    "Use geographic position from SIS?\'y' for yes, other inputs to enter position manually."
@@ -165,7 +170,7 @@ class CliCallbacks(AbstractCallbacks):
             return True
         return False
 
-    def ask_tss(self):
+    def ask_tss(self) -> Optional[float]:
         """Ask user for transducer sound speed"""
         tss = 1500.0
         tss_msg = "Enter transducer sound speed in m/sec [default: %s]:" % tss
@@ -188,7 +193,7 @@ class CliCallbacks(AbstractCallbacks):
 
         return tss
 
-    def ask_draft(self):
+    def ask_draft(self) -> Optional[float]:
         """Ask user for draft"""
         draft = 8.0
         draft_msg = "Enter transducer draft in m [default: %s]:" % draft
@@ -211,18 +216,18 @@ class CliCallbacks(AbstractCallbacks):
 
         return draft
 
-    def msg_tx_no_verification(self, name, protocol):
+    def msg_tx_no_verification(self, name: str, protocol: str) -> None:
         """Profile transmitted but not verification available"""
         pass
 
-    def msg_tx_sis_wait(self, name):
+    def msg_tx_sis_wait(self, name: str) -> None:
         """Profile transmitted, SIS is waiting for confirmation"""
         pass
 
-    def msg_tx_sis_confirmed(self, name):
+    def msg_tx_sis_confirmed(self, name: str) -> None:
         """Profile transmitted, SIS confirmed"""
         pass
 
-    def msg_tx_sis_not_confirmed(self, name, ip):
+    def msg_tx_sis_not_confirmed(self, name: str, port: int) -> None:
         """Profile transmitted, SIS not confirmed"""
         pass
