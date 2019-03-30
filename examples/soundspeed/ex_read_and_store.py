@@ -30,23 +30,33 @@ logger.info('output folder: %s' % data_output)
 
 # test readers/writers
 logger.info('test: *** START ***')
-filters = ["aml", ]
+filters = ["valeport", ]
 tests = testing.input_dict_test_files(inclusive_filters=filters)
 # print(tests)
 
+first_done = False
+
 # import each identified file
 for idx, testfile in enumerate(tests.keys()):
+
+    if "swift_svp" not in testfile:
+        continue
 
     logger.debug("filename: %s" % testfile)
 
     # if idx > 4:  # FILE FILTER
     #     break
 
+    if first_done:
+        break
+    else:
+        first_done = True
+
     logger.info("test: * New profile: #%03d *" % idx)
 
     # import
     lib.import_data(data_path=testfile, data_format=tests[testfile].name)
-    # print(lib.cur)
+    logger.debug("\n%s" % lib.cur)
     lib.plot_ssp(more=True, show=False)
 
     # store the current profile

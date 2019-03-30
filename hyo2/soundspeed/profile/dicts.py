@@ -67,6 +67,7 @@ class Dicts:
         ('MIDAS SVX2 6000', 306),
         ('MiniSVP', 307),
         ('RapidSVT', 308),
+        ('SWiFT', 309),
 
         ('Future', 999),
 

@@ -1,11 +1,12 @@
 import datetime as dt
 import logging
-
-logger = logging.getLogger(__name__)
+import os
 
 from hyo2.soundspeed.formats.readers.abstract import AbstractTextReader
 from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
+
+logger = logging.getLogger(__name__)
 
 
 class Valeport(AbstractTextReader):
@@ -23,6 +24,7 @@ class Valeport(AbstractTextReader):
         Dicts.probe_types['MiniSVP']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MONITOR SVP 500']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['RapidSVT']: Dicts.sensor_types["SVPT"],
+        Dicts.probe_types['SWiFT']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['Unknown']: Dicts.sensor_types["Unknown"]
     }
 
@@ -31,6 +33,7 @@ class Valeport(AbstractTextReader):
         self.desc = "Valeport"  # Monitor/Midas/MiniSVP/RapidSVT
         self._ext.add('000')
         self._ext.add('txt')
+        self._ext.add('vp2')
 
         self.tk_start_data = ""
         self.tk_time = ""
@@ -55,8 +58,11 @@ class Valeport(AbstractTextReader):
 
         self.fix()
 
-        if self.ssp.cur.meta.probe_type not \
-                in [Dicts.probe_types['MIDAS SVX2 1000'], Dicts.probe_types['MIDAS SVX2 3000']]:
+        if self.ssp.cur.meta.probe_type not in [
+            Dicts.probe_types['MIDAS SVX2 1000'],
+            Dicts.probe_types['MIDAS SVX2 3000'],
+            Dicts.probe_types['SWiFT']
+        ]:
             self.ssp.cur.calc_salinity()
         self.finalize()
 
@@ -66,10 +72,78 @@ class Valeport(AbstractTextReader):
     def _parse_header(self):
         logger.debug('parsing header')
 
-        if self.lines[0][:3] == 'Now':  # MiniSVP
+        if os.path.splitext(self.fid.path)[-1] == ".vp2":
+            self._vp2_header()
+
+        elif self.lines[0][:3] == 'Now':  # MiniSVP
             self._mini_header()
+
         else:  # MIDAS or Monitor
             self._midas_header()
+
+    def _vp2_header(self):
+        # check valid format
+        first_row = self.lines[0]
+        if not first_row.strip().upper() == "[HEADER]":
+            raise RuntimeError("Invalid first row: %s" % first_row)
+
+        logger.debug("VP2 format: header")
+
+        for idx, line in enumerate(self.lines):
+
+            line = line.strip().upper()
+
+            if line == "[DATA]":
+                logger.debug("found [DATA]")
+                self.samples_offset = idx
+                break
+
+            tokens = line.split('=')
+            if len(tokens) != 2:
+                continue
+
+            if tokens[0] == "INSTRUMENT":
+                if tokens[1] == "SWIFT SVP":
+                    self.ssp.cur.meta.probe_type = Dicts.probe_types['SWiFT']
+                    self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
+                    continue
+                else:
+                    raise RuntimeError("Unknown/unsupported instrument: %s" % line)
+
+            if tokens[0] == "INSTRUMENTCODE":
+                try:
+                    self.ssp.cur.meta.sn = tokens[1]
+                    continue
+                except ValueError:
+                    logger.warning("unable to parse instrument code: %s" % line)
+
+            if tokens[0] == "LATITUDE":
+                try:
+                    self.ssp.cur.meta.latitude = float(tokens[1])
+                    continue
+                except ValueError:
+                    logger.warning("unable to parse latitude: %s" % line)
+
+            if tokens[0] == "LONGITUDE":
+                try:
+                    self.ssp.cur.meta.longitude = float(tokens[1])
+                    continue
+                except ValueError:
+                    logger.warning("unable to parse longitude: %s" % line)
+
+            if tokens[0] == "DATASTARTTIME":
+                try:
+                    self.ssp.cur.meta.utc_time = dt.datetime.strptime(tokens[1], "%Y/%m/%d %H:%M:%S")
+                except ValueError:
+                    logger.warning("unable to parse date and time: %s" % line)
+
+        if not self.ssp.cur.meta.original_path:
+            self.ssp.cur.meta.original_path = self.fid.path
+
+        # initialize data sample fields
+        self.ssp.cur.init_data(len(self.lines) - self.samples_offset)
+        # initialize additional fields
+        self.ssp.cur.init_more(self.more_fields)
 
     def _mini_header(self):
         self.tk_start_data = 'Pressure units:'
@@ -185,10 +259,99 @@ class Valeport(AbstractTextReader):
     def _parse_body(self):
         logger.debug('parsing body')
 
-        if self.lines[0][:3] == 'Now':  # MiniSVP
+        if os.path.splitext(self.fid.path)[-1] == ".vp2":
+            self._vp2_body()
+
+        elif self.lines[0][:3] == 'Now':  # MiniSVP
             self._mini_body()
+
         else:  # MIDAS or Monitor
             self._midas_body()
+
+    def _vp2_body(self):
+        # check valid format
+        first_data_row = self.lines[self.samples_offset]
+        if not first_data_row.strip().upper() == "[DATA]":
+            raise RuntimeError("Invalid first data row: %s" % first_data_row)
+
+        logger.debug("VP2 format: body")
+
+        depth_idx = None
+        pressure_idx = None
+        speed_idx = None
+        temp_idx = None
+        sal_idx = None
+
+        count = 0
+        for idx, line in enumerate(self.lines[self.samples_offset:]):
+
+            if idx == 0:
+                continue
+
+            if idx == 1:
+                line = line.strip().upper()
+                tokens = line.split('\t')
+                # logger.debug("data header: %s" % line)
+                if len(tokens) < 4:
+                    raise RuntimeError("Invalid number of data columns: %s" % line)
+
+                for idx_token, token in enumerate(tokens):
+                    if token == "DEPTH":
+                        depth_idx = idx_token
+                    if token == "PRESSURE":
+                        pressure_idx = idx_token
+                    elif token == "SOUND VELOCITY":
+                        speed_idx = idx_token
+                    elif token == "TEMPERATURE":
+                        temp_idx = idx_token
+                    elif token == "SALINITY":
+                        sal_idx = idx_token
+
+                continue
+
+            if idx == 2:
+                continue
+
+            if depth_idx is None:
+                raise RuntimeError("Unable to identify depth column")
+
+            data_tokens = line.split('\t')
+            if len(data_tokens) < 4:
+                continue
+
+            try:
+                depth = float(data_tokens[depth_idx])
+                pressure = float(data_tokens[pressure_idx])
+                speed = float(data_tokens[speed_idx])
+                temp = float(data_tokens[temp_idx])
+                sal = float(data_tokens[sal_idx])
+
+                if pressure < 0.0:  # pressure
+                    logger.info("skipping for invalid pressure: %s" % line)
+                    continue
+                if speed < 0.0:  # sound speed
+                    logger.info("skipping for invalid sound speed: %s" % line)
+                    continue
+                if (temp < -10.0) or (temp > 100):  # temp
+                    logger.info("skipping for invalid temp: %s" % line)
+                    continue
+                if sal < 0.0:  # sound speed
+                    logger.info("skipping for invalid salinity: %s" % line)
+                    continue
+
+            except ValueError:
+                logger.error("unable to parse line: %s" % line)
+                continue
+
+            self.ssp.cur.data.depth[count] = depth
+            self.ssp.cur.data.pressure[count] = pressure
+            self.ssp.cur.data.speed[count] = speed
+            self.ssp.cur.data.temp[count] = temp
+            self.ssp.cur.data.sal[count] = sal
+
+            count += 1
+
+        self.ssp.cur.data_resize(count)
 
     def _mini_body(self):
         count = 0
@@ -214,9 +377,6 @@ class Valeport(AbstractTextReader):
 
         self.ssp.cur.data_resize(count)
 
-        # if not self.minisvp_has_depth:
-        #     self.ssp.cur.calc_data_depth()
-
     def _midas_body(self):
 
         count = 0
@@ -229,19 +389,17 @@ class Valeport(AbstractTextReader):
                     if float(data[2]) == 0.0:  # sound speed
                         continue
 
-                    # s_date = data[0]
-                    # s_time = data[1]
-                    self.ssp.cur.data.speed[count] = data[2]
-                    self.ssp.cur.data.depth[count] = data[3]
-                    self.ssp.cur.data.temp[count] = data[4]
+                    self.ssp.cur.data.speed[count] = float(data[2])
+                    self.ssp.cur.data.depth[count] = float(data[3])
+                    self.ssp.cur.data.temp[count] = float(data[4])
 
                     if (self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 1000']) or \
                             (self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 3000']):
-                        self.ssp.cur.data.sal[count] = data[6]
+                        self.ssp.cur.data.sal[count] = float(data[6])
+                        self.ssp.cur.data.pressure[count] = float(data[3])  # pressure
 
                         # additional data field
                         try:
-                            self.ssp.cur.more.sa['Pressure'][count] = float(data[3])  # pressure
                             self.ssp.cur.more.sa['Conductivity'][count] = float(data[5])  # conductivity
                         except Exception as e:
                             logger.debug("issue in reading additional data fields: %s -> skipping" % e)
