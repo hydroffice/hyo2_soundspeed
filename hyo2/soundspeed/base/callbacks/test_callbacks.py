@@ -2,7 +2,7 @@ from datetime import datetime
 import os
 import random
 import logging
-from typing import Optional, TYPE_CHECKING
+from typing import Optional
 
 from hyo2.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
 

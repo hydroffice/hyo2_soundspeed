@@ -1,11 +1,9 @@
 import numpy as np
-import math
-import datetime
 import logging
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeed.formats.writers.abstract import AbstractTextWriter
+
+logger = logging.getLogger(__name__)
 
 
 class Ixblue(AbstractTextWriter):
@@ -37,6 +35,6 @@ class Ixblue(AbstractTextWriter):
     def _write_body(self):
         # logger.debug('generating body')
         vi = self.ssp.cur.proc_valid
-        for idx in range(np.sum(vi)):
+        for idx in range(int(np.sum(vi))):
             self.fod.io.write("%.2f %.2f\n"
                               % (self.ssp.cur.proc.depth[vi][idx], self.ssp.cur.proc.speed[vi][idx],))

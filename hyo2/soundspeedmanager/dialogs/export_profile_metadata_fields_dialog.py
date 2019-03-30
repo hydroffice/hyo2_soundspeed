@@ -12,8 +12,6 @@ class ExportProfileMetadataFieldsDialog(QtWidgets.QDialog):
         self.setWindowTitle("Fields filter")
         self.setMinimumWidth(160)
 
-        settings = QtCore.QSettings()
-
         # outline ui
         self.mainLayout = QtWidgets.QVBoxLayout()
         self.setLayout(self.mainLayout)

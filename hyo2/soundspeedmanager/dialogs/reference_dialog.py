@@ -1,12 +1,10 @@
-from PySide2 import QtCore, QtGui, QtWidgets
-
 import copy
-import os
 import logging
-
-logger = logging.getLogger(__name__)
+from PySide2 import QtWidgets
 
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
+
+logger = logging.getLogger(__name__)
 
 
 class ReferenceDialog(AbstractDialog):
@@ -21,11 +19,11 @@ class ReferenceDialog(AbstractDialog):
         self.setLayout(self.mainLayout)
 
         # set reference
-        self.setLayout = QtWidgets.QHBoxLayout()
-        self.mainLayout.addLayout(self.setLayout)
+        self.setRefLayout = QtWidgets.QHBoxLayout()
+        self.mainLayout.addLayout(self.setRefLayout)
         # - label
         label = QtWidgets.QLabel("Set current profile as reference cast")
-        self.setLayout.addWidget(label)
+        self.setRefLayout.addWidget(label)
         # - button
         btn = QtWidgets.QPushButton("Apply")
         btn.setToolTip("Apply!")
@@ -34,7 +32,7 @@ class ReferenceDialog(AbstractDialog):
             btn.setDisabled(True)
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_set_ref)
-        self.setLayout.addWidget(btn)
+        self.setRefLayout.addWidget(btn)
 
         # load reference
         self.loadLayout = QtWidgets.QHBoxLayout()

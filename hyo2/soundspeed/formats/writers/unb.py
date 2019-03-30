@@ -1,12 +1,11 @@
 import numpy as np
 import logging
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeed import __version__ as ssp_version
 from hyo2.soundspeed import __doc__ as ssp_name
 from hyo2.soundspeed.formats.writers.abstract import AbstractTextWriter
-from hyo2.soundspeed.profile.dicts import Dicts
+
+logger = logging.getLogger(__name__)
 
 
 class Unb(AbstractTextWriter):

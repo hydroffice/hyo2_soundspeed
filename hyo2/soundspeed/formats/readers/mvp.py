@@ -1,15 +1,13 @@
 import datetime as dt
 import struct
 import os
-import numpy as np
 import logging
-
-logger = logging.getLogger(__name__)
 
 from hyo2.soundspeed.formats.readers.abstract import AbstractTextReader
 from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
-from hyo2.soundspeed.profile.profilelist import ProfileList
+
+logger = logging.getLogger(__name__)
 
 
 class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
@@ -42,7 +40,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
         self.protocol = None
         self.format = None
 
-    def init_from_listener(self, header, data_blocks, footer, protocol, fmt, progress=None):
+    def init_from_listener(self, header, data_blocks, footer, protocol, fmt):
 
         self.init_data()  # create a new empty profile list
         self.ssp.append()  # append a new profile

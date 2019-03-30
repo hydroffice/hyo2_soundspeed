@@ -13,7 +13,7 @@ from hyo2.soundspeed.profile import dicts
 # our custom package
 from hyo2.soundspeed.temp import coordinates
 
-'''
+"""
 This module is using a lot of Regular Expressions and numpy.fromregex to read file formats.
 numpy.fromregex does not allow a nice usage of sub groups (it would want to build a data column for each group.
 The fromregex also does a findall() that will search across newlines if not careful.
@@ -49,7 +49,7 @@ So to be most stringent in the parsing of data we have to loop the lines of the 
         In addition to XBT depth corrections, Johnson (1995) has shown the necessity of depth correction
         for Sippican XCTDs, while Mizuno and Watanabe (1998) give depth corrections for TSK XCTDs.
         Both corrections follow the same procedure as for XBTs.
-'''
+"""
 
 robust_re_number = r'[\-+]?(\d+(\.\d*)?|\.\d+)([Ee][+\-]?\d+)?'
 named_re_number = r'(?P<%s>' + robust_re_number + ')'

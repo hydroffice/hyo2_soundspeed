@@ -4,7 +4,7 @@ import numpy as np
 from netCDF4 import Dataset
 import logging
 from datetime import datetime as dt, date
-from typing import Optional, Union
+from typing import Union
 
 from hyo2.abc.lib.ftp import Ftp
 

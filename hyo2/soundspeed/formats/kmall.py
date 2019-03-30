@@ -81,35 +81,35 @@ class KmallMRZ(Kmall):
         super().__init__(data)
 
         # partition
-        partition = struct.unpack("<2H", self.data[20:24])
-        nr_of_datagrams = partition[0]
-        datagram_nr = partition[1]
+        # partition = struct.unpack("<2H", self.data[20:24])
+        # nr_of_datagrams = partition[0]
+        # datagram_nr = partition[1]
         # logger.debug('datagram: %s/%s' % (datagram_nr, nr_of_datagrams))
 
         # common
-        common = struct.unpack("<2H8B", self.data[24:36])
-        common_length = common[0]
+        # common = struct.unpack("<2H8B", self.data[24:36])
+        # common_length = common[0]
         # logger.debug("common part -> length: %d/%d" % (common_length, self.length))
-        ping_count = common[1]
+        # ping_count = common[1]
         # logger.debug("common part -> ping #%d" % (ping_count, ))
-        rx_fans_per_ping = common[2]
-        rx_fan_index = common[3]
+        # rx_fans_per_ping = common[2]
+        # rx_fan_index = common[3]
         # logger.debug("common part -> rx fan %d/%d" % (rx_fan_index, rx_fans_per_ping))
-        swaths_per_ping = common[4]
+        # swaths_per_ping = common[4]
         # logger.debug("common part -> swaths per ping: %d" % (swaths_per_ping, ))
-        swath_along_position = common[5]
+        # swath_along_position = common[5]
         # logger.debug("common part -> swath along position: %d" % (swath_along_position, ))
-        tx_transducer_index = common[6]
-        rx_transducer_index = common[7]
-        nr_of_rx_transducers = common[8]
+        # tx_transducer_index = common[6]
+        # rx_transducer_index = common[7]
+        # nr_of_rx_transducers = common[8]
         # logger.debug("common part -> transducer indices -> tx: %d, rx: %d/%d"
         #              % (tx_transducer_index, rx_transducer_index, nr_of_rx_transducers))
-        algorithm_type = common[9]
+        # algorithm_type = common[9]
         # logger.debug("common part -> algorithm type: %d" % (algorithm_type,))
 
         # ping info                  12 89 20  24   30  34  44 47
         ping_info = struct.unpack("<2Hf6BH11f2h2BHI3f2Hf2H6f4B2df", self.data[36:180])  # 144 bytes
-        ping_info_length = ping_info[0]
+        # ping_info_length = ping_info[0]
         # logger.debug("ping info part -> length: %d/%d" % (ping_info_length, self.length))
         nr_or_tx_sectors = ping_info[33]
         bytes_per_tx_sector = ping_info[34]
@@ -118,8 +118,10 @@ class KmallMRZ(Kmall):
         # logger.debug('TSS: %s m/s' % (self.tss, ))
         z_water_level_re_ref_point_m = ping_info[38]
         # logger.debug('RP-WL distance: %s m' % (z_water_level_re_ref_point_m, ))
-        vrp_latitude = ping_info[45]
-        vrp_longitude = ping_info[46]
+        # TODO: change the semantic for this measure
+        self.transducer_draft = z_water_level_re_ref_point_m
+        # vrp_latitude = ping_info[45]
+        # vrp_longitude = ping_info[46]
         # logger.debug('VRP pos: %s, %s' % (vrp_latitude, vrp_longitude))
 
         end_of_tx_sectors = 180 + nr_or_tx_sectors * bytes_per_tx_sector
@@ -127,7 +129,7 @@ class KmallMRZ(Kmall):
 
         # rx info
         rx_info = struct.unpack("<4H4f4H", self.data[end_of_tx_sectors:end_of_rx_info])
-        rx_info_length = rx_info[0]
+        # rx_info_length = rx_info[0]
         # logger.debug("rx info part -> length: %d/%d" % (rx_info_length, self.length))
         nr_of_soundings = rx_info[1]
         # logger.debug("rx info part -> nr of soundings: %d" % (nr_of_soundings, ))
@@ -146,15 +148,15 @@ class KmallMRZ(Kmall):
             start_sounding = end_of_extra_det_class_info + i * 120
             end_sounding = end_of_extra_det_class_info + (i + 1) * 120
             sounding = struct.unpack(sounding_struct, self.data[start_sounding:end_sounding])
-            sounding_idx = sounding[0]
+            # sounding_idx = sounding[0]
             # logger.debug("sounding -> #%d" % (sounding_idx, ))
             sounding_detection_type = sounding[2]
             # logger.debug("sounding -> detection type: %s" % (sounding_detection_type, ))
             sounding_detection_method = sounding[3]
             # logger.debug("sounding -> detection method: %s" % (sounding_detection_method, ))
             sounding_z = sounding[32]
-            sounding_y = sounding[33]
-            sounding_x = sounding[34]
+            # sounding_y = sounding[33]
+            # sounding_x = sounding[34]
             # logger.debug("sounding -> z: %s, y: %s, x: %s" % (sounding_z, sounding_y, sounding_x))
 
             if (sounding_detection_type == 0) and (sounding_detection_method != 0):
@@ -183,22 +185,22 @@ class KmallSPO(Kmall):
     def __init__(self, data):
         super().__init__(data)
 
-        common = struct.unpack("<4H", self.data[20:28])
-        common_length = common[0]
+        # common = struct.unpack("<4H", self.data[20:28])
+        # common_length = common[0]
         # logger.debug("common part -> length: %d/%d" % (common_length, self.length))
-        common_sensor_system = common[1]
+        # common_sensor_system = common[1]
         # logger.debug("common part -> sensor system: %d" % common_sensor_system)
-        common_sensor_status = common[2]
+        # common_sensor_status = common[2]
         # logger.debug("common part -> sensor status: %d" % common_sensor_status)
 
         data_blk = struct.unpack("<2If2d3f", self.data[28:68])
-        time_sec = data_blk[0]
+        # time_sec = data_blk[0]
         # logger.debug('sensor time sec: %s' % time_sec)
-        time_nanosec = data_blk[1]
+        # time_nanosec = data_blk[1]
         # logger.debug('sensor time nanosec: %s' % time_nanosec)
-        sensor_datetime = Kmall.kmall_datetime(time_sec, time_nanosec)
+        # sensor_datetime = Kmall.kmall_datetime(time_sec, time_nanosec)
         # logger.debug('sensor datetime: %s' % sensor_datetime.strftime('%Y-%m-%d %H:%M:%S.%f'))
-        fix_quality = data_blk[2]
+        # fix_quality = data_blk[2]
         # logger.debug('pos fix quality: %s' % fix_quality)
         self.latitude = data_blk[3]
         self.longitude = data_blk[4]

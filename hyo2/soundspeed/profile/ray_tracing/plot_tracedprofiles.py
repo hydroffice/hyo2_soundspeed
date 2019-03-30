@@ -2,11 +2,11 @@ from datetime import datetime
 
 import numpy as np
 from scipy import interpolate
+# noinspection PyUnresolvedReferences
 from PySide2 import QtWidgets
 import matplotlib
 # from matplotlib import rc_context as rc_context
 from matplotlib import pyplot as plt
-from matplotlib.mlab import griddata
 import logging
 
 from hyo2.soundspeed.profile.ray_tracing.diff_tracedprofiles import DiffTracedProfiles
@@ -171,7 +171,7 @@ class PlotTracedProfiles:
                 try:
                     _ = ray[0][idx]
                     _ = self._d.old_rays[ang][0][idx]
-                except IndexError as e:
+                except IndexError:
                     logger.debug("skipping idx %s" % idx)
                     continue
 
