@@ -83,8 +83,8 @@ For NOAA field, it is recommended to turn on the *NOAA tools* flag in the *Gener
 
 Currently, the *NOAA Tools* flag is mainly used for NCEI format output. When NOAA tools flag is on:
 
-* In the *Setup* tab, The default institution is not editable.
-* In the *Metadata* dialog, The vessel name is not editable
+* In the *Setup* tab, the default institution is not editable.
+* In the *Metadata* dialog, the vessel name is not editable
 * During NCEI files exporting, the NOAA-specific project naming format is enforced.
 
 Sound Speed Manager - SIS v4 interaction
@@ -416,5 +416,69 @@ Sound Speed Manager - SIS v5 interaction
 ========================================
 
 .. index:: SIS; v5
+.. index:: K-Controller
 
-The support of SIS v5 is currently in development.
+The support of SIS v5 and K-Controller is currently **experimental**.
+
+This method describes the case where Sound Speed Manager and K-Controller are installed on the same machine.
+
+First, retrieve the multicast address/port from the K-Controller's *Output Setup*
+(see :numref:`kctrl_output_setup_fig`).
+
+.. _kctrl_output_setup_fig:
+
+.. figure:: ./_static/kctrl_output_setup.png
+    :width: 800px
+    :align: center
+    :alt: figure with K-Ctrol output setup
+    :figclass: align-center
+
+    KController's *Output Setup* dialog.
+
+Open in editing mode the Sound Speed Manager's *Setup Tab*, then set the retrieved multicast address/port in the
+*Listeners* sub-tab (see :numref:`kctrl_ssm_listeners_fig`).
+
+.. _kctrl_ssm_listeners_fig:
+
+.. figure:: ./_static/kctrl_ssm_listeners.png
+    :width: 800px
+    :align: center
+    :alt: figure with SSM Setup tab
+    :figclass: align-center
+
+    *Listeners* tab in the Sound Speed Manager's *Setup*.
+
+Then, switch to the *Input* sub-tab (see :numref:`kctrl_ssm_input_fig`) and select the *True* value
+for the *Listen SIS5* field.
+
+.. _kctrl_ssm_input_fig:
+
+.. figure:: ./_static/kctrl_ssm_input.png
+    :width: 800px
+    :align: center
+    :alt: figure with SSM Setup tab
+    :figclass: align-center
+
+    *Input* tab in the Sound Speed Manager's *Setup*.
+
+The previous steps are required to make Sound Speed Manager able to listen the K-Controller.
+
+In order to be able to transmit to K-Controller, you need to add a client in the *Output* sub-tab
+(see :numref:`kctrl_ssm_output_fig`) using the following settings:
+
+* IP: *127.0.0.1*
+* port: *14002*
+* protocol: *KCTRL*
+
+.. _kctrl_ssm_output_fig:
+
+.. figure:: ./_static/kctrl_ssm_output.png
+    :width: 800px
+    :align: center
+    :alt: figure with SSM Setup tab
+    :figclass: align-center
+
+    *Output* tab in the Sound Speed Manager's *Setup*.
+
+Now **restart** Sound Speed Manager. If a K-Controller-controlled sonar is pinging, you should start
+to see the parsed information in the status bar (see :numref:`kctrl_ssm_input_fig`).

@@ -83,13 +83,14 @@ Currently implemented features
   * Sonardyne (.pro)
   * Turo XBT (.nc)
   * University of New Brunswick (.unb)
-  * Valeport Midas, MiniSVP, Monitor, and RapidSVT (.000, .txt)
+  * Valeport Midas, MiniSVP, Monitor, RapidSVT, and SWiFT (.000, .txt, .vp2)
 
 .. index:: format; supported inputs
 
 * Network reception of data from:
 
   * Kongsberg Maritime SIS
+  * Kongsberg Maritime K-Controller (*experimental*)
   * Sippican systems
   * Moving Vessel Profiler (MVP) systems
 
@@ -128,6 +129,7 @@ Currently implemented features
 * Network transmission of processed casts to data acquisition systems (see :ref:`app_b_connection_settings`):
 
   * Kongsberg Maritime SIS
+  * Kongsberg Maritime K-Controller (*experimental*)
   * QPS QINSy
   * Reson PDS2000
   * Hypack
