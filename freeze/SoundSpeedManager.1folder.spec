@@ -99,7 +99,7 @@ share_folder = os.path.join(python_path(), "Library", "share")
 output_folder = os.path.join("Library", "share")
 pyproj_data = collect_folder_data(input_data_folder=share_folder, relative_output_folder=output_folder)
 pyside2_data = collect_pkg_data('PySide2')
-gsw_data = collect_pkg_data('gsw.utilities')
+# gsw_data = collect_pkg_data('gsw.utilities')
 abc_data = collect_pkg_data('hyo2.abc')
 sdm_data = collect_pkg_data('hyo2.surveydatamonitor')
 ss_data = collect_pkg_data('hyo2.soundspeed')
@@ -112,7 +112,7 @@ if is_darwin:
 
 a = Analysis(['SoundSpeedManager.py'],
              pathex=[],
-             hiddenimports=["PIL", "scipy._lib.messagestream", "cftime._cftime"],
+             hiddenimports=["PIL", "scipy._lib.messagestream", "cftime._cftime", "PySide2.QtPrintSupport"],
              excludes=["IPython", "PyQt4", "PyQt5", "pandas", "sphinx", "sphinx_rtd_theme", "OpenGL_accelerate",
                        "FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter",
                        "wx"],
@@ -133,7 +133,7 @@ coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
-               gsw_data,
+               # gsw_data,
                sdm_data,
                pyproj_data,
                pyside2_data,
