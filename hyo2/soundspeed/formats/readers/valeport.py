@@ -210,39 +210,55 @@ class Valeport(AbstractTextReader):
         self.ssp.cur.init_more(self.more_fields)
 
     def _midas_header(self):
-        self.tk_start_data = 'Date / Time'
-        self.tk_time = 'Time Stamp :'
-        self.tk_probe_type = 'Model Name :'
+        # check valid format
+        first_row = self.lines[0]
+        first_row = first_row.split('\t')
+        if not first_row[0].strip().upper() == 'PREVIOUS FILE LOCATION :':
+            raise RuntimeError('Invalid first row: %s' % first_row)
 
-        for line in self.lines:
+        logger.debug('Midas format: header')
 
-            if line[:len(self.tk_start_data)] == self.tk_start_data:
-                self.samples_offset += 1
+        for idx, line in enumerate(self.lines):
+
+            line = line.strip().upper()
+
+            tokens = line.split('\t')
+            if len(tokens) == 1:
+                continue
+
+            if len(tokens)>2 and (tokens[0] == 'DATE / TIME'):
+                logger.debug('found data header list')
+                self.samples_offset = idx
                 break
 
-            elif line[:len(self.tk_time)] == self.tk_time:
-                try:
-                    date_string = line.split()[-2]
-                    time_string = line.split()[-1]
-                    day, month, year = [int(i) for i in date_string.split('/')]
-                    hour, minute, second = [int(i) for i in time_string.split(':')]
-                    self.ssp.cur.meta.utc_time = dt.datetime(year, month, day, hour, minute, second)
-                except ValueError:
-                    logger.warning("unable to parse time from line #%s" % self.samples_offset)
+            if tokens[0] == 'TIME STAMP :':
+                date_time = tokens[1]
+                date_string = date_time.split(' ')[0]
+                time_string = date_time.split(' ')[1]
+                day, month, year = [int(i) for i in date_string.split('/')]
+                hour, minute, second = [int(i) for i in time_string.split(':')]
+                self.ssp.cur.meta.utc_time = dt.datetime(year, month, day, hour, minute, second)
+                continue
 
-            elif line[:len(self.tk_probe_type)] == self.tk_probe_type:
+            if tokens[0] == 'MODEL NAME :':
                 try:
-                    self.ssp.cur.meta.probe_type = Dicts.probe_types[line.split(':')[-1].strip()]
+                    self.ssp.cur.meta.probe_type = Dicts.probe_types[tokens[1]]
                 except (ValueError, KeyError):
-                    logger.warning("unable to parse probe type from line #%s" % self.samples_offset)
+                    logger.warning("unable to parse probe type from line #%d" % idx)
                     self.ssp.cur.meta.probe_type = Dicts.probe_types['Unknown']
                 try:
                     self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
                 except KeyError:
-                    logger.warning("unable to find sensor type from line #%s" % self.samples_offset)
+                    logger.warning("unable to find sensor type from line #%d" % idx)
                     self.ssp.cur.meta.sensor_type = Dicts.sensor_types['Unknown']
+                continue
 
-            self.samples_offset += 1
+            if tokens[0] == 'SERIAL NO. :':
+                try:
+                    self.ssp.our.meta.sn = tokens[1]
+                    continue
+                except ValueError:
+                    logger.warning('Unable to parse serial number on line: #%d' % idx)
 
         if (self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 1000']) or \
                 (self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 3000']):
@@ -390,7 +406,7 @@ class Valeport(AbstractTextReader):
                         continue
 
                     self.ssp.cur.data.speed[count] = float(data[2])
-                    self.ssp.cur.data.depth[count] = float(data[3])
+                    #self.ssp.cur.data.depth[count] = float(data[3])
                     self.ssp.cur.data.temp[count] = float(data[4])
 
                     if (self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 1000']) or \
