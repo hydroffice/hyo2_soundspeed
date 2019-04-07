@@ -157,7 +157,8 @@ class Profile:
     @property
     def proc_dqa_valid(self):
         """Return indices of DQA valid proc samples"""
-        return np.logical_and(self.proc_valid, np.equal(self.proc.source, Dicts.sources['raw']))
+        return np.logical_and(self.proc_valid, np.logical_or(np.equal(self.proc.source, Dicts.sources['raw']),
+                                                             np.equal(self.proc.source, Dicts.sources['smoothing'])))
 
     @property
     def sis_valid(self):
