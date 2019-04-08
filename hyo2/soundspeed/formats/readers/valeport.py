@@ -434,9 +434,7 @@ class Valeport(AbstractTextReader):
                     elif token[0] == "CONDUCTIVITY":
                         cond_idx = idx_token
 
-                test_idx = [(pressure_idx == None), (temp_idx == None), (speed_idx == None)]
-
-                if  any(test_idx):
+                if (pressure_idx is None) or (temp_idx is None) or (speed_idx is None):
                     raise RuntimeError('Unable to identify required datafield (PRESSURE/ SOUNDSPEED/ TEMPERATURE)'
                                        ' in line: %s' % line)
 
