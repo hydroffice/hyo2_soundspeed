@@ -39,7 +39,8 @@ install:
   - pip install PySide2
   - conda install numpy=1.15.3 matplotlib-base gdal pyproj scipy basemap netCDF4 pillow cython
   - pip install gsw
-  - pip install https://github.com/hydroffice/hyo2_abc/archive/master.zip
+  # --no-deps because of pip not detecting the installed GDAL
+  - pip install --no-deps https://github.com/hydroffice/hyo2_abc/archive/master.zip
 
 build: off
 build_script:
