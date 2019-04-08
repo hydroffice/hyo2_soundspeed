@@ -210,39 +210,59 @@ class Valeport(AbstractTextReader):
         self.ssp.cur.init_more(self.more_fields)
 
     def _midas_header(self):
-        self.tk_start_data = 'Date / Time'
-        self.tk_time = 'Time Stamp :'
-        self.tk_probe_type = 'Model Name :'
+        # check valid format
+        first_row = self.lines[0]
+        first_row = first_row.split('\t')
+        if not first_row[0].strip().upper() == 'PREVIOUS FILE LOCATION :':
+            raise RuntimeError('Invalid first row: %s' % first_row)
 
-        for line in self.lines:
+        logger.debug('Midas format: header')
 
-            if line[:len(self.tk_start_data)] == self.tk_start_data:
-                self.samples_offset += 1
+        for idx, line in enumerate(self.lines):
+
+            line = line.strip().upper()
+
+            tokens = line.split('\t')
+            if len(tokens) == 1:
+                continue
+
+            if len(tokens) > 2 and (tokens[0] == 'DATE / TIME'):
+                logger.debug('found data header list')
+                self.samples_offset = idx
                 break
 
-            elif line[:len(self.tk_time)] == self.tk_time:
+            if tokens[0] == 'TIME STAMP :':
                 try:
-                    date_string = line.split()[-2]
-                    time_string = line.split()[-1]
+                    date_time = tokens[1]
+                    date_string = date_time.split(' ')[0]
+                    time_string = date_time.split(' ')[1]
                     day, month, year = [int(i) for i in date_string.split('/')]
                     hour, minute, second = [int(i) for i in time_string.split(':')]
                     self.ssp.cur.meta.utc_time = dt.datetime(year, month, day, hour, minute, second)
                 except ValueError:
-                    logger.warning("unable to parse time from line #%s" % self.samples_offset)
+                    logger.warning("Unable to parse time from line #%d" % idx)
+                continue
 
-            elif line[:len(self.tk_probe_type)] == self.tk_probe_type:
+
+            if tokens[0] == 'MODEL NAME :':
                 try:
-                    self.ssp.cur.meta.probe_type = Dicts.probe_types[line.split(':')[-1].strip()]
+                    self.ssp.cur.meta.probe_type = Dicts.probe_types[tokens[1]]
                 except (ValueError, KeyError):
-                    logger.warning("unable to parse probe type from line #%s" % self.samples_offset)
+                    logger.warning("unable to parse probe type from line #%d" % idx)
                     self.ssp.cur.meta.probe_type = Dicts.probe_types['Unknown']
                 try:
                     self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
                 except KeyError:
-                    logger.warning("unable to find sensor type from line #%s" % self.samples_offset)
+                    logger.warning("unable to find sensor type from line #%d" % idx)
                     self.ssp.cur.meta.sensor_type = Dicts.sensor_types['Unknown']
+                continue
 
-            self.samples_offset += 1
+            if tokens[0] == 'SERIAL NO. :':
+                try:
+                    self.ssp.cur.meta.sn = tokens[1]
+                except ValueError:
+                    logger.warning('Unable to parse serial number on line: #%d' % idx)
+                continue
 
         if (self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 1000']) or \
                 (self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 3000']):
@@ -335,7 +355,7 @@ class Valeport(AbstractTextReader):
                 if (temp < -10.0) or (temp > 100):  # temp
                     logger.info("skipping for invalid temp: %s" % line)
                     continue
-                if sal < 0.0:  # sound speed
+                if sal < 0.0:  # salinity
                     logger.info("skipping for invalid salinity: %s" % line)
                     continue
 
@@ -378,34 +398,87 @@ class Valeport(AbstractTextReader):
         self.ssp.cur.data_resize(count)
 
     def _midas_body(self):
+        # check valid format
+        first_row = self.lines[self.samples_offset]
+        first_row = first_row.split('\t')
+        if not first_row[0].strip().upper() == 'DATE / TIME':
+            raise RuntimeError('Invalid first data row: %s' % first_row)
+
+        logger.debug('midas format: body')
+
+        pressure_idx = None     # Pressure, Speed, and Temperature in all probe types
+        speed_idx = None
+        temp_idx = None
+        sal_idx = None
+        cond_idx = None
 
         count = 0
-        for line in self.lines[self.samples_offset:len(self.lines)]:
+        for idx, line in enumerate(self.lines[self.samples_offset:]):
+
+            if idx == 0:
+                line = line.strip().upper()
+                tokens = line.split('\t')
+                if len(tokens) < 2:
+                    raise RuntimeError('Invalid number of data columns: %s' % line)
+
+                for idx_token, token in enumerate(tokens):
+                    token = token.split(';')
+                    if token[0] == "PRESSURE":
+                        pressure_idx = idx_token
+                    elif token[0] == "SOUND VELOCITY":
+                        speed_idx = idx_token
+                    elif token[0] == "TEMPERATURE":
+                        temp_idx = idx_token
+                    elif token[0] == "CALC. SALINITY":
+                        sal_idx = idx_token
+                    elif token[0] == "CONDUCTIVITY":
+                        cond_idx = idx_token
+
+                if (pressure_idx is None) or (temp_idx is None) or (speed_idx is None):
+                    raise RuntimeError('Unable to identify required datafield (PRESSURE/ SOUNDSPEED/ TEMPERATURE)'
+                                       ' in line: %s' % line)
+
+                continue
+
+            data_tokens = line.split('\t')
+
             try:
-                # In case an incomplete file comes through
-                if self.ssp.cur.meta.sensor_type == Dicts.sensor_types["SVPT"]:
-                    data = line.split()
+                pressure = float(data_tokens[pressure_idx])
+                speed = float(data_tokens[speed_idx])
+                temp = float(data_tokens[temp_idx])
 
-                    if float(data[2]) == 0.0:  # sound speed
+                if pressure < 0.0:  # pressure
+                    logger.info("skipping for invalid pressure: %s" % line)
+                    continue
+                if speed < 0.0:  # sound speed
+                    logger.info("skipping for invalid sound speed: %s" % line)
+                    continue
+                if (temp < -10.0) or (temp > 100):  # temp
+                    logger.info("skipping for invalid temp: %s" % line)
+                    continue
+
+                self.ssp.cur.data.pressure[count] = pressure
+                self.ssp.cur.data.speed[count] = speed
+                self.ssp.cur.data.temp[count] = temp
+
+                # Potentially not present tokens
+                if sal_idx is not None:
+                    sal = float(data_tokens[sal_idx])
+                    if sal < 0.0:  # salinity
+                        logger.info("skipping for invalid salinity: %s" % line)
                         continue
+                    else:
+                        self.ssp.cur.data.sal[count] = sal
 
-                    self.ssp.cur.data.speed[count] = float(data[2])
-                    self.ssp.cur.data.depth[count] = float(data[3])
-                    self.ssp.cur.data.temp[count] = float(data[4])
-
-                    if (self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 1000']) or \
-                            (self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 3000']):
-                        self.ssp.cur.data.sal[count] = float(data[6])
-                        self.ssp.cur.data.pressure[count] = float(data[3])  # pressure
-
-                        # additional data field
-                        try:
-                            self.ssp.cur.more.sa['Conductivity'][count] = float(data[5])  # conductivity
-                        except Exception as e:
-                            logger.debug("issue in reading additional data fields: %s -> skipping" % e)
+                if cond_idx is not None:
+                    cond = float(data_tokens[cond_idx])
+                    if cond < 0.0:
+                        logger.info("skipping for invalid salinity: %s" % line)
+                    else:
+                        self.ssp.cur.data.conductivity[count] = cond  # conductivity
 
             except ValueError:
-                logger.error("unable to parse from line #%s" % self.samples_offset)
+                logger.error('Unable to parse line: %s' % line)
                 continue
 
             count += 1
