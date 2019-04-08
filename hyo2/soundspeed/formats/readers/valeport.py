@@ -443,39 +443,41 @@ class Valeport(AbstractTextReader):
             data_tokens = line.split('\t')
 
             try:
+                # Required tokens
                 pressure = float(data_tokens[pressure_idx])
+                if pressure < 0.0:
+                    logger.info("skipping for invalid pressure (%s): %s" % (pressure, line))
+                    continue
                 speed = float(data_tokens[speed_idx])
+                if speed < 0.0:
+                    logger.info("skipping for invalid sound speed (%s): %s" % (speed, line))
+                    continue
                 temp = float(data_tokens[temp_idx])
-
-                if pressure < 0.0:  # pressure
-                    logger.info("skipping for invalid pressure: %s" % line)
-                    continue
-                if speed < 0.0:  # sound speed
-                    logger.info("skipping for invalid sound speed: %s" % line)
-                    continue
-                if (temp < -10.0) or (temp > 100):  # temp
-                    logger.info("skipping for invalid temp: %s" % line)
+                if (temp < -10.0) or (temp > 100):
+                    logger.info("skipping for invalid temp (%s): %s" % (temp, line))
                     continue
 
-                self.ssp.cur.data.pressure[count] = pressure
-                self.ssp.cur.data.speed[count] = speed
-                self.ssp.cur.data.temp[count] = temp
-
-                # Potentially not present tokens
+                # Optional tokens
+                sal = None
                 if sal_idx is not None:
                     sal = float(data_tokens[sal_idx])
                     if sal < 0.0:  # salinity
-                        logger.info("skipping for invalid salinity: %s" % line)
+                        logger.info("skipping for invalid salinity (%s): %s" % (sal, line))
                         continue
-                    else:
-                        self.ssp.cur.data.sal[count] = sal
-
+                cond = None
                 if cond_idx is not None:
                     cond = float(data_tokens[cond_idx])
                     if cond < 0.0:
-                        logger.info("skipping for invalid salinity: %s" % line)
-                    else:
-                        self.ssp.cur.data.conductivity[count] = cond  # conductivity
+                        logger.info("skipping for invalid conductivity (%s): %s" % (cond, line))
+
+                # Storing the retrieved valid values
+                self.ssp.cur.data.pressure[count] = pressure
+                self.ssp.cur.data.speed[count] = speed
+                self.ssp.cur.data.temp[count] = temp
+                if sal_idx is not None:
+                    self.ssp.cur.data.sal[count] = sal
+                if cond_idx is not None:
+                    self.ssp.cur.data.conductivity[count] = cond
 
             except ValueError:
                 logger.error('Unable to parse line: %s' % line)
