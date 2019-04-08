@@ -232,13 +232,17 @@ class Valeport(AbstractTextReader):
                 break
 
             if tokens[0] == 'TIME STAMP :':
-                date_time = tokens[1]
-                date_string = date_time.split(' ')[0]
-                time_string = date_time.split(' ')[1]
-                day, month, year = [int(i) for i in date_string.split('/')]
-                hour, minute, second = [int(i) for i in time_string.split(':')]
-                self.ssp.cur.meta.utc_time = dt.datetime(year, month, day, hour, minute, second)
+                try:
+                    date_time = tokens[1]
+                    date_string = date_time.split(' ')[0]
+                    time_string = date_time.split(' ')[1]
+                    day, month, year = [int(i) for i in date_string.split('/')]
+                    hour, minute, second = [int(i) for i in time_string.split(':')]
+                    self.ssp.cur.meta.utc_time = dt.datetime(year, month, day, hour, minute, second)
+                except ValueError:
+                    logger.warning("Unable to parse time from line #%d" % idx)
                 continue
+
 
             if tokens[0] == 'MODEL NAME :':
                 try:
@@ -256,9 +260,9 @@ class Valeport(AbstractTextReader):
             if tokens[0] == 'SERIAL NO. :':
                 try:
                     self.ssp.cur.meta.sn = tokens[1]
-                    continue
                 except ValueError:
                     logger.warning('Unable to parse serial number on line: #%d' % idx)
+                continue
 
         if (self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 1000']) or \
                 (self.ssp.cur.meta.probe_type == Dicts.probe_types['MIDAS SVX2 3000']):
@@ -398,7 +402,7 @@ class Valeport(AbstractTextReader):
         first_row = self.lines[self.samples_offset]
         first_row = first_row.split('\t')
         if not first_row[0].strip().upper() == 'DATE / TIME':
-            raise RuntimeError('Invalid first data roq: %s' % first_row)
+            raise RuntimeError('Invalid first data row: %s' % first_row)
 
         logger.debug('midas format: body')
 
@@ -429,6 +433,12 @@ class Valeport(AbstractTextReader):
                         sal_idx = idx_token
                     elif token[0] == "CONDUCTIVITY":
                         cond_idx = idx_token
+
+                test_idx = [not(pressure_idx == None), (temp_idx == None), (speed_idx == None)]
+
+                if  any(test_idx):
+                    raise RuntimeError('Unable to identify required datafield (PRESSURE/ SOUNDSPEED/ TEMPERATURE)'
+                                       ' in line: %s' % line)
 
                 continue
 
