@@ -37,13 +37,13 @@ install:
 
   - pip install coveralls
   - pip install PySide2
-  - pip install cython
-  - conda install numpy=1.15.3 matplotlib-base gdal pyproj scipy basemap netCDF4 pillow gsw
+  - conda install numpy=1.15.3 matplotlib-base gdal pyproj scipy basemap netCDF4 pillow gsw cython
   # --no-deps because of pip not detecting the installed GDAL
   - pip install --no-deps https://github.com/hydroffice/hyo2_abc/archive/master.zip
 
 build: off
 build_script:
+  - python -m pip install --upgrade pip
   - pip install .
   # - conda remove --force PyQt Qt sip
   - del /q %MINICONDA%\envs\test-environment\qt.conf
