@@ -37,14 +37,17 @@ install:
 
   - pip install coveralls
   - pip install PySide2
-  - conda install numpy=1.15.3 matplotlib-base gdal pyproj scipy basemap netCDF4 pillow gsw cython
+  # for hyo2.abc
+  - conda install numpy matplotlib-base gdal pyproj appdirs bidict coverage psutil
+  # for hyo2.soundspeed
+  - conda install scipy basemap netCDF4 pillow gsw cython
   # --no-deps because of pip not detecting the installed GDAL
   - pip install --no-deps https://github.com/hydroffice/hyo2_abc/archive/master.zip
 
 build: off
 build_script:
   - python -m pip install --upgrade pip
-  - pip install .
+  - pip install --no-deps .
   # - conda remove --force PyQt Qt sip
   - del /q %MINICONDA%\envs\test-environment\qt.conf
   - conda list --show-channel-urls
