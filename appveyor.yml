@@ -8,7 +8,7 @@ environment:
       PYTHON_ARCH: x64
       MINICONDA: C:\Miniconda36-x64
 
-    - PYTHON_VERSION: 3.5
+    - PYTHON_VERSION: 3.7
       PYTHON_ARCH: x64
       MINICONDA: C:\Miniconda36-x64
 
@@ -46,7 +46,6 @@ install:
 
 build: off
 build_script:
-  - python -m pip install --upgrade pip
   - pip install --no-deps .
   # - conda remove --force PyQt Qt sip
   - del /q %MINICONDA%\envs\test-environment\qt.conf
