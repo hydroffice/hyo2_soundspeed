@@ -42,11 +42,11 @@ install:
   # for hyo2.soundspeed
   - conda install scipy basemap netCDF4 pillow gsw cython
   # --no-deps because of pip not detecting the installed GDAL
-  - pip install --no-deps https://github.com/hydroffice/hyo2_abc/archive/master.zip
+  - pip install https://github.com/hydroffice/hyo2_abc/archive/master.zip
 
 build: off
 build_script:
-  - pip install --no-deps .
+  - pip install .
   # - conda remove --force PyQt Qt sip
   - del /q %MINICONDA%\envs\test-environment\qt.conf
   - conda list --show-channel-urls
