@@ -23,7 +23,7 @@ from PyInstaller.compat import is_darwin, is_win
 
 from hyo2.soundspeed import __version__ as ssm_version
 
-is_beta = True
+is_beta = False
 if is_beta:
     beta = ".b%s" % datetime.now().strftime("%Y%m%d%H%M%S")
 else:
