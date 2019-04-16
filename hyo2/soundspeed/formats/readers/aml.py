@@ -24,6 +24,7 @@ class Aml(AbstractTextReader):
 
         self._data_token = "[data]"
         self._depth_token = "Depth (m)"
+        self._pressure_token = "Pressure (dBar)"
         self._temp_token = "Temperature (C)"
         self._sal_token = "Salinity (PSU)"
         self._speed_token = "SV (m/s)"
@@ -80,8 +81,12 @@ class Aml(AbstractTextReader):
                         continue
 
                 if (tokens[0].lower() == self._time_token) and (time is None):
-                    time = dt.strptime(tokens[1].strip(), "%H:%M:%S")
-                    continue
+                    try:
+                        time = dt.strptime(tokens[1].strip(), "%H:%M:%S")
+                        continue
+                    except ValueError:
+                        time = dt.strptime(tokens[1].strip(), "%H:%M:%S.%f")
+                        continue
 
                 if (tokens[0].lower() == self._lat_token) and (lat is None):
                     lat = float(tokens[1])
@@ -126,17 +131,17 @@ class Aml(AbstractTextReader):
         count = 0
         read_samples = False
         has_depth_and_speed = False
+        has_pressure_and_speed = False
         has_calc_speed = False
         has_temp = False
         has_sal = False
         depth_idx = None
+        pressure_idx = None
         temp_idx = None
         sal_idx = None
         speed_idx = None
 
         self.ssp.cur.init_data(len(self.lines))
-
-        data_row = 0
 
         for row_nr, line in enumerate(self.lines):
 
@@ -159,7 +164,7 @@ class Aml(AbstractTextReader):
                 continue
 
             # then look for depth and speed indices
-            if not has_depth_and_speed:
+            if not (has_depth_and_speed or has_pressure_and_speed):
 
                 tokens = line.split(",")
                 for idx, token in enumerate(tokens):
@@ -167,6 +172,10 @@ class Aml(AbstractTextReader):
                     if token == self._depth_token:
                         depth_idx = idx
                         logger.debug("found depth index: %s" % depth_idx)
+
+                    elif token == self._pressure_token:
+                        pressure_idx = idx
+                        logger.debug("found pressure index: %s" % pressure_idx)
 
                     elif token == self._temp_token:
                         temp_idx = idx
@@ -191,8 +200,13 @@ class Aml(AbstractTextReader):
 
                 # set flag to true
                 if (depth_idx is not None) and (speed_idx is not None):
-
                     has_depth_and_speed = True
+
+                elif (pressure_idx is not None) and (speed_idx is not None):
+                    has_pressure_and_speed = True
+
+                if has_pressure_and_speed or has_depth_and_speed:
+
                     if has_temp:
 
                         if not has_sal:
@@ -221,14 +235,26 @@ class Aml(AbstractTextReader):
 
                     if idx == depth_idx:
                         self.ssp.cur.data.depth[count] = float(tokens[depth_idx])
-                        if speed_idx < depth_idx:
-                            count += 1
+                        if has_depth_and_speed:
+                            if speed_idx < depth_idx:
+                                count += 1
+                        continue
+
+                    elif idx == pressure_idx:
+                        self.ssp.cur.data.pressure[count] = float(tokens[pressure_idx])
+                        if has_pressure_and_speed:
+                            if speed_idx < pressure_idx:
+                                count += 1
                         continue
 
                     elif idx == speed_idx:
                         self.ssp.cur.data.speed[count] = float(tokens[speed_idx])
-                        if speed_idx > depth_idx:
-                            count += 1
+                        if has_depth_and_speed:
+                            if speed_idx > depth_idx:
+                                count += 1
+                        elif has_pressure_and_speed:
+                            if speed_idx > pressure_idx:
+                                count += 1
                         continue
 
                     elif idx == temp_idx:
@@ -252,7 +278,7 @@ class Aml(AbstractTextReader):
         if read_samples is False:
             raise RuntimeError("Issue in finding data token: %s" % self._data_token)
 
-        if not has_depth_and_speed:
+        if not (has_depth_and_speed or has_pressure_and_speed):
             # try to guess the sound speed token at index 2
             speed_idx = 2
             depth_idx = 3

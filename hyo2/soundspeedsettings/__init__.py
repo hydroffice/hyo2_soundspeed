@@ -11,7 +11,7 @@ logger.addHandler(logging.NullHandler())
 from hyo2.abc.app.app_info import AppInfo
 
 name = "Sound Speed Settings"
-__version__ = '2019.0.0'
+__version__ = '2019.0.1'
 __copyright__ = 'Copyright 2019 University of New Hampshire, Center for Coastal and Ocean Mapping'
 
 app_info = AppInfo()

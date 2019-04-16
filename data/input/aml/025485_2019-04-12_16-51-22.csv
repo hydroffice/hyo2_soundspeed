@@ -1,0 +1,135 @@
+[cast header]
+DISPLAY OPTIONS
+[Instrument]
+Type=Base.X2
+EmulationMode=disabled
+UseCustomHeader=yes
+SN=25485
+Firmware=V4.23
+SampleUnits=continuous
+SampleInterval=0
+PressureInc=1.00
+SoundInc=0.00
+LogFile=20170713. 
+DateFormat=ISO
+Date=2019-04-12
+Time=16:51:22
+MemorySize=942.8 MB
+MemoryUsed=3.8 MB
+DisplayTime=yes
+DisplayDate=yes
+DisplaySalinity=yes
+DisplayDensity=yes
+DisplaySoundVelocity=yes
+DisplayBattery=yes
+RelayMode=RS232 mode
+RealtimeLogging=yes
+LoggingTimeout=0
+StartupDelay=10
+DisplayHeader=yes
+StartupMode=prompt
+CharacterReception=yes
+LoggingBreakMode=no
+DetectionMode=A3
+BatteryACoefficient=+3.500000E-01
+BatteryBCoefficient=+2.500000E-02
+ShutDownVoltage=6.5
+WarningVoltage=6.9
+PressureOffset=0.10
+UsePressureOffset=yes
+SoundVelocityThreshold=1375.00
+DelimterMode=Space
+SensorDetectionMode=Once
+Traceability=yes
+SkipPowerOff=no
+AnalogChannels=disabled
+Latitude=43.0737
+Longitude=-70.7086
+AutoMonitorSeconds=0
+FixedPressure=0.0000
+UseFixedPressure=no
+BiofoulingPwrAlways=no
+LedTimeoutSecs=300
+DisplayIncrement=no
+AutoZero=yes
+
+
+[Slot 1]
+SensorName=SV-C-CT.Xchange SV.X SN 206195 01/14/19
+BoardSN=05201
+
+[Slot 3]
+SensorName=P-T-TU-DO-UV.Xchange P.X SN 305373 01/15/19
+BoardSN=07065
+>
+
+[Data.X]
+Data.X SN =25485
+SSID =AML_25485
+IP Address =169.254.40.244
+Geo-Location Source =GPS
+C-sensor in-water threshold (mS/cm) =0.005
+Sleep Timeout Enabled =yes
+Sleep Timeout (mins) =5
+Shutdown Timeout Enabled =no
+Shutdown Timeout (mins) =60
+Wi-Fi Sleep Timeout Enabled =yes
+Wi-Fi Sleep Timeout (secs) =20
+Low Batt Shutdown Threshold Voltage =6.5
+WEP Key =25485
+Wi-Fi Channel =10
+In-Water Instrument Access =no
+Wi-Fi Enabled =yes
+Verbose output Enabled =no
+Terminal baud rate =115200
+Latitude=No-Lock
+Longitude=No-Lock
+HDOP=
+Water Detect Source =SV sensor
+Log Trigger Source =P increment
+Verbose =no
+Terminal baud =115200
+C position =0
+SV position =1
+Real positions =2
+
+
+[data]
+
+2019-04-12,16:51:24.09,1457.776,0000.18,007.93
+2019-04-12,16:51:39.01,1460.662,0001.19,007.90
+2019-04-12,16:51:40.42,1460.704,0002.22,007.90
+2019-04-12,16:51:41.92,1460.740,0003.24,007.90
+2019-04-12,16:51:43.07,1460.763,0004.27,007.90
+2019-04-12,16:51:44.21,1460.958,0005.30,007.90
+2019-04-12,16:51:45.32,1461.035,0006.33,007.90
+2019-04-12,16:51:46.46,1461.161,0007.33,007.90
+2019-04-12,16:51:47.64,1461.405,0008.38,007.90
+2019-04-12,16:51:48.82,1462.072,0009.38,007.90
+2019-04-12,16:51:49.84,1462.293,0010.39,007.90
+2019-04-12,16:51:50.94,1462.336,0011.43,007.90
+2019-04-12,16:51:52.01,1462.384,0012.44,007.90
+2019-04-12,16:51:53.08,1462.375,0013.44,007.90
+2019-04-12,16:51:54.27,1462.773,0014.46,007.90
+2019-04-12,16:51:55.58,1462.715,0015.46,007.90
+2019-04-12,16:51:58.02,1462.605,0016.47,007.90
+2019-04-12,16:51:59.37,1462.851,0017.48,007.90
+2019-04-12,16:52:00.57,1463.638,0018.48,007.93
+2019-04-12,16:52:07.12,1463.002,0017.46,007.93
+2019-04-12,16:52:08.19,1462.663,0016.44,007.93
+2019-04-12,16:52:09.27,1462.648,0015.42,007.90
+2019-04-12,16:52:10.82,1462.826,0014.40,007.93
+2019-04-12,16:52:12.29,1462.431,0013.38,007.93
+2019-04-12,16:52:13.57,1462.388,0012.37,007.93
+2019-04-12,16:52:14.92,1462.360,0011.36,007.93
+2019-04-12,16:52:16.35,1462.341,0010.36,007.93
+2019-04-12,16:52:17.62,1462.150,0009.31,007.93
+2019-04-12,16:52:19.12,1461.552,0008.30,007.93
+2019-04-12,16:52:20.66,1461.201,0007.30,007.93
+2019-04-12,16:52:22.20,1461.057,0006.30,007.93
+2019-04-12,16:52:23.67,1460.976,0005.29,007.93
+2019-04-12,16:52:25.33,1460.820,0004.29,007.93
+2019-04-12,16:52:26.82,1460.786,0003.29,007.93
+2019-04-12,16:52:28.25,1460.731,0002.26,007.93
+2019-04-12,16:52:29.75,1460.691,0001.23,007.93
+2019-04-12,16:52:35.55,1460.660,0000.23,007.93
