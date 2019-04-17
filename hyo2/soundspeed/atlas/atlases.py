@@ -4,7 +4,7 @@ import logging
 from hyo2.soundspeed.atlas.woa09 import Woa09
 from hyo2.soundspeed.atlas.woa13 import Woa13
 from hyo2.soundspeed.atlas.rtofs import Rtofs
-from hyo2.soundspeed.atlas.gomofs import Gomofs
+from hyo2.soundspeed.atlas.regofs import RegOfs
 
 logger = logging.getLogger(__name__)
 
@@ -49,17 +49,19 @@ class Atlases:
             os.makedirs(rtofs_folder)
         # logger.info("rtofs path: %s" % rtofs_folder)
 
-        # gomofs
-        gomofs_folder = os.path.join(self._atlases_folder, "gomofs")
-        if not os.path.exists(gomofs_folder):
-            os.makedirs(gomofs_folder)
-        # logger.info("gomofs path: %s" % gomofs_folder)
+        # regofs
+        regofs_folder = os.path.join(self._atlases_folder, "regofs")
+        if not os.path.exists(regofs_folder):
+            os.makedirs(regofs_folder)
+        # logger.info("regofs path: %s" % regofs_folder)
 
         # available atlases
         self.woa09 = Woa09(data_folder=woa09_folder, prj=self.prj)
         self.woa13 = Woa13(data_folder=woa13_folder, prj=self.prj)
         self.rtofs = Rtofs(data_folder=rtofs_folder, prj=self.prj)
-        self.gomofs = Gomofs(data_folder=gomofs_folder, prj=self.prj)
+        self.gomofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.GoMOFS)
+        self.leofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.LEOFS)
+        self.lhofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.LHOFS)
 
     @property
     def atlases_folder(self):
@@ -81,10 +83,20 @@ class Atlases:
     def gomofs_folder(self):
         return self.gomofs.data_folder
 
+    @property
+    def leofs_folder(self):
+        return self.leofs.data_folder
+
+    @property
+    def lhofs_folder(self):
+        return self.lhofs.data_folder
+
     def __repr__(self):
         msg = "  <atlases>\n"
         msg += "  %s" % self.woa09
         msg += "  %s" % self.woa13
         msg += "  %s" % self.rtofs
         msg += "  %s" % self.gomofs
+        msg += "  %s" % self.leofs
+        msg += "  %s" % self.lhofs
         return msg

@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.DEBUG,
                     format="%(levelname)-9s %(name)s.%(funcName)s:%(lineno)d > %(message)s")
 logger = logging.getLogger(__name__)
 
-switch = "GoMOFS"  # WOA09 or WOA13 or RTOFS or GoMOFS
+switch = "LEOFS"  # WOA09 or WOA13 or RTOFS or GoMOFS or LEOFS or LHOFS
 
 app = QtWidgets.QApplication([])  # PySide stuff (start)
 mw = QtWidgets.QMainWindow()
@@ -23,9 +23,10 @@ mw.show()
 lib = SoundSpeedLibrary(progress=QtProgress(parent=mw), callbacks=QtCallbacks(parent=mw))
 
 tests = [
-    (43.026480, -70.318824, dt.utcnow()),  # offshore Portsmouth
+    # (43.026480, -70.318824, dt.utcnow()),  # offshore Portsmouth
     # (-19.1, 74.16, dt.utcnow()),  # Indian Ocean
     # (18.2648113, 16.1761115, dt.utcnow()),  # in land -> middle of Africa
+    (42.181101, -81.451586, dt.utcnow()),  # Lake Erie
 ]
 
 if switch == "WOA09":
@@ -59,6 +60,20 @@ elif switch == "GoMOFS":
     if not lib.has_gomofs():
         lib.download_gomofs()
     logger.info("has GoMOFS: %s" % lib.has_gomofs())
+
+elif switch == "LEOFS":
+
+    # download the current-time leofs
+    if not lib.has_leofs():
+        lib.download_leofs()
+    logger.info("has LEOFS: %s" % lib.has_leofs())
+
+elif switch == "LHOFS":
+
+    # download the current-time lhofs
+    if not lib.has_lhofs():
+        lib.download_lhofs()
+    logger.info("has LHOFS: %s" % lib.has_lhofs())
 
 else:
     raise RuntimeError("invalid switch value: %s" % switch)
@@ -108,8 +123,12 @@ for test in tests:
         logger.info("RTOFS profiles:\n%s" % lib.atlases.rtofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
     elif switch == "GoMOFS":
         logger.info("GoMOFS profiles:\n%s" % lib.atlases.gomofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+    elif switch == "LEOFS":
+        logger.info("LEOFS profiles:\n%s" % lib.atlases.leofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+    elif switch == "LHOFS":
+        logger.info("LHOFS profiles:\n%s" % lib.atlases.lhofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
     else:
         raise RuntimeError("invalid switch value: %s" % switch)
     logger.info("execution time: %.3f s" % (time.time() - start_time))
 
-# app.exec_()  # no need to actually run the message loop
+app.exec_()  # no need to actually run the message loop

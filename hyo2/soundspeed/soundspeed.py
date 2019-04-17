@@ -555,6 +555,29 @@ class SoundSpeedLibrary:
 
         self.ssp = self.atlases.gomofs.query(lat=lat, lon=lon, datestamp=utc_time)
 
+    def retrieve_leofs(self) -> None:
+        """Retrieve data from LEOFS atlas"""
+
+        utc_time = self.cb.ask_date()
+        if utc_time is None:
+            logger.error("missing date required for database lookup")
+            return
+
+        if not self.download_leofs(datestamp=utc_time):
+            logger.error("unable to download LEOFS atlas data set")
+            return
+
+        if not self.has_leofs():
+            logger.error("missing LEOFS atlas data set")
+            return
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return
+
+        self.ssp = self.atlases.leofs.query(lat=lat, lon=lon, datestamp=utc_time)
+
     def retrieve_sis4(self) -> None:
         """Retrieve data from SIS4"""
         if not self.use_sis4():
@@ -1591,6 +1614,12 @@ class SoundSpeedLibrary:
     def has_gomofs(self) -> bool:
         return self.atlases.gomofs.is_present()
 
+    def has_leofs(self) -> bool:
+        return self.atlases.leofs.is_present()
+
+    def has_lhofs(self) -> bool:
+        return self.atlases.lhofs.is_present()
+
     def download_woa09(self) -> bool:
         return self.atlases.woa09.download_db()
 
@@ -1602,6 +1631,12 @@ class SoundSpeedLibrary:
 
     def download_gomofs(self, datestamp: Optional['datetime'] = None) -> bool:
         return self.atlases.gomofs.download_db(datestamp=datestamp)
+
+    def download_leofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.leofs.download_db(datestamp=datestamp)
+
+    def download_lhofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.lhofs.download_db(datestamp=datestamp)
 
     # --- listeners
 

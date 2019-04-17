@@ -1,9 +1,10 @@
 from datetime import datetime as dt, date, timedelta
+from enum import IntEnum
 from http import client
-from urllib import parse
-import socket
 import logging
+import socket
 from typing import Optional, Union
+from urllib import parse
 
 from netCDF4 import Dataset
 import numpy as np
@@ -19,13 +20,49 @@ from hyo2.soundspeed.profile.oceanography import Oceanography as Oc
 logger = logging.getLogger(__name__)
 
 
-class Gomofs(AbstractAtlas):
+class RegOfs(AbstractAtlas):
     """GoMOFS atlas"""
 
-    def __init__(self, data_folder: str, prj: 'hyo2.soundspeed.soundspeed import SoundSpeedLibrary') -> None:
-        super(Gomofs, self).__init__(data_folder=data_folder, prj=prj)
-        self.name = self.__class__.__name__
-        self.desc = "Gulf of Maine Operational Forecast System"
+    class Model(IntEnum):
+
+        CBOFS = 10
+        DBOFS = 11
+        GoMOFS = 12
+        NYOFS = 13
+        SJROFS = 14
+        NGOFS = 20
+        TBOFS = 21
+        LEOFS = 30  # RG = True
+        LHOFS = 31  # RG = False
+        LMOFS = 32
+        LOOFS = 33
+        LSOFS = 34
+        CREOFS = 40
+        SFBOFS = 41
+
+    regofs_model_descs = {
+        Model.CBOFS: "Chesapeake Bay Operational Forecast System",
+        Model.DBOFS: "Delaware Bay Operational Forecast System",
+        Model.GoMOFS: "Gulf of Maine Operational Forecast System",
+        Model.NYOFS: "Port of New York and New Jersey Operational Forecast System",
+        Model.SJROFS: "St. John's River Operational Forecast System",
+        Model.NGOFS: "Northern Gulf of Mexico Operational Forecast System",
+        Model.TBOFS: "Tampa Bay Operational Forecast System",
+        Model.LEOFS: "Lake Erie Operational Forecast System",
+        Model.LHOFS: "Lake Huron Operational Forecast System",
+        Model.LMOFS: "Lake Michigan Operational Forecast System",
+        Model.LOOFS: "Lake Ontario Operational Forecast System",
+        Model.LSOFS: "Lake Superior Operational Forecast System",
+        Model.CREOFS: "Columbia River Estuary Operational Forecast System",
+        Model.SFBOFS: "San Francisco Bay Operational Forecast System"
+    }
+
+    def __init__(self, data_folder: str, prj: 'hyo2.soundspeed.soundspeed import SoundSpeedLibrary',
+                 model: Model) -> None:
+        super().__init__(data_folder=data_folder, prj=prj)
+        self.model = model
+        self.name = model.name
+        self.desc = self.regofs_model_descs[model]
 
         # How far are we willing to look for solutions? size in grid nodes
         self._search_window = 5
@@ -92,7 +129,7 @@ class Gomofs(AbstractAtlas):
 
     def query(self, lat: Optional[float], lon: Optional[float], datestamp: Union[date, dt, None] = None,
               server_mode: bool = False):
-        """Query RTOFS for passed location and timestamp"""
+        """Query OFS for passed location and timestamp"""
         if datestamp is None:
             datestamp = dt.utcnow()
         if isinstance(datestamp, dt):
@@ -109,7 +146,7 @@ class Gomofs(AbstractAtlas):
         try:
             lat_idx, lon_idx = self.grid_coords(lat, lon, datestamp=datestamp, server_mode=server_mode)
             if lat_idx is None:
-                logger.info("location outside of GoMOFS coverage")
+                logger.info("location outside of %s coverage" % self.name)
                 return None
 
         except TypeError as e:
@@ -222,13 +259,13 @@ class Gomofs(AbstractAtlas):
         # Make a new SV object to return our query in
         ssp = Profile()
         ssp.meta.sensor_type = Dicts.sensor_types['Synthetic']
-        ssp.meta.probe_type = Dicts.probe_types['GoMOFS']
+        ssp.meta.probe_type = Dicts.probe_types[self.name]
         ssp.meta.latitude = lat
         if lon > 180.0:  # Go back to negative longitude
             lon -= 360.0
         ssp.meta.longitude = lon
         ssp.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
-        ssp.meta.original_path = "GoMOFS_%s" % datestamp.strftime("%Y%m%d")
+        ssp.meta.original_path = "%s_%s" % (self.name, datestamp.strftime("%Y%m%d"))
         ssp.init_data(num_values)
         ssp.data.depth = d[0:num_values]
         ssp.data.temp = temp_in_situ[0:num_values]
@@ -262,7 +299,7 @@ class Gomofs(AbstractAtlas):
         self._day_idx = None
 
     def __repr__(self):
-        msg = "%s" % super(Gomofs, self).__repr__()
+        msg = "%s" % super().__repr__()
         msg += "      <has data loaded: %s>\n" % (self._has_data_loaded,)
         msg += "      <last loaded day: %s>\n" % (self._last_loaded_day.strftime(r"%d\%m\%Y"),)
         return msg
@@ -286,21 +323,23 @@ class Gomofs(AbstractAtlas):
         return resp.status < 400
 
     @staticmethod
-    def _build_check_url(input_date: date) -> str:
+    def _build_check_url(input_date: date, name: str) -> str:
         """make up the url to use for salinity and temperature"""
         # Primary server: https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/GOMOFS/MODELS/201901/
         #                 nos.gomofs.regulargrid.n006.20190115.t18z.nc
-        url = 'https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/GOMOFS/MODELS/%s/' \
-              'nos.gomofs.regulargrid.n003.%s.t00z.nc' % (input_date.strftime("%Y%m"), input_date.strftime("%Y%m%d"))
+        url = 'https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/%s/MODELS/%s/' \
+              'nos.%s.regulargrid.n003.%s.t00z.nc' \
+              % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
         return url
 
     @staticmethod
-    def _build_opendap_url(input_date: date) -> str:
+    def _build_opendap_url(input_date: date, name: str) -> str:
         """make up the url to use for salinity and temperature"""
         # Primary server: https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/GOMOFS/MODELS/201901/
         #                 nos.gomofs.regulargrid.n006.20190115.t18z.nc
-        url = 'https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/GOMOFS/MODELS/%s/' \
-              'nos.gomofs.regulargrid.n003.%s.t00z.nc' % (input_date.strftime("%Y%m"), input_date.strftime("%Y%m%d"))
+        url = 'https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/%s/MODELS/%s/' \
+              'nos.%s.regulargrid.n003.%s.t00z.nc' \
+              % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
         return url
 
     def _download_files(self, datestamp: date, server_mode: bool = False):
@@ -322,17 +361,18 @@ class Gomofs(AbstractAtlas):
                 logger.info("cleaning data: %s %s" % (self._last_loaded_day, datestamp))
                 self.clear_data()
 
-        progress.start(text="Download GoMOFS", is_disabled=server_mode)
+        progress.start(text="Download %s" % self.name, is_disabled=server_mode)
 
         # check if the data are available on the RTOFS server
-        url_ck = self._build_check_url(datestamp)
+        url_ck = self._build_check_url(datestamp, self.name)
         if not self._check_url(url_ck):
 
             datestamp -= timedelta(days=1)
-            url_ck = self._build_check_url(datestamp)
+            url_ck = self._build_check_url(datestamp, self.name)
 
             if not self._check_url(url_ck):
-                logger.warning('unable to retrieve data from GoMOFS server for date: %s and next day' % datestamp)
+                logger.warning('unable to retrieve data from %s server for date: %s and next day'
+                               % (self.name, datestamp))
                 self.clear_data()
                 progress.end()
                 return False
@@ -340,7 +380,7 @@ class Gomofs(AbstractAtlas):
         progress.update(30)
 
         # Try to download the data grid grids
-        url = self._build_opendap_url(datestamp)
+        url = self._build_opendap_url(datestamp, self.name)
         # logger.debug('downloading RTOFS data for %s' % datestamp)
         try:
             self._file = Dataset(url)
@@ -361,7 +401,7 @@ class Gomofs(AbstractAtlas):
         return True
 
     def grid_coords(self, lat: float, lon: float, datestamp: date, server_mode: Optional[bool] = False) -> tuple:
-        """Convert the passed position in GOMOFS grid coords"""
+        """Convert the passed position in OFS grid coords"""
 
         # check if we need to update the data set (new day!)
         if not self.download_db(datestamp, server_mode=server_mode):
