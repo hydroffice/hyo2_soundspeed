@@ -4,7 +4,7 @@ import shutil
 import logging
 
 from hyo2.soundspeedmanager import AppInfo
-from hyo2.soundspeed.atlas.gomofs import Gomofs
+from hyo2.soundspeed.atlas.regofs import RegOfs
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger()
@@ -25,14 +25,14 @@ class TestSoundSpeedAtlasGomofs(unittest.TestCase):
 
     def test_creation_of_Gomofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        gomofs = Gomofs(data_folder=prj.gomofs_folder, prj=prj)
-        self.assertTrue('gomofs' in gomofs.data_folder)
+        gomofs = RegOfs(data_folder=prj.gomofs_folder, prj=prj, model=RegOfs.Model.GoMOFS)
+        self.assertTrue('regofs' in gomofs.data_folder)
         self.assertFalse(gomofs.is_present())
         prj.close()
 
     def test_download_db_from_Gomofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        gomofs = Gomofs(data_folder=prj.data_folder, prj=prj)
+        gomofs = RegOfs(data_folder=prj.gomofs_folder, prj=prj, model=RegOfs.Model.GoMOFS)
         gomofs.download_db(server_mode=True)
 
         # to avoid test failures
