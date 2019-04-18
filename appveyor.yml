@@ -38,9 +38,9 @@ install:
   - pip install coveralls
   - pip install PySide2
   # for hyo2.abc
-  - conda install numpy matplotlib-base gdal pyproj>=2.0 appdirs bidict coverage psutil
+  - conda install numpy matplotlib-base gdal pyproj appdirs bidict coverage psutil
   # for hyo2.soundspeed
-  - conda install scipy basemap netCDF4 pillow gsw cython pyproj>=2.0
+  - conda install scipy basemap netCDF4 pillow gsw cython pyproj
   # --no-deps because of pip not detecting the installed GDAL
   - pip install https://github.com/hydroffice/hyo2_abc/archive/master.zip
 
