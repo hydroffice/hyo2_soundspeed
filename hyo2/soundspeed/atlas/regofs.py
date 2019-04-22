@@ -25,20 +25,23 @@ class RegOfs(AbstractAtlas):
 
     class Model(IntEnum):
 
-        CBOFS = 10
-        DBOFS = 11
-        GoMOFS = 12
-        NYOFS = 13
-        SJROFS = 14
-        NGOFS = 20
-        TBOFS = 21
-        LEOFS = 30  # RG = True
-        LHOFS = 31  # RG = False
-        LMOFS = 32
-        LOOFS = 33
-        LSOFS = 34
-        CREOFS = 40
-        SFBOFS = 41
+        CBOFS = 10      # RG = True     # Format is GoMOFS
+        DBOFS = 11      # RG = True     # Format is GoMOFS
+        GoMOFS = 12     # RG = True     # Format is GoMOFS
+        NYOFS = 13      # RG = False
+        SJROFS = 14     # RG = False
+
+        NGOFS = 20      # RG = True     # Format is GoMOFS
+        TBOFS = 21      # RG = True     # Format is GoMOFS
+
+        LEOFS = 30      # RG = True     # Format is GoMOFS
+        LHOFS = 31      # RG = False
+        LMOFS = 32      # RG = False
+        LOOFS = 33      # RG = False
+        LSOFS = 34      # RG = False
+
+        CREOFS = 40     # RG = True     # Format is GoMOFS
+        SFBOFS = 41     # RG = True     # Format is GoMOFS
 
     regofs_model_descs = {
         Model.CBOFS: "Chesapeake Bay Operational Forecast System",
