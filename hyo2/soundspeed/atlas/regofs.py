@@ -25,21 +25,25 @@ class RegOfs(AbstractAtlas):
 
     class Model(IntEnum):
 
+        # East Coast
         CBOFS = 10      # RG = True     # Format is GoMOFS
         DBOFS = 11      # RG = True     # Format is GoMOFS
         GoMOFS = 12     # RG = True     # Format is GoMOFS
         NYOFS = 13      # RG = False
         SJROFS = 14     # RG = False
 
+        # Gulf of Mexico
         NGOFS = 20      # RG = True     # Format is GoMOFS
         TBOFS = 21      # RG = True     # Format is GoMOFS
 
+        # Great Lakes
         LEOFS = 30      # RG = True     # Format is GoMOFS
         LHOFS = 31      # RG = False
         LMOFS = 32      # RG = False
         LOOFS = 33      # RG = False
         LSOFS = 34      # RG = False
 
+        # Pacific Coast
         CREOFS = 40     # RG = True     # Format is GoMOFS
         SFBOFS = 41     # RG = True     # Format is GoMOFS
 
@@ -325,24 +329,32 @@ class RegOfs(AbstractAtlas):
 
         return resp.status < 400
 
-    @staticmethod
-    def _build_check_url(input_date: date, name: str) -> str:
+    def _build_check_url(self,input_date: date, name: str) -> str:
         """make up the url to use for salinity and temperature"""
         # Primary server: https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/GOMOFS/MODELS/201901/
         #                 nos.gomofs.regulargrid.n006.20190115.t18z.nc
-        url = 'https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/%s/MODELS/%s/' \
-              'nos.%s.regulargrid.n003.%s.t00z.nc' \
-              % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
+        if (name == self.Model.NGOFS.name) or (name == self.Model.CREOFS.name) or (name == self.Model.SFBOFS.name):
+            url = 'https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/%s/MODELS/%s/' \
+                  'nos.%s.regulargrid.n003.%s.t03z.nc' \
+                  % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
+        else:
+            url = 'https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/%s/MODELS/%s/' \
+                  'nos.%s.regulargrid.n003.%s.t00z.nc' \
+                    % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
         return url
 
-    @staticmethod
-    def _build_opendap_url(input_date: date, name: str) -> str:
+    def _build_opendap_url(self, input_date: date, name: str) -> str:
         """make up the url to use for salinity and temperature"""
         # Primary server: https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/GOMOFS/MODELS/201901/
         #                 nos.gomofs.regulargrid.n006.20190115.t18z.nc
-        url = 'https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/%s/MODELS/%s/' \
-              'nos.%s.regulargrid.n003.%s.t00z.nc' \
-              % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
+        if (name == self.Model.NGOFS.name) or (name == self.Model.CREOFS.name) or (name == self.Model.SFBOFS.name):
+            url = 'https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/%s/MODELS/%s/' \
+                  'nos.%s.regulargrid.n003.%s.t03z.nc' \
+                  % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
+        else:
+            url = 'https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/%s/MODELS/%s/' \
+                  'nos.%s.regulargrid.n003.%s.t00z.nc' \
+                  % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
         return url
 
     def _download_files(self, datestamp: date, server_mode: bool = False):
