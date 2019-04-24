@@ -1625,6 +1625,9 @@ class SoundSpeedLibrary:
     def use_lhofs(self) -> bool:
         return self.setup.use_lhofs
 
+    def use_lmofs(self) -> bool:
+        return self.setup.use_lmofs
+
     def use_loofs(self) -> bool:
         return self.setup.use_loofs
 
@@ -1673,6 +1676,9 @@ class SoundSpeedLibrary:
     def has_lhofs(self) -> bool:
         return self.atlases.lhofs.is_present()
 
+    def has_lmofs(self) -> bool:
+        return self.atlases.lmofs.is_present()
+
     def has_loofs(self) -> bool:
         return self.atlases.loofs.is_present()
 
@@ -1720,6 +1726,9 @@ class SoundSpeedLibrary:
 
     def download_lhofs(self, datestamp: Optional['datetime'] = None) -> bool:
         return self.atlases.lhofs.download_db(datestamp=datestamp)
+
+    def download_lmofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.lmofs.download_db(datestamp=datestamp)
 
     def download_loofs(self, datestamp: Optional['datetime'] = None) -> bool:
         return self.atlases.loofs.download_db(datestamp=datestamp)

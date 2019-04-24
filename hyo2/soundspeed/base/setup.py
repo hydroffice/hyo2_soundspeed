@@ -51,6 +51,7 @@ class Setup:
         self.use_tbofs = None
         self.use_leofs = None
         self.use_lhofs = None
+        self.use_lmofs = None
         self.use_loofs = None
         self.use_lsofs = None
         self.use_creofs = None

@@ -69,6 +69,7 @@ class Atlases:
         self.tbofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.TBOFS)
         self.leofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.LEOFS)
         self.lhofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.LHOFS)
+        self.lmofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.LMOFS)
         self.loofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.LOOFS)
         self.lsofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.LSOFS)
         self.creofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.CREOFS)
@@ -126,6 +127,10 @@ class Atlases:
         return self.lhofs.data_folder
 
     @property
+    def lmofs_folder(self):
+        return self.lmofs.data_folder
+
+    @property
     def loofs_folder(self):
         return self.loofs.data_folder
 
@@ -155,6 +160,7 @@ class Atlases:
         msg += "  %s" % self.tbofs
         msg += "  %s" % self.leofs
         msg += "  %s" % self.lhofs
+        msg += "  %s" % self.lmofs
         msg += "  %s" % self.loofs
         msg += "  %s" % self.lsofs
         msg += "  %s" % self.creofs
