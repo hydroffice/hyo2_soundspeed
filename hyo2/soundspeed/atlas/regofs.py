@@ -6,7 +6,7 @@ import socket
 from typing import Optional, Union
 from urllib import parse
 
-from netCDF4 import Dataset
+from netCDF4 import Dataset, num2date
 import numpy as np
 
 from hyo2.abc.lib.progress.cli_progress import CliProgress
@@ -137,6 +137,7 @@ class RegOfs(AbstractAtlas):
     def query(self, lat: Optional[float], lon: Optional[float], datestamp: Union[date, dt, None] = None,
               server_mode: bool = False):
         """Query OFS for passed location and timestamp"""
+        original_datestamp = datestamp
         if datestamp is None:
             datestamp = dt.utcnow()
         if isinstance(datestamp, dt):
@@ -159,6 +160,11 @@ class RegOfs(AbstractAtlas):
         except TypeError as e:
             logger.critical("while converting location to grid coords, %s" % e)
             return None
+
+        ocean_time = self._file.variables['ocean_time']
+        datetime_retrieved = num2date(ocean_time[0], units=ocean_time.units, calendar=ocean_time.calendar)
+        logger.debug(('Query datetime:\t\t\t%s' % original_datestamp.isoformat()))
+        logger.debug("Retrieved datetime:\t\t%s" % datetime_retrieved.isoformat())
 
         logger.debug("idx > lat: %s, lon: %s" % (lat_idx, lon_idx))
         lat_s_idx = lat_idx - self._search_half_window
@@ -329,7 +335,7 @@ class RegOfs(AbstractAtlas):
 
         return resp.status < 400
 
-    def _build_check_url(self,input_date: date, name: str) -> str:
+    def _build_check_url(self, input_date: date, name: str) -> str:
         """make up the url to use for salinity and temperature"""
         # Primary server: https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/GOMOFS/MODELS/201901/
         #                 nos.gomofs.regulargrid.n006.20190115.t18z.nc
@@ -411,7 +417,6 @@ class RegOfs(AbstractAtlas):
         # success!
         self._has_data_loaded = True
         self._last_loaded_day = datestamp
-        # logger.info("loaded data for %s" % datestamp)
         progress.end()
         return True
 
