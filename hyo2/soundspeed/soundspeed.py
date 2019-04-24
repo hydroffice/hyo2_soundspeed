@@ -1589,18 +1589,53 @@ class SoundSpeedLibrary:
         self.setup.db.delete_setup(original_setup_name)
 
     # --- atlases
-
-    def use_rtofs(self) -> bool:
-        return self.setup.use_rtofs
-
-    def use_gomofs(self) -> bool:
-        return self.setup.use_gomofs
-
     def use_woa09(self) -> bool:
         return self.setup.use_woa09
 
     def use_woa13(self) -> bool:
         return self.setup.use_woa13
+
+    def use_rtofs(self) -> bool:
+        return self.setup.use_rtofs
+
+    def use_cbofs(self) -> bool:
+        return self.setup.use_cbofs
+
+    def use_dbofs(self) -> bool:
+        return self.setup.use_dbofs
+
+    def use_gomofs(self) -> bool:
+        return self.setup.use_gomofs
+
+    def use_nyofs(self) -> bool:
+        return self.setup.use_nyofs
+
+    def use_sjrofs(self) -> bool:
+        return self.setup.use_sjrofs
+
+    def use_ngofs(self) -> bool:
+        return self.setup.use_ngofs
+
+    def use_tbofs(self) -> bool:
+        return self.setup.use_tbofs
+
+    def use_leofs(self) -> bool:
+        return self.setup.use_leofs
+
+    def use_lhofs(self) -> bool:
+        return self.setup.use_lhofs
+
+    def use_loofs(self) -> bool:
+        return self.setup.use_loofs
+
+    def use_lsofs(self) -> bool:
+        return self.setup.use_lsofs
+
+    def use_creofs(self) -> bool:
+        return self.setup.use_creofs
+
+    def use_sfbofs(self) -> bool:
+        return self.setup.use_sfbofs
 
     def has_woa09(self) -> bool:
         return self.atlases.woa09.is_present()
@@ -1611,14 +1646,44 @@ class SoundSpeedLibrary:
     def has_rtofs(self) -> bool:
         return self.atlases.rtofs.is_present()
 
+    def has_cbofs(self) -> bool:
+        return self.atlases.cbofs.is_present()
+
+    def has_dbofs(self) -> bool:
+        return self.atlases.dbofs.is_present()
+
     def has_gomofs(self) -> bool:
         return self.atlases.gomofs.is_present()
+
+    def has_nyofs(self) -> bool:
+        return self.atlases.nyofs.is_present()
+
+    def has_sjrofs(self) -> bool:
+        return self.atlases.sjrofs.is_present()
+
+    def has_ngofs(self) -> bool:
+        return self.atlases.ngofs.is_present()
+
+    def has_tbofs(self) -> bool:
+        return self.atlases.tbofs.is_present()
 
     def has_leofs(self) -> bool:
         return self.atlases.leofs.is_present()
 
     def has_lhofs(self) -> bool:
         return self.atlases.lhofs.is_present()
+
+    def has_loofs(self) -> bool:
+        return self.atlases.loofs.is_present()
+
+    def has_lsofs(self) -> bool:
+        return self.atlases.lsofs.is_present()
+
+    def has_creofs(self) -> bool:
+        return self.atlases.creofs.is_present()
+
+    def has_sfbofs(self) -> bool:
+        return self.atlases.sfbofs.is_present()
 
     def download_woa09(self) -> bool:
         return self.atlases.woa09.download_db()
@@ -1629,14 +1694,44 @@ class SoundSpeedLibrary:
     def download_rtofs(self, datestamp: Optional['datetime'] = None) -> bool:
         return self.atlases.rtofs.download_db(datestamp=datestamp)
 
+    def download_cbofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.cbofs.download_db(datestamp=datestamp)
+
+    def download_dbofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.dbofs.download_db(datestamp=datestamp)
+
     def download_gomofs(self, datestamp: Optional['datetime'] = None) -> bool:
         return self.atlases.gomofs.download_db(datestamp=datestamp)
+
+    def download_nyofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.nyofs.download_db(datestamp=datestamp)
+
+    def download_sjrofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.sjrofs.download_db(datestamp=datestamp)
+
+    def download_ngofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.ngofs.download_db(datestamp=datestamp)
+
+    def download_tbofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.tbofs.download_db(datestamp=datestamp)
 
     def download_leofs(self, datestamp: Optional['datetime'] = None) -> bool:
         return self.atlases.leofs.download_db(datestamp=datestamp)
 
     def download_lhofs(self, datestamp: Optional['datetime'] = None) -> bool:
         return self.atlases.lhofs.download_db(datestamp=datestamp)
+
+    def download_loofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.loofs.download_db(datestamp=datestamp)
+
+    def download_lsofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.lsofs.download_db(datestamp=datestamp)
+
+    def download_creofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.creofs.download_db(datestamp=datestamp)
+
+    def download_sfbofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.sfbofs.download_db(datestamp=datestamp)
 
     # --- listeners
 
