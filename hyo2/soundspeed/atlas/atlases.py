@@ -59,9 +59,20 @@ class Atlases:
         self.woa09 = Woa09(data_folder=woa09_folder, prj=self.prj)
         self.woa13 = Woa13(data_folder=woa13_folder, prj=self.prj)
         self.rtofs = Rtofs(data_folder=rtofs_folder, prj=self.prj)
+
+        self.cbofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.CBOFS)
+        self.dbofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.DBOFS)
         self.gomofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.GoMOFS)
+        self.nyofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.NYOFS)
+        self.sjrofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.SJROFS)
+        self.ngofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.NGOFS)
+        self.tbofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.TBOFS)
         self.leofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.LEOFS)
         self.lhofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.LHOFS)
+        self.loofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.LOOFS)
+        self.lsofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.LSOFS)
+        self.creofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.CREOFS)
+        self.sfbofs = RegOfs(data_folder=regofs_folder, prj=self.prj, model=RegOfs.Model.SFBOFS)
 
     @property
     def atlases_folder(self):
@@ -80,8 +91,31 @@ class Atlases:
         return self.rtofs.data_folder
 
     @property
+    def cbofs_folder(self):
+        return self.cbofs.data_folder
+
+    @property
+    def dbofs_folder(self):
+        return self.dbofs.data_folder
+
+    @property
     def gomofs_folder(self):
         return self.gomofs.data_folder
+
+    @property
+    def nyofs_folder(self):
+        return self.nyofs.data_folder
+
+    def sjrofs_folder(self):
+        return self.sjrofs.data_folder
+
+    @property
+    def ngofs_folder(self):
+        return self.ngofs.data_folder
+
+    @property
+    def tbofs_folder(self):
+        return self.tbofs.data_folder
 
     @property
     def leofs_folder(self):
@@ -91,12 +125,38 @@ class Atlases:
     def lhofs_folder(self):
         return self.lhofs.data_folder
 
+    @property
+    def loofs_folder(self):
+        return self.loofs.data_folder
+
+    @property
+    def lsofs_folder(self):
+        return self.lsofs.data_folder
+
+    @property
+    def creofs_folder(self):
+        return self.creofs.data_folder
+
+    @property
+    def sfbofs_folder(self):
+        return self.sfbofs.data_folder
+
     def __repr__(self):
         msg = "  <atlases>\n"
         msg += "  %s" % self.woa09
         msg += "  %s" % self.woa13
         msg += "  %s" % self.rtofs
+        msg += "  %s" % self.cbofs
+        msg += "  %s" % self.dbofs
         msg += "  %s" % self.gomofs
+        msg += "  %s" % self.nyofs
+        msg += "  %s" % self.sjrofs
+        msg += "  %s" % self.ngofs
+        msg += "  %s" % self.tbofs
         msg += "  %s" % self.leofs
         msg += "  %s" % self.lhofs
+        msg += "  %s" % self.loofs
+        msg += "  %s" % self.lsofs
+        msg += "  %s" % self.creofs
+        msg += "  %s" % self.sfbofs
         return msg
