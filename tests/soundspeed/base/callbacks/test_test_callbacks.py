@@ -1,13 +1,13 @@
 import unittest
 import os
 
-from hyo2.soundspeed.base.callbacks.test_callbacks import TestCallbacks
+from hyo2.soundspeed.base.callbacks.fake_callbacks import FakeCallbacks
 
 
 class TestSoundSpeedTestCallbacks(unittest.TestCase):
 
     def setUp(self):
-        self.cb = TestCallbacks()
+        self.cb = FakeCallbacks()
 
     def tearDown(self):
         pass

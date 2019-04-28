@@ -4,7 +4,7 @@ import logging
 
 from hyo2.soundspeedmanager import AppInfo
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
-from hyo2.soundspeed.base.callbacks.test_callbacks import TestCallbacks
+from hyo2.soundspeed.base.callbacks.fake_callbacks import FakeCallbacks
 from hyo2.soundspeed.base.testing import SoundSpeedTesting
 
 logging.basicConfig(level=logging.DEBUG)
@@ -107,7 +107,7 @@ class TestSoundSpeedFormats(unittest.TestCase):
 
     def _run(self, filters):
         # create a project with test-callbacks
-        lib = SoundSpeedLibrary(callbacks=TestCallbacks())
+        lib = SoundSpeedLibrary(callbacks=FakeCallbacks())
 
         # set the current project name
         lib.setup.current_project = 'test_read_store_and_write'

@@ -1,11 +1,11 @@
 import logging
 
-from hyo2.soundspeed.base.callbacks.test_callbacks import TestCallbacks
+from hyo2.soundspeed.base.callbacks.fake_callbacks import FakeCallbacks
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-cb = TestCallbacks()
+cb = FakeCallbacks()
 
 logger.debug("ask number: %s" % cb.ask_number())
 logger.debug("ask text: %s" % cb.ask_text())

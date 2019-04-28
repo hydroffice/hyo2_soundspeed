@@ -9,11 +9,11 @@ from hyo2.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
 logger = logging.getLogger(__name__)
 
 
-class TestCallbacks(AbstractCallbacks):
+class FakeCallbacks(AbstractCallbacks):
     """Used only for testing since the methods do not require user interaction"""
 
     def __init__(self) -> None:
-        super(TestCallbacks, self).__init__()
+        super(FakeCallbacks, self).__init__()
 
     def ask_number(self, title: Optional[str] = "", msg: Optional[str] = "Enter number", default: Optional[float] = 0.0,
                    min_value: Optional[float] = -2147483647.0, max_value: Optional[float] = 2147483647.0,

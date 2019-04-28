@@ -4,14 +4,14 @@ import logging
 from hyo2.soundspeedmanager import app_info
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 from hyo2.soundspeed.base.testing import SoundSpeedTesting
-from hyo2.soundspeed.base.callbacks.test_callbacks import TestCallbacks
+from hyo2.soundspeed.base.callbacks.fake_callbacks import FakeCallbacks
 
 logging.basicConfig(level=logging.DEBUG,
                     format="%(levelname)-9s %(name)s.%(funcName)s:%(lineno)d > %(message)s")
 logger = logging.getLogger(__name__)
 
 # create a project with test-callbacks
-lib = SoundSpeedLibrary(callbacks=TestCallbacks())
+lib = SoundSpeedLibrary(callbacks=FakeCallbacks())
 
 # set the current project name
 lib.setup.current_project = 'test'

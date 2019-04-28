@@ -54,7 +54,7 @@ build_script:
 
 test: off
 test_script:
-  - py.test --cov=hyo2
+  - py.test --cov
   - coverage report -m
   - pip install PyYAML
   - coveralls
