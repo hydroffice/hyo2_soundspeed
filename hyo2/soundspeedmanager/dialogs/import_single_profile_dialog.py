@@ -72,80 +72,172 @@ class ImportSingleProfileDialog(AbstractDialog):
         # noinspection PyUnresolvedReferences
         self.rightButtonBox.clicked.connect(self.on_click_import)
 
-        self.mainLayout.addSpacing(18)
+        self.mainLayout.addSpacing(36)
 
         # retrieve data
         self.retrieveLayout = QtWidgets.QVBoxLayout()
         self.mainLayout.addLayout(self.retrieveLayout)
-        # - retrieve
+        # - retrieve Label
         retrieve_hbox = QtWidgets.QHBoxLayout()
         self.retrieveLayout.addLayout(retrieve_hbox)
         retrieve_hbox.addStretch()
         retrieve_label = QtWidgets.QLabel("Retrieve from:")
         retrieve_hbox.addWidget(retrieve_label)
         retrieve_hbox.addStretch()
-        # - button box
+        # - retrieve Sources
+        self.retrieveSources = QtWidgets.QHBoxLayout()
+        self.retrieveLayout.addLayout(self.retrieveSources)
+
+        # -- left button box
         # noinspection PyUnresolvedReferences
-        self.retrieveButtonBox = QtWidgets.QDialogButtonBox(QtCore.Qt.Vertical)
-        self.retrieveButtonBox.setMinimumWidth(self.botton_min_width)
-        self.retrieveLayout.addWidget(self.retrieveButtonBox)
-        # add buttons
-        # -- current project
+        self.leftRetrieveButtonBox = QtWidgets.QDialogButtonBox(QtCore.Qt.Vertical)
+        self.leftRetrieveButtonBox.setMinimumWidth(self.botton_min_width)
+        self.retrieveSources.addWidget(self.leftRetrieveButtonBox)
+
+        # --- add buttons
+        # ---- current project
         btn = QtWidgets.QPushButton("Project DB")
-        self.retrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        self.leftRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
         btn.setToolTip("Retrieve profile from current project DB")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_load_db)
-        # -- WOA09
-        btn = QtWidgets.QPushButton("WOA09 DB")
-        self.retrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
-        btn.setToolTip("Retrieve synthetic data from WOA09 Atlas")
-        # noinspection PyUnresolvedReferences
-        btn.clicked.connect(self.on_click_woa09)
-        # -- WOA13
-        btn = QtWidgets.QPushButton("WOA13 DB")
-        self.retrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
-        btn.setToolTip("Retrieve synthetic data from WOA13 Atlas")
-        # noinspection PyUnresolvedReferences
-        btn.clicked.connect(self.on_click_woa13)
-        # -- RTOFS
-        btn = QtWidgets.QPushButton("RTOFS")
-        self.retrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
-        btn.setToolTip("Retrieve synthetic data from RTOFS Atlas")
-        # noinspection PyUnresolvedReferences
-        btn.clicked.connect(self.on_click_rtofs)
-        # -- GoMOFS
-        btn = QtWidgets.QPushButton("GoMOFS")
-        self.retrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
-        btn.setToolTip("Retrieve synthetic data from GoMOFS Atlas")
-        # noinspection PyUnresolvedReferences
-        btn.clicked.connect(self.on_click_gomofs)
-        # -- LEOFS
-        btn = QtWidgets.QPushButton("LEOFS")
-        self.retrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
-        btn.setToolTip("Retrieve synthetic data from LEOFS Atlas")
-        # noinspection PyUnresolvedReferences
-        btn.clicked.connect(self.on_click_leofs)
-        # -- SIS4
+        # ---- SIS4
         btn = QtWidgets.QPushButton("SIS4")
-        self.retrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        self.leftRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
         btn.setToolTip("Retrieve current profile from SIS4")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_click_sis4)
-        # -- SIS5
+        # --- SIS5
         btn = QtWidgets.QPushButton("SIS5")
-        self.retrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        self.leftRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
         btn.setToolTip("Retrieve current profile from SIS5")
         # TODO: Kongsberg does not support MR20 datagram with KCtrl
         btn.setDisabled(True)
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_click_sis5)
-        # -- Seabird CTD
+        # ---- Seabird CTD
         btn = QtWidgets.QPushButton("Seabird CTD")
-        self.retrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        self.leftRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
         btn.setToolTip("Retrieve profiles from Seabird CTD")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_click_seabird_ctd)
+        # --- WOA09
+        btn = QtWidgets.QPushButton("WOA09 DB")
+        self.leftRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from WOA09 Atlas")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_click_woa09)
+        # --- WOA13
+        btn = QtWidgets.QPushButton("WOA13 DB")
+        self.leftRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from WOA13 Atlas")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_click_woa13)
+        # ---- RTOFS
+        btn = QtWidgets.QPushButton("RTOFS")
+        self.leftRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from RTOFS Atlas")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_click_rtofs)
+
+        # -- mid button box
+        # noinspection PyUnresolvedReferences
+        self.midRetrieveButtonBox = QtWidgets.QDialogButtonBox(QtCore.Qt.Vertical)
+        self.midRetrieveButtonBox.setMinimumWidth(self.botton_min_width)
+        self.retrieveSources.addWidget(self.midRetrieveButtonBox)
+
+        # --- add buttons
+        # ---- CBOFS
+        btn = QtWidgets.QPushButton("CBOFS")
+        self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from CBOFS Atlas")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_click_cbofs)
+        # ---- CREOFS
+        btn = QtWidgets.QPushButton("CREOFS")
+        self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from CREOFS Atlas")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_click_creofs)
+        # ---- DBOFS
+        btn = QtWidgets.QPushButton("DBOFS")
+        self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from DBOFS Atlas")
+        # noinspection PyUnresolvedReferences
+        # btn.clicked.connect(self.on_click_dbofs)
+        # ---- GoMOFS
+        btn = QtWidgets.QPushButton("GoMOFS")
+        self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from GoMOFS Atlas")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_click_gomofs)
+        # ---- LEOFS
+        btn = QtWidgets.QPushButton("LEOFS")
+        self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from LEOFS Atlas")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_click_leofs)
+        # ---- LHOFS
+        btn = QtWidgets.QPushButton("LHOFS")
+        self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from LHOFS Atlas")
+        # TODO: Add support for Regional OFS without regular grids
+        btn.setDisabled(True)
+        # -- LMOFS
+        btn = QtWidgets.QPushButton("LMOFS")
+        self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from LMOFS Atlas")
+        # TODO: Add support for Regional OFS without regular grids
+        btn.setDisabled(True)
+
+        # --- right button box
+        # noinspection PyUnresolvedReferences
+        self.rightRetrieveButtonBox = QtWidgets.QDialogButtonBox(QtCore.Qt.Vertical)
+        self.rightRetrieveButtonBox.setMinimumWidth(self.botton_min_width)
+        self.retrieveSources.addWidget(self.rightRetrieveButtonBox)
+        # ---- LOOFS
+        btn = QtWidgets.QPushButton("LOOFS")
+        self.rightRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from LOOFS Atlas")
+        # TODO: Add support for Regional OFS without regular grids
+        btn.setDisabled(True)
+        # -- LSOFS
+        btn = QtWidgets.QPushButton("LSOFS")
+        self.rightRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from LSOFS Atlas")
+        # TODO: Add support for Regional OFS without regular grids
+        btn.setDisabled(True)
+        # -- NGOFS
+        btn = QtWidgets.QPushButton("NGOFS")
+        self.rightRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from NGOFS Atlas")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_click_ngofs)
+        # -- NYOFS
+        btn = QtWidgets.QPushButton("NYOFS")
+        self.rightRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from NYOFS Atlas")
+        # TODO: Add support for Regional OFS without regular grids
+        btn.setDisabled(True)
+        # -- SFBOFS
+        btn = QtWidgets.QPushButton("SFBOFS")
+        self.rightRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from SFBOFS Atlas")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_click_sfbofs)
+        # -- SJROFS
+        btn = QtWidgets.QPushButton("SJROFS")
+        self.rightRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from SJROFS Atlas")
+        # TODO: Add support for Regional OFS without regular grids
+        btn.setDisabled(True)
+        # -- TBOFS
+        btn = QtWidgets.QPushButton("TBOFS")
+        self.rightRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from TBOFS Atlas")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_click_tbofs)
+
 
         self.retrieveLayout.addStretch()
 
@@ -261,6 +353,55 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         self.accept()
 
+    def on_click_sis4(self) -> None:
+        """Retrieve SIS4 data"""
+        logger.debug("user wants to retrieve SIS4 profile")
+        if not self.lib.use_sis4():
+            msg = "The SIS4 listening is not activated!\n\nGo to Settings/Input/Listen SIS4"
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            return
+
+        try:
+            self.lib.retrieve_sis4()
+
+        except RuntimeError as e:
+            msg = "Issue in retrieving data from SIS4:\n\n%s" % e
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            return
+
+        self.accept()
+
+    def on_click_sis5(self) -> None:
+        """Retrieve SIS5 data"""
+        if not self.lib.use_sis5():
+            msg = "The SIS5 listening is not activated!\n\nGo to Settings/Input/Listen SIS5"
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            return
+
+        try:
+            self.lib.retrieve_sis5()
+
+        except RuntimeError as e:
+            msg = "Issue in retrieving data from SIS5:\n\n%s" % e
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            return
+
+        self.accept()
+
+    def on_click_seabird_ctd(self):
+        logger.debug("Open Seabird CTD dialog")
+        dlg = SeacatDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        ret = dlg.exec_()
+        if ret != QtWidgets.QDialog.Accepted:
+            logger.info("Seabird CTD dialog closed without selection")
+            return
+
+        self.accept()
+
     def on_click_woa09(self):
         """Retrieve WOA09 data"""
 
@@ -318,6 +459,63 @@ class ImportSingleProfileDialog(AbstractDialog):
         self.accept()
         self.progress.end()
 
+    def on_click_cbofs(self):
+        """Retrieve CBOFS"""
+
+        self.progress.start(text='Retrieve CBOFS')
+        self.progress.update(value=30)
+
+        try:
+            self.lib.retrieve_cbofs()
+
+        except RuntimeError as e:
+            msg = 'Issue in importing the CBOFS data:\n\n> %s' % e
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            self.progress.end()
+            return
+
+        self.accept()
+        self.progress.end()
+
+    def on_click_creofs(self):
+        """Retrieve CREOFS"""
+
+        self.progress.start(text='Retrieve CREOFS')
+        self.progress.update(value=30)
+
+        try:
+            self.lib.retrieve_creofs()
+
+        except RuntimeError as e:
+            msg = 'Issue in importing the CREOFS data:\n\n> %s' % e
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            self.progress.end()
+            return
+
+        self.accept()
+        self.progress.end()
+
+    def on_click_dbofs(self):
+        """Retrieve DBOFS"""
+
+        self.progress.start(text='Retrieve DBOFS')
+        self.progress.update(value=30)
+
+        try:
+            self.lib.retrieve_dbofs()
+
+        except RuntimeError as e:
+            msg = 'Issue in importing the DBOFS data:\n\n> %s' % e
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            self.progress.end()
+            return
+
+        self.accept()
+        self.progress.end()
+
     def on_click_gomofs(self):
         """Retrieve RTOFS data"""
 
@@ -356,51 +554,173 @@ class ImportSingleProfileDialog(AbstractDialog):
         self.accept()
         self.progress.end()
 
-    def on_click_sis4(self) -> None:
-        """Retrieve SIS4 data"""
-        logger.debug("user wants to retrieve SIS4 profile")
-        if not self.lib.use_sis4():
-            msg = "The SIS4 listening is not activated!\n\nGo to Settings/Input/Listen SIS4"
-            # noinspection PyCallByClass
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
-            return
+    def on_click_lhofs(self):
+        """Retrieve LHOFS"""
+
+        self.progress.start(text='Retrieve LEOFS')
+        self.progress.update(value=30)
 
         try:
-            self.lib.retrieve_sis4()
+            self.lib.retrieve_lhofs()
 
         except RuntimeError as e:
-            msg = "Issue in retrieving data from SIS4:\n\n%s" % e
+            msg = 'Issue in importing the LHOFS data:\n\n> %s' % e
             # noinspection PyCallByClass
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            self.progress.end()
             return
 
         self.accept()
+        self.progress.end()
 
-    def on_click_sis5(self) -> None:
-        """Retrieve SIS5 data"""
-        if not self.lib.use_sis5():
-            msg = "The SIS5 listening is not activated!\n\nGo to Settings/Input/Listen SIS5"
-            # noinspection PyCallByClass
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
-            return
+    def on_click_lmofs(self):
+        """Retrieve LMOFS"""
+
+        self.progress.start(text='Retrieve LMOFS')
+        self.progress.update(value=30)
 
         try:
-            self.lib.retrieve_sis5()
+            self.lib.retrieve_lmofs()
 
         except RuntimeError as e:
-            msg = "Issue in retrieving data from SIS5:\n\n%s" % e
+            msg = 'Issue in importing the LMOFS data:\n\n> %s' % e
             # noinspection PyCallByClass
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            self.progress.end()
             return
 
         self.accept()
+        self.progress.end()
 
-    def on_click_seabird_ctd(self):
-        logger.debug("Open Seabird CTD dialog")
-        dlg = SeacatDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        ret = dlg.exec_()
-        if ret != QtWidgets.QDialog.Accepted:
-            logger.info("Seabird CTD dialog closed without selection")
+    def on_click_loofs(self):
+        """Retrieve LOOFS"""
+
+        self.progress.start(text='Retrieve LOOFS')
+        self.progress.update(value=30)
+
+        try:
+            self.lib.retrieve_loofs()
+
+        except RuntimeError as e:
+            msg = 'Issue in importing the LOOFS data:\n\n> %s' % e
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            self.progress.end()
             return
 
         self.accept()
+        self.progress.end()
+
+    def on_click_lsofs(self):
+        """Retrieve LSOFS"""
+
+        self.progress.start(text='Retrieve LSOFS')
+        self.progress.update(value=30)
+
+        try:
+            self.lib.retrieve_lsofs()
+
+        except RuntimeError as e:
+            msg = 'Issue in importing the LSOFS data:\n\n> %s' % e
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            self.progress.end()
+            return
+
+        self.accept()
+        self.progress.end()
+
+    def on_click_ngofs(self):
+        """Retrieve NGOFS"""
+
+        self.progress.start(text='Retrieve NGOFS')
+        self.progress.update(value=30)
+
+        try:
+            self.lib.retrieve_ngofs()
+
+        except RuntimeError as e:
+            msg = 'Issue in importing the NGOFS data:\n\n> %s' % e
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            self.progress.end()
+            return
+
+        self.accept()
+        self.progress.end()
+
+    def on_click_nyofs(self):
+        """Retrieve NYOFS"""
+
+        self.progress.start(text='Retrieve NYOFS')
+        self.progress.update(value=30)
+
+        try:
+            self.lib.retrieve_nyofs()
+
+        except RuntimeError as e:
+            msg = 'Issue in importing the NYOFS data:\n\n> %s' % e
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            self.progress.end()
+            return
+
+        self.accept()
+        self.progress.end()
+
+    def on_click_sfbofs(self):
+        """Retrieve SFBOFS"""
+
+        self.progress.start(text='Retrieve SFBOFS')
+        self.progress.update(value=30)
+
+        try:
+            self.lib.retrieve_sfbofs()
+
+        except RuntimeError as e:
+            msg = 'Issue in importing the SFBOFS data:\n\n> %s' % e
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            self.progress.end()
+            return
+
+        self.accept()
+        self.progress.end()
+
+    def on_click_sjrofs(self):
+        """Retrieve SJROFS"""
+
+        self.progress.start(text='Retrieve SJROFS')
+        self.progress.update(value=30)
+
+        try:
+            self.lib.retrieve_sjrofs()
+
+        except RuntimeError as e:
+            msg = 'Issue in importing the SJROFS data:\n\n> %s' % e
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            self.progress.end()
+            return
+
+        self.accept()
+        self.progress.end()
+
+    def on_click_tbofs(self):
+        """Retrieve TBOFS"""
+
+        self.progress.start(text='Retrieve TBOFS')
+        self.progress.update(value=30)
+
+        try:
+            self.lib.retrieve_tbofs()
+
+        except RuntimeError as e:
+            msg = 'Issue in importing the TBOFS data:\n\n> %s' % e
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            self.progress.end()
+            return
+
+        self.accept()
+        self.progress.end()

@@ -578,6 +578,282 @@ class SoundSpeedLibrary:
 
         self.ssp = self.atlases.leofs.query(lat=lat, lon=lon, datestamp=utc_time)
 
+    def retrieve_cbofs(self) -> None:
+        """Retrieve data from CBOFS atlas"""
+
+        utc_time = self.cb.ask_date()
+        if utc_time is None:
+            logger.error("missing date required for database lookup")
+            return
+
+        if not self.download_cbofs(datestamp=utc_time):
+            logger.error("unable to download CBOFS atlas data set")
+            return
+
+        if not self.has_cbofs():
+            logger.error("missing CBOFS atlas data set")
+            return
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return
+
+        self.ssp = self.atlases.cbofs.query(lat=lat, lon=lon, datestamp=utc_time)
+
+    def retrieve_dbofs(self) -> None:
+        """Retrieve data from DBOFS atlas"""
+
+        utc_time = self.cb.ask_date()
+        if utc_time is None:
+            logger.error("missing date required for database lookup")
+            return
+
+        if not self.download_dbofs(datestamp=utc_time):
+            logger.error("unable to download DBOFS atlas data set")
+            return
+
+        if not self.has_dbofs():
+            logger.error("missing DBOFS atlas data set")
+            return
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return
+
+        self.ssp = self.atlases.dbofs.query(lat=lat, lon=lon, datestamp=utc_time)
+
+    def retrieve_ngofs(self) -> None:
+        """Retrieve data from NGOFS atlas"""
+
+        utc_time = self.cb.ask_date()
+        if utc_time is None:
+            logger.error("missing date required for database lookup")
+            return
+
+        if not self.download_ngofs(datestamp=utc_time):
+            logger.error("unable to download NGOFS atlas data set")
+            return
+
+        if not self.has_ngofs():
+            logger.error("missing NGOFS atlas data set")
+            return
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return
+
+        self.ssp = self.atlases.ngofs.query(lat=lat, lon=lon, datestamp=utc_time)
+
+    def retrieve_tbofs(self) -> None:
+        """Retrieve data from TBOFS atlas"""
+
+        utc_time = self.cb.ask_date()
+        if utc_time is None:
+            logger.error("missing date required for database lookup")
+            return
+
+        if not self.download_tbofs(datestamp=utc_time):
+            logger.error("unable to download TBOFS atlas data set")
+            return
+
+        if not self.has_tbofs():
+            logger.error("missing TBOFS atlas data set")
+            return
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return
+
+        self.ssp = self.atlases.tbofs.query(lat=lat, lon=lon, datestamp=utc_time)
+
+    def retrieve_creofs(self) -> None:
+        """Retrieve data from CREOFS atlas"""
+
+        utc_time = self.cb.ask_date()
+        if utc_time is None:
+            logger.error("missing date required for database lookup")
+            return
+
+        if not self.download_creofs(datestamp=utc_time):
+            logger.error("unable to download CREOFS atlas data set")
+            return
+
+        if not self.has_creofs():
+            logger.error("missing CREOFS atlas data set")
+            return
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return
+
+        self.ssp = self.atlases.creofs.query(lat=lat, lon=lon, datestamp=utc_time)
+
+    def retrieve_sfbofs(self) -> None:
+        """Retrieve data from SFBOFS atlas"""
+
+        utc_time = self.cb.ask_date()
+        if utc_time is None:
+            logger.error("missing date required for database lookup")
+            return
+
+        if not self.download_sfbofs(datestamp=utc_time):
+            logger.error("unable to download SFBOFS atlas data set")
+            return
+
+        if not self.has_sfbofs():
+            logger.error("missing SFBOFS atlas data set")
+            return
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return
+
+        self.ssp = self.atlases.sfbofs.query(lat=lat, lon=lon, datestamp=utc_time)
+
+    def retrieve_nyofs(self) -> None:
+        """Retrieve data from NYOFS atlas"""
+
+        utc_time = self.cb.ask_date()
+        if utc_time is None:
+            logger.error("missing date required for database lookup")
+            return
+
+        if not self.download_nyofs(datestamp=utc_time):
+            logger.error("unable to download NYOFS atlas data set")
+            return
+
+        if not self.has_nyofs():
+            logger.error("missing NYOFS atlas data set")
+            return
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return
+
+        self.ssp = self.atlases.nyofs.query(lat=lat, lon=lon, datestamp=utc_time)
+
+    def retrieve_sjrofs(self) -> None:
+        """Retrieve data from SJROFS atlas"""
+
+        utc_time = self.cb.ask_date()
+        if utc_time is None:
+            logger.error("missing date required for database lookup")
+            return
+
+        if not self.download_sjrofs(datestamp=utc_time):
+            logger.error("unable to download SJROFS atlas data set")
+            return
+
+        if not self.has_ngofs():
+            logger.error("missing SJROFS atlas data set")
+            return
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return
+
+        self.ssp = self.atlases.sjrofs.query(lat=lat, lon=lon, datestamp=utc_time)
+
+    def retrieve_lhofs(self) -> None:
+        """Retrieve data from LHOFS atlas"""
+
+        utc_time = self.cb.ask_date()
+        if utc_time is None:
+            logger.error("missing date required for database lookup")
+            return
+
+        if not self.download_lhofs(datestamp=utc_time):
+            logger.error("unable to download LHOFS atlas data set")
+            return
+
+        if not self.has_lhofs():
+            logger.error("missing LHOFS atlas data set")
+            return
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return
+
+        self.ssp = self.atlases.lhofs.query(lat=lat, lon=lon, datestamp=utc_time)
+
+    def retrieve_lmofs(self) -> None:
+        """Retrieve data from LMOFS atlas"""
+
+        utc_time = self.cb.ask_date()
+        if utc_time is None:
+            logger.error("missing date required for database lookup")
+            return
+
+        if not self.download_lmofs(datestamp=utc_time):
+            logger.error("unable to download LMOFS atlas data set")
+            return
+
+        if not self.has_lmofs():
+            logger.error("missing LMOFS atlas data set")
+            return
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return
+
+        self.ssp = self.atlases.lmofs.query(lat=lat, lon=lon, datestamp=utc_time)
+
+    def retrieve_loofs(self) -> None:
+        """Retrieve data from LOOFS atlas"""
+
+        utc_time = self.cb.ask_date()
+        if utc_time is None:
+            logger.error("missing date required for database lookup")
+            return
+
+        if not self.download_loofs(datestamp=utc_time):
+            logger.error("unable to download LOOFS atlas data set")
+            return
+
+        if not self.has_loofs():
+            logger.error("missing LOOFS atlas data set")
+            return
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return
+
+        self.ssp = self.atlases.loofs.query(lat=lat, lon=lon, datestamp=utc_time)
+
+    def retrieve_lsofs(self) -> None:
+        """Retrieve data from LSOFS atlas"""
+
+        utc_time = self.cb.ask_date()
+        if utc_time is None:
+            logger.error("missing date required for database lookup")
+            return
+
+        if not self.download_lsofs(datestamp=utc_time):
+            logger.error("unable to download LSOFS atlas data set")
+            return
+
+        if not self.has_lsofs():
+            logger.error("missing LSOFS atlas data set")
+            return
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return
+
+        self.ssp = self.atlases.lsofs.query(lat=lat, lon=lon, datestamp=utc_time)
+
     def retrieve_sis4(self) -> None:
         """Retrieve data from SIS4"""
         if not self.use_sis4():
@@ -1589,18 +1865,56 @@ class SoundSpeedLibrary:
         self.setup.db.delete_setup(original_setup_name)
 
     # --- atlases
-
-    def use_rtofs(self) -> bool:
-        return self.setup.use_rtofs
-
-    def use_gomofs(self) -> bool:
-        return self.setup.use_gomofs
-
     def use_woa09(self) -> bool:
         return self.setup.use_woa09
 
     def use_woa13(self) -> bool:
         return self.setup.use_woa13
+
+    def use_rtofs(self) -> bool:
+        return self.setup.use_rtofs
+
+    def use_cbofs(self) -> bool:
+        return self.setup.use_cbofs
+
+    def use_dbofs(self) -> bool:
+        return self.setup.use_dbofs
+
+    def use_gomofs(self) -> bool:
+        return self.setup.use_gomofs
+
+    def use_nyofs(self) -> bool:
+        return self.setup.use_nyofs
+
+    def use_sjrofs(self) -> bool:
+        return self.setup.use_sjrofs
+
+    def use_ngofs(self) -> bool:
+        return self.setup.use_ngofs
+
+    def use_tbofs(self) -> bool:
+        return self.setup.use_tbofs
+
+    def use_leofs(self) -> bool:
+        return self.setup.use_leofs
+
+    def use_lhofs(self) -> bool:
+        return self.setup.use_lhofs
+
+    def use_lmofs(self) -> bool:
+        return self.setup.use_lmofs
+
+    def use_loofs(self) -> bool:
+        return self.setup.use_loofs
+
+    def use_lsofs(self) -> bool:
+        return self.setup.use_lsofs
+
+    def use_creofs(self) -> bool:
+        return self.setup.use_creofs
+
+    def use_sfbofs(self) -> bool:
+        return self.setup.use_sfbofs
 
     def has_woa09(self) -> bool:
         return self.atlases.woa09.is_present()
@@ -1611,14 +1925,47 @@ class SoundSpeedLibrary:
     def has_rtofs(self) -> bool:
         return self.atlases.rtofs.is_present()
 
+    def has_cbofs(self) -> bool:
+        return self.atlases.cbofs.is_present()
+
+    def has_dbofs(self) -> bool:
+        return self.atlases.dbofs.is_present()
+
     def has_gomofs(self) -> bool:
         return self.atlases.gomofs.is_present()
+
+    def has_nyofs(self) -> bool:
+        return self.atlases.nyofs.is_present()
+
+    def has_sjrofs(self) -> bool:
+        return self.atlases.sjrofs.is_present()
+
+    def has_ngofs(self) -> bool:
+        return self.atlases.ngofs.is_present()
+
+    def has_tbofs(self) -> bool:
+        return self.atlases.tbofs.is_present()
 
     def has_leofs(self) -> bool:
         return self.atlases.leofs.is_present()
 
     def has_lhofs(self) -> bool:
         return self.atlases.lhofs.is_present()
+
+    def has_lmofs(self) -> bool:
+        return self.atlases.lmofs.is_present()
+
+    def has_loofs(self) -> bool:
+        return self.atlases.loofs.is_present()
+
+    def has_lsofs(self) -> bool:
+        return self.atlases.lsofs.is_present()
+
+    def has_creofs(self) -> bool:
+        return self.atlases.creofs.is_present()
+
+    def has_sfbofs(self) -> bool:
+        return self.atlases.sfbofs.is_present()
 
     def download_woa09(self) -> bool:
         return self.atlases.woa09.download_db()
@@ -1629,14 +1976,47 @@ class SoundSpeedLibrary:
     def download_rtofs(self, datestamp: Optional['datetime'] = None) -> bool:
         return self.atlases.rtofs.download_db(datestamp=datestamp)
 
+    def download_cbofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.cbofs.download_db(datestamp=datestamp)
+
+    def download_dbofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.dbofs.download_db(datestamp=datestamp)
+
     def download_gomofs(self, datestamp: Optional['datetime'] = None) -> bool:
         return self.atlases.gomofs.download_db(datestamp=datestamp)
+
+    def download_nyofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.nyofs.download_db(datestamp=datestamp)
+
+    def download_sjrofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.sjrofs.download_db(datestamp=datestamp)
+
+    def download_ngofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.ngofs.download_db(datestamp=datestamp)
+
+    def download_tbofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.tbofs.download_db(datestamp=datestamp)
 
     def download_leofs(self, datestamp: Optional['datetime'] = None) -> bool:
         return self.atlases.leofs.download_db(datestamp=datestamp)
 
     def download_lhofs(self, datestamp: Optional['datetime'] = None) -> bool:
         return self.atlases.lhofs.download_db(datestamp=datestamp)
+
+    def download_lmofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.lmofs.download_db(datestamp=datestamp)
+
+    def download_loofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.loofs.download_db(datestamp=datestamp)
+
+    def download_lsofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.lsofs.download_db(datestamp=datestamp)
+
+    def download_creofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.creofs.download_db(datestamp=datestamp)
+
+    def download_sfbofs(self, datestamp: Optional['datetime'] = None) -> bool:
+        return self.atlases.sfbofs.download_db(datestamp=datestamp)
 
     # --- listeners
 

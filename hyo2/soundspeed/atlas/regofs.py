@@ -6,7 +6,7 @@ import socket
 from typing import Optional, Union
 from urllib import parse
 
-from netCDF4 import Dataset
+from netCDF4 import Dataset, num2date
 import numpy as np
 
 from hyo2.abc.lib.progress.cli_progress import CliProgress
@@ -25,20 +25,27 @@ class RegOfs(AbstractAtlas):
 
     class Model(IntEnum):
 
-        CBOFS = 10
-        DBOFS = 11
-        GoMOFS = 12
-        NYOFS = 13
-        SJROFS = 14
-        NGOFS = 20
-        TBOFS = 21
-        LEOFS = 30  # RG = True
-        LHOFS = 31  # RG = False
-        LMOFS = 32
-        LOOFS = 33
-        LSOFS = 34
-        CREOFS = 40
-        SFBOFS = 41
+        # East Coast
+        CBOFS = 10      # RG = True     # Format is GoMOFS
+        DBOFS = 11      # RG = True     # Format is GoMOFS
+        GoMOFS = 12     # RG = True     # Format is GoMOFS
+        NYOFS = 13      # RG = False
+        SJROFS = 14     # RG = False
+
+        # Gulf of Mexico
+        NGOFS = 20      # RG = True     # Format is GoMOFS
+        TBOFS = 21      # RG = True     # Format is GoMOFS
+
+        # Great Lakes
+        LEOFS = 30      # RG = True     # Format is GoMOFS
+        LHOFS = 31      # RG = False
+        LMOFS = 32      # RG = False
+        LOOFS = 33      # RG = False
+        LSOFS = 34      # RG = False
+
+        # Pacific Coast
+        CREOFS = 40     # RG = True     # Format is GoMOFS
+        SFBOFS = 41     # RG = True     # Format is GoMOFS
 
     regofs_model_descs = {
         Model.CBOFS: "Chesapeake Bay Operational Forecast System",
@@ -130,6 +137,7 @@ class RegOfs(AbstractAtlas):
     def query(self, lat: Optional[float], lon: Optional[float], datestamp: Union[date, dt, None] = None,
               server_mode: bool = False):
         """Query OFS for passed location and timestamp"""
+        original_datestamp = datestamp
         if datestamp is None:
             datestamp = dt.utcnow()
         if isinstance(datestamp, dt):
@@ -152,6 +160,11 @@ class RegOfs(AbstractAtlas):
         except TypeError as e:
             logger.critical("while converting location to grid coords, %s" % e)
             return None
+
+        ocean_time = self._file.variables['ocean_time']
+        datetime_retrieved = num2date(ocean_time[0], units=ocean_time.units, calendar=ocean_time.calendar)
+        logger.debug(('Query datetime:\t\t\t%s' % original_datestamp.isoformat()))
+        logger.debug("Retrieved datetime:\t\t%s" % datetime_retrieved.isoformat())
 
         logger.debug("idx > lat: %s, lon: %s" % (lat_idx, lon_idx))
         lat_s_idx = lat_idx - self._search_half_window
@@ -322,24 +335,32 @@ class RegOfs(AbstractAtlas):
 
         return resp.status < 400
 
-    @staticmethod
-    def _build_check_url(input_date: date, name: str) -> str:
+    def _build_check_url(self, input_date: date, name: str) -> str:
         """make up the url to use for salinity and temperature"""
         # Primary server: https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/GOMOFS/MODELS/201901/
         #                 nos.gomofs.regulargrid.n006.20190115.t18z.nc
-        url = 'https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/%s/MODELS/%s/' \
-              'nos.%s.regulargrid.n003.%s.t00z.nc' \
-              % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
+        if (name == self.Model.NGOFS.name) or (name == self.Model.CREOFS.name) or (name == self.Model.SFBOFS.name):
+            url = 'https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/%s/MODELS/%s/' \
+                  'nos.%s.regulargrid.n003.%s.t03z.nc' \
+                  % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
+        else:
+            url = 'https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/%s/MODELS/%s/' \
+                  'nos.%s.regulargrid.n003.%s.t00z.nc' \
+                    % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
         return url
 
-    @staticmethod
-    def _build_opendap_url(input_date: date, name: str) -> str:
+    def _build_opendap_url(self, input_date: date, name: str) -> str:
         """make up the url to use for salinity and temperature"""
         # Primary server: https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/GOMOFS/MODELS/201901/
         #                 nos.gomofs.regulargrid.n006.20190115.t18z.nc
-        url = 'https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/%s/MODELS/%s/' \
-              'nos.%s.regulargrid.n003.%s.t00z.nc' \
-              % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
+        if (name == self.Model.NGOFS.name) or (name == self.Model.CREOFS.name) or (name == self.Model.SFBOFS.name):
+            url = 'https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/%s/MODELS/%s/' \
+                  'nos.%s.regulargrid.n003.%s.t03z.nc' \
+                  % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
+        else:
+            url = 'https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/%s/MODELS/%s/' \
+                  'nos.%s.regulargrid.n003.%s.t00z.nc' \
+                  % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
         return url
 
     def _download_files(self, datestamp: date, server_mode: bool = False):
@@ -396,7 +417,6 @@ class RegOfs(AbstractAtlas):
         # success!
         self._has_data_loaded = True
         self._last_loaded_day = datestamp
-        # logger.info("loaded data for %s" % datestamp)
         progress.end()
         return True
 
