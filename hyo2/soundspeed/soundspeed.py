@@ -150,9 +150,13 @@ class SoundSpeedLibrary:
         return release_folder
 
     @classmethod
-    def setup_exists(cls) -> bool:
+    def setup_path(cls) -> str:
         release_folder = cls.make_release_folder()
-        return os.path.exists(os.path.join(release_folder, "setup.db"))
+        return os.path.join(release_folder, "setup.db")
+
+    @classmethod
+    def setup_exists(cls) -> bool:
+        return os.path.exists(cls.setup_path())
 
     @classmethod
     def list_other_setups(cls) -> list:

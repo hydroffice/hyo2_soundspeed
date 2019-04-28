@@ -88,7 +88,7 @@ class Server(Thread):
 
         # ### Test clients interaction (only SIS currently) ###
 
-        prog_quantum = 80 / (len(self.prj.setup.client_list.clients) + 1)
+        prog_quantum = 40 / (len(self.prj.setup.client_list.clients) + 1)
         logger.info("Testing clients for reception-confirmation interaction")
         num_live_clients = 0
         for client in self.prj.setup.client_list.clients:
@@ -176,9 +176,9 @@ class Server(Thread):
         # ### Retrieve grid index ###
 
         if self.prj.setup.server_source == 'WOA09':  # WOA09 case
-            lat_idx, lon_idx = self.prj.atlases.woa09.grid_coords(lat=lat, lon=lon, server_mode=True)
+            lat_idx, lon_idx = self.prj.atlases.woa09.grid_coords(lat=lat, lon=lon)
         elif self.prj.setup.server_source == 'WOA13':  # WOA13 case
-            lat_idx, lon_idx = self.prj.atlases.woa13.grid_coords(lat=lat, lon=lon, server_mode=True)
+            lat_idx, lon_idx = self.prj.atlases.woa13.grid_coords(lat=lat, lon=lon)
         elif self.prj.setup.server_source == 'RTOFS':  # RTOFS case
             lat_idx, lon_idx = self.prj.atlases.rtofs.grid_coords(lat=lat, lon=lon, datestamp=tm, server_mode=True)
         elif self.prj.setup.server_source == 'GoMOFS':  # GoMOFS case

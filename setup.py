@@ -55,7 +55,7 @@ setup(
     ],
     install_requires=[
         "hyo2.abc",
-        "gsw>=3.3.0",
+        "gsw>=3.3.1",
         "netCDF4",
         "pillow",
         "pyserial",

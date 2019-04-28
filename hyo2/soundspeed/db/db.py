@@ -30,8 +30,8 @@ class ProjectDb:
             project_name = "default"
 
         # the passed project name is used to identify the project database to open
-        self.db_path = os.path.join(projects_folder, self.clean_project_name(project_name) + ".db")
-        # logger.debug('current project db: %s' % self.db_path)
+        self.db_path = os.path.abspath(os.path.join(projects_folder, self.clean_project_name(project_name) + ".db"))
+        logger.debug('current project db: %s' % self.db_path)
 
         # add plotting and exporting capabilities
         self.plot = PlotDb(db=self)
@@ -61,7 +61,9 @@ class ProjectDb:
             logger.info("already connected")
 
         if not os.path.exists(self.db_path):
-            logger.info("created a new project db")
+            logger.info("create a new project db: %s" % self.db_path)
+            if not os.path.exists(os.path.dirname(self.db_path)):
+                os.makedirs(os.path.dirname(self.db_path))
 
         try:
             self.conn = sqlite3.connect(self.db_path,

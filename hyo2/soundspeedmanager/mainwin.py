@@ -57,7 +57,7 @@ class MainWin(QtWidgets.QMainWindow):
 
         # check if setup db exists; if yes, ask to copy
         has_setup = SoundSpeedLibrary.setup_exists()
-        logger.info("setup exists: %s" % has_setup)
+        logger.info("setup exists: %s [%s]" % (has_setup, SoundSpeedLibrary.setup_path()))
         if not has_setup:
             other_setups = SoundSpeedLibrary.list_other_setups()
             if len(other_setups) != 0:
