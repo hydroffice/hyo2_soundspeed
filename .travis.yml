@@ -62,7 +62,7 @@ install:
   - conda list --show-channel-urls
 
 script:
-  - py.test --cov=hyo2 tests/
+  - py.test --cov=hyo2
 
 after_script:
   - coverage report -m
