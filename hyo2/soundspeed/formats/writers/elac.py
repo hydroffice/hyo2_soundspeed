@@ -1,10 +1,10 @@
 import numpy as np
 import logging
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeed.formats.writers.abstract import AbstractTextWriter
 from hyo2.soundspeed.profile.oceanography import Oceanography as Oc
+
+logger = logging.getLogger(__name__)
 
 
 class Elac(AbstractTextWriter):
@@ -27,7 +27,7 @@ class Elac(AbstractTextWriter):
 
         self.finalize()
 
-        # logger.debug('*** %s ***: done' % self.driver)
+        logger.debug('*** %s ***: done' % self.driver)
         return True
 
     def _write_header(self):
