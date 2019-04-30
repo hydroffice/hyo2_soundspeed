@@ -160,15 +160,18 @@ class Caris(AbstractTextReader):
 
             # A new section is coming
             if self.lines[self.cur_row_idx][:len(self.section_token)] == self.section_token:
+                self.cur_row_idx += 1
                 return
 
             # skip empty lines
             if len(self.lines[self.cur_row_idx]) == 0:
+                self.cur_row_idx += 1
                 continue
 
             tokens = self.lines[self.cur_row_idx].strip().split()
             if len(tokens) != 2:
                 logger.warning("skipping line for invalid number of tokens: %s " % self.lines[self.cur_row_idx])
+                self.cur_row_idx += 1
                 continue
 
             try:
@@ -177,10 +180,12 @@ class Caris(AbstractTextReader):
 
             except ValueError:
                 logger.warning("invalid conversion parsing of line #%03d" % (self.cur_row_idx,))
+                self.cur_row_idx += 1
                 continue
 
             except IndexError:
                 logger.warning("invalid index parsing of line #%03d" % (self.cur_row_idx,))
+                self.cur_row_idx += 1
                 continue
 
             count += 1

@@ -252,6 +252,12 @@ class Editor(AbstractWidget):
         if ret != QtWidgets.QDialog.Accepted:
             return
 
+        if self.lib.cur.data.num_samples == 0:
+            msg = "Unable to retrieve samples from the profile"
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.warning(self, "Input Data", msg, QtWidgets.QMessageBox.Ok)
+            return
+
         if self.lib.has_ssp():
             self.main_win.data_imported()
 
