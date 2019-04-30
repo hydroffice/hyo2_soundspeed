@@ -1,0 +1,122 @@
+[cast header]
+DISPLAY OPTIONS
+[Instrument]
+Type=Base.X2
+EmulationMode=disabled
+UseCustomHeader=yes
+SN=25485
+Firmware=V4.23
+SampleUnits=continuous
+SampleInterval=0
+PressureInc=1.00
+SoundInc=0.00
+LogFile=20170713. 
+DateFormat=ISO
+Date=2019-04-29
+Time=17:44:34
+MemorySize=942.8 MB
+MemoryUsed=3.8 MB
+DisplayTime=yes
+DisplayDate=yes
+DisplaySalinity=yes
+DisplayDensity=yes
+DisplaySoundVelocity=yes
+DisplayBattery=yes
+RelayMode=RS232 mode
+RealtimeLogging=yes
+LoggingTimeout=0
+StartupDelay=10
+DisplayHeader=yes
+StartupMode=prompt
+CharacterReception=yes
+LoggingBreakMode=no
+DetectionMode=A3
+BatteryACoefficient=+3.500000E-01
+BatteryBCoefficient=+2.500000E-02
+ShutDownVoltage=6.5
+WarningVoltage=6.9
+PressureOffset=0.10
+UsePressureOffset=yes
+SoundVelocityThreshold=1375.00
+DelimterMode=Space
+SensorDetectionMode=Once
+Traceability=yes
+SkipPowerOff=no
+AnalogChannels=disabled
+Latitude=43.0737
+Longitude=-70.7086
+AutoMonitorSeconds=0
+FixedPressure=0.0000
+UseFixedPressure=no
+BiofoulingPwrAlways=no
+LedTimeoutSecs=300
+DisplayIncrement=no
+AutoZero=yes
+
+
+[Slot 1]
+SensorName=SV-C-CT.Xchange CT.X C SN 450132 01/16/19 T SN 450132 02/26/19
+BoardSN=05201
+
+[Slot 3]
+SensorName=P-T-TU-DO-UV.Xchange P.X SN 305373 01/15/19
+BoardSN=07065
+>
+
+[Data.X]
+Data.X SN =25485
+SSID =AML_25485
+IP Address =169.254.40.244
+Geo-Location Source =GPS
+C-sensor in-water threshold (mS/cm) =0.005
+Sleep Timeout Enabled =yes
+Sleep Timeout (mins) =5
+Shutdown Timeout Enabled =no
+Shutdown Timeout (mins) =60
+Wi-Fi Sleep Timeout Enabled =yes
+Wi-Fi Sleep Timeout (secs) =20
+Low Batt Shutdown Threshold Voltage =6.5
+WEP Key =25485
+Wi-Fi Channel =10
+In-Water Instrument Access =no
+Wi-Fi Enabled =yes
+Verbose output Enabled =no
+Terminal baud rate =115200
+Latitude=No-Lock
+Longitude=No-Lock
+HDOP=
+Water Detect Source =C sensor
+Log Trigger Source =P increment
+Verbose =no
+Terminal baud =115200
+C position =1
+SV position =0
+Real positions =3
+
+
+[data]
+
+2019-04-29,17:44:35.62,02.604,12.949,0000.05,007.18,01.785,1000.773,1460.75
+2019-04-29,17:44:43.43,25.215,07.948,0001.07,007.15,23.500,1018.270,1468.07
+2019-04-29,17:44:45.44,25.456,07.896,0002.09,007.18,23.781,1018.501,1468.24
+2019-04-29,17:44:47.19,25.835,07.782,0003.12,007.18,24.249,1018.886,1468.38
+2019-04-29,17:44:48.88,26.103,07.728,0004.14,007.18,24.563,1019.144,1468.58
+2019-04-29,17:44:50.45,26.583,07.627,0005.17,007.18,25.133,1019.607,1468.90
+2019-04-29,17:44:53.07,26.875,07.590,0006.18,007.15,25.463,1019.875,1469.18
+2019-04-29,17:44:55.31,26.982,07.570,0007.19,007.18,25.589,1019.981,1469.28
+2019-04-29,17:44:59.52,27.096,07.571,0008.21,007.18,25.707,1020.078,1469.44
+2019-04-29,17:45:00.93,27.201,07.569,0009.21,007.18,25.818,1020.170,1469.59
+2019-04-29,17:45:03.54,27.331,07.567,0010.23,007.18,25.954,1020.282,1469.77
+2019-04-29,17:45:05.89,27.336,07.563,0011.24,007.18,25.962,1020.294,1469.78
+2019-04-29,17:45:17.28,27.640,07.434,0012.24,007.20,26.378,1020.640,1469.80
+2019-04-29,17:45:20.41,27.522,07.511,0011.23,007.18,26.196,1020.483,1469.86
+2019-04-29,17:45:21.01,27.321,07.572,0010.16,007.18,25.940,1020.270,1469.77
+2019-04-29,17:45:21.67,27.277,07.577,0009.12,007.20,25.891,1020.226,1469.71
+2019-04-29,17:45:22.49,27.155,07.576,0008.11,007.20,25.764,1020.122,1469.53
+2019-04-29,17:45:23.42,27.024,07.577,0007.03,007.20,25.627,1020.009,1469.35
+2019-04-29,17:45:24.51,26.695,07.611,0006.01,007.18,25.260,1019.713,1469.01
+2019-04-29,17:45:25.93,26.491,07.641,0005.01,007.18,25.027,1019.522,1468.82
+2019-04-29,17:45:27.53,26.213,07.706,0003.98,007.20,24.692,1019.247,1468.65
+2019-04-29,17:45:29.71,26.051,07.727,0002.98,007.20,24.511,1019.098,1468.49
+2019-04-29,17:45:32.27,25.444,07.903,0001.94,007.18,23.764,1018.486,1468.24
+2019-04-29,17:45:35.54,25.174,07.988,0000.93,007.18,23.431,1018.211,1468.14
