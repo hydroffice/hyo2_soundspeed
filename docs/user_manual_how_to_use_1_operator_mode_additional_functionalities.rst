@@ -4,35 +4,34 @@
 Additional Functionalities
 **************************
 
-Create a WOA or RTOFS profile
------------------------------
 
-.. index:: WOA, synthetic profile
-.. index:: RTOFS, synthetic profile
+Create profile from database
+============================
 
-It is possible to upload a single WOA or RTOFS profile to *SIS*.
-This can be done by first selecting WOA09 atlas or RTOFS atlas under the *Input data* button in the *Editor* toolbar
-(:numref:`editor_tab12`).
+.. index:: profile, synthetic profile
+
+The package makes it possible to create a single profile from a number of database options. This can be done by
+selecting one of the options listed under *Retrieve from* in the *Input data* dialog (:numref:`editor_tab12`). Database
+specific instructions for creating a profile are detailed in the sections below.
+
 
 .. _editor_tab12:
 .. figure:: ./_static/editor_tab12.png
-    :width: 360px
+    :width: 600px
     :align: center
     :alt: data storage
     :figclass: align-center
 
     The *Input data* button in the *Editor* toolbar.
 
-This will trigger a series of question dialogs about timestamp and position to apply a spatio-temporal search.
-The user can decide to use the SIS timestamp/position input (when available) or manually set these inputs.
-After, a surface sound speed can be applied, and finally the resulting cast can be sent as described in :ref:`data_transmission`.
+Project Database
+----------------
+The *Input data* dialog can be used to recall a profile from the project database. Clicking the *Project DB* button will
+open a dialog with a drop-down menu containing all the profiles in the current project database. After selecting a
+profile, it can be edited, and finally the resulting cast can be sent as described in :ref:`data_transmission`.
 
-The new cast will be given the filename YYYYMMDD_HHMMSS_WOA or YYYYMMDD_HHMMSS_RTOFS with the date/time
-in the filename based on the query time of the cast.
-
-
-Request profile from SIS
-------------------------
+Request profile from SIS4/SIS5
+------------------------------
 
 .. index:: SIS, profile
 
@@ -56,8 +55,33 @@ These shortcomings are overcome through the use of the “W” datagram in *SIS*
 to dynamically request this datagram from *SIS* (though it is possible to have *SIS* broadcast it
 as discussed in the section :ref:`method_B`).
 
+Note *SIS5* functionality is currently unavailable.
+
+Seabird CTD
+-----------
+Clicking Seabird CTD in the *Retrieve from* section of the *Input data* dialog opens a dialog that allows for direct
+interaction with a SeaCAT instrument.
+
+
+Oceanographic and Regional Atlases
+----------------------------------
+
+.. index:: WOA, synthetic profile
+.. index:: RTOFS, synthetic profile
+.. index:: RegOFS, synthetic profile
+
+It is possible to upload a single WOA, RTOFS, or any of the RegOFS with support listed in  :ref:`app_a_oceanographic_atlases`.
+This can be done by selecting the button under *Request from* that matches the desired model service.
+
+This will trigger a series of question dialogs about timestamp and position to apply a spatio-temporal search.
+The user can decide to use the SIS timestamp/position input (when available) or manually set these inputs.
+After, a surface sound speed can be applied, and finally the resulting cast can be sent as described in :ref:`data_transmission`.
+
+The new cast will be given the filename YYYYMMDD_HHMMSS_MODEL where the date/time
+of the filename is based on the query time of the cast and MODEL corresponds to the model descriptor described in :ref:`app_a_oceanographic_atlases`.
+
 Using a reference cast
-----------------------
+======================
 
 There are several scenarios where a CTD profile can be used as a reference cast by this package:
 
@@ -100,7 +124,7 @@ Prior to setting a cast as the reference cast, it is advisable to store it in da
 do not need to repeat any reference cast processing.
 
 Refraction monitor
-------------------
+==================
 
 .. note::
     This plugin is currently disabled.
@@ -134,7 +158,7 @@ if the results are not as expected without introducing artifacts into the multib
 .. index:: refraction; monitor
 
 Network data reception
-----------------------
+======================
 
 The package is configurable to listen on specified ports for UDP input of sound speed cast data.
 Currently supported systems are *MVP* and *Sippican*. See :ref:`app_b_connection_settings` for more on how
