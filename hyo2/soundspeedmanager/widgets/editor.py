@@ -4,12 +4,11 @@ import logging
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeedmanager.widgets.widget import AbstractWidget
 from hyo2.soundspeedmanager.dialogs.automate_dialog import AutomateDialog
 from hyo2.soundspeedmanager.dialogs.buttons_dialog import ButtonsDialog
 from hyo2.soundspeedmanager.dialogs.import_single_profile_dialog import ImportSingleProfileDialog
+from hyo2.soundspeedmanager.dialogs.constant_gradient_profile_dialog import ConstantGradientProfileDialog
 from hyo2.soundspeedmanager.dialogs.reference_dialog import ReferenceDialog
 from hyo2.soundspeedmanager.dialogs.spreadsheet_dialog import SpreadSheetDialog
 from hyo2.soundspeedmanager.dialogs.metadata_dialog import MetadataDialog
@@ -18,6 +17,8 @@ from hyo2.soundspeedmanager.widgets.dataplots import DataPlots
 from hyo2.soundspeedmanager.dialogs.seacat_dialog import SeacatDialog
 
 from hyo2.soundspeed.profile.dicts import Dicts
+
+logger = logging.getLogger(__name__)
 
 
 class Editor(AbstractWidget):
@@ -44,12 +45,21 @@ class Editor(AbstractWidget):
 
         # import
         self.input_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'input.png')),
-                                           'Input Data', self)
+                                           'Import Input Data', self)
         self.input_act.setShortcut('Alt+I')
         # noinspection PyUnresolvedReferences
         self.input_act.triggered.connect(self.on_input_data)
         self.input_bar.addAction(self.input_act)
         self.main_win.file_menu.addAction(self.input_act)
+
+        # import
+        self.create_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'constant_gradient.png')),
+                                            'Constant-gradient Profile', self)
+        # self.create_act.setShortcut('Alt+G')
+        # noinspection PyUnresolvedReferences
+        self.create_act.triggered.connect(self.on_create_data)
+        # self.input_bar.addAction(self.create_act)
+        self.main_win.file_menu.addAction(self.create_act)
 
         # clear
         self.clear_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'clear.png')),
@@ -73,7 +83,7 @@ class Editor(AbstractWidget):
 
         # seacat
         self.seacat_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'seacat.png')),
-                                            'Seabird CTD setup', self)
+                                            'Seabird CTD Setup', self)
         self.seacat_act.setShortcut('Alt+B')
         # noinspection PyUnresolvedReferences
         self.seacat_act.triggered.connect(self.on_seacat)
@@ -252,16 +262,51 @@ class Editor(AbstractWidget):
         if ret != QtWidgets.QDialog.Accepted:
             return
 
+        if not self.lib.has_ssp():
+            msg = "Unable to retrieve a profile"
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.warning(self, "Input Data", msg, QtWidgets.QMessageBox.Ok)
+            return
+
         if self.lib.cur.data.num_samples == 0:
             msg = "Unable to retrieve samples from the profile"
             # noinspection PyCallByClass
             QtWidgets.QMessageBox.warning(self, "Input Data", msg, QtWidgets.QMessageBox.Ok)
             return
 
-        if self.lib.has_ssp():
-            self.main_win.data_imported()
+        self.main_win.data_imported()
 
         # auto-apply options
+        self._auto_apply_to_current_profile()
+
+    def on_create_data(self):
+        """Import a data file"""
+        logger.debug('user wants to create data')
+
+        self.main_win.switch_to_editor_tab()
+        dlg = ConstantGradientProfileDialog(lib=self.lib, main_win=self.main_win, parent=self)
+        ret = dlg.exec_()
+        if ret != QtWidgets.QDialog.Accepted:
+            return
+
+        if not self.lib.has_ssp():
+            msg = "Unable to retrieve a profile"
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.warning(self, "Input Data", msg, QtWidgets.QMessageBox.Ok)
+            return
+
+        if self.lib.cur.data.num_samples == 0:
+            msg = "Unable to retrieve samples from the profile"
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.warning(self, "Input Data", msg, QtWidgets.QMessageBox.Ok)
+            return
+
+        self.main_win.data_imported()
+
+        # auto-apply options
+        self._auto_apply_to_current_profile()
+
+    def _auto_apply_to_current_profile(self):
         settings = QtCore.QSettings()
         if settings.value("auto_smooth_filter") == "true":
             logger.info("auto apply smooth/filter")

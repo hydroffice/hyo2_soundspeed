@@ -164,7 +164,7 @@ class ImportSingleProfileDialog(AbstractDialog):
         self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
         btn.setToolTip("Retrieve synthetic data from DBOFS Atlas")
         # noinspection PyUnresolvedReferences
-        # btn.clicked.connect(self.on_click_dbofs)
+        btn.clicked.connect(self.on_click_dbofs)
         # ---- GoMOFS
         btn = QtWidgets.QPushButton("GoMOFS")
         self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
@@ -237,7 +237,6 @@ class ImportSingleProfileDialog(AbstractDialog):
         btn.setToolTip("Retrieve synthetic data from TBOFS Atlas")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_click_tbofs)
-
 
         self.retrieveLayout.addStretch()
 

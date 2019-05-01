@@ -276,7 +276,7 @@ class Woa09(AbstractAtlas):
 
                 num_visited += 1
 
-        # logger.debug("visited: %s" % num_visited)
+        logger.debug("visited: %s" % num_visited)
 
         if (lat_idx == -1) and (lon_idx == -1):
             logger.info("possible request on land")

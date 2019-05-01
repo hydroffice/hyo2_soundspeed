@@ -444,18 +444,60 @@ class SoundSpeedLibrary:
         self.ssp = reader.ssp
         logger.debug("data file successfully parsed!")
 
+        if not skip_atlas:
+            self._retrieve_atlases()
+
+    def create_profile(self, start_depth, start_temp, start_sal, start_speed,
+                       end_depth, end_temp, end_sal, end_speed):
+
+        ssp = ProfileList()
+        ssp.append()  # append a new profile
+        # initialize probe/sensor type
+        ssp.cur.meta.sensor_type = Dicts.sensor_types['Synthetic']
+        ssp.cur.meta.probe_type = Dicts.probe_types['Unknown']
+
+        ssp.cur.meta.latitude, ssp.cur.meta.longitude = self.cb.ask_location()
+        if (ssp.cur.meta.latitude is None) or (ssp.cur.meta.longitude is None):
+            ssp.clear()
+            raise RuntimeError("missing geographic location required for database lookup")
+
+        ssp.cur.meta.utc_time = self.cb.ask_date()
+        if ssp.cur.meta.utc_time is None:
+            ssp.clear()
+            raise RuntimeError("missing date required for database lookup")
+
+        ssp.cur.init_data(2)
+
+        ssp.cur.data.depth[0] = start_depth
+        ssp.cur.data.temp[0] = start_temp
+        ssp.cur.data.sal[0] = start_sal
+        ssp.cur.data.speed[0] = start_speed
+
+        ssp.cur.data.depth[1] = end_depth
+        ssp.cur.data.temp[1] = end_temp
+        ssp.cur.data.sal[1] = end_sal
+        ssp.cur.data.speed[1] = end_speed
+
+        ssp.cur.clone_data_to_proc()
+        ssp.cur.init_sis()  # initialize to zero
+
+        self.ssp = ssp
+
+        self._retrieve_atlases()
+
+    def _retrieve_atlases(self):
         # retrieve atlases data for each retrieved profile
         for pr in self.ssp.l:
 
-            if self.use_woa09() and self.has_woa09() and not skip_atlas:
+            if self.use_woa09() and self.has_woa09():
                 pr.woa09 = self.atlases.woa09.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
                                                     datestamp=pr.meta.utc_time)
 
-            if self.use_woa13() and self.has_woa13() and not skip_atlas:
+            if self.use_woa13() and self.has_woa13():
                 pr.woa13 = self.atlases.woa13.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
                                                     datestamp=pr.meta.utc_time)
 
-            if self.use_rtofs() and not skip_atlas:
+            if self.use_rtofs():
                 # noinspection PyBroadException
                 try:
                     pr.rtofs = self.atlases.rtofs.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
@@ -464,7 +506,7 @@ class SoundSpeedLibrary:
                     pr.rtofs = None
                     logger.warning("unable to retrieve RTOFS data")
 
-            if self.use_gomofs() and not skip_atlas:
+            if self.use_gomofs():
                 # noinspection PyBroadException
                 try:
                     pr.gomofs = self.atlases.gomofs.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
