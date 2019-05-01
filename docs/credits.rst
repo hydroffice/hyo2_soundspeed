@@ -40,6 +40,8 @@ Other contributors:
 
 - `Matthew J. Wilson <mailto:matthew.wilson@noaa.gov>`_
 
+- `Michael Smith <mailto:msmith@ccom.unh.edu>`_
+
 Feel free to contact us for comments and suggestions.
 
 
