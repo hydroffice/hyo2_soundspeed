@@ -19,9 +19,9 @@ app_info = AppInfo()
 app_info.app_name = name
 app_info.app_version = __version__
 app_info.app_author = "Giuseppe Masetti(UNH,CCOM); Barry Gallagher(NOAA,OCS); " \
-                      "Chen Zhang(NOAA,OCS); Matthew Sharr(NOAA,OCS)"
+                      "Chen Zhang(NOAA,OCS); Matthew Sharr(NOAA,OCS); Michael Smith(UNH,CCOM)"
 app_info.app_author_email = "gmasetti@ccom.unh.edu; barry.gallagher@noaa.gov; " \
-                            "chen.zhang@noaa.gov; matthew.sharr@noaa.gov"
+                            "chen.zhang@noaa.gov; matthew.sharr@noaa.gov; msmith@ccom.unh.edu"
 
 app_info.app_license = "LGPLv2.1 or CCOM-UNH Industrial Associate license"
 app_info.app_license_url = "https://www.hydroffice.org/license/"
