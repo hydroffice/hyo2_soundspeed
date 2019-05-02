@@ -64,35 +64,34 @@ Daily forecast/nowcast grids can be downloaded via the URL:
 Similar to the RTOFS Global atlas, the package relies on the OpenDAP portal to download only small segments of the
 nowcast grids surrounding a specified query location.
 
-Currently the package supports a limited number of the RegOFS models. The full list of models and support levels can be
-found in the table below.
+Currently the package supports a limited number of the RegOFS models. The full list of models with related support is
+provided in the table below.
 
-
-=========================================== ========== =======
-            RegOFS Model                    Descriptor Support
-=========================================== ========== =======
-Chesapeake Bay                              CBOFS      X
-Deleware Bay                            	DBOFS      X
-Gulf of Maine	                            GoMOFS     X
-New York and New Jersey	                    NYOFS
-St. John’s River	                        SJROFS
-Northern Gulf of Mexico	                    NGOFS	   X
-Tampa Bay	                                TBOFS	   X
-Lake Erie	                                LEOFS	   X
-Lake Huron	                                LHOFS
-Lake Michigan	                            LMOFS
-Lake Ontario	                            LOOFS
-Lake Superior 	                            LSOFS
-Columbia River Estuary	                    CREOFS	   X
-Sanfrancisco Bay	                        SFBOFS	   X
-=========================================== ========== =======
+=========================================== =========== =======
+Regional Operational Forecast System Model  Descriptor  Support
+=========================================== =========== =======
+Chesapeake Bay                              CBOFS       X
+Deleware Bay                                DBOFS       X
+Gulf of Maine                               GoMOFS      X
+New York and New Jersey                     NYOFS
+St. John’s River                            SJROFS
+Northern Gulf of Mexico                     NGOFS       X
+Tampa Bay                                   TBOFS       X
+Lake Erie                                   LEOFS       X
+Lake Huron                                  LHOFS
+Lake Michigan                               LMOFS
+Lake Ontario                                LOOFS
+Lake Superior                               LSOFS
+Columbia River Estuary                      CREOFS      X
+Sanfrancisco Bay                            SFBOFS      X
+=========================================== =========== =======
 
 
 Synthetic cast values derived from atlases
 ==========================================
 
 The cast extrapolation algorithm vertically extends temperature and salinity profiles as deep as possible
-using the estimates immediately local to the area of the cast in either WOA or RTOFS.
+using the estimates immediately local to the area of the cast in either WOA or OFS.
 
 
 WOA09-based profiles
@@ -134,6 +133,7 @@ and quality control techniques:
 In the specific, the package uses the WOA13v2 release that was prepared to address both methodology concerns and,
 to a lesser extent, quality control concerns which have surfaced since the initial release of WOA13.
 
+.. _rtofs_based_profiles:
 
 RTOFS-based profiles
 --------------------
@@ -144,13 +144,18 @@ The RTOFS extension algorithm differs in the size of the search area (5x5), roug
 of 0.2° or 12.5 nmi at the equator. All of the shortcomings of the WOA09 lookup described above also apply
 to the RTOFS lookup.
 
-The final extrapolation to a depth of 12,000 m is done using the values measured by *(Taira et al., 2005)*
-in Challenger Deep. This could be improved by searching for the nearest neighbor grid node at the deepest level
-observed in the basin using the basin mask file.
-
 RegOFS-based profiles
 ---------------------
 
 .. index:: RegOFS; synthetic profile
 
-The RegOFS <<<< Insert Methods >>>>>
+The Regional Operational Forecast System Models follow an approach similar to the :ref:`rtofs_based_profiles`.
+However, the resulting search radius is function of the regular grid resolution at which each model output is published.
+
+
+Profile Finalization
+--------------------
+
+The final extrapolation to a depth of 12,000 m is done using the values measured by *(Taira et al., 2005)*
+in Challenger Deep. This could be improved by searching for the nearest neighbor grid node at the deepest level
+observed in the basin using the basin mask file.

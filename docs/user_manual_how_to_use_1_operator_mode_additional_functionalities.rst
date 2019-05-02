@@ -5,12 +5,12 @@ Additional Functionalities
 **************************
 
 
-Create profile from database
-============================
+Retrieve Profiles from Various Sources
+======================================
 
 .. index:: profile, synthetic profile
 
-The package makes it possible to create a single profile from a number of database options. This can be done by
+It is possible to retrieve a profile from a number of sources. This can be done by
 selecting one of the options listed under *Retrieve from* in the *Input data* dialog (:numref:`editor_tab12`). Database
 specific instructions for creating a profile are detailed in the sections below.
 
@@ -28,7 +28,7 @@ Project Database
 ----------------
 The *Input data* dialog can be used to recall a profile from the project database. Clicking the *Project DB* button will
 open a dialog with a drop-down menu containing all the profiles in the current project database. After selecting a
-profile, it can be edited, and finally the resulting cast can be sent as described in :ref:`data_transmission`.
+profile, it can be edited, and the resulting cast can be eventually sent as described in :ref:`data_transmission`.
 
 Request profile from SIS4/SIS5
 ------------------------------
@@ -55,7 +55,7 @@ These shortcomings are overcome through the use of the “W” datagram in *SIS*
 to dynamically request this datagram from *SIS* (though it is possible to have *SIS* broadcast it
 as discussed in the section :ref:`method_B`).
 
-Note *SIS5* functionality is currently unavailable.
+.. note:: *SIS5* functionality is currently unavailable.
 
 Seabird CTD
 -----------
@@ -70,7 +70,7 @@ Oceanographic and Regional Atlases
 .. index:: RTOFS, synthetic profile
 .. index:: RegOFS, synthetic profile
 
-It is possible to upload a single WOA, RTOFS, or any of the RegOFS with support listed in  :ref:`app_a_oceanographic_atlases`.
+It is possible to upload a single WOA, RTOFS, or any of the supported RegOFS models listed in :ref:`app_a_oceanographic_atlases`.
 This can be done by selecting the button under *Request from* that matches the desired model service.
 
 This will trigger a series of question dialogs about timestamp and position to apply a spatio-temporal search.
