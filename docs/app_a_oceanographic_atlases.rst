@@ -46,6 +46,48 @@ of the nowcast grids for surrounding a specified query location. The downloaded 
 on the query location.
 
 
+Regional Operational Forecast System
+====================================
+
+.. index:: RegOFS; description
+
+The NOAA Operational Forecast System (RegOFS) is a network of operational nowcast/forecast hydrodynamic models covering
+a number of coastal regions in the USA. Models are run 4 times a day and generate current and short-term (0 to 48 hour)
+forecast predictions of pertinent parameters such as water levels, currents, temperature, and salinity.
+
+More information about RegOFS models can be found at:
+`https://tidesandcurrents.noaa.gov/models.html <https://tidesandcurrents.noaa.gov/models.html>`_
+
+Daily forecast/nowcast grids can be downloaded via the URL:
+`https://opendap.co-ops.nos.noaa.gov/thredds/catalog.html <https://opendap.co-ops.nos.noaa.gov/thredds/catalog.html>`_
+
+Similar to the RTOFS Global atlas, the package relies on the OpenDAP portal to download only small segments of the
+nowcast grids surrounding a specified query location.
+
+Currently the package supports a limited number of the RegOFS models. The full list of models and support levels can be
+found in the table below.
+
+
+=========================================== ========== =======
+            RegOFS Model                    Descriptor Support
+=========================================== ========== =======
+Chesapeake Bay                              CBOFS      X
+Deleware Bay                            	DBOFS      X
+Gulf of Maine	                            GoMOFS     X
+New York and New Jersey	                    NYOFS
+St. John’s River	                        SJROFS
+Northern Gulf of Mexico	                    NGOFS	   X
+Tampa Bay	                                TBOFS	   X
+Lake Erie	                                LEOFS	   X
+Lake Huron	                                LHOFS
+Lake Michigan	                            LMOFS
+Lake Ontario	                            LOOFS
+Lake Superior 	                            LSOFS
+Columbia River Estuary	                    CREOFS	   X
+Sanfrancisco Bay	                        SFBOFS	   X
+=========================================== ========== =======
+
+
 Synthetic cast values derived from atlases
 ==========================================
 
@@ -106,3 +148,9 @@ The final extrapolation to a depth of 12,000 m is done using the values measured
 in Challenger Deep. This could be improved by searching for the nearest neighbor grid node at the deepest level
 observed in the basin using the basin mask file.
 
+RegOFS-based profiles
+---------------------
+
+.. index:: RegOFS; synthetic profile
+
+The RegOFS <<<< Insert Methods >>>>>

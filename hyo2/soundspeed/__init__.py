@@ -20,9 +20,9 @@ lib_info = LibInfo()
 lib_info.lib_name = name
 lib_info.lib_version = __version__
 lib_info.lib_author = "Giuseppe Masetti(UNH,CCOM); Barry Gallagher(NOAA,OCS); " \
-                      "Chen Zhang(NOAA,OCS); Matthew Sharr(NOAA,OCS)"
+                      "Chen Zhang(NOAA,OCS); Matthew Sharr(NOAA,OCS); Michael Smith(UNH,CCOM)"
 lib_info.lib_author_email = "gmasetti@ccom.unh.edu; barry.gallagher@noaa.gov; " \
-                            "chen.zhang@noaa.gov; matthew.sharr@noaa.gov"
+                            "chen.zhang@noaa.gov; matthew.sharr@noaa.gov; msmith@ccom.unh.edu"
 
 lib_info.lib_license = "LGPLv2.1 or CCOM-UNH Industrial Associate license"
 lib_info.lib_license_url = "https://www.hydroffice.org/license/"
