@@ -24,6 +24,7 @@ class Valeport(AbstractTextReader):
         Dicts.probe_types['MiniSVP']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MONITOR SVP 500']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['RapidSVT']: Dicts.sensor_types["SVPT"],
+        Dicts.probe_types['RapidSV']: Dicts.sensor_types["SVP"],
         Dicts.probe_types['SWiFT']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['Unknown']: Dicts.sensor_types["Unknown"]
     }
@@ -61,7 +62,8 @@ class Valeport(AbstractTextReader):
         if self.ssp.cur.meta.probe_type not in [
             Dicts.probe_types['MIDAS SVX2 1000'],
             Dicts.probe_types['MIDAS SVX2 3000'],
-            Dicts.probe_types['SWiFT']
+            Dicts.probe_types['SWiFT'],
+            Dicts.probe_types['RapidSV']
         ]:
             self.ssp.cur.calc_salinity()
         self.finalize()
@@ -199,6 +201,14 @@ class Valeport(AbstractTextReader):
                     logger.warning("unable to recognize probe type from line #%s" % self.samples_offset)
                     self.ssp.cur.meta.sensor_type = Dicts.sensor_types['Unknown']
 
+            elif line[:len('RapidSV:')] == 'RapidSV:':
+                self.ssp.cur.meta.probe_type = Dicts.probe_types['RapidSV']
+                try:
+                    self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
+                except KeyError:
+                    logger.warning("unable to recognize probe type from line #%s" % self.samples_offset)
+                    self.ssp.cur.meta.sensor_type = Dicts.sensor_types['Unknown']
+
             self.samples_offset += 1
 
         if not self.ssp.cur.meta.original_path:
@@ -242,7 +252,6 @@ class Valeport(AbstractTextReader):
                 except ValueError:
                     logger.warning("Unable to parse time from line #%d" % idx)
                 continue
-
 
             if tokens[0] == 'MODEL NAME :':
                 try:
@@ -376,24 +385,59 @@ class Valeport(AbstractTextReader):
     def _mini_body(self):
         count = 0
         for line in self.lines[self.samples_offset:len(self.lines)]:
-            try:
-                data = line.split()
+
+            data = line.split()
+
+            if self.ssp.cur.meta.probe_type == Dicts.probe_types['RapidSV']:  # 2-column data
+                if len(data) != 2:
+                    logger.warning("unexpected number of fields: %d" % len(data))
+                    continue
+
+                try:
+                    z = float(data[0])
+                    speed = float(data[1])
+                except ValueError:
+                    logger.error("unable to parse line: %s" % line)
+                    continue
+
                 # Skipping invalid data (above water, negative temperature or crazy sound speed)
-                if (float(data[0]) < 0.0) or (float(data[1]) < -2.0) or (float(data[2]) < 1400.0) \
-                        or (float(data[2]) > 1650.0):
+                if (z < 0.0) or (speed < 1400.0) or (speed > 1650.0):
+                    logger.warning("skipping invalid values: %.1f %.1f" % (z, speed))
                     continue
 
                 if self.minisvp_has_depth:
-                    self.ssp.cur.data.depth[count] = float(data[0])
+                    self.ssp.cur.data.depth[count] = z
                 else:
-                    self.ssp.cur.data.pressure[count] = float(data[0])
-                self.ssp.cur.data.temp[count] = float(data[1])
-                self.ssp.cur.data.speed[count] = float(data[2])
-                count += 1
+                    self.ssp.cur.data.pressure[count] = z
+                self.ssp.cur.data.speed[count] = speed
 
-            except ValueError:
-                logger.error("unable to parse from line #%s" % self.samples_offset)
-                continue
+            else:
+                if len(data) != 3:
+                    logger.warning("unexpected number of fields: %d" % len(data))
+                    continue
+
+                try:
+                    z = float(data[0])
+                    temp = float(data[1])
+                    speed = float(data[2])
+                except ValueError:
+                    logger.error("unable to parse line: %s" % line)
+                    continue
+
+                # Skipping invalid data (above water, negative temperature or crazy sound speed)
+                if (z < 0.0) or (temp < -2.0) or (temp > 100.0) or (speed < 1400.0) \
+                        or (speed > 1650.0):
+                    logger.warning("skipping invalid values: %.1f %.1f %.1f" % (z, temp, speed))
+                    continue
+
+                if self.minisvp_has_depth:
+                    self.ssp.cur.data.depth[count] = z
+                else:
+                    self.ssp.cur.data.pressure[count] = z
+                self.ssp.cur.data.temp[count] = temp
+                self.ssp.cur.data.speed[count] = speed
+
+            count += 1
 
         self.ssp.cur.data_resize(count)
 

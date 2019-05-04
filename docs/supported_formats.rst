@@ -33,6 +33,7 @@ Turo (.nc)                                          X
 UNB (.unb)                                          X    X
 Valeport Midas/Monitor (.000)                       X
 Valeport MiniSVP (.txt)                             X
+Valeport RapidSV/SVT (.txt)                         X
 Valeport SWiFT (.vp2)                               X
 =================================================== ==== =====
 

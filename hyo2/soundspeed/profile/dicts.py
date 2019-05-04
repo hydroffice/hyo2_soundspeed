@@ -81,6 +81,7 @@ class Dicts:
         ('MiniSVP', 307),
         ('RapidSVT', 308),
         ('SWiFT', 309),
+        ('RapidSV', 310),
 
         ('Future', 999),
 
