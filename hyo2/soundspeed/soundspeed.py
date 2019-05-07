@@ -285,9 +285,9 @@ class SoundSpeedLibrary:
         return self.atlases.rtofs_folder
 
     @property
-    def gomofs_folder(self) -> str:
-        """Get the gomofs atlas folder"""
-        return self.atlases.gomofs_folder
+    def regofs_folder(self) -> str:
+        """Get the regofs atlas folder"""
+        return self.atlases.regofs_folder
 
     # projects
 
