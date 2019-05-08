@@ -616,6 +616,16 @@ class ProjectDb:
         ssp_list = list()
         # noinspection SqlResolve
         sql = self.conn.execute("SELECT * FROM ssp_view")
+        sql_min = self.conn.execute("SELECT ssp_pk, speed, MIN(depth) as 'depth' FROM proc "
+                                    "WHERE flag=? GROUP BY ssp_pk", (Dicts.flags['valid'],)).fetchall()
+        sql_max = self.conn.execute("SELECT ssp_pk, speed, MAX(depth) as 'depth' FROM proc "
+                                    "WHERE flag=? GROUP BY ssp_pk", (Dicts.flags['valid'],)).fetchall()
+        sql_raw = self.conn.execute("SELECT ssp_pk, speed, MAX(depth) as 'depth' FROM proc "
+                                    "WHERE flag=? AND source!=? AND source!=? AND source!=? "
+                                    "AND source!=? AND source!=? AND source!=? GROUP BY ssp_pk",
+                                    (Dicts.flags['valid'], Dicts.sources['woa09_ext'], Dicts.sources['woa13_ext'],
+                                     Dicts.sources['woa18_ext'], Dicts.sources['rtofs_ext'], 
+                                     Dicts.sources['gomofs_ext'], Dicts.sources['ref_ext'],)).fetchall()
 
         try:
             with self.conn:
@@ -632,31 +642,29 @@ class ProjectDb:
                         probe_type = Dicts.probe_types['Future']
 
                     # special handling for surface sound speed, min depth, max depth
-                    # noinspection SqlResolve
-                    ssp_samples = self.conn.execute("SELECT * FROM proc WHERE ssp_pk=? AND flag=?",
-                                                    (row['pk'], Dicts.flags['valid'])).fetchall()
                     try:
-                        ss_at_min_depth = '%0.2f' % ssp_samples[0]['speed']
-                        min_depth = '%0.2f' % ssp_samples[0]['depth']
-                        max_depth = '%0.2f' % ssp_samples[-1]['depth']
+                        min_depth = ''
+                        for row_min in sql_min:
+                            if row_min['ssp_pk'] == row['pk']:
+                                ss_at_min_depth = '%0.2f' % row_min['speed']
+                                min_depth = '%0.2f' % row_min['depth']
+                        for row_max in sql_max:
+                            if row_max['ssp_pk'] == row['pk']:
+                                max_depth = '%0.2f' % row_max['depth']
+                        if min_depth == '':
+                            logger.warning("unable to import profile: %s -> skipping" % row['pk'])
+                            continue
                     except Exception as e:
                         logger.warning("unable to import profile: %s -> skipping" % row['pk'])
                         continue
 
-                    # noinspection SqlResolve
-                    ssp_samples = self.conn.execute("SELECT * FROM proc WHERE ssp_pk=? AND flag=? "
-                                                    "AND source!=? AND source!=? AND source!=? AND source!=? "
-                                                    "AND source!=? AND source!=?",
-                                                    (row['pk'], Dicts.flags['valid'],
-                                                     Dicts.sources['woa09_ext'], Dicts.sources['woa13_ext'],
-                                                     Dicts.sources['woa18_ext'],
-                                                     Dicts.sources['rtofs_ext'], Dicts.sources['gomofs_ext'],
-                                                     Dicts.sources['ref_ext'],
-                                                     )).fetchall()
                     try:
-                        max_raw_depth = '%0.2f' % ssp_samples[-1]['depth']
-                    except:
                         max_raw_depth = ''
+                        for row_raw in sql_raw:
+                            if row_raw['ssp_pk'] == row['pk']:
+                                max_raw_depth = '%0.2f' % row_raw['depth']
+                    except:
+                        pass
 
                     ssp_list.append((row['pk'],  # 0
                                      row['cast_datetime'],  # 1
