@@ -643,28 +643,44 @@ class ProjectDb:
 
                     # special handling for surface sound speed, min depth, max depth
                     try:
-                        min_depth = ''
+                        min_depth = str()
                         for row_min in sql_min:
                             if row_min['ssp_pk'] == row['pk']:
                                 ss_at_min_depth = '%0.2f' % row_min['speed']
                                 min_depth = '%0.2f' % row_min['depth']
-                        for row_max in sql_max:
-                            if row_max['ssp_pk'] == row['pk']:
-                                max_depth = '%0.2f' % row_max['depth']
+                                break
                         if min_depth == '':
-                            logger.warning("unable to import profile: %s -> skipping" % row['pk'])
+                            logger.warning("unable to retrieve min depth for profile: %s -> skipping" % row['pk'])
                             continue
                     except Exception as e:
-                        logger.warning("unable to import profile: %s -> skipping" % row['pk'])
+                        logger.warning("profile %s: %s -> skipping" % (e, row['pk']))
                         continue
 
                     try:
-                        max_raw_depth = ''
+                        max_depth = str()
+                        for row_max in sql_max:
+                            if row_max['ssp_pk'] == row['pk']:
+                                max_depth = '%0.2f' % row_max['depth']
+                                break
+                        if max_depth == '':
+                            logger.warning("unable to retrieve max depth for profile: %s -> skipping" % row['pk'])
+                            continue
+                    except Exception as e:
+                        logger.warning("profile %s: %s -> skipping" % (e, row['pk']))
+                        continue
+
+                    try:
+                        max_raw_depth = str()
                         for row_raw in sql_raw:
                             if row_raw['ssp_pk'] == row['pk']:
                                 max_raw_depth = '%0.2f' % row_raw['depth']
-                    except:
-                        pass
+                                break
+                        if max_raw_depth == '':
+                            logger.warning("unable to retrieve max raw depth for profile: %s -> skipping" % row['pk'])
+                            continue
+                    except Exception as e:
+                        logger.warning("profile %s: %s -> skipping" % (e, row['pk']))
+                        continue
 
                     ssp_list.append((row['pk'],  # 0
                                      row['cast_datetime'],  # 1
