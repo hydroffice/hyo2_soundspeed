@@ -258,8 +258,7 @@ class ExportDb:
                 ft.SetField('path', row[5])
 
             if self.filter_fields.fields['filename']:
-                fn = row[5].replace('/', '\\').split('\\')
-                ft.SetField('filename', fn[-1])
+                ft.SetField('filename', os.path.basename(row[5]))
 
             if self.filter_fields.fields['agency']:
                 if row[6]:
