@@ -18,6 +18,7 @@ class ExportDbFields:
             'sensor': True,
             'probe': True,
             'path': True,
+            'filename': True,
             'agency': True,
             'survey': True,
             'vessel': True,
@@ -86,6 +87,12 @@ class ExportDb:
 
         if self.filter_fields.fields['path']:
             field = ogr.FieldDefn('path', ogr.OFTString)
+            field.SetWidth(254)
+            if lyr.CreateField(field) != 0:
+                raise RuntimeError("Creating field failed.")
+
+        if self.filter_fields.fields['filename']:
+            field = ogr.FieldDefn('filename', ogr.OFTString)
             field.SetWidth(254)
             if lyr.CreateField(field) != 0:
                 raise RuntimeError("Creating field failed.")
@@ -249,6 +256,9 @@ class ExportDb:
 
             if self.filter_fields.fields['path']:
                 ft.SetField('path', row[5])
+
+            if self.filter_fields.fields['filename']:
+                ft.SetField('filename', os.path.basename(row[5]))
 
             if self.filter_fields.fields['agency']:
                 if row[6]:
