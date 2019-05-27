@@ -14,9 +14,9 @@ HydrOffice Sound Speed
     :target: https://ci.appveyor.com/project/giumas/hyo-soundspeed
     :alt: AppVeyor Status
 
-.. image:: https://travis-ci.org/hydroffice/hyo2_soundspeed.svg?branch=master
-     :target: https://travis-ci.org/hydroffice/hyo2_soundspeed
-     :alt: Travis-CI Status
+.. image:: https://travis-ci.com/hydroffice/hyo2_soundspeed.svg?branch=master
+    :target: https://travis-ci.com/hydroffice/hyo2_soundspeed
+    :alt: Travis-CI Status
 
 .. image:: https://api.codacy.com/project/badge/Grade/b92613f1b6794c968eef6ae5472c0c7f
     :target: https://www.codacy.com/app/hydroffice/hyo2_soundspeed

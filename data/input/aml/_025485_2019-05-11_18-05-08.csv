@@ -1,0 +1,109 @@
+[cast header]
+DISPLAY OPTIONS
+[Instrument]
+Type=Base.X2
+EmulationMode=disabled
+UseCustomHeader=yes
+SN=25485
+Firmware=V4.23
+SampleUnits=continuous
+SampleInterval=0
+PressureInc=1.00
+SoundInc=0.00
+LogFile=20170713. 
+DateFormat=ISO
+Date=2019-05-11
+Time=18:05:08
+MemorySize=942.8 MB
+MemoryUsed=3.8 MB
+DisplayTime=yes
+DisplayDate=yes
+DisplaySalinity=yes
+DisplayDensity=yes
+DisplaySoundVelocity=yes
+DisplayBattery=yes
+RelayMode=RS232 mode
+RealtimeLogging=yes
+LoggingTimeout=0
+StartupDelay=10
+DisplayHeader=yes
+StartupMode=prompt
+CharacterReception=yes
+LoggingBreakMode=no
+DetectionMode=A3
+BatteryACoefficient=+3.500000E-01
+BatteryBCoefficient=+2.500000E-02
+ShutDownVoltage=6.5
+WarningVoltage=6.9
+PressureOffset=-0.18
+UsePressureOffset=yes
+SoundVelocityThreshold=1375.00
+DelimterMode=Space
+SensorDetectionMode=Once
+Traceability=yes
+SkipPowerOff=no
+AnalogChannels=disabled
+Latitude=45.0548
+Longitude=-83.4215
+AutoMonitorSeconds=0
+FixedPressure=0.0000
+UseFixedPressure=no
+BiofoulingPwrAlways=no
+LedTimeoutSecs=300
+DisplayIncrement=no
+AutoZero=yes
+
+
+[Slot 1]
+SensorName=SV-C-CT.Xchange CT.X C SN 450132 01/16/19 T SN 450132 02/26/19
+BoardSN=05201
+
+[Slot 3]
+SensorName=P-T-TU-DO-UV.Xchange P.X SN 305373 01/15/19
+BoardSN=07065
+>
+
+[Data.X]
+Data.X SN =25485
+SSID =AML_25485
+IP Address =169.254.40.244
+Geo-Location Source =GPS
+C-sensor in-water threshold (mS/cm) =0.005
+Sleep Timeout Enabled =yes
+Sleep Timeout (mins) =5
+Shutdown Timeout Enabled =no
+Shutdown Timeout (mins) =60
+Wi-Fi Sleep Timeout Enabled =yes
+Wi-Fi Sleep Timeout (secs) =20
+Low Batt Shutdown Threshold Voltage =6.5
+WEP Key =25485
+Wi-Fi Channel =10
+In-Water Instrument Access =no
+Wi-Fi Enabled =yes
+Verbose output Enabled =no
+Terminal baud rate =115200
+Latitude=No-Lock
+Longitude=No-Lock
+HDOP=
+Water Detect Source =C sensor
+Log Trigger Source =P increment
+Verbose =no
+Terminal baud =115200
+C position =1
+SV position =0
+Real positions =3
+
+
+[data]
+
+2019-05-11,18:05:09.85,00.070,08.721,0000.15,007.00,00.047,0999.842,1442.19
+2019-05-11,18:05:14.49,00.171,08.833,0001.19,007.00,00.118,0999.895,1442.75
+2019-05-11,18:05:15.60,00.172,08.836,0002.24,007.00,00.118,0999.900,1442.78
+2019-05-11,18:05:19.51,00.171,08.821,0003.26,007.00,00.118,0999.905,1442.73
+2019-05-11,18:05:21.99,00.172,08.853,0004.28,007.00,00.119,0999.909,1442.88
+2019-05-11,18:05:25.80,00.171,08.800,0005.28,007.00,00.118,0999.917,1442.68
+2019-05-11,18:05:31.50,00.172,08.858,0004.28,007.00,00.119,0999.908,1442.90
+2019-05-11,18:05:33.78,00.170,08.860,0003.28,007.00,00.117,0999.902,1442.89
+2019-05-11,18:05:35.95,00.173,08.839,0002.28,007.00,00.119,0999.901,1442.79
+2019-05-11,18:05:38.02,00.173,08.868,0001.26,007.00,00.119,0999.893,1442.89
+2019-05-11,18:05:40.51,00.172,08.869,0000.24,007.03,00.118,0999.888,1442.88
