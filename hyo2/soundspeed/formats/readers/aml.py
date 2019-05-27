@@ -88,25 +88,19 @@ class Aml(AbstractTextReader):
                         time = dt.strptime(tokens[1].strip(), "%H:%M:%S.%f")
                         continue
 
-                if (tokens[0].lower() == self._lat_token) and (lat is None):
-                    lat = float(tokens[1])
-                    continue
-
-                if (tokens[0].lower() == self._long_token) and (lon is None):
-                    lon = float(tokens[1])
-                    continue
-
-                if (lat is not None) and (lon is not None) and \
-                        (self.ssp.cur.meta.latitude is None) and (self.ssp.cur.meta.longitude is None):
-                    if math.isclose(lat, 0.0) and math.isclose(lon, 0.0):
+                if tokens[0].lower() == self._lat_token:
+                    try:
+                        lat = float(tokens[1])
+                    except ValueError:  # it may be no-lock
                         lat = None
+                    continue
+
+                if tokens[0].lower() == self._long_token:
+                    try:
+                        lon = float(tokens[1])
+                    except ValueError:  # it may be no-lock
                         lon = None
-                        logger.info("skipped (0.0, 0.0) location as invalid")
-                    else:
-                        self.ssp.cur.meta.latitude = lat
-                        self.ssp.cur.meta.longitude = lon
-                        logger.debug("retrieved location: (%s, %s)" %
-                                     (self.ssp.cur.meta.longitude, self.ssp.cur.meta.latitude))
+                    continue
 
             except ValueError:
                 logger.warning("invalid conversion parsing of line #%s: %s" % (row_nr, tokens[1]))
@@ -116,6 +110,15 @@ class Aml(AbstractTextReader):
                 continue
 
             continue
+
+        if (lat is not None) and (lon is not None) and \
+                (self.ssp.cur.meta.latitude is None) and (self.ssp.cur.meta.longitude is None):
+            if math.isclose(lat, 0.0) and math.isclose(lon, 0.0):
+                logger.info("skipped (0.0, 0.0) location as invalid")
+            else:
+                self.ssp.cur.meta.latitude = lat
+                self.ssp.cur.meta.longitude = lon
+                logger.debug("retrieved location: (%s, %s)" % (self.ssp.cur.meta.longitude, self.ssp.cur.meta.latitude))
 
         if (date is not None) and (time is not None):
             self.ssp.cur.meta.utc_time = dt(year=date.year, month=date.month, day=date.day,
