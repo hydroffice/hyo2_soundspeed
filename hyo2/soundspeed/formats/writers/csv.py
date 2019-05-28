@@ -46,7 +46,7 @@ class Csv(AbstractTextWriter):
         else:
             header += "Latitude, unknown\n"
             header += "Longitude, unknown\n"
-        header += "depth (m), sound speed (m/s)\n"
+        header += "depth, sound speed, salinity, temperature\n"
 
         self.fod.io.write(header)
 
@@ -54,5 +54,6 @@ class Csv(AbstractTextWriter):
         # logger.debug('generating body')
         vi = self.ssp.cur.proc_valid
         for idx in range(np.sum(vi)):
-            self.fod.io.write("%.2f,%.2f\n"
-                              % (self.ssp.cur.proc.depth[vi][idx], self.ssp.cur.proc.speed[vi][idx],))
+            self.fod.io.write("%.2f,%.2f,%.2f,%.2f\n"
+                              % (self.ssp.cur.proc.depth[vi][idx], self.ssp.cur.proc.speed[vi][idx],
+                                 self.ssp.cur.proc.sal[vi][idx], self.ssp.cur.proc.temp[vi][idx]))
