@@ -176,6 +176,7 @@ class Woa09(AbstractAtlas):
 
         if not self.has_data_loaded:
             if not self.load_grids():
+                logger.error("No data")
                 return None
 
         # calculate month and season indices (based on julian day)

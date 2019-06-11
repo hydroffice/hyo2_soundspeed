@@ -1195,7 +1195,7 @@ class Profile:
     def update_proc_time(self):
         self.meta.update_proc_time()
 
-    def replace_proc_sal(self, source):  # unused
+    def replace_proc_sal(self, source):
         try:
             self.proc.sal = np.interp(self.proc.depth[:], source.cur.proc.depth[:], source.cur.proc.sal[:])
         except Exception as e:
@@ -1203,7 +1203,7 @@ class Profile:
             return False
         return True
 
-    def replace_proc_temp_sal(self, source):  # unused
+    def replace_proc_temp_sal(self, source):
         try:
             self.proc.temp = np.interp(self.proc.depth[:], source.cur.proc.depth[:], source.cur.proc.temp[:])
             self.proc.sal = np.interp(self.proc.depth[:], source.cur.proc.depth[:], source.cur.proc.sal[:])
