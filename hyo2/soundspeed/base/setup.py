@@ -28,6 +28,10 @@ class Setup:
             success = db.update_from_v1_to_v2()
             if success:
                 return True
+        if db.setup_version == 2:
+            success = db.update_from_v1_to_v2()
+            if success:
+                return True
         return False
 
     def __init__(self, release_folder, use_setup_name=None):
@@ -138,7 +142,7 @@ class Setup:
             release_folder, _ = os.path.split(db_path)
             db = SetupDb(release_folder)
 
-        if db.setup_version > 2:
+        if db.setup_version > 3:
             raise RuntimeError("unsupported setup version: %s" % db.setup_version)
 
         self.setup_version = db.setup_version

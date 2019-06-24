@@ -65,7 +65,7 @@ else:
 CREATE_SETTINGS = """-- noinspection SqlResolveForFile
  CREATE TABLE IF NOT EXISTS general(
      id integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
-     setup_version integer NOT NULL DEFAULT 2,
+     setup_version integer NOT NULL DEFAULT 3,
      setup_name text NOT NULL UNIQUE DEFAULT "default",
      setup_status text NOT NULL DEFAULT "inactive",
      /* input */
@@ -125,57 +125,7 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      default_institution text NOT NULL DEFAULT "%s",
      default_survey text NOT NULL DEFAULT "",
      default_vessel text NOT NULL DEFAULT "",
-     auto_apply_default_metadata integer NOT NULL DEFAULT 1,
-     
-     /* Checks */
-     CHECK (setup_status IN ("active", "inactive")),
-     /* input */
-     CHECK (use_woa09 IN (0, 1)),
-     CHECK (use_woa13 IN (0, 1)),
-     CHECK (use_woa18 IN (0, 1)),
-     CHECK (use_rtofs IN (0, 1)),
-     CHECK (use_gomofs IN (0, 1)),     
-     CHECK (ssp_extension_source IN ("GoMOFS", "RTOFS", "WOA09", "WOA13", "WOA18", "ref")),
-     CHECK (ssp_salinity_source IN ("GoMOFS", "RTOFS", "WOA09", "WOA13", "WOA18", "ref")),
-     CHECK (ssp_temp_sal_source IN ("GoMOFS", "RTOFS", "WOA09", "WOA13", "WOA18", "ref")),
-     CHECK (ssp_up_or_down IN ("down", "up")),
-     CHECK (rx_max_wait_time > 0),
-     CHECK (use_sis IN (0, 1)),
-     CHECK (use_sis5 IN (0, 1)),
-     CHECK (use_sippican IN (0, 1)),
-     CHECK (use_mvp IN (0, 1)),
-     /* output */
-     CHECK (log_user IN (0, 1)),
-     CHECK (log_server IN (0, 1)),
-     /* listeners - sis4 */
-     CHECK (sis_listen_port > 0),
-     CHECK (sis_listen_timeout > 0),
-     CHECK (sis_listen_port < 65536),
-     CHECK (sis_listen_timeout < 65536),
-     /* output sis */
-     CHECK (sis_auto_apply_manual_casts IN (0, 1)),
-     /* listeners - sis5 */
-     CHECK (sis5_listen_port > 0),
-     CHECK (sis5_listen_timeout > 0),
-     CHECK (sis5_listen_port < 65536),
-     CHECK (sis5_listen_timeout < 65536),
-     /* listeners - sippican */
-     CHECK (sippican_listen_port > 0),
-     CHECK (sippican_listen_timeout > 0),
-     /* mvp - sippican */
-     CHECK (mvp_listen_port > 0),
-     CHECK (mvp_listen_timeout > 0),
-     CHECK (mvp_transmission_protocol IN ("NAVO_ISS60", "UNDEFINED")),
-     CHECK (mvp_format IN ("S12", "CALC", "ASVP")),
-     CHECK (mvp_instrument IN ("AML_uSVP", "AML_uSVPT", "AML_Smart_SVP", "AML_uCTD", "AML_uCTD+", "Valeport_SVPT", 
-     "SBE_911+", "SBE_49")),
-     /* server */
-     CHECK (server_source IN ("RTOFS", "GoMOFS", "WOA09", "WOA13", "WOA18")),
-     CHECK (server_apply_surface_sound_speed IN (0, 1)),
-     /* user-defined */
-     CHECK (noaa_tools IN (0, 1)),
-     CHECK (auto_apply_default_metadata IN (0, 1))
-     
+     auto_apply_default_metadata integer NOT NULL DEFAULT 1
      ) """ % (default_use_woa_09, default_use_woa_13, default_use_woa_18,
               default_use_rtofs, default_use_gomofs,
               default_custom_woa09_folder, default_custom_woa13_folder, default_custom_woa18_folder,
@@ -191,10 +141,7 @@ CREATE_CLIENT_LIST = """-- noinspection SqlResolveForFile
      protocol text NOT NULL DEFAULT "SIS",
      CONSTRAINT setup_id_fk
      FOREIGN KEY(setup_id) REFERENCES general(id)
-     ON DELETE CASCADE,
-     /* Checks */
-     CHECK (port > 0),
-     CHECK (protocol IN ("SIS", "HYPACK", "PDS2000", "QINSY", "KCTRL"))
+     ON DELETE CASCADE
      ) """
 
 CREATE_SETTINGS_VIEW = """-- noinspection SqlResolveForFile
