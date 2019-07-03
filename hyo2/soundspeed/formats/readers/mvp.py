@@ -25,6 +25,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
         "M1": 3,
         "S05": 4,
         "S52": 5,
+        "S10": 6,
     }
 
     def __init__(self):  #
@@ -36,6 +37,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
         self._ext.add('m1')
         self._ext.add('s05')
         self._ext.add('s52')
+        self._ext.add('s10')
 
         # for listener
         self.file_content = None
@@ -110,11 +112,14 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
         elif file_ext == ".s52":
             self.format = self.formats["S52"]
 
+        elif file_ext == ".s10":
+            self.format = self.formats["S10"]
+
         else:
             raise RuntimeError("unknown format: %s" % self.format)
 
         # initialize probe/sensor type
-        if self.format in [self.formats["CALC"], self.formats["M1"]]:
+        if self.format in [self.formats["CALC"], self.formats["M1"], self.formats["S10"]]:
             self.ssp.cur.meta.sensor_type = Dicts.sensor_types["SVP"]
         else:
             self.ssp.cur.meta.sensor_type = Dicts.sensor_types["MVP"]
@@ -151,13 +156,17 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
             logger.info("parsing header [M1]")
             self._parse_m1_header()
 
-        elif self.format in self.formats["S05"]:
+        elif self.format == self.formats["S05"]:
             logger.info("parsing header [S05]")
             self._parse_s05_header()
 
-        elif self.format in self.formats["S52"]:
+        elif self.format == self.formats["S52"]:
             logger.info("parsing header [S52]")
             self._parse_s05_header()
+
+        elif self.format == self.formats["S10"]:
+            logger.info("parsing header [S10]")
+            self._parse_s10_header()
 
         else:
             raise RuntimeError("unknown format: %s" % self.format)
@@ -189,6 +198,10 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
         elif self.format == self.formats["S52"]:
             logger.info("parsing body [S52]")
             self._parse_s05_body()
+
+        elif self.format == self.formats["S10"]:
+            logger.info("parsing body [S10]")
+            self._parse_s10_body()
 
         else:
             raise RuntimeError("unknown format: %s" % self.format)
@@ -659,7 +672,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
 
         count = 0
         try:
-            self.ssp.cur.data.pressure[count] = float(header_fields[-4])
+            self.ssp.cur.data.pressure[count] = float(header_fields[-5])
             self.ssp.cur.data.temp[count] = float(header_fields[-3])
             self.ssp.cur.data.conductivity[count] = float(header_fields[-2])
         except (ValueError, IndexError, TypeError) as e:
@@ -671,7 +684,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
 
             try:
                 fields = line.split(",")
-                self.ssp.cur.data.pressure[count] = float(fields[-4])
+                self.ssp.cur.data.pressure[count] = float(fields[-5])
                 self.ssp.cur.data.temp[count] = float(fields[-3])
                 self.ssp.cur.data.conductivity[count] = float(fields[-2])
             except (ValueError, IndexError, TypeError) as e:
@@ -679,6 +692,101 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
                 continue
             count += 1
         self.ssp.cur.data_resize(count)
+
+    def _parse_s10_header(self):
+        try:
+            # $MVS12,00002,0095,132409,09,04,2013,6.75,1514.76,18.795,31.9262,
+            header_fields = self.total_data.splitlines()[0].split(",")
+        except (ValueError, IndexError, TypeError) as e:
+            raise RuntimeError("unable to parse header fields: %s" % e)
+
+        try:
+            year = int(header_fields[6])
+            month = int(header_fields[5])
+            day = int(header_fields[4])
+            hour = int(header_fields[3][0:2])
+            minute = int(header_fields[3][2:4])
+            second = int(header_fields[3][4:6])
+            if (year is not None) and (hour is not None):
+                self.ssp.cur.meta.utc_time = dt.datetime(year, month, day, hour, minute, second)
+                logger.info("date/time: %s" % self.ssp.cur.meta.utc_time)
+        except (ValueError, IndexError, TypeError) as e:
+            raise RuntimeError("unable to parse header fields: %s" % e)
+
+        try:
+            # 4249.46,N,05557.43,W,0.0,AML_uSVPT*15\
+            footer_fields = self.total_data.splitlines()[-1].split(",")
+        except (ValueError, IndexError, TypeError) as e:
+            raise RuntimeError("unable to parse footer_fields: %s" % e)
+
+        try:
+            lat_field = footer_fields[0]
+            lat_deg = int(lat_field[0:2])
+            lat_min = float(lat_field[2:])
+            lat_hemi = footer_fields[1]
+            logger.debug("lat: %s %s %s" % (lat_deg, lat_min, lat_hemi))
+            self.ssp.cur.meta.latitude = lat_deg + lat_min / 60.0
+            if lat_hemi == "S" or lat_hemi == "s":
+                self.ssp.cur.meta.latitude *= -1
+            logger.info("latitude: %s" % self.ssp.cur.meta.latitude)
+        except (ValueError, IndexError, TypeError) as e:
+            raise RuntimeError("unable to parse latitude: %s" % e)
+
+        try:
+            lon_field = footer_fields[2]
+            lon_deg = int(lon_field[0:3])
+            lon_min = float(lon_field[3:])
+            lon_hemi = footer_fields[3]
+            logger.debug("lon: %s %s %s" % (lon_deg, lon_min, lon_hemi))
+            self.ssp.cur.meta.longitude = lon_deg + lon_min / 60.0
+            if lon_hemi == "W" or lon_hemi == "w":
+                self.ssp.cur.meta.longitude *= -1
+            logger.info("longitude: %s" % self.ssp.cur.meta.longitude)
+        except (ValueError, IndexError, TypeError) as e:
+            raise RuntimeError("unable to parse longitude: %s" % e)
+
+        try:
+            self.ssp.cur.init_data(len(self.total_data.splitlines()))
+            logger.info("number of samples: %s" % self.ssp.cur.data.num_samples)
+        except (ValueError, IndexError, TypeError) as e:
+            raise RuntimeError("unable to parse the number of samples: %s" % e)
+
+        # ALWAYS SVP
+        # try:
+        #     sensor_field = footer_fields[5].split("*")[0]
+        #     if sensor_field == "AML_SmartSVP":
+        #         self.ssp.cur.meta.sensor_type = Dicts.sensor_types["SVP"]
+        #     elif sensor_field == "AML_uSVPT":
+        #         self.ssp.cur.meta.sensor_type = Dicts.sensor_types["SVP"]
+        #     elif sensor_field == "AML_uCTD":
+        #         self.ssp.cur.meta.sensor_type = Dicts.sensor_types["CTD"]
+        #     else:
+        #         logger.warning("unknown sensor name: %s" % sensor_field)
+        #
+        # except (ValueError, IndexError, TypeError) as e:
+        #     raise RuntimeError("unable to parse the number of samples: %s" % e)
+
+        count = 0
+        try:
+            self.ssp.cur.data.depth[count] = float(header_fields[-5])
+            self.ssp.cur.data.speed[count] = float(header_fields[-4])
+        except (ValueError, IndexError, TypeError) as e:
+            logger.error("skipping first line: %s" % e)
+
+    def _parse_s10_body(self):
+        count = 1  # given the first data are on the header
+        for line in self.total_data.splitlines()[1:-1]:
+
+            try:
+                fields = line.split(",")
+                self.ssp.cur.data.depth[count] = float(fields[-5])
+                self.ssp.cur.data.speed[count] = float(fields[-4])
+            except (ValueError, IndexError, TypeError) as e:
+                logger.error("skipping line %s: %s" % (count, e))
+                continue
+            count += 1
+        self.ssp.cur.data_resize(count)
+
 
 # # This is the documentation provided by Steve Smyth of Rolls Royce (ODIM Brooke Ocean)
 # # as per an email communication with Shannon Byrne of SAIC, dated February 03, 2009
