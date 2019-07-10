@@ -23,6 +23,7 @@ class Sippican(AbstractTextReader):
         Dicts.probe_types["T-7"]: Dicts.sensor_types["XBT"],
         Dicts.probe_types["XSV-01"]: Dicts.sensor_types["XSV"],
         Dicts.probe_types["XSV-02"]: Dicts.sensor_types["XSV"],
+        Dicts.probe_types["XCTD-01"]: Dicts.sensor_types["XCTD"],
         Dicts.probe_types["XCTD-1"]: Dicts.sensor_types["XCTD"],
         Dicts.probe_types["XCTD-2"]: Dicts.sensor_types["XCTD"],
         Dicts.probe_types["Fast Deep"]: Dicts.sensor_types["XBT"],
