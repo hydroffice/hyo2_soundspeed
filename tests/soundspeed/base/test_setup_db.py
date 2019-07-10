@@ -81,7 +81,7 @@ class TestSoundSpeedSetupDb(unittest.TestCase):
 
     def test_compare_setup_version(self):
         db = SetupDb(data_folder=self.data_folder, db_file=self.db_name)
-        self.assertLessEqual(db.setup_version, 2)
+        self.assertLessEqual(db.setup_version, 3)
         db.close()
 
     def test_checked_use_woa09(self):
