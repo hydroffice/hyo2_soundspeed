@@ -1,37 +1,23 @@
-cimport numpy
-import numpy
-from scipy.interpolate import interp1d
+import numpy as np
 import math
-from cpython cimport datetime
 import logging
+from scipy.interpolate import interp1d
 
 logger = logging.getLogger(__name__)
 
-from hyo2.soundspeed.profile.dicts import Dicts
 
+class TracedProfile:
 
-cdef class TracedProfile:
-
-    cpdef public double avg_depth
-    cpdef public double half_swath
-    cpdef public list rays
-    cpdef public list harmonic_means
-    cpdef public datetime.datetime date_time
-    cpdef public double latitude
-    cpdef public double longitude
-    cpdef public list data
-
-    def __init__(self, ssp, double half_swath=70, double avg_depth=10000, tss_depth=None, tss_value=None):
+    def __init__(self, ssp, half_swath=65, avg_depth=10000, tss_depth=None, tss_value=None):
         # PyDateTime_IMPORT
         self.avg_depth = avg_depth
         self.half_swath = half_swath
 
         # select samples for the ray tracing (must be deeper than the transducer depth)
         depths = list()
-        if tss_depth is not None:
-            depths.append(tss_depth)
         speeds = list()
-        if tss_value is not None:
+        if (tss_depth is not None) and (tss_value is not None):
+            depths.append(tss_depth)
             speeds.append(tss_value)
 
         vi = ssp.proc_valid
@@ -66,7 +52,7 @@ cdef class TracedProfile:
         # ray-trace a few angles (ref: Lurton, An Introduction to UA, p.50-52)
         self.rays = list()
         self.harmonic_means = list()
-        for angle in numpy.arange(0, int(math.ceil(self.half_swath + 1))):
+        for angle in np.arange(0, int(math.ceil(self.half_swath + 1))):
 
             # ray angles
             beta = list()
@@ -149,10 +135,10 @@ cdef class TracedProfile:
 
             # interpolate between 0 and 5000 meters with decimetric resolution
             if len(depths) > 1:
-                interp_z = numpy.linspace(0, 5000, num=25001, endpoint=True)
-                fx = interp1d(total_z, total_x, kind='cubic', bounds_error=False, fill_value=-1)
+                interp_z = np.linspace(0, 5000, num=25001, endpoint=True)
+                fx = interp1d(total_z, total_x, kind='cubic', bounds_error=False, fill_value=np.nan)
                 interp_x = fx(interp_z)
-                ft = interp1d(total_z, total_t, kind='cubic', bounds_error=False, fill_value=-1)
+                ft = interp1d(total_z, total_t, kind='cubic', bounds_error=False, fill_value=np.nan)
                 interp_t = ft(interp_z)
 
             elif len(depths) == 1:
@@ -160,7 +146,7 @@ cdef class TracedProfile:
                 interp_x = total_x
                 interp_t = total_t
 
-            self.rays.append(numpy.array([interp_t, interp_x, interp_z]))
+            self.rays.append(np.array([interp_t, interp_x, interp_z]))
 
         logger.debug("rays: %d (%d samples per-ray)" % (len(self.rays), len(self.rays[0][0])))
         self.date_time = ssp.meta.utc_time
@@ -168,15 +154,45 @@ cdef class TracedProfile:
         self.longitude = ssp.meta.longitude
         self.data = [depths, speeds]
 
-    def str_rays(self):
-        msg = str()
-        for ang in range(len(self.rays)):
-            msg += "[%d]\n" % ang
+    def debug_rays(self, ray_idx=0):
+        nr_rays = len(self.rays)
+        if (ray_idx < 0) or (ray_idx >= nr_rays):
+            logger.warning("invalid ray index: %d (total rays: %d)" % (ray_idx, nr_rays))
+            return
 
-            for idx in range(len(self.rays[ang][0])):
-                msg += "%10.2f %10.2f %10.2f\n" \
-                       % (self.rays[ang][0][idx], self.rays[ang][1][idx], self.rays[ang][2][idx])
-        return msg
+        logger.debug("[%d]" % ray_idx)
+        logger.debug("t      | x      | z     |")
+        for idx in range(len(self.rays[ray_idx][0])):
+            logger.debug("%10.4f %10.3f %10.2f"
+                         % (self.rays[ray_idx][0][idx], self.rays[ray_idx][1][idx], self.rays[ray_idx][2][idx]))
+
+    def plot(self, ray_idx=0):
+        nr_rays = len(self.rays)
+        if (ray_idx < 0) or (ray_idx >= nr_rays):
+            logger.warning("invalid ray index: %d (total rays: %d)" % (ray_idx, nr_rays))
+            return
+
+        from matplotlib import pyplot as plt
+
+        plt.figure("Traced Profile", dpi=120)
+
+        plt.subplot(131)  # time
+        plt.plot(self.data[1], self.data[0])
+        plt.gca().invert_yaxis()
+        plt.grid(True)
+        plt.title('profile')
+
+        plt.subplot(132)  # time
+        plt.plot(self.rays[ray_idx][0], self.rays[ray_idx][2])
+        plt.gca().invert_yaxis()
+        plt.grid(True)
+        plt.title('z vs. time')
+
+        plt.subplot(133)  # x
+        plt.plot(self.rays[ray_idx][1], self.rays[ray_idx][2])
+        plt.gca().invert_yaxis()
+        plt.grid(True)
+        plt.title('z vs. x')
 
     def __repr__(self):
         msg = "<%s>\n" % self.__class__.__name__
@@ -186,7 +202,7 @@ cdef class TracedProfile:
         msg += "  <longitude: %.7f>\n" % self.longitude
         msg += "  <avg depth: %.3f>\n" % self.avg_depth
         msg += "  <half swatch: %.1f>\n" % self.half_swath
-        msg += "  <profile valid samples: %d>" % len(self.data[0])
+        msg += "  <profile valid samples: %d>\n" % len(self.data[0])
         msg += "  <rays: %d>\n" % len(self.rays)
         msg += "  <samples per ray: %d>\n" % len(self.rays[0][0])
 

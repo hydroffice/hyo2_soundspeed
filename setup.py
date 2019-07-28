@@ -1,11 +1,9 @@
 import codecs
 import os
 import re
-import numpy as np
 
 # Always prefer setuptools over distutils
-from setuptools import setup, find_packages, Extension
-from Cython.Build import cythonize
+from setuptools import setup, find_packages
 
 # ------------------------------------------------------------------
 #                         HELPER FUNCTIONS
@@ -62,18 +60,6 @@ setup(
         "scipy",
         "basemap"  # you may also need: conda install -c conda-forge basemap-data-hires
     ],
-    ext_modules=cythonize([
-        Extension("hyo2.soundspeed.profile.ray_tracing.tracedprofile",
-                  sources=["hyo2/soundspeed/profile/ray_tracing/tracedprofile.pyx"],
-                  include_dirs=[np.get_include()],
-                  language='c++',
-                  # extra_compile_args=["-Zi", "/Od"],
-                  # extra_link_args=["-debug"],
-                  ),
-        ],
-        annotate=True,
-        compiler_directives={'language_level': '3'}
-    ),
     python_requires='>=3.5',
     entry_points={
         "gui_scripts": [
