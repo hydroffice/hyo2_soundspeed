@@ -84,23 +84,39 @@ class PlotTracedProfiles:
         svp_ax.grid(True)
 
         # calculate limits
-        z_max = max(max(self._d.new_rays[-1][2]),
-                    max(self._d.old_rays[-1][2]))
+        t_idx_max = max(np.nanargmax(self._d.new_rays[-1][0]),
+                        np.nanargmax(self._d.old_rays[-1][0]))
+        z_max = self._d.new_rays[-1][2][t_idx_max]
         x_max = max(max(self._d.new_rays[-1][1]),
                     max(self._d.old_rays[-1][1]))
+        logger.debug("z max: %s, x max: %s" % (z_max, x_max))
 
-        old_last_ray_x = self._d.old_rays[-1][1]
         new_last_ray_x = self._d.new_rays[-1][1]
-        old_last_ray_z = self._d.old_rays[-1][2]
         new_last_ray_z = self._d.new_rays[-1][2]
-        old_x_ends = [ray[1][-1] for ray in self._d.old_rays]
-        new_x_ends = [ray[1][-1] for ray in self._d.new_rays]
-        old_z_ends = [ray[2][-1] for ray in self._d.old_rays]
-        new_z_ends = [ray[2][-1] for ray in self._d.new_rays]
-        up_tol = [(ray[2][-1] - ray[2][-1] * self._d.variable_allowable_error - self._d.fixed_allowable_error)
-                  for ray in self._d.new_rays]
-        down_tol = [(ray[2][-1] + ray[2][-1] * self._d.variable_allowable_error + self._d.fixed_allowable_error)
-                    for ray in self._d.new_rays]
+        new_t_max = np.nanmax(self._d.new_rays[-1][0])
+        old_t_idx_max = np.nanargmin(np.abs(self._d.old_rays[-1][0] - new_t_max))
+        old_last_ray_x = self._d.old_rays[-1][1][:old_t_idx_max]
+        old_last_ray_z = self._d.old_rays[-1][2][:old_t_idx_max]
+
+        new_x_ends = list()
+        new_z_ends = list()
+        old_x_ends = list()
+        old_z_ends = list()
+        up_tol = list()
+        down_tol = list()
+        for ray_idx, new_ray in enumerate(self._d.new_rays):
+            old_ray = self._d.old_rays[ray_idx]
+            new_t_idx_max = np.nanargmax(new_ray[0])
+            new_x_ends.append(new_ray[1][new_t_idx_max])
+            new_z_ends.append(new_ray[2][new_t_idx_max])
+            new_t_max = new_ray[0][new_t_idx_max]
+            old_t_idx_max = np.nanargmin(np.abs(old_ray[0] - new_t_max))
+            old_x_ends.append(old_ray[1][old_t_idx_max])
+            old_z_ends.append(old_ray[2][old_t_idx_max])
+            up_tol.append(new_ray[2][new_t_idx_max] - new_ray[2][new_t_idx_max] * self._d.variable_allowable_error -
+                          self._d.fixed_allowable_error)
+            down_tol.append(new_ray[2][new_t_idx_max] + new_ray[2][new_t_idx_max] * self._d.variable_allowable_error +
+                            self._d.fixed_allowable_error)
 
         # error plot axis
         err_ax = fig.add_subplot(1, 2, 2)
@@ -138,10 +154,12 @@ class PlotTracedProfiles:
 
         start_time = datetime.now()
 
-        z_max = max(max(self._d.new_rays[-1][2]),
-                    max(self._d.old_rays[-1][2]))
-        x_max = max(max(self._d.new_rays[-1][1]),
-                    max(self._d.old_rays[-1][1]))
+        t_idx_max = max(np.nanargmax(self._d.new_rays[-1][0]),
+                        np.nanargmax(self._d.old_rays[-1][0]))
+        z_max = self._d.new_rays[-1][2][t_idx_max]
+        x_max = max(np.nanmax(self._d.new_rays[-1][1]),
+                    np.nanmax(self._d.old_rays[-1][1]))
+        logger.debug("z max: %s, x max: %s" % (z_max, x_max))
 
         xi, zi = np.mgrid[0:x_max:1000j, 0:z_max:1000j]
 
@@ -175,6 +193,11 @@ class PlotTracedProfiles:
                     logger.debug("skipping idx %s" % idx)
                     continue
 
+                if np.isnan(ray[0][idx]) or np.isnan(ray[1][idx]):
+                    continue
+                if np.isnan(self._d.old_rays[ang][0][idx]) or np.isnan(self._d.old_rays[ang][1][idx]):
+                    continue
+
                 t1 = np.append(t1, ray[0][idx])
                 x1 = np.append(x1, ray[1][idx])
                 z1 = np.append(z1, ray[2][idx])
@@ -190,10 +213,11 @@ class PlotTracedProfiles:
         logger.debug("timing: %s" % (datetime.now() - start_time))
 
         # noinspection PyTypeChecker
-        dxi = interpolate.griddata((x1, z1), dx, (xi, zi), method='linear')
+        dxi = interpolate.griddata((x1, z1), dx, (xi, zi), method='cubic')
         logger.debug("dxi: %s, min: %s, max: %s" % (dxi.shape, np.nanmin(dxi), np.nanmax(dxi)))
         # noinspection PyTypeChecker
-        dzi = interpolate.griddata((x1, z1), dz, (xi, zi), method='linear')
+        dzi = interpolate.griddata((x1, z1), dz, (xi, zi), method='cubic')
+        logger.debug("dzi: %s, min: %s, max: %s" % (dzi.shape, np.nanmin(dzi), np.nanmax(dzi)))
 
         logger.debug("timing: %s" % (datetime.now() - start_time))
 

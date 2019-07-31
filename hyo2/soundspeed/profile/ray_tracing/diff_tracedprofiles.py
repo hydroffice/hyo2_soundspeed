@@ -50,9 +50,9 @@ class DiffTracedProfiles:
             # first retrieve common areas for both profiles (and reset the 0 values)
             for idx in range(len(ray_new[0])):
 
-                if ray_new[0][idx] == -1:
+                if np.isnan(ray_new[0][idx]):
                     continue
-                if ray_old[0][idx] == -1:
+                if np.isnan(ray_old[0][idx]):
                     continue
 
                 if not init_done:

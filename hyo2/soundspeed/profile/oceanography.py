@@ -352,18 +352,22 @@ class Oceanography:
             return t
 
         temp = t
-        new_pot_t = cls.pot_temp(s=s, t=t, p=p, pr=pr)
+        new_pot_t = cls.pot_temp(s=s, t=temp, p=p, pr=pr)
+        # logger.debug("p: %s, pr: %s" % (p, pr))
         if new_pot_t < t:
             sign = 1
         else:
             sign = -1
 
-        dt = new_pot_t - temp
+        dt = new_pot_t - t
+        new_dt = new_pot_t - t
 
-        while np.abs(dt) > 0.001:
+        while abs(new_dt) > 0.001:
+            if abs(new_dt) > abs(dt):
+                sign = -sign
             temp += sign * 0.001
             new_pot_t = cls.pot_temp(s=s, t=temp, p=p, pr=pr)
-            dt = new_pot_t - t
+            new_dt = new_pot_t - t
 
         return temp
 

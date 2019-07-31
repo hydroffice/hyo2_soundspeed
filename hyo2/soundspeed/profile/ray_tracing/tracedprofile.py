@@ -140,11 +140,12 @@ class TracedProfile:
                 interp_x = fx(interp_z)
                 ft = interp1d(total_z, total_t, kind='cubic', bounds_error=False, fill_value=np.nan)
                 interp_t = ft(interp_z)
-
             elif len(depths) == 1:
                 interp_z = total_z
                 interp_x = total_x
                 interp_t = total_t
+            else:
+                raise RuntimeError("invalid profile with zero valid depth values")
 
             self.rays.append(np.array([interp_t, interp_x, interp_z]))
 
@@ -166,7 +167,7 @@ class TracedProfile:
             logger.debug("%10.4f %10.3f %10.2f"
                          % (self.rays[ray_idx][0][idx], self.rays[ray_idx][1][idx], self.rays[ray_idx][2][idx]))
 
-    def plot(self, ray_idx=0):
+    def debug_plot(self, ray_idx=0):
         nr_rays = len(self.rays)
         if (ray_idx < 0) or (ray_idx >= nr_rays):
             logger.warning("invalid ray index: %d (total rays: %d)" % (ray_idx, nr_rays))
@@ -176,7 +177,7 @@ class TracedProfile:
 
         plt.figure("Traced Profile", dpi=120)
 
-        plt.subplot(131)  # time
+        plt.subplot(131)  # profile
         plt.plot(self.data[1], self.data[0])
         plt.gca().invert_yaxis()
         plt.grid(True)
