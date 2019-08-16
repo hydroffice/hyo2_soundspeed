@@ -2,6 +2,8 @@
 Installation
 ************
 
+.. _pydro_installation:
+
 Installation using the Pydro distribution
 =========================================
 

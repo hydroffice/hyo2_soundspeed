@@ -1,3 +1,5 @@
+.. _supported_formats:
+
 *****************
 Supported Formats
 *****************
@@ -21,8 +23,8 @@ iXBlue (.txt)                                            X
 Kongsberg asvp (.asvp)                              X    X
 Kongsberg absorption (.abs)                              X
 Rolls-Royce MVP (.asvp, .calc, .s12)                X
-NCEI (.nc)                                               X
-QPS (.bsvp) [1]_                                         X
+NCEI (.nc) [1]_                                          X
+QPS (.bsvp) [2]_                                         X
 OceanScience (.asc)                                 X
 Sea&Sun (.tob)                                      X
 SAIV (.txt)                                         X
@@ -39,4 +41,5 @@ Valeport SWiFT (.vp2)                               X
 
 .. rubric:: Footnotes
 
-.. [1] The QPS bsvp format is only supported by old versions of some QPS applications (e.g., FMGT and FMMW).
+.. [1] For details on how to browse the content of a generated NCEI file, see :ref:`app_c_view_ncei_format`.
+.. [2] The QPS bsvp format is only supported by old versions of some QPS applications (e.g., FMGT and FMMW).

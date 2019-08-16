@@ -7,7 +7,7 @@ HydrOffice Sound Speed's documentation
 .. toctree::
 	:maxdepth: 1
 	:numbered:
-
+	
 	in_brief
 	user_manual
 	developer_guide

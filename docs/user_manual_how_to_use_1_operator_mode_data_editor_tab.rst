@@ -355,6 +355,7 @@ Any file that is loaded into the package can be exported by accessing the *Expor
 
 Several formats are currently supported, so the user must select the format of interest and
 then choose *Export selected formats* to actually perform the export.
+To inspect the content of a profile exported in the NCEI format, see :ref:`app_c_view_ncei_format`.
 
 The export function will prompt the user for an output prefix prior to export.
 
