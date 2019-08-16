@@ -48,9 +48,9 @@ copyright = u'2019, CCOM/JHC,UNH'
 # built documents.
 #
 # The short X.Y version.
-version = '2019.0'
+version = '2019.2'
 # The full version, including alpha/beta/rc tags.
-release = '2019.0.8'
+release = '2019.2.2'
 
 numfig = True
 
