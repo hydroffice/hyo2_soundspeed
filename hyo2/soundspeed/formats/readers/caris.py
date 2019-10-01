@@ -108,8 +108,11 @@ class Caris(AbstractTextReader):
         try:
             self.ssp.cur.meta.utc_time = dt.strptime(time_fields, "%Y-%j %H:%M:%S")
 
-        except Exception as e:
-            logger.warning("unable to interpret the timestamp: %s" % time_fields)
+        except Exception:
+            try:  # now try without seconds
+                self.ssp.cur.meta.utc_time = dt.strptime(time_fields, "%Y-%j %H:%M")
+            except Exception:
+                logger.warning("unable to interpret the timestamp: %s" % time_fields)
 
         try:
             self.ssp.cur.meta.latitude = self._interpret_caris_coord(tokens[3])
@@ -160,7 +163,7 @@ class Caris(AbstractTextReader):
 
             # A new section is coming
             if self.lines[self.cur_row_idx][:len(self.section_token)] == self.section_token:
-                self.cur_row_idx += 1
+                # self.cur_row_idx += 1  -> commented to read again the section header
                 return
 
             # skip empty lines
