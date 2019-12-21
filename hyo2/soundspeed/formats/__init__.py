@@ -12,6 +12,7 @@ from .readers.castaway import Castaway
 from .readers.digibarpro import DigibarPro
 from .readers.digibars import DigibarS
 from .readers.elac import Elac
+from .readers.hypack import Hypack
 from .readers.idronaut import Idronaut
 from .readers.iss import Iss
 from .readers.mvp import Mvp
@@ -34,6 +35,7 @@ readers.append(Castaway())
 readers.append(DigibarPro())
 readers.append(DigibarS())
 readers.append(Elac())
+readers.append(Hypack())
 readers.append(Idronaut())
 readers.append(Iss())
 readers.append(Asvp())
