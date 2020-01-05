@@ -16,7 +16,7 @@ CSV (.csv)                                               X
 Digibar Pro (.txt)                                  X
 Digibar S (.csv)                                    X
 ELAC (.sva)                                         X    X
-Hypack (.vel)                                            X
+Hypack (.vel)                                       X    X
 Idronaut (.txt)                                     X
 ISS (.v*, .d*, .svp)                                X
 iXBlue (.txt)                                            X

@@ -29,7 +29,7 @@ From the *Editor* tab, select *Import data* (:numref:`editor_tab0`) and choose t
 
 .. _editor_tab1:
 .. figure:: ./_static/editor_tab1.png
-    :width: 400px
+    :width: 600px
     :align: center
     :alt: alternate text
     :figclass: align-center

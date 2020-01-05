@@ -71,6 +71,7 @@ Currently implemented features
   * Castaway (.csv)
   * Digibar Pro (.txt), and S (.csv)
   * ELAC Hydrostar (.sva)
+  * Hypack (.vel)
   * Idronaut (.txt)
   * ISS Fugro (.svp, .v*, .d*)
   * Kongsberg Maritime (.asvp)
@@ -179,6 +180,7 @@ Input of AML format                                      **x**
 Input of AOML format                                     **x**
 Input of Caris format                                    **x**
 Input of ELAC format                                     **x**
+Input of Hypack format                                   **x**
 Input of Sonardyne format                                **x**
 Automated processing steps                               **x**
 Data management for multiple projects                    **x**
