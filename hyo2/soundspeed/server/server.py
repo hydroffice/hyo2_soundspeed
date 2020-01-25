@@ -180,9 +180,9 @@ class Server(Thread):
         elif self.prj.setup.server_source == 'WOA13':  # WOA13 case
             lat_idx, lon_idx = self.prj.atlases.woa13.grid_coords(lat=lat, lon=lon)
         elif self.prj.setup.server_source == 'RTOFS':  # RTOFS case
-            lat_idx, lon_idx = self.prj.atlases.rtofs.grid_coords(lat=lat, lon=lon, datestamp=tm, server_mode=True)
+            lat_idx, lon_idx = self.prj.atlases.rtofs.grid_coords(lat=lat, lon=lon, dtstamp=tm, server_mode=True)
         elif self.prj.setup.server_source == 'GoMOFS':  # GoMOFS case
-            lat_idx, lon_idx = self.prj.atlases.gomofs.grid_coords(lat=lat, lon=lon, datestamp=tm, server_mode=True)
+            lat_idx, lon_idx = self.prj.atlases.gomofs.grid_coords(lat=lat, lon=lon, dtstamp=tm, server_mode=True)
         else:
             raise RuntimeError('unable to understand server source: %s' % self.prj.setup.server_source)
         # logger.debug('lat idx: %s [last: %s]' % (lat_idx, self.lat_idx_last))
@@ -227,16 +227,16 @@ class Server(Thread):
 
         # retrieve profile
         if self.prj.setup.server_source == 'WOA09':  # WOA09 case
-            self.prj.ssp = self.prj.atlases.woa09.query(lat=lat, lon=lon, datestamp=tm, server_mode=True)
+            self.prj.ssp = self.prj.atlases.woa09.query(lat=lat, lon=lon, dtstamp=tm, server_mode=True)
 
         elif self.prj.setup.server_source == 'WOA13':  # WOA09 case
-            self.prj.ssp = self.prj.atlases.woa13.query(lat=lat, lon=lon, datestamp=tm, server_mode=True)
+            self.prj.ssp = self.prj.atlases.woa13.query(lat=lat, lon=lon, dtstamp=tm, server_mode=True)
 
         elif self.prj.setup.server_source == 'RTOFS':  # RTOFS case
-            self.prj.ssp = self.prj.atlases.rtofs.query(lat=lat, lon=lon, datestamp=tm, server_mode=True)
+            self.prj.ssp = self.prj.atlases.rtofs.query(lat=lat, lon=lon, dtstamp=tm, server_mode=True)
 
         elif self.prj.setup.server_source == 'GoMOFS':  # GoMOFS case
-            self.prj.ssp = self.prj.atlases.gomofs.query(lat=lat, lon=lon, datestamp=tm, server_mode=True)
+            self.prj.ssp = self.prj.atlases.gomofs.query(lat=lat, lon=lon, dtstamp=tm, server_mode=True)
 
         else:
             raise RuntimeError('unable to understand server source: %s' % self.prj.setup.server_source)

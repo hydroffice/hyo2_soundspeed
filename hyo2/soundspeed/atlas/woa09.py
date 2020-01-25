@@ -3,7 +3,7 @@ import math
 import numpy as np
 from netCDF4 import Dataset
 import logging
-from datetime import datetime as dt, date
+from datetime import datetime as dt
 from typing import Union
 
 from hyo2.abc.lib.ftp import Ftp
@@ -157,19 +157,17 @@ class Woa09(AbstractAtlas):
         lon_idx = int(round((lon - self.lon_0) / self.lon_step, 0))
         return lat_idx, lon_idx
 
-    def query(self, lat: float, lon: float, datestamp: Union[date, dt, None] = None, server_mode: bool = False):
+    def query(self, lat: float, lon: float, dtstamp: Union[dt, None] = None, server_mode: bool = False):
         """Query WOA09 for passed location and timestamp"""
-        if datestamp is None:
-            datestamp = dt.utcnow()
-        if isinstance(datestamp, dt):
-            datestamp = datestamp.date()
-        if not isinstance(datestamp, date):
-            raise RuntimeError("invalid date passed: %s" % type(datestamp))
-        logger.debug("query: %s @ (%.6f, %.6f)" % (datestamp, lon, lat))
+        if dtstamp is None:
+            dtstamp = dt.utcnow()
+        if not isinstance(dtstamp, dt):
+            raise RuntimeError("invalid datetime passed: %s" % type(dtstamp))
+        logger.debug("query: %s @ (%.6f, %.6f)" % (dtstamp, lon, lat))
 
         # check the inputs
-        if (lat is None) or (lon is None) or (datestamp is None):
-            logger.error("invalid query: %s @ (%s, %s)" % (datestamp.strftime("%Y%m%d"), lon, lat))
+        if (lat is None) or (lon is None) or (dtstamp is None):
+            logger.error("invalid query: %s @ (%s, %s)" % (dtstamp.strftime("%Y/%m/%d %H:%M:%S"), lon, lat))
             return None
         if lon < 0:  # Make all longitudes positive
             lon += 360.0
@@ -180,7 +178,7 @@ class Woa09(AbstractAtlas):
                 return None
 
         # calculate month and season indices (based on julian day)
-        jd = int(datestamp.strftime("%j"))
+        jd = int(dtstamp.strftime("%j"))
         self.calc_month_idx(jday=jd)
         self.calc_season_idx(jday=jd)
 
@@ -295,8 +293,9 @@ class Woa09(AbstractAtlas):
         ssp.meta.probe_type = Dicts.probe_types['WOA09']
         ssp.meta.latitude = lat
         ssp.meta.longitude = lon
-        ssp.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
-        ssp.meta.original_path = "WOA09_%s" % datestamp.strftime("%Y%m%d")
+        ssp.meta.utc_time = dt(year=dtstamp.year, month=dtstamp.month, day=dtstamp.day,
+                               hour=dtstamp.hour, minute=dtstamp.minute, second=dtstamp.second)
+        ssp.meta.original_path = "WOA09_%s" % dtstamp.strftime("%Y%m%d_%H%M%S")
         ssp.init_data(num_values)
         ssp.data.depth = self.t_seasonal.variables['depth'][0:num_values]
         ssp.data.temp = t[valid]
@@ -319,7 +318,8 @@ class Woa09(AbstractAtlas):
         ssp_min.meta.probe_type = Dicts.probe_types['WOA09']
         ssp_min.meta.latitude = lat
         ssp_min.meta.longitude = lon
-        ssp_min.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
+        ssp_min.meta.utc_time = dt(year=dtstamp.year, month=dtstamp.month, day=dtstamp.day,
+                                   hour=dtstamp.hour, minute=dtstamp.minute, second=dtstamp.second)
         if num_values > 0:
             ssp_min.init_data(num_values)
             ssp_min.data.depth = self.t_seasonal.variables['depth'][0:num_values]
@@ -337,7 +337,8 @@ class Woa09(AbstractAtlas):
         ssp_max.meta.probe_type = Dicts.probe_types['WOA09']
         ssp_max.meta.latitude = lat
         ssp_max.meta.longitude = lon
-        ssp_max.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
+        ssp_max.meta.utc_time = dt(year=dtstamp.year, month=dtstamp.month, day=dtstamp.day,
+                                   hour=dtstamp.hour, minute=dtstamp.minute, second=dtstamp.second)
         if num_values > 0:
             ssp_max.init_data(num_values)
             ssp_max.data.depth = self.t_seasonal.variables['depth'][0:num_values].astype(np.float64)

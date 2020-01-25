@@ -1,4 +1,4 @@
-from datetime import datetime as dt, date, timedelta
+from datetime import datetime as dt, timedelta
 from enum import IntEnum
 from http import client
 import logging
@@ -78,7 +78,7 @@ class RegOfs(AbstractAtlas):
         self._ref_p = 2000
 
         self._has_data_loaded = False  # grids are "loaded" ? (netCDF files are opened)
-        self._last_loaded_day = date(1900, 1, 1)  # some silly day in the past
+        self._last_loaded_day = dt(1900, 1, 1)  # some silly day in the past
         self._file = None
         self._day_idx = None
         self._d = None
@@ -97,16 +97,14 @@ class RegOfs(AbstractAtlas):
         """check the availability"""
         return self._has_data_loaded
 
-    def download_db(self, datestamp: Union[date, dt, None] = None, server_mode: bool = False) -> bool:
+    def download_db(self, dtstamp: Union[dt, None] = None, server_mode: bool = False) -> bool:
         """try to connect and load info from the data set"""
-        if datestamp is None:
-            datestamp = dt.utcnow()
-        if isinstance(datestamp, dt):
-            datestamp = datestamp.date()
-        if not isinstance(datestamp, date):
-            raise RuntimeError("invalid date passed: %s" % type(datestamp))
+        if dtstamp is None:
+            dtstamp = dt.utcnow()
+        if not isinstance(dtstamp, dt):
+            raise RuntimeError("invalid date passed: %s" % type(dtstamp))
 
-        if not self._download_files(datestamp=datestamp, server_mode=server_mode):
+        if not self._download_files(dtstamp=dtstamp, server_mode=server_mode):
             return False
 
         try:
@@ -134,25 +132,23 @@ class RegOfs(AbstractAtlas):
                      % (self._lat_min, self._lon_min, self._lat_max, self._lon_max, self._lat_step, self._lon_step))
         return True
 
-    def query(self, lat: Optional[float], lon: Optional[float], datestamp: Union[date, dt, None] = None,
+    def query(self, lat: Optional[float], lon: Optional[float], dtstamp: Union[dt, None] = None,
               server_mode: bool = False):
         """Query OFS for passed location and timestamp"""
-        original_datestamp = datestamp
-        if datestamp is None:
-            datestamp = dt.utcnow()
-        if isinstance(datestamp, dt):
-            datestamp = datestamp.date()
-        if not isinstance(datestamp, date):
-            raise RuntimeError("invalid date passed: %s" % type(datestamp))
-        logger.debug("query: %s @ (%.6f, %.6f)" % (datestamp, lon, lat))
+        original_datestamp = dtstamp
+        if dtstamp is None:
+            dtstamp = dt.utcnow()
+        if not isinstance(dtstamp, dt):
+            raise RuntimeError("invalid date passed: %s" % type(dtstamp))
+        logger.debug("query: %s @ (%.6f, %.6f)" % (dtstamp, lon, lat))
 
         # check the inputs
-        if (lat is None) or (lon is None) or (datestamp is None):
-            logger.error("invalid query: %s @ (%s, %s)" % (datestamp.strftime("%Y%m%d"), lon, lat))
+        if (lat is None) or (lon is None) or (dtstamp is None):
+            logger.error("invalid query: %s @ (%s, %s)" % (dtstamp.strftime("%Y/%m/%d %H:%M:%S"), lon, lat))
             return None
 
         try:
-            lat_idx, lon_idx = self.grid_coords(lat, lon, datestamp=datestamp, server_mode=server_mode)
+            lat_idx, lon_idx = self.grid_coords(lat, lon, dtstamp=dtstamp, server_mode=server_mode)
             if lat_idx is None:
                 logger.info("location outside of %s coverage" % self.name)
                 return None
@@ -277,8 +273,9 @@ class RegOfs(AbstractAtlas):
         if lon > 180.0:  # Go back to negative longitude
             lon -= 360.0
         ssp.meta.longitude = lon
-        ssp.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
-        ssp.meta.original_path = "%s_%s" % (self.name, datestamp.strftime("%Y%m%d"))
+        ssp.meta.utc_time = dt(year=dtstamp.year, month=dtstamp.month, day=dtstamp.day,
+                               hour=dtstamp.hour, minute=dtstamp.minute, second=dtstamp.second)
+        ssp.meta.original_path = "%s_%s" % (self.name, dtstamp.strftime("%Y%m%d_%H%M%S"))
         ssp.init_data(num_values)
         ssp.data.depth = d[0:num_values]
         ssp.data.temp = temp_in_situ[0:num_values]
@@ -308,7 +305,7 @@ class RegOfs(AbstractAtlas):
             self._lon_min = None
             self._lon_max = None
         self._has_data_loaded = False  # grids are "loaded" ? (netCDF files are opened)
-        self._last_loaded_day = date(1900, 1, 1)  # some silly day in the past
+        self._last_loaded_day = dt(1900, 1, 1)  # some silly day in the past
         self._day_idx = None
 
     def __repr__(self):
@@ -335,7 +332,7 @@ class RegOfs(AbstractAtlas):
 
         return resp.status < 400
 
-    def _build_check_url(self, input_date: date, name: str) -> str:
+    def _build_check_url(self, input_date: dt, name: str) -> str:
         """make up the url to use for salinity and temperature"""
         # Primary server: https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/GOMOFS/MODELS/201901/
         #                 nos.gomofs.regulargrid.n006.20190115.t18z.nc
@@ -349,7 +346,7 @@ class RegOfs(AbstractAtlas):
                     % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
         return url
 
-    def _build_opendap_url(self, input_date: date, name: str) -> str:
+    def _build_opendap_url(self, input_date: dt, name: str) -> str:
         """make up the url to use for salinity and temperature"""
         # Primary server: https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/GOMOFS/MODELS/201901/
         #                 nos.gomofs.regulargrid.n006.20190115.t18z.nc
@@ -363,37 +360,37 @@ class RegOfs(AbstractAtlas):
                   % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
         return url
 
-    def _download_files(self, datestamp: date, server_mode: bool = False):
+    def _download_files(self, dtstamp: dt, server_mode: bool = False):
         """Actually, just try to connect with the remote files
         For a given queried date, we may have to use the forecast from the previous
         day since the current nowcast doesn't hold data for today (solved?)
         """
         progress = CliProgress()
 
-        if not isinstance(datestamp, date):
-            raise RuntimeError("invalid date passed: %s" % type(datestamp))
+        if not isinstance(dtstamp, dt):
+            raise RuntimeError("invalid datetime passed: %s" % type(dtstamp))
 
         # check if the files are loaded and that the date matches
         if self._has_data_loaded:
             # logger.info("%s" % self.last_loaded_day)
-            if self._last_loaded_day == datestamp:
+            if self._last_loaded_day == dtstamp:
                 return True
             else:  # the data are old
-                logger.info("cleaning data: %s %s" % (self._last_loaded_day, datestamp))
+                logger.info("cleaning data: %s %s" % (self._last_loaded_day, dtstamp))
                 self.clear_data()
 
         progress.start(text="Download %s" % self.name, is_disabled=server_mode)
 
         # check if the data are available on the RTOFS server
-        url_ck = self._build_check_url(datestamp, self.name)
+        url_ck = self._build_check_url(dtstamp, self.name)
         if not self._check_url(url_ck):
 
-            datestamp -= timedelta(days=1)
-            url_ck = self._build_check_url(datestamp, self.name)
+            dtstamp -= timedelta(days=1)
+            url_ck = self._build_check_url(dtstamp, self.name)
 
             if not self._check_url(url_ck):
                 logger.warning('unable to retrieve data from %s server for date: %s and next day'
-                               % (self.name, datestamp))
+                               % (self.name, dtstamp))
                 self.clear_data()
                 progress.end()
                 return False
@@ -401,7 +398,7 @@ class RegOfs(AbstractAtlas):
         progress.update(30)
 
         # Try to download the data grid grids
-        url = self._build_opendap_url(datestamp, self.name)
+        url = self._build_opendap_url(dtstamp, self.name)
         # logger.debug('downloading RTOFS data for %s' % datestamp)
         try:
             self._file = Dataset(url)
@@ -409,23 +406,23 @@ class RegOfs(AbstractAtlas):
             self._day_idx = 0
 
         except (RuntimeError, IOError) as e:
-            logger.warning("unable to access data: %s -> %s" % (datestamp.strftime("%Y%m%d"), e))
+            logger.warning("unable to access data: %s -> %s" % (dtstamp.strftime("%Y%m%d"), e))
             self.clear_data()
             progress.end()
             return False
 
         # success!
         self._has_data_loaded = True
-        self._last_loaded_day = datestamp
+        self._last_loaded_day = dtstamp
         progress.end()
         return True
 
-    def grid_coords(self, lat: float, lon: float, datestamp: date, server_mode: Optional[bool] = False) -> tuple:
+    def grid_coords(self, lat: float, lon: float, dtstamp: dt, server_mode: Optional[bool] = False) -> tuple:
         """Convert the passed position in OFS grid coords"""
 
         # check if we need to update the data set (new day!)
-        if not self.download_db(datestamp, server_mode=server_mode):
-            logger.error("troubles in updating data set for timestamp: %s" % datestamp.strftime("%Y%m%d"))
+        if not self.download_db(dtstamp, server_mode=server_mode):
+            logger.error("troubles in updating data set for timestamp: %s" % dtstamp.strftime("%Y/%m/%d %H:%M:%S"))
             raise RuntimeError('troubles in db download')
 
         # check validity of longitude and latitude

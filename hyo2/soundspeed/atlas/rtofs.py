@@ -34,7 +34,7 @@ class Rtofs(AbstractAtlas):
         self._ref_p = 2000
 
         self._has_data_loaded = False  # grids are "loaded" ? (netCDF files are opened)
-        self._last_loaded_day = date(1900, 1, 1)  # some silly day in the past
+        self._last_loaded_day = dt(1900, 1, 1)  # some silly day in the past
         self._file_temp = None
         self._file_sal = None
         self._day_idx = None
@@ -52,16 +52,14 @@ class Rtofs(AbstractAtlas):
         """check the availability"""
         return self._has_data_loaded
 
-    def download_db(self, datestamp: Union[date, dt, None] = None, server_mode: bool = False) -> bool:
+    def download_db(self, dtstamp: Union[dt, None] = None, server_mode: bool = False) -> bool:
         """try to connect and load info from the data set"""
-        if datestamp is None:
-            datestamp = dt.utcnow()
-        if isinstance(datestamp, dt):
-            datestamp = datestamp.date()
-        if not isinstance(datestamp, date):
-            raise RuntimeError("invalid date passed: %s" % type(datestamp))
+        if dtstamp is None:
+            dtstamp = dt.utcnow()
+        if not isinstance(dtstamp, dt):
+            raise RuntimeError("invalid datetime passed: %s" % type(dtstamp))
 
-        if not self._download_files(datestamp=datestamp, server_mode=server_mode):
+        if not self._download_files(datestamp=dtstamp, server_mode=server_mode):
             return False
 
         try:
@@ -86,24 +84,22 @@ class Rtofs(AbstractAtlas):
         # logger.debug("0(%.3f, %.3f); step(%.3f, %.3f)" % (self.lat_0, self.lon_0, self.lat_step, self.lon_step))
         return True
 
-    def query(self, lat: Optional[float], lon: Optional[float], datestamp: Union[date, dt, None] = None,
+    def query(self, lat: Optional[float], lon: Optional[float], dtstamp: Union[dt, None] = None,
               server_mode: bool = False):
         """Query RTOFS for passed location and timestamp"""
-        if datestamp is None:
-            datestamp = dt.utcnow()
-        if isinstance(datestamp, dt):
-            datestamp = datestamp.date()
-        if not isinstance(datestamp, date):
-            raise RuntimeError("invalid date passed: %s" % type(datestamp))
-        logger.debug("query: %s @ (%.6f, %.6f)" % (datestamp, lon, lat))
+        if dtstamp is None:
+            dtstamp = dt.utcnow()
+        if not isinstance(dtstamp, dt):
+            raise RuntimeError("invalid datetime passed: %s" % type(dtstamp))
+        logger.debug("query: %s @ (%.6f, %.6f)" % (dtstamp, lon, lat))
 
         # check the inputs
-        if (lat is None) or (lon is None) or (datestamp is None):
-            logger.error("invalid query: %s @ (%s, %s)" % (datestamp.strftime("%Y%m%d"), lon, lat))
+        if (lat is None) or (lon is None) or (dtstamp is None):
+            logger.error("invalid query: %s @ (%s, %s)" % (dtstamp.strftime("%Y/%m/%d %H:%M:%S"), lon, lat))
             return None
 
         try:
-            lat_idx, lon_idx = self.grid_coords(lat, lon, datestamp=datestamp, server_mode=server_mode)
+            lat_idx, lon_idx = self.grid_coords(lat, lon, dtstamp=dtstamp, server_mode=server_mode)
         except TypeError as e:
             logger.critical("while converting location to grid coords, %s" % e)
             return None
@@ -277,8 +273,9 @@ class Rtofs(AbstractAtlas):
         if lon > 180.0:  # Go back to negative longitude
             lon -= 360.0
         ssp.meta.longitude = lon
-        ssp.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
-        ssp.meta.original_path = "RTOFS_%s" % datestamp.strftime("%Y%m%d")
+        ssp.meta.utc_time = dt(year=dtstamp.year, month=dtstamp.month, day=dtstamp.day,
+                               hour=dtstamp.hour, minute=dtstamp.minute, second=dtstamp.second)
+        ssp.meta.original_path = "RTOFS_%s" % dtstamp.strftime("%Y%m%d_%H%M%S")
         ssp.init_data(num_values)
         ssp.data.depth = d[0:num_values]
         ssp.data.temp = temp_in_situ[0:num_values]
@@ -309,7 +306,7 @@ class Rtofs(AbstractAtlas):
             self._lon_step = None
             self._lon_0 = None
         self._has_data_loaded = False  # grids are "loaded" ? (netCDF files are opened)
-        self._last_loaded_day = date(1900, 1, 1)  # some silly day in the past
+        self._last_loaded_day = dt(1900, 1, 1)  # some silly day in the past
         self._day_idx = None
 
     def __repr__(self) -> str:
@@ -362,15 +359,15 @@ class Rtofs(AbstractAtlas):
         logger.debug("opendap sal: %s" % url_sal)
         return url_temp, url_sal
 
-    def _download_files(self, datestamp: date, server_mode: bool = False):
+    def _download_files(self, datestamp: dt, server_mode: bool = False):
         """Actually, just try to connect with the remote files
         For a given queried date, we may have to use the forecast from the previous
         day since the current nowcast doesn't hold data for today (solved?)
         """
         progress = CliProgress()
 
-        if not isinstance(datestamp, date):
-            raise RuntimeError("invalid date passed: %s" % type(datestamp))
+        if not isinstance(datestamp, dt):
+            raise RuntimeError("invalid datetime passed: %s" % type(datestamp))
 
         # check if the files are loaded and that the date matches
         if self._has_data_loaded:
@@ -421,12 +418,12 @@ class Rtofs(AbstractAtlas):
         progress.end()
         return True
 
-    def grid_coords(self, lat: float, lon: float, datestamp: date, server_mode: Optional[bool] = False) -> tuple:
+    def grid_coords(self, lat: float, lon: float, dtstamp: dt, server_mode: Optional[bool] = False) -> tuple:
         """Convert the passed position in RTOFS grid coords"""
 
         # check if we need to update the data set (new day!)
-        if not self.download_db(datestamp, server_mode=server_mode):
-            logger.error("troubles in updating data set for timestamp: %s" % datestamp.strftime("%Y%m%d"))
+        if not self.download_db(dtstamp, server_mode=server_mode):
+            logger.error("troubles in updating data set for timestamp: %s" % dtstamp.strftime("%Y%m%d"))
             raise RuntimeError('troubles in db download')
 
         # make longitude "safe" since RTOFS grid starts at east longitude 70-ish degrees

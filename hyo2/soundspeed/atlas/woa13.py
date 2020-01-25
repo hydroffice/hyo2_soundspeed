@@ -3,7 +3,7 @@ import csv
 import numpy as np
 from netCDF4 import Dataset
 import logging
-from datetime import datetime as dt, date
+from datetime import datetime as dt
 from typing import Union
 
 from hyo2.abc.lib.ftp import Ftp
@@ -162,19 +162,17 @@ class Woa13(AbstractAtlas):
         logger.debug("grid coords: %s %s" % (lat_idx, lon_idx))
         return lat_idx, lon_idx
 
-    def query(self, lat: float, lon: float, datestamp: Union[date, dt, None] = None, server_mode: bool = False):
+    def query(self, lat: float, lon: float, dtstamp: Union[dt, None] = None, server_mode: bool = False):
         """Query WOA13 for passed location and timestamp"""
-        if datestamp is None:
-            datestamp = dt.utcnow()
-        if isinstance(datestamp, dt):
-            datestamp = datestamp.date()
-        if not isinstance(datestamp, date):
-            raise RuntimeError("invalid date passed: %s" % type(datestamp))
-        logger.debug("query: %s @ (%.6f, %.6f)" % (datestamp, lon, lat))
+        if dtstamp is None:
+            dtstamp = dt.utcnow()
+        if not isinstance(dtstamp, dt):
+            raise RuntimeError("invalid datetime passed: %s" % type(dtstamp))
+        logger.debug("query: %s @ (%.6f, %.6f)" % (dtstamp, lon, lat))
 
         # check the inputs
-        if (lat is None) or (lon is None) or (datestamp is None):
-            logger.error("invalid query: %s @ (%s, %s)" % (datestamp.strftime("%Y%m%d"), lon, lat))
+        if (lat is None) or (lon is None) or (dtstamp is None):
+            logger.error("invalid query: %s @ (%s, %s)" % (dtstamp.strftime("%Y/%m/%d %H:%M:%S"), lon, lat))
             return None
 
         if not self.has_data_loaded:
@@ -182,7 +180,7 @@ class Woa13(AbstractAtlas):
                 logger.error("No data")
                 return None
 
-        self.calc_indices(month=datestamp.month)
+        self.calc_indices(month=dtstamp.month)
 
         # Find the nearest grid node
         lat_base_idx, lon_base_idx = self.grid_coords(lat=lat, lon=lon)
@@ -307,7 +305,8 @@ class Woa13(AbstractAtlas):
         ssp.meta.probe_type = Dicts.probe_types['WOA13']
         ssp.meta.latitude = lat
         ssp.meta.longitude = lon
-        ssp.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
+        ssp.meta.utc_time = dt(year=dtstamp.year, month=dtstamp.month, day=dtstamp.day,
+                               hour=dtstamp.hour, minute=dtstamp.minute, second=dtstamp.second)
         ssp.init_data(num_values)
         ssp.data.depth = self.t[self.season_idx].variables['depth'][0:num_values]
         ssp.data.temp = t[valid]
@@ -330,7 +329,8 @@ class Woa13(AbstractAtlas):
         ssp_min.meta.probe_type = Dicts.probe_types['WOA13']
         ssp_min.meta.latitude = lat
         ssp_min.meta.longitude = lon
-        ssp_min.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
+        ssp_min.meta.utc_time = dt(year=dtstamp.year, month=dtstamp.month, day=dtstamp.day,
+                                   hour=dtstamp.hour, minute=dtstamp.minute, second=dtstamp.second)
         if num_values > 0:
             ssp_min.init_data(num_values)
             ssp_min.data.depth = self.t[self.season_idx].variables['depth'][0:num_values]
@@ -347,8 +347,9 @@ class Woa13(AbstractAtlas):
         ssp_max.meta.probe_type = Dicts.probe_types['WOA13']
         ssp_max.meta.latitude = lat
         ssp_max.meta.longitude = lon
-        ssp_max.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day)
-        ssp.meta.original_path = "WOA13_%s" % datestamp.strftime("%Y%m%d")
+        ssp_max.meta.utc_time = dt(year=dtstamp.year, month=dtstamp.month, day=dtstamp.day,
+                                   hour=dtstamp.hour, minute=dtstamp.minute, second=dtstamp.second)
+        ssp.meta.original_path = "WOA13_%s" % dtstamp.strftime("%Y%m%d_%H%M%S")
         if num_values > 0:
             ssp_max.init_data(num_values)
             ssp_max.data.depth = self.t[self.season_idx].variables['depth'][0:num_values].astype(np.float64)

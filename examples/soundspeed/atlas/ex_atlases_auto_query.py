@@ -244,39 +244,39 @@ for test in tests:
     start_time = time.time()
     # just the ssp (there are also ssp_min and ssp_max)
     if switch is ModelOptions.WOA09:
-        logger.info("WOA09 profiles:\n%s" % lib.atlases.woa09.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        logger.info("WOA09 profiles:\n%s" % lib.atlases.woa09.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.WOA13:
-        logger.info("WOA13 profiles:\n%s" % lib.atlases.woa13.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        logger.info("WOA13 profiles:\n%s" % lib.atlases.woa13.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.RTOFS:
-        logger.info("RTOFS profiles:\n%s" % lib.atlases.rtofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        logger.info("RTOFS profiles:\n%s" % lib.atlases.rtofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.CBOFS:
-        logger.info("CBOFS profiles:\n%s" % lib.atlases.cbofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        logger.info("CBOFS profiles:\n%s" % lib.atlases.cbofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.DBOFS:
-        logger.info("DBOFS profiles:\n%s" % lib.atlases.dbofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        logger.info("DBOFS profiles:\n%s" % lib.atlases.dbofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.GoMOFS:
-        logger.info("GoMOFS profiles:\n%s" % lib.atlases.gomofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        logger.info("GoMOFS profiles:\n%s" % lib.atlases.gomofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.NYOFS:
-        logger.info("NYOFS profiles:\n%s" % lib.atlases.nyofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        logger.info("NYOFS profiles:\n%s" % lib.atlases.nyofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.SJROFS:
-        logger.info("SJROFS profiles:\n%s" % lib.atlases.sjrofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        logger.info("SJROFS profiles:\n%s" % lib.atlases.sjrofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.NGOFS:
-        logger.info("NGOFS profiles:\n%s" % lib.atlases.ngofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        logger.info("NGOFS profiles:\n%s" % lib.atlases.ngofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.TBOFS:
-        logger.info("TBOFS profiles:\n%s" % lib.atlases.tbofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        logger.info("TBOFS profiles:\n%s" % lib.atlases.tbofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.LEOFS:
-        logger.info("LEOFS profiles:\n%s" % lib.atlases.leofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        logger.info("LEOFS profiles:\n%s" % lib.atlases.leofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.LHOFS:
-        logger.info("LHOFS profiles:\n%s" % lib.atlases.lhofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        logger.info("LHOFS profiles:\n%s" % lib.atlases.lhofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.LMOFS:
-        logger.info("LMOFS profiles:\n%s" % lib.atlases.lmofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        logger.info("LMOFS profiles:\n%s" % lib.atlases.lmofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.LOOFS:
-        logger.info("LOOFS profiles:\n%s" % lib.atlases.loofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        logger.info("LOOFS profiles:\n%s" % lib.atlases.loofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.LSOFS:
-        logger.info("LSOFS profiles:\n%s" % lib.atlases.lsofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        logger.info("LSOFS profiles:\n%s" % lib.atlases.lsofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.CREOFS:
-        logger.info("CREOFS profiles:\n%s" % lib.atlases.creofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        logger.info("CREOFS profiles:\n%s" % lib.atlases.creofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.SFBOFS:
-        logger.info("SFBOFS profiles:\n%s" % lib.atlases.sfbofs.query(lat=test[0], lon=test[1], datestamp=test[2]))
+        logger.info("SFBOFS profiles:\n%s" % lib.atlases.sfbofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     else:
         raise RuntimeError("invalid switch value: %s" % switch)
     logger.info("execution time: %.3f s" % (time.time() - start_time))

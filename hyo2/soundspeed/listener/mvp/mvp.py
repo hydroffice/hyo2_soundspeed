@@ -90,20 +90,20 @@ class Mvp(AbstractListener):
                 if self.prj.use_woa09() and self.prj.has_woa09():
                     self.prj.ssp.cur.woa09 = self.prj.atlases.woa09.query(lat=self.prj.ssp.cur.meta.latitude,
                                                                           lon=self.prj.ssp.cur.meta.longitude,
-                                                                          datestamp=self.prj.ssp.cur.meta.utc_time)
+                                                                          dtstamp=self.prj.ssp.cur.meta.utc_time)
                     logger.debug("added WOA09")
 
                 if self.prj.use_woa13() and self.prj.has_woa13():
                     self.prj.ssp.cur.woa13 = self.prj.atlases.woa13.query(lat=self.prj.ssp.cur.meta.latitude,
                                                                           lon=self.prj.ssp.cur.meta.longitude,
-                                                                          datestamp=self.prj.ssp.cur.meta.utc_time)
+                                                                          dtstamp=self.prj.ssp.cur.meta.utc_time)
                     logger.debug("added WOA13")
 
                 if self.prj.use_rtofs():
                     try:
                         self.prj.ssp.cur.rtofs = self.prj.atlases.rtofs.query(lat=self.prj.ssp.cur.meta.latitude,
                                                                               lon=self.prj.ssp.cur.meta.longitude,
-                                                                              datestamp=self.prj.ssp.cur.meta.utc_time)
+                                                                              dtstamp=self.prj.ssp.cur.meta.utc_time)
                         logger.debug("added RTOFS")
 
                     except RuntimeError:
@@ -141,18 +141,18 @@ class Mvp(AbstractListener):
             if self.prj.use_woa09() and self.prj.has_woa09():
                 self.prj.ssp.cur.woa09 = self.prj.atlases.woa09.query(lat=self.prj.ssp.cur.meta.latitude,
                                                                       lon=self.prj.ssp.cur.meta.longitude,
-                                                                      datestamp=self.prj.ssp.cur.meta.utc_time)
+                                                                      dtstamp=self.prj.ssp.cur.meta.utc_time)
 
             if self.prj.use_woa13() and self.prj.has_woa13():
                 self.prj.ssp.cur.woa13 = self.prj.atlases.woa13.query(lat=self.prj.ssp.cur.meta.latitude,
                                                                       lon=self.prj.ssp.cur.meta.longitude,
-                                                                      datestamp=self.prj.ssp.cur.meta.utc_time)
+                                                                      dtstamp=self.prj.ssp.cur.meta.utc_time)
 
             if self.prj.use_rtofs():
                 try:
                     self.prj.ssp.cur.rtofs = self.prj.atlases.rtofs.query(lat=self.prj.ssp.cur.meta.latitude,
                                                                           lon=self.prj.ssp.cur.meta.longitude,
-                                                                          datestamp=self.prj.ssp.cur.meta.utc_time)
+                                                                          dtstamp=self.prj.ssp.cur.meta.utc_time)
                 except RuntimeError:
                     self.prj.ssp.cur.rtofs = None
                     logger.warning("unable to retrieve RTOFS data")
