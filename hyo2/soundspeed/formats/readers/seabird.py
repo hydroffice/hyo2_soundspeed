@@ -202,6 +202,11 @@ class Seabird(AbstractTextReader):
                     day = int(m.group('day'))
                 m = SEACAT_SBE19PLUS_HEX_TIMERE.search(header)
                 hour, minute = int(m.group('hour')), int(m.group('minute'))
+                try:
+                    second = int(m.group('second'))
+                except Exception:
+                    second = 0
+                    logger.warning("unable to retrieve seconds")
 
             elif seacat_type == "SBE19":
                 try:  # For the SBE19s the start_time is not always cast time but can be the download time for some firmware revisions.
@@ -217,11 +222,21 @@ class Seabird(AbstractTextReader):
                 if m1 and m2:
                     mon, day = int(m1.group('month')), int(m1.group('day'))
                     hour, minute = int(m2.group('hour')), int(m2.group('minute'))
+                    try:
+                        second = int(m2.group('second'))
+                    except Exception:
+                        second = 0
+                        logger.warning("unable to retrieve seconds")
                 else:
                     dt_match = SEACAT_CNV_START_TIMERE.search(header)
                     dt = datetime.datetime(1, 1, 1).strptime(dt_match.group('full'), '%b %d %Y %H:%M:%S')
                     yr, mon, day = dt.year, dt.month, dt.day
                     hour, minute = dt.hour, dt.minute
+                    try:
+                        second = dt.second
+                    except Exception:
+                        second = 0
+                        logger.warning("unable to retrieve seconds")
 
             elif seacat_type in ('SBE911', 'SBE49', 'SBE37'):
                 # * System UpLoad Time = Sep 08 2008 14:18:19
@@ -229,6 +244,11 @@ class Seabird(AbstractTextReader):
                 dt = datetime.datetime(1, 1, 1).strptime(m.group('full'), '%b %d %Y %H:%M:%S')
                 yr, mon, day = dt.year, dt.month, dt.day
                 hour, minute = dt.hour, dt.minute
+                try:
+                    second = dt.second
+                except Exception:
+                    second = 0
+                    logger.warning("unable to retrieve seconds")
 
         except:  # bail out and look for the "start time" message that the Seabird Data processing program makes in the CNV file -- This is the download time from the SBE instrument
 
@@ -237,8 +257,13 @@ class Seabird(AbstractTextReader):
                 dt = datetime.datetime(1, 1, 1).strptime(dt_match.group('full'), '%b %d %Y %H:%M:%S')
                 yr, mon, day = dt.year, dt.month, dt.day
                 hour, minute = dt.hour, dt.minute
+                try:
+                    second = dt.second
+                except Exception:
+                    second = 0
+                    logger.warning("unable to retrieve seconds")
 
-        meta['timestamp'] = datetime.datetime(yr, mon, day, hour, minute)
+        meta['timestamp'] = datetime.datetime(yr, mon, day, hour, minute, second)
         logger.debug("timestamp: %s" % meta['timestamp'])
         meta['Time'] = "%02d:%02d" % (hour, minute)
         meta['Year'] = '%4d' % yr
