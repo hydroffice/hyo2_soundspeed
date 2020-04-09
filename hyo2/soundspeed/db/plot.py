@@ -11,7 +11,7 @@ import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 import logging
 
-matplotlib.use('qt5agg')
+# matplotlib.use('qt5agg')
 logger = logging.getLogger(__name__)
 
 
