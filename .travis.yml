@@ -40,7 +40,7 @@ install:
   - conda list --show-channel-urls
 
 script:
-  - py.test --cov
+  - coverage run --source hyo2 setup.py test
   - coverage report -m
   - coveralls
 
