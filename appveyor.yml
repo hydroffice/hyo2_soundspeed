@@ -1,8 +1,12 @@
-version: 0.1.{build}-{branch}
+version: 2020.0.{build}-{branch}
 
 environment:
 
   matrix:
+
+    - PYTHON_VERSION: 3.8
+      PYTHON_ARCH: x64
+      MINICONDA: C:\Miniconda36-x64
 
     - PYTHON_VERSION: 3.6
       PYTHON_ARCH: x64
@@ -30,33 +34,28 @@ install:
   - conda config --add channels conda-forge
   - conda create -q -n test-environment python=%PYTHON_VERSION%
   - activate test-environment
-  - pip install wheel
 
   # Check that we have the expected version of Python
   - python --version
 
-  - pip install pytest pytest-cov
-  - pip install coveralls
-  - pip install PySide2
+  - pip install coveralls PyYAML pytest pytest-cov wheel
   # for hyo2.abc
-  - conda install numpy matplotlib-base gdal pyproj appdirs bidict coverage psutil
+  - conda install appdirs bidict cartopy gdal matplotlib-base numpy psutil pyproj
+  - pip install PySide2
   # for hyo2.soundspeed
-  - conda install scipy basemap netCDF4 pillow gsw cython pyproj
+  - conda install gsw netCDF4 pillow pyserial scipy
   # --no-deps because of pip not detecting the installed GDAL
   - pip install https://github.com/hydroffice/hyo2_abc/archive/master.zip
 
 build: off
 build_script:
   - pip install .
-  # - conda remove --force PyQt Qt sip
-  - del /q %MINICONDA%\envs\test-environment\qt.conf
   - conda list --show-channel-urls
 
 test: off
 test_script:
   - py.test --cov
   - coverage report -m
-  - pip install PyYAML
   - coveralls
 
 after_test:

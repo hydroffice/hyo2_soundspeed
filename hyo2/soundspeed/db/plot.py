@@ -1,11 +1,13 @@
 import os
 import numpy as np
 
+# noinspection PyUnresolvedReferences
 from PySide2 import QtWidgets
 import matplotlib
 from matplotlib import rc_context
 
-from mpl_toolkits.basemap import Basemap
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 import logging
 
@@ -48,7 +50,7 @@ class PlotDb:
             os.makedirs(folder)
         return folder
 
-    def map_profiles(self, pks=None, output_folder=None, save_fig=False):
+    def map_profiles(self, pks=None, output_folder=None, save_fig=False, show_plot=False):
         """plot all the ssp in the database"""
 
         with rc_context(self.rc_context):
@@ -81,80 +83,59 @@ class PlotDb:
 
             # make the world map
             plt.close("Profiles Map")
-            fig = plt.figure("Profiles Map")
-            # fig.patch.set_facecolor('#1464F4')
-            ax = plt.subplot(111, aspect='equal')
+            _ = plt.figure("Profiles Map")
+            ax = plt.subplot(111, projection=ccrs.PlateCarree())
             plt.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
-            # plt.title("SSP Map (%s profiles)" % len(view_rows))
             plt.ioff()
+            # noinspection PyUnresolvedReferences
+            ax.coastlines(resolution='50m')
+            # noinspection PyUnresolvedReferences
+            ax.add_feature(cfeature.OCEAN.with_scale('50m'))
+            # noinspection PyUnresolvedReferences
+            ax.add_feature(cfeature.LAND.with_scale('50m'), color='lightgray')
+            # noinspection PyUnresolvedReferences
+            ax.gridlines(color='#cccccc', linestyle='--')
 
-            if rows:
-                wm = self._world_draw_polygons()
-            else:
-                wm = self._world_draw_map()
-            x, y = wm(ssp_x, ssp_y)
-            wm.scatter(x, y, marker='o', s=16, color='r')
-            wm.scatter(x, y, marker='.', s=1, color='k')
+            # noinspection PyUnresolvedReferences
+            ax.scatter(ssp_x, ssp_y, marker='o', s=14, color='r')
+            # noinspection PyUnresolvedReferences
+            ax.scatter(ssp_x, ssp_y, marker='.', s=1, color='k')
             if pks is not None:
                 delta = 5.0
-                y_min = min(y)
+                y_min = min(ssp_y)
                 if (y_min - delta) < -90.0:
                     y_min = -90.0
                 else:
                     y_min -= delta
-                y_max = max(y)
+                y_max = max(ssp_y)
                 if (y_max + delta) > 90.0:
                     y_max = 90.0
                 else:
                     y_max += delta
 
-                x_min = min(x)
+                x_min = min(ssp_x)
                 if (x_min - delta) < -180.0:
                     x_min = -180.0
                 else:
                     x_min = x_min - delta
-                x_max = max(x)
+                x_max = max(ssp_x)
                 if (x_max + delta) > 180.0:
                     x_max = 180.0
                 else:
                     x_max += delta
                 # logger.debug("%s %s, %s %s" % (y_min, y_max, x_min, x_max))
+                # noinspection PyUnresolvedReferences
                 ax.set_ylim(y_min, y_max)
+                # noinspection PyUnresolvedReferences
                 ax.set_xlim(x_min, x_max)
 
             if save_fig and (output_folder is not None):
                 plt.savefig(os.path.join(self.plots_folder(output_folder), 'ssp_map.png'),
                             bbox_inches='tight')
-            # else:
-            #     plt.show()
+            elif show_plot:
+                plt.show()
 
         return True
-
-    @staticmethod
-    def _world_draw_map():
-        logger.debug("drawing blue marble")
-        m = Basemap(resolution=None)
-        # resolution c, l, i, h, f in that order
-        img = m.bluemarble(zorder=0)
-        img.set_alpha(0.8)
-        return m
-
-    @staticmethod
-    def _world_draw_polygons():
-        logger.debug("drawing polygons")
-        m = None
-        try:
-            m = Basemap(resolution='i')
-        except OSError:
-            logger.debug("using low resolution for basemap")
-            m = Basemap(resolution='l')
-
-        m.drawcoastlines(zorder=1)
-        m.fillcontinents(color='lightgray', zorder=1)
-        m.drawparallels(np.arange(-90., 120., 10.), color="#cccccc", labels=[False, True, True, False])
-        m.drawmeridians(np.arange(0., 360., 20.), color="#cccccc", labels=[True, False, False, True])
-
-        return m
 
     @staticmethod
     def _set_inset_color(x, color):

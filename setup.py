@@ -2,7 +2,6 @@ import codecs
 import os
 import re
 
-# Always prefer setuptools over distutils
 from setuptools import setup, find_packages
 
 # ------------------------------------------------------------------
@@ -35,8 +34,12 @@ setup(
     version=find_version("hyo2", "soundspeed", "__init__.py"),
     license='LGPLv2.1 or CCOM-UNH Industrial Associate license',
 
-    namespace_packages=["hyo2"],
-    packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests", "*.test*", ]),
+    namespace_packages=[
+        "hyo2"
+    ],
+    packages=find_packages(exclude=[
+        "*.tests", "*.tests.*", "tests.*", "tests", "*.test*",
+    ]),
     package_data={
         "": [
             'soundspeed/listener/seacat/CONFIG/*.*',
@@ -49,15 +52,15 @@ setup(
     setup_requires=[
         "setuptools",
         "wheel",
+        "coverage"
     ],
     install_requires=[
         "hyo2.abc",
-        "gsw>=3.3.1",
+        "gsw",
         "netCDF4",
         "pillow",
         "pyserial",
-        "scipy",
-        "basemap"  # you may also need: conda install -c conda-forge basemap-data-hires
+        "scipy"
     ],
     python_requires='>=3.5',
     entry_points={
@@ -87,6 +90,8 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         'Topic :: Scientific/Engineering :: GIS',
         'Topic :: Office/Business :: Office Suites',
     ],
