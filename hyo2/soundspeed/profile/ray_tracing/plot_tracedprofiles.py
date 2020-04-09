@@ -11,7 +11,7 @@ import logging
 
 from hyo2.soundspeed.profile.ray_tracing.diff_tracedprofiles import DiffTracedProfiles
 
-matplotlib.use('qt5agg')
+# matplotlib.use('qt5agg')
 logger = logging.getLogger(__name__)
 
 
