@@ -193,8 +193,6 @@ class NavToolbar(NavigationToolbar2QT):
             self.mon_label.setStyleSheet("QLabel { color : red; }")
             vbox.addWidget(self.mon_label)
             # vbox.addStretch()
-        # reference holder for subplots_adjust window
-        self.adj_window = None
 
     def _update_buttons_checked(self):
         # sync button checkstates to match active mode

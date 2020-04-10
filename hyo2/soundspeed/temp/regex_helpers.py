@@ -354,7 +354,7 @@ class Profile(numpy.recarray):
         p.data.num_samples = len(self)
         col_types = []
         prof_data = []
-        for data, name in ((p.data.pressure, 'pressure'), (p.data.depth, 'depth')
+        for data, name in ((p.data.pressure, 'pressure'), (p.data.depth, 'depth'),
             (p.data.speed, 'soundspeed'), (p.data.temp, 'temperature'),
                            (p.data.sal, 'salinity'), (p.data.conductivity, 'conductivity')):
             if data is not None:

@@ -14,7 +14,7 @@ from hyo2.soundspeedmanager.widgets.widget import AbstractWidget
 from hyo2.soundspeedmanager.widgets.navtoolbar import NavToolbar
 
 logger = logging.getLogger(__name__)
-matplotlib.use('qt5agg')
+# matplotlib.use('qt5agg')
 
 
 class DataPlots(AbstractWidget):

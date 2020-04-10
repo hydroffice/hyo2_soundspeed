@@ -1504,10 +1504,10 @@ class SoundSpeedLibrary:
         _ = db.plot.raise_window()
         db.disconnect()
 
-    def map_db_profiles(self, pks: Optional[list] = None) -> bool:
+    def map_db_profiles(self, pks: Optional[list] = None, show_plot: Optional[bool] = False) -> bool:
         """List the profile on the db"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
-        ret = db.plot.map_profiles(pks=pks)
+        ret = db.plot.map_profiles(pks=pks, show_plot=show_plot)
         db.disconnect()
         return ret
 

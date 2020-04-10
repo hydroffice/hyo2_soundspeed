@@ -1,6 +1,14 @@
 History
 -------
 
+2020.0.0
+~~~~~~~~
+
+2020-04-09
+
+- Started migration from Basemap to Cartopy
+
+
 2019.0.0
 ~~~~~~~~
 

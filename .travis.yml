@@ -1,72 +1,52 @@
 language: cpp  # Travis-CI does not currently support Python and Mac OS X
 
-matrix:
-  include:
-    - os: linux
-      dist: xenial
-      env: PYTHON_VERSION=3.6
-    - os: linux
-      dist: trusty
-      env: PYTHON_VERSION=3.6
-    - os: linux
-      dist: xenial
-      env: PYTHON_VERSION=3.7
-    - os: osx
-      env: PYTHON_VERSION=3.6
+os:
+  - linux
+  - osx
 
+env:
+  - PYTHON_VERSION=3.8
+  - PYTHON_VERSION=3.6
+  - PYTHON_VERSION=3.7
+
+matrix:
   fast_finish: true
   allow_failures:
-    - os: linux
-      dist: trusty
-      env: PYTHON_VERSION=3.6
-    - os: linux
-      dist: xenial
-      env: PYTHON_VERSION=3.7
-    - os: osx
-      env: PYTHON_VERSION=3.6
+  - os: osx
+  - env: PYTHON_VERSION=3.7
 
 install:
-  - "export DISPLAY=:99.0"
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      ( sudo Xvfb :99 -ac -screen 0 1024x768x8; echo ok )&
-      curl https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -o miniconda.sh;
-    else
-      sudo apt-get update;
-      sudo apt-get install -y xvfb;
-      /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1920x1200x24 -ac +extension GLX +render -noreset;
-      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-    fi
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - hash -r
-  - conda config --set always_yes yes --set changeps1 no
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then MINICONDA_OS=Linux; else MINICONDA_OS=MacOSX; fi
+  - wget https://repo.anaconda.com/miniconda/Miniconda3-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
+  - bash miniconda.sh -b -p "$HOME"/miniconda
+  - source "$HOME"/miniconda/etc/profile.d/conda.sh
+  - conda config --set always_yes yes --set changeps1 no --set auto_update_conda false --set notify_outdated_conda false
   - conda config --add channels conda-forge
   - conda update -q conda
-  # Useful for debugging any issues with conda
   - conda info -a
-
   - conda create -q -n test-environment python=$PYTHON_VERSION
-  - source activate test-environment
+  - conda activate test-environment
+  - python --version
+
+  - pip install coveralls PyYAML pytest pytest-cov wheel
+  # for hyo2.abc
+  - conda install appdirs bidict cartopy gdal matplotlib-base numpy psutil pyproj
   - pip install PySide2
-  - conda install numpy matplotlib-base gdal pyproj scipy basemap netCDF4 pillow gsw
-  - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then
-      conda remove --force PyQt Qt sip;
-      export LD_LIBRARY_PATH=$HOME/miniconda/envs/test-environment/lib:$LD_LIBRARY_PATH;
-    fi
-  - pip install cython
-  - pip install coveralls
   - pip install https://github.com/hydroffice/hyo2_abc/archive/master.zip
+  # for hyo2.soundspeed
+  - conda install gsw netCDF4 pillow pyserial scipy
+
   - pip install .
-  - rm -f $HOME/miniconda/envs/test-environment/qt.conf
-  - pip install pytest pytest-cov
   - conda list --show-channel-urls
 
 script:
-  - py.test --cov
+  - coverage run --source hyo2 setup.py test
+  - coverage report -m
+  - coveralls
 
 after_script:
-  - coverage report -m
+  - python setup.py bdist_wheel
 
 after_success:
-  - pip install PyYAML
-  - coveralls
+  - path: dist\*
+

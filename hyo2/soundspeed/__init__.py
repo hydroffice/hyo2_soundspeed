@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 name = "Sound Speed"
-__version__ = '2019.2.6'
+__version__ = '2020.0.0'
 __copyright__ = 'Copyright 2020 University of New Hampshire, Center for Coastal and Ocean Mapping'
 
 lib_info = LibInfo()
@@ -44,6 +44,6 @@ lib_info.lib_dep_dict = {
     "numpy": "numpy",
     "pyproj": "pyproj",
     "matplotlib": "matplotlib",
-    "basemap": "mpl_toolkits.basemap",
+    "cartopy": "cartopy",
     "PySide2": "PySide2"
 }

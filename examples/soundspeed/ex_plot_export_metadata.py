@@ -2,6 +2,7 @@ import logging
 import os
 
 from hyo2.abc.lib.gdal_aux import GdalAux
+# noinspection PyUnresolvedReferences
 from hyo2.soundspeedmanager import app_info
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
@@ -22,8 +23,8 @@ lst = lib.db_list_profiles()
 logger.info("Profiles: %s" % len(lst))
 
 # plots/maps/exports
-# - map
-lib.map_db_profiles()
+# - mapt
+lib.map_db_profiles(show_plot=False)
 lib.save_map_db_profiles()
 
 # - aggregate plot

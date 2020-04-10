@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
 
 logger = logging.getLogger(__name__)
-matplotlib.use('qt5agg')
+# matplotlib.use('qt5agg')
 
 
 class PlotMultiProfileDialog(AbstractDialog):
