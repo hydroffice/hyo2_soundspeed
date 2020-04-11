@@ -21,7 +21,6 @@ from hyo2.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 from hyo2.soundspeed.base.setup import Setup
 from hyo2.soundspeed.db.db import ProjectDb
 from hyo2.soundspeed.listener.listeners import Listeners
-from hyo2.soundspeed.logger.sqlitelogging import SqliteLogging
 from hyo2.soundspeed.profile.profilelist import ProfileList
 from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeed.server.server import Server
@@ -73,9 +72,6 @@ class SoundSpeedLibrary:
         self.cb.sis_listener = self.listeners.sis4  # to provide default values from SIS4 (if available)
         self.cb.kctrl_listener = self.listeners.sis5  # to provide default values from SIS5 (if available)
         self.server = Server(prj=self)
-        self.logs = SqliteLogging(self._release_folder)  # (user and server) loggers
-
-        self.logging()  # Set on/off logging for user and server based on loaded settings
 
         # logger.info("** > LIB: initialized!")
 
@@ -352,26 +348,6 @@ class SoundSpeedLibrary:
     @property
     def desc_writers(self) -> list:
         return formats.desc_writers
-
-    # --- sqlite logging
-
-    def has_active_user_logger(self) -> bool:
-        return self.logs.user_active
-
-    def activate_user_logger(self, flag: bool) -> None:
-        if flag:
-            self.logs.activate_user_db()
-        else:
-            self.logs.deactivate_user_db()
-
-    def has_active_server_logger(self) -> bool:
-        return self.logs.server_active
-
-    def activate_server_logger(self, flag: bool) -> None:
-        if flag:
-            self.logs.activate_server_db()
-        else:
-            self.logs.deactivate_server_db()
 
     # --- ssp profile
 
@@ -2150,24 +2126,6 @@ class SoundSpeedLibrary:
             self.server.join(2)
         return not self.server.is_alive()
 
-    # --- logging
-
-    def logging(self) -> None:
-        """Set on/off logging for user and server"""
-        if self.setup.log_user:
-            if not self.logs.user_active:
-                self.logs.activate_user_db()
-        else:
-            if self.logs.user_active:
-                self.logs.deactivate_user_db()
-
-        if self.setup.log_server:
-            if not self.logs.server_active:
-                self.logs.activate_server_db()
-        else:
-            if self.logs.server_active:
-                self.logs.deactivate_server_db()
-
     # --- repr
 
     def __repr__(self) -> str:
@@ -2178,8 +2136,6 @@ class SoundSpeedLibrary:
 
         msg += "\n%s" % self.atlases
 
-        msg += "\n  <sqlite_loggers: user %s; server %s>\n" \
-               % (self.has_active_user_logger(), self.has_active_server_logger())
         msg += "\n%s" % self.setup
 
         return msg

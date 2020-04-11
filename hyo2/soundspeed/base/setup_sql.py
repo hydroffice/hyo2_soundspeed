@@ -83,9 +83,6 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      use_sis5 integer NOT NULL DEFAULT 0,
      use_sippican integer NOT NULL DEFAULT 0,
      use_mvp integer NOT NULL DEFAULT 0,
-     /* output */
-     log_user integer NOT NULL DEFAULT 0,
-     log_server integer NOT NULL DEFAULT 0,
      /* listeners - sis4 */
      sis_listen_port integer NOT NULL DEFAULT 16103,
      sis_listen_timeout integer NOT NULL DEFAULT 10,

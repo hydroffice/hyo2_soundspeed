@@ -98,9 +98,13 @@ class Output(AbstractWidget):
         self.sis_auto_apply_manual_casts.addItems(["True", "False"])
         hbox.addWidget(self.sis_auto_apply_manual_casts)
 
+        self.left_layout.addStretch()
+
+        # RIGHT
+
         # - server
         hbox = QtWidgets.QHBoxLayout()
-        self.left_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         hbox.addStretch()
         self.label = QtWidgets.QLabel("Server settings:")
         hbox.addWidget(self.label)
@@ -108,7 +112,7 @@ class Output(AbstractWidget):
 
         # - server_source
         hbox = QtWidgets.QHBoxLayout()
-        self.left_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtWidgets.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -128,7 +132,7 @@ class Output(AbstractWidget):
 
         # - server_apply_surface_sound_speed
         hbox = QtWidgets.QHBoxLayout()
-        self.left_layout.addLayout(hbox)
+        self.right_layout.addLayout(hbox)
         # -- label
         vbox = QtWidgets.QVBoxLayout()
         hbox.addLayout(vbox)
@@ -146,58 +150,6 @@ class Output(AbstractWidget):
         vbox.addWidget(self.server_apply_surface_sound_speed)
         vbox.addStretch()
 
-        self.left_layout.addStretch()
-
-        # RIGHT
-
-        # - Logging settings
-        hbox = QtWidgets.QHBoxLayout()
-        self.right_layout.addLayout(hbox)
-        hbox.addStretch()
-        self.label = QtWidgets.QLabel("SQLite logging:")
-        hbox.addWidget(self.label)
-        hbox.addStretch()
-
-        # - log_user
-        hbox = QtWidgets.QHBoxLayout()
-        self.right_layout.addLayout(hbox)
-        # -- label
-        vbox = QtWidgets.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        label = QtWidgets.QLabel("User logging:")
-        label.setFixedWidth(lbl_width)
-        vbox.addWidget(label)
-        vbox.addStretch()
-        # -- value
-        vbox = QtWidgets.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        self.log_user = QtWidgets.QComboBox()
-        self.log_user.addItems(["True", "False"])
-        vbox.addWidget(self.log_user)
-        vbox.addStretch()
-
-        # - log_server
-        hbox = QtWidgets.QHBoxLayout()
-        self.right_layout.addLayout(hbox)
-        # -- label
-        vbox = QtWidgets.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        label = QtWidgets.QLabel("Server logging:")
-        label.setFixedWidth(lbl_width)
-        vbox.addWidget(label)
-        vbox.addStretch()
-        # -- value
-        vbox = QtWidgets.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        self.log_server = QtWidgets.QComboBox()
-        self.log_server.addItems(["True", "False"])
-        vbox.addWidget(self.log_server)
-        vbox.addStretch()
-
         self.right_layout.addStretch()
 
         self.main_layout.addStretch()
@@ -213,13 +165,9 @@ class Output(AbstractWidget):
         # noinspection PyUnresolvedReferences
         self.sis_auto_apply_manual_casts.currentIndexChanged.connect(self.apply_sis_auto_apply_manual_casts)
         # noinspection PyUnresolvedReferences
-        self.log_user.currentIndexChanged.connect(self.apply_log_user)
-        # noinspection PyUnresolvedReferences
         self.server_source.currentIndexChanged.connect(self.apply_server_source)
         # noinspection PyUnresolvedReferences
         self.server_apply_surface_sound_speed.currentIndexChanged.connect(self.apply_server_apply_surface_sound_speed)
-        # noinspection PyUnresolvedReferences
-        self.log_server.currentIndexChanged.connect(self.apply_log_server)
 
     def new_client(self):
         logger.debug("new setup")
@@ -328,13 +276,6 @@ class Output(AbstractWidget):
         self.setup_changed()
         self.main_win.reload_settings()
 
-    def apply_log_user(self):
-        # logger.debug("apply log user")
-        self.db.log_user = self.log_user.currentText() == "True"
-        self.setup_changed()
-        self.main_win.reload_settings()
-        self.main_win.lib.logging()
-
     def apply_server_source(self):
         # logger.debug("apply server source")
         self.db.server_source = self.server_source.currentText()
@@ -347,25 +288,12 @@ class Output(AbstractWidget):
         self.setup_changed()
         self.main_win.reload_settings()
 
-    def apply_log_server(self):
-        # logger.debug("apply log server")
-        self.db.log_server = self.log_server.currentText() == "True"
-        self.setup_changed()
-        self.main_win.reload_settings()
-        self.main_win.lib.logging()
-
     def setup_changed(self):
         """Refresh the setup list"""
         # logger.debug("refresh clients")
 
         # set the top label
         self.active_label.setText("<b>Current setup: %s [#%02d]</b>" % (self.db.setup_name, self.db.active_setup_id))
-
-        # log_user
-        if self.db.log_user:
-            self.log_user.setCurrentIndex(0)  # True
-        else:
-            self.log_user.setCurrentIndex(1)  # False
 
         # extension source
         _str = self.db.server_source
@@ -383,12 +311,6 @@ class Output(AbstractWidget):
             self.server_apply_surface_sound_speed.setCurrentIndex(0)  # True
         else:
             self.server_apply_surface_sound_speed.setCurrentIndex(1)  # False
-
-        # log_server
-        if self.db.log_server:
-            self.log_server.setCurrentIndex(0)  # True
-        else:
-            self.log_server.setCurrentIndex(1)  # False
 
         # prepare the table
         self.client_list.clear()

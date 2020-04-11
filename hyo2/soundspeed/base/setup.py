@@ -71,8 +71,6 @@ class Setup:
         self.use_mvp = None
 
         # output
-        self.log_user = None
-        self.log_server = None
         self.client_list = ClientList()
 
         # listeners - sis4
@@ -175,8 +173,6 @@ class Setup:
         self.use_mvp = db.use_mvp
 
         # output
-        self.log_user = db.log_user
-        self.log_server = db.log_server
         # client list
         self.client_list = ClientList()  # to reset the list
         for client in db.client_list:
@@ -275,10 +271,6 @@ class Setup:
             db.use_sippican = self.use_sippican
             db.use_mvp = self.use_mvp
 
-            # output
-            db.log_user = self.log_user
-            db.log_server = self.log_server
-
             # client list
             db.delete_clients()
             for client in self.client_list.clients:
@@ -364,8 +356,6 @@ class Setup:
         msg += "      <use_sippican: %s>\n" % self.use_sippican
         msg += "      <use_mvp: %s>\n" % self.use_mvp
         msg += "    <output>\n"
-        msg += "      <log_user: %s>\n" % self.log_user
-        msg += "      <log_server: %s>\n" % self.log_server
         msg += "      <clients>\n"
         for c in self.client_list.clients:
             msg += "        <%s>\n" % c
