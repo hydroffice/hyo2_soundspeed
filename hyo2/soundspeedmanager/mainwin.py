@@ -130,7 +130,7 @@ class MainWin(QtWidgets.QMainWindow):
             self.tabs.setTabToolTip(self.idx_monitor, "Survey Data Monitor")
             logger.info("Support for Survey Monitor: ON")
         except Exception as e:
-            traceback.print_exc()
+            # traceback.print_exc()
             self.has_sdm_support = False
             logger.info("Support for Survey Monitor: OFF(%s)" % e)
         # server

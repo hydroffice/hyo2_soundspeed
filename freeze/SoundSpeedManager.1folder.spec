@@ -1,6 +1,4 @@
 # Builds a single-folder EXE for distribution.
-# Note that an "unbundled" distribution launches much more quickly, but
-# requires an installer program to distribute.
 #
 # To compile, execute the following within the source directory:
 #
@@ -8,11 +6,7 @@
 #
 # The resulting .exe file is placed in the dist/SoundSpeedManager folder.
 #
-# - It may require to manually copy DLL libraries.
-# - Uninstall PyQt and sip
-# - For QtWebEngine:
-#   . copy QtWebEngineProcess.exe in the root
-#   . copy in PySide2 both "resources" and "translations" folder
+# It may require to manually copy DLLs and other files.
 #
 
 from datetime import datetime
@@ -78,7 +72,7 @@ def python_path() -> str:
     return sys.prefix
 
 
-def collect_folder_data(input_data_folder: str, relative_output_folder: str):
+def collect_folder_data(input_data_folder: str, relative_output_folder: str, recursively: bool = False):
 
     data_toc = TOC()
     if not os.path.exists(input_data_folder):
@@ -88,31 +82,42 @@ def collect_folder_data(input_data_folder: str, relative_output_folder: str):
     for dir_path, dir_names, files in os.walk(input_data_folder):
         for f in files:
             source_file = os.path.join(dir_path, f)
-            dest_file = os.path.join(relative_output_folder, f)
+            dest_file = os.path.normpath(
+                os.path.join(relative_output_folder, os.path.relpath(dir_path, input_data_folder), f))
             data_toc.append((dest_file, source_file, 'DATA'))
-        break
+
+        if not recursively:
+            break
 
     return data_toc
 
 
-share_folder = os.path.join(python_path(), "Library", "share")
-output_folder = os.path.join("Library", "share")
+share_folder = os.path.join(python_path(), "Library", "share", "proj")
+output_folder = os.path.join("Library", "share", "proj")
 pyproj_data = collect_folder_data(input_data_folder=share_folder, relative_output_folder=output_folder)
-pyside2_data = collect_pkg_data('PySide2')
-# gsw_data = collect_pkg_data('gsw.utilities')
+share_folder = os.path.join(python_path(), "share", "cartopy")
+output_folder = os.path.join("share", "cartopy")
+cartopy_data = collect_folder_data(input_data_folder=share_folder, relative_output_folder=output_folder,
+                                   recursively=True)
+
 abc_data = collect_pkg_data('hyo2.abc')
-sdm_data = collect_pkg_data('hyo2.surveydatamonitor')
 ss_data = collect_pkg_data('hyo2.soundspeed')
 ssm_data = collect_pkg_data('hyo2.soundspeedmanager')
 sss_data = collect_pkg_data('hyo2.soundspeedsettings')
+try:
+    sdm_data = collect_pkg_data('hyo2.surveydatamonitor')
+except ImportError:
+    print("skipping hyo2.surveydatamonitor")
+    sdm_data = TOC()
 
-icon_file = os.path.join('freeze', 'SoundSpeedManager.ico')
+icon_file = os.path.normpath(os.path.join(os.curdir, 'SoundSpeedManager.ico'))
 if is_darwin:
-    icon_file = os.path.join('freeze', 'SoundSpeedManager.icns')
+    icon_file = os.path.normpath(os.path.join(os.curdir, 'SoundSpeedManager.icns'))
 
 a = Analysis(['SoundSpeedManager.py'],
              pathex=[],
-             hiddenimports=["PIL", "scipy._lib.messagestream", "cftime._cftime", "PySide2.QtPrintSupport"],
+             hiddenimports=["PIL", "scipy._lib.messagestream", "cftime._cftime", "PySide2.QtPrintSupport",
+                            "pyproj.datadir"],
              excludes=["IPython", "PyQt4", "PyQt5", "pandas", "sphinx", "sphinx_rtd_theme", "OpenGL_accelerate",
                        "FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter",
                        "wx"],
@@ -133,10 +138,9 @@ coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
-               # gsw_data,
                sdm_data,
                pyproj_data,
-               pyside2_data,
+               cartopy_data,
                abc_data,
                ss_data,
                ssm_data,
