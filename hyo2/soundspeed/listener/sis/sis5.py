@@ -78,8 +78,8 @@ class Sis5(AbstractListener):
         if self.id not in self.datagrams:
             return
 
-        logger.info("%s > DG %s [%s] > sz: %.2f KB"
-                    % (self.sender, self.id, name, len(this_data) / 1024))
+        # logger.info("%s > DG %s [%s] > sz: %.2f KB"
+        #             % (self.sender, self.id, name, len(this_data) / 1024))
 
         if self.id == b'#MRZ':
             self.mrz = kmall.KmallMRZ(this_data)

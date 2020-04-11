@@ -86,8 +86,8 @@ class Sis4(AbstractListener):
         except KeyError:
             name = "Unknown name"
 
-        logger.info("%s > DG %d/0x%x/%c [%s] > sz: %.2f KB"
-                    % (self.sender, self.id, self.id, self.id, name, len(this_data) / 1024))
+        # logger.info("%s > DG %d/0x%x/%c [%s] > sz: %.2f KB"
+        #             % (self.sender, self.id, self.id, self.id, name, len(this_data) / 1024))
 
         if not (self.id in self.datagrams):
             return

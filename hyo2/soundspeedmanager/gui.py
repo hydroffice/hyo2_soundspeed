@@ -7,7 +7,8 @@ from PySide2 import QtCore, QtWidgets
 from hyo2.abc.lib.logging import set_logging
 from hyo2.abc.app.app_style import AppStyle
 
-set_logging(ns_list=["hyo2.abc", "hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"])
+set_logging(ns_list=["hyo2.abc", "hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings",
+                     "hyo2.surveydatamonitor"])
 logger = logging.getLogger(__name__)
 
 
