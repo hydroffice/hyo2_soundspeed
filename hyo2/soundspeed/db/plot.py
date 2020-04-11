@@ -3,15 +3,13 @@ import numpy as np
 
 # noinspection PyUnresolvedReferences
 from PySide2 import QtWidgets
-import matplotlib
 from matplotlib import rc_context
 
 import cartopy.crs as ccrs
-import cartopy.feature as cfeature
+from cartopy.feature import NaturalEarthFeature
 import matplotlib.pyplot as plt
 import logging
 
-# matplotlib.use('qt5agg')
 logger = logging.getLogger(__name__)
 
 
@@ -87,47 +85,47 @@ class PlotDb:
             ax = plt.subplot(111, projection=ccrs.PlateCarree())
             plt.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
             plt.ioff()
-            # noinspection PyUnresolvedReferences
-            ax.coastlines(resolution='50m')
-            # noinspection PyUnresolvedReferences
-            ax.add_feature(cfeature.OCEAN.with_scale('50m'))
-            # noinspection PyUnresolvedReferences
-            ax.add_feature(cfeature.LAND.with_scale('50m'), color='lightgray')
-            # noinspection PyUnresolvedReferences
-            ax.gridlines(color='#cccccc', linestyle='--')
 
             # noinspection PyUnresolvedReferences
-            ax.scatter(ssp_x, ssp_y, marker='o', s=14, color='r')
+            ax.scatter(ssp_x, ssp_y, marker='o', s=14, color='r', zorder=4)
             # noinspection PyUnresolvedReferences
-            ax.scatter(ssp_x, ssp_y, marker='.', s=1, color='k')
-            if pks is not None:
-                delta = 5.0
-                y_min = min(ssp_y)
-                if (y_min - delta) < -90.0:
-                    y_min = -90.0
-                else:
-                    y_min -= delta
-                y_max = max(ssp_y)
-                if (y_max + delta) > 90.0:
-                    y_max = 90.0
-                else:
-                    y_max += delta
+            ax.scatter(ssp_x, ssp_y, marker='.', s=1, color='k', zorder=4)
 
-                x_min = min(ssp_x)
-                if (x_min - delta) < -180.0:
-                    x_min = -180.0
-                else:
-                    x_min = x_min - delta
-                x_max = max(ssp_x)
-                if (x_max + delta) > 180.0:
-                    x_max = 180.0
-                else:
-                    x_max += delta
-                # logger.debug("%s %s, %s %s" % (y_min, y_max, x_min, x_max))
-                # noinspection PyUnresolvedReferences
-                ax.set_ylim(y_min, y_max)
-                # noinspection PyUnresolvedReferences
-                ax.set_xlim(x_min, x_max)
+            delta = 5.0
+            y_min = min(ssp_y)
+            if (y_min - delta) < -90.0:
+                y_min = -90.0
+            else:
+                y_min -= delta
+            y_max = max(ssp_y)
+            if (y_max + delta) > 90.0:
+                y_max = 90.0
+            else:
+                y_max += delta
+
+            x_min = min(ssp_x)
+            if (x_min - delta) < -180.0:
+                x_min = -180.0
+            else:
+                x_min = x_min - delta
+            x_max = max(ssp_x)
+            if (x_max + delta) > 180.0:
+                x_max = 180.0
+            else:
+                x_max += delta
+            # logger.debug("%s %s, %s %s" % (y_min, y_max, x_min, x_max))
+            # noinspection PyUnresolvedReferences
+            ax.set_extent([x_min, x_max, y_min, y_max], crs=ccrs.PlateCarree())
+
+            scale = '110m'
+            # if (x_max - x_min) < 30 and (y_max - y_min) < 30:
+            #     scale = '50m'
+            ocean = NaturalEarthFeature('physical', 'ocean', scale, edgecolor='#777777',
+                                        facecolor="#5da1c9", zorder=2)
+            # noinspection PyUnresolvedReferences
+            ax.add_feature(ocean)
+            # noinspection PyUnresolvedReferences
+            ax.gridlines(color='#909090', linestyle='--', zorder=3)
 
             if save_fig and (output_folder is not None):
                 plt.savefig(os.path.join(self.plots_folder(output_folder), 'ssp_map.png'),
@@ -207,11 +205,10 @@ class PlotDb:
 
         # start a new figure
         plt.close("Aggregate Plot")
-        fig = plt.figure("Aggregate Plot")
+        fig, ax = plt.subplots(num="Aggregate Plot")
         plt.title("Aggregate SSP plot [from: %s to: %s]" % (dates[0], dates[1]))
-        ax = fig.add_subplot(111)
         ax.invert_yaxis()
-        ax.set_xlim(1460, 1580)
+        ax.set_xlim(1440, 1580)
         ax.set_ylim(780, 0)
         plt.xlabel('Sound Speed [m/s]', fontsize=10)
         plt.ylabel('Depth [m]', fontsize=10)
@@ -288,13 +285,14 @@ class PlotDb:
         date_plots = dict()
         for date in date_list:
             date_plots[date] = 0
-            fig = plt.figure(date_list.index(date))
-            ax = fig.add_subplot(111)
+            fig, ax = plt.subplots(num=date_list.index(date))
             ax.invert_yaxis()
+            logger.info("create: %s" % date_list.index(date))
 
         # plot each profile
         for row in rows:
             row_date = row[1].date()  # 1 is the cast_datetime
+            logger.info("plot: %s" % date_list.index(row_date))
             date_plots[row_date] += 1
 
             fig = plt.figure(date_list.index(row_date))
@@ -310,7 +308,7 @@ class PlotDb:
             fig = plt.figure(date_list.index(date))
 
             plt.title("Day #%s: %s (profiles: %s)" % (date_list.index(date) + 1, date, date_plots[date]))
-            fig.get_axes()[0].set_xlim(1460, 1580)
+            fig.get_axes()[0].set_xlim(1440, 1580)
             fig.get_axes()[0].set_ylim(780, 0)
             plt.xlabel('Sound Speed [m/s]', fontsize=10)
             plt.ylabel('Depth [m]', fontsize=10)

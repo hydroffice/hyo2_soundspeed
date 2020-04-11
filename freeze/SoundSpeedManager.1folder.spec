@@ -95,8 +95,8 @@ def collect_folder_data(input_data_folder: str, relative_output_folder: str, rec
 share_folder = os.path.join(python_path(), "Library", "share", "proj")
 output_folder = os.path.join("Library", "share", "proj")
 pyproj_data = collect_folder_data(input_data_folder=share_folder, relative_output_folder=output_folder)
-share_folder = os.path.join(python_path(), "share", "cartopy")
-output_folder = os.path.join("share", "cartopy")
+share_folder = os.path.join(python_path(), "share", "cartopy", "shapefiles", "natural_earth", "physical")
+output_folder = os.path.join("cartopy", "data", "shapefiles", "natural_earth", "physical")
 cartopy_data = collect_folder_data(input_data_folder=share_folder, relative_output_folder=output_folder,
                                    recursively=True)
 
@@ -119,8 +119,8 @@ a = Analysis(['SoundSpeedManager.py'],
              hiddenimports=["PIL", "scipy._lib.messagestream", "cftime._cftime", "PySide2.QtPrintSupport",
                             "pyproj.datadir"],
              excludes=["IPython", "PyQt4", "PyQt5", "pandas", "sphinx", "sphinx_rtd_theme", "OpenGL_accelerate",
-                       "FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter",
-                       "wx"],
+                       "FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter", "wx",
+                       "cartopy_offlinedata", "cartopy_userconfig"],
              hookspath=None,
              runtime_hooks=None)
 
