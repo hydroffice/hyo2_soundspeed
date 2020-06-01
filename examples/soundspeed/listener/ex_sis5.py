@@ -2,8 +2,11 @@ import time
 import logging
 
 from hyo2.soundspeed.listener.sis.sis5 import Sis5
+from hyo2.abc.lib.logging import set_logging
 
-logging.basicConfig(level=logging.DEBUG)
+ns_list = ["hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"]
+set_logging(ns_list=ns_list)
+
 logger = logging.getLogger(__name__)
 
 listen_ip = "224.1.20.40"

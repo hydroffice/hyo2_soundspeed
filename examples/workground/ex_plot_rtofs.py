@@ -8,14 +8,16 @@ from matplotlib import pyplot as plt
 import netCDF4
 
 from hyo2.abc.lib.testing import Testing
+from hyo2.abc.lib.logging import set_logging
 
-logging.basicConfig(level=logging.DEBUG,
-                    format="%(levelname)-9s %(name)s.%(funcName)s:%(lineno)d > %(message)s")
+ns_list = ["hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"]
+set_logging(ns_list=ns_list)
 logger = logging.getLogger(__name__)
 
 testing = Testing(root_folder=os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)))
 
 nc_path = testing.download_test_files(ext=".nc", subfolder="rtofs")[1]
+
 logger.debug("path: %s" % nc_path)
 
 # Extract the surface temperature field from the model

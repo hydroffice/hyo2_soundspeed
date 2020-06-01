@@ -3,15 +3,17 @@ import logging
 
 import numpy as np
 
-from hyo2.abc.lib.logging import set_logging
 from hyo2.soundspeed.profile.profile import Profile
 from hyo2.soundspeed.profile.profilelist import ProfileList
 from hyo2.soundspeed.profile.ray_tracing.tracedprofile import TracedProfile
 from hyo2.soundspeed.profile.ray_tracing.diff_tracedprofiles import DiffTracedProfiles
 from hyo2.soundspeed.profile.ray_tracing.plot_tracedprofiles import PlotTracedProfiles
+from hyo2.abc.lib.logging import set_logging
+
+ns_list = ["hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"]
+set_logging(ns_list=ns_list)
 
 logger = logging.getLogger(__name__)
-set_logging(ns_list=["hyo2.soundspeed", ])
 
 
 # create an example profile for testing

@@ -1,16 +1,17 @@
-from datetime import datetime as dt, date, timedelta
 from http import client
 from urllib import parse
 import socket
 import logging
-
 from netCDF4 import Dataset
 
-logging.basicConfig(level=logging.DEBUG,
-                    format="%(levelname)-9s %(name)s.%(funcName)s:%(lineno)d > %(message)s")
+from hyo2.abc.lib.logging import set_logging
+
+ns_list = ["hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"]
+set_logging(ns_list=ns_list)
+
 logger = logging.getLogger(__name__)
 
-url = r"https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/GOMOFS/MODELS/201903/nos.gomofs.regulargrid.n003.20190327.t00z.nc"
+url = r"https://prod.opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/GOMOFS/MODELS/2020/06/01/nos.gomofs.regulargrid.n003.20200601.t00z.nc"
 
 try:
     p = parse.urlparse(url)
@@ -30,3 +31,7 @@ _lon = file_temp.variables['Longitude'][:]
 
 logger.debug("latitude: %s" % _lat[-1, -1])
 logger.debug("longitude: %s" % _lon[-1, -1])
+
+t = file_temp.variables['temp'][0:1, :][..., 0:1, 0:1]
+logger.debug(t.shape)
+s = file_temp.variables['salt'][0:1, :][..., 0:1, 0:1]

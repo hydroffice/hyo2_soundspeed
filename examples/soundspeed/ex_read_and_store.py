@@ -7,10 +7,11 @@ from hyo2.soundspeedmanager import app_info
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 from hyo2.soundspeed.base.testing import SoundSpeedTesting
 from hyo2.soundspeed.base.callbacks.fake_callbacks import FakeCallbacks
+from hyo2.abc.lib.logging import set_logging
 
+ns_list = ["hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"]
+set_logging(ns_list=ns_list)
 
-logging.basicConfig(level=logging.DEBUG,
-                    format="%(levelname)-9s %(name)s.%(funcName)s:%(lineno)d > %(message)s")
 logger = logging.getLogger(__name__)
 
 # create a project with test-callbacks

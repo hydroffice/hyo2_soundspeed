@@ -5,9 +5,16 @@ from enum import IntEnum
 from PySide2 import QtWidgets
 
 from hyo2.abc.app.qt_progress import QtProgress
+from hyo2.abc.lib.logging import set_logging
 from hyo2.soundspeedmanager import app_info
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 from hyo2.soundspeedmanager.qt_callbacks import QtCallbacks
+
+
+ns_list = ["hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"]
+set_logging(ns_list=ns_list)
+
+logger = logging.getLogger(__name__)
 
 
 class ModelOptions(IntEnum):
@@ -40,13 +47,8 @@ class ModelOptions(IntEnum):
     SFBOFS = 41  # RG = True     # Format is GoMOFS
 
 
-# Setup Logger
-logging.basicConfig(level=logging.DEBUG,
-                    format="%(levelname)-9s %(name)s.%(funcName)s:%(lineno)d > %(message)s")
-logger = logging.getLogger(__name__)
-
 # Choose Model
-switch = ModelOptions.TBOFS  # Choose a ModelOptions Value to test
+switch = ModelOptions.CBOFS  # Choose a ModelOptions Value to test
 
 app = QtWidgets.QApplication([])  # PySide stuff (start)
 mw = QtWidgets.QMainWindow()
@@ -61,13 +63,13 @@ tests = [
     # (72.852028, -67.315431, dt.utcnow())      # Baffin Bay
     # (18.2648113, 16.1761115, dt.utcnow()),    # in land -> middle of Africa
     # (39.725989, -104.967745, dt.utcnow())     # in land -> Denver, CO
-    # (37.985427, -76.311156, dt.utcnow()),     # Chesapeake Bay
+    (37.985427, -76.311156, dt.utcnow()),     # Chesapeake Bay
     # (39.162802, -75.278057, dt.utcnow()),     # Deleware Bay
     # (43.026480, -70.318824, dt.utcnow()),     # offshore Portsmouth
     # (40.662218, -74.049306, dt.utcnow())      # New York Harbor
     # (30.382518, -81.573615, dt.utcnow())      # Mill Cove, St. Johns River
     # (28.976225, -92.078882, dt. utcnow())     # Offshore Louisiana
-    (27.762904, -82.557280, dt.utcnow())      # Tampa Bay
+    # (27.762904, -82.557280, dt.utcnow())      # Tampa Bay
     # (41.806023, -82.393283, dt.utcnow())      # Lake Erie
     # (44.564914, -82.845794, dt.utcnow())      # Lake Huron
     # (43.138573, -86.832183, dt.utcnow())      # Lake Michigan

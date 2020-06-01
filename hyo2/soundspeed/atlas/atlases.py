@@ -4,7 +4,8 @@ import logging
 from hyo2.soundspeed.atlas.woa09 import Woa09
 from hyo2.soundspeed.atlas.woa13 import Woa13
 from hyo2.soundspeed.atlas.rtofs import Rtofs
-from hyo2.soundspeed.atlas.regofs import RegOfs
+from hyo2.soundspeed.atlas.regofsonline import RegOfsOnline
+from hyo2.soundspeed.atlas.regofsoffline import RegOfsOffline
 
 logger = logging.getLogger(__name__)
 
@@ -60,20 +61,22 @@ class Atlases:
         self.woa13 = Woa13(data_folder=woa13_folder, prj=self.prj)
         self.rtofs = Rtofs(data_folder=rtofs_folder, prj=self.prj)
 
-        self.cbofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfs.Model.CBOFS)
-        self.dbofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfs.Model.DBOFS)
-        self.gomofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfs.Model.GoMOFS)
-        self.nyofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfs.Model.NYOFS)
-        self.sjrofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfs.Model.SJROFS)
-        self.ngofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfs.Model.NGOFS)
-        self.tbofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfs.Model.TBOFS)
-        self.leofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfs.Model.LEOFS)
-        self.lhofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfs.Model.LHOFS)
-        self.lmofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfs.Model.LMOFS)
-        self.loofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfs.Model.LOOFS)
-        self.lsofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfs.Model.LSOFS)
-        self.creofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfs.Model.CREOFS)
-        self.sfbofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfs.Model.SFBOFS)
+        self.cbofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.CBOFS)
+        self.dbofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.DBOFS)
+        self.gomofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.GoMOFS)
+        self.nyofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.NYOFS)
+        self.sjrofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.SJROFS)
+        self.ngofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.NGOFS)
+        self.tbofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.TBOFS)
+        self.leofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.LEOFS)
+        self.lhofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.LHOFS)
+        self.lmofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.LMOFS)
+        self.loofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.LOOFS)
+        self.lsofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.LSOFS)
+        self.creofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.CREOFS)
+        self.sfbofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.SFBOFS)
+
+        self.offofs = RegOfsOffline(data_folder=self._regofs_folder, prj=self.prj)
 
     @property
     def atlases_folder(self):
@@ -95,6 +98,7 @@ class Atlases:
     def regofs_folder(self):
         return self._regofs_folder
 
+    # noinspection DuplicatedCode
     def __repr__(self):
         msg = "  <atlases>\n"
         msg += "  %s" % self.woa09

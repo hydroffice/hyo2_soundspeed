@@ -9,15 +9,16 @@ from datetime import datetime
 import numpy as np
 from matplotlib import pyplot as plt
 
-from hyo2.abc.lib.logging import set_logging
 from hyo2.soundspeed.profile.profile import Profile
 from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeed.profile.profilelist import ProfileList
 from hyo2.soundspeed.profile.ray_tracing.tracedprofile import TracedProfile
+from hyo2.abc.lib.logging import set_logging
 
+ns_list = ["hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"]
+set_logging(ns_list=ns_list)
 
 logger = logging.getLogger(__name__)
-set_logging(ns_list=["hyo2.soundspeed", ])
 
 
 # create an example profile for testing

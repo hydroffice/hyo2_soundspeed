@@ -3,9 +3,11 @@ import logging
 import numpy as np
 
 from hyo2.soundspeed.profile.oceanography import Oceanography as Oc
+from hyo2.abc.lib.logging import set_logging
 
+ns_list = ["hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"]
+set_logging(ns_list=ns_list)
 
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # gold ref using the matlab script: generate_gsw_trusted_values.m and GSW 3.05

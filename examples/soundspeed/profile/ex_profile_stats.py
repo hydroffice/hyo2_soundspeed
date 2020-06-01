@@ -5,8 +5,11 @@ import logging
 import numpy as np
 
 from hyo2.soundspeed.profile.profile import Profile
+from hyo2.abc.lib.logging import set_logging
 
-logging.basicConfig(level=logging.DEBUG)
+ns_list = ["hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"]
+set_logging(ns_list=ns_list)
+
 logger = logging.getLogger(__name__)
 
 

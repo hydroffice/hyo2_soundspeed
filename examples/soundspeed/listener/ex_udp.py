@@ -2,7 +2,11 @@ from subprocess import check_output
 import socket
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+from hyo2.abc.lib.logging import set_logging
+
+ns_list = ["hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"]
+set_logging(ns_list=ns_list)
+
 logger = logging.getLogger(__name__)
 
 

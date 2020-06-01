@@ -3,9 +3,11 @@ import logging
 from PySide2 import QtWidgets
 
 from hyo2.soundspeedmanager.dialogs.multi_selection_dialog import MultiSelectionDialog
+from hyo2.abc.lib.logging import set_logging
 
+ns_list = ["hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"]
+set_logging(ns_list=ns_list)
 
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 app = QtWidgets.QApplication([])

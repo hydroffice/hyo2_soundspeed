@@ -20,7 +20,7 @@ from hyo2.soundspeed.profile.oceanography import Oceanography as Oc
 logger = logging.getLogger(__name__)
 
 
-class RegOfs(AbstractAtlas):
+class RegOfsOnline(AbstractAtlas):
     """GoMOFS atlas"""
 
     class Model(IntEnum):
@@ -143,8 +143,12 @@ class RegOfs(AbstractAtlas):
         logger.debug("query: %s @ (%.6f, %.6f)" % (dtstamp, lon, lat))
 
         # check the inputs
-        if (lat is None) or (lon is None) or (dtstamp is None):
-            logger.error("invalid query: %s @ (%s, %s)" % (dtstamp.strftime("%Y/%m/%d %H:%M:%S"), lon, lat))
+        if (lat is None) or (lon is None):
+            logger.error("invalid location query: %s @ (%s, %s)" % (dtstamp.strftime("%Y/%m/%d %H:%M:%S"), lon, lat))
+            return None
+
+        if dtstamp is None:
+            logger.error("invalid time query: (%s, %s)" % (lon, lat))
             return None
 
         try:
@@ -181,8 +185,9 @@ class RegOfs(AbstractAtlas):
         logger.info("updated search window: (%s, %s)" % (lat_search_window, lon_search_window))
 
         # Need +1 on the north and east indices since it is the "stop" value in these slices
-        t = self._file.variables['temp'][self._day_idx, :, lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
-        s = self._file.variables['salt'][self._day_idx, :, lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
+        t = self._file.variables['temp'][self._day_idx, :][..., lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
+        # logger.debug('t shape: %s' % (t.shape, ))
+        s = self._file.variables['salt'][self._day_idx, :][..., lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
         # Set 'unfilled' elements to NANs (BUT when the entire array has valid data, it returns numpy.ndarray)
         if isinstance(t, np.ma.core.MaskedArray):
             t_mask = t.mask
@@ -195,6 +200,7 @@ class RegOfs(AbstractAtlas):
 
         # Calculate distances from requested position to each of the grid node locations
         distances = np.zeros((self._d.size, lon_search_window, lat_search_window))
+        # logger.debug('distances shape: %s' % (distances.shape,))
         longitudes = self._lon[lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
         latitudes = self._lat[lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
 
@@ -334,30 +340,35 @@ class RegOfs(AbstractAtlas):
 
     def _build_check_url(self, input_date: dt, name: str) -> str:
         """make up the url to use for salinity and temperature"""
-        # Primary server: https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/GOMOFS/MODELS/201901/
-        #                 nos.gomofs.regulargrid.n006.20190115.t18z.nc
+        # Primary server: https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/GOMOFS/MODELS/2020/06/01/
+        #                 nos.gomofs.regulargrid.n006.20200601.t00z.nc
         if (name == self.Model.NGOFS.name) or (name == self.Model.CREOFS.name) or (name == self.Model.SFBOFS.name):
-            url = 'https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/%s/MODELS/%s/' \
+            url = 'https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/%s/MODELS/%s/%s/%s/' \
                   'nos.%s.regulargrid.n003.%s.t03z.nc' \
-                  % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
+                  % (name.upper(), input_date.strftime("%Y"), input_date.strftime("%m"), input_date.strftime("%d"),
+                     name.lower(), input_date.strftime("%Y%m%d"))
         else:
-            url = 'https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/%s/MODELS/%s/' \
+            url = 'https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/%s/MODELS/%s/%s/%s/' \
                   'nos.%s.regulargrid.n003.%s.t00z.nc' \
-                    % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
+                  % (name.upper(), input_date.strftime("%Y"), input_date.strftime("%m"), input_date.strftime("%d"),
+                     name.lower(), input_date.strftime("%Y%m%d"))
+
         return url
 
     def _build_opendap_url(self, input_date: dt, name: str) -> str:
         """make up the url to use for salinity and temperature"""
-        # Primary server: https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/GOMOFS/MODELS/201901/
-        #                 nos.gomofs.regulargrid.n006.20190115.t18z.nc
+        # Primary server: https://prod.opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/GOMOFS/MODELS/2020/06/01/
+        #                 nos.gomofs.regulargrid.n006.20200601.t00z.nc
         if (name == self.Model.NGOFS.name) or (name == self.Model.CREOFS.name) or (name == self.Model.SFBOFS.name):
-            url = 'https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/%s/MODELS/%s/' \
+            url = 'https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/%s/MODELS/%s/%s/%s/' \
                   'nos.%s.regulargrid.n003.%s.t03z.nc' \
-                  % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
+                  % (name.upper(), input_date.strftime("%Y"), input_date.strftime("%m"), input_date.strftime("%d"),
+                     name.lower(), input_date.strftime("%Y%m%d"))
         else:
-            url = 'https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/%s/MODELS/%s/' \
+            url = 'https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/%s/MODELS/%s/%s/%s/' \
                   'nos.%s.regulargrid.n003.%s.t00z.nc' \
-                  % (name.upper(), input_date.strftime("%Y%m"), name.lower(), input_date.strftime("%Y%m%d"))
+                  % (name.upper(), input_date.strftime("%Y"), input_date.strftime("%m"), input_date.strftime("%d"),
+                     name.lower(), input_date.strftime("%Y%m%d"))
         return url
 
     def _download_files(self, dtstamp: dt, server_mode: bool = False):
