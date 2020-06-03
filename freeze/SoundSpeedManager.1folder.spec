@@ -104,20 +104,21 @@ abc_data = collect_pkg_data('hyo2.abc')
 ss_data = collect_pkg_data('hyo2.soundspeed')
 ssm_data = collect_pkg_data('hyo2.soundspeedmanager')
 sss_data = collect_pkg_data('hyo2.soundspeedsettings')
+pyside2_data = collect_pkg_data('PySide2')
 try:
     sdm_data = collect_pkg_data('hyo2.surveydatamonitor')
 except ImportError:
     print("skipping hyo2.surveydatamonitor")
     sdm_data = TOC()
 
-icon_file = os.path.normpath(os.path.join(os.curdir, 'SoundSpeedManager.ico'))
+icon_file = 'freeze\SoundSpeedManager.ico'
 if is_darwin:
-    icon_file = os.path.normpath(os.path.join(os.curdir, 'SoundSpeedManager.icns'))
+    icon_file = 'freeze\SoundSpeedManager.icns'
 
 a = Analysis(['SoundSpeedManager.py'],
              pathex=[],
              hiddenimports=["PIL", "scipy._lib.messagestream", "cftime._cftime", "PySide2.QtPrintSupport",
-                            "pyproj.datadir"],
+                            "pyproj.datadir", "pkg_resources.py2_warn"],
              excludes=["IPython", "PyQt4", "PyQt5", "pandas", "sphinx", "sphinx_rtd_theme", "OpenGL_accelerate",
                        "FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter", "wx",
                        "cartopy_offlinedata", "cartopy_userconfig"],
@@ -145,6 +146,7 @@ coll = COLLECT(exe,
                ss_data,
                ssm_data,
                sss_data,
+               pyside2_data,
                strip=None,
                upx=True,
                name='SoundSpeedManager.%s%s' % (ssm_version, beta))
