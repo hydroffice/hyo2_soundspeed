@@ -1,7 +1,8 @@
+from datetime import datetime as dt
 import os
 from enum import IntEnum
 import logging
-from typing import Optional, Union
+from typing import Optional
 from netCDF4 import Dataset, num2date
 
 from hyo2.soundspeed.base.geodesy import Geodesy
@@ -69,6 +70,7 @@ class RegOfsOffline:
 
         self._file = None
         self._day_idx = 0
+        self._timestamp = None
         self._zeta = None
         self._siglay = None
         self._h = None
@@ -78,6 +80,8 @@ class RegOfsOffline:
         self._lon = None
         self._loc_idx = None
         self._d = None
+        self._temp = None
+        self._sal = None
 
     def query(self, nc_path: str, lat: float, lon: float) -> Optional[ProfileList]:
         if not os.path.exists(nc_path):
@@ -102,6 +106,12 @@ class RegOfsOffline:
             return None
 
         try:
+            self.name = self._file.title
+
+            time = self._file.variables['time']
+            self._timestamp = num2date(time[0], units=time.units)
+            logger.debug("Retrieved time: %s" % self._timestamp.isoformat())
+
             # Now get latitudes, longitudes and depths for x,y,z referencing
             self._lats = self._file.variables['lat'][:]
             self._lons = self._file.variables['lon'][:]
@@ -111,9 +121,14 @@ class RegOfsOffline:
             self._zeta = self._file.variables['zeta'][0, :]
             self._siglay = self._file.variables['siglay'][:]
             self._h = self._file.variables['h'][:]
-            logger.debug('zeta:(%s)\n%s' % (self._zeta.shape, self._zeta))
-            logger.debug('siglay:(%s)\n%s' % (self._siglay.shape, self._siglay[:, 0]))
-            logger.debug('h:(%s)\n%s' % (self._h.shape, self._h))
+            # logger.debug('zeta:(%s)\n%s' % (self._zeta.shape, self._zeta))
+            # logger.debug('siglay:(%s)\n%s' % (self._siglay.shape, self._siglay[:, 0]))
+            # logger.debug('h:(%s)\n%s' % (self._h.shape, self._h))
+
+            self._temp = self._file.variables['temp'][:]
+            self._sal = self._file.variables['salinity'][:]
+            # logger.debug('temp:(%s)\n%s' % (self._temp.shape, self._temp[:, 0]))
+            # logger.debug('sal:(%s)\n%s' % (self._sal.shape, self._sal[:, 0]))
 
         except Exception as e:
             logger.error("troubles in variable lookup for lat/long grid and/or depth: %s" % e)
@@ -148,22 +163,28 @@ class RegOfsOffline:
 
         zeta = self._zeta[self._loc_idx]
         h = self._h[self._loc_idx]
-        siglay = self._siglay[:, self._loc_idx]
+        siglay = -self._siglay[:, self._loc_idx]
         # logger.debug('zeta: %s, h: %s, siglay: %s' % (zeta, h, siglay))
-        self._d = zeta + siglay * (h + zeta)
-        logger.debug('d:(%s)\n%s' % (self._h.shape, self._d))
+        self._d = siglay * (h + zeta)
+        # logger.debug('d:(%s)\n%s' % (self._h.shape, self._d))
 
         # Make a new SV object to return our query in
         ssp = Profile()
         ssp.meta.sensor_type = Dicts.sensor_types['Synthetic']
-        # ssp.meta.probe_type = Dicts.probe_types[self.name]
+        ssp.meta.probe_type = Dicts.probe_types[self.name]
         ssp.meta.latitude = self._lat
         ssp.meta.longitude = self._lon
-        # ssp.meta.utc_time = dt(year=dtstamp.year, month=dtstamp.month, day=dtstamp.day,
-        #                        hour=dtstamp.hour, minute=dtstamp.minute, second=dtstamp.second)
-        # ssp.meta.original_path = "%s_%s" % (self.name, dtstamp.strftime("%Y%m%d_%H%M%S"))
+        ssp.meta.utc_time = dt(year=self._timestamp.year, month=self._timestamp.month,
+                               day=self._timestamp.day, hour=self._timestamp.hour,
+                               minute=self._timestamp.minute, second=self._timestamp.second)
+        ssp.meta.original_path = "%s_%s" % (self.name, self._timestamp.strftime("%Y%m%d_%H%M%S"))
         ssp.init_data(self._d.shape[0])
         ssp.data.depth = self._d[:]
+        ssp.data.temp = self._temp[0, :, self._loc_idx]
+        ssp.data.sal = self._sal[0, :, self._loc_idx]
+        ssp.calc_data_speed()
+        ssp.clone_data_to_proc()
+        ssp.init_sis()
 
         profiles = ProfileList()
         profiles.append_profile(ssp)
@@ -177,6 +198,25 @@ class RegOfsOffline:
         if self._has_data_loaded:
             if self._file:
                 self._file.close()
-            self._file = None
 
         self._has_data_loaded = False  # grids are "loaded" ? (netCDF files are opened)
+        self._file = None
+        self._day_idx = 0
+        self._timestamp = None
+        self._zeta = None
+        self._siglay = None
+        self._h = None
+        self._lats = None
+        self._lons = None
+        self._lat = None
+        self._lon = None
+        self._loc_idx = None
+        self._d = None
+        self._temp = None
+        self._sal = None
+
+    def __repr__(self):
+        msg = "%s" % super().__repr__()
+        msg += "      <has data loaded: %s>\n" % (self._has_data_loaded,)
+        msg += "      <loaded day: %s>\n" % (self._timestamp.strftime(r"%d\%m\%Y"),)
+        return msg

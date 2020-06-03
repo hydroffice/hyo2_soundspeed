@@ -133,12 +133,12 @@ class ImportSingleProfileDialog(AbstractDialog):
         btn.setToolTip("Retrieve synthetic data from WOA13 Atlas")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_click_woa13)
-        # ---- RTOFS
-        btn = QtWidgets.QPushButton("RTOFS")
+        # -- Offline OFS
+        btn = QtWidgets.QPushButton("OFS .nc")
         self.leftRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
-        btn.setToolTip("Retrieve synthetic data from RTOFS Atlas")
+        btn.setToolTip("Retrieve synthetic data from RegOFS .nc files")
         # noinspection PyUnresolvedReferences
-        btn.clicked.connect(self.on_click_rtofs)
+        btn.clicked.connect(self.on_click_offofs)
 
         # -- mid button box
         # noinspection PyUnresolvedReferences
@@ -147,6 +147,12 @@ class ImportSingleProfileDialog(AbstractDialog):
         self.retrieveSources.addWidget(self.midRetrieveButtonBox)
 
         # --- add buttons
+        # ---- RTOFS
+        btn = QtWidgets.QPushButton("RTOFS")
+        self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from RTOFS Atlas")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_click_rtofs)
         # ---- CBOFS
         btn = QtWidgets.QPushButton("CBOFS")
         self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
@@ -718,6 +724,25 @@ class ImportSingleProfileDialog(AbstractDialog):
             msg = 'Issue in importing the TBOFS data:\n\n> %s' % e
             # noinspection PyCallByClass
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            self.progress.end()
+            return
+
+        self.accept()
+        self.progress.end()
+
+    def on_click_offofs(self):
+        """Retrieve Regional OFS"""
+
+        self.progress.start(text='Retrieve from .nc OFS')
+        self.progress.update(value=30)
+
+        try:
+            self.lib.retrieve_offofs()
+
+        except RuntimeError as e:
+            msg = 'Issue in retrieving the regional OFS data:\n\n> %s' % e
+            # noinspection PyCallByClass
+            QtWidgets.QMessageBox.critical(self, "Retrieve error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return
 

@@ -876,6 +876,23 @@ class SoundSpeedLibrary:
 
         self.ssp = self.atlases.lsofs.query(lat=lat, lon=lon, dtstamp=utc_time)
 
+    def retrieve_offofs(self) -> None:
+        """Retrieve data from regional OFS nc file"""
+
+        nc_path = self.cb.ask_filename(saving=False, key_name="Seacat/AlternateConFilePath",
+                                       title="Select the NetCDF with OFS fields",
+                                       file_filter="OFS NetCDF file (*.nc)")
+        nc_basename = os.path.basename(nc_path)
+        if 'fields' not in nc_basename:
+            logger.error("wrong .nc files: %s -> missing 'fields' in filename" % nc_basename)
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return
+
+        self.ssp = self.atlases.offofs.query(nc_path=nc_path, lat=lat, lon=lon)
+
     def retrieve_sis4(self) -> None:
         """Retrieve data from SIS4"""
         if not self.use_sis4():
