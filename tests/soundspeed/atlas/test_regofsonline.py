@@ -4,13 +4,13 @@ import shutil
 import logging
 
 from hyo2.soundspeedmanager import AppInfo
-from hyo2.soundspeed.atlas.regofs import RegOfs
+from hyo2.soundspeed.atlas.regofsonline import RegOfsOnline
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger()
 
 
-class TestSoundSpeedAtlasRegofs(unittest.TestCase):
+class TestSoundSpeedAtlasRegofsOnline(unittest.TestCase):
 
     def setUp(self):
         self.cur_dir = os.path.abspath(os.path.dirname(__file__))
@@ -25,14 +25,14 @@ class TestSoundSpeedAtlasRegofs(unittest.TestCase):
 
     def test_creation_of_Cbofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        cbofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.CBOFS)
+        cbofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.CBOFS)
         self.assertTrue('regofs' in cbofs.data_folder)
         self.assertFalse(cbofs.is_present())
         prj.close()
 
     def test_download_db_from_Cbofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        cbofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.CBOFS)
+        cbofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.CBOFS)
         cbofs.download_db(server_mode=True)
 
         # to avoid test failures
@@ -44,14 +44,14 @@ class TestSoundSpeedAtlasRegofs(unittest.TestCase):
 
     def test_creation_of_Dbofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        dbofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.DBOFS)
+        dbofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.DBOFS)
         self.assertTrue('regofs' in dbofs.data_folder)
         self.assertFalse(dbofs.is_present())
         prj.close()
 
     def test_download_db_from_Dbofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        dbofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.DBOFS)
+        dbofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.DBOFS)
         dbofs.download_db(server_mode=True)
 
         # to avoid test failures
@@ -63,14 +63,14 @@ class TestSoundSpeedAtlasRegofs(unittest.TestCase):
 
     def test_creation_of_Gomofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        gomofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.GoMOFS)
+        gomofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.GoMOFS)
         self.assertTrue('regofs' in gomofs.data_folder)
         self.assertFalse(gomofs.is_present())
         prj.close()
 
     def test_download_db_from_Gomofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        gomofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.GoMOFS)
+        gomofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.GoMOFS)
         gomofs.download_db(server_mode=True)
 
         # to avoid test failures
@@ -120,14 +120,14 @@ class TestSoundSpeedAtlasRegofs(unittest.TestCase):
 
     def test_creation_of_Ngofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        ngofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.NGOFS)
+        ngofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.NGOFS)
         self.assertTrue('regofs' in ngofs.data_folder)
         self.assertFalse(ngofs.is_present())
         prj.close()
 
     def test_download_db_from_Ngofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        ngofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.NGOFS)
+        ngofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.NGOFS)
         ngofs.download_db(server_mode=True)
 
         # to avoid test failures
@@ -139,14 +139,14 @@ class TestSoundSpeedAtlasRegofs(unittest.TestCase):
 
     def test_creation_of_Tbofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        tbofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.TBOFS)
+        tbofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.TBOFS)
         self.assertTrue('regofs' in tbofs.data_folder)
         self.assertFalse(tbofs.is_present())
         prj.close()
 
     def test_download_db_from_Tbofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        tbofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.TBOFS)
+        tbofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.TBOFS)
         tbofs.download_db(server_mode=True)
 
         # to avoid test failures
@@ -158,14 +158,14 @@ class TestSoundSpeedAtlasRegofs(unittest.TestCase):
 
     def test_creation_of_Leofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        leofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.LEOFS)
+        leofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.LEOFS)
         self.assertTrue('regofs' in leofs.data_folder)
         self.assertFalse(leofs.is_present())
         prj.close()
 
     def test_download_db_from_Leofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        leofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.LEOFS)
+        leofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.LEOFS)
         leofs.download_db(server_mode=True)
 
         # to avoid test failures
@@ -253,14 +253,14 @@ class TestSoundSpeedAtlasRegofs(unittest.TestCase):
 
     def test_creation_of_Creofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        creofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.CREOFS)
+        creofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.CREOFS)
         self.assertTrue('regofs' in creofs.data_folder)
         self.assertFalse(creofs.is_present())
         prj.close()
 
     def test_download_db_from_Creofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        creofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.CREOFS)
+        creofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.CREOFS)
         creofs.download_db(server_mode=True)
 
         # to avoid test failures
@@ -272,14 +272,14 @@ class TestSoundSpeedAtlasRegofs(unittest.TestCase):
 
     def test_creation_of_Sfbofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        sfbofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.SFBOFS)
+        sfbofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.SFBOFS)
         self.assertTrue('regofs' in sfbofs.data_folder)
         self.assertFalse(sfbofs.is_present())
         prj.close()
 
     def test_download_db_from_Sfbofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        sfbofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.SFBOFS)
+        sfbofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.SFBOFS)
         sfbofs.download_db(server_mode=True)
 
         # to avoid test failures
@@ -292,5 +292,5 @@ class TestSoundSpeedAtlasRegofs(unittest.TestCase):
 
 def suite():
     s = unittest.TestSuite()
-    s.addTests(unittest.TestLoader().loadTestsFromTestCase(TestSoundSpeedAtlasRegofs))
+    s.addTests(unittest.TestLoader().loadTestsFromTestCase(TestSoundSpeedAtlasRegofsOnline))
     return s
