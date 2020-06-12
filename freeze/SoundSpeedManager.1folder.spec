@@ -92,8 +92,8 @@ def collect_folder_data(input_data_folder: str, relative_output_folder: str, rec
     return data_toc
 
 
-share_folder = os.path.join(python_path(), "Library", "share", "proj")
-output_folder = os.path.join("Library", "share", "proj")
+share_folder = os.path.join(python_path(), "Library", "share")
+output_folder = os.path.join("Library", "share")
 pyproj_data = collect_folder_data(input_data_folder=share_folder, relative_output_folder=output_folder)
 share_folder = os.path.join(python_path(), "share", "cartopy", "shapefiles", "natural_earth", "physical")
 output_folder = os.path.join("cartopy", "data", "shapefiles", "natural_earth", "physical")
