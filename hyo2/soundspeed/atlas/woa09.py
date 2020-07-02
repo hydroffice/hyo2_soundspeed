@@ -114,6 +114,7 @@ class Woa09(AbstractAtlas):
         logger.debug("0(%.3f, %.3f); step(%.3f, %.3f); depths: %s"
                      % (self.lat_0, self.lon_0, self.lat_step, self.lon_step, self.num_levels))
 
+        self.has_data_loaded = True
         return True
 
     def get_depth(self, lat: float, lon: float) -> float:

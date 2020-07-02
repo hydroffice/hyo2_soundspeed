@@ -124,6 +124,7 @@ class Woa13(AbstractAtlas):
             logger.error("issue in reading the netCDF data: %s" % e)
             return False
 
+        self.has_data_loaded = True
         return True
 
     def get_depth(self, lat: float, lon: float) -> float:
