@@ -64,6 +64,7 @@ from .writers.asvp import Asvp
 from .writers.caris import Caris
 from .writers.csv import Csv
 from .writers.elac import Elac
+from .writers.hipap import Hipap
 from .writers.hypack import Hypack
 from .writers.ixblue import Ixblue
 from .writers.ncei import Ncei
@@ -75,6 +76,7 @@ writers = list()
 writers.append(Caris())
 writers.append(Csv())
 writers.append(Elac())
+writers.append(Hipap())
 writers.append(Hypack())
 writers.append(Ixblue())
 writers.append(Asvp())
