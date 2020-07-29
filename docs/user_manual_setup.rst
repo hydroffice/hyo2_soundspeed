@@ -48,6 +48,8 @@ settings (if any).
 
     Select the desired setup and click on the *OK* button to copy an existing setup.
 
+.. _application_settings:
+
 Application Settings
 ====================
 

@@ -171,6 +171,9 @@ Data augmentation
 Sound speed data can be augmented with WOA/RTOFS/reference salinity and/or temperature. If a reference cast has been set,
 then the reference cast will be used to augment salinity and/or temperature profiles instead of the WOA/RTOFS profiles.
 
+.. note:: You can set the desired augmentation source (e.g., the user-defined reference cast) in the *Input* tab available in the :ref:`application_settings`.
+
+
 XBT probes
 ----------
 

@@ -22,6 +22,7 @@ ISS (.v*, .d*, .svp)                                X
 iXBlue (.txt)                                            X
 Kongsberg asvp (.asvp)                              X    X
 Kongsberg absorption (.abs)                              X
+Kongsberg HiPAP (.usr)                                   X
 Rolls-Royce MVP (.asvp, .calc, .s12)                X
 NCEI (.nc) [1]_                                          X
 QPS (.bsvp) [2]_                                         X
