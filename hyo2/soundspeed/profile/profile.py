@@ -573,9 +573,14 @@ class Profile:
                 else:
                     last_value = value
 
-            if value == max_value:
+            if (value == max_value) and (max_reached is False):
                 max_reached = True
                 last_value = value
+                if ssp_direction == Dicts.ssp_directions['up']:
+                    self.data.flag[i] = Dicts.flags['valid']  # switch back to valid the last flagged one
+
+        if np.sum(self.data_valid) <= 1:
+            raise RuntimeError('Unable to locate the upcast values. Double check their presence in the input file.')
 
         if ssp_direction == Dicts.ssp_directions['up']:
             logger.debug("flipping data for up direction")

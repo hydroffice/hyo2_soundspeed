@@ -44,12 +44,12 @@ install:
   - pip install PySide2
   # for hyo2.soundspeed
   - conda install gsw netCDF4 pillow pyserial scipy
-  # --no-deps because of pip not detecting the installed GDAL
   - pip install https://github.com/hydroffice/hyo2_abc/archive/master.zip
 
 build: off
 build_script:
-  - pip install .
+  # --no-deps because of pip not detecting the installed hyo2.abc
+  - pip install --no-deps .
   - conda list --show-channel-urls
 
 test: off

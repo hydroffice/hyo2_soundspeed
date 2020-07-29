@@ -96,7 +96,6 @@ class AbstractReader(AbstractFormat, metaclass=ABCMeta):
         """Function called at the end, to finalize the reading (e.g., clone raw to proc)"""
 
         for profile in self.ssp.l:  # we may have multiple profiles
-
             profile.clone_data_to_proc()
             profile.init_sis()  # initialize to zero
 
