@@ -8,6 +8,8 @@
 #
 # It may require to manually copy DLLs and other files.
 #
+# Uploading to BitBucket: curl -s -u giumas:password -X POST https://api.bitbucket.org/2.0/repositories/hydroffice/hyo_sound_speed_manager/downloads -F files=@SoundSpeedManager.2020.0.4.zip
+
 
 from datetime import datetime
 import sys
