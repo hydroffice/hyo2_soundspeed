@@ -36,7 +36,8 @@ install:
   # for hyo2.soundspeed
   - conda install gsw netCDF4 pillow pyserial scipy
 
-  - pip install .
+  # --no-deps because of pip not detecting the installed hyo2.abc
+  - pip install --no-deps .
   - conda list --show-channel-urls
 
 script:
