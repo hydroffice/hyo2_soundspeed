@@ -113,9 +113,9 @@ except ImportError:
     print("skipping hyo2.surveydatamonitor")
     sdm_data = TOC()
 
-icon_file = 'freeze\SoundSpeedManager.ico'
+icon_file = os.path.normpath(os.path.join(os.getcwd(), 'freeze', 'SoundSpeedManager.ico'))
 if is_darwin:
-    icon_file = 'freeze\SoundSpeedManager.icns'
+    icon_file = os.path.normpath(os.path.join(os.getcwd(), 'freeze', 'SoundSpeedManager.icns'))
 
 a = Analysis(['SoundSpeedManager.py'],
              pathex=[],
