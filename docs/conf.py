@@ -50,7 +50,7 @@ copyright = u'2020, CCOM/JHC,UNH'
 # The short X.Y version.
 version = '2020.0'
 # The full version, including alpha/beta/rc tags.
-release = '2020.0.4'
+release = '2020.0.5'
 
 numfig = True
 

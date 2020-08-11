@@ -26,6 +26,7 @@ class Valeport(AbstractTextReader):
         Dicts.probe_types['RapidSVT']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['RapidSV']: Dicts.sensor_types["SVP"],
         Dicts.probe_types['SWiFT']: Dicts.sensor_types["SVPT"],
+        Dicts.probe_types['MONITOR CTD']: Dicts.sensor_types["CTD"],
         Dicts.probe_types['Unknown']: Dicts.sensor_types["Unknown"]
     }
 
@@ -34,6 +35,7 @@ class Valeport(AbstractTextReader):
         self.desc = "Valeport"  # Monitor/Midas/MiniSVP/RapidSVT
         self._ext.add('000')
         self._ext.add('txt')
+        self._ext.add('vpd')
         self._ext.add('vp2')
 
         self.tk_start_data = ""
@@ -74,7 +76,7 @@ class Valeport(AbstractTextReader):
     def _parse_header(self):
         logger.debug('parsing header')
 
-        if os.path.splitext(self.fid.path)[-1] == ".vp2":
+        if os.path.splitext(self.fid.path)[-1] in [".vpd", ".vp2"]:
             self._vp2_header()
 
         elif self.lines[0][:3] == 'Now':  # MiniSVP
@@ -84,16 +86,19 @@ class Valeport(AbstractTextReader):
             self._midas_header()
 
     def _vp2_header(self):
-        # check valid format
-        first_row = self.lines[0]
-        if not first_row.strip().upper() == "[HEADER]":
-            raise RuntimeError("Invalid first row: %s" % first_row)
+        logger.debug("VPD/VP2 format: header")
 
-        logger.debug("VP2 format: header")
+        has_header = False
 
         for idx, line in enumerate(self.lines):
 
             line = line.strip().upper()
+
+            if not has_header:
+                # check valid format
+                if line == "[HEADER]":
+                    has_header = True
+                continue
 
             if line == "[DATA]":
                 logger.debug("found [DATA]")
@@ -109,15 +114,19 @@ class Valeport(AbstractTextReader):
                     self.ssp.cur.meta.probe_type = Dicts.probe_types['SWiFT']
                     self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
                     continue
+                elif tokens[1] == "MONITOR CTD":
+                    self.ssp.cur.meta.probe_type = Dicts.probe_types['MONITOR CTD']
+                    self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
+                    continue
                 else:
                     raise RuntimeError("Unknown/unsupported instrument: %s" % line)
 
-            if tokens[0] == "INSTRUMENTCODE":
+            if tokens[0] in ["INSTRUMENTCODE", "SERIAL_NUMBER"]:
                 try:
                     self.ssp.cur.meta.sn = tokens[1]
                     continue
                 except ValueError:
-                    logger.warning("unable to parse instrument code: %s" % line)
+                    logger.warning("unable to parse instrument code/serial number: %s" % line)
 
             if tokens[0] == "LATITUDE":
                 try:
@@ -138,6 +147,15 @@ class Valeport(AbstractTextReader):
                     self.ssp.cur.meta.utc_time = dt.datetime.strptime(tokens[1], "%Y/%m/%d %H:%M:%S")
                 except ValueError:
                     logger.warning("unable to parse date and time: %s" % line)
+
+            if tokens[0] == "TIME_STAMP":
+                try:
+                    self.ssp.cur.meta.utc_time = dt.datetime.strptime(tokens[1], "%Y/%m/%d %H:%M:%S.%f")
+                except ValueError:
+                    logger.warning("unable to parse date and time: %s" % line)
+
+        if not has_header:
+            raise RuntimeError('Invalid format! Unable to locate the [HEADER] row')
 
         if not self.ssp.cur.meta.original_path:
             self.ssp.cur.meta.original_path = self.fid.path
@@ -288,7 +306,7 @@ class Valeport(AbstractTextReader):
     def _parse_body(self):
         logger.debug('parsing body')
 
-        if os.path.splitext(self.fid.path)[-1] == ".vp2":
+        if os.path.splitext(self.fid.path)[-1] in [".vpd", ".vp2"]:
             self._vp2_body()
 
         elif self.lines[0][:3] == 'Now':  # MiniSVP
@@ -303,7 +321,7 @@ class Valeport(AbstractTextReader):
         if not first_data_row.strip().upper() == "[DATA]":
             raise RuntimeError("Invalid first data row: %s" % first_data_row)
 
-        logger.debug("VP2 format: body")
+        logger.debug("VPD/VP2 format: body")
 
         depth_idx = None
         pressure_idx = None

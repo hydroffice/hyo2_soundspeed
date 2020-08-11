@@ -84,6 +84,7 @@ class Dicts:
         ('RapidSVT', 308),
         ('SWiFT', 309),
         ('RapidSV', 310),
+        ('MONITOR CTD', 311),
 
         ('Future', 999),
 
