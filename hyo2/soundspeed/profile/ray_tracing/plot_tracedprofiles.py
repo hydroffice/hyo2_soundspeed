@@ -156,6 +156,10 @@ class PlotTracedProfiles:
 
         t_idx_max = max(np.nanargmax(self._d.new_rays[-1][0]),
                         np.nanargmax(self._d.old_rays[-1][0]))
+        # logger.debug('new times: %s' % (self._d.new_rays[-1][0], ))
+        # logger.debug('old times: %s' % (self._d.old_rays[-1][0], ))
+        # logger.debug('t idx max: %s' % t_idx_max)
+
         try:
             z_max = self._d.new_rays[-1][2][t_idx_max]
         except IndexError:

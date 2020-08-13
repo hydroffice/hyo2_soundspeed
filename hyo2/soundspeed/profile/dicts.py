@@ -85,6 +85,7 @@ class Dicts:
         ('SWiFT', 309),
         ('RapidSV', 310),
         ('MONITOR CTD', 311),
+        ('MIDAS SVX2', 312),
 
         ('Future', 999),
 

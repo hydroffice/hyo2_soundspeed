@@ -16,6 +16,7 @@ class Valeport(AbstractTextReader):
     sensor_dict = {
         Dicts.probe_types['MONITOR SVP 500']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVP 6000']: Dicts.sensor_types["SVPT"],
+        Dicts.probe_types['MIDAS SVX2']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVX2 100']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVX2 500']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVX2 1000']: Dicts.sensor_types["SVPT"],
@@ -118,6 +119,10 @@ class Valeport(AbstractTextReader):
                     self.ssp.cur.meta.probe_type = Dicts.probe_types['MONITOR CTD']
                     self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
                     continue
+                elif tokens[1] == "MIDAS SVX2":
+                    self.ssp.cur.meta.probe_type = Dicts.probe_types['MIDAS SVX2']
+                    self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
+                    continue
                 else:
                     raise RuntimeError("Unknown/unsupported instrument: %s" % line)
 
@@ -152,7 +157,10 @@ class Valeport(AbstractTextReader):
                 try:
                     self.ssp.cur.meta.utc_time = dt.datetime.strptime(tokens[1], "%Y/%m/%d %H:%M:%S.%f")
                 except ValueError:
-                    logger.warning("unable to parse date and time: %s" % line)
+                    try:
+                        self.ssp.cur.meta.utc_time = dt.datetime.strptime(tokens[1], "%Y.%m.%d %H:%M:%S.%f")
+                    except ValueError:
+                        logger.warning("unable to parse date and time: %s" % line)
 
         if not has_header:
             raise RuntimeError('Invalid format! Unable to locate the [HEADER] row')
