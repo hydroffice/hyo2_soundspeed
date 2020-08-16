@@ -119,7 +119,7 @@ class ClientList:
             else:
                 logger.warning("reception NOT confirmed: unable to catch the back datagram")
                 if not server_mode:
-                    prj.cb.msg_tx_sis_not_confirmed(name=client.name, port=prj.setup.sis4_listen_port)
+                    prj.cb.msg_tx_sis_not_confirmed(name=client.name, port=prj.setup.sis5_listen_port)
                 success = False
 
         prj.progress.end()
