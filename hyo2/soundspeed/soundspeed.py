@@ -1215,7 +1215,7 @@ class SoundSpeedLibrary:
 
         in_db = ProjectDb(projects_folder=in_projects_folder, project_name=in_project_name)
 
-        if in_db.get_db_version() > 2:
+        if in_db.get_db_version() > 3:
             raise RuntimeError("unsupported db version: %s" % in_db.get_db_version())
         logger.debug('input project db version: %s' % in_db.get_db_version())
 
