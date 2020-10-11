@@ -95,15 +95,15 @@ class Woa13(AbstractAtlas):
     def load_grids(self) -> bool:
         """Load atlas grids"""
         try:
-            for i in range(17):
+            for i in range(1, 17):
                 t_path = os.path.join(self.data_folder, "temp", "woa13_decav_t%02d_04v2.nc" % i)
                 self.t.append(Dataset(t_path))
             for i in range(1, 17):
                 s_path = os.path.join(self.data_folder, "sal", "woa13_decav_s%02d_04v2.nc" % i)
                 self.s.append(Dataset(s_path))
 
-            self.lat = self.t[0].variables['lat'][:]
-            self.lon = self.t[0].variables['lon'][:]
+            self.lat = self.t[12].variables['lat'][:]
+            self.lon = self.t[12].variables['lon'][:]
             # self.lon = np.hstack((lon[lon.size // 2:], lon[:lon.size // 2]))
             csv_iter = csv.reader(open((os.path.join(self.data_folder, "landsea_04.msk"))))
             next(csv_iter)  # skip firs header row
@@ -118,7 +118,7 @@ class Woa13(AbstractAtlas):
             # pyplot.show()
 
             # How many depth levels do we have?
-            self.num_levels = self.t[0].variables['depth'].size
+            self.num_levels = self.t[12].variables['depth'].size
 
         except Exception as e:
             logger.error("issue in reading the netCDF data: %s" % e)
@@ -139,17 +139,17 @@ class Woa13(AbstractAtlas):
 
     def calc_indices(self, month: int) -> None:
         """Calculate the month index based on the julian day"""
-        self.month_idx = month + 1
-        if month < 3:
+        self.month_idx = month - 1
+        if month <= 3:
+            self.season_idx = 12
+        elif (month > 3) and (month <= 6):
             self.season_idx = 13
-        elif (month >= 3) or (month < 6):
+        elif (month > 6) and (month <= 9):
             self.season_idx = 14
-        elif (month >= 6) or (month < 9):
-            self.season_idx = 15
         else:
-            self.season_idx = 16
+            self.season_idx = 15
 
-        # logger.debug("indices: %s, %s" % (self.month_idx, self.season_idx))
+        logger.debug("indices -> month idx: %s, season idx: %s" % (self.month_idx, self.season_idx))
 
     def grid_coords(self, lat: float, lon: float) -> tuple:
         """This does a nearest neighbour lookup"""

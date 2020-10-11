@@ -348,12 +348,12 @@ class Rtofs(AbstractAtlas):
     @staticmethod
     def _build_opendap_urls(input_date: date) -> tuple:
         """make up the url to use for salinity and temperature"""
-        # Primary server: http://nomads.ncep.noaa.gov:9090/dods/rtofs
-        url_temp = 'https://nomads.ncep.noaa.gov:9090/dods/rtofs/rtofs_global%s/' \
+        # Primary server: http://nomads.ncep.noaa.gov/dods/rtofs
+        url_temp = 'https://nomads.ncep.noaa.gov/dods/rtofs/rtofs_global%s/' \
                    'rtofs_glo_3dz_nowcast_daily_temp' \
                    % input_date.strftime("%Y%m%d")
         logger.debug("opendap temp: %s" % url_temp)
-        url_sal = 'https://nomads.ncep.noaa.gov:9090/dods/rtofs/rtofs_global%s/' \
+        url_sal = 'https://nomads.ncep.noaa.gov/dods/rtofs/rtofs_global%s/' \
                   'rtofs_glo_3dz_nowcast_daily_salt' \
                   % input_date.strftime("%Y%m%d")
         logger.debug("opendap sal: %s" % url_sal)
