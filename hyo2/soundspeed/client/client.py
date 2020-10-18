@@ -54,7 +54,7 @@ class Client:
 
         apply_thin = True
         apply_12k = True
-        tolerances = [0.1, 0.5]
+        tolerances = [0.01, 0.03, 0.06, 0.1, 0.5]
         if self.protocol == "QINSY":
             apply_12k = False
             tolerances = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5]
