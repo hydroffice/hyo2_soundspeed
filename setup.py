@@ -60,6 +60,7 @@ setup(
         "netCDF4",
         "pillow",
         "pyserial",
+        "requests",
         "scipy"
     ],
     python_requires='>=3.5',

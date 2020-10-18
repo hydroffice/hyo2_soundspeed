@@ -1,12 +1,10 @@
 from datetime import datetime as dt, date, timedelta
-from http import client
-from urllib import parse
-import socket
 import logging
 from typing import Optional, Union
 
 from netCDF4 import Dataset
 import numpy as np
+import requests
 
 from hyo2.abc.lib.progress.cli_progress import CliProgress
 
@@ -320,18 +318,16 @@ class Rtofs(AbstractAtlas):
     @staticmethod
     def _check_url(url: str) -> bool:
         try:
-            p = parse.urlparse(url)
-            conn = client.HTTPConnection(p.netloc)
-            conn.request('HEAD', p.path)
-            resp = conn.getresponse()
-            conn.close()
-            # logger.debug("passed url: %s -> %s" % (url, resp.status))
+            resp = requests.get(url, allow_redirects=True, stream=True)
+            logger.debug("passed url: %s -> %s" % (url, resp.status_code))
+            if resp.status_code == 200:
+                return True
+            else:
+                return False
 
-        except socket.error as e:
+        except Exception as e:
             logger.warning("while checking %s, %s" % (url, e))
             return False
-
-        return resp.status < 400
 
     @staticmethod
     def _build_check_urls(input_date: date) -> tuple:
@@ -340,9 +336,11 @@ class Rtofs(AbstractAtlas):
         url_temp = 'https://nomads.ncep.noaa.gov/pub/data/nccf/com/rtofs/prod/rtofs.%s/' \
                    'rtofs_glo_3dz_n024_daily_3ztio.nc' \
                    % input_date.strftime("%Y%m%d")
+        logger.debug("check temp: %s" % url_temp)
         url_sal = 'https://nomads.ncep.noaa.gov/pub/data/nccf/com/rtofs/prod/rtofs.%s/' \
                   'rtofs_glo_3dz_n024_daily_3zsio.nc' \
                   % input_date.strftime("%Y%m%d")
+        logger.debug("check sal: %s" % url_sal)
         return url_temp, url_sal
 
     @staticmethod
@@ -384,6 +382,7 @@ class Rtofs(AbstractAtlas):
         url_ck_temp, url_ck_sal = self._build_check_urls(datestamp)
         if not self._check_url(url_ck_temp) or not self._check_url(url_ck_sal):
 
+            logger.info('issue with %s -> trying with the previous day' % datestamp)
             datestamp -= timedelta(days=1)
             url_ck_temp, url_ck_sal = self._build_check_urls(datestamp)
 
@@ -405,8 +404,8 @@ class Rtofs(AbstractAtlas):
             progress.update(80)
             self._day_idx = 2  # usually 3 1-day steps
 
-        except (RuntimeError, IOError):
-            logger.warning("unable to access data: %s" % datestamp.strftime("%Y%m%d"))
+        except (RuntimeError, IOError) as e:
+            logger.warning("unable to access data: %s -> %s" % (datestamp.strftime("%Y%m%d"), e))
             self.clear_data()
             progress.end()
             return False
