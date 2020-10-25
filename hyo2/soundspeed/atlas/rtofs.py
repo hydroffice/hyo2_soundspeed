@@ -318,12 +318,12 @@ class Rtofs(AbstractAtlas):
     @staticmethod
     def _check_url(url: str) -> bool:
         try:
-            resp = requests.get(url, allow_redirects=True, stream=True)
-            logger.debug("passed url: %s -> %s" % (url, resp.status_code))
-            if resp.status_code == 200:
-                return True
-            else:
-                return False
+            with requests.get(url, allow_redirects=True, stream=True) as resp:
+                logger.debug("passed url: %s -> %s" % (url, resp.status_code))
+                if resp.status_code == 200:
+                    return True
+                else:
+                    return False
 
         except Exception as e:
             logger.warning("while checking %s, %s" % (url, e))
