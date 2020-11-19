@@ -194,11 +194,11 @@ class KmallSPO(Kmall):
         # logger.debug("common part -> sensor status: %d" % common_sensor_status)
 
         data_blk = struct.unpack("<2If2d3f", self.data[28:68])
-        # time_sec = data_blk[0]
+        time_sec = data_blk[0]
         # logger.debug('sensor time sec: %s' % time_sec)
-        # time_nanosec = data_blk[1]
+        time_nanosec = data_blk[1]
         # logger.debug('sensor time nanosec: %s' % time_nanosec)
-        # sensor_datetime = Kmall.kmall_datetime(time_sec, time_nanosec)
+        self.sensor_datetime = Kmall.kmall_datetime(time_sec, time_nanosec)
         # logger.debug('sensor datetime: %s' % sensor_datetime.strftime('%Y-%m-%d %H:%M:%S.%f'))
         # fix_quality = data_blk[2]
         # logger.debug('pos fix quality: %s' % fix_quality)

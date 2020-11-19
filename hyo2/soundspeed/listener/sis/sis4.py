@@ -37,17 +37,12 @@ class Sis4(AbstractListener):
         self.watercolumn = None
         self.bist = None
 
-        # SIS5
-        self.mrz = None
-        self.spo = None
-        self.svp = None
-
     def __repr__(self) -> str:
         msg = "%s" % super(Sis4, self).__repr__()
         # msg += "  <has data loaded: %s>\n" % self.has_data_loaded
         return msg
 
-    @classmethod
+    @classmethod        # Why is this not a static method?
     def request_cur_profile(cls, ip: str, port: int = 4001) -> None:
         logger.info("Requesting profile from %s:%s" % (ip, port))
 

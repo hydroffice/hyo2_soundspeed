@@ -12,11 +12,13 @@ class Server(Thread):
     def __init__(self, prj: Optional['hyo2.soundspeed.soundspeed.SoundSpeedLibrary']):
         Thread.__init__(self, target=None, name="Synthetic Profile Server")
         self.prj = prj
+        self.cli_protocol = None
         self.delivered_casts = 0
         self.force_send = Event()
         self.shutdown = Event()
         self.wait_time = 5
 
+        self.svp_acquisition_time = None
         self.tss_last = None
         self.lat_idx_last = None
         self.lon_idx_last = None
@@ -61,52 +63,102 @@ class Server(Thread):
 
         self.prj.progress.update(30)
 
-        # ### Now checks for SIS settings ###
+        # ### Now checks for SIS/SIS5 settings ###
 
-        if not self.prj.use_sis4():
-            logger.error("SIS-use check: KO")
+        # Force user to select either SIS4 or SIS5
+        if self.prj.use_sis4() and self.prj.use_sis5():
+            logger.error("Both SIS4 and SIS5 listeners active. Select one for server mode.")
             self.prj.progress.end()
             return False
 
-        # - navigation datagram
-        if self.prj.listeners.sis4.nav:
-            logger.info("SIS NAV broadcast: OK")
+        # Check SIS
+        sis4_check = True
+        if self.prj.use_sis4():
+
+            # - depth datagram
+            if self.prj.listeners.sis4.xyz88:
+                logger.info("SIS4 DEPTH broadcast: OK")
+            else:
+                logger.warning("SIS4 DEPTH broadcast: KO > SIS4 may warn about surface sound speed")
+
+            # - navigation datagram
+            if self.prj.listeners.sis4.nav:
+                logger.info("SIS4 NAV broadcast: OK")
+            else:
+                logger.error("SIS4 NAV broadcast: KO")
+                sis4_check = False
 
         else:
-            logger.error("SIS NAV broadcast: KO")
+            sis4_check = False
+
+        # Check SIS5
+        sis5_check = True
+        if self.prj.use_sis5():
+
+            # - depth datagram
+            if self.prj.listeners.sis5.mrz:
+                logger.info("SIS5 MRZ broadcast: OK")
+            else:
+                logger.warning("SIS5 MRZ broadcast: KO > SIS5 may warn about surface sound speed")
+
+            # - navigation datagram
+            if self.prj.listeners.sis5.spo:
+                logger.info("SIS5 SPO broadcast: OK")
+            else:
+                logger.error("SIS5 SPO broadcast: KO")
+                sis5_check = False
+
+        else:
+            sis5_check = False
+
+        # Select listener
+        if (sis4_check is False) and (sis5_check is False):
+            logger.error("SIS4/SIS5 listener check failed")
             self.prj.progress.end()
             return False
-
-        # - depth datagram
-        if self.prj.listeners.sis4.xyz88:
-            logger.info("SIS DEPTH broadcast: OK")
-
-        else:
-            logger.warning("SIS DEPTH broadcast: KO > SIS may warn about surface sound speed")
+        elif (sis4_check is True) and (sis5_check is False):
+            logger.info("SIS4 listener active")
+            self.cli_protocol = "SIS"
+        elif (sis4_check is False) and (sis5_check is True):
+            logger.info("SIS5 listener active")
+            self.cli_protocol = "KCTRL"
 
         self.prj.progress.update(60)
 
-        # ### Test clients interaction (only SIS currently) ###
+        # ### Test clients interaction (only SIS4/5 currently) ###
 
         prog_quantum = 40 / (len(self.prj.setup.client_list.clients) + 1)
         logger.info("Testing clients for reception-confirmation interaction")
         num_live_clients = 0
         for client in self.prj.setup.client_list.clients:
 
-            if client.protocol != "SIS":
+            if client.protocol != self.cli_protocol:
                 client.alive = False
                 continue
 
-            client.request_profile_from_sis4(self.prj)
+            if self.cli_protocol == "SIS":
+                client.request_profile_from_sis4(self.prj)
 
-            if self.prj.listeners.sis4.ssp:
-                logger.info("Interaction test: OK")
-                client.alive = True
-                num_live_clients += 1
+                if self.prj.listeners.sis4.ssp:
+                    logger.info("Interaction test: OK")
+                    client.alive = True
+                    num_live_clients += 1
 
-            else:
-                logger.warning("Interaction test: KO")
-                client.alive = False
+                else:
+                    logger.warning("Interaction test: KO")
+                    client.alive = False
+
+            if self.cli_protocol == "KCTRL":
+                client.request_profile_from_sis5(self.prj)
+
+                if self.prj.listeners.sis5.svp:
+                    logger.info("Interaction test: OK")
+                    client.alive = True
+                    num_live_clients += 1
+
+                else:
+                    logger.warning("Interaction test: KO")
+                    client.alive = False
 
             self.prj.progress.add(prog_quantum)
 
@@ -160,9 +212,18 @@ class Server(Thread):
     def check(self) -> None:
         # ### Retrieve current location/time ###
 
-        lat = self.prj.listeners.sis4.nav.latitude
-        lon = self.prj.listeners.sis4.nav.longitude
-        tm = self.prj.listeners.sis4.nav.dg_time
+        if self.cli_protocol == "SIS":
+            lat = self.prj.listeners.sis4.nav.latitude
+            lon = self.prj.listeners.sis4.nav.longitude
+            tm = self.prj.listeners.sis4.nav.dg_time
+        elif self.cli_protocol == "KCTRL":
+            lat = self.prj.listeners.sis5.spo.latitude
+            lon = self.prj.listeners.sis5.spo.longitude
+            tm = self.prj.listeners.sis5.spo.sensor_datetime
+        else:
+            logger.error("Shouldn't be able to reach here. Return Error")
+            return
+
         if (lat is None) or (lon is None) or (tm is None):
             logger.warning("Possible corrupted reception of spatial timestamp > Waiting %s secs"
                            % self.wait_time)
@@ -198,21 +259,39 @@ class Server(Thread):
         tss_diff = 0.0
         if self.prj.setup.server_apply_surface_sound_speed:
 
-            if self.prj.listeners.sis4.xyz88 is None:
-                logger.warning("Unable to retrieve xyz88 datagram > Waiting %s secs"
-                               % self.wait_time)
-                count = 0
-                while count < self.wait_time:
-                    time.sleep(1)
-                    count += 1
-                return
+            if self.cli_protocol == "SIS":
+                if self.prj.listeners.sis4.xyz88 is None:
+                    logger.warning("Unable to retrieve xyz88 datagram > Waiting %s secs"
+                                   % self.wait_time)
+                    count = 0
+                    while count < self.wait_time:
+                        time.sleep(1)
+                        count += 1
+                    return
 
-            if self.prj.listeners.sis4.xyz88.sound_speed:
-                tss = self.prj.listeners.sis4.xyz88.sound_speed
-                if self.tss_last:
-                    tss_diff = abs(tss - self.tss_last)
-            if self.prj.listeners.sis4.xyz88.transducer_draft:
-                draft = self.prj.listeners.sis4.xyz88.transducer_draft
+                if self.prj.listeners.sis4.xyz88.sound_speed:
+                    tss = self.prj.listeners.sis4.xyz88.sound_speed
+                    if self.tss_last:
+                        tss_diff = abs(tss - self.tss_last)
+                if self.prj.listeners.sis4.xyz88.transducer_draft:
+                    draft = self.prj.listeners.sis4.xyz88.transducer_draft
+
+            if self.cli_protocol == "KCTRL":
+                if self.prj.listeners.sis5.mrz is None:
+                    logger.warning("Unable to retrieve mrz datagram > Waiting %s secs"
+                                   % self.wait_time)
+                    count = 0
+                    while count < self.wait_time:
+                        time.sleep(1)
+                        count += 1
+                    return
+
+                if self.prj.listeners.sis5.mrz.tss:
+                    tss = self.prj.listeners.sis5.mrz.tss
+                    if self.tss_last:
+                        tss_diff = abs(tss - self.tss_last)
+                if self.prj.listeners.sis5.mrz.transducer_draft:
+                    draft = self.prj.listeners.sis5.mrz.transducer_draft
 
         logger.debug('TSS delta: %s' % tss_diff)
 
@@ -263,20 +342,33 @@ class Server(Thread):
                     logger.info("Dead client: %s > Skipping" % client.ip)
                     continue
 
-                client.request_profile_from_sis4(prj=self.prj)
-                if not self.prj.listeners.sis4.ssp:
-                    logger.info("client %s dead since last tx" % client.name)
-                    client.alive = False
-                    continue
+                if self.cli_protocol == "SIS":
+                    client.request_profile_from_sis4(prj=self.prj)
+                    if not self.prj.listeners.sis4.ssp:
+                        logger.info("client %s dead since last tx" % client.name)
+                        client.alive = False
+                        continue
+                    else:
+                        self.svp_acquisition_time = self.prj.listeners.sis4.ssp.acquisition_time
+
+                if self.cli_protocol == "KCTRL":
+                    client.request_profile_from_sis5(prj=self.prj)
+                    if not self.prj.listeners.sis5.svp:
+                        logger.info("client %s dead since last tx" % client.name)
+                        client.alive = False
+                        continue
+                    else:
+                        self.svp_acquisition_time = self.prj.listeners.sis5.svp.acquisition_time
 
                 logger.info("Live client: %s" % client.name)
                 num_live_clients += 1
 
                 # test by comparing the times
-                if self.prj.setup.client_list.last_tx_time != self.prj.listeners.sis4.ssp.acquisition_time:
+
+                if self.prj.setup.client_list.last_tx_time != self.svp_acquisition_time:
                     logger.error("Times mismatch > %s != %s"
                                  % (self.prj.setup.client_list.last_tx_time,
-                                    self.prj.listeners.sis4.ssp.acquisition_time))
+                                    self.svp_acquisition_time))
                     self.shutdown.set()
                     return
 
