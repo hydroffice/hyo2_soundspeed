@@ -1,6 +1,6 @@
 import os
 import logging
-import ogr
+from osgeo import ogr
 from typing import Optional
 
 from hyo2.abc.lib.gdal_aux import GdalAux
