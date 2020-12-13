@@ -3,8 +3,8 @@ import logging
 
 import numpy as np
 
-import ogr
-import osr
+from osgeo import ogr
+from osgeo import osr
 from pyproj import Geod
 
 from hyo2.abc.lib.gdal_aux import GdalAux
