@@ -1,4 +1,6 @@
-version: 2020.0.{build}-{branch}
+version: 2021.0.{build}-{branch}
+
+image: Visual Studio 2015
 
 environment:
 
@@ -6,23 +8,27 @@ environment:
 
     - PYTHON_VERSION: 3.8
       PYTHON_ARCH: x64
-      MINICONDA: C:\Miniconda36-x64
+      MINICONDA: C:\Miniconda37-x64
 
     - PYTHON_VERSION: 3.6
       PYTHON_ARCH: x64
-      MINICONDA: C:\Miniconda36-x64
+      MINICONDA: C:\Miniconda37-x64
 
     - PYTHON_VERSION: 3.7
       PYTHON_ARCH: x64
-      MINICONDA: C:\Miniconda36-x64
+      MINICONDA: C:\Miniconda37-x64
 
 matrix:
 
   allow_failures:
 
+    - PYTHON_VERSION: 3.6
+      PYTHON_ARCH: x64
+      MINICONDA: C:\Miniconda37-x64
+
     - PYTHON_VERSION: 3.7
       PYTHON_ARCH: x64
-      MINICONDA: C:\Miniconda36-x64
+      MINICONDA: C:\Miniconda37-x64
 
 install:
   - set PATH=%MINICONDA%;%MINICONDA%\Scripts;%PATH%
@@ -40,7 +46,7 @@ install:
 
   - pip install coveralls PyYAML pytest pytest-cov wheel
   # for hyo2.abc
-  - conda install appdirs bidict cartopy gdal matplotlib-base numpy psutil pyproj
+  - conda install appdirs bidict cartopy "gdal<3.0.0" matplotlib-base numpy psutil pyproj
   - pip install PySide2
   # for hyo2.soundspeed
   - conda install gsw netCDF4 pillow pyserial scipy
