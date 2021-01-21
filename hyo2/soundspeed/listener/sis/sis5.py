@@ -35,32 +35,18 @@ class Sis5(AbstractListener):
         return msg
 
     @classmethod
-    def request_cur_profile(cls, ip: str, port: int = 14002) -> None:
+    def request_cur_profile(cls, ip: str, port: int = 14002,
+                            echosounder_id: str = None) -> None:
         logger.info("Requesting profile from %s:%s" % (ip, port))
 
-        # sock_out = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        #
-        # # We try all of them in the hopes that one works.
-        # sensors = ["710", "122", "302", "3020", "2040"]
-        # for sensor in sensors:
-        #     # talker ID, Roger Davis (HMRG) suggested SM based on something KM told him
-        #     output = '$SMR20,EMX=%s,' % sensor
-        #
-        #     # calculate checksum, XOR of all bytes after the $
-        #     checksum = functools.reduce(operator.xor, map(ord, output[1:len(output)]))
-        #
-        #     # append the checksum and end of datagram identifier
-        #     output += "*{0:02x}".format(checksum)
-        #     output += "\\\r\n"
-        #
-        #     sock_out.sendto(output.encode('utf-8'), (ip, port))
-        #
-        #     # Adding a bit of a pause
-        #     time.sleep(0.5)
-        #
-        # sock_out.close()
+        sock_out = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        output = '$KSSIS,454,%s' % echosounder_id
+        output += "\\\r\n"
+        sock_out.sendto(output.encode('utf-8'), (ip, port))
 
-        raise RuntimeError("Not implemented")
+        # Adding a bit of a pause
+        time.sleep(0.5)
+        sock_out.close()
 
     def parse(self) -> None:
         self._parse_sis_5()
