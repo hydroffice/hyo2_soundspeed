@@ -1691,16 +1691,23 @@ class SoundSpeedLibrary:
             logger.warning("no profile!")
             return False
 
-        if not self.setup.use_sis4:
-            logger.warning("the SIS listening is off")
+        if (not self.setup.use_sis4) and (not self.setup.use_sis5):
+            logger.warning("SIS4/SIS5 listening is off")
             return False
 
         tss_depth = None
         tss_value = None
-        if self.listeners.sis4.xyz88:
+        if self.setup.use_sis4 and self.listeners.sis4.xyz88:
             try:
                 tss_depth = self.listeners.sis4.xyz88.transducer_draft
                 tss_value = self.listeners.sis4.xyz88.sound_speed
+            except Exception as e:
+                logger.warning("unable to retrieve tss values: %s" % e)
+
+        if self.setup.use_sis5 and self.listeners.sis5.mrz:
+            try:
+                tss_depth = self.listeners.sis5.mrz.transducer_draft
+                tss_value = self.listeners.sis5.mrz.tss
             except Exception as e:
                 logger.warning("unable to retrieve tss values: %s" % e)
 
