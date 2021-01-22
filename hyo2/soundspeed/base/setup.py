@@ -101,6 +101,7 @@ class Setup:
         self.mvp_instrument = None
 
         # server
+        self.server_echosounder_id = None
         self.server_source = None
         self.server_apply_surface_sound_speed = None
         self.server_auto_export_on_send = None

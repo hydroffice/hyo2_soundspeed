@@ -121,7 +121,8 @@ class Client:
         if self.protocol != "KCTRL":
             return
 
-        prj.listeners.sis5.request_cur_profile(ip=self.ip, port=self.port)
+        prj.listeners.sis5.request_cur_profile(ip=self.ip, port=self.port,
+                                               echosounder_id=prj.setup.server_echosounder_id)
         wait = prj.setup.rx_max_wait_time
         count = 0
         quantum = 2

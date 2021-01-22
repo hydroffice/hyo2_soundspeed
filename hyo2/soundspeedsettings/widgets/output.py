@@ -319,12 +319,12 @@ class Output(AbstractWidget):
     def modified_echosounder_id(self):
         self.echo_sounder_id.setStyleSheet("background-color: rgba(255,255,"
                                            "153, 255);")
+
     def apply_echosounder_id(self):
         self.db.echo_sounder_id = self.echo_sounder_id.text()
         self.setup_changed()
         self.main_win.reload_settings()
         self.echo_sounder_id.setStyleSheet("background-color: rgba(255,255,255, 255);")
-
 
     def apply_server_apply_surface_sound_speed(self):
         # logger.debug("apply apply surface sound speed")

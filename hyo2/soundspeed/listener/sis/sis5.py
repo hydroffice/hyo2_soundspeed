@@ -37,11 +37,15 @@ class Sis5(AbstractListener):
     @classmethod
     def request_cur_profile(cls, ip: str, port: int = 14002,
                             echosounder_id: str = None) -> None:
+        if echosounder_id is None:
+            raise RuntimeError("Echo sounder id is type = None")
+
         logger.info("Requesting profile from %s:%s" % (ip, port))
 
         sock_out = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         output = '$KSSIS,454,%s' % echosounder_id
-        output += "\\\r\n"
+        output += "\n\r"
+        logger.info('Transmit string : %s' % output)
         sock_out.sendto(output.encode('utf-8'), (ip, port))
 
         # Adding a bit of a pause
