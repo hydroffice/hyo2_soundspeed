@@ -1,6 +1,6 @@
 import logging
 
-from PySide2 import QtCore, QtWidgets
+from PySide2 import QtCore, QtGui, QtWidgets
 
 from hyo2.soundspeedsettings.widgets.widget import AbstractWidget
 from hyo2.soundspeed.profile.dicts import Dicts
@@ -110,6 +110,27 @@ class Output(AbstractWidget):
         hbox.addWidget(self.label)
         hbox.addStretch()
 
+        # - server_id
+        hbox = QtWidgets.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        # -- label
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtWidgets.QLabel("Echo sounder ID (*):")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- value
+        self.echo_sounder_id = QtWidgets.QLineEdit()
+        self.echo_sounder_id.setPlaceholderText("Format: EM<Model>_<Sounder "
+                                               "Id> ex: EM124_010")
+        rex = QtCore.QRegExp(r'em\d{3,4}_\d{3}')
+        rex.setCaseSensitivity(QtCore.Qt.CaseInsensitive)
+        validator = QtGui.QRegExpValidator(rex)
+        self.echo_sounder_id.setValidator(validator)
+        hbox.addWidget(self.echo_sounder_id)
+
         # - server_source
         hbox = QtWidgets.QHBoxLayout()
         self.right_layout.addLayout(hbox)
@@ -150,6 +171,15 @@ class Output(AbstractWidget):
         vbox.addWidget(self.server_apply_surface_sound_speed)
         vbox.addStretch()
 
+        # - Note
+        hbox = QtWidgets.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        label = QtWidgets.QLabel("<i>* Setting for SIS5 servers only. If "
+                                 "yellow, press enter to apply changes</i>")
+        label.setFixedHeight(22)
+        label.setStyleSheet("QLabel { color : #aaaaaa; }")
+        hbox.addWidget(label)
+
         self.right_layout.addStretch()
 
         self.main_layout.addStretch()
@@ -164,6 +194,10 @@ class Output(AbstractWidget):
         self.btn_refresh_list.clicked.connect(self.setup_changed)
         # noinspection PyUnresolvedReferences
         self.sis_auto_apply_manual_casts.currentIndexChanged.connect(self.apply_sis_auto_apply_manual_casts)
+        # noinspection PyUnresolvedReferences
+        self.echo_sounder_id.textChanged.connect(self.modified_echosounder_id)
+        # noinspection PyUnresolvedReferences
+        self.echo_sounder_id.returnPressed.connect(self.apply_echosounder_id)
         # noinspection PyUnresolvedReferences
         self.server_source.currentIndexChanged.connect(self.apply_server_source)
         # noinspection PyUnresolvedReferences
@@ -281,6 +315,16 @@ class Output(AbstractWidget):
         self.db.server_source = self.server_source.currentText()
         self.setup_changed()
         self.main_win.reload_settings()
+
+    def modified_echosounder_id(self):
+        self.echo_sounder_id.setStyleSheet("background-color: rgba(255,255,"
+                                           "153, 255);")
+    def apply_echosounder_id(self):
+        self.db.echo_sounder_id = self.echo_sounder_id.text()
+        self.setup_changed()
+        self.main_win.reload_settings()
+        self.echo_sounder_id.setStyleSheet("background-color: rgba(255,255,255, 255);")
+
 
     def apply_server_apply_surface_sound_speed(self):
         # logger.debug("apply apply surface sound speed")
