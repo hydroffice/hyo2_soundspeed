@@ -31,7 +31,7 @@ logger.info('output folder: %s' % data_output)
 
 # test readers/writers
 logger.info('test: *** START ***')
-filters = ["valeport", ]
+filters = ["rbr", ]
 tests = testing.input_dict_test_files(inclusive_filters=filters)
 # print(tests)
 
@@ -40,13 +40,7 @@ first_done = False
 # import each identified file
 for idx, testfile in enumerate(tests.keys()):
 
-    if "swift_svp" not in testfile:
-        continue
-
     logger.debug("filename: %s" % testfile)
-
-    # if idx > 4:  # FILE FILTER
-    #     break
 
     if first_done:
         break

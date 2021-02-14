@@ -57,6 +57,7 @@ class Dicts:
         ('AML', 117),
         ('SeaAndSun', 118),
         ('HYPACK', 119),
+        ('RBR', 120),
 
         ('Deep Blue', 200),
         ('T-10', 201),
