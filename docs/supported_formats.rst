@@ -27,6 +27,7 @@ Rolls-Royce MVP (.asvp, .calc, .s12)                X
 NCEI (.nc) [1]_                                          X
 QPS (.bsvp) [2]_                                         X
 OceanScience (.asc)                                 X
+RBR Ltd. (.txt)                                     X
 Sea&Sun (.tob)                                      X
 SAIV (.txt)                                         X
 Seabird (.cnv)                                      X
