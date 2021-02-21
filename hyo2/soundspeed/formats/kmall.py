@@ -109,7 +109,7 @@ class KmallMRZ(Kmall):
 
         # ping info                  12 89 20  24   30  34  44 47
         ping_info = struct.unpack("<2Hf6BH11f2h2BHI3f2Hf2H6f4B2df", self.data[36:180])  # 144 bytes
-        # ping_info_length = ping_info[0]
+        ping_info_length = ping_info[0]
         # logger.debug("ping info part -> length: %d/%d" % (ping_info_length, self.length))
         nr_or_tx_sectors = ping_info[33]
         bytes_per_tx_sector = ping_info[34]
@@ -123,31 +123,33 @@ class KmallMRZ(Kmall):
         # vrp_latitude = ping_info[45]
         # vrp_longitude = ping_info[46]
         # logger.debug('VRP pos: %s, %s' % (vrp_latitude, vrp_longitude))
+        start_of_tx_sectors = 36 + ping_info_length
+        end_of_tx_sectors = start_of_tx_sectors + nr_or_tx_sectors * bytes_per_tx_sector
 
-        end_of_tx_sectors = 180 + nr_or_tx_sectors * bytes_per_tx_sector
-        end_of_rx_info = end_of_tx_sectors + 32
 
         # rx info
-        rx_info = struct.unpack("<4H4f4H", self.data[end_of_tx_sectors:end_of_rx_info])
-        # rx_info_length = rx_info[0]
+        rx_info = struct.unpack("<4H4f4H", self.data[end_of_tx_sectors:end_of_tx_sectors+32])
+        rx_info_length = rx_info[0]
         # logger.debug("rx info part -> length: %d/%d" % (rx_info_length, self.length))
         nr_of_soundings = rx_info[1]
+        sounding_length = rx_info[3]
         # logger.debug("rx info part -> nr of soundings: %d" % (nr_of_soundings, ))
         nr_extra_detection_classes = rx_info[10]
         nr_bytes_per_class = rx_info[11]
         # logger.debug("rx info part -> extra det. classes: %d [%d B]"
         #              % (nr_extra_detection_classes, nr_bytes_per_class))
-
+        end_of_rx_info = end_of_tx_sectors + rx_info_length
         end_of_extra_det_class_info = end_of_rx_info + nr_extra_detection_classes * nr_bytes_per_class
 
         # each sounding       8 15   35 39
         sounding_struct = '<H8BH6f2H18f4H'
+
         depths_valid = 0
         depths_sum = 0.0
         for i in range(nr_of_soundings):
-            start_sounding = end_of_extra_det_class_info + i * 120
-            end_sounding = end_of_extra_det_class_info + (i + 1) * 120
-            sounding = struct.unpack(sounding_struct, self.data[start_sounding:end_sounding])
+            start_sounding = end_of_extra_det_class_info + i * sounding_length
+            end_sounding = end_of_extra_det_class_info + (i + 1) * sounding_length
+            sounding = struct.unpack(sounding_struct, self.data[start_sounding:start_sounding+120])
             # sounding_idx = sounding[0]
             # logger.debug("sounding -> #%d" % (sounding_idx, ))
             sounding_detection_type = sounding[2]

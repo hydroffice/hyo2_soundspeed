@@ -82,7 +82,16 @@ class Sis5(AbstractListener):
         #             % (self.sender, self.id, name, len(this_data) / 1024))
 
         if self.id == b'#MRZ':
-            self.mrz = kmall.KmallMRZ(this_data)
+            partition = struct.unpack("<2H", this_data[20:24])
+            nr_of_datagrams = partition[0]
+            datagram_nr = partition[1]
+            if datagram_nr == 1:
+                logger.info("%s DG Partition %d of %d: Read datagram" % (
+                    self.id, datagram_nr, nr_of_datagrams))
+                self.mrz = kmall.KmallMRZ(this_data)
+            else:
+                logger.info("%s DG, Partition %d of %d: Skip reading" % (
+                    self.id, datagram_nr, nr_of_datagrams))
 
         elif self.id == b'#SPO':
             self.spo = kmall.KmallSPO(this_data)
