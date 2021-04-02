@@ -301,8 +301,6 @@ the previous two methods. **Methods A and B are not required in addition to Meth
 *DataDistrib.exe*, bundled with SIS and usually installed in "C:/Program Files/Kongsberg Maritime/SIS/bin" (together with a
 configuration file "DataDistrib.ini" with all the subscriptions).
 
-The *Data Distribution - MDM 400*, which is automatically bundled with SIS and usually installed in
-"C:\\Program Files\\Kongsberg Maritime\\SIS\\bin", is required when multiple software package need to receive data from SIS.
 It is suggested to add the *DataDistrib.exe* to the *Startup* menu of the computer, in Windows OS (so that it is automatically
 started). However, common backsides of this method is that the executable can be accidentally closed (stopping the data
 distribution to this package), or it can accidentally runs twice corrupting the configuration file (to prevent this, it
