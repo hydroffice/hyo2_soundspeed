@@ -201,7 +201,7 @@ class Input(AbstractWidget):
         hbox = QtWidgets.QHBoxLayout()
         self.right_layout.addLayout(hbox)
         hbox.addStretch()
-        self.label = QtWidgets.QLabel("Listeners")
+        self.label = QtWidgets.QLabel("Listeners(*)")
         hbox.addWidget(self.label)
         hbox.addStretch()
 
@@ -338,6 +338,16 @@ class Input(AbstractWidget):
 
         self.right_layout.addStretch()
 
+        # - active setup
+        hbox = QtWidgets.QHBoxLayout()
+        self.main_layout.addLayout(hbox)
+        hbox.addStretch()
+        label = QtWidgets.QLabel("<i>* Restart the application to apply any change to the listeners.</i>")
+        label.setFixedHeight(22)
+        label.setStyleSheet("QLabel { color : #FF6347; }")
+        hbox.addWidget(label)
+        hbox.addStretch()
+
         self.main_layout.addStretch()
 
         self.setup_changed()  # to trigger the first data population
@@ -358,9 +368,9 @@ class Input(AbstractWidget):
         # noinspection PyUnresolvedReferences
         self.temp_sal_source.currentIndexChanged.connect(self.apply_temp_sal_source)
         # noinspection PyUnresolvedReferences
-        self.use_sis4.currentIndexChanged.connect(self.apply_use_sis4)
+        self.use_sis4.currentIndexChanged.connect(self.apply_use_sis)
         # noinspection PyUnresolvedReferences
-        self.use_sis5.currentIndexChanged.connect(self.apply_use_sis5)
+        self.use_sis5.currentIndexChanged.connect(self.apply_use_sis)
         # noinspection PyUnresolvedReferences
         self.use_sippican.currentIndexChanged.connect(self.apply_use_sippican)
         # noinspection PyUnresolvedReferences
@@ -424,9 +434,20 @@ class Input(AbstractWidget):
         self.setup_changed()
         self.main_win.reload_settings()
 
-    def apply_use_sis4(self):
-        # logger.debug("apply use SIS")
-        self.db.use_sis4 = self.use_sis4.currentText() == "True"
+    def apply_use_sis(self):
+        # logger.debug("apply use SIS: %s" % self.sender())
+
+        if self.sender() is self.use_sis4:
+            use_value = self.use_sis4.currentText() == "True"
+            self.db.use_sis4 = use_value
+            if use_value:
+                self.use_sis5.setCurrentText("False")
+        elif self.sender() is self.use_sis5:
+            use_value = self.use_sis5.currentText() == "True"
+            self.db.use_sis5 = use_value
+            if use_value:
+                self.use_sis4.setCurrentText("False")
+
         self.setup_changed()
         self.main_win.reload_settings()
 
