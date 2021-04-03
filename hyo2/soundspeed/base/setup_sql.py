@@ -65,7 +65,7 @@ else:
 CREATE_SETTINGS = """-- noinspection SqlResolveForFile
  CREATE TABLE IF NOT EXISTS general(
      id integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
-     setup_version integer NOT NULL DEFAULT 3,
+     setup_version integer NOT NULL DEFAULT 4,
      setup_name text NOT NULL UNIQUE DEFAULT "default",
      setup_status text NOT NULL DEFAULT "inactive",
      /* input */
@@ -87,10 +87,6 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      sis_listen_port integer NOT NULL DEFAULT 16103,
      sis_listen_timeout integer NOT NULL DEFAULT 10,
      sis_auto_apply_manual_casts integer NOT NULL DEFAULT 1,
-     /* listeners - sis5 */
-     sis5_listen_ip text NOT NULL DEFAULT "224.1.20.40",
-     sis5_listen_port integer NOT NULL DEFAULT 6020,
-     sis5_listen_timeout integer NOT NULL DEFAULT 10,
      /* listeners - sippican */
      sippican_listen_port integer NOT NULL DEFAULT 2002,
      sippican_listen_timeout integer NOT NULL DEFAULT 10,

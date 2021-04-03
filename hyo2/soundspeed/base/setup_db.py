@@ -480,22 +480,22 @@ class SetupDb(BaseDb):
     def rx_max_wait_time(self, value):
         self._setter_int("rx_max_wait_time", value)
 
-    # --- sis4_listen_port
+    # --- sis_listen_port
     @property
-    def sis4_listen_port(self):
+    def sis_listen_port(self):
         return self._getter_int("sis_listen_port")
 
-    @sis4_listen_port.setter
-    def sis4_listen_port(self, value):
+    @sis_listen_port.setter
+    def sis_listen_port(self, value):
         self._setter_int("sis_listen_port", value)
 
-    # --- sis4_listen_timeout
+    # --- sis_listen_timeout
     @property
-    def sis4_listen_timeout(self):
+    def sis_listen_timeout(self):
         return self._getter_int("sis_listen_timeout")
 
-    @sis4_listen_timeout.setter
-    def sis4_listen_timeout(self, value):
+    @sis_listen_timeout.setter
+    def sis_listen_timeout(self, value):
         self._setter_int("sis_listen_timeout", value)
 
     # --- sis_auto_apply_manual_casts
@@ -506,33 +506,6 @@ class SetupDb(BaseDb):
     @sis_auto_apply_manual_casts.setter
     def sis_auto_apply_manual_casts(self, value):
         self._setter_bool("sis_auto_apply_manual_casts", value)
-
-    # --- sis5_listen_ip
-    @property
-    def sis5_listen_ip(self):
-        return self._getter_str("sis5_listen_ip")
-
-    @sis5_listen_ip.setter
-    def sis5_listen_ip(self, value):
-        self._setter_str("sis5_listen_ip", value)
-
-    # --- sis5_listen_port
-    @property
-    def sis5_listen_port(self):
-        return self._getter_int("sis5_listen_port")
-
-    @sis5_listen_port.setter
-    def sis5_listen_port(self, value):
-        self._setter_int("sis5_listen_port", value)
-
-    # --- sis5_listen_timeout
-    @property
-    def sis5_listen_timeout(self):
-        return self._getter_int("sis5_listen_timeout")
-
-    @sis5_listen_timeout.setter
-    def sis5_listen_timeout(self, value):
-        self._setter_int("sis5_listen_timeout", value)
 
     # --- sippican_listen_port
     @property

@@ -73,16 +73,11 @@ class Setup:
         # output
         self.client_list = ClientList()
 
-        # listeners - sis4
-        self.sis4_listen_port = None
-        self.sis4_listen_timeout = None
+        # listeners - sis
+        self.sis_listen_port = None
+        self.sis_listen_timeout = None
         # output - sis 4 and 5
         self.sis_auto_apply_manual_casts = None
-        # listeners - sis5
-        self.sis5_listen_ip = None
-        self.sis5_listen_port = None
-        self.sis5_listen_timeout = None
-        self.sis5_auto_apply_manual_casts = None
         # listeners - sippican
         self.sippican_listen_port = None
         self.sippican_listen_timeout = None
@@ -140,7 +135,7 @@ class Setup:
             release_folder, _ = os.path.split(db_path)
             db = SetupDb(release_folder)
 
-        if db.setup_version > 3:
+        if db.setup_version > 4:
             raise RuntimeError("unsupported setup version: %s" % db.setup_version)
 
         self.setup_version = db.setup_version
@@ -181,19 +176,10 @@ class Setup:
             # logger.debug('- load: %s' % client_string)
 
         # listeners - sis4
-        self.sis4_listen_port = db.sis4_listen_port
-        self.sis4_listen_timeout = db.sis4_listen_timeout
+        self.sis_listen_port = db.sis_listen_port
+        self.sis_listen_timeout = db.sis_listen_timeout
         # output - sis 4 and 5
         self.sis_auto_apply_manual_casts = db.sis_auto_apply_manual_casts
-        # listeners - sis5
-        if db.setup_version == 1:
-            self.sis5_listen_ip = '224.1.20.40'
-            self.sis5_listen_port = 6020
-            self.sis5_listen_timeout = 10
-        else:
-            self.sis5_listen_ip = db.sis5_listen_ip
-            self.sis5_listen_port = db.sis5_listen_port
-            self.sis5_listen_timeout = db.sis5_listen_timeout
 
         # listeners - sippican
         self.sippican_listen_port = db.sippican_listen_port
@@ -280,17 +266,11 @@ class Setup:
                               client_protocol=client.protocol)
 
             # listeners - sis4
-            db.sis4_listen_port = self.sis4_listen_port
-            db.sis4_listen_timeout = self.sis4_listen_timeout
+            db.sis_listen_port = self.sis_listen_port
+            db.sis_listen_timeout = self.sis_listen_timeout
 
             # output - sis 4 and 5
             db.sis_auto_apply_manual_casts = self.sis_auto_apply_manual_casts
-
-            # listeners - sis5
-            if db.setup_version > 1:
-                db.sis5_listen_ip = self.sis5_listen_ip
-                db.sis5_listen_port = self.sis5_listen_port
-                db.sis5_listen_timeout = self.sis5_listen_timeout
 
             # listeners - sippican
             db.sippican_listen_port = self.sippican_listen_port
@@ -359,16 +339,10 @@ class Setup:
         msg += "      <clients>\n"
         for c in self.client_list.clients:
             msg += "        <%s>\n" % c
-        msg += "    <listeners - sis4>\n"
-        msg += "      <sis4_listen_port: %s>\n" % self.sis4_listen_port
-        msg += "      <sis4_listen_timeout: %s>\n" % self.sis4_listen_timeout
-        msg += "    <output - sis 4 and 5>\n"
+        msg += "    <listeners - sis>\n"
+        msg += "      <sis4_listen_port: %s>\n" % self.sis_listen_port
+        msg += "      <sis4_listen_timeout: %s>\n" % self.sis_listen_timeout
         msg += "      <sis_auto_apply_manual_casts: %s>\n" % self.sis_auto_apply_manual_casts
-        msg += "    <listeners - sis5>\n"
-        msg += "      <sis5_listen_ip: %s>\n" % self.sis5_listen_ip
-        msg += "      <sis5_listen_port: %s>\n" % self.sis5_listen_port
-        msg += "      <sis5_listen_timeout: %s>\n" % self.sis5_listen_timeout
-        msg += "      <sis5_auto_apply_manual_casts: %s>\n" % self.sis5_auto_apply_manual_casts
         msg += "    <listeners - sippican>\n"
         msg += "      <sippican_listen_port: %s>\n" % self.sippican_listen_port
         msg += "      <sippican_listen_timeout: %s>\n" % self.sippican_listen_timeout
