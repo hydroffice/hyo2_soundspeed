@@ -66,14 +66,14 @@ class MainWin(QtWidgets.QMainWindow):
         self.tab_input = Input(db=self.db, main_win=self)
         idx = self.tabs.insertTab(2, self.tab_input, "Input")
         self.tabs.setTabToolTip(idx, "Input setup")
-        # output
-        self.tab_output = Output(db=self.db, main_win=self)
-        idx = self.tabs.insertTab(3, self.tab_output, "Output")
-        self.tabs.setTabToolTip(idx, "Output setup")
         # listeners
         self.tab_listeners = Listeners(db=self.db, main_win=self)
-        idx = self.tabs.insertTab(4, self.tab_listeners, "Listeners")
+        idx = self.tabs.insertTab(3, self.tab_listeners, "Listeners")
         self.tabs.setTabToolTip(idx, "Listeners setup")
+        # output
+        self.tab_output = Output(db=self.db, main_win=self)
+        idx = self.tabs.insertTab(4, self.tab_output, "Output")
+        self.tabs.setTabToolTip(idx, "Output setup")
 
         self.setup_changed()  # trigger the first update of all the tabs
 
