@@ -77,7 +77,7 @@ class Kmall:
 
 
 class KmallMRZ(Kmall):
-    def __init__(self, data):
+    def __init__(self, data, debug: bool = False):
         super().__init__(data)
 
         # partition
@@ -168,13 +168,16 @@ class KmallMRZ(Kmall):
         self.mean_depth = None
         if depths_valid > 0:
             self.mean_depth = (depths_sum / depths_valid) - z_water_level_re_ref_point_m
-            # logger.debug("sounding -> mean depth: %s" % (self.mean_depth, ))
+            if debug:
+                logger.debug("MRZ -> mean depth: %.4f" % (self.mean_depth, ))
 
         # footer
         final_length = struct.unpack("<I", self.data[-4:])
         # logger.debug('final length: %s' % final_length)
         self.is_valid = final_length != self.length
         # logger.debug('#MRZ is valid: %s' % self.is_valid)
+        if not self.is_valid:
+            logger.warning('MRZ -> Invalid length: %s != %s' % (final_length, self.length))
 
     def __str__(self):
         output = Kmall.__str__(self)
@@ -184,7 +187,7 @@ class KmallMRZ(Kmall):
 
 
 class KmallSPO(Kmall):
-    def __init__(self, data):
+    def __init__(self, data, debug: bool = False):
         super().__init__(data)
 
         # common = struct.unpack("<4H", self.data[20:28])
@@ -206,7 +209,8 @@ class KmallSPO(Kmall):
         # logger.debug('pos fix quality: %s' % fix_quality)
         self.latitude = data_blk[3]
         self.longitude = data_blk[4]
-        # logger.debug('pos: %s, %s' % (self.latitude, self.longitude))
+        if debug:
+            logger.debug('SPO -> pos: %.7f, %.7f' % (self.latitude, self.longitude))
         self.sog = data_blk[5]
         self.cog = data_blk[6]
         # logger.debug('sog: %s, cog: %s' % (self.sog, self.cog))
@@ -219,6 +223,8 @@ class KmallSPO(Kmall):
         final_length = struct.unpack("<I", self.data[-4:])
         self.is_valid = final_length != self.length
         # logger.debug('#SPO is valid: %s' % self.is_valid)
+        if not self.is_valid:
+            logger.warning('SPO -> Invalid length: %s != %s' % (final_length, self.length))
 
     def __str__(self):
         output = Kmall.__str__(self)
@@ -230,15 +236,17 @@ class KmallSPO(Kmall):
 
 
 class KmallSVP(Kmall):
-    def __init__(self, data):
+    def __init__(self, data, debug: bool = False):
         super().__init__(data)
 
         header_struct = '<2H4BIdd'
         svp_header = struct.unpack(header_struct, self.data[20:48])
         self.num_entries = svp_header[1]
-        logger.debug("svp samples: %s" % (self.num_entries,))
+        if debug:
+            logger.debug("SVP -> samples: %s" % (self.num_entries,))
         self.acquisition_time = Kmall.kmall_datetime(svp_header[3])
-        logger.debug("acquisition time: %s" % self.acquisition_time.strftime('%Y-%m-%d %H:%M:%S.%f'))
+        if debug:
+            logger.debug("SVP -> acquisition time: %s" % self.acquisition_time.strftime('%Y-%m-%d %H:%M:%S.%f'))
 
         fields_struct = '<2fI2f'  # 20B
         self.depth = np.zeros(self.num_entries)
@@ -253,9 +261,12 @@ class KmallSVP(Kmall):
             self.speed[i] = svp_field[1]
             self.temp[i] = svp_field[3]
             self.sal[i] = svp_field[4]
-        logger.debug("depths: %s" % (self.depth, ))
-        logger.debug("speeds: %s" % (self.speed, ))
+        if debug:
+            logger.debug("depths: %s" % (self.depth, ))
+            logger.debug("speeds: %s" % (self.speed, ))
 
         final_length = struct.unpack("<I", self.data[-4:])
         self.is_valid = final_length != self.length
-        logger.debug('#SVP is valid: %s' % self.is_valid)
+        # logger.debug('#SVP is valid: %s' % self.is_valid)
+        if not self.is_valid:
+            logger.warning('SVP -> Invalid length: %s != %s' % (final_length, self.length))

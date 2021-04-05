@@ -61,7 +61,8 @@ setup(
         "pillow",
         "pyserial",
         "requests",
-        "scipy"
+        "scipy",
+        "PySide2"
     ],
     python_requires='>=3.5',
     entry_points={

@@ -13,17 +13,19 @@ class AbstractListener(Thread):
 
     def __init__(self, port: int = 4001, ip: str = "0.0.0.0", timeout: int = 1,
                  datagrams: Optional[list] = None,
-                 target: Optional[object] = None, name: Optional[str] = "Abstract") -> None:
+                 target: Optional[object] = None, name: Optional[str] = "Abstract",
+                 debug: bool = False) -> None:
         Thread.__init__(self, target=target, name=name)
         self.name = self.__class__.__name__
         self.desc = "Abstract listener"  # a human-readable description
         self.ip = ip
         self.port = port
-        self.is_multicast = False  # True for SIS5/K-Ctrl
+        self.is_multicast = False  # True for K-Ctrl
         self.timeout = timeout
         self.datagrams = datagrams
         if not self.datagrams:
             self.datagrams = list()
+        self.debug = debug
 
         self.shutdown = Event()
         self.sock_in = None
@@ -51,6 +53,8 @@ class AbstractListener(Thread):
         else:
             try:
                 self.sock_in.bind((self.ip, self.port))
+                if self.debug:
+                    logger.debug('%s bound to %s@%s' % (self.desc, self.ip, self.port))
 
             except socket.error as e:
                 self.sock_in.close()
@@ -74,7 +78,8 @@ class AbstractListener(Thread):
         count = 0
         while True:
             if self.shutdown.is_set():
-                # logger.debug("shutdown")
+                if self.debug:
+                    logger.info("shutdown")
                 break
             # if (count % 20) == 0:
             #     logger.debug("%s: listening" % self.__class__.__name__)
@@ -84,7 +89,8 @@ class AbstractListener(Thread):
                 self.data, self.sender = self.sock_in.recvfrom(2 ** 16)
 
             except socket.timeout:
-                # logger.info("socket timeout")
+                if self.debug:
+                    logger.info("socket timeout")
                 time.sleep(0.1)
                 continue
 

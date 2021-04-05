@@ -49,7 +49,9 @@ class MainWin(QtWidgets.QMainWindow):
         _app.setOrganizationDomain("hydroffice.org")
 
         # set the minimum and the initial size
+        # noinspection PyArgumentList
         self.setMinimumSize(640, 480)
+        # noinspection PyArgumentList
         self.resize(920, 640)
 
         # set icons
@@ -178,6 +180,7 @@ class MainWin(QtWidgets.QMainWindow):
         timer = QtCore.QTimer(self)
         # noinspection PyUnresolvedReferences
         timer.timeout.connect(self.update_gui)
+        # noinspection PyArgumentList
         timer.start(1500)
         self.timer_execs = 0
 
