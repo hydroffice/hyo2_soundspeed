@@ -244,7 +244,7 @@ class KmallSVP(Kmall):
         self.num_entries = svp_header[1]
         if debug:
             logger.debug("SVP -> samples: %s" % (self.num_entries,))
-        self.acquisition_time = Kmall.kmall_datetime(svp_header[3])
+        self.acquisition_time = Kmall.kmall_datetime(svp_header[6])
         if debug:
             logger.debug("SVP -> acquisition time: %s" % self.acquisition_time.strftime('%Y-%m-%d %H:%M:%S.%f'))
 

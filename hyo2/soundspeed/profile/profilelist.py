@@ -1,6 +1,8 @@
 import logging
+from datetime import datetime
 
 from hyo2.soundspeed.profile.profile import Profile
+from hyo2.soundspeed.profile.dicts import Dicts
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +17,58 @@ class ProfileList:
         # True only if loaded from a project db
         # The current use of this flag is in the app to change the behavior of the metadata dialog
         self.loaded_from_db = False
+
+    @classmethod
+    def constant_gradient(cls, start_depth: float = 0.0,
+                          start_temp: float = 12.94,
+                          start_sal: float = 35.0,
+                          start_speed: float = 1500.0,
+                          end_depth: float = 1000.0,
+                          end_temp: float = 12.94,
+                          end_sal: float = 35.0,
+                          end_speed: float = 1516.7,
+                          thinned: bool = False
+                          ) -> 'ProfileList':
+        ssp = ProfileList()
+        ssp.append()  # append a new profile
+        # initialize probe/sensor type
+        ssp.cur.meta.sensor_type = Dicts.sensor_types['Synthetic']
+        ssp.cur.meta.probe_type = Dicts.probe_types['Unknown']
+        ssp.cur.meta.latitude = 43.13555
+        ssp.cur.meta.longitude = -70.9395
+        ssp.cur.meta.utc_time = datetime.utcnow()
+
+        ssp.cur.init_data(2)
+
+        ssp.cur.data.depth[0] = start_depth
+        ssp.cur.data.temp[0] = start_temp
+        ssp.cur.data.sal[0] = start_sal
+        ssp.cur.data.speed[0] = start_speed
+
+        ssp.cur.data.depth[1] = end_depth
+        ssp.cur.data.temp[1] = end_temp
+        ssp.cur.data.sal[1] = end_sal
+        ssp.cur.data.speed[1] = end_speed
+
+        ssp.cur.clone_data_to_proc()
+        if thinned:
+            ssp.cur.init_sis(2)
+
+            ssp.cur.sis.depth[0] = start_depth
+            ssp.cur.sis.temp[0] = start_temp
+            ssp.cur.sis.sal[0] = start_sal
+            ssp.cur.sis.speed[0] = start_speed
+            ssp.cur.sis.flag[0] = Dicts.flags['thin']
+
+            ssp.cur.sis.depth[1] = end_depth
+            ssp.cur.sis.temp[1] = end_temp
+            ssp.cur.sis.sal[1] = end_sal
+            ssp.cur.sis.speed[1] = end_speed
+            ssp.cur.sis.flag[1] = Dicts.flags['thin']
+        else:
+            ssp.cur.init_sis()  # initialize to zero
+
+        return ssp
 
     @property
     def l(self):

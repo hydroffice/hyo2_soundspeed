@@ -1,9 +1,18 @@
+import functools
 import logging
+import operator
+import socket
 import struct
+import time
+import traceback
 from typing import Optional
 
 from hyo2.soundspeed.listener.abstract import AbstractListener
 from hyo2.soundspeed.formats import km, kmall
+from hyo2.soundspeed.profile.profilelist import ProfileList
+from hyo2.soundspeed.profile.dicts import Dicts
+from hyo2.soundspeed.formats.writers.asvp import Asvp
+
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +46,9 @@ class Sis(AbstractListener):
             self.bist = None  # Type: Optional[km.KmBist]
             self.bist_count = 0
 
+            self.r20_count = 0
+            self.s01_count = 0
+
     class Sis5:
         def __init__(self):
             self.datagrams = [b'#MRZ', b'#SPO', b'#SVP']
@@ -46,6 +58,8 @@ class Sis(AbstractListener):
             self.spo_count = 0
             self.svp = None  # Type: Optional[kmall.KmallSVP]
             self.svp_count = 0
+
+            self.s01_count = 0
 
     def __init__(self, port: int, timeout: int = 1, ip: str = "0.0.0.0",
                  target: Optional[object] = None, name: str = "SIS",
@@ -198,6 +212,56 @@ class Sis(AbstractListener):
         else:
             logger.error("Missing parser for datagram type: %s" % self.cur_id)
 
+    def request_cur_profile(self, ip: str, port: int):
+        if self.use_sis5:
+            logger.warning("uncoded")
+        else:
+            self._request_cur_sis4_profile(ip=ip, port=port)
+
+    def _request_cur_sis4_profile(self, ip: str, port: int) -> None:
+        logger.info("Requesting profile from %s:%s" % (ip, port))
+
+        sock_out = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        # We try all of them in the hopes that one works.
+        sensors = ["710", "122", "302", "3020", "2040"]
+        for idx, sensor in enumerate(sensors):
+            # talker ID, Roger Davis (HMRG) suggested SM based on something KM told him
+            output = '$SMR20,EMX=%s,' % sensor
+
+            # calculate checksum, XOR of all bytes after the $
+            checksum = functools.reduce(operator.xor, map(ord, output[1:len(output)]))
+
+            # append the checksum and end of datagram identifier
+            output += "*{0:02x}".format(checksum)
+            output += "\\\r\n"
+
+            sock_out.sendto(output.encode('utf-8'), (ip, port))
+            if self.debug:
+                logger.debug("%s: tx -> %s" % (idx, output))
+            self.sis4.r20_count += 1
+
+            # Adding a bit of a pause
+            time.sleep(0.5)
+
+        sock_out.close()
+
+    def send_profile(self, ssp: ProfileList, ip: str, port: int) -> None:
+        tx_data = Asvp().convert(ssp, fmt=Dicts.kng_formats['S01'])
+        if self.debug:
+            logger.debug('sending:\n%s' % tx_data)
+        sock_out = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            sock_out.sendto(tx_data.encode('utf-8'), (ip, port))
+            if self.use_sis5:
+                self.sis5.s01_count += 1
+            else:
+                self.sis4.s01_count += 1
+        except socket.error as e:
+            traceback.print_exc()
+            logger.warning("socket issue: %s" % e)
+        sock_out.close()
+
     def info(self) -> str:
         msg = "Received datagrams:\n"
         if self.use_sis5:
@@ -209,4 +273,10 @@ class Sis(AbstractListener):
             msg += "- Xyz: %d\n" % self.sis4.xyz88_count
             msg += "- Ssp: %d\n" % self.sis4.ssp_count
             msg += "- Runtime: %d\n" % self.sis4.runtime_count
+        msg += "Transmitted datagrams:\n"
+        if self.use_sis5:
+            msg += "- S01: %d\n" % self.sis5.s01_count
+        else:
+            msg += "- R20: %d\n" % self.sis4.r20_count
+            msg += "- S01: %d\n" % self.sis4.s01_count
         return msg

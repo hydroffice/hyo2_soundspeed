@@ -1,10 +1,10 @@
 import logging
 import os
-from typing import Optional
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
 from hyo2.soundspeed.listener.sis.sis import Sis
+from hyo2.soundspeed.profile.profilelist import ProfileList
 
 
 logger = logging.getLogger(__name__)
@@ -39,6 +39,7 @@ class ControlPanel(QtWidgets.QWidget):
         self.button_stop = None
         self._make_sis_commands()
 
+        # info viewer
         self.viewer = QtWidgets.QTextBrowser()
         self.viewer.resize(QtCore.QSize(280, 40))
         self.viewer.setTextColor(QtGui.QColor("#4682b4"))
@@ -63,6 +64,7 @@ class ControlPanel(QtWidgets.QWidget):
         self.vbox.addWidget(comments)
 
         self.set_sis_4()
+        self.enable_commands(True)
 
         timer = QtCore.QTimer(self)
         # noinspection PyUnresolvedReferences
@@ -165,7 +167,10 @@ class ControlPanel(QtWidgets.QWidget):
         self.set_input_port.setEnabled(enable)
         self.set_output_ip.setEnabled(enable)
         self.set_output_port.setEnabled(enable)
+        self.set_verbose.setEnabled(enable)
         self.button_start.setEnabled(enable)
+        self.button_request.setDisabled(enable)
+        self.button_send.setDisabled(enable)
         self.button_stop.setDisabled(enable)
 
     def _make_sis_commands(self):
@@ -184,6 +189,20 @@ class ControlPanel(QtWidgets.QWidget):
         self.button_start.setToolTip('Start listening using defined settings')
         # noinspection PyUnresolvedReferences
         self.button_start.clicked.connect(self.start_listening)
+
+        self.button_request = QtWidgets.QPushButton()
+        hbox.addWidget(self.button_request)
+        self.button_request.setText("Require SSP")
+        self.button_request.setToolTip('Require the current SSP')
+        # noinspection PyUnresolvedReferences
+        self.button_request.clicked.connect(self.request_svp)
+
+        self.button_send = QtWidgets.QPushButton()
+        hbox.addWidget(self.button_send)
+        self.button_send.setText("Send SSP")
+        self.button_send.setToolTip('Send a simple SSP')
+        # noinspection PyUnresolvedReferences
+        self.button_send.clicked.connect(self.send_svp)
 
         self.button_stop = QtWidgets.QPushButton()
         hbox.addWidget(self.button_stop)
@@ -211,6 +230,28 @@ class ControlPanel(QtWidgets.QWidget):
         self.sis = None
         self.enable_commands(True)
         logger.info("Stop listening ... DONE!")
+
+    def request_svp(self):
+        if self.sis is None:
+            return
+        logger.info("Requiring SVP ...")
+        self.button_request.setEnabled(False)
+        self.sis.request_cur_profile(ip=self.set_output_ip.text(),
+                                     port=int(self.set_output_port.text()))
+        self.button_request.setEnabled(True)
+        logger.info("Requiring SVP ... DONE")
+
+    def send_svp(self):
+        if self.sis is None:
+            return
+        logger.info("Sending SVP ...")
+        self.button_send.setEnabled(False)
+        self.sis.send_profile(
+            ssp=ProfileList.constant_gradient(thinned=True),
+            ip=self.set_output_ip.text(),
+            port=int(self.set_output_port.text()))
+        self.button_send.setEnabled(True)
+        logger.info("Sending SVP ... DONE")
 
     def update_gui(self):
         if self.sis is None:

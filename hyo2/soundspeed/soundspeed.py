@@ -423,14 +423,15 @@ class SoundSpeedLibrary:
         if not skip_atlas:
             self._retrieve_atlases()
 
-    def create_profile(self, start_depth, start_temp, start_sal, start_speed,
-                       end_depth, end_temp, end_sal, end_speed):
+    def create_profile(self, start_depth: float, start_temp: float,
+                       start_sal: float, start_speed: float,
+                       end_depth: float, end_temp: float,
+                       end_sal: float, end_speed: float):
 
-        ssp = ProfileList()
-        ssp.append()  # append a new profile
-        # initialize probe/sensor type
-        ssp.cur.meta.sensor_type = Dicts.sensor_types['Synthetic']
-        ssp.cur.meta.probe_type = Dicts.probe_types['Unknown']
+        ssp = ProfileList.constant_gradient(start_depth=start_depth, start_temp=start_temp,
+                                            start_sal=start_sal, start_speed=start_speed,
+                                            end_depth=end_depth, end_temp=end_temp,
+                                            end_sal=end_sal, end_speed=end_speed)
 
         ssp.cur.meta.latitude, ssp.cur.meta.longitude = self.cb.ask_location()
         if (ssp.cur.meta.latitude is None) or (ssp.cur.meta.longitude is None):
@@ -441,21 +442,6 @@ class SoundSpeedLibrary:
         if ssp.cur.meta.utc_time is None:
             ssp.clear()
             raise RuntimeError("missing date required for database lookup")
-
-        ssp.cur.init_data(2)
-
-        ssp.cur.data.depth[0] = start_depth
-        ssp.cur.data.temp[0] = start_temp
-        ssp.cur.data.sal[0] = start_sal
-        ssp.cur.data.speed[0] = start_speed
-
-        ssp.cur.data.depth[1] = end_depth
-        ssp.cur.data.temp[1] = end_temp
-        ssp.cur.data.sal[1] = end_sal
-        ssp.cur.data.speed[1] = end_speed
-
-        ssp.cur.clone_data_to_proc()
-        ssp.cur.init_sis()  # initialize to zero
 
         self.ssp = ssp
 
