@@ -23,27 +23,27 @@ class Sis(AbstractListener):
     class Sis4:
         def __init__(self):
             self.datagrams = [0x50, 0x52, 0x55, 0x58]
-            self.surface_ssp = None  # Type: Optional[km.KmSsp]
+            self.surface_ssp = None  # type: Optional[km.KmSsp]
             self.surface_ssp_count = 0
-            self.nav = None  # Type: Optional[km.KmNav]
+            self.nav = None  # type: Optional[km.KmNav]
             self.nav_count = 0
-            self.installation = None  # Type: Optional[km.KmInstallation]
+            self.installation = None  # type: Optional[km.KmInstallation]
             self.installation_count = 0
-            self.runtime = None  # Type: Optional[km.KmRuntime]
+            self.runtime = None  # type: Optional[km.KmRuntime]
             self.runtime_count = 0
-            self.ssp = None  # Type: Optional[km.KmSvp]
+            self.ssp = None  # type: Optional[km.KmSvp]
             self.ssp_count = 0
-            self.svp_input = None  # Type: Optional[km.KmSvpInput]
+            self.svp_input = None  # type: Optional[km.KmSvpInput]
             self.svp_input_count = 0
-            self.xyz88 = None  # Type: Optional[km.KmXyz88]
+            self.xyz88 = None  # type: Optional[km.KmXyz88]
             self.xyz88_count = 0
-            self.range_angle78 = None  # Type: Optional[km.KmRangeAngle78]
+            self.range_angle78 = None  # type: Optional[km.KmRangeAngle78]
             self.range_angle78_count = 0
-            self.seabed_image89 = None  # Type: Optional[km.KmSeabedImage89]
+            self.seabed_image89 = None  # type: Optional[km.KmSeabedImage89]
             self.seabed_image89_count = 0
-            self.watercolumn = None  # Type: Optional[km.KmWatercolumn]
+            self.watercolumn = None  # type: Optional[km.KmWatercolumn]
             self.watercolumn_count = 0
-            self.bist = None  # Type: Optional[km.KmBist]
+            self.bist = None  # type: Optional[km.KmBist]
             self.bist_count = 0
 
             self.r20_count = 0
@@ -52,13 +52,14 @@ class Sis(AbstractListener):
     class Sis5:
         def __init__(self):
             self.datagrams = [b'#MRZ', b'#SPO', b'#SVP']
-            self.mrz = None  # Type: Optional[kmall.KmallMRZ]
+            self.mrz = None  # type: Optional[kmall.KmallMRZ]
             self.mrz_count = 0
-            self.spo = None  # Type: Optional[kmall.KmallSPO]
+            self.spo = None  # type: Optional[kmall.KmallSPO]
             self.spo_count = 0
-            self.svp = None  # Type: Optional[kmall.KmallSVP]
+            self.svp = None  # type: Optional[kmall.KmallSVP]
             self.svp_count = 0
 
+            self.k454_count = 0
             self.s01_count = 0
 
     def __init__(self, port: int, timeout: int = 1, ip: str = "0.0.0.0",
@@ -214,9 +215,29 @@ class Sis(AbstractListener):
 
     def request_cur_profile(self, ip: str, port: int):
         if self.use_sis5:
-            logger.warning("uncoded")
+            self._request_cur_sis5_profile(ip=ip, port=port)
         else:
             self._request_cur_sis4_profile(ip=ip, port=port)
+
+    def _request_cur_sis5_profile(self, ip: str, port: int) -> None:
+        logger.info("Requesting profile from %s:%s" % (ip, port))
+
+        if self.sis5.mrz:
+            echo_id = "%d_%d" % (self.sis5.mrz.sounder_id, self.sis5.mrz.system_id)
+        elif self.sis5.spo:
+            echo_id = "%d_%d" % (self.sis5.spo.sounder_id, self.sis5.spo.system_id)
+        else:
+            logger.warning("unable to retrieve a valid echo sounder ID")
+            return
+
+        output = "$KSSIS,454,EM%s\n\r" % echo_id
+
+        sock_out = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock_out.sendto(output.encode('utf-8'), (ip, port))
+        if self.debug:
+            logger.debug("tx -> '%s'" % (output, ))
+        self.sis5.k454_count += 1
+        sock_out.close()
 
     def _request_cur_sis4_profile(self, ip: str, port: int) -> None:
         logger.info("Requesting profile from %s:%s" % (ip, port))
@@ -224,7 +245,8 @@ class Sis(AbstractListener):
         sock_out = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         # We try all of them in the hopes that one works.
-        sensors = ["710", "122", "302", "3020", "2040"]
+        sensors = ["710", "122", "302", "3020",  # legacy
+                   "0124", "0304", "0712", "2040", "2045"]
         for idx, sensor in enumerate(sensors):
             # talker ID, Roger Davis (HMRG) suggested SM based on something KM told him
             output = '$SMR20,EMX=%s,' % sensor
@@ -275,6 +297,7 @@ class Sis(AbstractListener):
             msg += "- Runtime: %d\n" % self.sis4.runtime_count
         msg += "Transmitted datagrams:\n"
         if self.use_sis5:
+            msg += "- K454: %d\n" % self.sis5.k454_count
             msg += "- S01: %d\n" % self.sis5.s01_count
         else:
             msg += "- R20: %d\n" % self.sis4.r20_count
