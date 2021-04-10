@@ -55,9 +55,12 @@ setup(
         "coverage"
     ],
     install_requires=[
-        "hyo2.abc",
+        "appdirs",
         "gsw",
+        "hyo2.abc",
+        "matplotlib",
         "netCDF4",
+        "numpy",
         "pillow",
         "pyserial",
         "requests",
@@ -79,8 +82,7 @@ setup(
     long_description=(read("README.rst") + "\n\n\"\"\"\"\"\"\"\n\n" +
                       read("HISTORY.rst") + "\n\n\"\"\"\"\"\"\"\n\n" +
                       read("AUTHORS.rst") + "\n\n\"\"\"\"\"\"\"\n\n" +
-                      read(os.path.join("docs", "developer_guide_how_to_contribute.rst")))
-    ,
+                      read(os.path.join("docs", "developer_guide_how_to_contribute.rst"))),
     url="https://github.com/hydroffice/hyo2_soundspeed",
     classifiers=[  #
         'Development Status :: 5 - Production/Stable',

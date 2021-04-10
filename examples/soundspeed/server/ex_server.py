@@ -12,7 +12,7 @@ set_logging(ns_list=ns_list)
 logger = logging.getLogger(__name__)
 
 lib = SoundSpeedLibrary()
-lib.listen_sis4()
+lib.listen_sis()
 time.sleep(3)  # for SIS emulator
 
 server = Server(prj=lib)

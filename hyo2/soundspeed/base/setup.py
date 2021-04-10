@@ -118,6 +118,10 @@ class Setup:
         self.load_from_db()
 
     @property
+    def use_sis(self) -> bool:
+        return self.use_sis4 or self.use_sis5
+
+    @property
     def db(self):
         """Usually the data_folder is set when the project is instantiated, so this is safe"""
         # logger.debug("release_folder: %s, use setup: %s" % (self.release_folder, self.use_setup_name))

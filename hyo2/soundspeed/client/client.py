@@ -103,30 +103,16 @@ class Client:
         sock_out.close()
         return True
 
-    def request_profile_from_sis4(self, prj: 'SoundSpeedLibrary') -> None:
-        if self.protocol != "SIS":
+    def request_profile_from_sis(self, prj: 'SoundSpeedLibrary') -> None:
+        if self.protocol not in ["SIS", "KCTRL"]:
             return
 
-        prj.listeners.sis4.request_cur_profile(ip=self.ip, port=self.port)
+        prj.listeners.sis.request_cur_profile(ip=self.ip, port=self.port)
         wait = prj.setup.rx_max_wait_time
         count = 0
         quantum = 2
         logger.info("Waiting ..")
-        while (count < wait) and (not prj.listeners.sis4.ssp):
-            time.sleep(quantum)
-            count += quantum
-            logger.info(".. %s sec" % count)
-
-    def request_profile_from_sis5(self, prj: 'SoundSpeedLibrary') -> None:
-        if self.protocol != "KCTRL":
-            return
-
-        prj.listeners.sis5.request_cur_profile(ip=self.ip, port=self.port)
-        wait = prj.setup.rx_max_wait_time
-        count = 0
-        quantum = 2
-        logger.info("Waiting ..")
-        while (count < wait) and (not prj.listeners.sis5.svp):
+        while (count < wait) and (not prj.listeners.sis.ssp):
             time.sleep(quantum)
             count += quantum
             logger.info(".. %s sec" % count)

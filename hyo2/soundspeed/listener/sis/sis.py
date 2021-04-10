@@ -5,7 +5,8 @@ import socket
 import struct
 import time
 import traceback
-from typing import Optional
+from datetime import datetime
+from typing import Optional, Union
 
 from hyo2.soundspeed.listener.abstract import AbstractListener
 from hyo2.soundspeed.formats import km, kmall
@@ -64,7 +65,7 @@ class Sis(AbstractListener):
 
     def __init__(self, port: int, timeout: int = 1, ip: str = "0.0.0.0",
                  target: Optional[object] = None, name: str = "SIS",
-                 use_sis5: bool = False, debug: bool = False):
+                 use_sis5: bool = False, debug: bool = False) -> None:
         super().__init__(port=port, ip=ip, timeout=timeout, target=target, name=name, debug=debug)
         self.use_sis5 = use_sis5
         self.desc = name
@@ -74,7 +75,77 @@ class Sis(AbstractListener):
 
         self.cur_id = None
 
-    def parse(self):
+    @property
+    def ssp(self) -> Union[km.KmSvp, kmall.KmallSVP, None]:
+        if self.use_sis5:
+            return self.sis5.svp
+        else:
+            return self.sis4.ssp
+
+    @ssp.setter
+    def ssp(self, value: Union[km.KmSvp, kmall.KmallSVP, None]) -> None:
+        if self.use_sis5:
+            self.sis5.svp = value
+        else:
+            self.sis4.ssp = value
+
+    @property
+    def nav(self) -> Union[km.KmNav, kmall.KmallSPO]:
+        if self.use_sis5:
+            return self.sis5.spo
+        else:
+            return self.sis4.nav
+
+    @property
+    def xyz(self) -> Union[km.KmXyz88, kmall.KmallMRZ]:
+        if self.use_sis5:
+            return self.sis5.mrz
+        else:
+            return self.sis4.xyz88
+
+    @property
+    def xyz_transducer_depth(self) -> float:
+        if self.use_sis5:
+            return self.sis5.mrz.transducer_depth
+        else:
+            return self.sis4.xyz88.transducer_draft
+
+    @property
+    def xyz_transducer_sound_speed(self) -> float:
+        if self.use_sis5:
+            return self.sis5.mrz.tss
+        else:
+            return self.sis4.xyz88.sound_speed
+
+    @property
+    def xyz_mean_depth(self) -> float:
+        if self.use_sis5:
+            return self.sis5.mrz.mean_depth
+        else:
+            return self.sis4.xyz88.mean_depth
+
+    @property
+    def nav_latitude(self) -> float:
+        if self.use_sis5:
+            return self.sis5.spo.latitude
+        else:
+            return self.sis4.nav.latitude
+
+    @property
+    def nav_longitude(self) -> float:
+        if self.use_sis5:
+            return self.sis5.spo.longitude
+        else:
+            return self.sis4.nav.longitude
+
+    @property
+    def nav_timestamp(self) -> datetime:
+        if self.use_sis5:
+            return self.sis5.spo.dg_time
+        else:
+            return self.sis4.nav.dg_time
+
+    def parse(self) -> None:
         if self.use_sis5:
             self.sis4 = Sis.Sis4()
             self._parse_sis5()
@@ -213,7 +284,7 @@ class Sis(AbstractListener):
         else:
             logger.error("Missing parser for datagram type: %s" % self.cur_id)
 
-    def request_cur_profile(self, ip: str, port: int):
+    def request_cur_profile(self, ip: str, port: int) -> None:
         if self.use_sis5:
             self._request_cur_sis5_profile(ip=ip, port=port)
         else:

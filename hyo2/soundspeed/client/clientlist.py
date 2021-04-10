@@ -1,7 +1,7 @@
 import numpy as np
 import time
 import logging
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 from hyo2.soundspeed.client.client import Client
 if TYPE_CHECKING:
@@ -31,10 +31,8 @@ class ClientList:
         for client in self.clients:
 
             # clean previously received profile from SIS
-            if client.protocol == "SIS":
-                prj.listeners.sis4.ssp = None
-            elif client.protocol == "KCTRL":
-                prj.listeners.sis5.svp = None
+            if client.protocol in ["SIS", "KCTRL"]:
+                prj.listeners.sis.ssp = None
 
             prj.progress.add(prog_quantum)
 
@@ -62,7 +60,7 @@ class ClientList:
             wait_max = prj.setup.rx_max_wait_time
             # For multiple SIS clients, make sure the client IP match with the sender IP.
             while True:
-                if (wait > wait_max) or (prj.listeners.sis4.ssp is not None) or (prj.listeners.sis5.svp is not None):
+                if (wait > wait_max) or (prj.listeners.sis.ssp is not None):
                     break
 
                 time.sleep(1)
@@ -74,17 +72,17 @@ class ClientList:
                     logger.info("canceled by user")
                     wait = wait_max
 
-            if (client.protocol == "SIS") and prj.listeners.sis4.ssp:
+            if client.protocol in ["SIS", "KCTRL"] and prj.listeners.sis.ssp:
                 # The KM .all SVP datagrams have a bug in their time reporting and
                 # have a 100 second granularity so can't compare times
                 # to ensure it's the same profile.  Comparing the sound speeds instead
                 d_tx = prj.cur.sis.depth[prj.cur.sis_thinned]
                 s_tx = prj.cur.sis.speed[prj.cur.sis_thinned]
                 # print(d_tx, s_tx)
-                s_rx = np.interp(d_tx, prj.listeners.sis4.ssp.depth, prj.listeners.sis4.ssp.speed)
+                s_rx = np.interp(d_tx, prj.listeners.sis.ssp.depth, prj.listeners.sis.ssp.speed)
                 max_diff = max(abs(s_tx - s_rx))
                 if max_diff < 0.2:
-                    self.last_tx_time = prj.listeners.sis4.ssp.acquisition_time
+                    self.last_tx_time = prj.listeners.sis.ssp.acquisition_time
                     logger.debug("reception confirmed: %s" % self.last_tx_time.strftime("%d/%m/%Y, %H:%M:%S"))
                     if not server_mode:
                         prj.cb.msg_tx_sis_confirmed(name=client.name)
@@ -96,30 +94,10 @@ class ClientList:
                     success = False
                     continue
 
-            elif (client.protocol == "KCTRL") and prj.listeners.sis5.svp:
-                # Comparing the sound speeds instead
-                d_tx = prj.cur.sis.depth[prj.cur.sis_thinned]
-                s_tx = prj.cur.sis.speed[prj.cur.sis_thinned]
-                # print(d_tx, s_tx)
-                s_rx = np.interp(d_tx, prj.listeners.sis5.svp.depth, prj.listeners.sis5.svp.speed)
-                max_diff = max(abs(s_tx - s_rx))
-                if max_diff < 0.2:
-                    self.last_tx_time = prj.listeners.sis5.svp.acquisition_time
-                    logger.debug("reception confirmed: %s" % self.last_tx_time.strftime("%d/%m/%Y, %H:%M:%S"))
-                    if not server_mode:
-                        prj.cb.msg_tx_sis_confirmed(name=client.name)
-                    continue
-                else:
-                    logger.info("casts differ by %.2f m/s" % max_diff)
-                    if not server_mode:
-                        prj.cb.msg_tx_sis_not_confirmed(name=client.name, port=prj.setup.sis5_listen_port)
-                    success = False
-                    continue
-
             else:
                 logger.warning("reception NOT confirmed: unable to catch the back datagram")
                 if not server_mode:
-                    prj.cb.msg_tx_sis_not_confirmed(name=client.name, port=prj.setup.sis5_listen_port)
+                    prj.cb.msg_tx_sis_not_confirmed(name=client.name, port=prj.setup.sis_listen_port)
                 success = False
 
         prj.progress.end()

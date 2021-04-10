@@ -13,7 +13,6 @@ class GeneralAbstractCallbacks(metaclass=ABCMeta):
 
     def __init__(self) -> None:
         self.sis_listener = None
-        self.kctrl_listener = None
 
     @abstractmethod
     def ask_number(self, title: Optional[str] = "", msg: Optional[str] = "Enter number", default: Optional[float] = 0.0,

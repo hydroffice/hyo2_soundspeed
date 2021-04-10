@@ -77,8 +77,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.check_woa09()
         self.check_woa13()
         # self.check_rtofs()  # no need to wait for the download at the beginning
-        self.check_sis4()
-        self.check_sis5()
+        self.check_sis()
         self.check_sippican()
         self.check_mvp()
 
@@ -111,11 +110,13 @@ class MainWin(QtWidgets.QMainWindow):
         self.tabs.currentChanged.connect(self.on_change)  # changed!
         # editor
         self.tab_editor = Editor(lib=self.lib, main_win=self)
+        # noinspection PyArgumentList
         self.idx_editor = self.tabs.insertTab(0, self.tab_editor,
                                               QtGui.QIcon(os.path.join(app_info.app_media_path, 'editor.png')), "")
         self.tabs.setTabToolTip(self.idx_editor, "Editor")
         # database
         self.tab_database = Database(lib=self.lib, main_win=self)
+        # noinspection PyArgumentList
         self.idx_database = self.tabs.insertTab(1, self.tab_database,
                                                 QtGui.QIcon(os.path.join(app_info.app_media_path, 'database.png')), "")
         self.tabs.setTabToolTip(self.idx_database, "Database")
@@ -125,6 +126,7 @@ class MainWin(QtWidgets.QMainWindow):
             # noinspection PyUnresolvedReferences
             from hyo2.surveydatamonitor.app.widgets.monitor import SurveyDataMonitor
             self.tab_monitor = SurveyDataMonitor(lib=self.lib, main_win=self)
+            # noinspection PyArgumentList
             self.idx_monitor = self.tabs.insertTab(3, self.tab_monitor,
                                                    QtGui.QIcon(
                                                        os.path.join(app_info.app_media_path, 'surveydatamonitor.png')),
@@ -137,6 +139,7 @@ class MainWin(QtWidgets.QMainWindow):
             logger.info("Support for Survey Monitor: OFF(%s)" % e)
         # server
         self.tab_server = Server(lib=self.lib, main_win=self)
+        # noinspection PyArgumentList
         self.idx_server = self.tabs.insertTab(4, self.tab_server,
                                               QtGui.QIcon(os.path.join(app_info.app_media_path, 'server.png')), "")
         self.tabs.setTabToolTip(self.idx_server, "Synthetic Profile Server")
@@ -148,6 +151,7 @@ class MainWin(QtWidgets.QMainWindow):
         # self.tabs.setTabToolTip(idx, "Refraction Monitor")
         # setup
         self.tab_setup = Settings(lib=self.lib, main_win=self)
+        # noinspection PyArgumentList
         self.idx_setup = self.tabs.insertTab(6, self.tab_setup,
                                              QtGui.QIcon(os.path.join(app_info.app_media_path, 'settings.png')), "")
         self.tabs.setTabToolTip(self.idx_setup, "Setup")
@@ -161,6 +165,7 @@ class MainWin(QtWidgets.QMainWindow):
                                 with_noaa_link=True,
                                 with_unh_link=True,
                                 with_license=True)
+        # noinspection PyArgumentList
         self.idx_info = self.tabs.insertTab(6, self.tab_info,
                                             QtGui.QIcon(os.path.join(app_info.app_media_path, 'info.png')), "")
         self.tabs.setTabToolTip(self.idx_info, "Info")
@@ -235,7 +240,7 @@ class MainWin(QtWidgets.QMainWindow):
               '   %s\n\n' \
               'Do you want that I perform this operation for you?\n' \
               'Internet connection is required!\n' % self.lib.woa09_folder
-        # noinspection PyCallByClass
+        # noinspection PyCallByClass,PyArgumentList
         ret = QtWidgets.QMessageBox.information(self, "Sound Speed Manager - WOA09 Atlas", msg,
                                                 QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
         if ret == QtWidgets.QMessageBox.No:
@@ -245,7 +250,7 @@ class MainWin(QtWidgets.QMainWindow):
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
                   ' - restart Sound Speed Manager\n' % self.lib.woa09_folder
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.information(self, "Sound Speed Manager - WOA09 Atlas", msg,
                                               QtWidgets.QMessageBox.Ok)
             logger.debug('WOA09: disabled')
@@ -260,7 +265,7 @@ class MainWin(QtWidgets.QMainWindow):
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
                   ' - restart Sound Speed Manager\n' % self.lib.woa09_folder
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - WOA09 Atlas", msg,
                                           QtWidgets.QMessageBox.Ok)
             logger.debug('WOA09: disabled')
@@ -286,7 +291,7 @@ class MainWin(QtWidgets.QMainWindow):
               '   %s\n\n' \
               'Do you want that I perform this operation for you?\n' \
               'Internet connection is required!\n' % self.lib.woa13_folder
-        # noinspection PyCallByClass
+        # noinspection PyCallByClass,PyArgumentList
         ret = QtWidgets.QMessageBox.information(self, "Sound Speed Manager - WOA13 Atlas", msg,
                                                 QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
         if ret == QtWidgets.QMessageBox.No:
@@ -297,7 +302,7 @@ class MainWin(QtWidgets.QMainWindow):
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
                   ' - restart Sound Speed Manager\n' % self.lib.woa13_folder
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.information(self, "Sound Speed Manager - WOA13 Atlas", msg,
                                               QtWidgets.QMessageBox.Ok)
             logger.debug('WOA13: disabled')
@@ -313,7 +318,7 @@ class MainWin(QtWidgets.QMainWindow):
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
                   ' - restart Sound Speed Manager\n' % self.lib.woa13_folder
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - WOA13 Atlas", msg,
                                           QtWidgets.QMessageBox.Ok)
             logger.debug('WOA13: disabled')
@@ -338,7 +343,7 @@ class MainWin(QtWidgets.QMainWindow):
                   'this server (with port 9090 open):\n' \
                   ' - http://nomads.ncep.noaa.gov:9090\n\n' \
                   'You can disable the RTOFS support in Settings/Basic/Use RTOFS.\n'
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - RTOFS Atlas", msg,
                                           QtWidgets.QMessageBox.Ok)
             logger.debug('RTOFS: disabled')
@@ -346,45 +351,31 @@ class MainWin(QtWidgets.QMainWindow):
 
         logger.debug('RTOFS: enabled')
 
-    def check_sis4(self):
-        if self.lib.use_sis4():
-            if not self.lib.listen_sis4():
-                msg = 'Unable to listen SIS4.'
-                # noinspection PyCallByClass
-                QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - SIS4", msg,
+    def check_sis(self):
+        if self.lib.use_sis():
+            if not self.lib.listen_sis():
+                msg = 'Unable to listen SIS.'
+                # noinspection PyCallByClass,PyArgumentList
+                QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - SIS", msg,
                                               QtWidgets.QMessageBox.Ok)
         else:
-            if not self.lib.stop_listen_sis4():
+            if not self.lib.stop_listen_sis():
                 msg = 'Unable to stop listening SIS.'
-                # noinspection PyCallByClass
-                QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - SIS4", msg,
-                                              QtWidgets.QMessageBox.Ok)
-
-    def check_sis5(self):
-        if self.lib.use_sis5():
-            if not self.lib.listen_sis5():
-                msg = 'Unable to listen SIS5.'
-                # noinspection PyCallByClass
-                QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - SIS5", msg,
-                                              QtWidgets.QMessageBox.Ok)
-        else:
-            if not self.lib.stop_listen_sis5():
-                msg = 'Unable to stop listening SIS5.'
-                # noinspection PyCallByClass
-                QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - SIS5", msg,
+                # noinspection PyCallByClass,PyArgumentList
+                QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - SIS", msg,
                                               QtWidgets.QMessageBox.Ok)
 
     def check_sippican(self):
         if self.lib.use_sippican():
             if not self.lib.listen_sippican():
                 msg = 'Unable to listening Sippican.'
-                # noinspection PyCallByClass
+                # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - Sippican", msg,
                                               QtWidgets.QMessageBox.Ok)
         else:
             if not self.lib.stop_listen_sippican():
                 msg = 'Unable to stop listening Sippican.'
-                # noinspection PyCallByClass
+                # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - Sippican", msg,
                                               QtWidgets.QMessageBox.Ok)
 
@@ -392,13 +383,13 @@ class MainWin(QtWidgets.QMainWindow):
         if self.lib.use_mvp():
             if not self.lib.listen_mvp():
                 msg = 'Unable to listening MVP.'
-                # noinspection PyCallByClass
+                # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - MVP", msg,
                                               QtWidgets.QMessageBox.Ok)
         else:
             if not self.lib.stop_listen_mvp():
                 msg = 'Unable to stop listening MVP.'
-                # noinspection PyCallByClass
+                # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - MVP", msg,
                                               QtWidgets.QMessageBox.Ok)
 
@@ -523,35 +514,36 @@ class MainWin(QtWidgets.QMainWindow):
             tokens.append("SIP")
         if self.lib.use_mvp():
             tokens.append("MVP")
-        if self.lib.use_sis4():
-            tokens.append("SIS4")
-        if self.lib.use_sis5():
-            tokens.append("SIS5")
+        if self.lib.use_sis():
+            if self.lib.use_sis4():
+                tokens.append("SIS4")
+            else:
+                tokens.append("SIS5")
         msg += "|".join(tokens)
 
-        if (not self.lib.use_sis4()) and (not self.lib.use_sis5()):  # in case that SIS4 and SIS5 were disabled
+        if not self.lib.use_sis():  # in case that SIS4 and SIS5 were disabled
             self.statusBar().showMessage(msg, 1000)
             return
 
         msg += "  -  "  # add some spacing
 
-        if self.lib.use_sis4():
+        if self.lib.use_sis():
 
-            if self.lib.listeners.sis4.nav is not None:
+            if self.lib.listeners.sis.nav is not None:
                 # time stamp
                 msg += "time:"
-                if self.lib.listeners.sis4.nav.dg_time is not None:
-                    msg += "%s, " % (self.lib.listeners.sis4.nav.dg_time.strftime("%H:%M:%S"))
+                if self.lib.listeners.sis.nav_timestamp is not None:
+                    msg += "%s, " % (self.lib.listeners.sis.nav_timestamp.strftime("%H:%M:%S"))
 
                 else:
                     msg += "NA, "
 
                 # position
                 msg += "pos:"
-                if (self.lib.listeners.sis4.nav.latitude is not None) and \
-                        (self.lib.listeners.sis4.nav.longitude is not None):
+                if (self.lib.listeners.sis.nav_latitude is not None) and \
+                        (self.lib.listeners.sis.nav_longitude is not None):
 
-                    latitude = self.lib.listeners.sis4.nav.latitude
+                    latitude = self.lib.listeners.sis.nav_latitude
                     if latitude >= 0:
                         letter = "N"
                     else:
@@ -559,7 +551,7 @@ class MainWin(QtWidgets.QMainWindow):
                     lat_min = float(60 * math.fabs(latitude - int(latitude)))
                     lat_str = "%02d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(latitude)), lat_min, letter)
 
-                    longitude = self.lib.listeners.sis4.nav.longitude
+                    longitude = self.lib.listeners.sis.nav_longitude
                     if longitude < 0:
                         letter = "W"
                     else:
@@ -572,16 +564,16 @@ class MainWin(QtWidgets.QMainWindow):
                 else:
                     msg += "(NA, NA),  "
 
-            if self.lib.listeners.sis4.xyz88 is not None:
+            if self.lib.listeners.sis.xyz is not None:
                 msg += 'tss:'
-                if self.lib.listeners.sis4.xyz88.sound_speed is not None:
-                    msg += '%.1f m/s,  ' % self.lib.listeners.sis4.xyz88.sound_speed
+                if self.lib.listeners.sis.xyz_transducer_sound_speed is not None:
+                    msg += '%.1f m/s,  ' % self.lib.listeners.sis.xyz_transducer_sound_speed
 
                 else:
                     msg += 'NA m/s,  '
 
                 msg += 'avg.depth:'
-                mean_depth = self.lib.listeners.sis4.xyz88.mean_depth
+                mean_depth = self.lib.listeners.sis.xyz_mean_depth
                 if mean_depth:
                     msg += '%.1f m' % mean_depth
                 else:
@@ -589,64 +581,6 @@ class MainWin(QtWidgets.QMainWindow):
 
             else:
                 msg += 'XYZ88 NA [pinging?]'
-
-        if self.lib.use_sis5():
-
-            if self.lib.use_sis4():
-                msg += " | "
-
-            if self.lib.listeners.sis5.spo is not None:
-                # time stamp
-                msg += "time:"
-                if self.lib.listeners.sis5.spo.dg_time is not None:
-                    msg += "%s, " % (self.lib.listeners.sis5.spo.dg_time.strftime("%H:%M:%S"))
-
-                else:
-                    msg += "NA, "
-
-                # position
-                msg += "pos:"
-                if (self.lib.listeners.sis5.spo.latitude is not None) and \
-                        (self.lib.listeners.sis5.spo.longitude is not None):
-
-                    latitude = self.lib.listeners.sis5.spo.latitude
-                    if latitude >= 0:
-                        letter = "N"
-                    else:
-                        letter = "S"
-                    lat_min = float(60 * math.fabs(latitude - int(latitude)))
-                    lat_str = "%02d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(latitude)), lat_min, letter)
-
-                    longitude = self.lib.listeners.sis5.spo.longitude
-                    if longitude < 0:
-                        letter = "W"
-                    else:
-                        letter = "E"
-                    lon_min = float(60 * math.fabs(longitude - int(longitude)))
-                    lon_str = "%03d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(longitude)), lon_min, letter)
-
-                    msg += "(%s, %s),  " % (lat_str, lon_str)
-
-                else:
-                    msg += "(NA, NA),  "
-
-            if self.lib.listeners.sis5.mrz is not None:
-                msg += 'tss:'
-                if self.lib.listeners.sis5.mrz.tss is not None:
-                    msg += '%.1f m/s,  ' % self.lib.listeners.sis5.mrz.tss
-
-                else:
-                    msg += 'NA m/s,  '
-
-                msg += 'avg.depth:'
-                mean_depth = self.lib.listeners.sis5.mrz.mean_depth
-                if mean_depth:
-                    msg += '%.1f m' % mean_depth
-                else:
-                    msg += 'NA m'
-
-            else:
-                msg += 'MRZ NA [pinging?]'
 
         self.statusBar().showMessage(msg, 2000)
         if self.lib.has_ssp():
@@ -684,6 +618,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.tab_info.change_url(url)
 
     def exception_hook(self, ex_type: type, ex_value: BaseException, tb: traceback) -> None:
+        # noinspection PyTypeChecker
         sys.__excepthook__(ex_type, ex_value, tb)
 
         # first manage case of not being an exception (e.g., keyboard interrupts)

@@ -1,10 +1,8 @@
 import os
-import sys
 import unittest
 from datetime import datetime
 import numpy as np
 
-from hyo2.soundspeedmanager import AppInfo
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 from hyo2.soundspeed.profile.profilelist import ProfileList
 
@@ -44,10 +42,10 @@ class TestSoundSpeedDb(unittest.TestCase):
 
     # @unittest.skipUnless(sys.platform.startswith("win"), "only works with GDAL < 2.0 on Windows")
     def test_save_load_cast(self):
-        def test_pk(pk):
-            self.lib.ssp = self.lib.db_retrieve_profile(pk)
+        def test_pk(pkey):
+            self.lib.ssp = self.lib.db_retrieve_profile(pkey)
             self.lib.store_data()
-            self.lib.ssp = self.lib.db_retrieve_profile(pk)
+            self.lib.ssp = self.lib.db_retrieve_profile(pkey)
             sum_ = len(self.lib.ssp.cur.proc.speed) + len(self.lib.ssp.cur.proc.depth)
             sum_ += len(self.lib.ssp.cur.data.speed) + len(self.lib.ssp.cur.data.depth)
             self.assertEqual(sum_, self.levels * 4)
