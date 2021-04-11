@@ -1,11 +1,11 @@
-from PySide2 import QtCore, QtGui, QtWidgets
-
 import os
 import logging
 
-logger = logging.getLogger(__name__)
+from PySide2 import QtCore, QtWidgets
 
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
+
+logger = logging.getLogger(__name__)
 
 
 class OutputFoldersDialog(AbstractDialog):

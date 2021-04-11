@@ -1,10 +1,10 @@
-from PySide2 import QtCore, QtGui, QtWidgets
-
-QVariant = lambda value=None: value
+from PySide2 import QtCore
 
 from collections import OrderedDict
 
 from hyo2.soundspeed.profile.dicts import Dicts
+
+QVariant = lambda value=None: value
 
 
 class RawDataModel(QtCore.QAbstractTableModel):
@@ -25,6 +25,7 @@ class RawDataModel(QtCore.QAbstractTableModel):
         self.prj = prj
         self.editable = False
 
+    # noinspection PyPep8Naming
     def setEditable(self, value):
         self.editable = value
 
@@ -34,12 +35,15 @@ class RawDataModel(QtCore.QAbstractTableModel):
             flags |= QtCore.Qt.ItemIsEditable
         return flags
 
+    # noinspection PyMethodOverriding
     def rowCount(self, parent=None):
         return self.prj.cur.data.num_samples
 
+    # noinspection PyMethodOverriding
     def columnCount(self, parent=None):
         return 8
 
+    # noinspection PyPep8Naming
     def signalUpdate(self):
         """This is full update, not efficient"""
         # noinspection PyUnresolvedReferences
@@ -86,5 +90,6 @@ class RawDataModel(QtCore.QAbstractTableModel):
         else:
             return QVariant()
 
+    # noinspection PyMethodOverriding
     def setData(self, index, value, role):
         return False

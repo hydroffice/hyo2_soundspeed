@@ -1,8 +1,8 @@
-from PySide2 import QtCore, QtWidgets
-
 import traceback
 import os
 import logging
+
+from PySide2 import QtCore, QtWidgets
 
 from hyo2.abc.lib.helper import Helper
 from hyo2.soundspeed import lib_info
@@ -102,19 +102,11 @@ class ImportSingleProfileDialog(AbstractDialog):
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_load_db)
         # ---- SIS4
-        btn = QtWidgets.QPushButton("SIS4")
+        btn = QtWidgets.QPushButton("SIS")
         self.leftRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
-        btn.setToolTip("Retrieve current profile from SIS4")
+        btn.setToolTip("Retrieve current profile from SIS")
         # noinspection PyUnresolvedReferences
-        btn.clicked.connect(self.on_click_sis4)
-        # --- SIS5
-        btn = QtWidgets.QPushButton("SIS5")
-        self.leftRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
-        btn.setToolTip("Retrieve current profile from SIS5")
-        # TODO: Kongsberg does not support MR20 datagram with KCtrl
-        btn.setDisabled(True)
-        # noinspection PyUnresolvedReferences
-        btn.clicked.connect(self.on_click_sis5)
+        btn.clicked.connect(self.on_click_sis)
         # ---- Seabird CTD
         btn = QtWidgets.QPushButton("Seabird CTD")
         self.leftRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
@@ -139,6 +131,12 @@ class ImportSingleProfileDialog(AbstractDialog):
         btn.setToolTip("Retrieve synthetic data from RegOFS .nc files")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_click_offofs)
+        # ---- RTOFS
+        btn = QtWidgets.QPushButton("RTOFS")
+        self.leftRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from RTOFS Atlas")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_click_rtofs)
 
         # -- mid button box
         # noinspection PyUnresolvedReferences
@@ -147,12 +145,6 @@ class ImportSingleProfileDialog(AbstractDialog):
         self.retrieveSources.addWidget(self.midRetrieveButtonBox)
 
         # --- add buttons
-        # ---- RTOFS
-        btn = QtWidgets.QPushButton("RTOFS")
-        self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
-        btn.setToolTip("Retrieve synthetic data from RTOFS Atlas")
-        # noinspection PyUnresolvedReferences
-        btn.clicked.connect(self.on_click_rtofs)
         # ---- CBOFS
         btn = QtWidgets.QPushButton("CBOFS")
         self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
@@ -263,7 +255,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
     def showEvent(self, event):
         super().showEvent(event)
-        # noinspection PyCallByClass,PyTypeChecker
+        # noinspection PyCallByClass,PyTypeChecker,PyArgumentList
         QtCore.QTimer.singleShot(100, self._auto_apply)
 
     def on_click_import(self, btn):
@@ -299,7 +291,7 @@ class ImportSingleProfileDialog(AbstractDialog):
             self.progress.end()
             traceback.print_exc()
             msg = "Issue in importing the data:\n\n> %s" % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Import error", msg, QtWidgets.QMessageBox.Ok)
             return
 
@@ -340,7 +332,7 @@ class ImportSingleProfileDialog(AbstractDialog):
         lst = ["#%03d: %s" % (p[0], p[1]) for p in profiles]
         if len(lst) == 0:
             msg = "Store data before import!"
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Database", msg, QtWidgets.QMessageBox.Ok)
             return
 
@@ -352,46 +344,27 @@ class ImportSingleProfileDialog(AbstractDialog):
         success = self.lib.load_profile(profiles[lst.index(sel)][0])
         if not success:
             msg = "Unable to load profile!"
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Database", msg, QtWidgets.QMessageBox.Ok)
             return
 
         self.accept()
 
-    def on_click_sis4(self) -> None:
-        """Retrieve SIS4 data"""
-        logger.debug("user wants to retrieve SIS4 profile")
-        if not self.lib.use_sis4():
-            msg = "The SIS4 listening is not activated!\n\nGo to Settings/Input/Listen SIS4"
-            # noinspection PyCallByClass
+    def on_click_sis(self) -> None:
+        """Retrieve SIS data"""
+        logger.debug("user wants to retrieve SIS profile")
+        if not self.lib.use_sis():
+            msg = "The SIS listening is not activated!\n\nGo to Settings/Input/Listen SIS"
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             return
 
         try:
-            self.lib.retrieve_sis4()
+            self.lib.retrieve_sis()
 
         except RuntimeError as e:
-            msg = "Issue in retrieving data from SIS4:\n\n%s" % e
-            # noinspection PyCallByClass
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
-            return
-
-        self.accept()
-
-    def on_click_sis5(self) -> None:
-        """Retrieve SIS5 data"""
-        if not self.lib.use_sis5():
-            msg = "The SIS5 listening is not activated!\n\nGo to Settings/Input/Listen SIS5"
-            # noinspection PyCallByClass
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
-            return
-
-        try:
-            self.lib.retrieve_sis5()
-
-        except RuntimeError as e:
-            msg = "Issue in retrieving data from SIS5:\n\n%s" % e
-            # noinspection PyCallByClass
+            msg = "Issue in retrieving data from SIS:\n\n%s" % e
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             return
 
@@ -418,7 +391,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = "Issue in importing the WOA09 data:\n\n> %s" % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return
@@ -437,7 +410,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = "Issue in importing the WOA13 data:\n\n> %s" % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return
@@ -456,7 +429,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = "Issue in importing the RTOFS data:\n\n> %s" % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return
@@ -475,7 +448,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = 'Issue in importing the CBOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return
@@ -494,7 +467,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = 'Issue in importing the CREOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return
@@ -513,7 +486,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = 'Issue in importing the DBOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return
@@ -532,7 +505,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = "Issue in importing the GoMOFS data:\n\n> %s" % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return
@@ -551,7 +524,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = "Issue in importing the LEOFS data:\n\n> %s" % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return
@@ -570,7 +543,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = 'Issue in importing the LHOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return
@@ -589,7 +562,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = 'Issue in importing the LMOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return
@@ -608,7 +581,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = 'Issue in importing the LOOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return
@@ -627,7 +600,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = 'Issue in importing the LSOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return
@@ -646,7 +619,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = 'Issue in importing the NGOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return
@@ -665,7 +638,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = 'Issue in importing the NYOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return
@@ -684,7 +657,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = 'Issue in importing the SFBOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return
@@ -703,7 +676,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = 'Issue in importing the SJROFS data:\n\n> %s' % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return
@@ -722,7 +695,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = 'Issue in importing the TBOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return
@@ -741,7 +714,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = 'Issue in retrieving the regional OFS data:\n\n> %s' % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Retrieve error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()
             return

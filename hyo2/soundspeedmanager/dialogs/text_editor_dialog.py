@@ -17,6 +17,7 @@ class TextEditorDialog(AbstractDialog):
 
         self._title = title
         self.setWindowTitle(self._title)
+        # noinspection PyArgumentList
         self.setMinimumSize(200, 200)
         self.resize(init_size)
 
@@ -38,6 +39,7 @@ class TextEditorDialog(AbstractDialog):
         self._editor.set_html_text(body)
 
         # tool bar
+        # noinspection PyArgumentList
         self._tools_bar = self.mainWidget.addToolBar('Tools')
         self._tools_bar.setIconSize(QtCore.QSize(32, 32))
         self._tools_bar.setAllowedAreas(QtCore.Qt.TopToolBarArea | QtCore.Qt.BottomToolBarArea)
@@ -78,6 +80,7 @@ class TextEditorDialog(AbstractDialog):
         timer = QtCore.QTimer(self)
         # noinspection PyUnresolvedReferences
         timer.timeout.connect(self._update_gui)
+        # noinspection PyArgumentList
         timer.start(400)
 
     def _update_gui(self):
@@ -141,7 +144,7 @@ class TextEditorDialog(AbstractDialog):
         if os.path.exists(selection):
 
             msg = "Do you want to append to the existing file?"
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             ret = QtWidgets.QMessageBox.warning(self, "File exists", msg,
                                                 QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.Cancel)
             if ret == QtWidgets.QMessageBox.Cancel:

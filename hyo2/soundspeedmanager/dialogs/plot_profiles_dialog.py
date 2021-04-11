@@ -67,7 +67,7 @@ class PlotProfilesDialog(AbstractDialog):
 
         success = self.lib.map_db_profiles()
         if not success:
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Database", "Unable to create a profile map!")
         else:
             self.accept()
@@ -79,7 +79,7 @@ class PlotProfilesDialog(AbstractDialog):
         # print(ssp_times[0][0], ssp_times[-1][0])
 
         if len(ssp_times) == 0:
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.information(self, "Database",
                                               "Missing SSPs in the database. Import and store them first!")
 
@@ -88,6 +88,7 @@ class PlotProfilesDialog(AbstractDialog):
             def __init__(self, date_start, date_end, *args, **kwargs):
                 super(DateDialog, self).__init__(*args, **kwargs)
 
+                # noinspection PyArgumentList
                 self.setMinimumSize(300, 500)
                 self.setWindowTitle('SSP date range to plot')
 
@@ -138,7 +139,7 @@ class PlotProfilesDialog(AbstractDialog):
 
         # check the user selection
         if dates[0] > dates[1]:
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self,
                                            'The start date (%s) comes after the end data (%s)' % (dates[0], dates[1]),
                                            'Invalid selection')
@@ -146,7 +147,7 @@ class PlotProfilesDialog(AbstractDialog):
 
         success = self.lib.aggregate_plot(dates=dates)
         if not success:
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Database", "Unable to create an aggregate plot!")
         else:
             self.accept()
@@ -155,7 +156,7 @@ class PlotProfilesDialog(AbstractDialog):
         logger.debug("user want to show per-day plots")
         success = self.lib.plot_daily_db_profiles()
         if not success:
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Database", "Unable to create daily plots!")
         else:
             self.accept()
@@ -164,7 +165,7 @@ class PlotProfilesDialog(AbstractDialog):
         logger.debug("user want to save per-day plots")
         success = self.lib.save_daily_db_profiles()
         if not success:
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Database", "Unable to save daily plots!")
         else:
             self.only_saved = True

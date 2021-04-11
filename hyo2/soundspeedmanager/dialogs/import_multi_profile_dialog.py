@@ -78,7 +78,7 @@ class ImportMultiProfileDialog(AbstractDialog):
             msg = "Do you really want to store profiles based \non pre-processed %s data?\n\n" \
                   "This operation may OVERWRITE existing raw data \nin the database!" \
                   % desc
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             ret = QtWidgets.QMessageBox.warning(self, "Pre-processed source warning", msg,
                                                 QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
             if ret == QtWidgets.QMessageBox.No:
@@ -114,7 +114,7 @@ class ImportMultiProfileDialog(AbstractDialog):
             except RuntimeError as e:
                 self.progress.end()
                 msg = "Issue in importing the file #%s: %s\n\n> %s" % (i, selection, e)
-                # noinspection PyCallByClass
+                # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.critical(self, "Import error", msg, QtWidgets.QMessageBox.Ok)
                 return
 

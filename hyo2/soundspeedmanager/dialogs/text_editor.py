@@ -1,5 +1,5 @@
-from PySide2 import QtGui, QtWidgets
 import logging
+from PySide2 import QtGui, QtWidgets
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +29,7 @@ class TextEditor(QtWidgets.QTextEdit):
         self.setFont(font)
         # set the tab size
         metrics = QtGui.QFontMetrics(font)
+        # noinspection PyArgumentList
         self.setTabStopWidth(3 * metrics.width(' '))
 
     @property

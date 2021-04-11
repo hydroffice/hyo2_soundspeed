@@ -144,6 +144,7 @@ class MetadataDialog(AbstractDialog):
             self.vessel.setEditable(True)
         self.vessel.addItems(vessel_list)
         if self.lib.cur.meta.vessel and self.vessel.findText(self.lib.cur.meta.vessel) < 0:
+            # noinspection PyArgumentList
             self.vessel.insertItem(0, self.lib.cur.meta.vessel)
         self.vessel.setCurrentIndex(self.vessel.findText(self.lib.cur.meta.vessel))
         hbox.addWidget(self.vessel)
@@ -431,6 +432,7 @@ class MetadataDialog(AbstractDialog):
         self.institution.setText(self.lib.setup.default_institution)
         self.survey.setText(self.lib.setup.default_survey)
         if self.lib.setup.default_vessel and self.vessel.findText(self.lib.setup.default_vessel) < 0:
+            # noinspection PyArgumentList
             self.vessel.insertItem(0, self.lib.setup.default_vessel)
         self.vessel.setCurrentIndex(self.vessel.findText(self.lib.setup.default_vessel))
 
@@ -473,11 +475,13 @@ class MetadataDialog(AbstractDialog):
                         # only if the profile was loaded from a db
                         if self.lib.ssp.loaded_from_db:
                             msg = "Unable to remove old profile!"
+                            # noinspection PyArgumentList
                             QtWidgets.QMessageBox.warning(self, "Database warning", msg, QtWidgets.QMessageBox.Ok)
                             return
 
             except Exception as e:
                 msg = "Unable to interpret position or location!\n\n%s" % e
+                # noinspection PyArgumentList
                 QtWidgets.QMessageBox.warning(self, "Database warning", msg, QtWidgets.QMessageBox.Ok)
                 return
 
@@ -499,7 +503,7 @@ class MetadataDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = "Issue in apply changes\n%s" % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Metadata error", msg, QtWidgets.QMessageBox.Ok)
             return
 
@@ -511,6 +515,7 @@ class MetadataDialog(AbstractDialog):
 
             if not self.lib.store_data():
                 msg = "Unable to save to db!"
+                # noinspection PyArgumentList
                 QtWidgets.QMessageBox.warning(self, "Database warning", msg, QtWidgets.QMessageBox.Ok)
                 return
             else:

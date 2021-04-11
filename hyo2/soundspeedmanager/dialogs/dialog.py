@@ -1,13 +1,12 @@
+import logging
 import os
 
-from PySide2 import QtCore, QtGui, QtWidgets
-
-import logging
-
-logger = logging.getLogger(__name__)
+from PySide2 import QtCore, QtWidgets
 
 from hyo2.abc.app.qt_progress import QtProgress
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+
+logger = logging.getLogger(__name__)
 
 
 class AbstractDialog(QtWidgets.QDialog):

@@ -65,13 +65,13 @@ class ProjectRenameDialog(AbstractDialog):
 
         if len(txt) == 0:
             msg = "Set the project name!"
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Creation warning", msg, QtWidgets.QMessageBox.Ok)
             return
 
         if txt in self.lib.list_projects():
             msg = "The project '%s' already exists!" % txt
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Creation warning", msg, QtWidgets.QMessageBox.Ok)
             return
 

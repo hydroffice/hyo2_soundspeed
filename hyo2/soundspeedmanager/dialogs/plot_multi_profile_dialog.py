@@ -1,14 +1,12 @@
 import logging
 
 from PySide2 import QtWidgets
-import matplotlib
 from matplotlib import rc_context
 from matplotlib import pyplot as plt
 
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
 
 logger = logging.getLogger(__name__)
-# matplotlib.use('qt5agg')
 
 
 class PlotMultiProfileDialog(AbstractDialog):
@@ -117,7 +115,7 @@ class PlotMultiProfileDialog(AbstractDialog):
 
                 success = self.lib.load_profile(pk, skip_atlas=True)
                 if not success:
-                    # noinspection PyCallByClass
+                    # noinspection PyCallByClass,PyArgumentList
                     QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile #%02d!" % pk,
                                                   QtWidgets.QMessageBox.Ok)
                     continue
@@ -192,7 +190,7 @@ class PlotMultiProfileDialog(AbstractDialog):
 
                 success = self.lib.load_profile(pk, skip_atlas=True)
                 if not success:
-                    # noinspection PyCallByClass
+                    # noinspection PyCallByClass,PyArgumentList
                     QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile #%02d!" % pk,
                                                   QtWidgets.QMessageBox.Ok)
                     continue
@@ -267,7 +265,7 @@ class PlotMultiProfileDialog(AbstractDialog):
 
                 success = self.lib.load_profile(pk, skip_atlas=True)
                 if not success:
-                    # noinspection PyCallByClass
+                    # noinspection PyCallByClass,PyArgumentList
                     QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile #%02d!" % pk,
                                                   QtWidgets.QMessageBox.Ok)
                     continue

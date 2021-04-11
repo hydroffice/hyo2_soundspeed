@@ -9,27 +9,30 @@ class MultiSelectionDialog(QtWidgets.QDialog):
     def __init__(self, title, message, items, parent=None):
         super().__init__(parent=parent)
         form = QtWidgets.QFormLayout(self)
+        # noinspection PyArgumentList
         form.addRow(QtWidgets.QLabel(message))
         self.listView = QtWidgets.QListView(self)
+        # noinspection PyArgumentList
         form.addRow(self.listView)
         model = QtGui.QStandardItemModel(self.listView)
         self.setWindowTitle(title)
         for item in items:
             # create an item with a caption
-            standardItem = QtGui.QStandardItem(item)
-            standardItem.setCheckable(True)
-            model.appendRow(standardItem)
+            standard_item = QtGui.QStandardItem(item)
+            standard_item.setCheckable(True)
+            model.appendRow(standard_item)
         self.listView.setModel(model)
 
-        buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel,
-                                               QtCore.Qt.Horizontal, self)
-        form.addRow(buttonBox)
+        button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel,
+                                                QtCore.Qt.Horizontal, self)
+        # noinspection PyArgumentList
+        form.addRow(button_box)
         self.setLayout(form)
 
         # noinspection PyUnresolvedReferences
-        buttonBox.accepted.connect(self.accept)
+        button_box.accepted.connect(self.accept)
         # noinspection PyUnresolvedReferences
-        buttonBox.rejected.connect(self.reject)
+        button_box.rejected.connect(self.reject)
 
     def selected_items(self):
         selected = []

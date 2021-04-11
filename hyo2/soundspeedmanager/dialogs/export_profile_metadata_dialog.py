@@ -89,7 +89,7 @@ class ExportProfileMetadataDialog(AbstractDialog):
         logger.debug("export clicked")
         if len(self.fmt_outputs) == 0:
             msg = "Select output formats before metadata export!"
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.Ok)
             return
 
@@ -122,7 +122,7 @@ class ExportProfileMetadataDialog(AbstractDialog):
                                                        filter_fields=filter_fields)
             if not ret:
                 success = False
-                # noinspection PyCallByClass
+                # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.critical(self, "Database", "Unable to export as %s!" % fmt)
 
         # except RuntimeError as e:

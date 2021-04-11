@@ -137,7 +137,7 @@ class ExportSingleProfileDialog(AbstractDialog):
 
         if len(self.selected_writers) == 0:
             msg = "Select output formats before data export!"
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.Ok)
             return
 
@@ -151,7 +151,7 @@ class ExportSingleProfileDialog(AbstractDialog):
 
             if self.lib.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']:
                 msg = "Attempt to export a synthetic profile in NCEI format!"
-                # noinspection PyCallByClass
+                # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.Ok)
                 return
 
@@ -160,7 +160,7 @@ class ExportSingleProfileDialog(AbstractDialog):
                       "Rename the project in the Database tab!"
                 if self.lib.setup.noaa_tools:
                     msg += "\n\nRecommend in project_survey format, e.g. OPR-P999-RA-17_H12345"
-                # noinspection PyCallByClass
+                # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.Ok)
                 return
 
@@ -170,7 +170,7 @@ class ExportSingleProfileDialog(AbstractDialog):
                     msg = "The project name cannot be used for NCEI export.\n\n" \
                           "Rename the project in the Database tab!\n\n" \
                           "Recommend \"project_survey\" format, e.g. OPR-P999-RA-17_H12345"
-                    # noinspection PyCallByClass
+                    # noinspection PyCallByClass,PyArgumentList
                     QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.Ok)
                     return
 
@@ -181,7 +181,7 @@ class ExportSingleProfileDialog(AbstractDialog):
                       "To fix the issue:\n" \
                       "- Load the profile (if not already loaded)\n" \
                       "- Set the missing values using the Metadata button on the Editor tool bar\n"
-                # noinspection PyCallByClass
+                # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.Ok)
                 return
 
@@ -230,7 +230,7 @@ class ExportSingleProfileDialog(AbstractDialog):
 
             basename_msg = "Enter output basename (without extension):"
             while True:
-                # noinspection PyCallByClass
+                # noinspection PyCallByClass,PyArgumentList
                 basename, ok = QtWidgets.QInputDialog.getText(self, "Output basename", basename_msg,
                                                               text=self.lib.cur_basename)
                 if not ok:
@@ -247,7 +247,7 @@ class ExportSingleProfileDialog(AbstractDialog):
         except RuntimeError as e:
             self.progress.end()
             msg = "Issue in exporting the data.\nReason: %s" % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Export error", msg, QtWidgets.QMessageBox.Ok)
             return
 
@@ -266,7 +266,7 @@ class ExportSingleProfileDialog(AbstractDialog):
         else:
             self.progress.end()
             msg = "Profile successfully exported!"
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.information(self, "Export profile", msg, QtWidgets.QMessageBox.Ok)
 
         self.accept()

@@ -145,7 +145,7 @@ class ExportMultiProfileDialog(AbstractDialog):
 
         if len(self.selected_writers) == 0:
             msg = "Select output formats before data export!"
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.Ok)
             return
 
@@ -178,7 +178,7 @@ class ExportMultiProfileDialog(AbstractDialog):
                 if os.path.exists(caris_path):
                     msg = "An existing CARIS file is present in the output folder.\n\n" \
                           "Do you want to remove it to avoid possible profile duplications?"
-                    # noinspection PyCallByClass
+                    # noinspection PyCallByClass,PyArgumentList
                     ret = QtWidgets.QMessageBox.question(self, "CARIS export", msg,
                                                          QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
                     if ret == QtWidgets.QMessageBox.Yes:
@@ -200,7 +200,7 @@ class ExportMultiProfileDialog(AbstractDialog):
 
             success = self.lib.load_profile(pk, skip_atlas=True)
             if not success:
-                # noinspection PyCallByClass
+                # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile #%02d!" % pk,
                                               QtWidgets.QMessageBox.Ok)
                 continue
@@ -214,7 +214,7 @@ class ExportMultiProfileDialog(AbstractDialog):
 
                 if self.lib.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']:
                     msg = "Attempt to export a synthetic profile in NCEI format!"
-                    # noinspection PyCallByClass
+                    # noinspection PyCallByClass,PyArgumentList
                     QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.Ok)
                     skip_export = True
                     continue
@@ -225,7 +225,7 @@ class ExportMultiProfileDialog(AbstractDialog):
                           "Rename the project in the Database tab!"
                     if self.lib.setup.noaa_tools:
                         msg += "\n\nRecommend in project_survey format, e.g. OPR-P999-RA-17_H12345"
-                    # noinspection PyCallByClass
+                    # noinspection PyCallByClass,PyArgumentList
                     QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.Ok)
                     skip_export = True
                     continue
@@ -237,7 +237,7 @@ class ExportMultiProfileDialog(AbstractDialog):
                             msg = "The project name cannot be used for NCEI export.\n\n" \
                                   "Rename the project in the Database tab!\n\n" \
                                   "Recommend \"project_survey\" format, e.g. OPR-P999-RA-17_H12345"
-                            # noinspection PyCallByClass
+                            # noinspection PyCallByClass,PyArgumentList
                             QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.Ok)
                             skip_export = True
                             continue
@@ -249,7 +249,7 @@ class ExportMultiProfileDialog(AbstractDialog):
                           "To fix the issue:\n" \
                           "- Load the profile (if not already loaded)\n" \
                           "- Set the missing values using the Metadata button on the Editor tool bar\n"
-                    # noinspection PyCallByClass
+                    # noinspection PyCallByClass,PyArgumentList
                     QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.Ok)
                     skip_export = True
                     continue
@@ -289,7 +289,7 @@ class ExportMultiProfileDialog(AbstractDialog):
             except RuntimeError as e:
                 self.progress.end()
                 msg = "Issue in exporting the data for profile #%02d.\nReason: %s" % (pk, e)
-                # noinspection PyCallByClass
+                # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.critical(self, "Export error", msg, QtWidgets.QMessageBox.Ok)
                 continue
             self.progress.end()
@@ -304,11 +304,11 @@ class ExportMultiProfileDialog(AbstractDialog):
 
         if all_exported:
             msg = "Profiles successfully exported!"
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.information(self, "Export profile", msg, QtWidgets.QMessageBox.Ok)
         else:
             msg = "At least one profile had issues in being exported!"
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Export profile", msg, QtWidgets.QMessageBox.Ok)
 
         self.accept()

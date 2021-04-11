@@ -12,11 +12,11 @@ import logging
 
 from PySide2 import QtGui, QtWidgets
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
 from hyo2.soundspeedmanager.dialogs.seacat import add_btn, get_last_comport, AutoSeacat, SelectCastsDlg, \
     save_last_comport, sbe_serialcomms, get_setting_string
+
+logger = logging.getLogger(__name__)
 
 
 class SeacatDialog(AbstractDialog):
@@ -52,6 +52,7 @@ class SeacatDialog(AbstractDialog):
         img = QtGui.QImage(os.path.join(self.media, 'seacat.png'))
         if img.isNull():
             raise RuntimeError("unable to open seacat image")
+        # noinspection PyArgumentList
         img_label.setPixmap(QtGui.QPixmap.fromImage(img))
         group_layout.addWidget(img_label)
         # - text

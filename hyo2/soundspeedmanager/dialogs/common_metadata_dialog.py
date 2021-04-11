@@ -34,6 +34,7 @@ class CommonMetadataDialog(AbstractDialog):
         if not lib.setup.noaa_tools:
             self.institution.setEditable(True)
         self.institution.addItems(institution_list)
+        # noinspection PyArgumentList
         self.institution.insertItem(0, "")
         self.institution.setCurrentIndex(self.institution.findText(""))
         hbox.addWidget(self.institution)
@@ -65,6 +66,7 @@ class CommonMetadataDialog(AbstractDialog):
         if not lib.setup.noaa_tools:
             self.vessel.setEditable(True)
         self.vessel.addItems(vessel_list)
+        # noinspection PyArgumentList
         self.vessel.insertItem(0, "")
         self.vessel.setCurrentIndex(self.vessel.findText(""))
         hbox.addWidget(self.vessel)
@@ -152,10 +154,12 @@ class CommonMetadataDialog(AbstractDialog):
         logger.debug("load default")
 
         if self.lib.setup.default_institution and self.institution.findText(self.lib.setup.default_institution) < 0:
+            # noinspection PyArgumentList
             self.institution.insertItem(0, self.lib.setup.default_institution)
         self.institution.setCurrentIndex(self.institution.findText(self.lib.setup.default_institution))
         self.survey.setText(self.lib.setup.default_survey)
         if self.lib.setup.default_vessel and self.vessel.findText(self.lib.setup.default_vessel) < 0:
+            # noinspection PyArgumentList
             self.vessel.insertItem(0, self.lib.setup.default_vessel)
         self.vessel.setCurrentIndex(self.vessel.findText(self.lib.setup.default_vessel))
 
@@ -166,7 +170,7 @@ class CommonMetadataDialog(AbstractDialog):
 
             success = self.lib.load_profile(pk, skip_atlas=True)
             if not success:
-                # noinspection PyCallByClass
+                # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile #%s!" % pk,
                                               QtWidgets.QMessageBox.Ok)
                 continue
@@ -186,14 +190,14 @@ class CommonMetadataDialog(AbstractDialog):
 
             except RuntimeError as e:
                 msg = "Issue in apply changes\n%s" % e
-                # noinspection PyCallByClass
+                # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.critical(self, "Metadata error", msg, QtWidgets.QMessageBox.Ok)
                 continue
 
             # we store the metadata to the db
             if not self.lib.store_data():
                 msg = "Unable to save to db!"
-                # noinspection PyCallByClass
+                # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.warning(self, "Database warning for profile #%s" % pk, msg,
                                               QtWidgets.QMessageBox.Ok)
                 continue

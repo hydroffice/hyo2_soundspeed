@@ -1,14 +1,10 @@
 from PySide2 import QtCore, QtWidgets, QtGui
 
 import traceback
-import os
 import logging
 
-from hyo2.abc.lib.helper import Helper
-from hyo2.soundspeed import lib_info
 from hyo2.soundspeed.profile.oceanography import Oceanography
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
-from hyo2.soundspeedmanager.dialogs.seacat_dialog import SeacatDialog
 
 logger = logging.getLogger(__name__)
 
@@ -177,11 +173,11 @@ class ConstantGradientProfileDialog(AbstractDialog):
             self.start_speed_value.setText("%.2f" % start_speed)
         except Exception as e:
             logger.warning("Invalid start sound speed calculation: %s" % e)
-            
+
         try:
             end_speed = self.oc.speed(d=float(self.end_depth_value.text()),
-                                        t=float(self.end_temp_value.text()),
-                                        s=float(self.end_sal_value.text()))
+                                      t=float(self.end_temp_value.text()),
+                                      s=float(self.end_sal_value.text()))
             self.end_speed_value.setText("%.2f" % end_speed)
         except Exception as e:
             logger.warning("Invalid end sound speed calculation: %s" % e)
@@ -199,10 +195,10 @@ class ConstantGradientProfileDialog(AbstractDialog):
 
         except Exception as e:
             msg = "Issue in depth fields!\n\n%s" % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Constant-gradient profile", msg, QtWidgets.QMessageBox.Ok)
             return
-        
+
         try:
             start_temp = float(self.start_temp_value.text())
             end_temp = float(self.end_temp_value.text())
@@ -211,7 +207,7 @@ class ConstantGradientProfileDialog(AbstractDialog):
 
         except Exception as e:
             msg = "Issue in temperature fields!\n\n%s" % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Constant-gradient profile", msg, QtWidgets.QMessageBox.Ok)
             return
 
@@ -223,7 +219,7 @@ class ConstantGradientProfileDialog(AbstractDialog):
 
         except Exception as e:
             msg = "Issue in salinity fields!\n\n%s" % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Constant-gradient profile", msg, QtWidgets.QMessageBox.Ok)
             return
 
@@ -235,7 +231,7 @@ class ConstantGradientProfileDialog(AbstractDialog):
 
         except Exception as e:
             msg = "Issue in speed fields!\n\n%s" % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Constant-gradient profile", msg, QtWidgets.QMessageBox.Ok)
             return
 
@@ -248,7 +244,7 @@ class ConstantGradientProfileDialog(AbstractDialog):
         except RuntimeError as e:
             traceback.print_exc()
             msg = "Issue in creating the profile:\n\n> %s" % e
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Creation error", msg, QtWidgets.QMessageBox.Ok)
             return
 

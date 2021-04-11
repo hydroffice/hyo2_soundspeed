@@ -1,10 +1,10 @@
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2 import QtCore, QtWidgets
 
 import logging
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
+
+logger = logging.getLogger(__name__)
 
 
 class ButtonsDialog(AbstractDialog):
@@ -31,7 +31,6 @@ class ButtonsDialog(AbstractDialog):
         self.setMinimumWidth(140)
 
         self.botton_min_width = 80
-        lbl_width = 180
 
         # outline ui
         self.mainLayout = QtWidgets.QVBoxLayout()
@@ -93,6 +92,6 @@ class ButtonsDialog(AbstractDialog):
 
         msg = "The new visibility settings for the buttons have been saved. \n" \
               "Close and re-open the app to apply the changes!"
-        # noinspection PyCallByClass
+        # noinspection PyCallByClass,PyArgumentList
         QtWidgets.QMessageBox.information(self, "Buttons visibility", msg, QtWidgets.QMessageBox.Ok)
         self.accept()

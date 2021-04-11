@@ -1,15 +1,14 @@
 from PySide2 import QtCore, QtGui, QtWidgets
 
 import os
-
 import logging
-
-logger = logging.getLogger(__name__)
 
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
 from hyo2.soundspeedmanager.dialogs.raw_data_model import RawDataModel
 from hyo2.soundspeedmanager.dialogs.proc_data_model import ProcDataModel
 from hyo2.soundspeedmanager.dialogs.sis_data_model import SisDataModel
+
+logger = logging.getLogger(__name__)
 
 
 class SpreadSheetDialog(AbstractDialog):
@@ -79,7 +78,7 @@ class SpreadSheetDialog(AbstractDialog):
         logger.debug("editable: %s" % self.editable.isChecked())
         if self.editable.isChecked():
             msg = "Do you really want to manually edit the processed data?"
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             ret = QtWidgets.QMessageBox.warning(self, "Spreadsheet", msg,
                                                 QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
             if ret == QtWidgets.QMessageBox.No:

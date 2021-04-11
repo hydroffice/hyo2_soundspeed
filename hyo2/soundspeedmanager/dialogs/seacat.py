@@ -1,6 +1,6 @@
 import logging
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2 import QtCore, QtWidgets
 from hyo2.soundspeed.listener.seacat import sbe_serialcomms
 
 logger = logging.getLogger(__name__)
@@ -61,12 +61,12 @@ class SelectCastsDlg(QtWidgets.QDialog):
         label = QtWidgets.QLabel("Select the casts to download")
         layout.addWidget(label)
 
-        listWidget = self.listWidget = QtWidgets.QListWidget(self)
+        list_widget = self.listWidget = QtWidgets.QListWidget(self)
         for item in items:
-            newItem = QtWidgets.QListWidgetItem("", listWidget)
+            new_item = QtWidgets.QListWidgetItem("", list_widget)
             cb = QtWidgets.QCheckBox(item)
-            listWidget.setItemWidget(newItem, cb)
-        layout.addWidget(listWidget)
+            list_widget.setItemWidget(new_item, cb)
+        layout.addWidget(list_widget)
 
         self.buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
         # noinspection PyUnresolvedReferences
