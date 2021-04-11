@@ -315,15 +315,9 @@ class QtCallbacks(AbstractCallbacks):
 
             if self.sis_listener is not None:
                 if self.sis_listener.nav is not None:
-                    if (self.sis_listener.nav.latitude is not None) and (self.sis_listener.nav.longitude is not None):
-                        default_lat = self.sis_listener.nav.latitude
-                        default_lon = self.sis_listener.nav.longitude
-
-            if self.kctrl_listener is not None:
-                if self.kctrl_listener.spo is not None:
-                    if (self.kctrl_listener.spo.latitude is not None) and (self.kctrl_listener.spo.longitude is not None):
-                        default_lat = self.kctrl_listener.spo.latitude
-                        default_lon = self.kctrl_listener.spo.longitude
+                    if (self.sis_listener.nav_latitude is not None) and (self.sis_listener.nav_longitude is not None):
+                        default_lat = self.sis_listener.nav_latitude
+                        default_lon = self.sis_listener.nav_longitude
 
             if (default_lat is None) or (default_lon is None):
 
@@ -357,7 +351,7 @@ class QtCallbacks(AbstractCallbacks):
 
             while True:
 
-                # noinspection PyCallByClass
+                # noinspection PyCallByClass,PyArgumentList
                 lon, ok = QtWidgets.QInputDialog.getText(self._parent, "Location",
                                                          "Enter longitude as DD, DM, or DMS:",
                                                          text="%s" % default_lon)
@@ -548,7 +542,7 @@ class QtCallbacks(AbstractCallbacks):
 
     def msg_tx_sis_not_confirmed(self, name: str, port: int) -> None:
         """Profile transmitted, SIS not confirmed"""
-        # noinspection PyCallByClass
+        # noinspection PyCallByClass,PyArgumentList
         QtWidgets.QMessageBox.warning(self._parent, "Transmitted",
                                       "Profile transmitted, but \'%s\' did not confirm the reception\n\n"
                                       "Please do the following checks on SIS:\n"

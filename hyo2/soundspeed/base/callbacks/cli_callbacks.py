@@ -148,11 +148,11 @@ class CliCallbacks(AbstractCallbacks):
                      file_filter: Optional[str] = "All Files (*.*)", multi_file: Optional[bool] = False) -> str:
         raw = " "
         if not saving:
-            filemsg = "Enter existing filename:"
+            file_msg = "Enter existing filename:"
         else:
-            filemsg = "Enter filename:"
+            file_msg = "Enter filename:"
         while raw == " " or (os.path.exists(raw) and raw != ""):
-            raw = input(filemsg)
+            raw = input(file_msg)
         return os.path.normpath(raw)
 
     def ask_directory(self, key_name: Optional[str] = None, default_path: Optional[str] = ".",

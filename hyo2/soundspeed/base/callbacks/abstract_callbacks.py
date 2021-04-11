@@ -1,8 +1,10 @@
 from abc import ABCMeta, abstractmethod
 import logging
 from datetime import datetime
+from typing import Optional, TYPE_CHECKING
 
-from typing import Optional
+if TYPE_CHECKING:
+    from hyo2.soundspeed.listener.sis.sis import Sis
 
 
 logger = logging.getLogger(__name__)
@@ -12,7 +14,7 @@ class GeneralAbstractCallbacks(metaclass=ABCMeta):
     """Abstract class with several callbacks that has to be implemented for a new backend"""
 
     def __init__(self) -> None:
-        self.sis_listener = None
+        self.sis_listener = None  # type: Optional[Sis]
 
     @abstractmethod
     def ask_number(self, title: Optional[str] = "", msg: Optional[str] = "Enter number", default: Optional[float] = 0.0,
