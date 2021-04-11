@@ -48,9 +48,9 @@ copyright = u'2021, CCOM/JHC,UNH'
 # built documents.
 #
 # The short X.Y version.
-version = '2021.0'
+version = '2021.1'
 # The full version, including alpha/beta/rc tags.
-release = '2021.0.2'
+release = '2021.1.0'
 
 numfig = True
 

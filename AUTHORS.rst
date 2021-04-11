@@ -14,12 +14,13 @@ HydrOffice Sound Speed is developed and maintained by:
 
 - `Matthew Sharr <mailto:matthew.sharr@noaa.gov>`_
 
-- `Michael Smith <mailto:msmith@ccom.unh.edu>`_
 
 Contributors
 ~~~~~~~~~~~~
 
 The following wonderful people contributed directly or indirectly to this project:
+
+- `Michael Smith <mailto:msmith@ccom.unh.edu>`_
 
 - `Brian R. Calder <mailto:brc@ccom.unh.edu>`_
 

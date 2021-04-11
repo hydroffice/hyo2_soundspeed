@@ -104,6 +104,7 @@ cartopy_data = collect_folder_data(input_data_folder=share_folder, relative_outp
 
 abc_data = collect_pkg_data('hyo2.abc')
 ss_data = collect_pkg_data('hyo2.soundspeed')
+ssm_sis_data = collect_pkg_data('hyo2.ssm_sis')
 pyside2_data = collect_pkg_data('PySide2')
 
 icon_file = os.path.normpath(os.path.join(os.getcwd(), 'freeze', 'SSM_SIS.ico'))
@@ -134,11 +135,11 @@ coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
-               sdm_data,
                pyproj_data,
                cartopy_data,
                abc_data,
                ss_data,
+               ssm_sis_data,
                pyside2_data,
                strip=None,
                upx=True,

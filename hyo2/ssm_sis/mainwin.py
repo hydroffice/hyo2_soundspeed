@@ -1,7 +1,10 @@
 import logging
 
 from PySide2 import QtCore, QtGui, QtWidgets
-from selenium import webdriver
+try:
+    from selenium import webdriver
+except ModuleNotFoundError:
+    webdriver = None
 from urllib.request import urlopen
 
 from hyo2.abc.lib.helper import Helper
@@ -17,8 +20,8 @@ class MainWin(QtWidgets.QMainWindow):
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
 
-        # self._check_web_page()
-        # self._check_latest_release()
+        self._check_web_page()
+        self._check_latest_release()
 
         # set the application name and the version
         self.name = app_info.app_name
@@ -44,6 +47,8 @@ class MainWin(QtWidgets.QMainWindow):
 
     @classmethod
     def _check_web_page(cls):
+        if webdriver is None:
+            return
         try:
             url = Helper(lib_info=lib_info).web_url()
             options = webdriver.ChromeOptions()
