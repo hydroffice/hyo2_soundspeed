@@ -662,7 +662,12 @@ class Profile:
 
     def calc_data_depth(self):
         """Helper method to calculate depth from pressure (in dBar)"""
-        dyn_height = self.calc_dyn_height()
+        if np.count_nonzero(self.data.sal[self.data_valid]):
+            # when salinity is available, calculate depth using TEOS-10 standard
+            dyn_height = self.calc_dyn_height()
+        else:
+            # when salinity is unavailable, calculate depth using EOS-80 standard
+            dyn_height = None
 
         if not self.meta.latitude:
             latitude = 30.0
