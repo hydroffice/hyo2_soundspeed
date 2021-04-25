@@ -1,8 +1,8 @@
-Sound Speed Manager 2020.x.y - Installation Notes
+Sound Speed Manager 2021.1.n - Installation Notes
 
-1. Extract the "SoundSpeedManager.2020.x.y" folder from the zip archive to destination of your choice.
+1. Extract the "SoundSpeedManager.2021.1.n" folder from the zip archive to destination of your choice.
 
-2. Run "SoundSpeedManager.2020.x.y.exe" from within the folder.
+2. Run "SoundSpeedManager.2021.1.y.exe" from within the folder.
 
 3. At first run, the application will ask to download the WOA database (~120 MB).
    If the machine does NOT have Internet access, click "NO" and close the application (since we will manually copy the WOA09 database).
@@ -14,11 +14,12 @@ Sound Speed Manager 2020.x.y - Installation Notes
    - "C:/Users/<username>/AppData/Local/HydrOffice/Sound Speed/atlases" (newer Windows OS)
 
 [Optional, recommended]
-5. Kongsberg SIS 4 Interaction.
+5. Kongsberg SIS Interaction.
    If you want that Sound Speed Manager directly interacts with SIS, you need to:
    - Open the "Settings" tab.
-   - Go to the "Output' sub-tab, and set the IP address of the SIS machine (127.0.0.1 if SIS and Sound Speed Manager are on the same machine). The port used by SIS to listen is always 4001.
-   - Go to the "Listeners" sub-tab, and set the IP address and port that SIS uses to broadcast datagrams.
+   - Go to the "Input" sub-tab, and set to True one between "Listen SIS4" or "Listen SIS5". 
+   - Go to the "Listeners" sub-tab, and set the port that SIS uses to broadcast datagrams.   
+   - Go to the "Output" sub-tab, and set the IP address of the SIS machine (127.0.0.1 if SIS and Sound Speed Manager are on the same machine). The port used to listen is always 4001 for SIS4 and 14002 for SIS5. The protocol name is SIS.
 
 [Optional]
 6. RTOFS database.
