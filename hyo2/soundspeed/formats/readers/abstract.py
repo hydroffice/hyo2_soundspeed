@@ -41,6 +41,10 @@ class AbstractReader(AbstractFormat, metaclass=ABCMeta):
 
         for profile in self.ssp.l:  # we may have multiple profiles
 
+            if not np.count_nonzero(profile.data.depth) and not np.count_nonzero(profile.data.pressure):
+                self.ssp.clear()
+                raise RuntimeError("missing both depth and pressure values")
+
             # check if location is present
             if (profile.meta.latitude is None) or (profile.meta.longitude is None):
 
@@ -49,13 +53,15 @@ class AbstractReader(AbstractFormat, metaclass=ABCMeta):
                     self.ssp.clear()
                     raise RuntimeError("missing geographic location required for database lookup")
 
-            # Calc salinity if conductivity and temperature and (pressure or depth exist)
-            if not np.count_nonzero(profile.data.sal) and np.count_nonzero(
-                    profile.data.conductivity) and np.count_nonzero(profile.data.temp):
+            # Calc salinity if conductivity and temperature
+            if not np.count_nonzero(profile.data.sal) and \
+                    np.count_nonzero(profile.data.conductivity) and \
+                    np.count_nonzero(profile.data.temp):
                 profile.calc_salinity_from_conductivity()
 
             # Calc depth data if needed since we are now guaranteed a lat/lon
-            if not np.count_nonzero(profile.data.depth) and np.count_nonzero(profile.data.pressure):
+            if not np.count_nonzero(profile.data.depth) and \
+                    np.count_nonzero(profile.data.pressure):
                 # first select samples by casting direction but using pressure
                 profile.reduce_up_down(self.s.ssp_up_or_down, use_pressure=True)
 
@@ -63,11 +69,12 @@ class AbstractReader(AbstractFormat, metaclass=ABCMeta):
 
             else:
                 # select samples by casting direction
-                profile.reduce_up_down(self.s.ssp_up_or_down)
+                profile.reduce_up_down(self.s.ssp_up_or_down, use_pressure=False)
 
             # Calc speed if needed (must have temp+salinity) since we are now guaranteed depth.
-            if not np.count_nonzero(profile.data.speed) and np.count_nonzero(profile.data.temp) and np.count_nonzero(
-                    profile.data.sal):
+            if not np.count_nonzero(profile.data.speed) and \
+                    np.count_nonzero(profile.data.temp) and \
+                    np.count_nonzero(profile.data.sal):
                 profile.calc_data_speed()
 
             # check if timestamp is present

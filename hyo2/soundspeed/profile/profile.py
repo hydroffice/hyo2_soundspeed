@@ -628,6 +628,13 @@ class Profile:
 
     def calc_dyn_height(self):
         """Helper method to calculate the dynamic height"""
+        if not np.count_nonzero(self.data.sal[self.data_valid]):
+            logger.debug('Unable to calculate dynamic height because of missing salinity')
+            return None
+        if not np.count_nonzero(self.data.temp[self.data_valid]):
+            logger.debug('Unable to calculate dynamic height because of missing temperature')
+            return None
+
         if not self.meta.latitude:
             latitude = 30.0
             logger.warning("using default latitude: %s" % latitude)
@@ -662,12 +669,7 @@ class Profile:
 
     def calc_data_depth(self):
         """Helper method to calculate depth from pressure (in dBar)"""
-        if np.count_nonzero(self.data.sal[self.data_valid]):
-            # when salinity is available, calculate depth using TEOS-10 standard
-            dyn_height = self.calc_dyn_height()
-        else:
-            # when salinity is unavailable, calculate depth using EOS-80 standard
-            dyn_height = None
+        dyn_height = self.calc_dyn_height()  # None in case of zero temp or salinity
 
         if not self.meta.latitude:
             latitude = 30.0
@@ -679,46 +681,6 @@ class Profile:
         self.data.depth[self.data_valid] = Oc.p2d(p=self.data.pressure[self.data_valid], lat=latitude,
                                                   dyn_height=dyn_height, debug=True)
         self.modify_proc_info(Dicts.proc_import_infos['CALC_DEP'])
-
-    def calc_dyn_height_with_depth(self):
-        """Helper method to calculate the dynamic height"""
-        if not self.meta.latitude:
-            latitude = 30.0
-            logger.warning("using default latitude: %s" % latitude)
-        else:
-            latitude = self.meta.latitude
-
-        if not self.meta.longitude:
-            longitude = -70.0
-            logger.warning("using default longitude: %s" % longitude)
-        else:
-            longitude = self.meta.longitude
-
-        try:
-            # print(self.data_valid)
-            sa = Oc.sal2sa(sal=self.data.sal[self.data_valid],
-                           p=self.data.depth[self.data_valid],
-                           lon=longitude, lat=latitude)
-            ct = Oc.t2ct(sa=sa,
-                         t=self.data.temp[self.data_valid],
-                         p=self.data.depth[self.data_valid])
-            dh = Oc.geo_strf_dyn_height(sa=sa, ct=ct, p=self.data.depth[self.data_valid], p_ref=0)
-
-            for val in dh:
-                if np.isnan(val):
-                    raise RuntimeError("nan in geo_strf_dyn_height_with_depth")
-
-            return dh
-
-        except Exception as e:
-            logger.warning("issue: %s" % e)
-            return None
-
-    def calc_data_pressure(self):
-        """Helper method to calculate pressure from depth (in m)"""
-        dyn_height = self.calc_dyn_height_with_depth()
-
-        raise RuntimeError("Not implemented")
 
     def calc_data_speed(self):
         """Helper method to calculate sound speed"""
