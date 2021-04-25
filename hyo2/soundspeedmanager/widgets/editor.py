@@ -338,8 +338,6 @@ class Editor(AbstractWidget):
             logger.info("Seabird CTD dialog closed without selection")
             return
 
-        self.accept()
-
     def on_set_ref(self):
         logger.debug('user wants to set as a reference')
 
