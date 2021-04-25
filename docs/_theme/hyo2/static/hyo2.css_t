@@ -255,12 +255,6 @@ dt:target, .highlight {
     background: #FAF3E8;
 }
 
-div.note {
-    font-size: 10px;
-    background-color: {{ very_ligh_black }};
-    border: 1px solid #ccc;
-}
-
 div.seealso {
     background-color: #ffc;
     border: 1px solid #ff6;
@@ -270,9 +264,16 @@ div.topic {
     background-color: #eee;
 }
 
+div.note {
+    font-size: 11px;
+    background-color: #f2efe1;
+    border: 1px solid #c7b25d;
+}
+
 div.warning {
-    background-color: #ffe4e4;
-    border: 1px solid #f66;
+    font-size: 11px;
+    background-color: #f7f0f0;
+    border: 1px solid #cc5e5e;
 }
 
 p.admonition-title {
