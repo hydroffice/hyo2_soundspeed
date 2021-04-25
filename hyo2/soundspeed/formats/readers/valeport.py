@@ -14,7 +14,6 @@ class Valeport(AbstractTextReader):
 
     # A dictionary to resolve sensor type from probe type
     sensor_dict = {
-        Dicts.probe_types['MONITOR SVP 500']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVP 6000']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVX2']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVX2 100']: Dicts.sensor_types["SVPT"],
@@ -23,11 +22,11 @@ class Valeport(AbstractTextReader):
         Dicts.probe_types['MIDAS SVX2 3000']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVX2 6000']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MiniSVP']: Dicts.sensor_types["SVPT"],
-        Dicts.probe_types['MONITOR SVP 500']: Dicts.sensor_types["SVPT"],
-        Dicts.probe_types['RapidSVT']: Dicts.sensor_types["SVPT"],
-        Dicts.probe_types['RapidSV']: Dicts.sensor_types["SVP"],
-        Dicts.probe_types['SWiFT']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MONITOR CTD']: Dicts.sensor_types["CTD"],
+        Dicts.probe_types['MONITOR SVP 500']: Dicts.sensor_types["SVPT"],
+        Dicts.probe_types['RapidSV']: Dicts.sensor_types["SVP"],
+        Dicts.probe_types['RapidSVT']: Dicts.sensor_types["SVPT"],
+        Dicts.probe_types['SWiFT']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['Unknown']: Dicts.sensor_types["Unknown"]
     }
 
@@ -61,14 +60,6 @@ class Valeport(AbstractTextReader):
         self._parse_body()
 
         self.fix()
-
-        if self.ssp.cur.meta.probe_type not in [
-            Dicts.probe_types['MIDAS SVX2 1000'],
-            Dicts.probe_types['MIDAS SVX2 3000'],
-            Dicts.probe_types['SWiFT'],
-            Dicts.probe_types['RapidSV']
-        ]:
-            self.ssp.cur.calc_salinity()
         self.finalize()
 
         logger.debug('*** %s ***: done' % self.driver)

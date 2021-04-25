@@ -2,11 +2,12 @@ from abc import ABCMeta, abstractmethod
 import numpy as np
 import logging
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeed.base.files import FileManager
-from hyo2.soundspeed.formats.abstract import AbstractFormat
 from hyo2.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
+from hyo2.soundspeed.formats.abstract import AbstractFormat
+from hyo2.soundspeed.profile.dicts import Dicts
+
+logger = logging.getLogger(__name__)
 
 
 class AbstractReader(AbstractFormat, metaclass=ABCMeta):
@@ -58,6 +59,13 @@ class AbstractReader(AbstractFormat, metaclass=ABCMeta):
                     np.count_nonzero(profile.data.conductivity) and \
                     np.count_nonzero(profile.data.temp):
                 profile.calc_salinity_from_conductivity()
+
+            # Calc salinity if sound speed and temperature for SVP and SVPT sensor types
+            if self.ssp.cur.meta.sensor_type in [Dicts.sensor_types["SVP"], Dicts.sensor_types["SVPT"]]:
+                if not np.count_nonzero(self.ssp.cur.data.sal) and \
+                        np.count_nonzero(self.ssp.cur.data.temp) and \
+                        np.count_nonzero(self.ssp.cur.data.speed):
+                    self.ssp.cur.calc_salinity_from_speed_and_temp()
 
             # Calc depth data if needed since we are now guaranteed a lat/lon
             if not np.count_nonzero(profile.data.depth) and \

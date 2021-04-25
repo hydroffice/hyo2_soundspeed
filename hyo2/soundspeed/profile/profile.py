@@ -612,7 +612,7 @@ class Profile:
                                self.data.temp)  # FIXME - what is the standard conductivity unit? S/m or mmho/cm (mS/cm)
         self.modify_proc_info(Dicts.proc_import_infos['CALC_SAL'])
 
-    def calc_salinity(self):
+    def calc_salinity_from_speed_and_temp(self):
         """Helper method to calculate salinity from depth, sound speed and temperature"""
         # logger.debug("calculate salinity")
         if not self.meta.latitude:
