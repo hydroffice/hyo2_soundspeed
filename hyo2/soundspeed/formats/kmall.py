@@ -125,14 +125,14 @@ class KmallMRZ(Kmall):
         start_of_tx_sectors = 36 + ping_info_length
         end_of_tx_sectors = start_of_tx_sectors + nr_or_tx_sectors * bytes_per_tx_sector
 
-
         # rx info
         rx_info = struct.unpack("<4H4f4H", self.data[end_of_tx_sectors:end_of_tx_sectors+32])
         rx_info_length = rx_info[0]
         # logger.debug("rx info part -> length: %d/%d" % (rx_info_length, self.length))
         nr_of_soundings = rx_info[1]
-        sounding_length = rx_info[3]
         # logger.debug("rx info part -> nr of soundings: %d" % (nr_of_soundings, ))
+        sounding_length = rx_info[3]
+        # logger.debug("rx info part -> sounding length: %d" % (sounding_length, ))
         nr_extra_detection_classes = rx_info[10]
         nr_bytes_per_class = rx_info[11]
         # logger.debug("rx info part -> extra det. classes: %d [%d B]"
@@ -148,8 +148,11 @@ class KmallMRZ(Kmall):
         for i in range(nr_of_soundings):
             start_sounding = end_of_extra_det_class_info + i * sounding_length
             end_sounding = end_of_extra_det_class_info + (i + 1) * sounding_length
-            sounding = struct.unpack(sounding_struct, self.data[start_sounding:start_sounding+120])
-            # sounding_idx = sounding[0]
+            if len(self.data[start_sounding:end_sounding]) != sounding_length:
+                logger.debug("sounding #%d: data length: %d -> break" % (i, len(self.data[start_sounding:end_sounding])))
+                break
+            sounding = struct.unpack(sounding_struct, self.data[start_sounding:end_sounding])
+            sounding_idx = sounding[0]
             # logger.debug("sounding -> #%d" % (sounding_idx, ))
             sounding_detection_type = sounding[2]
             # logger.debug("sounding -> detection type: %s" % (sounding_detection_type, ))
