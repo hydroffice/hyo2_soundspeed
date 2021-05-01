@@ -5,14 +5,15 @@ HydrOffice Sound Speed's documentation
 ######################################
 
 .. toctree::
-	:maxdepth: 1
-	:numbered:
+    :maxdepth: 1
+    :numbered:
 	
-	in_brief
-	user_manual
-	developer_guide
-	license
-	credits
+    in_brief
+    user_manual
+    developer_guide
+    ssm_sis
+    license
+    credits
 
 
 .. only:: html
