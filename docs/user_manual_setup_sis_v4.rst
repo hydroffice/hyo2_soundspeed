@@ -319,3 +319,6 @@ You will now be able to send a sound speed profile from Sound Speed Manager to S
     :figclass: align-center
 
     *Sound Speed Manager SIS Receipt* dialog.
+
+.. note::
+    In case of troubles in configuring the interaction between SSM and SIS, use :ref:`ssm_sis`.

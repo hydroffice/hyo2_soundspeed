@@ -77,3 +77,6 @@ In order to be able to transmit to SIS v5, you need to add a client in the Outpu
 
 Now **restart** Sound Speed Manager. If a SIS-controlled sonar is pinging, you should start
 to see the parsed information in the status bar (see :numref:`ssm_sis5_p2_fig`).
+
+.. note::
+    In case of troubles in configuring the interaction between SSM and SIS, use :ref:`ssm_sis`.
