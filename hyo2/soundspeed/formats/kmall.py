@@ -116,9 +116,11 @@ class KmallMRZ(Kmall):
         # logger.debug('nr or tx sectors: %s (%d B)' % (nr_or_tx_sectors, bytes_per_tx_sector))
         self.tss = ping_info[36]
         # logger.debug('TSS: %s m/s' % (self.tss, ))
+        transducer_depth_m = ping_info[37]
         z_water_level_re_ref_point_m = ping_info[38]
-        # logger.debug('RP-WL distance: %s m' % (z_water_level_re_ref_point_m, ))
-        self.transducer_depth = z_water_level_re_ref_point_m
+        logger.debug('WL re RP: %.3f m, transducer depth re WL: %.3f m'
+                     % (z_water_level_re_ref_point_m, transducer_depth_m))
+        self.transducer_depth = z_water_level_re_ref_point_m + transducer_depth_m
         # vrp_latitude = ping_info[45]
         # vrp_longitude = ping_info[46]
         # logger.debug('VRP pos: %s, %s' % (vrp_latitude, vrp_longitude))
@@ -149,7 +151,8 @@ class KmallMRZ(Kmall):
             start_sounding = end_of_extra_det_class_info + i * sounding_length
             end_sounding = end_of_extra_det_class_info + (i + 1) * sounding_length
             if len(self.data[start_sounding:end_sounding]) != sounding_length:
-                logger.debug("sounding #%d: data length: %d -> break" % (i, len(self.data[start_sounding:end_sounding])))
+                # logger.debug("sounding #%d: data length: %d -> break"
+                #              % (i, len(self.data[start_sounding:end_sounding])))
                 break
             sounding = struct.unpack(sounding_struct, self.data[start_sounding:end_sounding])
             sounding_idx = sounding[0]
@@ -169,7 +172,7 @@ class KmallMRZ(Kmall):
 
         self.mean_depth = None
         if depths_valid > 0:
-            self.mean_depth = (depths_sum / depths_valid) - z_water_level_re_ref_point_m
+            self.mean_depth = (depths_sum / depths_valid) - self.transducer_depth
             if debug:
                 logger.debug("MRZ -> mean depth: %.4f" % (self.mean_depth, ))
 
