@@ -3,6 +3,8 @@ import os
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
+from hyo2.abc.lib.helper import Helper
+from hyo2.ssm_sis import app_info
 from hyo2.soundspeed.listener.sis.sis import Sis
 from hyo2.soundspeed.profile.profilelist import ProfileList
 
@@ -58,10 +60,28 @@ class ControlPanel(QtWidgets.QWidget):
         self.vbox.addWidget(self.viewer)
 
         self.vbox.addSpacing(12)
+        hbox = QtWidgets.QHBoxLayout()
+        self.vbox.addLayout(hbox)
+        hbox.addStretch()
+
+        button = QtWidgets.QPushButton()
+        hbox.addWidget(button)
+        button.setFixedHeight(28)
+        button.setFixedWidth(28)
+        icon_info = QtCore.QFileInfo(os.path.join(app_info.app_media_path, 'small_info.png'))
+        button.setIcon(QtGui.QIcon(icon_info.absoluteFilePath()))
+        button.setToolTip('Open the manual page')
+        button.setStyleSheet("QPushButton { background-color: rgba(255, 255, 255, 0); }\n"
+                             "QPushButton:hover { background-color: rgba(230, 230, 230, 100); }\n")
+        # noinspection PyUnresolvedReferences
+        button.clicked.connect(self.click_open_manual)
+
         comments = QtWidgets.QLabel("<i>Comments and suggestions:</i> "
                                     "<a href='mailto:gmasetti@ccom.unh.edu'>gmasetti@ccom.unh.edu</a>")
         comments.setOpenExternalLinks(True)
-        self.vbox.addWidget(comments)
+        hbox.addWidget(comments)
+
+        hbox.addStretch()
 
         self.set_sis_4()
         self.enable_commands(True)
@@ -252,6 +272,11 @@ class ControlPanel(QtWidgets.QWidget):
             port=int(self.set_output_port.text()))
         self.button_send.setEnabled(True)
         logger.info("Sending SVP ... DONE")
+
+    @classmethod
+    def click_open_manual(cls):
+        logger.debug("open manual")
+        Helper.explore_folder("https://www.hydroffice.org/manuals/soundspeed/ssm_sis.html")
 
     def update_gui(self):
         if self.sis is None:
