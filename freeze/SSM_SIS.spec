@@ -107,11 +107,16 @@ ss_data = collect_pkg_data('hyo2.soundspeed')
 ssm_sis_data = collect_pkg_data('hyo2.ssm_sis')
 pyside2_data = collect_pkg_data('PySide2')
 
+chromedriver_path = os.path.join(os.path.dirname(sys.executable), "Scripts", "chromedriver.exe")
+if not os.path.exists(chromedriver_path):
+    raise RuntimeError("Unable to locate %s" % chromedriver_path)
+
 icon_file = os.path.normpath(os.path.join(os.getcwd(), 'freeze', 'SSM_SIS.ico'))
 if is_darwin:
     icon_file = os.path.normpath(os.path.join(os.getcwd(), 'freeze', 'SSM_SIS.icns'))
 
 a = Analysis(['SSM_SIS.py'],
+             binaries = [(chromedriver_path, '.')],
              pathex=[],
              hiddenimports=["PIL", "scipy._lib.messagestream", "cftime._cftime", "PySide2.QtPrintSupport",
                             "pyproj.datadir", "pkg_resources.py2_warn"],
