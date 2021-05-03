@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 name = "Sound Speed"
-__version__ = '2021.1.5'
+__version__ = '2021.1.6'
 __copyright__ = 'Copyright 2021 University of New Hampshire, Center for Coastal and Ocean Mapping'
 
 lib_info = LibInfo()
@@ -20,9 +20,9 @@ lib_info = LibInfo()
 lib_info.lib_name = name
 lib_info.lib_version = __version__
 lib_info.lib_author = "Giuseppe Masetti(UNH,CCOM); Barry Gallagher(NOAA,OCS); " \
-                      "Chen Zhang(NOAA,OCS); Matthew Sharr(NOAA,OCS); Michael Smith(UNH,CCOM)"
+                      "Chen Zhang(NOAA,OCS); Matthew Sharr(NOAA,OCS)"
 lib_info.lib_author_email = "gmasetti@ccom.unh.edu; barry.gallagher@noaa.gov; " \
-                            "chen.zhang@noaa.gov; matthew.sharr@noaa.gov; msmith@ccom.unh.edu"
+                            "chen.zhang@noaa.gov; matthew.sharr@noaa.gov"
 
 lib_info.lib_license = "LGPLv2.1 or CCOM-UNH Industrial Associate license"
 lib_info.lib_license_url = "https://www.hydroffice.org/license/"

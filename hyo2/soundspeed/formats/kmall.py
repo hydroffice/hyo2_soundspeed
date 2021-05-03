@@ -120,7 +120,7 @@ class KmallMRZ(Kmall):
         z_water_level_re_ref_point_m = ping_info[38]
         logger.debug('WL re RP: %.3f m, transducer depth re WL: %.3f m'
                      % (z_water_level_re_ref_point_m, transducer_depth_m))
-        self.transducer_depth = z_water_level_re_ref_point_m + transducer_depth_m
+        self.transducer_depth = transducer_depth_m
         # vrp_latitude = ping_info[45]
         # vrp_longitude = ping_info[46]
         # logger.debug('VRP pos: %s, %s' % (vrp_latitude, vrp_longitude))
