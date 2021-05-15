@@ -78,11 +78,11 @@ class Rtofs(AbstractAtlas):
         self._lat_step = self._lat[1] - self._lat_0
         self._lon_0 = self._lon[0]
         self._lon_step = self._lon[1] - self._lon_0
+        # logger.debug("0(%.3f, %.3f); step(%.3f, %.3f)" % (self._lat_0, self._lon_0, self._lat_step, self._lon_step))
 
-        # logger.debug("0(%.3f, %.3f); step(%.3f, %.3f)" % (self.lat_0, self.lon_0, self.lat_step, self.lon_step))
         return True
 
-    def query(self, lat: Optional[float], lon: Optional[float], dtstamp: Union[dt, None] = None,
+    def query(self, lat: Optional[float], lon: Optional[float], dtstamp: Optional[dt] = None,
               server_mode: bool = False):
         """Query RTOFS for passed location and timestamp"""
         if dtstamp is None:
@@ -92,7 +92,7 @@ class Rtofs(AbstractAtlas):
         logger.debug("query: %s @ (%.6f, %.6f)" % (dtstamp, lon, lat))
 
         # check the inputs
-        if (lat is None) or (lon is None) or (dtstamp is None):
+        if (lat is None) or (lon is None):
             logger.error("invalid query: %s @ (%s, %s)" % (dtstamp.strftime("%Y/%m/%d %H:%M:%S"), lon, lat))
             return None
 
@@ -101,8 +101,8 @@ class Rtofs(AbstractAtlas):
         except TypeError as e:
             logger.critical("while converting location to grid coords, %s" % e)
             return None
-
         # logger.debug("idx > lat: %s, lon: %s" % (lat_idx, lon_idx))
+
         lat_s_idx = lat_idx - self._search_half_window
         lat_n_idx = lat_idx + self._search_half_window
         lon_w_idx = lon_idx - self._search_half_window
@@ -364,9 +364,6 @@ class Rtofs(AbstractAtlas):
         """
         progress = CliProgress()
 
-        if not isinstance(datestamp, dt):
-            raise RuntimeError("invalid datetime passed: %s" % type(datestamp))
-
         # check if the files are loaded and that the date matches
         if self._has_data_loaded:
             # logger.info("%s" % self.last_loaded_day)
@@ -402,7 +399,7 @@ class Rtofs(AbstractAtlas):
             progress.update(60)
             self._file_sal = Dataset(url_sal)
             progress.update(80)
-            self._day_idx = 2  # usually 3 1-day steps
+            self._day_idx = 1  # it was 3 1-day steps, now only 2 steps
 
         except (RuntimeError, IOError) as e:
             logger.warning("unable to access data: %s -> %s" % (datestamp.strftime("%Y%m%d"), e))

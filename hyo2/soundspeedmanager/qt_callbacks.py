@@ -109,7 +109,7 @@ class QtCallbacks(AbstractCallbacks):
         try:
             # this regex split the string if not a number, not a letter ,not . or -
             lat_tokens = re.split(r'[^\d\w.-]+', str_value)
-            logger.debug("lat tokens: %s" % (lat_tokens,))
+            # logger.debug("lat tokens: %s" % (lat_tokens,))
 
             # manage the different kind of input by nr. of tokens
             nr_lat_tokens = len(lat_tokens)
@@ -121,20 +121,20 @@ class QtCallbacks(AbstractCallbacks):
 
                 if lat_tokens[0][-1] in ["N", "S"]:  # DDH
 
-                    logger.debug("DDH")
+                    # logger.debug("DDH")
                     lat = float(lat_tokens[0][0:-1])
                     if lat_tokens[0][-1].strip() == "S":
                         lat *= -1
 
                 else:  # DD
-                    logger.debug("DD")
+                    # logger.debug("DD")
                     lat = float(lat_tokens[0])
 
             elif nr_lat_tokens == 2:
 
                 if lat_tokens[1].strip() in ["N", "S"]:  # DD H
 
-                    logger.debug("DD H")
+                    # logger.debug("DD H")
                     lat = float(lat_tokens[0])
                     if lat_tokens[1].strip() == "S":
                         lat *= -1
@@ -143,37 +143,37 @@ class QtCallbacks(AbstractCallbacks):
 
                     if lat_tokens[1][-1] in ["N", "S"]:  # DMH
 
-                        logger.debug("DMH")
+                        # logger.debug("DMH")
                         lat = cls.dm2dd(lat_tokens[0], lat_tokens[1][0:-1], lat_tokens[1][-1])
 
                     else:  # DM
-                        logger.debug("DM")
+                        # logger.debug("DM")
                         lat = cls.dm2dd(lat_tokens[0], lat_tokens[1])
 
             elif nr_lat_tokens == 3:
 
                 if lat_tokens[2].strip() in ["N", "S"]:  # DM H
 
-                    logger.debug("DM H")
+                    # logger.debug("DM H")
                     lat = cls.dm2dd(lat_tokens[0], lat_tokens[1], lat_tokens[2])
 
                 else:
 
                     if lat_tokens[2][-1] in ["N", "S"]:  # DMSH
 
-                        logger.debug("DMSH")
+                        # logger.debug("DMSH")
                         lat = cls.dms2dd(lat_tokens[0], lat_tokens[1], lat_tokens[2][0:-1], lat_tokens[2][-1])
 
                     else:  # DMS
 
-                        logger.debug("DMS")
+                        # logger.debug("DMS")
                         lat = cls.dms2dd(lat_tokens[0], lat_tokens[1], lat_tokens[2])
 
             elif nr_lat_tokens == 4:
 
                 if lat_tokens[3].strip() in ["N", "S"]:  # DMS H
 
-                    logger.debug("DMS H")
+                    # logger.debug("DMS H")
                     lat = cls.dms2dd(lat_tokens[0], lat_tokens[1], lat_tokens[2], lat_tokens[3])
 
                 else:
@@ -205,7 +205,7 @@ class QtCallbacks(AbstractCallbacks):
 
             # this regex split the string if not a number, not a letter ,not . or -
             lon_tokens = re.split(r'[^\d\w.-]+', str_value)
-            logger.debug("lon tokens: %s" % (lon_tokens,))
+            # logger.debug("lon tokens: %s" % (lon_tokens,))
 
             # manage the different kind of input by nr. of tokens
             nr_lon_tokens = len(lon_tokens)
@@ -217,21 +217,21 @@ class QtCallbacks(AbstractCallbacks):
 
                 if lon_tokens[0][-1] in ["E", "W"]:  # DDH
 
-                    logger.debug("DDH")
+                    # logger.debug("DDH")
                     lon = float(lon_tokens[0][0:-1])
                     if lon_tokens[0][-1].strip() == "W":
                         lon *= -1
 
                 else:  # DD
 
-                    logger.debug("DD")
+                    # logger.debug("DD")
                     lon = float(lon_tokens[0])
 
             elif nr_lon_tokens == 2:
 
                 if lon_tokens[1].strip() in ["W", "E"]:  # DD H
 
-                    logger.debug("DD H")
+                    # logger.debug("DD H")
                     lon = float(lon_tokens[0])
                     if lon_tokens[1].strip() == "W":
                         lon *= -1
@@ -240,36 +240,36 @@ class QtCallbacks(AbstractCallbacks):
 
                     if lon_tokens[1][-1] in ["W", "E"]:  # DMH
 
-                        logger.debug("DMH")
+                        # logger.debug("DMH")
                         lon = cls.dm2dd(lon_tokens[0], lon_tokens[1][0:-1], lon_tokens[1][-1])
 
                     else:  # DM
-                        logger.debug("DM")
+                        # logger.debug("DM")
                         lon = cls.dm2dd(lon_tokens[0], lon_tokens[1])
 
             elif nr_lon_tokens == 3:
 
                 if lon_tokens[2].strip() in ["W", "E"]:  # DM H
 
-                    logger.debug("DM H")
+                    # logger.debug("DM H")
                     lon = cls.dm2dd(lon_tokens[0], lon_tokens[1], lon_tokens[2])
 
                 else:  # DMS
 
                     if lon_tokens[2][-1] in ["W", "E"]:  # DMSH
 
-                        logger.debug("DMSH")
+                        # logger.debug("DMSH")
                         lon = cls.dms2dd(lon_tokens[0], lon_tokens[1], lon_tokens[2][0:-1], lon_tokens[2][-1])
 
                     else:
-                        logger.debug("DMS")
+                        # logger.debug("DMS")
                         lon = cls.dms2dd(lon_tokens[0], lon_tokens[1], lon_tokens[2])
 
             elif nr_lon_tokens == 4:
 
                 if lon_tokens[3].strip() in ["W", "E"]:  # DMS H
 
-                    logger.debug("DMS H")
+                    # logger.debug("DMS H")
                     lon = cls.dms2dd(lon_tokens[0], lon_tokens[1], lon_tokens[2], lon_tokens[3])
 
                 else:
