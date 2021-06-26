@@ -114,7 +114,7 @@ class DigibarPro(AbstractTextReader):
                 depth, speed, temp = line.split()
 
                 if speed == 0.0:
-                    logger.info("skipping 0-speed row #%s" % (self.lines_offset + count))
+                    logger.info("skipping 0-speed row #%s" % (self.samples_offset + count))
                     count += 1
                     continue
 

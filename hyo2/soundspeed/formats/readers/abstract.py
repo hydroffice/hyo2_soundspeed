@@ -122,7 +122,7 @@ class AbstractTextReader(AbstractReader, metaclass=ABCMeta):
         super(AbstractTextReader, self).__init__()
         self.lines = []
         self.total_data = None
-        self.lines_offset = None
+        self.samples_offset = None
 
     def _read(self, data_path, encoding='utf8'):
         """Helper function to read the raw file"""

@@ -1,9 +1,14 @@
-from abc import ABCMeta, abstractmethod, abstractproperty
 import logging
-
-logger = logging.getLogger(__name__)
+from abc import ABCMeta
+from typing import Optional, Set, TYPE_CHECKING
 
 from hyo2.soundspeed.profile.profilelist import ProfileList
+
+if TYPE_CHECKING:
+    from hyo2.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
+    from hyo2.soundspeed.base.setup import Setup
+
+logger = logging.getLogger(__name__)
 
 
 class AbstractFormat(metaclass=ABCMeta):
@@ -13,30 +18,30 @@ class AbstractFormat(metaclass=ABCMeta):
         self.name = self.__class__.__name__.lower()
         self.desc = "Abstract Format"  # a human-readable description
         self.version = "0.1.0"
-        self._ssp = None  # profile list
+        self._ssp = None  # type: Optional[ProfileList]
         self._ext = set()
         self._project = str()
         self.multicast_support = False
 
-        self.s = None  # settings
-        self.cb = None  # callbacks
+        self.s = None  # type: Optional[Setup]
+        self.cb = None  # type: Optional[AbstractCallbacks]
 
     @property
-    def ssp(self):
+    def ssp(self) -> Optional[ProfileList]:
         return self._ssp
 
     @ssp.setter
-    def ssp(self, value):
+    def ssp(self, value: ProfileList):
         self._ssp = value
 
     @property
-    def ext(self):
+    def ext(self) -> Set[str]:
         return self._ext
 
     @property
-    def driver(self):
+    def driver(self) -> str:
         return "%s.%s" % (self.name, self.version)
 
-    def init_data(self):
+    def init_data(self) -> None:
         """Create a new empty profile list"""
         self._ssp = ProfileList()

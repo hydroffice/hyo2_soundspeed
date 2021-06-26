@@ -31,7 +31,7 @@ logger.info('output folder: %s' % data_output)
 
 # test readers/writers
 logger.info('test: *** START ***')
-filters = ["rbr", ]
+filters = ["aml", ]
 tests = testing.input_dict_test_files(inclusive_filters=filters)
 # print(tests)
 
@@ -40,7 +40,7 @@ first_done = False
 # import each identified file
 for idx, testfile in enumerate(tests.keys()):
 
-    logger.debug("filename: %s" % testfile)
+    logger.debug("%d -> filename: %s" % (idx, testfile))
 
     if first_done:
         break

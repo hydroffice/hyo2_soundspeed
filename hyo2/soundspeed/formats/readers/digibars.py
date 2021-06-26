@@ -72,7 +72,7 @@ class DigibarS(AbstractTextReader):
                 date, time, speed, depth, temp, other = line.split(",")
 
                 if speed == 0.0:
-                    logger.info("skipping 0-speed row #%s" % (self.lines_offset + count))
+                    logger.info("skipping 0-speed row #%s" % (self.samples_offset + count))
                     count += 1
                     continue
 
@@ -81,7 +81,7 @@ class DigibarS(AbstractTextReader):
                         self.ssp.cur.meta.utc_time = dt.datetime.strptime(date, "%m-%d-%y")
                         has_date = True
                     except Exception as e:
-                        logger.info("unable to read date at row #%s: %s" % (self.lines_offset + count, e))
+                        logger.info("unable to read date at row #%s: %s" % (self.samples_offset + count, e))
                 if not has_time:
                     try:
                         hour, minute, second = [int(i) for i in time.split(':')]
@@ -89,7 +89,7 @@ class DigibarS(AbstractTextReader):
                                                                    milliseconds=0, minutes=minute, hours=hour)
                         has_time = True
                     except Exception as e:
-                        logger.info("unable to read time at row #%s: %s" % (self.lines_offset + count, e))
+                        logger.info("unable to read time at row #%s: %s" % (self.samples_offset + count, e))
 
                 self.ssp.cur.data.depth[count] = depth
                 self.ssp.cur.data.speed[count] = speed
