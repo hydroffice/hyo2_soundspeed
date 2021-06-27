@@ -15,6 +15,7 @@ class ClientList:
         self.num_clients = 0
         self.clients = list()
         self.last_tx_time = None
+        self.last_tx_time_2 = None  # storing the timestamp of the previously-transmitted SSP
 
     def add_client(self, client: str):
         client = Client(client)
@@ -82,6 +83,8 @@ class ClientList:
                 s_rx = np.interp(d_tx, prj.listeners.sis.ssp.depth, prj.listeners.sis.ssp.speed)
                 max_diff = max(abs(s_tx - s_rx))
                 if max_diff < 0.2:
+                    if self.last_tx_time:  # store this for server mode in case of missed reception
+                        self.last_tx_time_2 = self.last_tx_time
                     self.last_tx_time = prj.listeners.sis.ssp.acquisition_time
                     logger.debug("reception confirmed: %s" % self.last_tx_time.strftime("%d/%m/%Y, %H:%M:%S"))
                     if not server_mode:

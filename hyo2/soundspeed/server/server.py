@@ -274,11 +274,15 @@ class Server(Thread):
 
                 # test by comparing the times
                 if self.prj.setup.client_list.last_tx_time != self.prj.listeners.sis.ssp.acquisition_time:
-                    logger.error("Times mismatch > %s != %s"
-                                 % (self.prj.setup.client_list.last_tx_time,
-                                    self.prj.listeners.sis.ssp.acquisition_time))
-                    self.shutdown.set()
-                    return
+                    if self.prj.setup.client_list.last_tx_time_2 == self.prj.listeners.sis.ssp.acquisition_time:
+                        logger.info('missed reception of last transmitted SSP -> '
+                                    'SIS is using the previously-transmitted SSP')
+                    else:
+                        logger.error("Times mismatch > %s != %s"
+                                     % (self.prj.setup.client_list.last_tx_time,
+                                        self.prj.listeners.sis.ssp.acquisition_time))
+                        self.shutdown.set()
+                        return
 
             if num_live_clients == 0:
                 self.shutdown.set()
