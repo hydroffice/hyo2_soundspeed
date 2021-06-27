@@ -1,11 +1,8 @@
 import logging
 import math
 import os
-import socket
-import ssl
 import sys
 import traceback
-from urllib.error import URLError
 from urllib.request import urlopen
 
 from PySide2 import QtCore, QtGui, QtWidgets
@@ -182,6 +179,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.releaseInfo = QtWidgets.QLabel()
         self.statusBar().addPermanentWidget(self.releaseInfo)
         self.releaseInfo.setStyleSheet("QLabel{color:rgba(0,0,0,128);font-size: 8pt;}")
+        self.release_checked = False
         timer = QtCore.QTimer(self)
         # noinspection PyUnresolvedReferences
         timer.timeout.connect(self.update_gui)
@@ -445,7 +443,6 @@ class MainWin(QtWidgets.QMainWindow):
 
         new_release = False
         new_bugfix = False
-        latest_version = None
         try:
             response = urlopen('http://www.hydroffice.org/latest/soundspeedmanager.txt', timeout=2)
             latest_version = response.read().split()[0].decode()
@@ -462,8 +459,11 @@ class MainWin(QtWidgets.QMainWindow):
             elif (int(lat_maj) == int(cur_maj)) and (int(lat_min) == int(cur_min)) and (int(lat_fix) > int(cur_fix)):
                 new_bugfix = True
 
-        except (URLError, ssl.SSLError, socket.timeout, ConnectionResetError, ValueError) as e:
-            logger.info("unable to check latest release (reason: %s)" % e)
+            self.release_checked = True
+
+        except Exception as e:
+            # logger.info("unable to check latest release (reason: %s)" % e)
+            return
 
         if new_release:
             logger.info("new release available: %s" % latest_version)
@@ -481,7 +481,7 @@ class MainWin(QtWidgets.QMainWindow):
 
     def update_gui(self):
 
-        if self.timer_execs % 200 == 0:
+        if (self.timer_execs % 200 == 0) and not self.release_checked:
             # logger.debug("timer executions: %d" % self.timer_execs)
             self._check_latest_release()
 
