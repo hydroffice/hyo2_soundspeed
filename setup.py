@@ -101,7 +101,7 @@ setup(
     ],
     keywords="hydrography ocean mapping survey sound speed profiles",
     author="Giuseppe Masetti(UNH,CCOM); Barry Gallagher(NOAA,OCS); " \
-           "Chen Zhang(NOAA,OCS); Matthew Sharr (NOAA,OCS)",
+           "Chen Zhang(NOAA,OCS)",
     author_email="gmasetti@ccom.unh.edu, barry.gallagher@noaa.gov, " \
-                 "chen.zhang@noaa.gov, matthew.sharr@noaa.gov",
+                 "chen.zhang@noaa.gov",
 )
