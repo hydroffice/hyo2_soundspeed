@@ -20,6 +20,7 @@ class Castaway(AbstractTextReader):
         self.ext.add('csv')
 
         # header tokens
+        self.tk_sn = '% Device'
         self.tk_filename = '% File name'
         self.tk_cast_time = '% Cast time (UTC)'
         self.tk_latitude = '% Start latitude'
@@ -101,6 +102,14 @@ class Castaway(AbstractTextReader):
                 self.samples_offset += 1
                 logger.debug("samples offset: %s" % self.samples_offset)
                 break
+            
+            elif line[:len(self.tk_sn)] == self.tk_sn:
+                try:
+                    sn_str = line.split(",")[-1]
+                    if len(sn_str) != 0:
+                        self.ssp.cur.meta.sn = sn_str
+                except ValueError:
+                    logger.error("unable to parse serial number from line #%s" % self.samples_offset)
 
             elif line[:len(self.tk_cast_time)] == self.tk_cast_time:  # utc time
                 try:
