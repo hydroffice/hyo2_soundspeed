@@ -53,6 +53,7 @@ class Aml(AbstractTextReader):
                 self.lat2 = "gpslatitude"
                 self.long2 = "gpslongitude"
                 self.serial = "serialnumber"
+                self.serial2 = "sn"
 
                 self.metadata = "[measurementmetadata]"
                 self.columns = "columns"
@@ -152,6 +153,11 @@ class Aml(AbstractTextReader):
                         lon = float(tokens[1])
                     except ValueError:  # it may be no-lock
                         lon = None
+                    continue
+                
+                if tokens[0].lower() == self._aml.serial2:
+                    if tokens[1]:
+                        self.ssp.cur.meta.sn = tokens[1]
                     continue
 
             except ValueError:
