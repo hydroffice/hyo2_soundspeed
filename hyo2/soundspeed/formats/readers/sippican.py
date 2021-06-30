@@ -18,6 +18,7 @@ class Sippican(AbstractTextReader):
         Dicts.probe_types["T-11 (Fine Structure)"]: Dicts.sensor_types["XBT"],
         Dicts.probe_types["T-4"]: Dicts.sensor_types["XBT"],
         Dicts.probe_types["T-5"]: Dicts.sensor_types["XBT"],
+        Dicts.probe_types["T5"]: Dicts.sensor_types["XBT"],
         Dicts.probe_types["T-5/20"]: Dicts.sensor_types["XBT"],
         Dicts.probe_types["T-5_20"]: Dicts.sensor_types["XBT"],
         Dicts.probe_types["T-7"]: Dicts.sensor_types["XBT"],
