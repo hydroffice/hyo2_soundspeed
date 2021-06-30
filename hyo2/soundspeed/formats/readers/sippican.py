@@ -104,11 +104,12 @@ class Sippican(AbstractTextReader):
 
             elif line[:len(self.tk_time)] == self.tk_time:  # retrieve time
                 time_str = line.split()[-1]
-                try:
-                    hour, minute, second = [int(i) for i in time_str.split(':')]
-                    self.ssp.cur.meta.utc_time += dt.timedelta(seconds=second, minutes=minute, hours=hour)
-                except ValueError:
-                    logger.warning("issue in casting the time format at line #%s" % self.samples_offset)
+                if self.ssp.cur.meta.utc_time:
+                    try:
+                        hour, minute, second = [int(i) for i in time_str.split(':')]
+                        self.ssp.cur.meta.utc_time += dt.timedelta(seconds=second, minutes=minute, hours=hour)
+                    except ValueError:
+                        logger.warning("issue in casting the time format at line #%s" % self.samples_offset)
 
             elif line[:len(self.tk_latitude)] == self.tk_latitude:  # latitude
                 lat_str = line.split(':')[-1].lstrip().strip()
