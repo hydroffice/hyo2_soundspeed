@@ -146,7 +146,7 @@ class Asvp(AbstractTextWriter):
             # e.g., ( SoundVelocity  1.0 0 201203212242 22.50000000 -156.50000000 -1 0 0 MVS01_00000 P 0035 )
             self.header += "( SoundVelocity  1.0 0 "
             self.header += self.ssp.cur.meta.utc_time.strftime("%Y%m%d%H%M ")
-            self.header += "%.8f %.8f -1 0 0 SSM_%s P %04d )\n" \
+            self.header += "%.7f %.7f -1 0 0 SSM_%s P %04d )\n" \
                            % (self.ssp.cur.meta.latitude,
                               self.ssp.cur.meta.longitude,
                               __version__,
