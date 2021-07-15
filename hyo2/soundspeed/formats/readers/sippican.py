@@ -50,6 +50,7 @@ class Sippican(AbstractTextReader):
         self.tk_salinity_alpha = 'Salinity'
         self.tk_probe = 'Probe Type'
         self.tk_field = 'Field'
+        self.tk_serial = 'Serial'
 
     def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
         logger.debug('*** %s ***: start' % self.driver)
@@ -162,6 +163,9 @@ class Sippican(AbstractTextReader):
                     self.ssp.cur.meta.sensor_type = Dicts.sensor_types['Unknown']
                     logger.warning("reverted to unknown probe type at line #%s" % self.samples_offset)
 
+            elif line[:len(self.tk_serial)] == self.tk_serial:
+                self.ssp.cur.meta.sn = line.split(':')[-1].lstrip().strip()
+                    
             elif line[:len(self.tk_field)] == self.tk_field:
                 column = int(line[5]) - 1  # create the field index
                 field_type = line.split()[2]
