@@ -157,7 +157,7 @@ class Aml(AbstractTextReader):
                 
                 if tokens[0].lower() == self._aml.serial2:
                     if tokens[1]:
-                        self.ssp.cur.meta.sn = tokens[1]
+                        self.ssp.cur.meta.sn = tokens[1].strip()
                     continue
 
             except ValueError:

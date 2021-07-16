@@ -164,7 +164,7 @@ class Sippican(AbstractTextReader):
                     logger.warning("reverted to unknown probe type at line #%s" % self.samples_offset)
 
             elif line[:len(self.tk_serial)] == self.tk_serial:
-                self.ssp.cur.meta.sn = line.split(':')[-1].lstrip().strip()
+                self.ssp.cur.meta.sn = line.split(':')[-1].strip()
                     
             elif line[:len(self.tk_field)] == self.tk_field:
                 column = int(line[5]) - 1  # create the field index
