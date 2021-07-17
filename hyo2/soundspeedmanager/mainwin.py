@@ -184,7 +184,7 @@ class MainWin(QtWidgets.QMainWindow):
         # noinspection PyUnresolvedReferences
         timer.timeout.connect(self.update_gui)
         # noinspection PyArgumentList
-        timer.start(1500)
+        timer.start(2000)
         self.timer_execs = 0
 
         self.data_cleared()
@@ -591,6 +591,7 @@ class MainWin(QtWidgets.QMainWindow):
                     self.tab_server.dataplots.on_first_draw()
 
                 self.tab_server.dataplots.update_data()
+                self.tab_server.dataplots.update_all_limits()
                 self.tab_server.dataplots.redraw()
 
             else:  # user mode

@@ -89,12 +89,24 @@ class Sis(AbstractListener):
         else:
             self.sis4.ssp = value
 
+    def clear_ssp(self) -> None:
+        if self.use_sis5:
+            self.sis5.svp = None
+        else:
+            self.sis4.ssp = None
+
     @property
     def nav(self) -> Union[km.KmNav, kmall.KmallSPO]:
         if self.use_sis5:
             return self.sis5.spo
         else:
             return self.sis4.nav
+
+    def clear_nav(self) -> None:
+        if self.use_sis5:
+            self.sis5.spo = None
+        else:
+            self.sis4.nav = None
 
     @property
     def xyz(self) -> Union[km.KmXyz88, kmall.KmallMRZ]:
@@ -103,18 +115,32 @@ class Sis(AbstractListener):
         else:
             return self.sis4.xyz88
 
-    @property
-    def xyz_transducer_depth(self) -> float:
+    def clear_xyz(self) -> None:
         if self.use_sis5:
+            self.sis5.mrz = None
+        else:
+            self.sis4.xyz88 = None
+
+    @property
+    def xyz_transducer_depth(self) -> Optional[float]:
+        if self.use_sis5:
+            if self.sis5.mrz is None:
+                return None
             return self.sis5.mrz.transducer_depth
         else:
+            if self.sis4.xyz88 is None:
+                return None
             return self.sis4.xyz88.transducer_draft
 
     @property
-    def xyz_transducer_sound_speed(self) -> float:
+    def xyz_transducer_sound_speed(self) -> Optional[float]:
         if self.use_sis5:
+            if self.sis5.mrz is None:
+                return None
             return self.sis5.mrz.tss
         else:
+            if self.sis4.xyz88 is None:
+                return None
             return self.sis4.xyz88.sound_speed
 
     @property
@@ -125,24 +151,36 @@ class Sis(AbstractListener):
             return self.sis4.xyz88.mean_depth
 
     @property
-    def nav_latitude(self) -> float:
+    def nav_latitude(self) -> Optional[float]:
         if self.use_sis5:
+            if self.sis5.spo is None:
+                return None
             return self.sis5.spo.latitude
         else:
+            if self.sis4.nav is None:
+                return None
             return self.sis4.nav.latitude
 
     @property
-    def nav_longitude(self) -> float:
+    def nav_longitude(self) -> Optional[float]:
         if self.use_sis5:
+            if self.sis5.spo is None:
+                return None
             return self.sis5.spo.longitude
         else:
+            if self.sis4.nav is None:
+                return None
             return self.sis4.nav.longitude
 
     @property
-    def nav_timestamp(self) -> datetime:
+    def nav_timestamp(self) -> Optional[float]:
         if self.use_sis5:
+            if self.sis5.spo is None:
+                return None
             return self.sis5.spo.dg_time
         else:
+            if self.sis4.nav is None:
+                return None
             return self.sis4.nav.dg_time
 
     def parse(self) -> None:
