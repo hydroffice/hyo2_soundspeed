@@ -1,3 +1,5 @@
+.. _ssm_sis5:
+
 Sound Speed Manager - SIS v5 interaction
 ========================================
 

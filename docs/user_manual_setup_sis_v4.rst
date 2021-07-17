@@ -1,3 +1,5 @@
+.. _ssm_sis4:
+
 Sound Speed Manager - SIS v4 interaction
 ========================================
 
