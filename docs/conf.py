@@ -25,7 +25,14 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.coverage',
     'sphinx.ext.intersphinx',
+    'sphinx_multiversion',
 ]
+
+# Whitelist pattern for tags (set to None to ignore all tags)
+smv_tag_whitelist = r'^v\.\d+\.\d+\.\d+$'
+
+# Whitelist pattern for branches (set to None to ignore all branches)
+smv_branch_whitelist = r'^latest$'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -50,7 +57,7 @@ copyright = u'2021, CCOM/JHC,UNH'
 # The short X.Y version.
 version = '2021.2'
 # The full version, including alpha/beta/rc tags.
-release = '2021.2.0'
+release = '2021.2.2'
 
 numfig = True
 
@@ -139,9 +146,9 @@ html_static_path = ['_static']
 
 # Custom sidebar templates, maps document names to template names.
 html_sidebars = {
-    'index': ['sidebarintro.html', 'sourcelink.html', 'searchbox.html'],
+    'index': ['sidebarintro.html', 'sourcelink.html', 'searchbox.html', 'versioning.html'],
     '**': ['sidebarlogo.html', 'relations.html',
-           'sourcelink.html', 'searchbox.html'],
+           'sourcelink.html', 'searchbox.html', 'versioning.html'],
 }
 
 # Additional templates that should be rendered to pages, maps page names to
