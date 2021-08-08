@@ -29,10 +29,10 @@ extensions = [
 ]
 
 # Whitelist pattern for tags (set to None to ignore all tags)
-smv_tag_whitelist = r'^v\.\d+\.\d+\.\d+$'
+smv_tag_whitelist = r'^(stable|v\.\d+\.\d+\.\d+)$'
 
-# Whitelist pattern for branches (set to None to ignore all branches)
-smv_branch_whitelist = r'^latest$'
+# Whitelist pattern for branches (set to None to ignore all branches -> BUG!)
+smv_branch_whitelist = r'^None$'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
