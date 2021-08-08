@@ -2,7 +2,7 @@
 #
 # To compile, execute the following within the source directory:
 #
-# python /path/to/pyinstaller.py SoundSpeedManager.1folder.spec
+# python /path/to/pyinstaller.py SoundSpeedManager.spec
 #
 # The resulting .exe file is placed in the dist/SoundSpeedManager folder.
 #

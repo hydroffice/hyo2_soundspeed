@@ -54,6 +54,16 @@ class AbstractReader(AbstractFormat, metaclass=ABCMeta):
                     self.ssp.clear()
                     raise RuntimeError("missing geographic location required for database lookup")
 
+            # check if location is an reasonable number present
+            elif (abs(profile.meta.latitude) > 90.0) or (abs(profile.meta.longitude) > 360.0):
+                logger.info('The retrieved location values does not look correct: (%f, %f) -> ASK USER'
+                            % (profile.meta.longitude, profile.meta.latitude))
+
+                profile.meta.latitude, profile.meta.longitude = self.cb.ask_location()
+                if (profile.meta.latitude is None) or (profile.meta.longitude is None):
+                    self.ssp.clear()
+                    raise RuntimeError("missing geographic location required for database lookup")
+
             # Calc salinity if conductivity and temperature
             if not np.count_nonzero(profile.data.sal) and \
                     np.count_nonzero(profile.data.conductivity) and \
