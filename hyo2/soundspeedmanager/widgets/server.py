@@ -128,11 +128,29 @@ class Server(AbstractWidget):
               "This Mode will OVERWRITE the current SIS SSP.\n"
         # noinspection PyCallByClass,PyArgumentList
         ret = QtWidgets.QMessageBox.warning(self, "Server mode", msg,
-                                            QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
+                                            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if ret == QtWidgets.QMessageBox.No:
             return
 
-        if not self.lib.server.check_settings():
+        uni_clients = self.lib.server.list_uni_clients()
+        use_uni_clients = False
+        if len(uni_clients) > 0:
+            msg = "The following clients do NOT provide acknowledgment of the received profiles:\n"
+            for uni_client in uni_clients:
+                msg += "- %s\n" % uni_client
+            msg += "\nDo you still want to transmit the profiles to them?\n"
+            # noinspection PyCallByClass,PyArgumentList
+            ret = QtWidgets.QMessageBox.warning(self, "Server mode", msg,
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            if ret == QtWidgets.QMessageBox.Yes:
+                use_uni_clients = True
+            elif ret == QtWidgets.QMessageBox.No:
+                use_uni_clients = False
+            else:
+                logger.debug("Cancelled by user.")
+                return
+
+        if not self.lib.server.check_settings(use_uni_clients=use_uni_clients):
             msg = "Unable to start the server mode!\n"
             for err in self.lib.server.settings_errors:
                 msg += "Reason: %s\n" % err

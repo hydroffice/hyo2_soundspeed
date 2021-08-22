@@ -43,7 +43,10 @@ Based on the SIS version in use, follow the instructions in :ref:`ssm_sis4` or :
 The *Setup* tab has the following *Server settings* options that specifically apply to the *Server Mode*:
 
 * *Source*. It defines the source used to retrieve the synthetic profile.
-* *Surface sound speed*. If true, the received transducer sound speed is used to enhance the transitted synthetic profile.
+* *Surface sound speed*. If true, the received transducer sound speed is used to enhance the transmitted synthetic profile.
+
+In case that unidirectional clients (e.g., QINSy) are present, the user is prompted to decide whether or not
+transmitting the profiles to them. Given that no acknowledgment is received, *SSM* cannot verified the profile transmission.
 
 Each time that the *Server Mode* is started, a few initialization checks are performed:
 
@@ -95,7 +98,8 @@ The evaluation is done following these steps:
   * The user have clicked the 'Send SSP now' button.
 
 * To guard against accidentally overwriting a profile uploaded by the operator (or by another program) directly into SIS,
-  the *Server Mode* compares the SSP currently on SIS against the latext two transmitted synthetic SSP.
+  the *Server Mode* compares the SSP currently on *SIS* against the latest two transmitted synthetic SSP. This **cannot**
+  happen in case on unidirectional clients (e.g., QINSy).
 
 .. note::
    In case that the SIS and the transmitted profiles differ, the *Server Mode* automatically stops.

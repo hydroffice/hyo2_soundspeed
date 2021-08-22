@@ -3,7 +3,7 @@ import time
 import traceback
 from datetime import datetime
 from threading import Thread, Event
-from typing import Optional
+from typing import List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,16 @@ class Server(Thread):
         self.settings_errors = list()
         self.runtime_errors = list()
 
-    def check_settings(self) -> bool:
+    def list_uni_clients(self) -> List[str]:
+        uni_clients = list()
+
+        for client in self.prj.setup.client_list.clients:
+            if client.protocol not in ["SIS", "KCTRL"]:
+                uni_clients.append("%s [protocol: %s]" % (client.name, client.protocol))
+
+        return uni_clients
+
+    def check_settings(self, use_uni_clients: bool = False) -> bool:
         """Check the server settings"""
 
         logger.debug("Initialization checks ...")
@@ -60,7 +69,7 @@ class Server(Thread):
         self.prj.progress.update(60)
 
         # Check for clients
-        if not self._check_settings_clients():
+        if not self._check_settings_clients(use_uni_clients=use_uni_clients):
             self.prj.progress.end()
             return False
 
@@ -148,7 +157,7 @@ class Server(Thread):
 
         return True
 
-    def _check_settings_clients(self) -> bool:
+    def _check_settings_clients(self, use_uni_clients: bool = False) -> bool:
 
         prog_quantum = 40 / (len(self.prj.setup.client_list.clients) + 1)
         logger.info("Testing clients for reception-confirmation interaction")
@@ -158,7 +167,12 @@ class Server(Thread):
             client.alive = True
 
             if client.protocol not in ["SIS", "KCTRL"]:
-                client.alive = False
+                if use_uni_clients:
+                    logger.info('Using unidirectional client: %s [%s]' % (client.name, client.protocol))
+                    num_clients += 1
+                else:
+                    logger.info('Skipping unidirectional client: %s [%s]' % (client.name, client.protocol))
+                    client.alive = False
                 continue
 
             client.request_profile_from_sis(self.prj)
@@ -348,12 +362,13 @@ class Server(Thread):
         num_clients = 0
         for client in self.prj.setup.client_list.clients:
 
-            if client.protocol not in ["SIS", "KCTRL"]:
-                continue
-
             # skipping dead clients
             if not client.alive:
-                logger.info("Dead client: %s > Skipping" % client.ip)
+                logger.info("Dead client: %s [%s] > Skipping" % (client.ip, client.protocol))
+                continue
+
+            if client.protocol not in ["SIS", "KCTRL"]:
+                num_clients += 1
                 continue
 
             client.request_profile_from_sis(prj=self.prj)
