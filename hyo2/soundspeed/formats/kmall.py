@@ -172,7 +172,7 @@ class KmallMRZ(Kmall):
 
         self.mean_depth = None
         if depths_valid > 0:
-            self.mean_depth = (depths_sum / depths_valid) - self.transducer_depth
+            self.mean_depth = (depths_sum / depths_valid) + self.transducer_depth
             if debug:
                 logger.debug("MRZ -> mean depth: %.4f" % (self.mean_depth, ))
 
