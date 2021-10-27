@@ -61,53 +61,59 @@ to reduce the data by thinning the profile. Received profiles will use the filen
 Settings for data transmission
 ==============================
 
-The *Sound Speed* package can be configured to transmit data to a number of systems by selecting the *Transmit data* button
-in the *Editor* tab.
+The *Sound Speed* package can be configured to transmit data to a number of systems by selecting the *Transmit data*
+button in the *Editor* tab.
 
 For installations with multiple clients, the *Sound Speed* package will deliver the cast sequentially to all clients.
-Failure on transmission to one client will not interfere with other clients though it will slow down
+Failure on transmission to one client will not interfere with other clients. However, it will slow down
 the transmission sequence through all clients for any clients who are timing out on confirmation of reception
 as the *Sound Speed* package will wait up to the 'RX timeout' value defined in the setup (default: 20 seconds) for confirmation.
 
-.. note:: Server mode will only currently work with the *SIS* transmission protocol.
+.. note:: Server mode will only *currently* work with the *SIS* transmission protocol.
 
 
-Kongsberg SIS
--------------
+.. _sis4:
 
-*SIS* does not require additional configuration to receive sound speed files since it always listens on port 4001
+Kongsberg SIS v4
+----------------
+
+*SIS v4* does not require additional configuration to receive sound speed files since it always listens on port 4001
 for input sound speed data.
 
 The following indications are useful for monitoring reception of sound speed profiles:
 
-* The SSP profile filename will be updated in the Runtime parameters menu in the form: ``YYYYMMDD_HHMMSS.asvp``. The date and time fields are populated based on the time stamp in the profile that was received from the SSP package. In the case of measured casts, this is the time of acquisition, as found in the input file. In the case of synthetic WOA profiles, the date/time is based on the time of transmission of the cast (using the computer clock where the SSP package is installed).
+* The SSP profile filename will be updated in the Runtime parameters menu in the form: ``YYYYMMDD_HHMMSS.asvp``.
+  The date and time fields are populated based on the time stamp in the profile that was received from the SSP package.
+  In the case of measured casts, this is the time of acquisition, as found in the input file.
+  In the case of synthetic WOA profiles, the date/time is based on the time of transmission of the cast
+  (using the computer clock where the SSP package is installed).
 * *SIS* creates several files in the last location from which it loaded a sound speed profile.
 * The SVP display window, if being viewed in *SIS*, will update with the new cast.
 * In the event that a cast is rejected, *SIS* will launch a warning dialog to indicate that the cast it received was rejected.
 
-Although *SIS* will always allow incoming sound speed transmissions, it has several restrictions
+Although *SIS v4* will always allow incoming sound speed transmissions, it has several restrictions
 that must be observed in order for the data to be accepted (see *Kongsberg manual*).
 As this particular transmission protocol is used by other acquisition systems, it is worth describing in detail
 what the *Sound Speed* package does to the cast data to satisfy the input criteria for *SIS*.
 
 The transmission procedure used by the SSP package will format the temperature and salinity profiles
 into the Kongsberg Maritime format. Since the WOA09/RTOFS grids only extend to a maximum depth of 5,500 m,
-the profile undergoes a final extrapolation to a depth of 12,000 m to satisfy *SIS* input criteria,
+the profile undergoes a final extrapolation to a depth of 12,000 m to satisfy *SIS v4* input criteria,
 this is done with temperature and salinity values measured in the Mariana Trench by *Taira et al. (2005)*.
 
-Since *SIS* input profiles have a limit on the maximum allowable number of data points,
+Since *SIS v4* input profiles have a limit on the maximum allowable number of data points,
 the sound speed profile is thinned using a modified version of the Douglas-Peucker line reduction method
 as described by *Beaudoin et al. (2011)*. The algorithm begins with a small tolerance and increases it linearly
 until the number of points in the profile falls below the maximum allowed by *SIS*.
 
-By default, the cast header is formatted to instruct *SIS* to accept the profile for immediate application
+By default, the cast header is formatted to instruct *SIS v4* to accept the profile for immediate application
 without launching the *Kongsberg SVP Editor*. This behavior can be changed through the configuration file
-by setting *Auto apply profile* to *False* (in the *Setup* tab). In this case, *SIS* will accept the cast
-but will then launch its own editor interface and user interaction will be required on the *SIS* computer
+by setting *Auto apply profile* to *False* (in the *Setup* tab). In this case, *SIS v4* will accept the cast
+but will then launch its own editor interface and user interaction will be required on the *SIS v4* computer
 in order to have the cast applied to the multibeam system.
 
-Once the cast has been prepared for transmission, it is sent to *SIS* via UDP transmission over the network.
-If *SIS* receives the profile and accepts it, it will rebroadcast the SVP datagram.
+Once the cast has been prepared for transmission, it is sent to *SIS v4* via UDP transmission over the network.
+If *SIS v4* receives the profile and accepts it, it will rebroadcast the SVP datagram.
 The *Sound Speed* package waits for this rebroadcast to ensure reception of the cast. The profile that was re-broadcasted
 from SIS is compared against that which was sent. If they match, then the transmission is considered successful.
 If there is a discrepancy, or if no rebroadcast profile is received, the user is notified that reception

@@ -1,7 +1,9 @@
-from typing import Optional
-import time
-from threading import Thread, Event
 import logging
+import time
+import traceback
+from datetime import datetime
+from threading import Thread, Event
+from typing import List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -13,31 +15,69 @@ class Server(Thread):
         Thread.__init__(self, target=None, name="Synthetic Profile Server")
         self.prj = prj
         self.delivered_casts = 0
-        self.force_send = Event()
+        self.force_send = False
         self.shutdown = Event()
         self.wait_time = 5
 
-        self.tss_last = None
-        self.lat_idx_last = None
-        self.lon_idx_last = None
+        self.last_tx_tss = None
 
-    def check_settings(self) -> bool:
+        self.cur_lat = None  # type: Optional[float]
+        self.cur_lon = None  # type: Optional[float]
+        self.cur_tm = None  # type: Optional[datetime]
+        self.cur_tss = None  # type: Optional[float]
+        self.cur_draft = None  # type: Optional[float]
+        self.cur_tss_diff = 0.0  # type: float
+        self.cur_lat_idx = None  # type: Optional[int]
+        self.cur_lon_idx = None  # type: Optional[int]
+
+        self.last_lat_idx = None  # type: Optional[int]
+        self.last_lon_idx = None  # type: Optional[int]
+
+        self.settings_errors = list()
+        self.runtime_errors = list()
+
+    def list_uni_clients(self) -> List[str]:
+        uni_clients = list()
+
+        for client in self.prj.setup.client_list.clients:
+            if client.protocol not in ["SIS", "KCTRL"]:
+                uni_clients.append("%s [protocol: %s]" % (client.name, client.protocol))
+
+        return uni_clients
+
+    def check_settings(self, use_uni_clients: bool = False) -> bool:
         """Check the server settings"""
 
-        logger.debug("checking settings ...")
+        logger.debug("Initialization checks ...")
         self.prj.progress.start(text='Check settings')
+        self.settings_errors.clear()
+        self.prj.setup.client_list.last_tx_time = None
+        self.prj.setup.client_list.last_tx_time_2 = None
 
-        # ### First checks for atlas sources ###
+        # Check for atlas sources
+        if not self._check_settings_source():
+            self.prj.progress.end()
+            return False
 
-        if self.prj.setup.server_source == 'RTOFS':  # RTOFS case
+        self.prj.progress.update(30)
 
-            if self.prj.use_rtofs():
-                logger.info("RTOFS-use check: OK")
+        # Check for SIS settings
+        if not self._check_settings_sis():
+            self.prj.progress.end()
+            return False
 
-            else:
-                logger.error("RTOFS-use check: KO")
-                self.prj.progress.end()
-                return False
+        self.prj.progress.update(60)
+
+        # Check for clients
+        if not self._check_settings_clients(use_uni_clients=use_uni_clients):
+            self.prj.progress.end()
+            return False
+
+        self.prj.progress.end()
+        logger.debug("Initialization checks: OK")
+        return True
+
+    def _check_settings_source(self) -> bool:
 
         if self.prj.setup.server_source == 'WOA09':  # WOA09 case
 
@@ -45,27 +85,58 @@ class Server(Thread):
                 logger.info("WOA09-use check: OK")
 
             else:
-                logger.error("WOA09-use check: KO")
-                self.prj.progress.end()
+                msg = "WOA09-use check: KO"
+                logger.error(msg)
+                self.settings_errors.append(msg)
                 return False
 
-        if self.prj.setup.server_source == 'WOA13':  # WOA09 case
+        elif self.prj.setup.server_source == 'WOA13':  # WOA09 case
 
             if self.prj.use_woa13():
                 logger.info("WOA13-use check: OK")
 
             else:
-                logger.error("WOA13-use check: KO")
-                self.prj.progress.end()
+                msg = "WOA13-use check: KO"
+                logger.error(msg)
+                self.settings_errors.append(msg)
                 return False
 
-        self.prj.progress.update(30)
+        elif self.prj.setup.server_source == 'RTOFS':  # RTOFS case
 
-        # ### Now checks for SIS settings ###
+            if self.prj.use_rtofs():
+                logger.info("RTOFS-use check: OK")
+
+            else:
+                msg = "RTOFS-use check: KO"
+                logger.error(msg)
+                self.settings_errors.append(msg)
+                return False
+
+        elif self.prj.setup.server_source == 'GoMOFS':  # GoMOFS case
+
+            if self.prj.use_gomofs:
+                logger.info("GoMOFS-use check: OK")
+
+            else:
+                msg = "GoMOFS-use check: KO"
+                logger.error(msg)
+                self.settings_errors.append(msg)
+                return False
+
+        else:
+            msg = "Unsupported source: %s" % self.prj.setup.server_source
+            logger.error(msg)
+            self.settings_errors.append(msg)
+            return False
+
+        return True
+
+    def _check_settings_sis(self) -> bool:
 
         if not self.prj.use_sis():
-            logger.error("SIS-use check: KO")
-            self.prj.progress.end()
+            msg = "SIS-use check: KO"
+            logger.error(msg)
+            self.settings_errors.append(msg)
             return False
 
         # - navigation datagram
@@ -73,28 +144,35 @@ class Server(Thread):
             logger.info("SIS NAV broadcast: OK")
 
         else:
-            logger.error("SIS NAV broadcast: KO")
-            self.prj.progress.end()
+            msg = "SIS NAV broadcast: KO"
+            logger.error(msg)
+            self.settings_errors.append(msg)
             return False
 
         # - depth datagram
         if self.prj.listeners.sis.xyz:
             logger.info("SIS DEPTH broadcast: OK")
-
         else:
             logger.warning("SIS DEPTH broadcast: KO > SIS may warn about surface sound speed")
 
-        self.prj.progress.update(60)
+        return True
 
-        # ### Test clients interaction (only SIS currently) ###
+    def _check_settings_clients(self, use_uni_clients: bool = False) -> bool:
 
         prog_quantum = 40 / (len(self.prj.setup.client_list.clients) + 1)
         logger.info("Testing clients for reception-confirmation interaction")
-        num_live_clients = 0
+        num_clients = 0
         for client in self.prj.setup.client_list.clients:
 
-            if client.protocol != "SIS":
-                client.alive = False
+            client.alive = True
+
+            if client.protocol not in ["SIS", "KCTRL"]:
+                if use_uni_clients:
+                    logger.info('Using unidirectional client: %s [%s]' % (client.name, client.protocol))
+                    num_clients += 1
+                else:
+                    logger.info('Skipping unidirectional client: %s [%s]' % (client.name, client.protocol))
+                    client.alive = False
                 continue
 
             client.request_profile_from_sis(self.prj)
@@ -102,7 +180,7 @@ class Server(Thread):
             if self.prj.listeners.sis.ssp:
                 logger.info("Interaction test: OK")
                 client.alive = True
-                num_live_clients += 1
+                num_clients += 1
 
             else:
                 logger.warning("Interaction test: KO")
@@ -110,39 +188,33 @@ class Server(Thread):
 
             self.prj.progress.add(prog_quantum)
 
-        if num_live_clients == 0:
-            logger.error("Unable to confirm interaction with any clients > The Server Mode is not available")
-            self.prj.progress.end()
+        if num_clients == 0:
+            msg = "Unable to confirm clients."
+            logger.error(msg)
+            self.settings_errors.append(msg)
             return False
 
         else:
-            logger.info("Interaction verified with %s client/clients" % num_live_clients)
+            logger.info("Interaction verified with %s client/clients" % num_clients)
 
-        # # test vessel draft
-        # if self.lib.vessel_draft is None:
-        #     log.info("Vessel draft: %s (server)" % self.server_vessel_draft)
-        # else:
-        #     log.error("Vessel draft: %s" % self.lib.vessel_draft)
-        #
-        # # reset server flags
-        # self.update_plot = False
-
-        self.force_send = False
-        self.delivered_casts = 0
-
-        self.prj.progress.end()
-        logger.debug("checking settings: OK")
         return True
 
     def run(self) -> None:
         """Start the simulation"""
         # self.init_logger()
         logger.debug("%s -> started" % self.name)
+        self.runtime_errors.clear()
+
+        self.force_send = False
+        self.delivered_casts = 0
 
         count = 0
         while True:
             if self.shutdown.is_set():
-                logger.debug("shutdown")
+                # reset alive all the clients
+                for client in self.prj.setup.client_list.clients:
+                    client.alive = True
+                logger.debug("Shutdown Server Mode")
                 break
             if (count % 100) == 0:
                 logger.debug("#%05d: running" % count)
@@ -150,155 +222,230 @@ class Server(Thread):
             try:
                 self.check()
             except Exception as e:
-                logger.warning("issue while retrieving synthetic data: %s" % e)
+                traceback.print_exc()
+                msg = "While in Server Mode, %s" % e
+                self.runtime_errors.append(msg)
+                logger.error(e)
+                self.shutdown.set()
+                continue
 
-            time.sleep(3)
+            time.sleep(60)  # TODO
             count += 1
 
         logger.debug("%s -> ended" % self.name)
 
     def check(self) -> None:
-        # ### Retrieve current location/time ###
-
-        lat = self.prj.listeners.sis.nav_latitude
-        lon = self.prj.listeners.sis.nav_longitude
-        tm = self.prj.listeners.sis.nav_timestamp
-        if (lat is None) or (lon is None) or (tm is None):
-            logger.warning("Possible corrupted reception of spatial timestamp > Waiting %s secs"
-                           % self.wait_time)
-            count = 0
-            while count < self.wait_time:
-                time.sleep(1)
-                count += 1
+        # Retrieve current location/time
+        if not self._retrieve_cur_pos():
             return
-        logger.debug('loc/timestamp: (%s %s) @%s' % (lat, lon, tm.strftime('%Y/%m/%d %H:%M')))
+        if not self._retrieve_cur_source_idx():
+            return
+        logger.debug('current location/time: (%s %s) @%s -> (%s, %s)'
+                     % (self.cur_lat, self.cur_lon, self.cur_tm.strftime('%Y/%m/%d %H:%M:%S'),
+                        self.cur_lat_idx, self.cur_lon_idx))
 
-        # ### Retrieve grid index ###
+        self._retrieve_cur_tss()
+        if self.cur_tss_diff:
+            logger.debug('TSS delta: %.3f m/s' % self.cur_tss_diff)
 
+        if not self._is_new_profile_required():
+            return
+
+        if self._has_sis_manual_profile():
+            return
+
+        if not self._retrieve_new_profile():
+            return
+
+        self._transmit_profile()
+
+    def _retrieve_cur_pos(self) -> bool:
+
+        max_attempts = 12
+        cur_attempts = 0
+
+        while True:
+            self.cur_lat = self.prj.listeners.sis.nav_latitude
+            self.cur_lon = self.prj.listeners.sis.nav_longitude
+            self.cur_tm = self.prj.listeners.sis.nav_timestamp
+
+            if (self.cur_lat is None) or (self.cur_lon is None) or (self.cur_tm is None):
+
+                if cur_attempts < max_attempts:
+                    logger.warning("Possible issues in retrieving current location and timestamp. "
+                                   "Waiting %s secs (Ongoing attempt #%d/%d)"
+                                   % (self.wait_time, cur_attempts, max_attempts))
+                    cur_attempts += 1
+                    count = 0
+                    while count < self.wait_time:
+                        time.sleep(1)
+                        count += 1
+
+                else:
+                    self.shutdown.set()
+                    msg = 'Unable to retrieve current location and timestamp after %s seconds' \
+                          % (max_attempts * self.wait_time)
+                    self.runtime_errors.append(msg)
+                    logging.error(msg)
+                    return False
+
+            else:
+                self.prj.listeners.sis.clear_nav()
+                return True
+
+    def _retrieve_cur_source_idx(self) -> bool:
         if self.prj.setup.server_source == 'WOA09':  # WOA09 case
-            lat_idx, lon_idx = self.prj.atlases.woa09.grid_coords(lat=lat, lon=lon)
+            self.cur_lat_idx, self.cur_lon_idx = self.prj.atlases.woa09.grid_coords(lat=self.cur_lat, lon=self.cur_lon)
         elif self.prj.setup.server_source == 'WOA13':  # WOA13 case
-            lat_idx, lon_idx = self.prj.atlases.woa13.grid_coords(lat=lat, lon=lon)
+            self.cur_lat_idx, self.cur_lon_idx = self.prj.atlases.woa13.grid_coords(lat=self.cur_lat, lon=self.cur_lon)
         elif self.prj.setup.server_source == 'RTOFS':  # RTOFS case
-            lat_idx, lon_idx = self.prj.atlases.rtofs.grid_coords(lat=lat, lon=lon, dtstamp=tm, server_mode=True)
+            self.cur_lat_idx, self.cur_lon_idx = self.prj.atlases.rtofs.grid_coords(lat=self.cur_lat, lon=self.cur_lon,
+                                                                                    dtstamp=self.cur_tm,
+                                                                                    server_mode=True)
         elif self.prj.setup.server_source == 'GoMOFS':  # GoMOFS case
-            lat_idx, lon_idx = self.prj.atlases.gomofs.grid_coords(lat=lat, lon=lon, dtstamp=tm, server_mode=True)
+            self.cur_lat_idx, self.cur_lon_idx = self.prj.atlases.gomofs.grid_coords(lat=self.cur_lat, lon=self.cur_lon,
+                                                                                     dtstamp=self.cur_tm,
+                                                                                     server_mode=True)
         else:
-            raise RuntimeError('unable to understand server source: %s' % self.prj.setup.server_source)
+            raise RuntimeError('Unsupported source: %s' % self.prj.setup.server_source)
+
         # logger.debug('lat idx: %s [last: %s]' % (lat_idx, self.lat_idx_last))
         # logger.debug('lon idx: %s [last: %s]' % (lon_idx, self.lon_idx_last))
-        if (lat_idx is None) or (lon_idx is None):
-            logger.warning("grid index is invalid: (%s %s) -> out of model bounding box?" % (lat_idx, lon_idx))
-            return
+        if (self.cur_lat_idx is None) or (self.cur_lon_idx is None):
+            logger.warning("Source index is invalid: (%s %s) -> Is the vessel out of the selected source coverage?"
+                           % (self.cur_lat_idx, self.cur_lon_idx))
+            return False
 
-        # ### Retrieve surface sound speed (optional) ###
+        return True
 
-        tss = None
-        draft = None
-        tss_diff = 0.0
+    def _retrieve_cur_tss(self) -> None:
+
+        self.cur_tss = None
+        self.cur_draft = None
+        self.cur_tss_diff = 0.0
+
         if self.prj.setup.server_apply_surface_sound_speed:
 
             if self.prj.listeners.sis.xyz is None:
-                logger.warning("Unable to retrieve xyz datagram > Waiting %s secs"
-                               % self.wait_time)
-                count = 0
-                while count < self.wait_time:
-                    time.sleep(1)
-                    count += 1
+                logger.warning("Unable to retrieve xyz datagram")
                 return
 
             if self.prj.listeners.sis.xyz_transducer_sound_speed:
-                tss = self.prj.listeners.sis.xyz_transducer_sound_speed
-                if self.tss_last:
-                    tss_diff = abs(tss - self.tss_last)
+                self.cur_tss = self.prj.listeners.sis.xyz_transducer_sound_speed
+                if self.last_tx_tss:
+                    self.cur_tss_diff = abs(self.cur_tss - self.last_tx_tss)
             if self.prj.listeners.sis.xyz_transducer_depth:
-                draft = self.prj.listeners.sis.xyz_transducer_depth
+                self.cur_draft = self.prj.listeners.sis.xyz_transducer_depth
 
-        logger.debug('TSS delta: %s' % tss_diff)
+    def _is_new_profile_required(self):
+        source_idx_changed = (self.cur_lat_idx != self.last_lat_idx) or (self.cur_lon_idx != self.last_lon_idx)
+        if source_idx_changed:
+            return True
 
-        # check if we need a new cast
-        if (tss_diff < 1.0) and (lat_idx == self.lat_idx_last) and (lon_idx == self.lon_idx_last):
-            if self.force_send:
-                logger.debug('Forcing profile transmission')
-                self.force_send = False
-            else:
-                logger.debug('New profile not required')
-                return
+        if self.cur_tss_diff >= 1.0:
+            return True
 
+        if self.force_send:
+            logger.debug('Forcing the transmission of a synthetic profile')
+            self.force_send = False
+            return True
+
+        logger.debug('New profile not required')
+        return False
+
+    def _has_sis_manual_profile(self) -> bool:
+        # after the first tx, a cast from SIS is always required
+        if not self.prj.setup.client_list.last_tx_time:
+            return False
+
+        logger.info("Requesting SIS current profile ...")
+        num_clients = 0
+        for client in self.prj.setup.client_list.clients:
+
+            # skipping dead clients
+            if not client.alive:
+                logger.info("Dead client: %s [%s] > Skipping" % (client.ip, client.protocol))
+                continue
+
+            if client.protocol not in ["SIS", "KCTRL"]:
+                num_clients += 1
+                continue
+
+            client.request_profile_from_sis(prj=self.prj)
+            if not self.prj.listeners.sis.ssp:
+                logger.info("Client %s dead since last tx" % client.name)
+                client.alive = False
+                continue
+
+            logger.info("Live client: %s" % client.name)
+            num_clients += 1
+
+            # test by comparing the times
+            if self.prj.setup.client_list.last_tx_time != self.prj.listeners.sis.ssp.acquisition_time:
+                if self.prj.setup.client_list.last_tx_time_2 == self.prj.listeners.sis.ssp.acquisition_time:
+                    logger.info('missed reception of last transmitted SSP -> '
+                                'SIS is using the previously-transmitted SSP')
+                else:
+                    msg = "Times mismatch > %s AND %s != %s " \
+                          % (self.prj.setup.client_list.last_tx_time, self.prj.setup.client_list.last_tx_time_2,
+                             self.prj.listeners.sis.ssp.acquisition_time)
+                    self.runtime_errors.append(msg)
+                    logger.error(msg)
+                    self.shutdown.set()
+                    return True
+
+        if num_clients == 0:
+            msg = "No alive clients"
+            self.runtime_errors.append(msg)
+            logger.error(msg)
+            self.shutdown.set()
+            return True
+
+        return False
+
+    def _retrieve_new_profile(self) -> bool:
         # retrieve profile
         if self.prj.setup.server_source == 'WOA09':  # WOA09 case
-            self.prj.ssp = self.prj.atlases.woa09.query(lat=lat, lon=lon, dtstamp=tm, server_mode=True)
+            self.prj.ssp = self.prj.atlases.woa09.query(lat=self.cur_lat, lon=self.cur_lon, dtstamp=self.cur_tm,
+                                                        server_mode=True)
 
         elif self.prj.setup.server_source == 'WOA13':  # WOA09 case
-            self.prj.ssp = self.prj.atlases.woa13.query(lat=lat, lon=lon, dtstamp=tm, server_mode=True)
+            self.prj.ssp = self.prj.atlases.woa13.query(lat=self.cur_lat, lon=self.cur_lon, dtstamp=self.cur_tm,
+                                                        server_mode=True)
 
         elif self.prj.setup.server_source == 'RTOFS':  # RTOFS case
-            self.prj.ssp = self.prj.atlases.rtofs.query(lat=lat, lon=lon, dtstamp=tm, server_mode=True)
+            self.prj.ssp = self.prj.atlases.rtofs.query(lat=self.cur_lat, lon=self.cur_lon, dtstamp=self.cur_tm,
+                                                        server_mode=True)
 
         elif self.prj.setup.server_source == 'GoMOFS':  # GoMOFS case
-            self.prj.ssp = self.prj.atlases.gomofs.query(lat=lat, lon=lon, dtstamp=tm, server_mode=True)
+            self.prj.ssp = self.prj.atlases.gomofs.query(lat=self.cur_lat, lon=self.cur_lon, dtstamp=self.cur_tm,
+                                                         server_mode=True)
 
         else:
             raise RuntimeError('unable to understand server source: %s' % self.prj.setup.server_source)
 
         if not self.prj.has_ssp():
             logger.warning("Unable to retrieve a synthetic cast > Continue the loop")
-            return
-
-        logger.debug('Retrieve new synthetic profile')
+            return False
 
         # apply tss (if required)
-        if self.prj.setup.server_apply_surface_sound_speed and tss and draft:
+        if self.prj.setup.server_apply_surface_sound_speed and self.cur_tss and self.cur_draft:
             self.prj.add_cur_tss(server_mode=True)
 
-        # after the first tx, a cast from SIS is always required
-        num_live_clients = 0
-        if self.prj.setup.client_list.last_tx_time:
-            logger.info("Requesting cast from SIS (prior to transmission)")
+        logger.debug('Retrieved a new synthetic profile')
+        return True
 
-            for client in self.prj.setup.client_list.clients:
-
-                # skipping dead clients
-                if not client.alive:
-                    logger.info("Dead client: %s > Skipping" % client.ip)
-                    continue
-
-                client.request_profile_from_sis(prj=self.prj)
-                if not self.prj.listeners.sis.ssp:
-                    logger.info("client %s dead since last tx" % client.name)
-                    client.alive = False
-                    continue
-
-                logger.info("Live client: %s" % client.name)
-                num_live_clients += 1
-
-                # test by comparing the times
-                if self.prj.setup.client_list.last_tx_time != self.prj.listeners.sis.ssp.acquisition_time:
-                    if self.prj.setup.client_list.last_tx_time_2 == self.prj.listeners.sis.ssp.acquisition_time:
-                        logger.info('missed reception of last transmitted SSP -> '
-                                    'SIS is using the previously-transmitted SSP')
-                    else:
-                        logger.error("Times mismatch > %s != %s"
-                                     % (self.prj.setup.client_list.last_tx_time,
-                                        self.prj.listeners.sis.ssp.acquisition_time))
-                        self.shutdown.set()
-                        return
-
-            if num_live_clients == 0:
-                self.shutdown.set()
-                logger.error("no live clients")
-                return
+    def _transmit_profile(self) -> None:
 
         self.prj.setup.client_list.transmit_ssp(prj=self.prj, server_mode=True)
-        if self.prj.setup.server_apply_surface_sound_speed:
-            self.tss_last = tss  # store the tss for the next iteration
 
-        self.lat_idx_last = lat_idx
-        self.lon_idx_last = lon_idx
+        if self.cur_tss:
+            self.last_tx_tss = self.cur_tss
+        self.last_lat_idx = self.cur_lat_idx
+        self.last_lon_idx = self.cur_lon_idx
 
         if not self.prj.store_data():
             logger.warning("Unable to save to db!")
-            return
 
     def stop(self) -> None:
         self.shutdown.set()

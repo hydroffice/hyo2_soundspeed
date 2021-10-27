@@ -1,17 +1,25 @@
+.. _ssm_sis5:
+
 Sound Speed Manager - SIS v5 interaction
 ========================================
 
 .. index:: SIS; v5
 .. index:: K-Controller
 
-SIS v5 is currently supported through the Data Distribution application installed with SIS v5.
+SIS v5 is currently supported through the Data Distribution application (usually installed with SIS v5).
 
 This method covers both cases:
 
 * Sound Speed Manager and SIS v5 installed on the same machine.
 * Sound Speed Manager and SIS v5 installed on the different machines.
 
-First, under the SIS v5 installation folder, locate and execute 'DataDist.exe'. Once started, you need the following
+
+.. _ssm_sis5_sis_settings:
+
+SIS v5 settings
+---------------
+
+Under the SIS v5 installation folder, locate and execute 'DataDist.exe'. Once started, you need the following
 settings (see :numref:`data_dist_exe_fig`):
 
 * Select the Echo Sounder.
@@ -29,6 +37,15 @@ settings (see :numref:`data_dist_exe_fig`):
     :figclass: align-center
 
     *Data Distribution Configuration* application with required settings.
+
+.. warning::
+    Data Distribution requires to have SIS v5 in execution.
+    Setups with the K-Controller interacting with acquisition software different from SIS v5 are *currently* unsupported.
+
+.. _ssm_sis5_ssm_settings:
+
+SSM settings
+------------
 
 Open in editing mode the Sound Speed Manager’s Setup Tab, then set the SIS listen port (that you have set in
 the Data Distribution Configuration) in the Listeners sub-tab (see :numref:`ssm_sis5_p1_fig`).

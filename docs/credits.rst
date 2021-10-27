@@ -18,10 +18,6 @@ HydrOffice Sound Speed is developed and maintained by:
 
 Other contributors:
 
-- `Matthew Sharr <mailto:matthew.sharr@noaa.gov>`_
-
-- `Michael Smith <mailto:msmith@ccom.unh.edu>`_
-
 - `Jonathan Beaudoin <mailto:beaudoin@qps.nl>`_
 
 - `Brian R. Calder <mailto:brc@ccom.unh.edu>`_
@@ -36,9 +32,15 @@ Other contributors:
 
 - `Damian Manda <damian.manda@noaa.gov>`_
 
+- `Patrice Ponchant <mailto:patrice.ponchant@fugro.com>`_
+
 - `Glen Rice <mailto:glen.rice@noaa.gov>`_
 
 - `Jack Riley <mailto:jack.riley@noaa.gov>`_
+
+- `Matthew Sharr <mailto:matthew.sharr@noaa.gov>`_
+
+- `Michael Smith <mailto:msmith@ccom.unh.edu>`_
 
 - `Matthew J. Wilson <mailto:matthew.wilson@noaa.gov>`_
 

@@ -19,6 +19,8 @@ from PyInstaller.compat import is_darwin, is_win
 
 from hyo2.ssm_sis import __version__ as ssm_version
 
+sys.setrecursionlimit(20000)
+
 is_beta = False
 if is_beta:
     beta = ".b%s" % datetime.now().strftime("%Y%m%d%H%M%S")
@@ -107,24 +109,20 @@ ss_data = collect_pkg_data('hyo2.soundspeed')
 ssm_sis_data = collect_pkg_data('hyo2.ssm_sis')
 pyside2_data = collect_pkg_data('PySide2')
 
-chromedriver_path = os.path.join(os.path.dirname(sys.executable), "Scripts", "chromedriver.exe")
-if not os.path.exists(chromedriver_path):
-    raise RuntimeError("Unable to locate %s" % chromedriver_path)
-
 icon_file = os.path.normpath(os.path.join(os.getcwd(), 'freeze', 'SSM_SIS.ico'))
 if is_darwin:
     icon_file = os.path.normpath(os.path.join(os.getcwd(), 'freeze', 'SSM_SIS.icns'))
 
 a = Analysis(['SSM_SIS.py'],
-             binaries = [(chromedriver_path, '.')],
-             pathex=[],
-             hiddenimports=["PIL", "scipy._lib.messagestream", "cftime._cftime", "PySide2.QtPrintSupport",
-                            "pyproj.datadir", "pkg_resources.py2_warn"],
-             excludes=["IPython", "PyQt4", "PyQt5", "pandas", "sphinx", "sphinx_rtd_theme", "OpenGL_accelerate",
-                       "FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter", "wx",
-                       "cartopy_offlinedata", "cartopy_userconfig"],
-             hookspath=None,
-             runtime_hooks=None)
+         binaries=[],
+         pathex=[],
+         hiddenimports=["PIL", "scipy._lib.messagestream", "cftime._cftime", "PySide2.QtPrintSupport",
+                        "pyproj.datadir", "pkg_resources.py2_warn"],
+         excludes=["IPython", "PyQt4", "PyQt5", "pandas", "sphinx", "sphinx_rtd_theme", "OpenGL_accelerate",
+                   "FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter", "wx",
+                   "cartopy_offlinedata", "cartopy_userconfig"],
+         hookspath=None,
+         runtime_hooks=None)
 
 pyz = PYZ(a.pure)
 exe = EXE(pyz,
@@ -137,15 +135,15 @@ exe = EXE(pyz,
           console=True,
           icon=icon_file)
 coll = COLLECT(exe,
-               a.binaries,
-               a.zipfiles,
-               a.datas,
-               pyproj_data,
-               cartopy_data,
-               abc_data,
-               ss_data,
-               ssm_sis_data,
-               pyside2_data,
-               strip=None,
-               upx=True,
-               name='SSM_SIS.%s%s' % (ssm_version, beta))
+           a.binaries,
+           a.zipfiles,
+           a.datas,
+           pyproj_data,
+           cartopy_data,
+           abc_data,
+           ss_data,
+           ssm_sis_data,
+           pyside2_data,
+           strip=None,
+           upx=True,
+           name='SSM_SIS.%s%s' % (ssm_version, beta))

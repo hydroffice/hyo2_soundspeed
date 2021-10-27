@@ -237,7 +237,7 @@ div.admonition {
 div.admonition p.admonition-title {
     font-family: {{ headline_font_stack }};
     font-weight: normal;
-    font-size: 14px;
+    font-size: 15px;
     margin: 0 0 10px 0;
     padding: 0;
     line-height: 1;
@@ -265,18 +265,19 @@ div.topic {
 }
 
 div.note {
-    font-size: 11px;
+    font-size: 12px;
     background-color: #f2efe1;
     border: 1px solid #c7b25d;
 }
 
 div.warning {
-    font-size: 11px;
+    font-size: 14px;
     background-color: #f7f0f0;
     border: 1px solid #cc5e5e;
 }
 
 p.admonition-title {
+    font-size: 15px;
     display: inline;
 }
 

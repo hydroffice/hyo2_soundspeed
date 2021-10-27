@@ -1,13 +1,10 @@
 import logging
 
 from PySide2 import QtCore, QtGui, QtWidgets
-try:
-    from selenium import webdriver
-except ModuleNotFoundError:
-    webdriver = None
 from urllib.request import urlopen
 
 from hyo2.abc.lib.helper import Helper
+from hyo2.abc.app.web_renderer import WebRenderer
 from hyo2.ssm_sis import app_info, lib_info
 from hyo2.ssm_sis.controlpanel import ControlPanel
 
@@ -18,8 +15,8 @@ logger = logging.getLogger(__name__)
 class MainWin(QtWidgets.QMainWindow):
 
     def __init__(self):
-        QtWidgets.QMainWindow.__init__(self)
-
+        super().__init__()
+        self._web = WebRenderer()
         self._check_web_page()
         self._check_latest_release()
 
@@ -45,17 +42,14 @@ class MainWin(QtWidgets.QMainWindow):
         self.panel = ControlPanel()
         self.setCentralWidget(self.panel)
 
-    @classmethod
-    def _check_web_page(cls):
-        if webdriver is None:
-            return
+    def _check_web_page(self, token: str = ""):
         try:
-            url = Helper(lib_info=lib_info).web_url()
-            options = webdriver.ChromeOptions()
-            options.headless = True
-            options.add_experimental_option('excludeSwitches', ['enable-logging'])
-            driver = webdriver.Chrome(options=options)
-            driver.get(url)
+            if len(token) > 0:
+                url = "%s_%s" % (Helper(lib_info=lib_info).web_url(), token)
+            else:
+                url = "%s" % Helper(lib_info=lib_info).web_url()
+            self._web.open(url=url)
+            logger.debug('check %s' % url)
 
         except Exception as e:
             logger.warning(e)

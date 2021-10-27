@@ -105,9 +105,9 @@ class Castaway(AbstractTextReader):
             
             elif line[:len(self.tk_sn)] == self.tk_sn:
                 try:
-                    sn_str = line.split(",")[-1]
-                    if len(sn_str) != 0:
-                        self.ssp.cur.meta.sn = sn_str
+                    sn = line.split(",")[-1]
+                    if len(sn) != 0:
+                        self.ssp.cur.meta.sn = sn
                 except ValueError:
                     logger.error("unable to parse serial number from line #%s" % self.samples_offset)
 

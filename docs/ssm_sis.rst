@@ -7,7 +7,7 @@ SSM-SIS app
 The SSM-SIS app is a simple application used to check the settings/interaction between Sound Speed Manager and
 Kongsberg SIS (:numref:`ssm_sis_init`).
 
-.. note::
+.. warning::
    To avoid interference with Sound Speed Manager keep it closed while using SSM-SIS.
 
 .. _ssm_sis_init:
@@ -23,6 +23,9 @@ Kongsberg SIS (:numref:`ssm_sis_init`).
 
 Settings
 ========
+
+.. note::
+   For the settings required on the SIS side, see :ref:`ssm_sis5_sis_settings`.
 
 The *Settings* group box lists the app configuration settings:
 
@@ -45,7 +48,7 @@ The *Commands* group box lists the app commands:
   speed profile.
 * *Stop*: to end the listening of SIS datagrams.
 
-.. note::
+.. warning::
    Do not use the *Send SSP* command during regular survey operations because it will trigger the transmission of a
    fake sound speed profile.
 

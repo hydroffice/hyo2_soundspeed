@@ -160,7 +160,7 @@ class Woa13(AbstractAtlas):
 
         lat_idx = np.abs((self.lat - lat)).argmin()
         lon_idx = np.abs((self.lon - lon)).argmin()
-        logger.debug("grid coords: %s %s" % (lat_idx, lon_idx))
+        # logger.debug("grid coords: %s %s" % (lat_idx, lon_idx))
         return lat_idx, lon_idx
 
     def query(self, lat: float, lon: float, dtstamp: Union[dt, None] = None, server_mode: bool = False):

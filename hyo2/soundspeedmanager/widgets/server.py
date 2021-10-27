@@ -1,7 +1,7 @@
 import os
 import logging
 
-from PySide2 import QtGui, QtWidgets
+from PySide2 import QtCore, QtGui, QtWidgets
 
 from hyo2.soundspeedmanager.widgets.widget import AbstractWidget
 from hyo2.soundspeedmanager.widgets.dataplots import DataPlots
@@ -39,12 +39,12 @@ class Server(AbstractWidget):
         img = QtGui.QImage(os.path.join(self.media, 'server.png'))
         if img.isNull():
             raise RuntimeError("unable to open server image")
-        # noinspection PyCallByClass
+        # noinspection PyCallByClass,PyArgumentList
         img_label.setPixmap(QtGui.QPixmap.fromImage(img))
         group_layout.addWidget(img_label)
         # - text
         info_label = QtWidgets.QLabel(
-            "This tool delivers WOA/RTOFS-derived synthetic profiles to one or more network\n"
+            "This tool delivers WOA/model-derived synthetic profiles to one or more network\n"
             "clients in a continuous manner, enabling opportunistic mapping while underway.\n\n"
             "Given the uncertainty of such an approach, this mode is expected to ONLY be used\n"
             "in transit, capturing the position from SIS to lookup into the oceanographic atlas."
@@ -59,11 +59,11 @@ class Server(AbstractWidget):
         self.main_layout.addLayout(hbox)
         hbox.addStretch()
         # -- start
-        btn = QtWidgets.QPushButton("Start server")
+        self.start_btn = QtWidgets.QPushButton("Start server")
         # noinspection PyUnresolvedReferences
-        btn.clicked.connect(self.on_start_server)
-        btn.setToolTip("Start server mode")
-        hbox.addWidget(btn)
+        self.start_btn.clicked.connect(self.on_start_server)
+        self.start_btn.setToolTip("Start server mode")
+        hbox.addWidget(self.start_btn)
         self.start_server_act = QtWidgets.QAction('Start Server', self)
         # self.start_server_act.setShortcut('Ctrl+Alt+S')
         # noinspection PyUnresolvedReferences
@@ -71,34 +71,23 @@ class Server(AbstractWidget):
         self.main_win.server_menu.addAction(self.start_server_act)
 
         # -- force
-        btn = QtWidgets.QPushButton("Send now")
+        self.force_btn = QtWidgets.QPushButton("Send SSP now")
         # noinspection PyUnresolvedReferences
-        btn.clicked.connect(self.on_force_server)
-        btn.setToolTip("Force the transmission of a synthethic profile")
-        hbox.addWidget(btn)
+        self.force_btn.clicked.connect(self.on_force_server)
+        self.force_btn.setToolTip("Force the transmission of a synthethic profile")
+        hbox.addWidget(self.force_btn)
         self.force_server_act = QtWidgets.QAction('Force Transmission', self)
         # self.force_server_act.setShortcut('Ctrl+Alt+T')
         # noinspection PyUnresolvedReferences
         self.force_server_act.triggered.connect(self.on_force_server)
         self.main_win.server_menu.addAction(self.force_server_act)
 
-        # -- refresh
-        btn = QtWidgets.QPushButton("Refresh DB")
-        # noinspection PyUnresolvedReferences
-        btn.clicked.connect(self.on_refresh_db)
-        btn.setToolTip("Refresh the database tab")
-        hbox.addWidget(btn)
-        self.refresh_db_act = QtWidgets.QAction('Refresh Database', self)
-        # noinspection PyUnresolvedReferences
-        self.refresh_db_act.triggered.connect(self.on_refresh_db)
-        self.main_win.server_menu.addAction(self.refresh_db_act)
-
         # -- stop
-        btn = QtWidgets.QPushButton("Stop server")
+        self.stop_btn = QtWidgets.QPushButton("Stop server")
         # noinspection PyUnresolvedReferences
-        btn.clicked.connect(self.on_stop_server)
-        btn.setToolTip("Stop server mode")
-        hbox.addWidget(btn)
+        self.stop_btn.clicked.connect(self.on_stop_server)
+        self.stop_btn.setToolTip("Stop server mode")
+        hbox.addWidget(self.stop_btn)
         self.stop_server_act = QtWidgets.QAction('Stop Server', self)
         # self.stop_server_act.setShortcut('Ctrl+Alt+E')
         # noinspection PyUnresolvedReferences
@@ -110,13 +99,26 @@ class Server(AbstractWidget):
         # - plots
         self.dataplots = DataPlots(main_win=self.main_win, lib=self.lib, server_mode=True)
         self.main_layout.addWidget(self.dataplots)
-        self.dataplots.setHidden(True)
         self.hidden = QtWidgets.QFrame()
         self.main_layout.addWidget(self.hidden)
-        self.hidden.setVisible(True)
+
+        self._deactivate_gui(also_main_win=False)
+
+        self.activated_server = False
+        timer = QtCore.QTimer(self)
+        # noinspection PyUnresolvedReferences
+        timer.timeout.connect(self.update_gui)
+        # noinspection PyArgumentList
+        timer.start(2000)
 
     def on_start_server(self):
         logger.debug('start server')
+
+        if self.lib.server_is_alive():
+            msg = "The server mode is already started!"
+            # noinspection PyCallByClass,PyArgumentList
+            QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.Ok)
+            return
 
         self.main_win.switch_to_server_tab()
 
@@ -124,25 +126,43 @@ class Server(AbstractWidget):
               "The Server Mode creates sound speed profiles based on oceanographic models.\n" \
               "Thus, it is meant for use in transit, NOT for systematic seabed mapping.\n" \
               "This Mode will OVERWRITE the current SIS SSP.\n"
-        # noinspection PyCallByClass
+        # noinspection PyCallByClass,PyArgumentList
         ret = QtWidgets.QMessageBox.warning(self, "Server mode", msg,
-                                            QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
+                                            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if ret == QtWidgets.QMessageBox.No:
             return
 
-        if not self.lib.server.check_settings():
-            msg = "Unable to start the server mode.\n\n" \
-                  "Double-check the server settings and be sure that SIS is properly configured."
-            # noinspection PyCallByClass
+        uni_clients = self.lib.server.list_uni_clients()
+        use_uni_clients = False
+        if len(uni_clients) > 0:
+            msg = "The following clients do NOT provide acknowledgment of the received profiles:\n"
+            for uni_client in uni_clients:
+                msg += "- %s\n" % uni_client
+            msg += "\nDo you still want to transmit the profiles to them?\n"
+            # noinspection PyCallByClass,PyArgumentList
+            ret = QtWidgets.QMessageBox.warning(self, "Server mode", msg,
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            if ret == QtWidgets.QMessageBox.Yes:
+                use_uni_clients = True
+            elif ret == QtWidgets.QMessageBox.No:
+                use_uni_clients = False
+            else:
+                logger.debug("Cancelled by user.")
+                return
+
+        if not self.lib.server.check_settings(use_uni_clients=use_uni_clients):
+            msg = "Unable to start the server mode!\n"
+            for err in self.lib.server.settings_errors:
+                msg += "Reason: %s\n" % err
+            msg += "\nDouble-check the server settings and be sure that SIS is properly configured."
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Server mode", msg, QtWidgets.QMessageBox.Ok)
             return
 
         self.lib.start_server()
 
-        self.dataplots.setVisible(True)
-        self.hidden.setHidden(True)
-        self.group_box.setHidden(True)
-        self.main_win.server_started()
+        self.activated_server = True
+        self._activate_gui()
 
     def on_force_server(self):
         logger.debug('force server')
@@ -151,27 +171,60 @@ class Server(AbstractWidget):
 
         if not self.lib.server_is_alive():
             msg = "First start the server mode!"
-            # noinspection PyCallByClass
+            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.Ok)
             return
 
         self.lib.force_server()
         self.main_win.data_stored()
 
-    def on_refresh_db(self):
-        logger.debug('refresh db')
-        self.main_win.data_stored()
-        self.main_win.switch_to_database_tab()
-
     def on_stop_server(self):
         logger.debug('stop server')
 
         self.main_win.switch_to_server_tab()
 
+        if not self.lib.server_is_alive():
+            msg = "First start the server mode!"
+            # noinspection PyCallByClass,PyArgumentList
+            QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.Ok)
+            return
+
         self.lib.stop_server()
 
+        self.activated_server = False
+        self._deactivate_gui()
+
+    def update_gui(self):
+        if self.activated_server and not self.lib.server_is_alive():
+            self._deactivate_gui()
+            self.activated_server = False
+            msg = "Server Mode automatically stopped!\n"
+            for err in self.lib.server.runtime_errors:
+                msg += "Reason: %s\n" % err
+            # noinspection PyCallByClass,PyArgumentList
+            QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.Ok)
+            return
+
+    def _activate_gui(self):
+        self.dataplots.setVisible(True)
+        self.hidden.setHidden(True)
+        self.group_box.setHidden(True)
+
+        self.start_btn.setDisabled(True)
+        self.force_btn.setEnabled(True)
+        self.stop_btn.setEnabled(True)
+
+        self.main_win.server_started()
+
+    def _deactivate_gui(self, also_main_win=True):
         self.dataplots.setHidden(True)
         self.hidden.setVisible(True)
         self.group_box.setVisible(True)
-        self.main_win.server_stopped()
-        self.main_win.data_stored()
+
+        self.start_btn.setEnabled(True)
+        self.force_btn.setDisabled(True)
+        self.stop_btn.setDisabled(True)
+
+        if also_main_win:
+            self.main_win.data_stored()
+            self.main_win.server_stopped()

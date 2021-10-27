@@ -143,6 +143,17 @@ class Database(AbstractWidget):
         self.project_folder_act.triggered.connect(self.project_folder)
         self.main_win.database_menu.addAction(self.project_folder_act)
 
+        # ---- refresh DB
+        self.btn_refresh_db = QtWidgets.QPushButton("Refresh DB")
+        # noinspection PyUnresolvedReferences
+        self.btn_refresh_db.clicked.connect(self.update_table)
+        self.btn_refresh_db.setToolTip("Refresh DB entries")
+        self.manage_btn_box.addButton(self.btn_refresh_db, QtWidgets.QDialogButtonBox.ActionRole)
+        self.refresh_db_act = QtWidgets.QAction('Open Projects DB Folder', self)
+        # noinspection PyUnresolvedReferences
+        self.refresh_db_act.triggered.connect(self.update_table)
+        self.main_win.database_menu.addAction(self.refresh_db_act)
+
         right_vbox.addStretch()
         right_vbox.addStretch()
 
