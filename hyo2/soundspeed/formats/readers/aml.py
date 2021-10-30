@@ -372,7 +372,7 @@ class Aml(AbstractTextReader):
 
         # logger.info(self.field_index)
         if self._aml.speed2 in self.field_index:  # CalcSV -> CTD
-            self.ssp.cur.meta.sensor_type = Dicts.sensor_types['CTD']
+            self.ssp.cur.meta.sensor_type = Dicts.sensor_types['CTD']            
         elif self._aml.speed in self.field_index:  # SV -> SV or SVT
             if has_temp:
                 self.ssp.cur.meta.sensor_type = Dicts.sensor_types['SVPT']
@@ -731,10 +731,10 @@ class Aml(AbstractTextReader):
 
             # sound speed
             try:
-                if self._aml.speed in self.field_index:
-                    self.ssp.cur.data.speed[count] = float(data[self.field_index[self._aml.speed]])
-                elif self._aml.speed2 in self.field_index:
+                if self._aml.speed2 in self.field_index:
                     self.ssp.cur.data.speed[count] = float(data[self.field_index[self._aml.speed2]])
+                elif self._aml.speed in self.field_index:
+                    self.ssp.cur.data.speed[count] = float(data[self.field_index[self._aml.speed]])
             except ValueError:
                 logger.warning("invalid conversion parsing of line #%s" % (self.samples_offset + line_idx))
                 continue
