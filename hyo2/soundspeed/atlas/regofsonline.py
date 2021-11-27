@@ -434,7 +434,7 @@ class RegOfsOnline(AbstractAtlas):
         # check if we need to update the data set (new day!)
         if not self.download_db(dtstamp, server_mode=server_mode):
             logger.error("troubles in updating data set for timestamp: %s" % dtstamp.strftime("%Y/%m/%d %H:%M:%S"))
-            raise RuntimeError('troubles in db download')
+            return None, None
 
         # check validity of longitude and latitude
         if lon < (self._lon_min - self._lon_step / 2.0):

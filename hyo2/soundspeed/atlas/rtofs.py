@@ -369,9 +369,9 @@ class Rtofs(AbstractAtlas):
             # logger.info("%s" % self.last_loaded_day)
             if self._last_loaded_day == datestamp:
                 return True
-            else:  # the data are old
-                logger.info("cleaning data: %s %s" % (self._last_loaded_day, datestamp))
-                self.clear_data()
+            # the data are old
+            logger.info("cleaning data: %s %s" % (self._last_loaded_day, datestamp))
+            self.clear_data()
 
         progress.start(text="Download RTOFS", is_disabled=server_mode)
 
@@ -420,7 +420,7 @@ class Rtofs(AbstractAtlas):
         # check if we need to update the data set (new day!)
         if not self.download_db(dtstamp, server_mode=server_mode):
             logger.error("troubles in updating data set for timestamp: %s" % dtstamp.strftime("%Y%m%d"))
-            raise RuntimeError('troubles in db download')
+            return None, None
 
         # make longitude "safe" since RTOFS grid starts at east longitude 70-ish degrees
         if lon < self._lon_0:

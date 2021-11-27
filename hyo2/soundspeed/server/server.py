@@ -33,6 +33,9 @@ class Server(Thread):
         self.last_lat_idx = None  # type: Optional[int]
         self.last_lon_idx = None  # type: Optional[int]
 
+        self.cur_invalid_source_idx = 0
+        self.max_invalid_source_idx = 60
+
         self.settings_errors = list()
         self.runtime_errors = list()
 
@@ -312,10 +315,18 @@ class Server(Thread):
         # logger.debug('lat idx: %s [last: %s]' % (lat_idx, self.lat_idx_last))
         # logger.debug('lon idx: %s [last: %s]' % (lon_idx, self.lon_idx_last))
         if (self.cur_lat_idx is None) or (self.cur_lon_idx is None):
-            logger.warning("Source index is invalid: (%s %s) -> Is the vessel out of the selected source coverage?"
-                           % (self.cur_lat_idx, self.cur_lon_idx))
+            self.cur_invalid_source_idx += 1
+            if self.cur_invalid_source_idx >= self.max_invalid_source_idx:
+                raise RuntimeError("Too many invalid attempts (%d) to retrieve a valid source index"
+                                   % self.cur_invalid_source_idx)
+            logger.warning("Source index is invalid: (%s %s) [%d/%d] -> "
+                           "Is the vessel out of the selected source coverage?"
+                           % (self.cur_lat_idx, self.cur_lon_idx,
+                              self.cur_invalid_source_idx, self.max_invalid_source_idx))
             return False
 
+        # reset the number of invalid source idx
+        self.cur_invalid_source_idx = 0
         return True
 
     def _retrieve_cur_tss(self) -> None:
