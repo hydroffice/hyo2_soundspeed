@@ -4,6 +4,7 @@ import logging
 
 from PySide2 import QtCore, QtWidgets
 
+from hyo2.abc.lib.helper import Helper
 from hyo2.abc.lib.logging import set_logging
 from hyo2.abc.app.app_style import AppStyle
 
@@ -31,6 +32,9 @@ def gui():
 
     app = QtWidgets.QApplication([])
     app.setStyleSheet(AppStyle.load_stylesheet())
+
+    if Helper.is_script_already_running():
+        logger.warning("The app is already running!")
 
     main_win = MainWin()
     sys.excepthook = main_win.exception_hook  # install the exception hook
