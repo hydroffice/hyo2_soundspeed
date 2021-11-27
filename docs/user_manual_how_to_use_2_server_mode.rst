@@ -45,8 +45,9 @@ The *Setup* tab has the following *Server settings* options that specifically ap
 * *Source*. It defines the source used to retrieve the synthetic profile.
 * *Surface sound speed*. If true, the received transducer sound speed is used to enhance the transmitted synthetic profile.
 
-In case that unidirectional clients (e.g., QINSy) are present, the user is prompted to decide whether or not
-transmitting the profiles to them. Given that no acknowledgment is received, *SSM* cannot verified the profile transmission.
+When clicking on the "Start server" button and in case that unidirectional clients (e.g., QINSy) are present,
+the user is prompted to decide whether or not transmitting the profiles to them.
+Given that no acknowledgment is received, *SSM* cannot automatically verify the profile transmission.
 
 Each time that the *Server Mode* is started, a few initialization checks are performed:
 

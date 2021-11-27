@@ -300,7 +300,8 @@ not currently known thus the user should confirm reception in the acquisition sy
     :alt: alternate text
     :figclass: align-center
 
-    Choose appropriate options to control QINSy’s behavior when it receives casts from SSP package. For initial testing purposes, you should at least choose to be informed after a new update.
+    Choose appropriate options to control QINSy’s behavior when it receives casts from SSP package.
+    If you plan to deliver casts using ef:`server_mode`, remember to set the "Automatically Update Profile" flag.
 
 .. _qinsy_8_fig:
 
