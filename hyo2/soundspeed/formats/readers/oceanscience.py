@@ -119,9 +119,10 @@ class OceanScience(AbstractTextReader):
                                      ('temperature', numpy.float32), ('pressure', numpy.float32)],
                                     r"[\s,]+", pre=r'^\s*', post=r'\s*$')
 
-        # clear some of the surface noise when first entering water
+        # clear profile (e.g., when first entering water)
         profile_data = numpy.compress(profile_data['temperature'] >= -10.0, profile_data)  # remove t < -10
         profile_data = numpy.compress(profile_data['conductivity'] >= 0.0, profile_data)  # remove C < 0
+        profile_data = numpy.compress(profile_data['conductivity'] < 13.0, profile_data)  # remove C => 13
         profile_data = numpy.compress(profile_data['pressure'] >= 0.2, profile_data)  # remove p < 0.2
 
         p = Profile(profile_data, ymetric="depth", attribute="soundspeed", metadata=meta)
