@@ -352,7 +352,7 @@ class MainWin(QtWidgets.QMainWindow):
     def check_sis(self):
         if self.lib.use_sis():
             if not self.lib.listen_sis():
-                msg = 'Unable to listen SIS.'
+                msg = 'Unable to listen SIS.\nCheck whether another process is already using the SIS port.'
                 # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - SIS", msg,
                                               QtWidgets.QMessageBox.Ok)
@@ -366,7 +366,7 @@ class MainWin(QtWidgets.QMainWindow):
     def check_sippican(self):
         if self.lib.use_sippican():
             if not self.lib.listen_sippican():
-                msg = 'Unable to listening Sippican.'
+                msg = 'Unable to listening Sippican.\nCheck whether another process is already using the Sippican port.'
                 # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - Sippican", msg,
                                               QtWidgets.QMessageBox.Ok)
@@ -380,7 +380,7 @@ class MainWin(QtWidgets.QMainWindow):
     def check_mvp(self):
         if self.lib.use_mvp():
             if not self.lib.listen_mvp():
-                msg = 'Unable to listening MVP.'
+                msg = 'Unable to listening MVP.\nCheck whether another process is already using the MVP port.'
                 # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - MVP", msg,
                                               QtWidgets.QMessageBox.Ok)
