@@ -511,8 +511,12 @@ class Editor(AbstractWidget):
             return False
 
         min_samples = 5
-        max_temp = np.nanmax(self.lib.cur.proc.temp[self.lib.cur.proc_valid][:])
-        max_sal = np.nanmax(self.lib.cur.proc.sal[self.lib.cur.proc_valid][:])
+
+        # used to check against the validity range of UNESCO 1981
+        min_temp = np.nanmin(self.lib.cur.proc.temp[self.lib.cur.proc_valid][:])  # > -2 deg C
+        max_temp = np.nanmax(self.lib.cur.proc.temp[self.lib.cur.proc_valid][:])  # < 35 deg C
+        min_sal = np.nanmin(self.lib.cur.proc.sal[self.lib.cur.proc_valid][:])  # > 2 psu
+        max_sal = np.nanmax(self.lib.cur.proc.sal[self.lib.cur.proc_valid][:])  # < 42 psu
 
         if len(self.lib.cur.proc.temp) < min_samples:
 
@@ -535,7 +539,18 @@ class Editor(AbstractWidget):
             if ret == QtWidgets.QMessageBox.No:
                 return False
 
-        if max_temp > 32.0:
+        if min_temp < -2.0:
+
+            msg = "Suspect low value (%.2f) in the temperature profile detected!\n" \
+                  "Invalid values can heavily affect the quality of sonar data.\n\n" \
+                  "Do you really want to continue?" % min_temp
+            # noinspection PyCallByClass
+            ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            if ret == QtWidgets.QMessageBox.No:
+                return False
+
+        if max_temp > 35.0:
 
             msg = "Suspect high value (%.2f) in the temperature profile detected!\n" \
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
@@ -567,7 +582,18 @@ class Editor(AbstractWidget):
             if ret == QtWidgets.QMessageBox.No:
                 return False
 
-        if max_sal > 40.0:
+        if min_sal < 2.0:
+
+            msg = "Suspect low value (%.2f) in the salinity profile detected!\n" \
+                  "Invalid values can heavily affect the quality of sonar data.\n\n" \
+                  "Do you really want to continue?" % min_sal
+            # noinspection PyCallByClass
+            ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            if ret == QtWidgets.QMessageBox.No:
+                return False
+
+        if max_sal > 42.0:
 
             msg = "Suspect high value (%.2f) in the salinity profile detected!\n" \
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
