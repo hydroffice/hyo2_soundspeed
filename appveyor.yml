@@ -1,4 +1,4 @@
-version: 2021.0.{build}-{branch}
+version: 2022.{build}-{branch}
 
 image: Visual Studio 2015
 
