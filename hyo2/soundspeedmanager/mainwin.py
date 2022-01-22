@@ -3,6 +3,7 @@ import math
 import os
 import sys
 import traceback
+from datetime import datetime
 from urllib.request import urlopen
 
 from PySide2 import QtCore, QtGui, QtWidgets
@@ -173,13 +174,26 @@ class MainWin(QtWidgets.QMainWindow):
         self.help_menu.addAction(self.tab_info.authors_action)
         self.help_menu.addAction(self.tab_info.show_about_action)
 
-        self.statusBar().setStyleSheet("QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;}")
-        self.status_bar_normal_style = self.statusBar().styleSheet()
+        self.normal_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
+                                 "background-color:rgba(0,0,0,0);}"
+        self.orange_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
+                                 "background-color:rgba(255,163,102);}"
+        self.purple_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
+                                 "background-color:rgba(221,160,221,128);}"
+        self.red_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
+                              "background-color:rgba(255,0,0,128);}"
+        self.yellow_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
+                                 "background-color:rgba(255,255,0,128);}"
+        self.cyan_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
+                               "background-color:rgba(51,204,255,128);}"
+        self.statusBar().setStyleSheet(self.normal_stylesheet)
         self.statusBar().showMessage("%s" % app_info.app_name, 2000)
         self.releaseInfo = QtWidgets.QLabel()
         self.statusBar().addPermanentWidget(self.releaseInfo)
-        self.releaseInfo.setStyleSheet("QLabel{color:rgba(0,0,0,128);font-size: 8pt;}")
+        self.releaseInfo.setStyleSheet(self.normal_stylesheet)
         self.release_checked = False
+        self.old_sis_xyz_data = False
+        self.old_sis_nav_data = False
         timer = QtCore.QTimer(self)
         # noinspection PyUnresolvedReferences
         timer.timeout.connect(self.update_gui)
@@ -428,8 +442,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.tab_server.server_started()
         # self.tab_refraction.server_started()
         self.tab_setup.server_started()
-        self.statusBar().setStyleSheet("QStatusBar{color:rgba(0,0,0,128);"
-                                       "font-size: 8pt;background-color:rgba(51,204,255,128);}")
+        self.statusBar().setStyleSheet(self.cyan_stylesheet)
 
     def server_stopped(self):
         self.tab_editor.server_stopped()
@@ -437,7 +450,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.tab_server.server_stopped()
         # self.tab_refraction.server_stopped()
         self.tab_setup.server_stopped()
-        self.statusBar().setStyleSheet(self.status_bar_normal_style)
+        self.statusBar().setStyleSheet(self.normal_stylesheet)
 
     def _check_latest_release(self):
 
@@ -468,35 +481,14 @@ class MainWin(QtWidgets.QMainWindow):
         if new_release:
             logger.info("new release available: %s" % latest_version)
             self.releaseInfo.setText("New release available: %s" % latest_version)
-            self.releaseInfo.setStyleSheet("QLabel{background-color:rgba(255,0,0,128);"
-                                           "color:rgba(0,0,0,128);"
-                                           "font-size: 8pt;}")
+            self.releaseInfo.setStyleSheet(self.red_stylesheet)
 
         elif new_bugfix:
             logger.info("new bugfix available: %s" % latest_version)
             self.releaseInfo.setText("New bugfix available: %s" % latest_version)
-            self.releaseInfo.setStyleSheet("QLabel{background-color:rgba(255,255,0,128);"
-                                           "color:rgba(0,0,0,128);"
-                                           "font-size: 8pt;}")
+            self.releaseInfo.setStyleSheet(self.yellow_stylesheet)
 
-    def update_gui(self):
-
-        if (self.timer_execs % 200 == 0) and not self.release_checked:
-            # logger.debug("timer executions: %d" % self.timer_execs)
-            self._check_latest_release()
-
-        self.timer_execs += 1
-
-        # if self.lib.setup.noaa_tools:
-        #     self.tab_seacat.setEnabled(True)
-        # else:
-        #     self.tab_seacat.setDisabled(True)
-
-        # update the windows title
-        self.setWindowTitle('%s v.%s [project: %s]' % (self.name, self.version, self.lib.current_project))
-
-        msg = str()
-
+    def _update_gui_in_use(self) -> str:
         tokens = list()
         if self.lib.server.is_alive():
             tokens.append("SRV")
@@ -519,70 +511,116 @@ class MainWin(QtWidgets.QMainWindow):
                 tokens.append("SIS4")
             else:
                 tokens.append("SIS5")
-        msg += "|".join(tokens)
+        return "|".join(tokens)
 
-        if not self.lib.use_sis():  # in case that SIS4 and SIS5 were disabled
-            self.statusBar().showMessage(msg, 1000)
-            return
+    def _update_gui_from_sis_nav(self, msg: str) -> str:
+        self.old_sis_nav_data = False
+        if self.lib.listeners.sis.nav_last_time is not None:
+            diff_time = datetime.utcnow() - self.lib.listeners.sis.nav_last_time
+            self.old_sis_nav_data = diff_time.total_seconds() > (self.lib.setup.sis_listen_timeout * 10)
+            if self.old_sis_nav_data:
+                logger.warning("%s: navigation datagram is too old (%d seconds)"
+                               % (datetime.utcnow(), diff_time.total_seconds()))
+
+        # time stamp
+        msg += "time:"
+        if self.old_sis_nav_data:
+            msg += "TOO OLD, "
+        elif self.lib.listeners.sis.nav_timestamp is None:
+            msg += "NA, "
+        else:
+            msg += "%s, " % (self.lib.listeners.sis.nav_timestamp.strftime("%H:%M:%S"))
+
+        # position
+        msg += "pos:"
+        if self.old_sis_nav_data:
+            msg += "(TOO OLD),  "
+        elif (self.lib.listeners.sis.nav_latitude is None) or \
+                (self.lib.listeners.sis.nav_longitude is None):
+            msg += "(NA, NA),  "
+        else:
+            latitude = self.lib.listeners.sis.nav_latitude
+            if latitude >= 0:
+                letter = "N"
+            else:
+                letter = "S"
+            lat_min = float(60 * math.fabs(latitude - int(latitude)))
+            lat_str = "%02d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(latitude)), lat_min, letter)
+
+            longitude = self.lib.listeners.sis.nav_longitude
+            if longitude < 0:
+                letter = "W"
+            else:
+                letter = "E"
+            lon_min = float(60 * math.fabs(longitude - int(longitude)))
+            lon_str = "%03d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(longitude)), lon_min, letter)
+
+            msg += "(%s, %s),  " % (lat_str, lon_str)
+
+        return msg
+
+    def _update_gui_from_sis_xyz(self, msg: str) -> str:
+        self.old_sis_xyz_data = False
+        if self.lib.listeners.sis.xyz_last_time is not None:
+            diff_time = datetime.utcnow() - self.lib.listeners.sis.xyz_last_time
+            self.old_sis_xyz_data = diff_time.total_seconds() > (self.lib.setup.sis_listen_timeout * 10)
+            if self.old_sis_xyz_data:
+                logger.warning("%s: xyz datagram is too old (%d seconds)"
+                               % (datetime.utcnow(), diff_time.total_seconds()))
+
+        if self.old_sis_xyz_data:
+            msg += 'XYZ88 OLD [pinging?]'
+
+        elif self.lib.listeners.sis.xyz is None:
+            msg += 'XYZ88 NA [pinging?]'
+
+        else:
+            msg += 'tss:'
+            if self.lib.listeners.sis.xyz_transducer_sound_speed is not None:
+                msg += '%.1f m/s,  ' % self.lib.listeners.sis.xyz_transducer_sound_speed
+
+            else:
+                msg += 'NA m/s,  '
+
+            msg += 'avg.depth:'
+            mean_depth = self.lib.listeners.sis.xyz_mean_depth
+            if mean_depth:
+                msg += '%.1f m' % mean_depth
+            else:
+                msg += 'NA m'
+
+        return msg
+
+    def _update_gui_from_sis(self, msg: str) -> str:
 
         msg += "  -  "  # add some spacing
 
-        if self.lib.use_sis():
+        msg = self._update_gui_from_sis_nav(msg=msg)
 
-            if self.lib.listeners.sis.nav is not None:
-                # time stamp
-                msg += "time:"
-                if self.lib.listeners.sis.nav_timestamp is not None:
-                    msg += "%s, " % (self.lib.listeners.sis.nav_timestamp.strftime("%H:%M:%S"))
+        msg = self._update_gui_from_sis_xyz(msg=msg)
 
-                else:
-                    msg += "NA, "
+        return msg
 
-                # position
-                msg += "pos:"
-                if (self.lib.listeners.sis.nav_latitude is not None) and \
-                        (self.lib.listeners.sis.nav_longitude is not None):
+    def update_gui(self):
 
-                    latitude = self.lib.listeners.sis.nav_latitude
-                    if latitude >= 0:
-                        letter = "N"
-                    else:
-                        letter = "S"
-                    lat_min = float(60 * math.fabs(latitude - int(latitude)))
-                    lat_str = "%02d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(latitude)), lat_min, letter)
+        self.timer_execs += 1
 
-                    longitude = self.lib.listeners.sis.nav_longitude
-                    if longitude < 0:
-                        letter = "W"
-                    else:
-                        letter = "E"
-                    lon_min = float(60 * math.fabs(longitude - int(longitude)))
-                    lon_str = "%03d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(longitude)), lon_min, letter)
+        # update the windows title
+        self.setWindowTitle('%s v.%s [project: %s]' % (self.name, self.version, self.lib.current_project))
 
-                    msg += "(%s, %s),  " % (lat_str, lon_str)
+        # check release
+        if (self.timer_execs % 200 == 0) and not self.release_checked:
+            # logger.debug("timer executions: %d" % self.timer_execs)
+            self._check_latest_release()
 
-                else:
-                    msg += "(NA, NA),  "
-
-            if self.lib.listeners.sis.xyz is not None:
-                msg += 'tss:'
-                if self.lib.listeners.sis.xyz_transducer_sound_speed is not None:
-                    msg += '%.1f m/s,  ' % self.lib.listeners.sis.xyz_transducer_sound_speed
-
-                else:
-                    msg += 'NA m/s,  '
-
-                msg += 'avg.depth:'
-                mean_depth = self.lib.listeners.sis.xyz_mean_depth
-                if mean_depth:
-                    msg += '%.1f m' % mean_depth
-                else:
-                    msg += 'NA m'
-
-            else:
-                msg += 'XYZ88 NA [pinging?]'
-
+        # list activated features
+        msg = self._update_gui_in_use()
+        self.old_sis_nav_data = False
+        self.old_sis_xyz_data = False
+        if self.lib.use_sis():  # in case that SIS4 and SIS5 are enabled
+            msg = self._update_gui_from_sis(msg=msg)
         self.statusBar().showMessage(msg, 2000)
+
         if self.lib.has_ssp():
 
             if self.lib.server.is_alive():  # server mode
@@ -610,10 +648,12 @@ class MainWin(QtWidgets.QMainWindow):
 
         if not self.lib.server.is_alive():  # user mode - listeners
             if self.lib.has_mvp_to_process() or self.lib.has_sippican_to_process():
-                self.statusBar().setStyleSheet("QStatusBar{color:rgba(0,0,0,128);"
-                                               "font-size: 8pt;background-color:rgba(255,163,102,128);}")
+                self.statusBar().setStyleSheet(self.orange_stylesheet)
             else:
-                self.statusBar().setStyleSheet(self.status_bar_normal_style)
+                if self.old_sis_nav_data or self.old_sis_xyz_data:
+                    self.statusBar().setStyleSheet(self.purple_stylesheet)
+                else:
+                    self.statusBar().setStyleSheet(self.normal_stylesheet)
 
     def change_info_url(self, url):
         self.tab_info.change_url(url)
