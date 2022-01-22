@@ -74,6 +74,8 @@ class Sis(AbstractListener):
         self.sis5 = Sis.Sis5()
 
         self.cur_id = None
+        self.nav_last_time = None  # type: Optional[datetime]
+        self.xyz_last_time = None  # type: Optional[datetime]
 
     @property
     def ssp(self) -> Union[km.KmSvp, kmall.KmallSVP, None]:
@@ -235,6 +237,7 @@ class Sis(AbstractListener):
         elif self.cur_id == 0x50:
             self.sis4.nav = km.KmNav(this_data)
             self.sis4.nav_count += 1
+            self.nav_last_time = datetime.utcnow()
             if self.debug:
                 logger.debug("Parsed")
 
@@ -259,6 +262,7 @@ class Sis(AbstractListener):
         elif self.cur_id == 0x58:
             self.sis4.xyz88 = km.KmXyz88(this_data)
             self.sis4.xyz88_count += 1
+            self.xyz_last_time = datetime.utcnow()
             if self.debug:
                 logger.debug("Parsed")
 
@@ -301,6 +305,7 @@ class Sis(AbstractListener):
             if datagram_nr == 1:
                 self.sis5.mrz = kmall.KmallMRZ(this_data, self.debug)
                 self.sis5.mrz_count += 1
+                self.xyz_last_time = datetime.utcnow()
                 if self.debug:
                     logger.info("%d/%d -> Parsed" % (datagram_nr, nr_of_datagrams))
             else:
@@ -308,8 +313,12 @@ class Sis(AbstractListener):
                     logger.info("%d/%d -> Ignored" % (datagram_nr, nr_of_datagrams))
 
         elif self.cur_id == b'#SPO':
-            self.sis5.spo = kmall.KmallSPO(this_data, self.debug)
+            spo = kmall.KmallSPO(this_data, self.debug)
+            if spo.invalid_data or spo.inactive_sensor:
+                return
+            self.sis5.spo = spo
             self.sis5.spo_count += 1
+            self.nav_last_time = datetime.utcnow()
             if self.debug:
                 logger.debug("Parsed")
 

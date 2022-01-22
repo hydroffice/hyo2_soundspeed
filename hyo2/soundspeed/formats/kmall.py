@@ -195,13 +195,17 @@ class KmallSPO(Kmall):
     def __init__(self, data, debug: bool = False):
         super().__init__(data)
 
-        # common = struct.unpack("<4H", self.data[20:28])
+        common = struct.unpack("<4H", self.data[20:28])
         # common_length = common[0]
         # logger.debug("common part -> length: %d/%d" % (common_length, self.length))
         # common_sensor_system = common[1]
         # logger.debug("common part -> sensor system: %d" % common_sensor_system)
-        # common_sensor_status = common[2]
-        # logger.debug("common part -> sensor status: %d" % common_sensor_status)
+        common_sensor_status = common[2]
+        self.inactive_sensor = (common_sensor_status & 1) != 1
+        self.invalid_data = (common_sensor_status & 16) == 16
+        # if self.inactive_sensor or self.invalid_data:
+        #     logger.debug("common part -> sensor status: %s (inactive: %s, invalid: %s)"
+        #                  % (common_sensor_status, self.inactive_sensor, self.invalid_data))
 
         data_blk = struct.unpack("<2If2d3f", self.data[28:68])
         # time_sec = data_blk[0]
