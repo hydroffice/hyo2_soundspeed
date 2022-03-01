@@ -6,7 +6,7 @@ import logging
 from datetime import datetime as dt
 from typing import Union
 
-from hyo2.abc.lib.ftp import Ftp
+from hyo2.abc.lib.onedrive import OneDrive
 
 from hyo2.soundspeed.atlas.abstract import AbstractAtlas
 from hyo2.soundspeed.profile.profile import Profile
@@ -59,32 +59,18 @@ class Woa13(AbstractAtlas):
         """try to download the data set"""
         logger.debug('downloading WOA13 atlas')
 
-        # FIXME: this was too dangerous if the user select the wrong folder
-        # try:
-        #     # remove all the content
-        #     for root, dirs, files in os.walk(self.data_folder, topdown=False):
-        #         for name in files:
-        #             os.remove(os.path.join(root, name))
-        #         for name in dirs:
-        #             os.rmdir(os.path.join(root, name))
-        # except Exception as e:
-        #     logger.error('during cleaning target folder: %s' % e)
-        #     return False
-
         try:
-            ftp = Ftp("ftp.ccom.unh.edu", show_progress=True, debug_mode=False,
-                      progress=self.prj.progress)
-            data_zip_src = "fromccom/hydroffice/woa13_temp.red.zip"
+            od = OneDrive(show_progress=True, debug_mode=True, progress=self.prj.progress)
+            data_zip_src = "https://universitysystemnh-my.sharepoint.com/:u:/g/personal/" \
+                           "gma72_usnh_edu/ET4kv3t8CuBGuyHUqThonvMBMmxWp5f3ZTt08XG_u9COHQ?e=mVEJij&download=1"
             data_zip_dst = os.path.abspath(os.path.join(self.data_folder, os.pardir, "woa13_temp.red.zip"))
-            ftp.get_file(data_zip_src, data_zip_dst, unzip_it=True)
-            ftp.disconnect()
+            od.get_file(file_src=data_zip_src, file_dst=data_zip_dst, unzip_it=True)
 
-            ftp = Ftp("ftp.ccom.unh.edu", show_progress=True, debug_mode=False,
-                      progress=self.prj.progress)
-            data_zip_src = "fromccom/hydroffice/woa13_sal.red.zip"
+            od = OneDrive(show_progress=True, debug_mode=True, progress=self.prj.progress)
+            data_zip_src = "https://universitysystemnh-my.sharepoint.com/:u:/g/personal/" \
+                           "gma72_usnh_edu/EXq15M1i-WBIkYmjALq6VSUBGuaZ7LoQqMBdG1jJYbjCcA?e=3v56kV&download=1"
             data_zip_dst = os.path.abspath(os.path.join(self.data_folder, os.pardir, "woa13_sal.red.zip"))
-            ftp.get_file(data_zip_src, data_zip_dst, unzip_it=True)
-            ftp.disconnect()
+            od.get_file(file_src=data_zip_src, file_dst=data_zip_dst, unzip_it=True)
 
             return self.is_present()
 
