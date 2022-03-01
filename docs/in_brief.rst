@@ -33,8 +33,8 @@ processing and analysis.
 
 The current development of Sound Speed Manager is partially supported by:
 
-* NOAA grant NA15NOS4000200, and
-* NSF grant 1150574.
+* NOAA grant NA20NOS4000196, and
+* NSF grant 1933720.
 
 Operation modes
 ===============
