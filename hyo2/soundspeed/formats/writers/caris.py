@@ -42,7 +42,7 @@ class Caris(AbstractTextWriter):
         logger.debug("append: %s" % self.fod.append_exists)
         if not self.fod.append_exists:
             header += "[SVP_VERSION_2]\r\n"
-            header += "%s.%s\r\n" % (self.fod.basename, self.fod.ext)
+            header += "%s\r\n" % (self.fod.path)
 
         # date
         if self.ssp.cur.meta.utc_time:
