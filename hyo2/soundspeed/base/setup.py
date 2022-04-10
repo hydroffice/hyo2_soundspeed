@@ -14,9 +14,10 @@ class Setup:
 
     @classmethod
     def are_updates_required(cls, db_path):
-        logger.debug("check if version updates are required for %s" % db_path)
+        # logger.debug("check if version updates are required for %s" % db_path)
         db = SetupDb(os.path.dirname(db_path))
-        if db.setup_version == 1:
+        # logger.debug(db.setup_version)
+        if db.setup_version < 5:
             return True
         return False
 
@@ -25,11 +26,7 @@ class Setup:
         logger.debug("applying version updates %s" % db_path)
         db = SetupDb(os.path.dirname(db_path))
         if db.setup_version == 1:
-            success = db.update_from_v1_to_v2()
-            if success:
-                return True
-        if db.setup_version == 2:
-            success = db.update_from_v1_to_v2()
+            success = db.update_from_v1_to_v5()
             if success:
                 return True
         return False
@@ -99,6 +96,7 @@ class Setup:
         self.server_source = None
         self.server_apply_surface_sound_speed = None
         self.server_auto_export_on_send = None
+        self.server_max_failed_attempts = None
 
         # current settings
         self.current_project = None
@@ -139,7 +137,7 @@ class Setup:
             release_folder, _ = os.path.split(db_path)
             db = SetupDb(release_folder)
 
-        if db.setup_version > 4:
+        if db.setup_version > 5:
             raise RuntimeError("unsupported setup version: %s" % db.setup_version)
 
         self.setup_version = db.setup_version
@@ -149,25 +147,16 @@ class Setup:
         # input
         self.use_woa09 = db.use_woa09
         self.use_woa13 = db.use_woa13
-        if db.setup_version == 1:
-            self.use_woa18 = False
-        else:
-            self.use_woa18 = db.use_woa18
+        self.use_woa18 = db.use_woa18
         self.use_rtofs = db.use_rtofs
-        if db.setup_version == 1:
-            self.use_gomofs = False
-        else:
-            self.use_gomofs = db.use_gomofs
+        self.use_gomofs = db.use_gomofs
         self.ssp_extension_source = Dicts.atlases[db.ssp_extension_source]
         self.ssp_salinity_source = Dicts.atlases[db.ssp_salinity_source]
         self.ssp_temp_sal_source = Dicts.atlases[db.ssp_temp_sal_source]
         self.ssp_up_or_down = Dicts.ssp_directions[db.ssp_up_or_down]
         self.rx_max_wait_time = db.rx_max_wait_time
         self.use_sis4 = db.use_sis4
-        if db.setup_version == 1:
-            self.use_sis5 = False
-        else:
-            self.use_sis5 = db.use_sis5
+        self.use_sis5 = db.use_sis5
         self.use_sippican = db.use_sippican
         self.use_mvp = db.use_mvp
 
@@ -206,6 +195,7 @@ class Setup:
         # server
         self.server_source = db.server_source
         self.server_apply_surface_sound_speed = db.server_apply_surface_sound_speed
+        self.server_max_failed_attempts = db.server_max_failed_attempts
 
         # current settings
         self.current_project = db.current_project
@@ -213,10 +203,7 @@ class Setup:
         self.custom_outputs_folder = db.custom_outputs_folder
         self.custom_woa09_folder = db.custom_woa09_folder
         self.custom_woa13_folder = db.custom_woa13_folder
-        if db.setup_version == 1:
-            self.custom_woa18_folder = ""
-        else:
-            self.custom_woa18_folder = db.custom_woa18_folder
+        self.custom_woa18_folder = db.custom_woa18_folder
         self.noaa_tools = db.noaa_tools
         self.default_institution = db.default_institution
         self.default_survey = db.default_survey
@@ -244,11 +231,9 @@ class Setup:
             # input
             db.use_woa09 = self.use_woa09
             db.use_woa13 = self.use_woa13
-            if db.setup_version > 1:
-                db.use_woa18 = self.use_woa18
+            db.use_woa18 = self.use_woa18
             db.use_rtofs = self.use_rtofs
-            if db.setup_version > 1:
-                db.use_gomofs = self.use_gomofs
+            db.use_gomofs = self.use_gomofs
             db.ssp_extension_source = Helper.first_match(Dicts.atlases, self.ssp_extension_source)
             db.ssp_salinity_source = Helper.first_match(Dicts.atlases, self.ssp_salinity_source)
             db.ssp_temp_sal_source = Helper.first_match(Dicts.atlases, self.ssp_temp_sal_source)
@@ -256,8 +241,7 @@ class Setup:
 
             db.rx_max_wait_time = self.rx_max_wait_time
             db.use_sis4 = self.use_sis4
-            if db.setup_version > 1:
-                db.use_sis5 = self.use_sis5
+            db.use_sis5 = self.use_sis5
             db.use_sippican = self.use_sippican
             db.use_mvp = self.use_mvp
 
@@ -297,6 +281,7 @@ class Setup:
             # server
             db.server_source = self.server_source
             db.server_apply_surface_sound_speed = self.server_apply_surface_sound_speed
+            db.server_max_failed_attempts = self.server_max_failed_attempts
 
             # current settings
             db.current_project = self.current_project
@@ -304,8 +289,7 @@ class Setup:
             db.custom_outputs_folder = self.custom_outputs_folder
             db.custom_woa09_folder = self.custom_woa09_folder
             db.custom_woa13_folder = self.custom_woa13_folder
-            if db.setup_version > 1:
-                db.custom_woa18_folder = self.custom_woa18_folder
+            db.custom_woa18_folder = self.custom_woa18_folder
             db.noaa_tools = self.noaa_tools
             db.default_institution = self.default_institution
             db.default_survey = self.default_survey
@@ -357,6 +341,7 @@ class Setup:
         msg += "      <server_source: %s>\n" % self.server_source
         msg += "      <server_apply_surface_sound_speed: %s>\n" % self.server_apply_surface_sound_speed
         msg += "      <server_auto_export_on_send: %s>\n" % self.server_auto_export_on_send
+        msg += "      <server_max_failed_attempts: %s>\n" % self.server_max_failed_attempts
         msg += "    <current settings>\n"
         msg += "      <current_project: %s>\n" % self.current_project
         msg += "      <projects folder: %s>\n" % self.custom_projects_folder

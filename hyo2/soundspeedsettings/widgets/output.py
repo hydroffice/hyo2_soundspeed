@@ -1,6 +1,6 @@
 import logging
 
-from PySide2 import QtCore, QtWidgets
+from PySide2 import QtCore, QtGui, QtWidgets
 
 from hyo2.soundspeedsettings.widgets.widget import AbstractWidget
 from hyo2.soundspeed.profile.dicts import Dicts
@@ -150,6 +150,27 @@ class Output(AbstractWidget):
         vbox.addWidget(self.server_apply_surface_sound_speed)
         vbox.addStretch()
 
+        # - server_max_failed_attempts
+        hbox = QtWidgets.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        # -- label
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtWidgets.QLabel("Maximum failed attempts:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- value
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.server_max_failed_attempts = QtWidgets.QLineEdit()
+        validator = QtGui.QIntValidator(1, 9999)
+        self.server_max_failed_attempts.setValidator(validator)
+        vbox.addWidget(self.server_max_failed_attempts)
+        vbox.addStretch()
+
         self.right_layout.addStretch()
 
         self.main_layout.addStretch()
@@ -168,6 +189,8 @@ class Output(AbstractWidget):
         self.server_source.currentIndexChanged.connect(self.apply_server_source)
         # noinspection PyUnresolvedReferences
         self.server_apply_surface_sound_speed.currentIndexChanged.connect(self.apply_server_apply_surface_sound_speed)
+        # noinspection PyUnresolvedReferences
+        self.server_max_failed_attempts.textChanged.connect(self.apply_server_max_failed_attempts)
 
     def new_client(self):
         logger.debug("new setup")
@@ -283,8 +306,15 @@ class Output(AbstractWidget):
         self.main_win.reload_settings()
 
     def apply_server_apply_surface_sound_speed(self):
-        # logger.debug("apply apply surface sound speed")
+        # logger.debug("apply surface sound speed")
         self.db.server_apply_surface_sound_speed = self.server_apply_surface_sound_speed.currentText() == "True"
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+    def apply_server_max_failed_attempts(self):
+        # logger.debug("apply server max failed attempts")
+        logger.debug(self.server_max_failed_attempts.text())
+        self.db.server_max_failed_attempts = int(self.server_max_failed_attempts.text())
         self.setup_changed()
         self.main_win.reload_settings()
 
@@ -311,6 +341,9 @@ class Output(AbstractWidget):
             self.server_apply_surface_sound_speed.setCurrentIndex(0)  # True
         else:
             self.server_apply_surface_sound_speed.setCurrentIndex(1)  # False
+
+        # server_max_failed_attempts
+        self.server_max_failed_attempts.setText("%d" % self.db.server_max_failed_attempts)
 
         # prepare the table
         self.client_list.clear()

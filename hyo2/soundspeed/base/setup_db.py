@@ -6,7 +6,7 @@ from hyo2.abc.lib.helper import Helper
 from hyo2.soundspeed.base.basedb import BaseDb
 from hyo2.soundspeed.base.setup_sql import CREATE_SETTINGS, CREATE_SETTINGS_VIEW, CREATE_CLIENT_LIST, \
     RENAME_SETTINGS, RENAME_CLIENT_LIST, DROP_OLD_SETTINGS, DROP_OLD_CLIENT_LIST, DROP_SETTINGS_VIEW, \
-    V1_V2_COPY_SETTINGS, V1_V2_COPY_CLIENT_LIST
+    V1_V5_COPY_SETTINGS, V1_V5_COPY_CLIENT_LIST
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ class SetupDb(BaseDb):
         self._check_default_setup()
         self.use_setup_name = use_setup_name
 
-    def update_from_v1_to_v2(self):
+    def update_from_v1_to_v5(self):
         if not self.conn:
             logger.error("Missing db connection")
             return False
@@ -39,8 +39,8 @@ class SetupDb(BaseDb):
                 self.conn.execute(CREATE_SETTINGS_VIEW)
 
             with self.conn:
-                self.conn.execute(V1_V2_COPY_SETTINGS)
-                self.conn.execute(V1_V2_COPY_CLIENT_LIST)
+                self.conn.execute(V1_V5_COPY_SETTINGS)
+                self.conn.execute(V1_V5_COPY_CLIENT_LIST)
                 self.conn.execute(DROP_OLD_SETTINGS)
                 self.conn.execute(DROP_OLD_CLIENT_LIST)
 
@@ -650,6 +650,15 @@ class SetupDb(BaseDb):
     @server_apply_surface_sound_speed.setter
     def server_apply_surface_sound_speed(self, value):
         self._setter_bool("server_apply_surface_sound_speed", value)
+
+    # --- server_max_failed_attempts
+    @property
+    def server_max_failed_attempts(self):
+        return self._getter_int("server_max_failed_attempts")
+
+    @server_max_failed_attempts.setter
+    def server_max_failed_attempts(self, value):
+        self._setter_int("server_max_failed_attempts", value)
 
     # --- current_project
     @property

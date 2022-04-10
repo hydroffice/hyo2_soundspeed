@@ -26,11 +26,13 @@ def qt_custom_handler(error_type: QtCore.QtMsgType, error_context: QtCore.QMessa
 
 QtCore.qInstallMessageHandler(qt_custom_handler)
 
+app = None
+
 
 def gui():
     """Create the application and show the Sound Speed Manager gui"""
     from hyo2.soundspeedmanager.mainwin import MainWin
-
+    global app
     app = QtWidgets.QApplication([])
     app.setStyleSheet(AppStyle.load_stylesheet())
 

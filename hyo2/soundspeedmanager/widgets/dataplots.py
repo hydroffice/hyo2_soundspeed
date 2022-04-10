@@ -584,23 +584,6 @@ class DataPlots(AbstractWidget):
         """Redraw the canvases, update the locators"""
 
         with rc_context(self.rc_context):
-            for a in self.c.figure.get_axes():
-
-                xaxis = getattr(a, 'xaxis', None)
-                yaxis = getattr(a, 'yaxis', None)
-                locators = []
-
-                if xaxis is not None:
-                    locators.append(xaxis.get_major_locator())
-                    locators.append(xaxis.get_minor_locator())
-
-                if yaxis is not None:
-                    locators.append(yaxis.get_major_locator())
-                    locators.append(yaxis.get_minor_locator())
-
-                for loc in locators:
-                    loc.refresh()
-
             self.c.draw_idle()
 
     def update_validity_indices(self):

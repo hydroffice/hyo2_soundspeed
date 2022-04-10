@@ -34,7 +34,7 @@ class Server(Thread):
         self.last_lon_idx = None  # type: Optional[int]
 
         self.cur_invalid_source_idx = 0
-        self.max_invalid_source_idx = 60
+        self.max_invalid_source_idx = self.prj.setup.server_max_failed_attempts
 
         self.settings_errors = list()
         self.runtime_errors = list()

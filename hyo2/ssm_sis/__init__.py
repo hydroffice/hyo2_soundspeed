@@ -6,7 +6,7 @@ from hyo2.abc.lib.lib_info import LibInfo
 
 
 name = "SSM-SIS"
-__version__ = '1.0.2'
+__version__ = '1.1.0'
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

@@ -65,7 +65,7 @@ else:
 CREATE_SETTINGS = """-- noinspection SqlResolveForFile
  CREATE TABLE IF NOT EXISTS general(
      id integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
-     setup_version integer NOT NULL DEFAULT 4,
+     setup_version integer NOT NULL DEFAULT 5,
      setup_name text NOT NULL UNIQUE DEFAULT "default",
      setup_status text NOT NULL DEFAULT "inactive",
      /* input */
@@ -106,6 +106,7 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      /* server */
      server_source text NOT NULL DEFAULT "WOA09",
      server_apply_surface_sound_speed integer NOT NULL DEFAULT 1,
+     server_max_failed_attempts integer NOT NULL DEFAULT 60,
 
      /* current settings */
      current_project text NOT NULL DEFAULT "default",
@@ -168,7 +169,7 @@ DROP_SETTINGS_VIEW = """-- noinspection SqlResolveForFile
 
 # COPY V1 -> V2
 
-V1_V2_COPY_SETTINGS = """-- noinspection SqlResolveForFile
+V1_V5_COPY_SETTINGS = """-- noinspection SqlResolveForFile
     INSERT INTO  general 
     (id, setup_name, setup_status, use_woa09, use_woa13, use_rtofs, 
     ssp_extension_source, ssp_salinity_source, ssp_temp_sal_source, ssp_up_or_down, rx_max_wait_time,
@@ -254,7 +255,7 @@ V1_V2_COPY_SETTINGS = """-- noinspection SqlResolveForFile
     FROM general_old
     """
 
-V1_V2_COPY_CLIENT_LIST = """-- noinspection SqlResolveForFile
+V1_V5_COPY_CLIENT_LIST = """-- noinspection SqlResolveForFile
     INSERT INTO client_list (id, setup_id, name, ip, port, protocol) 
     SELECT 
     id, setup_id, name, ip, port, protocol

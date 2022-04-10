@@ -165,14 +165,14 @@ class SoundSpeedLibrary:
             if not os.path.exists(setup_path):
                 continue
 
-            # if exists, attempt to load the setup
+            # if exists, check if updated required and validity
             try:
-                Setup(release_folder=release_path)
+                updates_required = Setup.are_updates_required(db_path=setup_path)
+                logger.debug("found setup: %s [requires updates: %s]" % (setup_path, updates_required))
             except Exception as e:
                 logger.debug("skipping %s: %s" % (release_path, e))
                 continue
 
-            logger.debug("found setup: %s" % setup_path)
             old_setups.append(setup_path)
 
         return old_setups
