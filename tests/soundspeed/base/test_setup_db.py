@@ -13,7 +13,10 @@ class TestSoundSpeedSetupDb(unittest.TestCase):
 
     def tearDown(self):
         if os.path.exists(self.db_path):
-            os.remove(self.db_path)
+            try:
+                os.remove(self.db_path)
+            except PermissionError:
+                pass
 
     def test_create_settings_db_and_check_db_path(self):
         db = SetupDb(data_folder=self.data_folder, db_file=self.db_name)
@@ -81,7 +84,7 @@ class TestSoundSpeedSetupDb(unittest.TestCase):
 
     def test_compare_setup_version(self):
         db = SetupDb(data_folder=self.data_folder, db_file=self.db_name)
-        self.assertLessEqual(db.setup_version, 4)
+        self.assertLessEqual(db.setup_version, 5)
         db.close()
 
     def test_checked_use_woa09(self):
