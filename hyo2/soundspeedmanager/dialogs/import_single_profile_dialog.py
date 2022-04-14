@@ -383,6 +383,12 @@ class ImportSingleProfileDialog(AbstractDialog):
     def on_click_woa09(self):
         """Retrieve WOA09 data"""
 
+        if not self.lib.setup.use_woa09:
+            msg = "First activate the 'Use WOA09' option in Setup/Input tab"
+            # noinspection PyCallByClass,PyArgumentList
+            QtWidgets.QMessageBox.critical(self, "WOA09 not in use", msg, QtWidgets.QMessageBox.Ok)
+            return
+
         self.progress.start(text="Retrieve WOA09")
         self.progress.update(value=30)
 
@@ -401,6 +407,12 @@ class ImportSingleProfileDialog(AbstractDialog):
 
     def on_click_woa13(self):
         """Retrieve WOA13 data"""
+
+        if not self.lib.setup.use_woa13:
+            msg = "First activate the 'Use WOA13' option in Setup/Input tab"
+            # noinspection PyCallByClass,PyArgumentList
+            QtWidgets.QMessageBox.critical(self, "WOA13 not in use", msg, QtWidgets.QMessageBox.Ok)
+            return
 
         self.progress.start(text="Retrieve WOA13")
         self.progress.update(value=30)
