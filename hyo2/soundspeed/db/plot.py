@@ -171,10 +171,14 @@ class PlotDb:
 
         def calc_avg(self):
 
+            skip_counter = 0
+
             for i, i_bin in enumerate(self.bins):
 
                 # to avoid unstable statistics
                 if len(i_bin) < 3:
+                    # logger.debug("[%d] too few samples: %s -> skip" % (i, i_bin))
+                    skip_counter += 1
                     continue
 
                 if i == 0:
@@ -189,6 +193,9 @@ class PlotDb:
                 self.mean.append(avg)
                 self.min_2std.append(avg - 2 * std)
                 self.max_2std.append(avg + 2 * std)
+
+            if skip_counter > 0:
+                logger.debug("skipped depth bins: %d" % skip_counter)
 
     def aggregate_plot(self, dates, output_folder, save_fig=False):
         """aggregate plot with all the SSPs between the passed dates"""
@@ -220,8 +227,10 @@ class PlotDb:
         for ts_pk in ts_list:
 
             tmp_date = ts_pk[1].date()
+            logger.debug("profile date: %s" % tmp_date)
 
             if (tmp_date < dates[0]) or (tmp_date > dates[1]):
+                logger.debug("skip for date")
                 continue
 
             ssp_count += 1

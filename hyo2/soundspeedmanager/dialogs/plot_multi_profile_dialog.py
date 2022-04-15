@@ -1,6 +1,6 @@
 import logging
 
-from PySide2 import QtWidgets
+from PySide2 import QtWidgets, QtCore
 from matplotlib import rc_context
 from matplotlib import pyplot as plt
 
@@ -162,7 +162,11 @@ class PlotMultiProfileDialog(AbstractDialog):
             fig.get_axes()[0].set_xlim(x_min - 0.1 * x_range, x_max + 0.1 * x_range)
             fig.get_axes()[0].set_ylim(y_max + 0.15 * y_range, y_min - 0.05 * y_range)
             plt.grid()
-            plt.show()
+            if QtCore.QCoreApplication.instance():
+                fig.show()
+                fig.canvas.manager.window.raise_()
+            else:
+                plt.draw()
 
         self.accept()
 
@@ -237,7 +241,11 @@ class PlotMultiProfileDialog(AbstractDialog):
             fig.get_axes()[0].set_xlim(x_min - 0.1 * x_range, x_max + 0.1 * x_range)
             fig.get_axes()[0].set_ylim(y_max + 0.15 * y_range, y_min - 0.05 * y_range)
             plt.grid()
-            plt.show()
+            if QtCore.QCoreApplication.instance():
+                fig.show()
+                fig.canvas.manager.window.raise_()
+            else:
+                plt.draw()
 
         self.accept()
 
@@ -312,6 +320,10 @@ class PlotMultiProfileDialog(AbstractDialog):
             fig.get_axes()[0].set_xlim(x_min - 0.1 * x_range, x_max + 0.1 * x_range)
             fig.get_axes()[0].set_ylim(y_max + 0.15 * y_range, y_min - 0.05 * y_range)
             plt.grid()
-            plt.show()
+            if QtCore.QCoreApplication.instance():
+                fig.show()
+                fig.canvas.manager.window.raise_()
+            else:
+                plt.draw()
 
         self.accept()

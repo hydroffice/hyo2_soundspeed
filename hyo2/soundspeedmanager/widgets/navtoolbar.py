@@ -60,6 +60,8 @@ class NavToolbar(NavigationToolbar2QT):
         self._flag_end = None
         self.insert_sample = None
 
+        # prepare to modify the class toolitems
+        old_toolitems = NavigationToolbar2QT.toolitems
         NavigationToolbar2QT.toolitems = (
             ('Home', 'Reset view', 'home', 'home'),
             ('Back', 'Previous view', 'back', 'back'),
@@ -84,6 +86,8 @@ class NavToolbar(NavigationToolbar2QT):
           )
         super().__init__(canvas=canvas, parent=parent, coordinates=coordinates)
         self.setIconSize(QtCore.QSize(24, 24))
+        # set back the class toolitems
+        NavigationToolbar2QT.toolitems = old_toolitems
 
         # set checkable buttons
         self._actions['scale'].setCheckable(True)

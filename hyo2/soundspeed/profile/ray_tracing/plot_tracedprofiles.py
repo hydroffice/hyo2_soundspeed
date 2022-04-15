@@ -3,7 +3,7 @@ from datetime import datetime
 import numpy as np
 from scipy import interpolate
 # noinspection PyUnresolvedReferences
-from PySide2 import QtWidgets
+from PySide2 import QtWidgets, QtCore
 import matplotlib
 # from matplotlib import rc_context as rc_context
 from matplotlib import pyplot as plt
@@ -84,9 +84,8 @@ class PlotTracedProfiles:
         svp_ax.grid(True)
 
         # calculate limits
-        t_idx_max = max(np.nanargmax(self._d.new_rays[-1][0]),
-                        np.nanargmax(self._d.old_rays[-1][0]))
-        z_max = self._d.new_rays[-1][2][t_idx_max]
+        z_max = max(max(self._d.new_rays[-1][0]),
+                    max(self._d.old_rays[-1][0]))
         x_max = max(max(self._d.new_rays[-1][1]),
                     max(self._d.old_rays[-1][1]))
         logger.debug("z max: %s, x max: %s" % (z_max, x_max))
@@ -146,7 +145,11 @@ class PlotTracedProfiles:
         err_ax.grid(True)
 
         fig.tight_layout()
-        plt.show()
+        if QtCore.QCoreApplication.instance():
+            fig.show()
+            fig.canvas.manager.window.raise_()
+        else:
+            plt.draw()
 
     def make_bias_plots(self):
 
@@ -259,4 +262,8 @@ class PlotTracedProfiles:
         # hb_ax.scatter(x1, z1, marker='o', c='b', s=10, zorder=10)
 
         fig.tight_layout()
-        plt.show()
+        if QtCore.QCoreApplication.instance():
+            fig.show()
+            fig.canvas.manager.window.raise_()
+        else:
+            plt.draw()
