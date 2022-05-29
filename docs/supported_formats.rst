@@ -35,10 +35,10 @@ Sippican (.edf)                                     X
 Sonardyne (.pro)                                    X    X
 Turo (.nc)                                          X
 UNB (.unb)                                          X    X
-Valeport Midas/Monitor SVP (.000)                   X
+Valeport Midas/Monitor SVP/SVX2 (.000)              X
 Valeport MiniSVP (.txt)                             X
 Valeport RapidSV/SVT (.txt)                         X
-Valeport Monitor CTD (.vpd)                         X
+Valeport Monitor CTD, Midas SVP/SVX2(.vpd)          X
 Valeport SWiFT (.vp2)                               X
 =================================================== ==== =====
 
