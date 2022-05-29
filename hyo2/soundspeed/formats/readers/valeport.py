@@ -14,6 +14,7 @@ class Valeport(AbstractTextReader):
 
     # A dictionary to resolve sensor type from probe type
     sensor_dict = {
+        Dicts.probe_types['MIDAS SVP']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVP 6000']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVX2']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVX2 100']: Dicts.sensor_types["SVPT"],
@@ -112,6 +113,10 @@ class Valeport(AbstractTextReader):
                     continue
                 elif tokens[1] == "MIDAS SVX2":
                     self.ssp.cur.meta.probe_type = Dicts.probe_types['MIDAS SVX2']
+                    self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
+                    continue
+                elif tokens[1] == "MIDAS SVP":
+                    self.ssp.cur.meta.probe_type = Dicts.probe_types['MIDAS SVP']
                     self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
                     continue
                 else:
