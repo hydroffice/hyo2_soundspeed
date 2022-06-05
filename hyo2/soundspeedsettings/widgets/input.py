@@ -93,6 +93,26 @@ class Input(AbstractWidget):
         vbox.addWidget(self.use_woa13)
         vbox.addStretch()
 
+        # - use woa18
+        hbox = QtWidgets.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtWidgets.QLabel("Use WOA18:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- value
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.use_woa18 = QtWidgets.QComboBox()
+        self.use_woa18.addItems(["True", "False"])
+        vbox.addWidget(self.use_woa18)
+        vbox.addStretch()
+
         # - use rtofs
         hbox = QtWidgets.QHBoxLayout()
         self.left_layout.addLayout(hbox)
@@ -358,6 +378,8 @@ class Input(AbstractWidget):
         # noinspection PyUnresolvedReferences
         self.use_woa13.currentIndexChanged.connect(self.apply_use_woa13)
         # noinspection PyUnresolvedReferences
+        self.use_woa18.currentIndexChanged.connect(self.apply_use_woa18)
+        # noinspection PyUnresolvedReferences
         self.use_rtofs.currentIndexChanged.connect(self.apply_use_rtofs)
         # noinspection PyUnresolvedReferences
         self.use_gomofs.currentIndexChanged.connect(self.apply_use_gomofs)
@@ -403,6 +425,15 @@ class Input(AbstractWidget):
 
         if self.main_win.main_win:
             self.main_win.main_win.check_woa13()
+
+    def apply_use_woa18(self):
+        # logger.debug("apply use woa18: %s" % self.use_woa18.currentText())
+        self.db.use_woa18 = self.use_woa18.currentText() == "True"
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+        if self.main_win.main_win:
+            self.main_win.main_win.check_woa18()
 
     def apply_use_rtofs(self):
         # logger.debug("apply use rtofs: %s" % self.use_rtofs.currentText())
@@ -493,6 +524,12 @@ class Input(AbstractWidget):
             self.use_woa13.setCurrentIndex(0)  # True
         else:
             self.use_woa13.setCurrentIndex(1)  # False
+
+        # use woa18
+        if self.db.use_woa18:
+            self.use_woa18.setCurrentIndex(0)  # True
+        else:
+            self.use_woa18.setCurrentIndex(1)  # False
 
         # use rtofs
         if self.db.use_rtofs:

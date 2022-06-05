@@ -93,13 +93,24 @@ class Server(Thread):
                 self.settings_errors.append(msg)
                 return False
 
-        elif self.prj.setup.server_source == 'WOA13':  # WOA09 case
+        elif self.prj.setup.server_source == 'WOA13':  # WOA13 case
 
             if self.prj.use_woa13():
                 logger.info("WOA13-use check: OK")
 
             else:
                 msg = "WOA13-use check: KO"
+                logger.error(msg)
+                self.settings_errors.append(msg)
+                return False
+
+        elif self.prj.setup.server_source == 'WOA18':  # WOA18 case
+
+            if self.prj.use_woa18():
+                logger.info("WOA18-use check: OK")
+
+            else:
+                msg = "WOA18-use check: KO"
                 logger.error(msg)
                 self.settings_errors.append(msg)
                 return False
@@ -301,6 +312,8 @@ class Server(Thread):
             self.cur_lat_idx, self.cur_lon_idx = self.prj.atlases.woa09.grid_coords(lat=self.cur_lat, lon=self.cur_lon)
         elif self.prj.setup.server_source == 'WOA13':  # WOA13 case
             self.cur_lat_idx, self.cur_lon_idx = self.prj.atlases.woa13.grid_coords(lat=self.cur_lat, lon=self.cur_lon)
+        elif self.prj.setup.server_source == 'WOA18':  # WOA18 case
+            self.cur_lat_idx, self.cur_lon_idx = self.prj.atlases.woa18.grid_coords(lat=self.cur_lat, lon=self.cur_lon)
         elif self.prj.setup.server_source == 'RTOFS':  # RTOFS case
             self.cur_lat_idx, self.cur_lon_idx = self.prj.atlases.rtofs.grid_coords(lat=self.cur_lat, lon=self.cur_lon,
                                                                                     dtstamp=self.cur_tm,
@@ -420,7 +433,11 @@ class Server(Thread):
             self.prj.ssp = self.prj.atlases.woa09.query(lat=self.cur_lat, lon=self.cur_lon, dtstamp=self.cur_tm,
                                                         server_mode=True)
 
-        elif self.prj.setup.server_source == 'WOA13':  # WOA09 case
+        elif self.prj.setup.server_source == 'WOA13':  # WOA13 case
+            self.prj.ssp = self.prj.atlases.woa13.query(lat=self.cur_lat, lon=self.cur_lon, dtstamp=self.cur_tm,
+                                                        server_mode=True)
+
+        elif self.prj.setup.server_source == 'WOA18':  # WOA18 case
             self.prj.ssp = self.prj.atlases.woa13.query(lat=self.cur_lat, lon=self.cur_lon, dtstamp=self.cur_tm,
                                                         server_mode=True)
 

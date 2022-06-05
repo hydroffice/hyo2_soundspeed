@@ -37,6 +37,7 @@ class Dicts:
         ('LSOFS', 16),  # since DB v.3
         ('CREOFS', 17),  # since DB v.3
         ('SFBOFS', 18),  # since DB v.3
+        ('WOA18', 19),  # since DB v.4
 
         ('SVP', 101),
         ('Castaway', 102),
@@ -169,6 +170,7 @@ class Dicts:
         ("RTOFS", 2),
         ("ref", 3),
         ("GoMOFS", 4),  # since DB v.3
+        ("WOA18", 5),  # since DB v.4
 
     ])
 
@@ -178,7 +180,7 @@ class Dicts:
         ("WOA13", 1),
         ("RTOFS", 2),
         ("GoMOFS", 3),  # since DB v.3
-
+        ("WOA18", 4),  # since DB v.4
     ])
 
     mvp_protocols = OrderedDict([
@@ -246,6 +248,7 @@ class Dicts:
 
         ('EXT_WOA09', 'ext.from WOA09'),
         ('EXT_WOA13', 'ext.from WOA13'),
+        ('EXT_WOA18', 'ext.from WOA18'),  # since DB v.4
         ('EXT_RTOFS', 'ext.from RTOFS'),
         ('EXT_GoMOFS', 'ext.from GoMOFS'),  # since DB v.3
         ('EXT_REF', 'ext.from ref'),
@@ -254,6 +257,7 @@ class Dicts:
         ('REP_SAL_WOA13', 'sal.from WOA13'),
         ('REP_SAL_RTOFS', 'sal.from RTOFS'),
         ('REP_SAL_GoMOFS', 'sal.from GoMOFS'),  # since DB v.3
+        ('REP_SAL_WOA18', 'sal.from WOA18'), # since DB v.4
         ('REP_SAL_REF', 'sal.from ref'),
 
         ('REP_TEMP_SAL_WOA09', 'temp./sal.from WOA09'),
@@ -261,6 +265,7 @@ class Dicts:
         ('REP_TEMP_SAL_RTOFS', 'temp./sal.from RTOFS'),
         ('REP_TEMP_SAL_GoMOFS', 'temp./sal.from GoMOFS'),  # since DB v.3
         ('REP_TEMP_SAL_REF', 'temp./sal.from ref'),
+        ('REP_TEMP_SAL_WOA18', 'temp./sal.from WOA18'),  # since DB v.4
 
         ('RECALC_SPD', 'recalc.speed'),
         ('ADD_TSS', 'added tss'),

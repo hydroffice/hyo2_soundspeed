@@ -46,7 +46,7 @@ if Helper.is_pydro():
     default_use_gomofs = 0
     default_custom_woa09_folder = Helper.hstb_woa09_folder()
     default_custom_woa13_folder = Helper.hstb_woa13_folder()
-    default_custom_woa18_folder = ""
+    default_custom_woa18_folder = Helper.hstb_woa18_folder()
     default_noaa_tools = 1
     default_default_institution = institution_list[0]
 
@@ -188,10 +188,15 @@ V1_V5_COPY_SETTINGS = """-- noinspection SqlResolveForFile
         use_woa09
     END, 
     CASE WHEN typeof(use_woa13) == 'text' THEN
-        use_woa13 == 'True'
+        use_woa13 == 'False'
     ELSE
         use_woa13
     END, 
+    CASE WHEN typeof(use_woa18) == 'text' THEN
+        use_woa18 == 'False'
+    ELSE
+        use_woa18
+    END,     
     CASE WHEN typeof(use_rtofs) == 'text' THEN
         use_rtofs == 'True'
     ELSE
