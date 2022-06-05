@@ -25,7 +25,7 @@ class Setup:
     def apply_required_updates(cls, db_path):
         logger.debug("applying version updates %s" % db_path)
         db = SetupDb(os.path.dirname(db_path))
-        if db.setup_version == 1:
+        if db.setup_version < 5:
             success = db.update_from_v1_to_v5()
             if success:
                 return True

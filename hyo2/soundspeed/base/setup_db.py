@@ -1,6 +1,7 @@
 import os
 import logging
 import sqlite3
+import traceback
 
 from hyo2.abc.lib.helper import Helper
 from hyo2.soundspeed.base.basedb import BaseDb
@@ -54,6 +55,7 @@ class SetupDb(BaseDb):
             return True
 
         except sqlite3.Error as e:
+            traceback.print_exc()
             logger.error("during building tables, %s: %s" % (type(e), e))
             return False
 

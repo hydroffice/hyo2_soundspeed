@@ -138,6 +138,17 @@ class Main(AbstractWidget):
         if not selection:
             return
 
+        if Setup.are_updates_required(db_path=selection):
+            from shutil import copyfile
+            updated_selection = os.path.join(os.path.dirname(selection), "setup.updated.db")
+            copyfile(selection, updated_selection)
+            success = Setup.apply_required_updates(updated_selection)
+            if not success:
+                QtWidgets.QMessageBox.information(self, "Importable setup",
+                                                  "Unable to update the selected setup.")
+                return
+            selection = updated_selection
+
         try:
             # look inside the user selected setup db
             input_db = Setup(release_folder=os.path.dirname(selection))

@@ -171,9 +171,9 @@ DROP_SETTINGS_VIEW = """-- noinspection SqlResolveForFile
 
 V1_V5_COPY_SETTINGS = """-- noinspection SqlResolveForFile
     INSERT INTO  general 
-    (id, setup_name, setup_status, use_woa09, use_woa13, use_rtofs, 
+    (id, setup_name, setup_status, use_woa09, use_woa13, use_woa18, use_rtofs, 
     ssp_extension_source, ssp_salinity_source, ssp_temp_sal_source, ssp_up_or_down, rx_max_wait_time,
-    use_sis, use_sippican, use_mvp, log_user, log_server, sis_listen_port, sis_listen_timeout,
+    use_sis, use_sippican, use_mvp, sis_listen_port, sis_listen_timeout,
     sis_auto_apply_manual_casts, sippican_listen_port, sippican_listen_timeout, mvp_ip_address,
     mvp_listen_port, mvp_listen_timeout, mvp_transmission_protocol, mvp_format, mvp_winch_port,
     mvp_fish_port, mvp_nav_port, mvp_system_port, mvp_sw_version, mvp_instrument_id, mvp_instrument,
@@ -217,17 +217,7 @@ V1_V5_COPY_SETTINGS = """-- noinspection SqlResolveForFile
         use_mvp == 'True'
     ELSE
         use_mvp
-    END, 
-    CASE WHEN typeof(log_user) == 'text' THEN
-        log_user == 'True'
-    ELSE
-        log_user
-    END, 
-    CASE WHEN typeof(log_server) == 'text' THEN
-        log_server == 'True'
-    ELSE
-        log_server
-    END, 
+    END,
     sis_listen_port, sis_listen_timeout,
     CASE WHEN typeof(sis_auto_apply_manual_casts) == 'text' THEN
         sis_auto_apply_manual_casts == 'True'
