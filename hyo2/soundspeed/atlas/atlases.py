@@ -3,6 +3,7 @@ import logging
 
 from hyo2.soundspeed.atlas.woa09 import Woa09
 from hyo2.soundspeed.atlas.woa13 import Woa13
+from hyo2.soundspeed.atlas.woa18 import Woa18
 from hyo2.soundspeed.atlas.rtofs import Rtofs
 from hyo2.soundspeed.atlas.regofsonline import RegOfsOnline
 from hyo2.soundspeed.atlas.regofsoffline import RegOfsOffline
@@ -33,7 +34,7 @@ class Atlases:
         # logger.info("woa09 path: %s" % woa09_folder)
 
         # woa13
-        if (self.prj.setup.custom_woa09_folder is None) or (self.prj.setup.custom_woa13_folder == ""):
+        if (self.prj.setup.custom_woa13_folder is None) or (self.prj.setup.custom_woa13_folder == ""):
             woa13_folder = os.path.join(self._atlases_folder, "woa13")
         else:
             if os.path.exists(os.path.abspath(self.prj.setup.custom_woa13_folder)):
@@ -43,6 +44,18 @@ class Atlases:
         if not os.path.exists(woa13_folder):
             os.makedirs(woa13_folder)
         # logger.info("woa13 path: %s" % woa13_folder)
+
+        # woa18
+        if (self.prj.setup.custom_woa18_folder is None) or (self.prj.setup.custom_woa18_folder == ""):
+            woa18_folder = os.path.join(self._atlases_folder, "woa18")
+        else:
+            if os.path.exists(os.path.abspath(self.prj.setup.custom_woa18_folder)):
+                woa18_folder = self.prj.setup.custom_woa18_folder
+            else:
+                woa18_folder = os.path.join(self._atlases_folder, "woa18")
+        if not os.path.exists(woa18_folder):
+            os.makedirs(woa18_folder)
+        # logger.info("woa18 path: %s" % woa18_folder)
 
         # rtofs
         rtofs_folder = os.path.join(self._atlases_folder, "rtofs")
@@ -59,6 +72,7 @@ class Atlases:
         # available atlases
         self.woa09 = Woa09(data_folder=woa09_folder, prj=self.prj)
         self.woa13 = Woa13(data_folder=woa13_folder, prj=self.prj)
+        self.woa18 = Woa18(data_folder=woa18_folder, prj=self.prj)
         self.rtofs = Rtofs(data_folder=rtofs_folder, prj=self.prj)
 
         self.cbofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.CBOFS)
@@ -91,6 +105,10 @@ class Atlases:
         return self.woa13.data_folder
 
     @property
+    def woa18_folder(self):
+        return self.woa18.data_folder
+
+    @property
     def rtofs_folder(self):
         return self.rtofs.data_folder
 
@@ -103,6 +121,7 @@ class Atlases:
         msg = "  <atlases>\n"
         msg += "  %s" % self.woa09
         msg += "  %s" % self.woa13
+        msg += "  %s" % self.woa18
         msg += "  %s" % self.rtofs
         msg += "  %s" % self.cbofs
         msg += "  %s" % self.dbofs

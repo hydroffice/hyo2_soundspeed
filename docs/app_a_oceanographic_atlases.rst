@@ -117,10 +117,10 @@ from a neighboring oceanographic basin. Future versions of the algorithm will ad
 likely with the use of the basin mask file provided with the WOA09 data set.
 
 
-WOA13-based profiles
---------------------
+WOA13-based and WOA18-based profiles
+------------------------------------
 
-.. index:: WOA; WOA13
+.. index:: WOA; WOA13; WOA18
 
 WOA13 represents the ocean state variables of temperature and salinity with more detail and less uncertainty than
 WOA09 due to large increases in data holdings and better temporal and spatial coverage coupled with refined analysis
@@ -132,6 +132,9 @@ and quality control techniques:
 
 In the specific, the package uses the WOA13v2 release that was prepared to address both methodology concerns and,
 to a lesser extent, quality control concerns which have surfaced since the initial release of WOA13.
+
+WOA18 was released September 30, 2018. It includes approximately 3 million new oceanographic casts added to the WOD,
+as well as renewed and updated quality control.
 
 .. _rtofs_based_profiles:
 

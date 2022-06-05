@@ -50,7 +50,8 @@ class DataPlots(AbstractWidget):
         self.valid_color = '#3385ff'
         self.invalid_color = '#999966'
         self.woa09_color = '#ffaaaa'
-        self.woa13_color = '#ffcc66'
+        self.woa13_color = '#ffcc88'
+        self.woa18_color = '#ffee33'
         self.rtofs_color = '#99cc00'
         self.gomofs_color = '#6cbdbb'
         self.ref_color = '#ff6600'
@@ -107,6 +108,15 @@ class DataPlots(AbstractWidget):
         self.speed_woa13_max = None
         self.temp_woa13_max = None
         self.sal_woa13_max = None
+        self.speed_woa18 = None
+        self.temp_woa18 = None
+        self.sal_woa18 = None
+        self.speed_woa18_min = None
+        self.temp_woa18_min = None
+        self.sal_woa18_min = None
+        self.speed_woa18_max = None
+        self.temp_woa18_max = None
+        self.sal_woa18_max = None
         self.speed_rtofs = None
         self.temp_rtofs = None
         self.sal_rtofs = None
@@ -181,6 +191,26 @@ class DataPlots(AbstractWidget):
                                                            color=self.woa13_color,
                                                            linestyle=':',
                                                            label='WOA13 max'
+                                                           )
+        if self.lib.cur.woa18:
+            self.speed_woa18, = self.speed_ax.plot(self.lib.cur.woa18.l[0].proc.speed,
+                                                   self.lib.cur.woa18.l[0].proc.depth,
+                                                   color=self.woa18_color,
+                                                   linestyle='--',
+                                                   label='WOA18 avg'
+                                                   )
+            if len(self.lib.cur.woa18.l) == 3:
+                self.speed_woa18_min, = self.speed_ax.plot(self.lib.cur.woa18.l[1].proc.speed,
+                                                           self.lib.cur.woa18.l[1].proc.depth,
+                                                           color=self.woa18_color,
+                                                           linestyle=':',
+                                                           label='WOA18 min'
+                                                           )
+                self.speed_woa18_max, = self.speed_ax.plot(self.lib.cur.woa18.l[2].proc.speed,
+                                                           self.lib.cur.woa18.l[2].proc.depth,
+                                                           color=self.woa18_color,
+                                                           linestyle=':',
+                                                           label='WOA18 max'
                                                            )
         if self.lib.cur.rtofs:
             self.speed_rtofs, = self.speed_ax.plot(self.lib.cur.rtofs.l[0].proc.speed,
@@ -294,6 +324,27 @@ class DataPlots(AbstractWidget):
                                                          linestyle=':',
                                                          label='WOA13 max'
                                                          )
+        if self.lib.cur.woa18:
+
+            self.temp_woa18, = self.temp_ax.plot(self.lib.cur.woa18.l[0].proc.temp,
+                                                 self.lib.cur.woa18.l[0].proc.depth,
+                                                 color=self.woa18_color,
+                                                 linestyle='--',
+                                                 label='WOA18 avg'
+                                                 )
+            if len(self.lib.cur.woa18.l) == 3:
+                self.temp_woa18_min, = self.temp_ax.plot(self.lib.cur.woa18.l[1].proc.temp,
+                                                         self.lib.cur.woa18.l[1].proc.depth,
+                                                         color=self.woa18_color,
+                                                         linestyle=':',
+                                                         label='WOA18 min'
+                                                         )
+                self.temp_woa18_max, = self.temp_ax.plot(self.lib.cur.woa18.l[2].proc.temp,
+                                                         self.lib.cur.woa18.l[2].proc.depth,
+                                                         color=self.woa18_color,
+                                                         linestyle=':',
+                                                         label='WOA18 max'
+                                                         )
         if self.lib.cur.rtofs:
             self.temp_rtofs, = self.temp_ax.plot(self.lib.cur.rtofs.l[0].proc.temp,
                                                  self.lib.cur.rtofs.l[0].proc.depth,
@@ -376,6 +427,26 @@ class DataPlots(AbstractWidget):
                                                        color=self.woa13_color,
                                                        linestyle=':',
                                                        label='WOA13 max'
+                                                       )
+        if self.lib.cur.woa18:
+            self.sal_woa18, = self.sal_ax.plot(self.lib.cur.woa18.l[0].proc.sal,
+                                               self.lib.cur.woa18.l[0].proc.depth,
+                                               color=self.woa18_color,
+                                               linestyle='--',
+                                               label='WOA18 avg'
+                                               )
+            if len(self.lib.cur.woa18.l) == 3:
+                self.sal_woa18_min, = self.sal_ax.plot(self.lib.cur.woa18.l[1].proc.sal,
+                                                       self.lib.cur.woa18.l[1].proc.depth,
+                                                       color=self.woa18_color,
+                                                       linestyle=':',
+                                                       label='WOA18 min'
+                                                       )
+                self.sal_woa18_max, = self.sal_ax.plot(self.lib.cur.woa18.l[2].proc.sal,
+                                                       self.lib.cur.woa18.l[2].proc.depth,
+                                                       color=self.woa18_color,
+                                                       linestyle=':',
+                                                       label='WOA18 max'
                                                        )
         if self.lib.cur.rtofs:
             self.sal_rtofs, = self.sal_ax.plot(self.lib.cur.rtofs.l[0].proc.sal,

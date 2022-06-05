@@ -125,6 +125,12 @@ class ImportSingleProfileDialog(AbstractDialog):
         btn.setToolTip("Retrieve synthetic data from WOA13 Atlas")
         # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_click_woa13)
+        # --- WOA18
+        btn = QtWidgets.QPushButton("WOA18 DB")
+        self.leftRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        btn.setToolTip("Retrieve synthetic data from WOA18 Atlas")
+        # noinspection PyUnresolvedReferences
+        btn.clicked.connect(self.on_click_woa18)
         # -- Offline OFS
         btn = QtWidgets.QPushButton("OFS .nc")
         self.leftRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
@@ -422,6 +428,31 @@ class ImportSingleProfileDialog(AbstractDialog):
 
         except RuntimeError as e:
             msg = "Issue in importing the WOA13 data:\n\n> %s" % e
+            # noinspection PyCallByClass,PyArgumentList
+            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
+            self.progress.end()
+            return
+
+        self.accept()
+        self.progress.end()
+
+    def on_click_woa18(self):
+        """Retrieve WOA18 data"""
+
+        if not self.lib.setup.use_woa18:
+            msg = "First activate the 'Use WOA18' option in Setup/Input tab"
+            # noinspection PyCallByClass,PyArgumentList
+            QtWidgets.QMessageBox.critical(self, "WOA18 not in use", msg, QtWidgets.QMessageBox.Ok)
+            return
+
+        self.progress.start(text="Retrieve WOA18")
+        self.progress.update(value=30)
+
+        try:
+            self.lib.retrieve_woa18()
+
+        except RuntimeError as e:
+            msg = "Issue in importing the WOA18 data:\n\n> %s" % e
             # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.Ok)
             self.progress.end()

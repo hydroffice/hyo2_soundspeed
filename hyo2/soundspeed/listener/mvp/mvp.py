@@ -99,6 +99,12 @@ class Mvp(AbstractListener):
                                                                           dtstamp=self.prj.ssp.cur.meta.utc_time)
                     logger.debug("added WOA13")
 
+                if self.prj.use_woa18() and self.prj.has_woa18():
+                    self.prj.ssp.cur.woa18 = self.prj.atlases.woa18.query(lat=self.prj.ssp.cur.meta.latitude,
+                                                                          lon=self.prj.ssp.cur.meta.longitude,
+                                                                          dtstamp=self.prj.ssp.cur.meta.utc_time)
+                    logger.debug("added WOA18")
+
                 if self.prj.use_rtofs():
                     try:
                         self.prj.ssp.cur.rtofs = self.prj.atlases.rtofs.query(lat=self.prj.ssp.cur.meta.latitude,
@@ -145,6 +151,11 @@ class Mvp(AbstractListener):
 
             if self.prj.use_woa13() and self.prj.has_woa13():
                 self.prj.ssp.cur.woa13 = self.prj.atlases.woa13.query(lat=self.prj.ssp.cur.meta.latitude,
+                                                                      lon=self.prj.ssp.cur.meta.longitude,
+                                                                      dtstamp=self.prj.ssp.cur.meta.utc_time)
+
+            if self.prj.use_woa18() and self.prj.has_woa18():
+                self.prj.ssp.cur.woa18 = self.prj.atlases.woa18.query(lat=self.prj.ssp.cur.meta.latitude,
                                                                       lon=self.prj.ssp.cur.meta.longitude,
                                                                       dtstamp=self.prj.ssp.cur.meta.utc_time)
 

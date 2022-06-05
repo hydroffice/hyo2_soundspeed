@@ -62,13 +62,13 @@ to point to the correct path (see :ref:`possible_configurations`).
 
 By default, SSM looks for databases at:
 
-* "C:/Documents and Settings/**<username>**/Application Data/HydrOffice/Sound Speed/atlases/**[woa09 or woa13]**" (Windows XP), or
-* "C:/Users/**<username>**/AppData/Local/HydrOffice/Sound Speed/atlases/**[woa09 or woa13]**" (newer Windows OS)
+* "C:/Documents and Settings/**<username>**/Application Data/HydrOffice/Sound Speed/atlases/**[woa09|woa13|woa18]**" (Windows XP), or
+* "C:/Users/**<username>**/AppData/Local/HydrOffice/Sound Speed/atlases/**[woa09|woa13|woa18]**" (newer Windows OS)
 
-.. index:: WOA; WOA13
+.. index:: WOA; WOA13; WOA18
 
-Among other improvements, the WOA13 db provides a much better spatial resolution, but this comes with a much larger data size (~18 GB).
+Among other improvements, the WOA13 and WOA18 dbs provide a much better spatial resolution, but this comes with a much larger data size (~18 GB).
 
 .. note:: If a previous version of the application was installed, *Sound Speed Manager* will try to localize past
-    installations of WOA databases (WOA09 or WOA13).
+    installations of WOA databases (WOA09, WOA13 and WOA18).
 

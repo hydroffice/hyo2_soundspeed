@@ -29,6 +29,7 @@ class Profile:
 
         self.woa09 = None
         self.woa13 = None
+        self.woa18 = None
         self.rtofs = None
         self.gomofs = None
 
@@ -1075,6 +1076,9 @@ class Profile:
 
         elif ext_type == Dicts.sources['woa13_ext']:
             self.modify_proc_info(Dicts.proc_user_infos['EXT_WOA13'])
+
+        elif ext_type == Dicts.sources['woa18_ext']:
+            self.modify_proc_info(Dicts.proc_user_infos['EXT_WOA18'])
 
         elif ext_type == Dicts.sources['rtofs_ext']:
             self.modify_proc_info(Dicts.proc_user_infos['EXT_RTOFS'])

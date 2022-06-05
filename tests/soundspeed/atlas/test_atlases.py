@@ -27,6 +27,7 @@ class TestSoundSpeedAtlasAtlases(unittest.TestCase):
         self.assertTrue("atlases" in atl.rtofs_folder)
         self.assertTrue("woa" in atl.woa09_folder)
         self.assertTrue("woa" in atl.woa13_folder)
+        self.assertTrue("woa" in atl.woa18_folder)
 
         lib.close()
 

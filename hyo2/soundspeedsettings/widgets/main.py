@@ -1,5 +1,6 @@
 import os
 import logging
+import traceback
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
@@ -142,6 +143,7 @@ class Main(AbstractWidget):
             input_db = Setup(release_folder=os.path.dirname(selection))
             input_setups = input_db.db.setup_list
         except Exception as e:
+            traceback.print_exc()
             # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "Importable setup",
                                               "Unable to load the selected setup.\n"

@@ -74,6 +74,7 @@ class MainWin(QtWidgets.QMainWindow):
         logger.info("current configuration:\n%s" % Helper(lib_info=lib_info).package_info())
         self.check_woa09()
         self.check_woa13()
+        self.check_woa18()
         # self.check_rtofs()  # no need to wait for the download at the beginning
         self.check_sis()
         self.check_sippican()
@@ -347,6 +348,65 @@ class MainWin(QtWidgets.QMainWindow):
 
         logger.debug('WOA13: enabled')
 
+    def check_woa18(self):
+        """ helper function that looks after WOA18 database"""
+        if not self.lib.use_woa18():
+            logger.debug('WOA18: disabled by settings')
+            return
+
+        if self.lib.has_woa18():
+            logger.debug('WOA18: enabled')
+            return
+
+        msg = 'The WOA18 atlas is required by some advanced application functions.\n\n' \
+              'The data set (~4GB) can be retrieved from:\n' \
+              '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
+              'gma72_usnh_edu/EfOHuG2a5TRHpFWyP4cXIHsBU5nnpngIHqXr43nGA2-FVg?e=RgfYWe&download=1\n' \
+              '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
+              'gma72_usnh_edu/ETftTVRyTGNHrCKThnLoF0EB7WiG1YmVUN9Ly3OKqXO0qg?e=IFaveC&download=1\n' \
+              'then unzipped it into:\n' \
+              '   %s\n\n' \
+              'Do you want that I perform this operation for you?\n' \
+              'Internet connection is required!\n' % self.lib.woa18_folder
+        # noinspection PyCallByClass,PyArgumentList
+        ret = QtWidgets.QMessageBox.information(self, "Sound Speed Manager - WOA18 Atlas", msg,
+                                                QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
+        if ret == QtWidgets.QMessageBox.No:
+            msg = 'You can also manually install it. The steps are:\n' \
+                  ' - download the archive from:\n' \
+                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
+                  'gma72_usnh_edu/EfOHuG2a5TRHpFWyP4cXIHsBU5nnpngIHqXr43nGA2-FVg?e=RgfYWe&download=1\n' \
+                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
+                  'gma72_usnh_edu/ETftTVRyTGNHrCKThnLoF0EB7WiG1YmVUN9Ly3OKqXO0qg?e=IFaveC&download=1\n' \
+                  ' - unzip the archive into:\n' \
+                  '   %s\n' \
+                  ' - restart Sound Speed Manager\n' % self.lib.woa18_folder
+            # noinspection PyCallByClass,PyArgumentList
+            QtWidgets.QMessageBox.information(self, "Sound Speed Manager - WOA18 Atlas", msg,
+                                              QtWidgets.QMessageBox.Ok)
+            logger.debug('WOA18: disabled')
+            return
+
+        success = self.lib.download_woa18()
+        if not success:
+            msg = 'Unable to retrieve the WOA18 atlas.\n\n ' \
+                  'You may manually install it. The steps are:\n' \
+                  ' - download the archive from:\n' \
+                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
+                  'gma72_usnh_edu/EfOHuG2a5TRHpFWyP4cXIHsBU5nnpngIHqXr43nGA2-FVg?e=RgfYWe&download=1\n' \
+                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
+                  'gma72_usnh_edu/ETftTVRyTGNHrCKThnLoF0EB7WiG1YmVUN9Ly3OKqXO0qg?e=IFaveC&download=1\n' \
+                  ' - unzip the archive into:\n' \
+                  '   %s\n' \
+                  ' - restart Sound Speed Manager\n' % self.lib.woa18_folder
+            # noinspection PyCallByClass,PyArgumentList
+            QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - WOA18 Atlas", msg,
+                                          QtWidgets.QMessageBox.Ok)
+            logger.debug('WOA18: disabled')
+            return
+
+        logger.debug('WOA18: enabled')
+
     def check_rtofs(self):
         """ helper function that looks after RTOFS connection"""
         if not self.lib.use_rtofs():
@@ -511,6 +571,8 @@ class MainWin(QtWidgets.QMainWindow):
             tokens.append("W09")
         if self.lib.use_woa13():
             tokens.append("W13")
+        if self.lib.use_woa18():
+            tokens.append("W18")
         if self.lib.use_sippican():
             tokens.append("SIP")
         if self.lib.use_mvp():
