@@ -1196,7 +1196,7 @@ class Profile:
 
         # if the profile is too short, we just pass it back
         sis_valid_size = self.sis.depth[self.sis_valid].size
-        if sis_valid_size < 100:
+        if sis_valid_size < 570:
             self.sis.flag[self.sis_valid] = Dicts.flags['thin']
             logger.debug("skipping thinning for short profile (%d samples)" % sis_valid_size)
             return True
