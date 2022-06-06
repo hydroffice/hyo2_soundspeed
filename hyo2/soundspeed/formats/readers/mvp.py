@@ -39,6 +39,8 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
         self._ext.add('s52')
         self._ext.add('s10')
 
+        self.samples_header = None
+
         # for listener
         self.file_content = None
         self.header = None
@@ -443,6 +445,8 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
                     raise RuntimeError("unable to convert to longitude: %s" % e)
 
             elif line[:len(data_token)] == data_token:
+                self.samples_header = idx + 3
+                logger.debug("data header at row: %s" % self.samples_header)
                 self.samples_offset = idx + 17
                 logger.debug("data starts at row: %s" % self.samples_offset)
                 break
@@ -460,8 +464,40 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
     def _parse_m1_body(self):
 
         lines = self.total_data.splitlines()
-        count = 0
 
+        # data header
+        depth_idx = 1
+        speed_idx = 2
+        temp_idx = 3
+        sal_idx = 5
+        has_depth_idx = False
+        has_speed_idx = False
+        has_temp_idx = False
+        has_sal_idx = False
+        data_header = lines[self.samples_header]
+        logger.debug("data header: %s" % data_header)
+        for idx, token in enumerate(data_header.split(",")):
+            token = token.strip()
+            if "Depth" in token:
+                has_depth_idx = True
+                depth_idx = idx
+            elif "SV" in token:
+                has_speed_idx = True
+                speed_idx = idx
+            elif "Temp" in token:
+                has_temp_idx = True
+                temp_idx = idx
+            elif "Sal" in token:
+                has_sal_idx = True
+                sal_idx = idx
+        logger.debug("data header: depth %s, speed %s, temp %s, sal %s" %
+                     (has_depth_idx, has_speed_idx, has_temp_idx, has_sal_idx))
+        if not has_depth_idx:
+            raise RuntimeError("Unable to locate depth field in %s [%d]" % (data_header, self.samples_header))
+        if not has_speed_idx:
+            raise RuntimeError("Unable to locate speed field in %s [%d]" % (data_header, self.samples_header))
+
+        count = 0
         for idx, line in enumerate(lines):
 
             if idx < self.samples_offset:
@@ -474,8 +510,8 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
             if len(fields) == 3:
 
                 try:
-                    self.ssp.cur.data.depth[count] = float(fields[1].strip())
-                    self.ssp.cur.data.speed[count] = float(fields[2].strip())
+                    self.ssp.cur.data.depth[count] = float(fields[depth_idx].strip())
+                    self.ssp.cur.data.speed[count] = float(fields[speed_idx].strip())
 
                 except (ValueError, IndexError, TypeError) as e:
                     logger.error("skipping %s row: %s" % (idx, e))
@@ -485,10 +521,12 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
             elif len(fields) >= 6:
 
                 try:
-                    self.ssp.cur.data.depth[count] = float(fields[1].strip())
-                    self.ssp.cur.data.speed[count] = float(fields[2].strip())
-                    self.ssp.cur.data.temp[count] = float(fields[3].strip())
-                    self.ssp.cur.data.sal[count] = float(fields[5].strip())
+                    self.ssp.cur.data.depth[count] = float(fields[depth_idx].strip())
+                    self.ssp.cur.data.speed[count] = float(fields[speed_idx].strip())
+                    if has_temp_idx:
+                        self.ssp.cur.data.temp[count] = float(fields[temp_idx].strip())
+                    if has_sal_idx:
+                        self.ssp.cur.data.sal[count] = float(fields[sal_idx].strip())
 
                 except (ValueError, IndexError, TypeError) as e:
                     logger.error("skipping %s row: %s" % (idx, e))
