@@ -2,11 +2,8 @@ from matplotlib.backends.qt_compat import QtCore, QtGui, QtWidgets
 
 import os
 import logging
-from collections import namedtuple
-from enum import Enum
 
 import numpy as np
-import matplotlib
 from matplotlib import rc_context, cbook
 # noinspection PyProtectedMember
 from matplotlib.backend_bases import _Mode, MouseButton
@@ -97,7 +94,9 @@ class NavToolbar(NavigationToolbar2QT):
         self._actions['unflag'].setCheckable(True)
         self._actions['insert'].setCheckable(True)
         self._actions['flagged_plot'].setCheckable(True)
+        self._actions['flagged_plot'].setChecked(True)
         self._actions['grid_plot'].setCheckable(True)
+        self._actions['grid_plot'].setChecked(True)
         self._actions['legend_plot'].setCheckable(True)
         self._actions['legend_plot'].setChecked(False)
 
@@ -145,13 +144,6 @@ class NavToolbar(NavigationToolbar2QT):
             logger.warning("using icon at %s" % icon_path)
         pm = QtGui.QPixmap(icon_path)
         _setDevicePixelRatio(pm, _devicePixelRatioF(self))
-        if self.palette().color(self.backgroundRole()).value() < 128:
-            icon_color = self.palette().color(self.foregroundRole())
-            mask = pm.createMaskFromColor(
-                QtGui.QColor('black'),
-                _enum("QtCore.Qt.MaskMode").MaskOutColor)
-            pm.fill(icon_color)
-            pm.setMask(mask)
         return QtGui.QIcon(pm)
 
     def _active_button(self):
@@ -288,8 +280,8 @@ class NavToolbar(NavigationToolbar2QT):
                 self.mon_label.setText('')
 
         else:
-            if self.mode:
-                self.set_message('%s' % self.mode)
+            if self._active:
+                self.set_message('%s' % self._active.lower())
 
             else:
                 self.set_message('')
@@ -304,122 +296,159 @@ class NavToolbar(NavigationToolbar2QT):
                 self.set_cursor(cursors.POINTER)
                 self._lastCursor = cursors.POINTER
         else:
-            if (self._active == 'ZOOM_IN') or (self._active == 'ZOOM_OUT') or (self._active == 'INSERT'):
+            if (self._active == 'ZOOM_IN') or (self._active == 'ZOOM_OUT') or (self._active == 'INSERT')\
+                    or (self._active == 'FLAG') or (self._active == 'UNFLAG'):
                 if self._lastCursor != cursors.SELECT_REGION:
                     self.set_cursor(cursors.SELECT_REGION)
                     self._lastCursor = cursors.SELECT_REGION
 
-            elif (self._active == 'PAN') and (self._lastCursor != cursors.HAND):
-                if self._lastCursor != cursors.HAND:
-                    self.set_cursor(cursors.HAND)
-                    self._lastCursor = cursors.HAND
+            elif (self._active == 'PAN') or (self._active == 'SCALE'):
+                if self._lastCursor != cursors.MOVE:
+                    self.set_cursor(cursors.MOVE)
+                    self._lastCursor = cursors.MOVE
 
-            elif (self._active == 'SCALE') and (self._lastCursor != cursors.MOVE):
-                self.set_cursor(cursors.MOVE)
-                self._lastCursor = cursors.MOVE
+            else:
+                raise RuntimeError("Unsupported cursor mode: %s" % self._active)
 
     # --- pan ---
 
     def pan(self, *args):
-        if self._active == "SCALE":
-            super().pan(*args)
-        super().pan(*args)
-
-        if self.mode != _Mode.PAN:
+        self.mode = _Mode.NONE
+        if self._active == 'PAN':
             self._active = None
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self.canvas.widgetlock.release(self)
         else:
-            self._active = "PAN"
+            self._active = 'PAN'
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            self._id_press = self.canvas.mpl_connect('button_press_event', self.press_pan)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self._id_release = self.canvas.mpl_connect('button_release_event', self.release_pan)
+            self.canvas.widgetlock(self)
 
+        # logger.debug("active: %s" % self._active)
+        self.set_message(self._active)
         self._active_button()
 
     def scale(self, *args):
-        """Activate the scale tool"""
-        if self._active == "PAN":
-            super().pan(*args)
-        super().pan(*args)
-
-        if self.mode != _Mode.PAN:
+        self.mode = _Mode.NONE
+        if self._active == 'SCALE':
             self._active = None
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self.canvas.widgetlock.release(self)
         else:
-            self._active = "SCALE"
+            self._active = 'SCALE'
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            self._id_press = self.canvas.mpl_connect('button_press_event', self.press_pan)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self._id_release = self.canvas.mpl_connect('button_release_event', self.release_pan)
+            self.canvas.widgetlock(self)
 
+        # logger.debug("active: %s" % self._active)
+        self.set_message(self._active)
         self._active_button()
 
     def press_pan(self, event):
-        # logger.debug("Press pan")
         if event.button != MouseButton.LEFT:
             return
         if self._active == "PAN":
+            # logger.debug("Press pan")
             super().press_pan(event=event)
         elif self._active == "SCALE":
-            self.press_scale(event=event)
+            # logger.debug("Press scale")
+            if (event.button not in [MouseButton.LEFT, MouseButton.RIGHT]
+                    or event.x is None or event.y is None):
+                return
+            axes = [a for a in self.canvas.figure.get_axes()
+                    if a.in_axes(event) and a.get_navigate() and a.can_pan()]
+            if not axes:
+                return
+            if self._nav_stack() is None:
+                self.push_current()  # set the home button to this view
+            for ax in axes:
+                # MODIFIED for passing MouseButton.RIGHT
+                ax.start_pan(event.x, event.y, MouseButton.RIGHT)
+            self.canvas.mpl_disconnect(self._id_drag)
+            id_drag = self.canvas.mpl_connect("motion_notify_event", self.drag_pan)
+            self._pan_info = self._PanInfo(
+                button=event.button, axes=axes, cid=id_drag)
 
     def drag_pan(self, event):
-        # logger.debug("Drag pan")
         if self._active == "PAN":
+            # logger.debug("Drag pan")
             super().drag_pan(event=event)
         elif self._active == "SCALE":
-            self.drag_scale(event=event)
+            # logger.debug("Drag scale")
+            for ax in self._pan_info.axes:
+                # Using the recorded button at the press is safer than the current
+                # button, as multiple buttons can get pressed during motion.
+                # MODIFIED for passing MouseButton.RIGHT
+                ax.drag_pan(MouseButton.RIGHT, event.key, event.x, event.y)
+            self.canvas.draw_idle()
 
     def release_pan(self, event):
-        # logger.debug("Release pan")
         if self._active == "PAN":
+            # logger.debug("Release pan")
             super().release_pan(event=event)
         elif self._active == "SCALE":
             super().release_pan(event=event)
-
-    def press_scale(self, event):
-        # logger.debug("Press scale")
-        if (event.button not in [MouseButton.LEFT, MouseButton.RIGHT]
-                or event.x is None or event.y is None):
-            return
-        axes = [a for a in self.canvas.figure.get_axes()
-                if a.in_axes(event) and a.get_navigate() and a.can_pan()]
-        if not axes:
-            return
-        if self._nav_stack() is None:
-            self.push_current()  # set the home button to this view
-        for ax in axes:
-            # MODIFIED for passing MouseButton.RIGHT
-            ax.start_pan(event.x, event.y, MouseButton.RIGHT)
-        self.canvas.mpl_disconnect(self._id_drag)
-        id_drag = self.canvas.mpl_connect("motion_notify_event", self.drag_pan)
-        self._pan_info = self._PanInfo(
-            button=event.button, axes=axes, cid=id_drag)
-
-    def drag_scale(self, event):
-        # logger.debug("Drag scale")
-        for ax in self._pan_info.axes:
-            # Using the recorded button at the press is safer than the current
-            # button, as multiple buttons can get pressed during motion.
-            # MODIFIED for passing MouseButton.RIGHT
-            ax.drag_pan(MouseButton.RIGHT, event.key, event.x, event.y)
-        self.canvas.draw_idle()
 
     # --- zoom in/out ---
 
     def zoom_in(self, *args):
-        if self._active == "ZOOM_OUT":
-            super().zoom(*args)
-        super().zoom(*args)
-
-        if self.mode != _Mode.ZOOM:
+        self.mode = _Mode.NONE
+        if self._active == 'ZOOM_IN':
             self._active = None
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self.canvas.widgetlock.release(self)
         else:
-            self._active = "ZOOM_IN"
+            self._active = 'ZOOM_IN'
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            self._id_press = self.canvas.mpl_connect('button_press_event', self.press_zoom)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self._id_release = self.canvas.mpl_connect('button_release_event', self.release_zoom)
+            self.canvas.widgetlock(self)
 
+        # logger.debug("active: %s" % self._active)
+        self.set_message(self._active)
         self._active_button()
 
     def zoom_out(self, *args):
-        if self._active == "ZOOM_IN":
-            super().zoom(*args)
-        super().zoom(*args)
-
-        if self.mode != _Mode.ZOOM:
+        self.mode = _Mode.NONE
+        if self._active == 'ZOOM_OUT':
             self._active = None
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self.canvas.widgetlock.release(self)
         else:
-            self._active = "ZOOM_OUT"
+            self._active = 'ZOOM_OUT'
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            self._id_press = self.canvas.mpl_connect('button_press_event', self.press_zoom)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self._id_release = self.canvas.mpl_connect('button_release_event', self.release_zoom)
+            self.canvas.widgetlock(self)
 
+        # logger.debug("active: %s" % self._active)
+        self.set_message(self._active)
         self._active_button()
 
     def press_zoom(self, event):
@@ -452,12 +481,12 @@ class NavToolbar(NavigationToolbar2QT):
             self._id_release = self.canvas.mpl_connect('button_release_event', self.release_flag)
             self.canvas.widgetlock(self)
 
+        # logger.debug("active: %s" % self._active)
         self.set_message(self._active)
-        self._update_buttons_checked()
         self._active_button()
 
     def press_flag(self, event):
-        """Mouse press callback for flag"""
+        # logger.debug("Press flag")
 
         # store the pressed button
         if event.button != MouseButton.LEFT:  # left
@@ -490,7 +519,7 @@ class NavToolbar(NavigationToolbar2QT):
         # logger.debug("FLAG > press > key: %s" % self._flag_mode)
 
     def release_flag(self, event):
-        """release mouse button callback in flagging mode"""
+        # logger.debug("Release flag")
         # disconnect callbacks
         for flag_id in self._ids_flag:
             self.canvas.mpl_disconnect(flag_id)
@@ -576,6 +605,7 @@ class NavToolbar(NavigationToolbar2QT):
         self._flag_mode = None
 
     def unflag(self):
+        # logger.debug("Unflag")
         self.mode = _Mode.NONE
         if self._active == 'UNFLAG':
             self._active = None
@@ -595,11 +625,10 @@ class NavToolbar(NavigationToolbar2QT):
             self.canvas.widgetlock(self)
 
         self.set_message(self._active)
-        self._update_buttons_checked()
         self._active_button()
 
     def press_unflag(self, event):
-        """Mouse press callback for flag"""
+        # logger.debug("Press unflag")
 
         # store the pressed button
         if event.button != MouseButton.LEFT:  # left
@@ -632,7 +661,7 @@ class NavToolbar(NavigationToolbar2QT):
         # logger.debug("UNFLAG > press > key: %s" % self._flag_mode)
 
     def release_unflag(self, event):
-        """release mouse button callback in flagging mode"""
+        # logger.debug("Release unflag")
         # disconnect callbacks
         for flag_id in self._ids_flag:
             self.canvas.mpl_disconnect(flag_id)
@@ -789,18 +818,18 @@ class NavToolbar(NavigationToolbar2QT):
             self._id_release = self.canvas.mpl_connect('button_release_event', self.release_insert)
             self.canvas.widgetlock(self)
 
+        # logger.debug("active: %s" % self._active)
         self.set_message(self._active)
-        self._update_buttons_checked()
         self._active_button()
 
     def press_insert(self, event):
-        """Mouse press callback for flag"""
+        """Mouse press callback for insert"""
 
         # store the pressed button
         if event.button != MouseButton.LEFT:  # left
             self.insert_sample = None
             return
-        # logger.debug("INSERT > press > button #%s" % self._button_pressed)
+        # logger.debug("INSERT > press > button #%s" % event.button)
 
         # x, y = event.x, event.y  # cursor position in pixel
         xd, yd = event.xdata, event.ydata  # cursor position in data coords
@@ -852,14 +881,14 @@ class NavToolbar(NavigationToolbar2QT):
 
     def flagged_plot(self):
         flagged_flag = self._actions['flagged_plot'].isChecked()
-        logger.debug("plot flagged: %s" % flagged_flag)
+        # logger.debug("plot flagged: %s" % flagged_flag)
         self.plot_win.set_invalid_visibility(flagged_flag)
 
         self.canvas.draw_idle()
 
     def grid_plot(self):
         grid_flag = self._actions['grid_plot'].isChecked()
-        logger.debug("plot grid: %s" % grid_flag)
+        # logger.debug("plot grid: %s" % grid_flag)
 
         with rc_context(self.rc_context):
             for a in self.canvas.figure.get_axes():
@@ -869,7 +898,7 @@ class NavToolbar(NavigationToolbar2QT):
 
     def legend_plot(self):
         legend_flag = self._actions['legend_plot'].isChecked()
-        logger.debug("plot legend: %s" % legend_flag)
+        # logger.debug("plot legend: %s" % legend_flag)
 
         with rc_context(self.rc_context):
             if legend_flag:
