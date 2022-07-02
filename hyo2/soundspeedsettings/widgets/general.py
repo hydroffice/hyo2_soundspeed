@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
@@ -343,7 +344,7 @@ class General(AbstractWidget):
             return
         logger.debug('user selection: %s' % selection)
 
-        self.db.custom_projects_folder = selection
+        self.db.custom_projects_folder = str(Path(selection))
 
         self.setup_changed()
         self.main_win.reload_settings()
@@ -360,7 +361,7 @@ class General(AbstractWidget):
             return
         logger.debug('user selection: %s' % selection)
 
-        self.db.custom_outputs_folder = selection
+        self.db.custom_outputs_folder = str(Path(selection))
 
         self.setup_changed()
         self.main_win.reload_settings()
@@ -383,7 +384,7 @@ class General(AbstractWidget):
             selection = ""
         logger.debug('user selection: %s' % selection)
 
-        self.db.custom_woa09_folder = selection
+        self.db.custom_woa09_folder = str(Path(selection))
 
         self.setup_changed()
         self.main_win.reload_settings()
@@ -410,7 +411,7 @@ class General(AbstractWidget):
             selection = ""
         logger.debug('user selection: %s' % selection)
 
-        self.db.custom_woa13_folder = selection
+        self.db.custom_woa13_folder = str(Path(selection))
 
         self.setup_changed()
         self.main_win.reload_settings()
@@ -437,7 +438,7 @@ class General(AbstractWidget):
             selection = ""
         logger.debug('user selection: %s' % selection)
 
-        self.db.custom_woa18_folder = selection
+        self.db.custom_woa18_folder = str(Path(selection))
 
         self.setup_changed()
         self.main_win.reload_settings()
@@ -469,19 +470,19 @@ class General(AbstractWidget):
         self.current_project.setText("%s" % self.db.current_project)
 
         # projects_folder
-        self.projects_folder.setText("%s" % self.db.custom_projects_folder)
+        self.projects_folder.setText("%s" % Path(self.db.custom_projects_folder))
 
         # outputs_folder
-        self.outputs_folder.setText("%s" % self.db.custom_outputs_folder)
+        self.outputs_folder.setText("%s" % Path(self.db.custom_outputs_folder))
 
         # woa09_folder
-        self.woa09_folder.setText("%s" % self.db.custom_woa09_folder)
+        self.woa09_folder.setText("%s" % Path(self.db.custom_woa09_folder))
 
         # woa13_folder
-        self.woa13_folder.setText("%s" % self.db.custom_woa13_folder)
+        self.woa13_folder.setText("%s" % Path(self.db.custom_woa13_folder))
 
         # woa18_folder
-        self.woa18_folder.setText("%s" % self.db.custom_woa18_folder)
+        self.woa18_folder.setText("%s" % Path(self.db.custom_woa18_folder))
 
         # noaa tools and default_vessel
         if self.db.noaa_tools:
