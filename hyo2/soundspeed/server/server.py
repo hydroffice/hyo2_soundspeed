@@ -438,7 +438,7 @@ class Server(Thread):
                                                         server_mode=True)
 
         elif self.prj.setup.server_source == 'WOA18':  # WOA18 case
-            self.prj.ssp = self.prj.atlases.woa13.query(lat=self.cur_lat, lon=self.cur_lon, dtstamp=self.cur_tm,
+            self.prj.ssp = self.prj.atlases.woa18.query(lat=self.cur_lat, lon=self.cur_lon, dtstamp=self.cur_tm,
                                                         server_mode=True)
 
         elif self.prj.setup.server_source == 'RTOFS':  # RTOFS case
