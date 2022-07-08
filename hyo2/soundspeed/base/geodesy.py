@@ -150,6 +150,8 @@ class Geodesy:
         osr_inputs = osr.SpatialReference()
         osr_inputs.ImportFromEPSG(epsg_inputs)
         osr_calc = osr.SpatialReference()
+        if epsg_inputs == 4326:
+            osr_calc.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
         if epsg_calc == 3857:
             osr_calc.ImportFromWkt(wkt_3857)
         else:
