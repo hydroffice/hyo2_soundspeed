@@ -22,6 +22,7 @@ class ModelOptions(IntEnum):
     WOA09 = 1
     WOA13 = 2
     RTOFS = 3
+    WOA18 = 4
 
     # Regional Models
     # East Coast
@@ -48,7 +49,7 @@ class ModelOptions(IntEnum):
 
 
 # Choose Model
-switch = ModelOptions.CBOFS  # Choose a ModelOptions Value to test
+switch = ModelOptions.WOA18  # Choose a ModelOptions Value to test
 
 app = QtWidgets.QApplication([])  # PySide stuff (start)
 mw = QtWidgets.QMainWindow()
@@ -79,8 +80,6 @@ tests = [
     # (37.689510, -122.298514, dt.utcnow())     # San Francisco Bay
 ]
 
-
-
 if switch is ModelOptions.WOA09:
 
     # download the woa09 if not present
@@ -98,6 +97,15 @@ elif switch is ModelOptions.WOA13:
         if not success:
             raise RuntimeError("unable to download")
     logger.info("has WOA13: %s" % lib.has_woa13())
+
+elif switch is ModelOptions.WOA18:
+
+    # download the woa18 if not present
+    if not lib.has_woa18():
+        success = lib.download_woa18()
+        if not success:
+            raise RuntimeError("unable to download")
+    logger.info("has WOA18: %s" % lib.has_woa18())
 
 elif switch is ModelOptions.RTOFS:
 
@@ -249,6 +257,8 @@ for test in tests:
         logger.info("WOA09 profiles:\n%s" % lib.atlases.woa09.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.WOA13:
         logger.info("WOA13 profiles:\n%s" % lib.atlases.woa13.query(lat=test[0], lon=test[1], dtstamp=test[2]))
+    elif switch is ModelOptions.WOA18:
+        logger.info("WOA18 profiles:\n%s" % lib.atlases.woa18.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.RTOFS:
         logger.info("RTOFS profiles:\n%s" % lib.atlases.rtofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.CBOFS:
