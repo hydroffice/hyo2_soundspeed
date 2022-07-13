@@ -8,7 +8,7 @@
 #
 # It may require to manually copy DLLs and other files.
 # Move _gdal.dll under a folder named 'osgeo'
-# Copy the qt.conf
+# Copy the qt.conf and opengl32sw.dll
 #
 # Uploading to BitBucket: curl -s -v -u giumas:password -X POST https://api.bitbucket.org/2.0/repositories/hydroffice/hyo_sound_speed_manager/downloads -F files=@SoundSpeedManager.2020.0.4.zip
 
