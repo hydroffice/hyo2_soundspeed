@@ -149,6 +149,12 @@ class Valeport(AbstractTextReader):
                 except ValueError:
                     logger.warning("unable to parse date and time: %s" % line)
 
+            if tokens[0] == "DATESTARTTIME":
+                try:
+                    self.ssp.cur.meta.utc_time = dt.datetime.strptime(tokens[1], "%Y/%m/%d %H:%M:%S")
+                except ValueError:
+                    logger.warning("unable to parse date and time: %s" % line)
+
             if tokens[0] == "TIME_STAMP":
                 try:
                     self.ssp.cur.meta.utc_time = dt.datetime.strptime(tokens[1], "%Y/%m/%d %H:%M:%S.%f")
