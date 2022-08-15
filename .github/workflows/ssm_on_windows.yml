@@ -1,10 +1,10 @@
-name: Sound Speed Manager
+name: SSM on Windows
 
 on: [push]
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: windows-latest
     strategy:
       max-parallel: 5
 
@@ -20,10 +20,9 @@ jobs:
         echo $CONDA/bin >> $GITHUB_PATH
     - name: Install dependencies
       run: |
-        pip install wheel
-        conda install appdirs bidict cartopy "gdal<3.0.0" matplotlib-base numpy psutil pyproj
-        pip install PySide2
+        conda install appdirs bidict cartopy gdal matplotlib-base numpy psutil pyproj
         conda install gsw netCDF4 pillow pyserial scipy
+        pip install PySide2
         pip install https://github.com/hydroffice/hyo2_abc/archive/master.zip
         pip install --no-deps .
     - name: Lint with flake8
