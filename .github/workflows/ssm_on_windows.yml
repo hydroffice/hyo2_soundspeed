@@ -14,11 +14,11 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: 3.9
-    - name: Add conda to system path
-      run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
-        conda config --add channels conda-forge
+    - name: setup-conda
+      uses: s-weigand/setup-conda@v1.1.1
+      with:
+        update-conda: true
+        python-version: 3.9
     - name: Install dependencies
       run: |
         conda install appdirs bidict cartopy gdal matplotlib-base numpy psutil pyproj
