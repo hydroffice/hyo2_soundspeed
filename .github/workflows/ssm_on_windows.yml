@@ -18,6 +18,7 @@ jobs:
       run: |
         # $CONDA is an environment variable pointing to the root of the miniconda directory
         echo $CONDA/bin >> $GITHUB_PATH
+        conda config --add channels conda-forge
     - name: Install dependencies
       run: |
         conda install appdirs bidict cartopy gdal matplotlib-base numpy psutil pyproj
