@@ -21,6 +21,7 @@ jobs:
         python-version: 3.9
     - name: Install dependencies
       run: |
+        conda config --add channels conda-forge
         conda install appdirs bidict cartopy gdal matplotlib-base numpy psutil pyproj
         conda install gsw netCDF4 pillow pyserial scipy
         pip install PySide2
