@@ -3,7 +3,7 @@ from enum import IntEnum
 from http import client
 import logging
 import socket
-from typing import Optional, Union
+from typing import Optional, Union, TYPE_CHECKING
 from urllib import parse
 
 from netCDF4 import Dataset, num2date
@@ -16,6 +16,8 @@ from hyo2.soundspeed.profile.profile import Profile
 from hyo2.soundspeed.profile.profilelist import ProfileList
 from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeed.profile.oceanography import Oceanography as Oc
+if TYPE_CHECKING:
+    from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +66,7 @@ class RegOfsOnline(AbstractAtlas):
         Model.SFBOFS: "San Francisco Bay Operational Forecast System"
     }
 
-    def __init__(self, data_folder: str, prj: 'hyo2.soundspeed.soundspeed import SoundSpeedLibrary',
+    def __init__(self, data_folder: str, prj: 'SoundSpeedLibrary',
                  model: Model) -> None:
         super().__init__(data_folder=data_folder, prj=prj)
         self.model = model

@@ -2,7 +2,7 @@ from datetime import datetime as dt
 import os
 from enum import IntEnum
 import logging
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from netCDF4 import Dataset, num2date
 
 from hyo2.soundspeed.base.geodesy import Geodesy
@@ -10,7 +10,8 @@ from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeed.profile.profile import Profile
 from hyo2.soundspeed.profile.profilelist import ProfileList
 from hyo2.abc.lib.progress.cli_progress import CliProgress
-
+if TYPE_CHECKING:
+    from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +60,7 @@ class RegOfsOffline:
             Model.SFBOFS: "San Francisco Bay Operational Forecast System"
         }
 
-    def __init__(self, data_folder: str, prj: 'hyo2.soundspeed.soundspeed import SoundSpeedLibrary') -> None:
+    def __init__(self, data_folder: str, prj: 'SoundSpeedLibrary') -> None:
         self.name = self.__class__.__name__
         self.desc = "Abstract atlas"  # a human-readable description
         self.data_folder = data_folder

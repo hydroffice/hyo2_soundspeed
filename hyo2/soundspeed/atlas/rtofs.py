@@ -1,6 +1,6 @@
 from datetime import datetime as dt, date, timedelta
 import logging
-from typing import Optional, Union
+from typing import Optional, Union, TYPE_CHECKING
 
 from netCDF4 import Dataset
 import numpy as np
@@ -13,6 +13,8 @@ from hyo2.soundspeed.profile.profile import Profile
 from hyo2.soundspeed.profile.profilelist import ProfileList
 from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeed.profile.oceanography import Oceanography as Oc
+if TYPE_CHECKING:
+    from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +22,7 @@ logger = logging.getLogger(__name__)
 class Rtofs(AbstractAtlas):
     """RTOFS atlas"""
 
-    def __init__(self, data_folder: str, prj: 'hyo2.soundspeed.soundspeed import SoundSpeedLibrary') -> None:
+    def __init__(self, data_folder: str, prj: 'SoundSpeedLibrary') -> None:
         super(Rtofs, self).__init__(data_folder=data_folder, prj=prj)
         self.name = self.__class__.__name__
         self.desc = "Global Real-Time Ocean Forecast System"

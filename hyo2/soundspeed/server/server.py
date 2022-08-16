@@ -3,7 +3,9 @@ import time
 import traceback
 from datetime import datetime
 from threading import Thread, Event
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 
@@ -11,7 +13,7 @@ logger = logging.getLogger(__name__)
 class Server(Thread):
 
     # noinspection PyUnresolvedReferences
-    def __init__(self, prj: Optional['hyo2.soundspeed.soundspeed.SoundSpeedLibrary']):
+    def __init__(self, prj: Optional['SoundSpeedLibrary']):
         Thread.__init__(self, target=None, name="Synthetic Profile Server")
         self.prj = prj
         self.delivered_casts = 0

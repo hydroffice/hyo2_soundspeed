@@ -27,7 +27,7 @@ class TestSoundSpeedTestCallbacks(unittest.TestCase):
         self.assertEqual(self.cb.ask_date().minute, dt.utcnow().minute)
 
         import sys
-        if (sys.platform == 'win32') or (os.name is "nt"):
+        if (sys.platform == 'win32') or (os.name == "nt"):
             self.assertEqual(self.cb.ask_date().second, dt.utcnow().second)
 
     def test_ask_location(self):

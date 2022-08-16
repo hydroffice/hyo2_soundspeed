@@ -310,62 +310,6 @@ class Profile(numpy.recarray):
             p3[n] = self[n] + p2[n]
         return p3
 
-    @staticmethod
-    def ConvertFromSoundSpeedProfile(p):
-        metadata = {}
-
-        # translate metadata
-        d = {}
-        for k, v in dicts.Dicts.probe_types.items():
-            try:
-                d[v] = k
-            except:
-                pass
-        try:
-            metadata['ImportFormat'] = d[p.meta.probe_type]
-        except:
-            d = {}
-            for k, v in dicts.Dicts.sensor_types.items():
-                try:
-                    d[v] = k
-                except:
-                    pass
-            metadata['ImportFormat'] = d.get(p.meta.sensor_type, "")
-        try:
-            metadata.update(Profile.getMetaFromCoord(coordinates.Coordinate(p.meta.latitude, p.meta.longitude, )))
-        except:
-            pass
-        metadata['filename'] = p.meta.original_path
-        metadata['timestamp'] = p.meta.utc_time
-        # p.meta._institution = ''
-        metadata['Survey'] = p.meta._survey
-        metadata['Ship'] = p.meta._vessel
-        metadata['Instrument'] = p.meta._sn
-        # p.meta.proc_time = datetime.datetime.now()
-        # p.meta.proc_info = 'imported via Velocipy'
-        # translate units
-        # p.meta.pressure_uom = 'dbar'
-        # p.meta.depth_uom = 'm'
-        # p.meta.speed_uom = 'm/s'
-        # p.meta.temperature_uom = 'deg C'
-        # p.meta.conductivity_uom = ''
-        # p.meta.salinity_uom = ''
-        # convert profile data
-        p.data.num_samples = len(self)
-        col_types = []
-        prof_data = []
-        for data, name in ((p.data.pressure, 'pressure'), (p.data.depth, 'depth'),
-            (p.data.speed, 'soundspeed'), (p.data.temp, 'temperature'),
-                           (p.data.sal, 'salinity'), (p.data.conductivity, 'conductivity')):
-            if data is not None:
-                col_types.append((name, numpy.float32))
-                prof_data.append(data)
-
-        # return the finised profile
-        prof_array = numpy.zeros(prof_data, dtype=col_types)
-        p = Profile(prof_array, metadata=metadata)
-        return p
-
     def ConvertToSoundSpeedProfile(self):
         p = hyo2.soundspeed.profile.profile.Profile()
         # translate metadata

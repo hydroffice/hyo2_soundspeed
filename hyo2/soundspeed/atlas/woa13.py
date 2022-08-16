@@ -4,7 +4,7 @@ import numpy as np
 from netCDF4 import Dataset
 import logging
 from datetime import datetime as dt
-from typing import Union
+from typing import Union, TYPE_CHECKING
 
 from hyo2.abc.lib.onedrive import OneDrive
 
@@ -12,6 +12,8 @@ from hyo2.soundspeed.atlas.abstract import AbstractAtlas
 from hyo2.soundspeed.profile.profile import Profile
 from hyo2.soundspeed.profile.profilelist import ProfileList
 from hyo2.soundspeed.profile.dicts import Dicts
+if TYPE_CHECKING:
+    from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +21,7 @@ logger = logging.getLogger(__name__)
 class Woa13(AbstractAtlas):
     """WOA13 atlas"""
 
-    def __init__(self, data_folder: str, prj: 'hyo2.soundspeed.soundspeed import SoundSpeedLibrary') -> None:
+    def __init__(self, data_folder: str, prj: 'SoundSpeedLibrary') -> None:
         super(Woa13, self).__init__(data_folder=data_folder, prj=prj)
         self.name = self.__class__.__name__
         self.desc = "World Ocean Atlas 2013 v2"
