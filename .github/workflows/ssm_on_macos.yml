@@ -23,7 +23,7 @@ jobs:
       run: |
         conda install appdirs bidict cartopy gdal matplotlib-base numpy psutil pyproj
         conda install gsw netCDF4 pillow pyserial scipy
-        pip install PySide2
+        pip install PySide2 wheel
         pip install https://github.com/hydroffice/hyo2_abc/archive/master.zip
         pip install --no-deps .
     - name: Lint with flake8
