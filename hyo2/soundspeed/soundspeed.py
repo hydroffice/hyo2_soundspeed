@@ -1094,6 +1094,8 @@ class SoundSpeedLibrary:
                 if f.endswith('.db'):
                     prj_list.append(os.path.splitext(os.path.basename(f))[0])
             break
+        prj_list.sort()
+        
         return prj_list
 
     def remove_data(self) -> bool:

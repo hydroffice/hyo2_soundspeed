@@ -32,6 +32,8 @@ The following wonderful people contributed directly or indirectly to this projec
 
 - `Damian Manda <damian.manda@noaa.gov>`_
 
+- `Jean-Guy Nistad <jean-guy.nistad@bsh.de>`_  
+
 - `Patrice Ponchant <mailto:patrice.ponchant@fugro.com>`_
 
 - `Glen Rice <mailto:glen.rice@noaa.gov>`_
