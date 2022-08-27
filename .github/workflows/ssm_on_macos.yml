@@ -21,17 +21,15 @@ jobs:
         python-version: 3.9
     - name: Install dependencies
       run: |
-        conda config --add channels conda-forge
-        conda install appdirs bidict cartopy gdal matplotlib-base numpy psutil pyproj
-        conda install gsw netCDF4 pillow pyserial scipy
-        pip install --upgrade --force-reinstall wheel
-        pip install --upgrade --force-reinstall setuptools
-        pip install PySide2
-        pip install --no-deps https://github.com/hydroffice/hyo2_abc/archive/master.zip
-        pip install --no-deps .
+        sudo conda config --add channels conda-forge
+        sudo conda install appdirs bidict cartopy gdal matplotlib-base numpy psutil pyproj gsw netCDF4 pillow pyserial scipy
+        sudo pip install --upgrade --force-reinstall pip wheel setuptools
+        sudo pip install PySide2
+        sudo pip install --no-deps https://github.com/hydroffice/hyo2_abc/archive/master.zip
+        sudo pip install --no-deps .
     - name: Lint with flake8
       run: |
-        conda install flake8
+        sudo conda install flake8
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
@@ -39,7 +37,7 @@ jobs:
       continue-on-error: true
     - name: Test with pytest
       run: |
-        pip install coveralls PyYAML pytest pytest-cov
+        sudo pip install coveralls PyYAML pytest pytest-cov
         py.test --cov
         coverage report -m
         coveralls
