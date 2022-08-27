@@ -21,7 +21,7 @@ jobs:
         python-version: 3.9
     - name: Install dependencies
       run: |
-        sudo -H source activate
+        sudo -H activate
         sudo -H which python
         sudo -H conda config --add channels conda-forge
         sudo -H conda install appdirs bidict cartopy gdal matplotlib-base numpy psutil pyproj gsw netCDF4 pillow pyserial scipy
