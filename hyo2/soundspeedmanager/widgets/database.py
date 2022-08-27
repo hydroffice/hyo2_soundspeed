@@ -232,6 +232,7 @@ class Database(AbstractWidget):
         # self.main_layout.addStretch()
 
         self.update_table()
+        logger.debug("Database tab is now initialized")
 
     def make_context_menu(self, pos):
         """Make a context menu to deal with profile specific actions"""
@@ -863,6 +864,7 @@ class Database(AbstractWidget):
         # populate the table
         self.ssp_list.setRowCount(len(lst))
 
+        logger.debug("Populating %d table entries ..." % len(lst))
         for i, ssp_ in enumerate(lst):
 
             processed = True
@@ -906,8 +908,12 @@ class Database(AbstractWidget):
 
                 self.ssp_list.setItem(i, j, item)
 
+        logger.debug("Populating %d table entries ... (sorting)" % len(lst))
         self.ssp_list.setSortingEnabled(True)
+        logger.debug("Populating %d table entries ... (resizing)" % len(lst))
         self.ssp_list.resizeColumnsToContents()
+
+        logger.debug("Populating %d table entries ... DONE" % len(lst))
 
     def data_stored(self):
         self.update_table()
