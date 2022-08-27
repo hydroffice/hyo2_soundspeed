@@ -14,12 +14,20 @@ HydrOffice Sound Speed
     :target: https://ci.appveyor.com/project/giumas/hyo-soundspeed
     :alt: AppVeyor Status
 
-.. image:: https://travis-ci.com/hydroffice/hyo2_soundspeed.svg?branch=master
-    :target: https://travis-ci.com/hydroffice/hyo2_soundspeed
-    :alt: Travis-CI Status
+.. image:: https://github.com/hydroffice/hyo2_soundspeed/actions/workflows/ssm_on_linux.yml/badge.svg?branch=master
+    :target: https://github.com/hydroffice/hyo2_soundspeed/actions/workflows/ssm_on_linux.yml
+    :alt: GitHub Linux Status
 
-.. image:: https://api.codacy.com/project/badge/Grade/b92613f1b6794c968eef6ae5472c0c7f
-    :target: https://www.codacy.com/app/hydroffice/hyo2_soundspeed
+.. image:: https://github.com/hydroffice/hyo2_soundspeed/actions/workflows/ssm_on_macos.yml/badge.svg?branch=master
+    :target: https://github.com/hydroffice/hyo2_soundspeed/actions/workflows/ssm_on_macos.yml
+    :alt: GitHub MacOS Status
+
+.. image:: https://github.com/hydroffice/hyo2_soundspeed/actions/workflows/ssm_on_windows.yml/badge.svg?branch=master
+    :target: https://github.com/hydroffice/hyo2_soundspeed/actions/workflows/ssm_on_windows.yml
+    :alt: GitHub Windows Status
+
+.. image:: https://app.codacy.com/project/badge/Grade/c1eccd9e15a7408fb05aab06034e005e
+    :target: https://www.codacy.com/gh/hydroffice/hyo2_soundspeed/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hydroffice/hyo2_soundspeed&amp;utm_campaign=Badge_Grade
     :alt: Codacy badge
 
 .. image:: https://zenodo.org/badge/54854024.svg
