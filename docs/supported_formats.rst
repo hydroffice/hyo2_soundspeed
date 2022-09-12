@@ -39,7 +39,7 @@ Valeport Midas/Monitor SVP/SVX2 (.000)              X
 Valeport MiniSVP (.txt)                             X
 Valeport RapidSV/SVT (.txt)                         X
 Valeport Monitor CTD, Midas SVP/SVX2(.vpd)          X
-Valeport SWiFT (.vp2)                               X
+Valeport SWiFT SVP/CTD (.vp2)                       X
 =================================================== ==== =====
 
 .. rubric:: Footnotes

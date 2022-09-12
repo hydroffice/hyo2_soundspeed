@@ -28,6 +28,7 @@ class Valeport(AbstractTextReader):
         Dicts.probe_types['RapidSV']: Dicts.sensor_types["SVP"],
         Dicts.probe_types['RapidSVT']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['SWiFT']: Dicts.sensor_types["SVPT"],
+        Dicts.probe_types['SWiFT CTD']: Dicts.sensor_types["CTD"],
         Dicts.probe_types['Unknown']: Dicts.sensor_types["Unknown"]
     }
 

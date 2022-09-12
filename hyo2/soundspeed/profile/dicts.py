@@ -90,6 +90,7 @@ class Dicts:
         ('MONITOR CTD', 311),
         ('MIDAS SVX2', 312),
         ('MIDAS SVP', 313),
+        ('SWiFT CTD', 314),
 
         ('Future', 999),
 
@@ -161,6 +162,7 @@ class Dicts:
         ("PDS2000", 2),
         ("QINSY", 3),
         ("KCTRL", 4),
+
     ])
 
     atlases = OrderedDict([
@@ -181,6 +183,7 @@ class Dicts:
         ("RTOFS", 2),
         ("GoMOFS", 3),  # since DB v.3
         ("WOA18", 4),  # since DB v.4
+
     ])
 
     mvp_protocols = OrderedDict([
