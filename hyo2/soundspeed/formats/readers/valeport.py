@@ -108,6 +108,10 @@ class Valeport(AbstractTextReader):
                     self.ssp.cur.meta.probe_type = Dicts.probe_types['SWiFT']
                     self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
                     continue
+                elif tokens[1] == "SWIFT CTD":
+                    self.ssp.cur.meta.probe_type = Dicts.probe_types['SWiFT CTD']
+                    self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
+                    continue
                 elif tokens[1] == "MONITOR CTD":
                     self.ssp.cur.meta.probe_type = Dicts.probe_types['MONITOR CTD']
                     self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
