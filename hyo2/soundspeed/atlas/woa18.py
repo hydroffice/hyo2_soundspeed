@@ -196,6 +196,11 @@ class Woa18(AbstractAtlas):
         lat_idx = -1
         lon_idx = -1
         for this_lat_index in lat_offsets:
+
+            if this_lat_index >= 720:
+                logger.info("skipping search for latitude higher than 89.75N (index: %d)" % 720)
+                continue
+
             for this_lon_index in lon_offsets:
 
                 if this_lon_index >= self.lon.size:

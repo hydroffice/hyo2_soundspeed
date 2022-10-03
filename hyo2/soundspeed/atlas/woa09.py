@@ -197,6 +197,11 @@ class Woa09(AbstractAtlas):
         lat_idx = -1
         lon_idx = -1
         for this_lat_index in lat_offsets:
+
+            if this_lat_index >= 180:
+                logger.info("skipping search for latitude higher than 89.5N (index: %d)" % 180)
+                continue
+
             for this_lon_index in lon_offsets:
 
                 if this_lon_index >= self.t_monthly.variables['lon'].size:
