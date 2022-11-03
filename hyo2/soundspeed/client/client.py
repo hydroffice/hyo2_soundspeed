@@ -58,6 +58,8 @@ class Client:
         if self.protocol == "QINSY":
             apply_12k = False
             tolerances = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5]
+        elif self.protocol == "PDS2000":
+            apply_12k = False
 
         tx_data = None
         for tolerance in tolerances:
