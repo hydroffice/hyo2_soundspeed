@@ -27,6 +27,7 @@ from .readers.sonardyne import Sonardyne
 from .readers.turo import Turo
 from .readers.unb import Unb
 from .readers.valeport import Valeport
+from .readers.csiro_dtc import CSIRO_DTC
 
 readers = list()
 readers.append(Aml())
@@ -52,6 +53,7 @@ readers.append(Sonardyne())
 readers.append(Turo())
 readers.append(Unb())
 readers.append(Valeport())
+readers.append(CSIRO_DTC())
 
 name_readers = list()
 ext_readers = list()
