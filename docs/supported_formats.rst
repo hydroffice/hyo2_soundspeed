@@ -12,6 +12,7 @@ AML (.csv, .aml)                                    X
 AOML (.txt)                                         X
 CARIS (.svp)                                        X    X
 Castaway (.csv)                                     X
+CSIRO DTC (.json)                                   X
 CSV (.csv)                                               X
 Digibar Pro (.txt)                                  X
 Digibar S (.csv)                                    X

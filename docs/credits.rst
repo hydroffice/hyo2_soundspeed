@@ -18,6 +18,8 @@ HydrOffice Sound Speed is developed and maintained by:
 
 Other contributors:
 
+- `Hugh Barker <mailto:hugh.barker@csiro.au>`_
+
 - `Jonathan Beaudoin <mailto:beaudoin@qps.nl>`_
 
 - `Brian R. Calder <mailto:brc@ccom.unh.edu>`_
@@ -30,7 +32,9 @@ Other contributors:
 
 - `Paul Johnson <mailto:pjohnson@ccom.unh.edu>`_
 
-- `Damian Manda <damian.manda@noaa.gov>`_
+- `Damian Manda <mailto:damian.manda@noaa.gov>`_
+
+- `Jean-Guy Nistad <mailto:jean-guy.nistad@bsh.de>`_
 
 - `Patrice Ponchant <mailto:patrice.ponchant@fugro.com>`_
 

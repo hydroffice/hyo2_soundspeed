@@ -9,6 +9,7 @@ from .readers.aoml import Aoml
 from .readers.asvp import Asvp
 from .readers.caris import Caris
 from .readers.castaway import Castaway
+from .readers.csiro_dtc import CSIRO_DTC
 from .readers.digibarpro import DigibarPro
 from .readers.digibars import DigibarS
 from .readers.elac import Elac
@@ -27,13 +28,13 @@ from .readers.sonardyne import Sonardyne
 from .readers.turo import Turo
 from .readers.unb import Unb
 from .readers.valeport import Valeport
-from .readers.csiro_dtc import CSIRO_DTC
 
 readers = list()
 readers.append(Aml())
 readers.append(Aoml())
 readers.append(Caris())
 readers.append(Castaway())
+readers.append(CSIRO_DTC())
 readers.append(DigibarPro())
 readers.append(DigibarS())
 readers.append(Elac())
@@ -53,7 +54,6 @@ readers.append(Sonardyne())
 readers.append(Turo())
 readers.append(Unb())
 readers.append(Valeport())
-readers.append(CSIRO_DTC())
 
 name_readers = list()
 ext_readers = list()
