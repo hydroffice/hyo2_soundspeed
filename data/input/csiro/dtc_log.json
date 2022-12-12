@@ -1,0 +1,51 @@
+{"message": "dtc.deployment.metadata", "data": {"principal_investigator": "Tim O'Hara", "vessel": "RV Investigator", "file_version": "1", "operation_identifier": "132", "comment": "2nd Deployment", "operator": "Trevor Goodwin", "project": "IOT - Indian Ocean Territories", "voyage_identifier": "IN2022_V08", "realtime_annotation": "NAN", "platform": "DTC MK II", "site_identifier": "NA", "units": "NA"}, "timestamp": "2022-10-15T08:10:57.854Z"}
+{"message": "dtc.sony.dsp.metadata", "data": {"Description": "Port Digital Stills", "Camera_name": "DSP", "Body_serial_number": "04470045"}, "timestamp": "2022-10-15T08:10:57.854Z"}
+{"message": "dtc.sony.dss.metadata", "data": {"Description": "Starboard Digital Stills", "Camera_name": "DSS", "Body_serial_number": "04470062"}, "timestamp": "2022-10-15T08:10:57.854Z"}
+{"message": "dtc.sony.svy.metadata", "data": {"Description": "HD Video Camera", "Camera_name": "SVY", "Body_serial_number": "04477614"}, "timestamp": "2022-10-15T08:10:57.854Z"}
+{"message": "dtc.sbe37.ctd.metadata", "data": {"CTD_type": "SBE 37", "Serial_number": "11491", "Calibration_date": "15/10/2021"}, "timestamp": "2022-10-15T08:10:57.854Z"}
+{"message": "dtc.microstrain.imu.raw", "data": "b'\\x80\\x0e\\x0e\\x0c>U/P\\xbeD\\x82\\xd9?\\xbaZ\\x16Z_ue'", "timestamp": "2022-10-15T08:10:57.916Z"}
+{"message": "dtc.microstrain.imu.eng", "data": {"roll": 11.9, "pitch": -11.0, "yaw": 83.4}, "timestamp": "2022-10-15T08:10:57.916Z"}
+{"message": "dtc.sbe37.ctd.raw", "data": "  27.2290,  5.34005,   12.952,  4.761, 33.570, 1538.309", "timestamp": "2022-10-15T08:10:57.964Z"}
+{"message": "dtc.sbe37.ctd.eng", "data": {"sea_water_temperature_celsius": "27.2290", "sea_water_electrical_conductivity": "5.34005", "sea_water_pressure": "12.952", "ml_concentration_of_dissolved_molecular_oxygen_in_seawater": "4.761", "sea_water_practical_salinity": "33.570", "speed_of_sound_in_sea_water": "1538.309"}, "timestamp": "2022-10-15T08:10:57.964Z"}
+{"message": "dtc.microstrain.imu.raw", "data": "b'\\x80\\x0e\\x0e\\x0c>S\\xcc\\xb5\\xbeB\\xdan?\\xba\\xb5z\\x04\\xfdue'", "timestamp": "2022-10-15T08:10:58.045Z"}
+{"message": "dtc.microstrain.imu.eng", "data": {"roll": 11.9, "pitch": -10.9, "yaw": 83.6}, "timestamp": "2022-10-15T08:10:58.045Z"}
+{"message": "dtc.csiro.telem.raw", "data": "$STATS,D47440,00,47235,23677,11770,23650,11770,23650,0,0,275,690,0,315> ", "timestamp": "2022-10-15T08:10:57.955Z"}
+{"message": "dtc.csiro.telem.eng", "data": {"header": "$STATS", "outputstatus": "D47440", "outputfault": "00", "bank1mV": "47235", "bank2mV": "23677", "bank3mV": "11770", "bank4mV": "23650", "bank5mV": "11770", "bank6mV": "23650", "bank1mA": "0", "bank2mA": "0", "bank3mA": "275", "bank4mA": "690", "bank5mA": "0", "bank6mA": "315"}, "timestamp": "2022-10-15T08:10:57.955Z"}
+{"message": "dtc.microstrain.imu.raw", "data": "b'\\x80\\x0e\\x0e\\x0c>Q\\x174\\xbeA\\xf4\\xf1?\\xbb\\x13\\x1ag\\xcfue'", "timestamp": "2022-10-15T08:10:58.111Z"}
+{"message": "dtc.microstrain.imu.eng", "data": {"roll": 11.7, "pitch": -10.9, "yaw": 83.7}, "timestamp": "2022-10-15T08:10:58.111Z"}
+{"message": "dtc.microstrain.imu.raw", "data": "b'\\x80\\x0e\\x0e\\x0c>NQ\\x9d\\xbeAL2?\\xbbWR\\x1c\\xb8ue'", "timestamp": "2022-10-15T08:10:58.211Z"}
+{"message": "dtc.microstrain.imu.eng", "data": {"roll": 11.5, "pitch": -10.8, "yaw": 83.9}, "timestamp": "2022-10-15T08:10:58.211Z"}
+{"message": "investigator.seapath.gps.raw", "data": "$GPGGA,081058.30,1158.541176,S,09649.009995,E,6,12,0.9,2.11,M,-39.33,M,11.0,1007*45\r\n", "timestamp": "2022-10-15T08:10:58.296Z"}
+{"message": "investigator.seapath.gps.eng", "data": {"header": "$GPGGA", "vessel_gps_time": "081058.30", "vessel_latitude": "11.975686", "vessel_latitude_indicator": "S", "vessel_longitude": "96.816833", "vessel_longitude_indicator": "E", "vessel_gps_quality": "6", "vessel_gps_satelite_number": "12", "vessel_gps_HDOP": "0.9", "vessel_gps_antenna_altitude": "2.11", "vessel_gps_antenna_altitude_unit": "M", "vessel_gps_geoidal_seperation": "-39.33", "vessel_gps_geoidal_seperation_unit": "M", "vessel_gps_differential_correction_age": "11.0", "vessel_gps_differential_reference_station_ID": "1007"}, "timestamp": "2022-10-15T08:10:58.296Z"}
+{"message": "dtc.microstrain.imu.raw", "data": "b'\\x80\\x0e\\x0e\\x0c>K\\xad=\\xbe@\\xe0b?\\xbb\\x86\\xe8\\x9d$ue'", "timestamp": "2022-10-15T08:10:58.310Z"}
+{"message": "dtc.microstrain.imu.eng", "data": {"roll": 11.4, "pitch": -10.8, "yaw": 83.9}, "timestamp": "2022-10-15T08:10:58.310Z"}
+{"message": "dtc.microstrain.imu.raw", "data": "b'\\x80\\x0e\\x0e\\x0c>I?\"\\xbeA\\x0e\\x8d?\\xbb\\xab\\xf1\\x9a\\x14ue'", "timestamp": "2022-10-15T08:10:58.411Z"}
+{"message": "dtc.microstrain.imu.eng", "data": {"roll": 11.3, "pitch": -10.8, "yaw": 84.0}, "timestamp": "2022-10-15T08:10:58.411Z"}
+{"message": "dtc.kongsberg.altimeter.raw", "data": "$SDDBT,,f,328.6426,M,,F*39", "timestamp": "2022-10-15T08:10:58.462Z"}
+{"message": "dtc.kongsberg.altimeter.eng", "data": {"header": "$SDDBT", "height": "328.6426"}, "timestamp": "2022-10-15T08:10:58.462Z"}
+{"message": "dtc.microstrain.imu.raw", "data": "b'\\x80\\x0e\\x0e\\x0c>Gg\\x04\\xbeA\\xa2M?\\xbb\\xcb\\xf0\\x15\\xf7ue'", "timestamp": "2022-10-15T08:10:58.535Z"}
+{"message": "dtc.microstrain.imu.eng", "data": {"roll": 11.2, "pitch": -10.8, "yaw": 84.1}, "timestamp": "2022-10-15T08:10:58.535Z"}
+{"message": "dtc.csiro.telem.raw", "data": "$STATS,D47440,00,47235,23677,11770,23650,11770,23650,0,0,275,680,0,375> ", "timestamp": "2022-10-15T08:10:58.429Z"}
+{"message": "dtc.csiro.telem.eng", "data": {"header": "$STATS", "outputstatus": "D47440", "outputfault": "00", "bank1mV": "47235", "bank2mV": "23677", "bank3mV": "11770", "bank4mV": "23650", "bank5mV": "11770", "bank6mV": "23650", "bank1mA": "0", "bank2mA": "0", "bank3mA": "275", "bank4mA": "680", "bank5mA": "0", "bank6mA": "375"}, "timestamp": "2022-10-15T08:10:58.429Z"}
+{"message": "dtc.microstrain.imu.raw", "data": "b'\\x80\\x0e\\x0e\\x0c>E\\x83\\xc0\\xbeB\\xecg?\\xbb\\xda\\xebZ\\xf3ue'", "timestamp": "2022-10-15T08:10:58.616Z"}
+{"message": "dtc.microstrain.imu.eng", "data": {"roll": 11.1, "pitch": -10.9, "yaw": 84.1}, "timestamp": "2022-10-15T08:10:58.616Z"}
+{"message": "dtc.microstrain.imu.raw", "data": "b'\\x80\\x0e\\x0e\\x0c>E\\x1f\\xf3\\xbeD\\\\\\xa4?\\xbb\\xea\\xd5\\xd2\\xbfue'", "timestamp": "2022-10-15T08:10:58.716Z"}
+{"message": "dtc.microstrain.imu.eng", "data": {"roll": 11.0, "pitch": -11.0, "yaw": 84.1}, "timestamp": "2022-10-15T08:10:58.716Z"}
+{"message": "dtc.microstrain.imu.raw", "data": "b'\\x80\\x0e\\x0e\\x0c>E\\x11\\xf8\\xbeFDQ?\\xbb\\xfeE\\xe4\\xd7ue'", "timestamp": "2022-10-15T08:10:58.816Z"}
+{"message": "dtc.microstrain.imu.eng", "data": {"roll": 11.0, "pitch": -11.1, "yaw": 84.2}, "timestamp": "2022-10-15T08:10:58.816Z"}
+{"message": "dtc.microstrain.imu.raw", "data": "b'\\x80\\x0e\\x0e\\x0c>E4\\x96\\xbeH\\x9b\\xb0?\\xbc\\x12\\xda\\x07vue'", "timestamp": "2022-10-15T08:10:58.917Z"}
+{"message": "dtc.microstrain.imu.eng", "data": {"roll": 11.0, "pitch": -11.2, "yaw": 84.2}, "timestamp": "2022-10-15T08:10:58.917Z"}
+{"message": "dtc.sbe37.ctd.raw", "data": "  27.2222,  5.33985,   13.279,  4.741, 33.573, 1538.303", "timestamp": "2022-10-15T08:10:58.965Z"}
+{"message": "dtc.sbe37.ctd.eng", "data": {"sea_water_temperature_celsius": "27.2222", "sea_water_electrical_conductivity": "5.33985", "sea_water_pressure": "13.279", "ml_concentration_of_dissolved_molecular_oxygen_in_seawater": "4.741", "sea_water_practical_salinity": "33.573", "speed_of_sound_in_sea_water": "1538.303"}, "timestamp": "2022-10-15T08:10:58.965Z"}
+{"message": "dtc.microstrain.imu.raw", "data": "b'\\x80\\x0e\\x0e\\x0c>E\\xdd\\xe8\\xbeKa\\xab?\\xbc|\\xf4J\\x80ue'", "timestamp": "2022-10-15T08:10:59.061Z"}
+{"message": "dtc.microstrain.imu.eng", "data": {"roll": 11.1, "pitch": -11.4, "yaw": 84.4}, "timestamp": "2022-10-15T08:10:59.061Z"}
+{"message": "dtc.microstrain.imu.raw", "data": "b'\\x80\\x0e\\x0e\\x0c>F=h\\xbeN\\x85P?\\xbc\\xd7\\x0el\\xc1ue'", "timestamp": "2022-10-15T08:10:59.120Z"}
+{"message": "dtc.microstrain.imu.eng", "data": {"roll": 11.1, "pitch": -11.6, "yaw": 84.5}, "timestamp": "2022-10-15T08:10:59.120Z"}
+{"message": "dtc.kongsberg.altimeter.raw", "data": "$SDDBT,,f,,M,,F*28", "timestamp": "2022-10-15T08:10:59.134Z"}
+{"message": "dtc.kongsberg.altimeter.eng", "data": {"header": "$SDDBT", "height": ""}, "timestamp": "2022-10-15T08:10:59.134Z"}
+{"message": "dtc.csiro.telem.raw", "data": "$STATS,D47440,00,47235,23677,11770,23650,11770,23650,0,0,275,690,0,305> ", "timestamp": "2022-10-15T08:10:59.025Z"}
+{"message": "dtc.csiro.telem.eng", "data": {"header": "$STATS", "outputstatus": "D47440", "outputfault": "00", "bank1mV": "47235", "bank2mV": "23677", "bank3mV": "11770", "bank4mV": "23650", "bank5mV": "11770", "bank6mV": "23650", "bank1mA": "0", "bank2mA": "0", "bank3mA": "275", "bank4mA": "690", "bank5mA": "0", "bank6mA": "305"}, "timestamp": "2022-10-15T08:10:59.025Z"}
+{"message": "dtc.microstrain.imu.raw", "data": "b'\\x80\\x0e\\x0e\\x0c>Fe\\x1a\\xbeQ\\xf3.?\\xbdf\\x01\\x18\\xa6ue'", "timestamp": "2022-10-15T08:10:59.237Z"}
+{"message": "dtc.microstrain.imu.eng", "data": {"roll": 11.1, "pitch": -11.7, "yaw": 84.8}, "timestamp": "2022-10-15T08:10:59.237Z"}
+{"message": "investigator.seapath.gps.raw", "data": "$GPGGA,081059.30,1158.541540,S,09649.010360,E,6,12,0.9,2.24,M,-39.33,M,12.0,1007*48\r\n", "timestamp": "2022-10-15T08:10:59.296Z"}
+{"message": "investigator.seapath.gps.eng", "data": {"header": "$GPGGA", "vessel_gps_time": "081059.30", "vessel_latitude": "11.975692", "vessel_latitude_indicator": "S", "vessel_longitude": "96.816839", "vessel_longitude_indicator": "E", "vessel_gps_quality": "6", "vessel_gps_satelite_number": "12", "vessel_gps_HDOP": "0.9", "vessel_gps_antenna_altitude": "2.24", "vessel_gps_antenna_altitude_unit": "M", "vessel_gps_geoidal_seperation": "-39.33", "vessel_gps_geoidal_seperation_unit": "M", "vessel_gps_differential_correction_age": "12.0", "vessel_gps_differential_reference_station_ID": "1007"}, "timestamp": "2022-10-15T08:10:59.296Z"}
