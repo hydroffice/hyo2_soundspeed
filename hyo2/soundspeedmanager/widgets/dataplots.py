@@ -51,7 +51,7 @@ class DataPlots(AbstractWidget):
         self.invalid_color = '#999966'
         self.woa09_color = '#ffaaaa'
         self.woa13_color = '#ffcc88'
-        self.woa18_color = '#ffee33'
+        self.woa18_color = '#e6d200'
         self.rtofs_color = '#99cc00'
         self.gomofs_color = '#6cbdbb'
         self.ref_color = '#ff6600'
