@@ -159,7 +159,7 @@ if "%1" == "latex" (
 if "%1" == "latexpdf" (
 	%SPHINXBUILD% -b latex %ALLSPHINXOPTS% %BUILDDIR%/latex
 	cd %BUILDDIR%/latex
-	pdflatex HydrOfficeSoundSpeedManager.tex
+	pdflatex SoundSpeedManager.tex
 	cd ..
 	cd ..
 	echo.

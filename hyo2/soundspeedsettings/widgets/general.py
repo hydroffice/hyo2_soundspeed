@@ -279,7 +279,7 @@ class General(AbstractWidget):
         # noinspection PyUnresolvedReferences
         self.default_vessel.editTextChanged.connect(self.apply_default_vessel)
         # noinspection PyUnresolvedReferences
-        self.default_vessel.currentIndexChanged.connect(self.apply_default_noaa_vessel)
+        self.default_vessel.currentIndexChanged.connect(self.apply_default_vessel)
         # noinspection PyUnresolvedReferences
         self.projects_folder.textChanged.connect(self.apply_custom_folders)
         # noinspection PyUnresolvedReferences
@@ -314,13 +314,6 @@ class General(AbstractWidget):
         self.db.default_vessel = self.default_vessel.currentText()
         self.setup_changed()
         self.main_win.reload_settings()
-
-    def apply_default_noaa_vessel(self):
-        # logger.debug("apply default NOAA vessel")
-        # connect this function to QComboBox currentIndexChanged event
-        # the editTextChanged event doesn't work if QComboBox is non-editable
-        if self.db.noaa_tools:
-            self.apply_default_vessel()
 
     def apply_custom_folders(self):
         # logger.debug("apply default vessel")
@@ -487,14 +480,10 @@ class General(AbstractWidget):
         # noaa tools and default_vessel
         if self.db.noaa_tools:
             self.noaa_tools.setCurrentIndex(0)  # True
-            self.default_vessel.setEditable(False)
-            if self.db.default_vessel and self.default_vessel.findText(self.db.default_vessel) < 0:
-                self.default_vessel.insertItem(0, self.db.default_vessel)
-            self.default_vessel.setCurrentIndex(self.default_vessel.findText(self.db.default_vessel))
         else:
             self.noaa_tools.setCurrentIndex(1)  # False
-            self.default_vessel.setEditable(True)
-            self.default_vessel.setEditText("%s" % self.db.default_vessel)
+
+        self.default_vessel.setEditText("%s" % self.db.default_vessel)
 
         # default_institution
         self.default_institution.setEditText("%s" % self.db.default_institution)

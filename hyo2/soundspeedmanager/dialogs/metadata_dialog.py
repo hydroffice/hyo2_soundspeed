@@ -140,8 +140,7 @@ class MetadataDialog(AbstractDialog):
         hbox.addWidget(label)
         self.vessel = QtWidgets.QComboBox()
         self.vessel.setDisabled(True)
-        if not lib.setup.noaa_tools:
-            self.vessel.setEditable(True)
+        logger.debug(lib.setup.noaa_tools)
         self.vessel.addItems(vessel_list)
         if self.lib.cur.meta.vessel and self.vessel.findText(self.lib.cur.meta.vessel) < 0:
             # noinspection PyArgumentList

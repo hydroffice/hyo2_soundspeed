@@ -31,8 +31,6 @@ class CommonMetadataDialog(AbstractDialog):
         label.setFixedWidth(lbl_width)
         hbox.addWidget(label)
         self.institution = QtWidgets.QComboBox()
-        if not lib.setup.noaa_tools:
-            self.institution.setEditable(True)
         self.institution.addItems(institution_list)
         # noinspection PyArgumentList
         self.institution.insertItem(0, "")
@@ -63,8 +61,6 @@ class CommonMetadataDialog(AbstractDialog):
         label.setFixedWidth(lbl_width)
         hbox.addWidget(label)
         self.vessel = QtWidgets.QComboBox()
-        if not lib.setup.noaa_tools:
-            self.vessel.setEditable(True)
         self.vessel.addItems(vessel_list)
         # noinspection PyArgumentList
         self.vessel.insertItem(0, "")
