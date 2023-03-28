@@ -65,6 +65,7 @@ for reader in readers:
 
 # writers
 from .writers.asvp import Asvp
+from .writers.calc import Calc
 from .writers.caris import Caris
 from .writers.csv import Csv
 from .writers.elac import Elac
@@ -77,6 +78,7 @@ from .writers.sonardyne import Sonardyne
 from .writers.unb import Unb
 
 writers = list()
+writers.append(Calc())
 writers.append(Caris())
 writers.append(Csv())
 writers.append(Elac())

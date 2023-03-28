@@ -11,7 +11,7 @@ class Calc(AbstractTextWriter):
 
     def __init__(self):
         super(Calc, self).__init__()
-        self.desc = "aml calc"
+        self.desc = "CALC"
         self._ext.add('calc')
 
     def write(self, ssp, data_path, data_file=None, project=''):
@@ -63,12 +63,12 @@ class Calc(AbstractTextWriter):
 
         last_depth = None
         for i in range(np.sum(vi)):
-            if self.ssp.cur.sis.depth[vi][i] < 0.0:
+            if self.ssp.cur.proc.depth[vi][i] < 0.0:
                 continue
-            body += "%5.1f %4.2f %1.3f\n" % (self.ssp.cur.sis.depth[vi][i],
-                                             self.ssp.cur.sis.speed[vi][i],
-                                             self.ssp.cur.sis.temp[vi][i])
-            last_depth = self.ssp.cur.sis.depth[vi][i]
+            body += "%5.1f %4.2f %1.3f\n" % (self.ssp.cur.proc.depth[vi][i],
+                                             self.ssp.cur.proc.speed[vi][i],
+                                             self.ssp.cur.proc.temp[vi][i])
+            last_depth = self.ssp.cur.proc.depth[vi][i]
 
         body += " 0  0  0\n"
         body += "*** NAV ****\n"

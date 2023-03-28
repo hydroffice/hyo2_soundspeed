@@ -8,6 +8,7 @@ Supported Formats
 =================================================== ==== =====
                         Format                      Read Write
 =================================================== ==== =====
+AML (.calc)                                              X
 AML (.csv, .aml)                                    X
 AOML (.txt)                                         X
 CARIS (.svp)                                        X    X
