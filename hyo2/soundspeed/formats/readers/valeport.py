@@ -183,6 +183,7 @@ class Valeport(AbstractTextReader):
     def _mini_header(self):
         self.tk_start_data = 'Pressure units:'
         self.tk_time = 'Now'
+        self.tk_sn = 'S/N'
 
         for line in self.lines:
             if line[:len(self.tk_start_data)] == self.tk_start_data:
@@ -225,6 +226,12 @@ class Valeport(AbstractTextReader):
                 except KeyError:
                     logger.warning("unable to recognize probe type from line #%s" % self.samples_offset)
                     self.ssp.cur.meta.sensor_type = Dicts.sensor_types['Unknown']
+                    
+                if self.tk_sn in line[len('MiniSVP:'):]:
+                    try:
+                        self.ssp.cur.meta.sn = line[len('MiniSVP:'):].split()[1]
+                    except IndexError:
+                        logger.warning("unable to parse instrument serial number from line: %s" % line)
 
             elif line[:len('RapidSVT:')] == 'RapidSVT:':
                 self.ssp.cur.meta.probe_type = Dicts.probe_types['RapidSVT']
