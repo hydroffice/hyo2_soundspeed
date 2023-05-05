@@ -127,37 +127,38 @@ Hypack
 ------
 
 The *Sound Speed* package can transmit data to *HYPACK* using *HYPACK*'s driver
-for Moving Vessel Profiler (MVP) systems (``MVP.dll``). Next figures provide a guidance on how to configure
-a Hypack project to receive data from SSP package.
+for Moving Vessel Profiler (MVP) systems (``MVP.dll`` version 23.3.0.0 and above). The next figures provide a guidance on how to configure
+a *HYPACK* 2023 project to receive data from the *Sound Speed* package.
+
+First, open an existing project or create a new project using the Project Manager or Project Wizard (see :numref:`hypack_1_fig` and :numref:`hypack_2_fig`)
 
 .. _hypack_1_fig:
 
 .. figure:: ./_static/hypack_1.png
     :width: 600px
     :align: center
-    :height: 400px
     :alt: alternate text
     :figclass: align-center
 
-    Step 1: opening the project manager.
+    The *HYPACK* Project Manager or the Project Wizard can be used to load or create a project.
 
 .. _hypack_2_fig:
 
 .. figure:: ./_static/hypack_2.png
-    :width: 300px
     :align: center
     :height: 400px
     :alt: alternate text
     :figclass: align-center
 
-    Selecting or creating a Hypack project.
+    Selecting or creating a *HYPACK* project from the Project Manager.
 
 .. _hypack_3_fig:
+
+Once your project is selected, click the *Add device* button to add the MVP driver to the list of installed drivers.
 
 .. figure:: ./_static/hypack_3.png
     :width: 600px
     :align: center
-    :height: 300px
     :alt: alternate text
     :figclass: align-center
 
@@ -168,38 +169,28 @@ a Hypack project to receive data from SSP package.
 .. figure:: ./_static/hypack_4.png
     :width: 600px
     :align: center
-    :height: 400px
     :alt: alternate text
     :figclass: align-center
 
-    Adding device drivers to a Hypack project.
+    Adding the MVP device driver.
+
+Now, configure the network parameters accordingly. In this case, *HYPACK* and the *Sound Speed* package are running on the same computer.
 
 .. _hypack_5_fig:
 
 .. figure:: ./_static/hypack_5.png
     :width: 600px
     :align: center
-    :height: 400px
     :alt: alternate text
     :figclass: align-center
 
-    Adding the MVP device driver.
+    Configuring the MVP driver. The network parameters of the driver are configured to use a UDP input protocol in a client role. The host IP address must match the address used by the computer running the *Sound Speed* package and the reception port must match the port configuration chosen in the package configuration file. The “Write Port” is left as zero.
+
+Press the *Setup* button to configure the MVP driver accordingly. See :numref:`hypack_6_fig` for a short description of the driver configuration features. 
 
 .. _hypack_6_fig:
 
 .. figure:: ./_static/hypack_6.png
-    :width: 600px
-    :align: center
-    :height: 400px
-    :alt: alternate text
-    :figclass: align-center
-
-    Configuring the MVP driver. The network parameters of the driver are configured to use a UDP input protocol in a client role. The host IP address must match the address used by the computer running SSP and the reception port must match the port configuration chosen in the package configuration file. The “Write Port” is left as zero.
-
-.. _hypack_7_fig:
-
-.. figure:: ./_static/hypack_7.png
-    :width: 600px
     :align: center
     :height: 400px
     :alt: alternate text
@@ -207,16 +198,61 @@ a Hypack project to receive data from SSP package.
 
     Additional configuration of the MVP device driver.
 
+Press the *Test Device* button to test the MVP driver together with the *Sound Speed* Package.
+
+.. _hypack_7_fig:
+
+.. figure:: ./_static/hypack_7.png
+    :align: center
+    :height: 500px
+    :alt: alternate text
+    :figclass: align-center
+
+    Testing reception capabilities in *HYPACK*. After having loaded a sample cast into the *Sound Speed* package and sent it, the profile should be visualized in *HYPACK*.
+
+Once you are satisfied that the connection between the *Sound Speed* package and *HYPACK* works, start *HYSWEEP Survey*. A new permanent window displaying the received casts should be visible (See :numref:`hypack_9_fig`). An update of the "SV From Profile" value in :numref:`hypack_8_fig` is also an indicator that *HYSWEEP Survey* has received a new cast. 
+
 .. _hypack_8_fig:
 
 .. figure:: ./_static/hypack_8.png
-    :width: 600px
+    :align: center
+    :height: 300px
+    :alt: alternate text
+    :figclass: align-center
+
+    In HYSWEEP Survey, an update of the “SV From Profile” field should occur after reception of a new cast.
+
+.. _hypack_9_fig:
+
+.. figure:: ./_static/hypack_9.png
     :align: center
     :height: 400px
     :alt: alternate text
     :figclass: align-center
 
-    Testing reception capabilities in Hypack. After having loaded a sample cast into SSP and send it, the profile should be visualized in Hypack (after clicking “Test” button).
+    In HYSWEEP, the MVP plot will display all received casts.
+
+If the MVP driver has been configured as per :numref:`hypack_6_fig`, a new sound velocity file should be visible in *HYPACK* (See :numref:`hypack_10_fig`). A target should be also be visible in both HYPACK (See :numref:`hypack_10_fig`) and in the *HYSWEEP* Map display (See :numref:`hypack_11_fig`).
+
+.. _hypack_10_fig:
+
+.. figure:: ./_static/hypack_10.png
+    :width: 700px
+    :align: center
+    :alt: alternate text
+    :figclass: align-center
+
+    In HYPACK, a new sound velocity file and a new target will appear if these options were selected in the MVP driver setup page.
+
+.. _hypack_11_fig:
+
+.. figure:: ./_static/hypack_11.png
+    :align: center
+    :height: 500px
+    :alt: alternate text
+    :figclass: align-center
+
+    In HYSWEEP, the new target corresponding to the received cast will be displayed in the Map view.
 
 
 QINSy
