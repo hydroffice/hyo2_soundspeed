@@ -221,33 +221,42 @@ class Valeport(AbstractTextReader):
 
             elif line[:len('MiniSVP:')] == 'MiniSVP:':
                 self.ssp.cur.meta.probe_type = Dicts.probe_types['MiniSVP']
-                try:
-                    self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
-                except KeyError:
-                    logger.warning("unable to recognize probe type from line #%s" % self.samples_offset)
-                    self.ssp.cur.meta.sensor_type = Dicts.sensor_types['Unknown']
-                    
-                if self.tk_sn in line[len('MiniSVP:'):]:
-                    try:
-                        self.ssp.cur.meta.sn = line[len('MiniSVP:'):].split()[1]
-                    except IndexError:
-                        logger.warning("unable to parse instrument serial number from line: %s" % line)
+                self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
+
+                tokens = line[len('MiniSVP:'):].split()
+                sn_valid = False
+                if len(tokens) == 2:
+                    if self.tk_sn in tokens[0]:
+                        self.ssp.cur.meta.sn = tokens[1]
+                        sn_valid = True
+                if not sn_valid:
+                    logger.warning("unable to parse instrument serial number from line: %s" % line)
 
             elif line[:len('RapidSVT:')] == 'RapidSVT:':
                 self.ssp.cur.meta.probe_type = Dicts.probe_types['RapidSVT']
-                try:
-                    self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
-                except KeyError:
-                    logger.warning("unable to recognize probe type from line #%s" % self.samples_offset)
-                    self.ssp.cur.meta.sensor_type = Dicts.sensor_types['Unknown']
+                self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
+
+                tokens = line[len('RapidSVT:'):].split()
+                sn_valid = False
+                if len(tokens) == 2:
+                    if self.tk_sn in tokens[0]:
+                        self.ssp.cur.meta.sn = tokens[1]
+                        sn_valid = True
+                if not sn_valid:
+                    logger.warning("unable to parse instrument serial number from line: %s" % line)
 
             elif line[:len('RapidSV:')] == 'RapidSV:':
                 self.ssp.cur.meta.probe_type = Dicts.probe_types['RapidSV']
-                try:
-                    self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
-                except KeyError:
-                    logger.warning("unable to recognize probe type from line #%s" % self.samples_offset)
-                    self.ssp.cur.meta.sensor_type = Dicts.sensor_types['Unknown']
+                self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
+
+                tokens = line[len('RapidSV:'):].split()
+                sn_valid = False
+                if len(tokens) == 2:
+                    if self.tk_sn in tokens[0]:
+                        self.ssp.cur.meta.sn = tokens[1]
+                        sn_valid = True
+                if not sn_valid:
+                    logger.warning("unable to parse instrument serial number from line: %s" % line)
 
             self.samples_offset += 1
 

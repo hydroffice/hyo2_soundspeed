@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 name = "Sound Speed Manager"
-__version__ = "2023.0.2"
+__version__ = "2023.0.3"
 __copyright__ = "Copyright 2023 University of New Hampshire, Center for Coastal and Ocean Mapping"
 
 app_info = AppInfo()
