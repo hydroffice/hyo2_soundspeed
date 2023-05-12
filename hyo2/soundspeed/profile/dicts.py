@@ -59,6 +59,9 @@ class Dicts:
         ('SeaAndSun', 118),
         ('HYPACK', 119),
         ('RBR', 120),
+        ('SST-CTD', 121),  # SeaAndSun
+        ('SST-CTP', 122),  # SeaAndSun
+        ('SST-MEM', 123),  # SeaAndSun
 
         ('Deep Blue', 200),
         ('T-10', 201),
@@ -92,7 +95,7 @@ class Dicts:
         ('MIDAS SVX2', 312),
         ('MIDAS SVP', 313),
         ('SWiFT CTD', 314),
-
+        
         ('Future', 999),
 
     ])

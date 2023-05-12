@@ -15,6 +15,13 @@ class SeaAndSun(AbstractTextReader):
     Info: https://sea-sun-tech.com/technology.html
     """
 
+    # A dictionary to resolve probe type from probe type token
+    probe_dict = {
+        'CTD': Dicts.probe_types['SST-CTD'],
+        'CTP': Dicts.probe_types['SST-CTP'],
+        'CTM': Dicts.probe_types['SST-MEM']
+    }
+    
     def __init__(self):
         super(SeaAndSun, self).__init__()
         self.desc = "SeaAndSun"
@@ -23,6 +30,7 @@ class SeaAndSun(AbstractTextReader):
         # header tokens
         self.tk_datasets = '; Datasets'
         self.tk_header = 'Sea & Sun Technology'
+        self.tk_serial = '001'
 
         # sample field tokens
         self.tk_pressure = 'Press'
@@ -39,9 +47,8 @@ class SeaAndSun(AbstractTextReader):
         self.init_data()  # create a new empty profile list
         self.ssp.append()  # append a new profile
 
-        # initialize probe/sensor type
+        # initialize sensor type
         self.ssp.cur.meta.sensor_type = Dicts.sensor_types['CTD']
-        self.ssp.cur.meta.probe_type = Dicts.probe_types['SeaAndSun']
 
         self._read(data_path=data_path, encoding='latin')  # Idronaut seems to have a specific encoding
         self._parse_header()
@@ -54,7 +61,7 @@ class SeaAndSun(AbstractTextReader):
         return True
 
     def _parse_header(self):
-        """Parsing header: field header, filename, time, latitude, longitude"""
+        """Parsing header: field header, filename, time, latitude, longitude, probe type, serial number"""
         logger.debug('parsing header')
 
         # control flags
@@ -86,20 +93,6 @@ class SeaAndSun(AbstractTextReader):
                 except Exception as e:
                     logger.info("Fail to interpret date from German: %s" % e)
                     date_string = None
-
-            elif line_idx == 7:  # vessel
-                try:
-                    self.ssp.cur.meta.vessel = line.split(':')[1].strip().replace("\"", "")
-                except Exception as e:
-                    logger.warning("unable to retrieve vessel name from %s, %s" % (line, e))
-
-            elif line_idx == 8:  # survey and date
-                if date_string is None:
-                    try:
-                        self.ssp.cur.meta.survey = line.split()[2].strip().replace("\"", "")
-                        date_string = line.split()[-1].strip()
-                    except Exception as e:
-                        logger.warning("unable to retrieve date from %s, %s" % (line, e))
 
             elif line_idx == 9:  # latitude and longitude
                 try:
@@ -134,6 +127,15 @@ class SeaAndSun(AbstractTextReader):
                 except Exception as e:
                     logger.warning("unable to retrieve longitude from %s, %s" % (line, e))
 
+            elif line_idx == 17:   # probe type and serial number
+               if line[:len(self.tk_serial)] == self.tk_serial:
+                   try:
+                       probe_sn_tokens = line.split()[1]
+                       self.ssp.cur.meta.probe_type = self.probe_dict[probe_sn_tokens[:3]]
+                       self.ssp.cur.meta.sn = probe_sn_tokens[3:]
+                   except KeyError:
+                       logger.warning("unable to recognize probe type from line #%s" % line_idx)
+                    
             if not line:  # skip empty lines
                 continue
 
