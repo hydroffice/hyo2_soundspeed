@@ -18,7 +18,7 @@ class SeaAndSun(AbstractTextReader):
     # A dictionary to resolve probe type from probe type token
     probe_dict = {
         'CTD': Dicts.probe_types['SST-CTD'],
-        'CTP': Dicts.probe_types['SST-CTP'],   # deprecated
+        'CTP': Dicts.probe_types['SST-CTP'],
         'CTM': Dicts.probe_types['SST-MEM']
     }
     

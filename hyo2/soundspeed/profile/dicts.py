@@ -56,8 +56,12 @@ class Dicts:
         ('Simrad', 115),
         ('OceanScience', 116),
         ('AML', 117),
-        ('HYPACK', 118),
-        ('RBR', 119),
+        ('SeaAndSun', 118),
+        ('HYPACK', 119),
+        ('RBR', 120),
+        ('SST-CTD', 121),  # SeaAndSun
+        ('SST-CTP', 122),  # SeaAndSun
+        ('SST-MEM', 123),  # SeaAndSun
 
         ('Deep Blue', 200),
         ('T-10', 201),
@@ -91,10 +95,6 @@ class Dicts:
         ('MIDAS SVX2', 312),
         ('MIDAS SVP', 313),
         ('SWiFT CTD', 314),
-
-        ('SST-CTD', 400),
-        ('SST-CTP', 401),   # deprecated        
-        ('SST-MEM', 402),
         
         ('Future', 999),
 
