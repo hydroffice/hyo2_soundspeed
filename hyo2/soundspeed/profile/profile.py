@@ -89,7 +89,7 @@ class Profile:
         return math.sqrt(var)
 
     def weighted_harmonic_std(self):
-        w = self.calc_weights(self.proc.speed[self.proc_valid])
+        w = self.calc_weights(self.proc.depth[self.proc_valid])
         avg = self.weighted_harmonic_mean()
         var = np.average((self.proc.speed[self.proc_valid] - avg) ** 2, weights=w)
         return math.sqrt(var)
@@ -215,17 +215,17 @@ class Profile:
 
     @property
     def proc_speed_median(self):
-        w = self.calc_weights(self.proc.speed[self.proc_valid])
+        w = self.calc_weights(self.proc.depth[self.proc_valid])
         return self.weighted_median(self.proc.speed[self.proc_valid], w)
 
     @property
     def proc_temp_median(self):
-        w = self.calc_weights(self.proc.temp[self.proc_valid])
+        w = self.calc_weights(self.proc.depth[self.proc_valid])
         return self.weighted_median(self.proc.temp[self.proc_valid], w)
 
     @property
     def proc_sal_median(self):
-        w = self.calc_weights(self.proc.sal[self.proc_valid])
+        w = self.calc_weights(self.proc.depth[self.proc_valid])
         return self.weighted_median(self.proc.sal[self.proc_valid], w)
 
     @property
@@ -239,12 +239,12 @@ class Profile:
 
     @property
     def proc_temp_mean(self):
-        w = self.calc_weights(self.proc.temp[self.proc_valid])
+        w = self.calc_weights(self.proc.depth[self.proc_valid])
         return np.average(self.proc.temp[self.proc_valid], weights=w)
 
     @property
     def proc_sal_mean(self):
-        w = self.calc_weights(self.proc.sal[self.proc_valid])
+        w = self.calc_weights(self.proc.depth[self.proc_valid])
         return np.average(self.proc.sal[self.proc_valid], weights=w)
 
     @property
@@ -258,12 +258,12 @@ class Profile:
 
     @property
     def proc_temp_std(self):
-        w = self.calc_weights(self.proc.temp[self.proc_valid])
+        w = self.calc_weights(self.proc.depth[self.proc_valid])
         return self.weighted_arithmetic_std(self.proc.temp[self.proc_valid], w)
 
     @property
     def proc_sal_std(self):
-        w = self.calc_weights(self.proc.sal[self.proc_valid])
+        w = self.calc_weights(self.proc.depth[self.proc_valid])
         return self.weighted_arithmetic_std(self.proc.sal[self.proc_valid], w)
 
     def _calc_water_salinity_threshold(self):
