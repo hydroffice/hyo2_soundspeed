@@ -19,6 +19,22 @@ This method covers both cases:
 SIS v5 settings
 ---------------
 
+Verify Data Distribution settings in SIS v5:
+
+* Open *SIS*.
+* Under *Tools* in *Parameter Setup*/*Logging*, locate the *Disable DDIST if 1* entry (see :numref:`enable_data_dist_fig`).
+* If the value of *Disable DDIST if 1* is 0, change the value to 1 and restart SIS.
+
+.. _enable_data_dist_fig:
+
+.. figure:: ./_static/enable_data_dist.png
+    :width: 640px
+    :align: center
+    :alt: figure for enabling DDist
+    :figclass: align-center
+
+    The *Disable DDIST if 1* entry under *Tools* in *Parameter Setup*/*Logging*.
+
 Under the SIS v5 installation folder, locate and execute 'DataDist.exe'. Once started, you need the following
 settings (see :numref:`data_dist_exe_fig`):
 
