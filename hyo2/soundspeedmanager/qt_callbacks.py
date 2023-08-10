@@ -298,6 +298,9 @@ class QtCallbacks(AbstractCallbacks):
 
         settings = QtCore.QSettings()
 
+        msg_lat = "Enter latitude as DD, DM, or DMS:"
+        msg_lon = "Enter longitude as DD, DM, or DMS:"        
+        
         # try to convert the passed default values
         if (default_lat is not None) and (default_lon is not None):
 
@@ -310,14 +313,28 @@ class QtCallbacks(AbstractCallbacks):
                 default_lat = 43.13555
                 default_lon = -70.9395
 
-        # if both default lat and lon are None, check if sis has position
+        # if both default lat and lon are None, check if position can be retrieved from listeners
         else:
 
+            # sis listener
             if self.sis_listener is not None:
                 if self.sis_listener.nav is not None:
                     if (self.sis_listener.nav_latitude is not None) and (self.sis_listener.nav_longitude is not None):
-                        default_lat = self.sis_listener.nav_latitude
-                        default_lon = self.sis_listener.nav_longitude
+                        if self.ask_location_from_sis():
+                            msg_lat = "Latitude retrieved from SIS listener:"
+                            msg_lon = "Longitude retrieved from SIS listener:"                            
+                            default_lat = self.sis_listener.nav_latitude
+                            default_lon = self.sis_listener.nav_longitude
+
+            # nmea listener
+            if self.nmea_listener is not None:
+                if self.nmea_listener.nav is not None:
+                    if (self.nmea_listener.nav_latitude is not None) and (self.nmea_listener.nav_longitude is not None):
+                        if self.ask_location_from_nmea():
+                            msg_lat = "Latitude retrieved from NMEA-0183 listener:"
+                            msg_lon = "Longitude retrieved from NMEA-0183 listener:"                            
+                            default_lat = self.nmea_listener.nav_latitude
+                            default_lon = self.nmea_listener.nav_longitude            
 
             if (default_lat is None) or (default_lon is None):
 
@@ -330,14 +347,14 @@ class QtCallbacks(AbstractCallbacks):
                     default_lon = -70.9395
 
         # ask user for both lat and long
+        
         lon = None
 
         # first latitude
         while True:
 
             # noinspection PyArgumentList,PyCallByClass
-            lat, ok = QtWidgets.QInputDialog.getText(self._parent, "Location", "Enter latitude as DD, DM, or DMS:",
-                                                     text="%s" % default_lat)
+            lat, ok = QtWidgets.QInputDialog.getText(self._parent, "Location", msg_lat, text="%s" % default_lat)
             if not ok:
                 lat = None
                 break
@@ -352,9 +369,7 @@ class QtCallbacks(AbstractCallbacks):
             while True:
 
                 # noinspection PyCallByClass,PyArgumentList
-                lon, ok = QtWidgets.QInputDialog.getText(self._parent, "Location",
-                                                         "Enter longitude as DD, DM, or DMS:",
-                                                         text="%s" % default_lon)
+                lon, ok = QtWidgets.QInputDialog.getText(self._parent, "Location", msg_lon, text="%s" % default_lon)
                 if not ok:
                     lat = None
                     break
@@ -481,6 +496,17 @@ class QtCallbacks(AbstractCallbacks):
         if ret == QtWidgets.QMessageBox.No:
             return False
         return True
+
+    def ask_location_from_nmea(self) -> bool:
+        """Ask user whether retrieving location from NMEA"""
+        msg = "Geographic location required for pressure/depth conversion and atlas lookup.\n" \
+              "Use geographic position from NMEA-0183?\nChoose 'no' to enter position manually."
+        # noinspection PyArgumentList,PyCallByClass
+        ret = QtWidgets.QMessageBox.information(self._parent, "Location", msg,
+                                                QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
+        if ret == QtWidgets.QMessageBox.No:
+            return False
+        return True    
 
     def ask_tss(self) -> Optional[float]:
         """Ask user for transducer sound speed"""

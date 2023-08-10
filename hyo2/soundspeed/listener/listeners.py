@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from hyo2.soundspeed.listener.sis.sis import Sis
 from hyo2.soundspeed.listener.sippican.sippican import Sippican
+from hyo2.soundspeed.listener.nmea.nmea import Nmea
 from hyo2.soundspeed.listener.mvp.mvp import Mvp
 if TYPE_CHECKING:
     from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
@@ -24,6 +25,8 @@ class Listeners:
                        timeout=self.prj.setup.sis_listen_timeout,
                        use_sis5=self.prj.setup.use_sis5)
         self.sippican = Sippican(port=self.prj.setup.sippican_listen_port, prj=prj)
+        self.nmea = Nmea(port=self.prj.setup.nmea_listen_port,
+                         timeout=self.prj.setup.nmea_listen_timeout)
         self.mvp = Mvp(port=self.prj.setup.mvp_listen_port, prj=prj)
 
     @property
@@ -72,6 +75,20 @@ class Listeners:
             logger.debug("stop")
         return not self.sippican.is_alive()
 
+    def listen_nmea(self) -> bool:
+        if not self.nmea.is_alive():
+            self.nmea.start()
+            time.sleep(0.1)
+            logger.debug("start")
+        return self.nmea.is_alive()
+
+    def stop_listen_nmea(self) -> bool:
+        if self.nmea.is_alive():
+            self.nmea.stop()
+            self.nmea.join(2)
+            logger.debug("stop")
+        return not self.nmea.is_alive()    
+
     def listen_mvp(self) -> bool:
         if not self.mvp.is_alive():
             self.mvp.start()
@@ -89,11 +106,13 @@ class Listeners:
     def stop(self) -> None:
         self.stop_listen_sis()
         self.stop_listen_sippican()
+        self.stop_listen_nmea()        
         self.stop_listen_mvp()
 
     def __repr__(self) -> str:
         msg = "<Listeners>\n"
         msg += "%s" % self.sis
         msg += "%s" % self.sippican
+        msg += "%s" % self.nmea        
         msg += "%s" % self.mvp
         return msg

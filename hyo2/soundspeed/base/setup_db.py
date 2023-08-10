@@ -464,6 +464,15 @@ class SetupDb(BaseDb):
     def use_sippican(self, value):
         self._setter_bool("use_sippican", value)
 
+    # --- use_nmea
+    @property
+    def use_nmea(self):
+        return self._getter_bool("use_nmea")
+
+    @use_nmea.setter
+    def use_nmea(self, value):
+        self._setter_bool("use_nmea", value)        
+
     # --- use_mvp
     @property
     def use_mvp(self):
@@ -526,6 +535,24 @@ class SetupDb(BaseDb):
     @sippican_listen_timeout.setter
     def sippican_listen_timeout(self, value):
         self._setter_int("sippican_listen_timeout", value)
+
+    # --- nmea_listen_port
+    @property
+    def nmea_listen_port(self):
+        return self._getter_int("nmea_listen_port")
+
+    @nmea_listen_port.setter
+    def nmea_listen_port(self, value):
+        self._setter_int("nmea_listen_port", value)
+
+    # --- nmea_listen_timeout
+    @property
+    def nmea_listen_timeout(self):
+        return self._getter_int("nmea_listen_timeout")
+
+    @nmea_listen_timeout.setter
+    def nmea_listen_timeout(self, value):
+        self._setter_int("nmea_listen_timeout", value)        
 
     # --- mvp_ip_address
     @property
