@@ -115,6 +115,42 @@ class Listeners(AbstractWidget):
         self.sippican_listen_timeout.setValidator(validator)
         hbox.addWidget(self.sippican_listen_timeout)
 
+        self.left_layout.addSpacing(12)
+
+        # NMEA
+        hbox = QtWidgets.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        hbox.addStretch()
+        self.label = QtWidgets.QLabel("NMEA-0183(*):")
+        hbox.addWidget(self.label)
+        hbox.addStretch()        
+
+        # - nmea_listen_port
+        hbox = QtWidgets.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        label = QtWidgets.QLabel("Listen port:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.nmea_listen_port = QtWidgets.QLineEdit()
+        validator = QtGui.QIntValidator(0, 99999)
+        self.nmea_listen_port.setValidator(validator)
+        hbox.addWidget(self.nmea_listen_port)
+
+        # - nmea_listen_timeout
+        hbox = QtWidgets.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        label = QtWidgets.QLabel("Listen timeout:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.nmea_listen_timeout = QtWidgets.QLineEdit()
+        validator = QtGui.QIntValidator(0, 99999)
+        self.nmea_listen_timeout.setValidator(validator)
+        hbox.addWidget(self.nmea_listen_timeout)
+        
         self.left_layout.addStretch()
 
         # RIGHT
@@ -402,6 +438,10 @@ class Listeners(AbstractWidget):
         self.sippican_listen_port.textChanged.connect(self.apply_sippican_listen_port)
         # noinspection PyUnresolvedReferences
         self.sippican_listen_timeout.textChanged.connect(self.apply_sippican_listen_timeout)
+        # noinspection PyUnresolvedReferences
+        self.nmea_listen_port.textChanged.connect(self.apply_nmea_listen_port)
+        # noinspection PyUnresolvedReferences
+        self.nmea_listen_timeout.textChanged.connect(self.apply_nmea_listen_timeout)        
         # --- right
         # noinspection PyUnresolvedReferences
         self.mvp_ip_address.textChanged.connect(self.apply_mvp_ip_address)
@@ -440,15 +480,27 @@ class Listeners(AbstractWidget):
         self.setup_changed()
         self.main_win.reload_settings()
 
+    def apply_sippican_listen_port(self):
+        # logger.debug("apply listen port")
+        self.db.sippican_listen_port = int(self.sippican_listen_port.text())
+        self.setup_changed()
+        self.main_win.reload_settings()
+        
     def apply_sippican_listen_timeout(self):
         # logger.debug("apply listen timeout")
         self.db.sippican_listen_timeout = int(self.sippican_listen_timeout.text())
         self.setup_changed()
         self.main_win.reload_settings()
 
-    def apply_sippican_listen_port(self):
+    def apply_nmea_listen_port(self):
         # logger.debug("apply listen port")
-        self.db.sippican_listen_port = int(self.sippican_listen_port.text())
+        self.db.nmea_listen_port = int(self.nmea_listen_port.text())
+        self.setup_changed()
+        self.main_win.reload_settings()
+        
+    def apply_nmea_listen_timeout(self):
+        # logger.debug("apply listen timeout")
+        self.db.nmea_listen_timeout = int(self.nmea_listen_timeout.text())
         self.setup_changed()
         self.main_win.reload_settings()
 
@@ -545,6 +597,14 @@ class Listeners(AbstractWidget):
 
         # sippican_listen_timeout
         self.sippican_listen_timeout.setText("%d" % self.db.sippican_listen_timeout)
+
+        # - NMEA
+
+        # nmea_listen_port
+        self.nmea_listen_port.setText("%d" % self.db.nmea_listen_port)
+
+        # nmea_listen_timeout
+        self.nmea_listen_timeout.setText("%d" % self.db.nmea_listen_timeout)        
 
         # - MVP
 

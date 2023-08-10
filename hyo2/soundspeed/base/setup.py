@@ -65,6 +65,7 @@ class Setup:
         self.use_sis4 = None
         self.use_sis5 = None
         self.use_sippican = None
+        self.use_nmea = None        
         self.use_mvp = None
 
         # output
@@ -78,6 +79,9 @@ class Setup:
         # listeners - sippican
         self.sippican_listen_port = None
         self.sippican_listen_timeout = None
+        # listeners - nmea
+        self.nmea_listen_port = None
+        self.nmea_listen_timeout = None        
         # listeners - mvp
         self.mvp_ip_address = None
         self.mvp_listen_port = None
@@ -158,6 +162,7 @@ class Setup:
         self.use_sis4 = db.use_sis4
         self.use_sis5 = db.use_sis5
         self.use_sippican = db.use_sippican
+        self.use_nmea = db.use_nmea        
         self.use_mvp = db.use_mvp
 
         # output
@@ -177,6 +182,10 @@ class Setup:
         # listeners - sippican
         self.sippican_listen_port = db.sippican_listen_port
         self.sippican_listen_timeout = db.sippican_listen_timeout
+
+        # listeners - nmea
+        self.nmea_listen_port = db.nmea_listen_port
+        self.nmea_listen_timeout = db.nmea_listen_timeout        
 
         # listeners - mvp
         self.mvp_ip_address = db.mvp_ip_address
@@ -243,6 +252,7 @@ class Setup:
             db.use_sis4 = self.use_sis4
             db.use_sis5 = self.use_sis5
             db.use_sippican = self.use_sippican
+            db.use_nmea = self.use_nmea            
             db.use_mvp = self.use_mvp
 
             # client list
@@ -263,6 +273,10 @@ class Setup:
             # listeners - sippican
             db.sippican_listen_port = self.sippican_listen_port
             db.sippican_listen_timeout = self.sippican_listen_timeout
+
+            # listeners - nmea
+            db.nmea_listen_port = self.nmea_listen_port
+            db.nmea_listen_timeout = self.nmea_listen_timeout            
 
             # listeners - mvp
             db.mvp_ip_address = self.mvp_ip_address
@@ -322,6 +336,7 @@ class Setup:
         msg += "      <use_sis4: %s>\n" % self.use_sis4
         msg += "      <use_sis5: %s>\n" % self.use_sis5
         msg += "      <use_sippican: %s>\n" % self.use_sippican
+        msg += "      <use_nmea: %s>\n" % self.use_nmea        
         msg += "      <use_mvp: %s>\n" % self.use_mvp
         msg += "    <output>\n"
         msg += "      <clients>\n"
@@ -334,6 +349,9 @@ class Setup:
         msg += "    <listeners - sippican>\n"
         msg += "      <sippican_listen_port: %s>\n" % self.sippican_listen_port
         msg += "      <sippican_listen_timeout: %s>\n" % self.sippican_listen_timeout
+        msg += "    <listeners - nmea>\n"
+        msg += "      <nmea_listen_port: %s>\n" % self.nmea_listen_port
+        msg += "      <nmea_listen_timeout: %s>\n" % self.nmea_listen_timeout        
         msg += "    <listeners - mvp>\n"
         msg += "      <mvp_ip_address: %s>\n" % self.mvp_ip_address
         msg += "      <mvp_listen_port: %s>\n" % self.mvp_listen_port

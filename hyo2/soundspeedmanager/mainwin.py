@@ -73,6 +73,7 @@ class MainWin(QtWidgets.QMainWindow):
         # self.check_rtofs()  # no need to wait for the download at the beginning
         self.check_sis()
         self.check_sippican()
+        self.check_nmea()        
         self.check_mvp()
 
         # init default settings
@@ -190,6 +191,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.release_checked = False
         self.old_sis_xyz_data = False
         self.old_sis_nav_data = False
+        self.old_nmea_nav_data = False        
         timer = QtCore.QTimer(self)
         # noinspection PyUnresolvedReferences
         timer.timeout.connect(self.update_gui)
@@ -455,6 +457,20 @@ class MainWin(QtWidgets.QMainWindow):
                 QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - Sippican", msg,
                                               QtWidgets.QMessageBox.Ok)
 
+    def check_nmea(self):
+        if self.lib.use_nmea():
+            if not self.lib.listen_nmea():
+                msg = 'Unable to listening NMEA-0183.\nCheck whether another process is already using the NMEA-0183 port.'
+                # noinspection PyCallByClass,PyArgumentList
+                QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - NMEA-0183", msg,
+                                              QtWidgets.QMessageBox.Ok)
+        else:
+            if not self.lib.stop_listen_nmea():
+                msg = 'Unable to stop listening Nmea.'
+                # noinspection PyCallByClass,PyArgumentList
+                QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - NMEA-0183", msg,
+                                              QtWidgets.QMessageBox.Ok)                
+
     def check_mvp(self):
         if self.lib.use_mvp():
             if not self.lib.listen_mvp():
@@ -570,6 +586,8 @@ class MainWin(QtWidgets.QMainWindow):
             tokens.append("W18")
         if self.lib.use_sippican():
             tokens.append("SIP")
+        if self.lib.use_nmea():
+            tokens.append("NMEA-0183")            
         if self.lib.use_mvp():
             tokens.append("MVP")
         if self.lib.use_sis():
@@ -667,6 +685,43 @@ class MainWin(QtWidgets.QMainWindow):
 
         return msg
 
+    def _update_gui_from_nmea_nav(self, msg: str) -> str:
+        self.old_nmea_nav_data = False
+        if self.lib.listeners.nmea.nav_last_time is not None:
+            diff_time = datetime.utcnow() - self.lib.listeners.nmea.nav_last_time
+            self.old_nmea_nav_data = diff_time.total_seconds() > (self.lib.setup.nmea_listen_timeout * 10)
+            if self.old_nmea_nav_data:
+                logger.warning("%s: navigation message is too old (%d seconds)"
+                               % (datetime.utcnow(), diff_time.total_seconds()))
+        
+        # position
+        msg += "  -  pos:"
+        if self.old_nmea_nav_data:
+            msg += "(TOO OLD)"
+        elif (self.lib.listeners.nmea.nav_latitude is None) or \
+                (self.lib.listeners.nmea.nav_longitude is None):
+            msg += "(NA, NA)"
+        else:
+            latitude = self.lib.listeners.nmea.nav_latitude
+            if latitude >= 0:
+                letter = "N"
+            else:
+                letter = "S"
+            lat_min = float(60 * math.fabs(latitude - int(latitude)))
+            lat_str = "%02d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(latitude)), lat_min, letter)
+
+            longitude = self.lib.listeners.nmea.nav_longitude
+            if longitude < 0:
+                letter = "W"
+            else:
+                letter = "E"
+            lon_min = float(60 * math.fabs(longitude - int(longitude)))
+            lon_str = "%03d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(longitude)), lon_min, letter)
+            
+            msg += "(%s, %s)" % (lat_str, lon_str)
+
+        return msg
+    
     def update_gui(self):
 
         self.timer_execs += 1
@@ -685,6 +740,8 @@ class MainWin(QtWidgets.QMainWindow):
         self.old_sis_xyz_data = False
         if self.lib.use_sis():  # in case that SIS4 and SIS5 are enabled
             msg = self._update_gui_from_sis(msg=msg)
+        elif self.lib.use_nmea():  # in case that the NMEA listener is enabled
+            msg = self._update_gui_from_nmea_nav(msg=msg)
         self.statusBar().showMessage(msg, 2000)
 
         if self.lib.has_ssp():
@@ -716,7 +773,7 @@ class MainWin(QtWidgets.QMainWindow):
             if self.lib.has_mvp_to_process() or self.lib.has_sippican_to_process():
                 self.statusBar().setStyleSheet(self.orange_stylesheet)
             else:
-                if self.old_sis_nav_data or self.old_sis_xyz_data:
+                if self.old_sis_nav_data or self.old_sis_xyz_data or self.old_nmea_nav_data:
                     self.statusBar().setStyleSheet(self.purple_stylesheet)
                 else:
                     self.statusBar().setStyleSheet(self.normal_stylesheet)

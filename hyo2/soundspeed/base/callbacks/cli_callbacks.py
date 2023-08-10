@@ -170,6 +170,17 @@ class CliCallbacks(AbstractCallbacks):
             return True
         return False
 
+    def ask_location_from_nmea(self) -> bool:
+        """Ask user whether retrieving location from NMEA-0183"""
+        bool_msg = "Geographic location required for pressure/depth conversion and atlas lookup.\n" \
+                   "Use geographic position from NMEA-0183?\'y' for yes, other inputs to enter position manually."
+
+        raw = input(bool_msg)
+        # print(raw)
+        if (raw == "Y") or (raw == "y"):
+            return True
+        return False    
+
     def ask_tss(self) -> Optional[float]:
         """Ask user for transducer sound speed"""
         tss = 1500.0

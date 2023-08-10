@@ -82,6 +82,7 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      use_sis integer NOT NULL DEFAULT 1,
      use_sis5 integer NOT NULL DEFAULT 0,
      use_sippican integer NOT NULL DEFAULT 0,
+     use_nmea integer NOT NULL DEFAULT 0,
      use_mvp integer NOT NULL DEFAULT 0,
      /* listeners - sis4 */
      sis_listen_port integer NOT NULL DEFAULT 16103,
@@ -90,6 +91,9 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      /* listeners - sippican */
      sippican_listen_port integer NOT NULL DEFAULT 2002,
      sippican_listen_timeout integer NOT NULL DEFAULT 10,
+     /* listeners - nmea */
+     nmea_listen_port integer NOT NULL DEFAULT 2006,
+     nmea_listen_timeout integer NOT NULL DEFAULT 10,
      /* listeners - mvp */
      mvp_ip_address text NOT NULL DEFAULT "127.0.0.1",
      mvp_listen_port integer NOT NULL DEFAULT 2006,
@@ -173,13 +177,13 @@ V1_V5_COPY_SETTINGS = """-- noinspection SqlResolveForFile
     INSERT INTO  general 
     (id, setup_name, setup_status, use_woa09, use_woa13, use_woa18, use_rtofs, 
     ssp_extension_source, ssp_salinity_source, ssp_temp_sal_source, ssp_up_or_down, rx_max_wait_time,
-    use_sis, use_sippican, use_mvp, sis_listen_port, sis_listen_timeout,
-    sis_auto_apply_manual_casts, sippican_listen_port, sippican_listen_timeout, mvp_ip_address,
-    mvp_listen_port, mvp_listen_timeout, mvp_transmission_protocol, mvp_format, mvp_winch_port,
-    mvp_fish_port, mvp_nav_port, mvp_system_port, mvp_sw_version, mvp_instrument_id, mvp_instrument,
-    server_source, server_apply_surface_sound_speed, current_project, custom_projects_folder,
-    custom_outputs_folder, custom_woa09_folder, custom_woa13_folder, noaa_tools, default_institution,
-    default_survey, default_vessel, auto_apply_default_metadata) 
+    use_sis, use_sippican, use_nmea, use_mvp, sis_listen_port, sis_listen_timeout,
+    sis_auto_apply_manual_casts, sippican_listen_port, sippican_listen_timeout, nmea_listen_port,
+    nmea_listen_timeout, mvp_ip_address, mvp_listen_port, mvp_listen_timeout, mvp_transmission_protocol,
+    mvp_format, mvp_winch_port, mvp_fish_port, mvp_nav_port, mvp_system_port, mvp_sw_version,
+    mvp_instrument_id, mvp_instrument, server_source, server_apply_surface_sound_speed, current_project,
+    custom_projects_folder, custom_outputs_folder, custom_woa09_folder, custom_woa13_folder, noaa_tools,
+    default_institution, default_survey, default_vessel, auto_apply_default_metadata) 
     SELECT 
     id, setup_name, setup_status, 
     CASE WHEN typeof(use_woa09) == 'text' THEN
@@ -213,6 +217,11 @@ V1_V5_COPY_SETTINGS = """-- noinspection SqlResolveForFile
     ELSE
         use_sippican
     END,
+    CASE WHEN typeof(use_nmea) == 'text' THEN
+        use_nmea == 'True'
+    ELSE
+        use_nmea
+    END,
     CASE WHEN typeof(use_mvp) == 'text' THEN
         use_mvp == 'True'
     ELSE
@@ -225,6 +234,7 @@ V1_V5_COPY_SETTINGS = """-- noinspection SqlResolveForFile
         sis_auto_apply_manual_casts
     END, 
     sippican_listen_port, sippican_listen_timeout, 
+    nmea_listen_port, nmea_listen_timeout, 
     mvp_ip_address, mvp_listen_port, mvp_listen_timeout, mvp_transmission_protocol, mvp_format, mvp_winch_port,
     mvp_fish_port, mvp_nav_port, mvp_system_port, mvp_sw_version, mvp_instrument_id, mvp_instrument,
     server_source, 

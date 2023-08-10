@@ -285,6 +285,26 @@ class Input(AbstractWidget):
         vbox.addWidget(self.use_sippican)
         vbox.addStretch()
 
+        # - use nmea
+        hbox = QtWidgets.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        # -- label
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtWidgets.QLabel("Listen NMEA-0183:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- value
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.use_nmea = QtWidgets.QComboBox()
+        self.use_nmea.addItems(["True", "False"])
+        vbox.addWidget(self.use_nmea)
+        vbox.addStretch()        
+
         # - use mvp
         hbox = QtWidgets.QHBoxLayout()
         self.right_layout.addLayout(hbox)
@@ -396,6 +416,8 @@ class Input(AbstractWidget):
         # noinspection PyUnresolvedReferences
         self.use_sippican.currentIndexChanged.connect(self.apply_use_sippican)
         # noinspection PyUnresolvedReferences
+        self.use_nmea.currentIndexChanged.connect(self.apply_use_nmea)
+        # noinspection PyUnresolvedReferences        
         self.use_mvp.currentIndexChanged.connect(self.apply_use_mvp)
         # noinspection PyUnresolvedReferences
         self.rx_max_wait_time.textChanged.connect(self.apply_rx_max_wait_time)
@@ -494,6 +516,12 @@ class Input(AbstractWidget):
         self.setup_changed()
         self.main_win.reload_settings()
 
+    def apply_use_nmea(self):
+        # logger.debug("apply use Nmea")
+        self.db.use_nmea = self.use_nmea.currentText() == "True"
+        self.setup_changed()
+        self.main_win.reload_settings()        
+
     def apply_use_mvp(self):
         # logger.debug("apply use MVP")
         self.db.use_mvp = self.use_mvp.currentText() == "True"
@@ -575,6 +603,12 @@ class Input(AbstractWidget):
             self.use_sippican.setCurrentIndex(0)  # True
         else:
             self.use_sippican.setCurrentIndex(1)  # False
+
+        # use nmea
+        if self.db.use_nmea:
+            self.use_nmea.setCurrentIndex(0)  # True
+        else:
+            self.use_nmea.setCurrentIndex(1)  # False            
 
         # use mvp
         if self.db.use_mvp:

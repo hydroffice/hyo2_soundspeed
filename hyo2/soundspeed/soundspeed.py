@@ -70,6 +70,7 @@ class SoundSpeedLibrary:
         self.check_custom_folders()
         self.listeners = Listeners(prj=self)
         self.cb.sis_listener = self.listeners.sis  # to provide default values from SIS (if available)
+        self.cb.nmea_listener = self.listeners.nmea  # to provide default values from NMEA (if available)
         self.server = Server(prj=self)
 
         # logger.info("** > LIB: initialized!")
@@ -394,18 +395,18 @@ class SoundSpeedLibrary:
 
     # --- listeners
 
-    def has_mvp_to_process(self) -> bool:
-        if not self.use_mvp():
-            return False
-
-        return self.listeners.mvp_to_process
-
     def has_sippican_to_process(self) -> bool:
         if not self.use_sippican():
             return False
 
         return self.listeners.sippican_to_process
 
+    def has_mvp_to_process(self) -> bool:
+        if not self.use_mvp():
+            return False
+
+        return self.listeners.mvp_to_process
+    
     # --- import data
 
     def import_data(self, data_path: str, data_format: str, skip_atlas: bool = False) -> None:
@@ -953,6 +954,34 @@ class SoundSpeedLibrary:
         self.ssp = ssp_list
         self.progress.end()
 
+    def retrieve_nmea(self) -> None:
+        """Retrieve data from NMEA"""
+        if not self.use_nmea():
+            raise RuntimeError("use NMEA option is disabled")
+
+        self.progress.start(text="Retrieve from NMEA")
+
+        if not self.listen_nmea():
+            raise RuntimeError("unable to listen NMEA")
+
+        # try to retrieve the location from NMEA
+        lat = None
+        lon = None
+        if self.listeners.nmea.nav:
+            from_nmea = self.cb.ask_location_from_nmea()
+            if from_nmea:
+                lat, lon = self.listeners.nmea.nav_latitude, self.listeners.nmea.nav_longitude
+        # if we don't have a location, ask user
+        if (lat is None) or (lon is None):
+            lat, lon = self.cb.ask_location()
+            if (lat is None) or (lon is None):
+                self.progress.end()
+                raise RuntimeError("missing geographic location required for database lookup")
+
+        ssp.meta.latitude = lat
+        ssp.meta.longitude = lon
+        self.progress.end()
+        
     # --- export data
 
     def export_data(self, data_formats: list, data_paths: Optional[dict],
@@ -2081,6 +2110,9 @@ class SoundSpeedLibrary:
     def use_sippican(self) -> bool:
         return self.setup.use_sippican
 
+    def use_nmea(self) -> bool:
+        return self.setup.use_nmea    
+
     def use_mvp(self) -> bool:
         return self.setup.use_mvp
 
@@ -2090,6 +2122,9 @@ class SoundSpeedLibrary:
     def listen_sippican(self) -> bool:
         return self.listeners.listen_sippican()
 
+    def listen_nmea(self) -> bool:
+        return self.listeners.listen_nmea()    
+
     def listen_mvp(self) -> bool:
         return self.listeners.listen_mvp()
 
@@ -2098,6 +2133,9 @@ class SoundSpeedLibrary:
 
     def stop_listen_sippican(self) -> bool:
         return self.listeners.stop_listen_sippican()
+
+    def stop_listen_nmea(self) -> bool:
+        return self.listeners.stop_listen_nmea()    
 
     def stop_listen_mvp(self) -> bool:
         return self.listeners.stop_listen_mvp()

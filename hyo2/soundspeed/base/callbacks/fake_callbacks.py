@@ -55,6 +55,9 @@ class FakeCallbacks(AbstractCallbacks):
     def ask_location_from_sis(self) -> bool:
         return True
 
+    def ask_location_from_nmea(self) -> bool:
+        return True    
+
     def ask_tss(self) -> Optional[float]:
         return 1500.0
 
