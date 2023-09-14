@@ -1,9 +1,9 @@
 import numpy as np
 import logging
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeed.formats.writers.abstract import AbstractTextWriter
+
+logger = logging.getLogger(__name__)
 
 
 class Csv(AbstractTextWriter):
@@ -54,6 +54,6 @@ class Csv(AbstractTextWriter):
         # logger.debug('generating body')
         vi = self.ssp.cur.proc_valid
         for idx in range(np.sum(vi)):
-            self.fod.io.write("%.2f,%.2f,%.2f,%.2f\n"
+            self.fod.io.write("%.3f,%.3f,%.3f,%.3f\n"
                               % (self.ssp.cur.proc.depth[vi][idx], self.ssp.cur.proc.speed[vi][idx],
                                  self.ssp.cur.proc.sal[vi][idx], self.ssp.cur.proc.temp[vi][idx]))
