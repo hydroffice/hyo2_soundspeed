@@ -51,4 +51,4 @@ Other contributors:
 Feel free to contact us for comments and suggestions.
 
 
-For bugs and feature requests: `hydroffice.soundspeed@ccom.unh.edu <mailto:hydroffice.soundspeed@ccom.unh.edu>`_
+For bugs and feature requests: `soundspeed@hydroffice.org <mailto:soundspeed@hydroffice.org>`_
