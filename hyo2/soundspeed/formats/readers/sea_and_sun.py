@@ -61,7 +61,7 @@ class SeaAndSun(AbstractTextReader):
         return True
 
     def _parse_header(self):
-        """Parsing header: field header, filename, time, latitude, longitude, probe type, serial number"""
+        """Parsing header: field header, filename, time, probe type, serial number"""
         logger.debug('parsing header')
 
         # control flags
@@ -93,39 +93,6 @@ class SeaAndSun(AbstractTextReader):
                 except Exception as e:
                     logger.info("Fail to interpret date from German: %s" % e)
                     date_string = None
-
-            elif line_idx == 9:  # latitude and longitude
-                try:
-                    lat_str = line[21:34]
-                    lat_tokens = lat_str.split()
-                    # logger.debug("lat: %s" % (lat_tokens,))
-                    lat_deg = int(lat_tokens[0].split('\xb0')[0])
-                    lat_min = float(lat_tokens[1].split('\'')[0])
-                    if lat_tokens[2] == "S":
-                        lat_sign = -1.0
-                    else:
-                        lat_sign = 1.0
-
-                    self.ssp.cur.meta.latitude = lat_sign * (lat_deg + lat_min / 60.0)
-
-                except Exception as e:
-                    logger.warning("unable to retrieve latitude from %s, %s" % (line, e))
-
-                try:
-                    lon_str = line[47:60]
-                    lon_tokens = lon_str.split()
-                    # logger.debug("lon: %s" % (lon_tokens,))
-                    lon_deg = int(lon_tokens[0].split('\xb0')[0])
-                    lon_min = float(lon_tokens[1].split('\'')[0])
-                    if lon_tokens[2] == "W":
-                        lon_sign = -1.0
-                    else:
-                        lon_sign = 1.0
-
-                    self.ssp.cur.meta.longitude = lon_sign * (lon_deg + lon_min / 60.0)
-
-                except Exception as e:
-                    logger.warning("unable to retrieve longitude from %s, %s" % (line, e))
 
             elif line_idx == 17:   # probe type and serial number
                if line[:len(self.tk_serial)] == self.tk_serial:
