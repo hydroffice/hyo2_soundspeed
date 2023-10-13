@@ -23,6 +23,7 @@ class Valeport(AbstractTextReader):
         Dicts.probe_types['MIDAS SVX2 3000']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MIDAS SVX2 6000']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['MiniSVP']: Dicts.sensor_types["SVPT"],
+        Dicts.probe_types['MiniCTD']: Dicts.sensor_types["CTD"],        
         Dicts.probe_types['MONITOR CTD']: Dicts.sensor_types["CTD"],
         Dicts.probe_types['MONITOR SVP 500']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['RapidSV']: Dicts.sensor_types["SVP"],
@@ -195,7 +196,7 @@ class Valeport(AbstractTextReader):
                     if ' dBar' in line[len(self.tk_start_data):]:
                         self.ssp.cur.meta.pressure_uom = Dicts.uom_symbols['decibar']
                     self.minisvp_has_depth = False
-                logger.info("MiniSVP/RapidSVT has depth: %s" % self.minisvp_has_depth)
+                logger.info("MiniSVP/MiniCTD/RapidSVT has depth: %s" % self.minisvp_has_depth)
                 break
 
             elif line[:len(self.tk_time)] == self.tk_time:
@@ -231,6 +232,19 @@ class Valeport(AbstractTextReader):
                         sn_valid = True
                 if not sn_valid:
                     logger.warning("unable to parse instrument serial number from line: %s" % line)
+
+            elif line[:len('MiniCTD:')] == 'MiniCTD:':
+                self.ssp.cur.meta.probe_type = Dicts.probe_types['MiniCTD']
+                self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
+
+                tokens = line[len('MiniCTD:'):].split()
+                sn_valid = False
+                if len(tokens) == 2:
+                    if self.tk_sn in tokens[0]:
+                        self.ssp.cur.meta.sn = tokens[1]
+                        sn_valid = True
+                if not sn_valid:
+                    logger.warning("unable to parse instrument serial number from line: %s" % line)                    
 
             elif line[:len('RapidSVT:')] == 'RapidSVT:':
                 self.ssp.cur.meta.probe_type = Dicts.probe_types['RapidSVT']
@@ -340,7 +354,7 @@ class Valeport(AbstractTextReader):
         if os.path.splitext(self.fid.path)[-1] in [".vpd", ".vp2"]:
             self._vp2_body()
 
-        elif self.lines[0][:3] == 'Now':  # MiniSVP
+        elif self.lines[0][:3] == 'Now':  # MiniSVP or MiniCTD
             self._mini_body()
 
         else:  # MIDAS or Monitor
@@ -460,7 +474,33 @@ class Valeport(AbstractTextReader):
                     self.ssp.cur.data.pressure[count] = z
                 self.ssp.cur.data.speed[count] = speed
 
-            else:
+            elif self.ssp.cur.meta.probe_type == Dicts.probe_types['MiniCTD']:
+                if len(data) != 3:
+                    logger.warning("unexpected number of fields: %d" % len(data))
+                    continue
+
+                try:
+                    z = float(data[0])
+                    temp = float(data[1])
+                    sal = float(data[2])
+                except ValueError:
+                    logger.error("unable to parse line: %s" % line)
+                    continue
+
+                # Skipping invalid data (above water, negative temperature or negative salinity)
+                if (z < 0.0) or (temp < -2.0) or (temp > 100.0) or (sal < 0.0) \
+                        or (sal > 50.0):
+                    logger.warning("skipping invalid values: %.1f %.1f %.1f" % (z, temp, sal))
+                    continue
+
+                if self.minisvp_has_depth:
+                    self.ssp.cur.data.depth[count] = z
+                else:
+                    self.ssp.cur.data.pressure[count] = z
+                self.ssp.cur.data.temp[count] = temp
+                self.ssp.cur.data.sal[count] = sal
+
+            elif self.ssp.cur.meta.probe_type == Dicts.probe_types['MiniSVP']:
                 if len(data) != 3:
                     logger.warning("unexpected number of fields: %d" % len(data))
                     continue
