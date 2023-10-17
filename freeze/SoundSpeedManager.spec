@@ -115,7 +115,7 @@ ssm_data = collect_pkg_data('hyo2.soundspeedmanager')
 sss_data = collect_pkg_data('hyo2.soundspeedsettings')
 try:
     sdm_data = collect_pkg_data('hyo2.surveydatamonitor')
-except ImportError:
+except ValueError:
     print("skipping hyo2.surveydatamonitor")
     sdm_data = TOC()
 
