@@ -2,11 +2,11 @@ import datetime as dt
 import locale
 import logging
 
-logger = logging.getLogger(__name__)
-
 from hyo2.soundspeed.formats.readers.abstract import AbstractTextReader
 from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
+
+logger = logging.getLogger(__name__)
 
 
 class SeaAndSun(AbstractTextReader):

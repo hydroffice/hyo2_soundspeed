@@ -1,14 +1,13 @@
+import logging
 import os
-import numpy as np
-
-# noinspection PyUnresolvedReferences
-from PySide2 import QtWidgets
-from matplotlib import rc_context
 
 import cartopy.crs as ccrs
-from cartopy.feature import NaturalEarthFeature
 import matplotlib.pyplot as plt
-import logging
+import numpy as np
+# noinspection PyUnresolvedReferences
+from PySide2 import QtWidgets
+from cartopy.feature import NaturalEarthFeature
+from matplotlib import rc_context
 
 logger = logging.getLogger(__name__)
 
@@ -296,12 +295,15 @@ class PlotDb:
             date_plots[date] = 0
             fig, ax = plt.subplots(num=date_list.index(date))
             ax.invert_yaxis()
-            logger.info("create: %s" % date_list.index(date))
+            logger.info("created plot #%d" % date_list.index(date))
 
         # plot each profile
+        max_depth = None
+        min_speed = None
+        max_speed = None
         for row in rows:
             row_date = row[1].date()  # 1 is the cast_datetime
-            logger.info("plot: %s" % date_list.index(row_date))
+            logger.info("added profile to plot #%d" % date_list.index(row_date))
             date_plots[row_date] += 1
 
             fig = plt.figure(date_list.index(row_date))
@@ -310,15 +312,45 @@ class PlotDb:
                                    row_ssp.cur.proc.depth[row_ssp.cur.proc_valid],
                                    label='%s [%04d]' % (row[1].time(), row[0]))
 
+            # check max depth
+            max_d = np.max(row_ssp.cur.proc.depth[row_ssp.cur.proc_valid])
+            if not max_depth:
+                max_depth = max_d
+            else:
+                if max_d > max_depth:
+                    max_depth = max_d
+
+            # check min sound speed
+            min_s = np.min(row_ssp.cur.proc.speed[row_ssp.cur.proc_valid])
+            if not min_speed:
+                min_speed = min_s
+            else:
+                if min_s < min_speed:
+                    min_speed = min_s
+
+            # check max sound speed
+            max_s = np.max(row_ssp.cur.proc.speed[row_ssp.cur.proc_valid])
+            if not max_speed:
+                max_speed = max_s
+            else:
+                if max_s > max_speed:
+                    max_speed = max_s
+
         # print(date_plots)
+        y_max = max_depth * 1.05
+        logger.debug("y lim: %s, 0" % y_max)
+        dx = max_speed * 0.05
+        x_min = min_speed - dx
+        x_max = max_speed + dx
+        logger.debug("x lim: %s, %s" % (x_min, x_max))
 
         # finishing up the plots
         for date in date_list:
             fig = plt.figure(date_list.index(date))
 
             plt.title("Day #%s: %s (profiles: %s)" % (date_list.index(date) + 1, date, date_plots[date]))
-            fig.get_axes()[0].set_xlim(1440, 1580)
-            fig.get_axes()[0].set_ylim(780, 0)
+            fig.get_axes()[0].set_xlim(x_min, x_max)
+            fig.get_axes()[0].set_ylim(y_max, 0)
             plt.xlabel('Sound Speed [m/s]', fontsize=10)
             plt.ylabel('Depth [m]', fontsize=10)
             plt.grid()
