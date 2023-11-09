@@ -21,7 +21,7 @@ class SeaAndSun(AbstractTextReader):
         'CTP': Dicts.probe_types['SST-CTP'],
         'CTM': Dicts.probe_types['SST-MEM']
     }
-    
+
     def __init__(self):
         super(SeaAndSun, self).__init__()
         self.desc = "SeaAndSun"
@@ -91,18 +91,18 @@ class SeaAndSun(AbstractTextReader):
                     date_string = date_tuple.strftime("%d.%m.%Y")
                     locale.setlocale(locale.LC_TIME, old_loc)
                 except Exception as e:
-                    logger.info("Fail to interpret date from German: %s" % e)
+                    logger.info("unable to interpret date using German locale: %s" % e)
                     date_string = None
 
-            elif line_idx == 17:   # probe type and serial number
-               if line[:len(self.tk_serial)] == self.tk_serial:
-                   try:
-                       probe_sn_tokens = line.split()[1]
-                       self.ssp.cur.meta.probe_type = self.probe_dict[probe_sn_tokens[:3]]
-                       self.ssp.cur.meta.sn = probe_sn_tokens[3:]
-                   except KeyError:
-                       logger.warning("unable to recognize probe type from line #%s" % line_idx)
-                    
+            elif line_idx == 17:  # probe type and serial number
+                if line[:len(self.tk_serial)] == self.tk_serial:
+                    try:
+                        probe_sn_tokens = line.split()[1]
+                        self.ssp.cur.meta.probe_type = self.probe_dict[probe_sn_tokens[:3]]
+                        self.ssp.cur.meta.sn = probe_sn_tokens[3:]
+                    except KeyError:
+                        logger.warning("unable to recognize probe type from line #%s" % line_idx)
+
             if not line:  # skip empty lines
                 continue
 
@@ -130,10 +130,11 @@ class SeaAndSun(AbstractTextReader):
 
         if (time_string is not None) and (date_string is not None):
             try:
-                self.ssp.cur.meta.utc_time = dt.datetime.strptime(date_string + ' ' + time_string, "%d.%m.%Y %H:%M:%S")
+                timestamp = "%s %s" % (date_string, time_string)
+                self.ssp.cur.meta.utc_time = dt.datetime.strptime(timestamp, "%d.%m.%Y %H:%M:%S")
 
-            except Exception:
-                logger.warning("issue in retrieving the timestamp")
+            except Exception as e:
+                logger.warning("issue in retrieving the timestamp: %s" % e)
 
         # sample fields checks
         if not has_pressure:
