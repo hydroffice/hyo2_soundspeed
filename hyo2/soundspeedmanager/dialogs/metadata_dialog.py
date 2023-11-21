@@ -139,6 +139,7 @@ class MetadataDialog(AbstractDialog):
         label.setFixedWidth(lbl_width)
         hbox.addWidget(label)
         self.vessel = QtWidgets.QComboBox()
+        self.vessel.setEditable(True)
         self.vessel.setDisabled(True)
         logger.debug(lib.setup.noaa_tools)
         self.vessel.addItems(vessel_list)
