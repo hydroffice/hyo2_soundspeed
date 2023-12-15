@@ -3,7 +3,7 @@ import os
 import re
 import logging
 from typing import Optional
-from PySide2 import QtCore, QtWidgets
+from PySide6 import QtCore, QtWidgets
 
 from hyo2.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
 from hyo2.soundspeedmanager.dialogs.formatted_input_dialog import FormattedInputDialog

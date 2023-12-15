@@ -1,9 +1,9 @@
 import os
 import logging
 
-from PySide2 import QtCore, QtWidgets
+from PySide6 import QtCore, QtWidgets
 
-from hyo2.abc.lib.helper import Helper
+from hyo2.abc2.lib.helper import Helper
 from hyo2.soundspeed import lib_info
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
 

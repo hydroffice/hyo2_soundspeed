@@ -1,12 +1,12 @@
 import logging
 import os
 
-from hyo2.abc.app.app_info import AppInfo
-from hyo2.abc.lib.lib_info import LibInfo
+from hyo2.abc2.app.app_info import AppInfo
+from hyo2.abc2.lib.lib_info import LibInfo
 
 
 name = "SSM-SIS"
-__version__ = '1.1.0'
+__version__ = '1.2.0'
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

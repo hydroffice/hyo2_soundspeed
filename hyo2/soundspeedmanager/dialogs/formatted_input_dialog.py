@@ -1,4 +1,4 @@
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 import logging
 
@@ -9,8 +9,10 @@ class FormattedInputDialog(QtWidgets.QDialog):
     def __init__(self, parent, title="", msg="", default="", fmt=""):
         super(FormattedInputDialog, self).__init__(parent, f=QtCore.Qt.WindowTitleHint)
         self.setWindowTitle(title)
-        rex = QtCore.QRegExp(fmt)
-        self.validator = QtGui.QRegExpValidator(rex)
+        rex = QtCore.QRegularExpression(fmt)
+        if not rex.isValid():
+            logger.warning(rex.errorString())
+        self.validator = QtGui.QRegularExpressionValidator(rex)
         self.line_edit = QtWidgets.QLineEdit(default)
 
         label = QtWidgets.QLabel(msg)

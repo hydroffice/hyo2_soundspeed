@@ -1,22 +1,20 @@
-import numpy as np
-import os
 import logging
+import os
 
-from PySide2 import QtCore, QtGui, QtWidgets
-
-from hyo2.soundspeedmanager.widgets.widget import AbstractWidget
+import numpy as np
+from PySide6 import QtCore, QtGui, QtWidgets
+from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeedmanager.dialogs.automate_dialog import AutomateDialog
 from hyo2.soundspeedmanager.dialogs.buttons_dialog import ButtonsDialog
-from hyo2.soundspeedmanager.dialogs.import_single_profile_dialog import ImportSingleProfileDialog
 from hyo2.soundspeedmanager.dialogs.constant_gradient_profile_dialog import ConstantGradientProfileDialog
-from hyo2.soundspeedmanager.dialogs.reference_dialog import ReferenceDialog
-from hyo2.soundspeedmanager.dialogs.spreadsheet_dialog import SpreadSheetDialog
-from hyo2.soundspeedmanager.dialogs.metadata_dialog import MetadataDialog
 from hyo2.soundspeedmanager.dialogs.export_single_profile_dialog import ExportSingleProfileDialog
-from hyo2.soundspeedmanager.widgets.dataplots import DataPlots
+from hyo2.soundspeedmanager.dialogs.import_single_profile_dialog import ImportSingleProfileDialog
+from hyo2.soundspeedmanager.dialogs.metadata_dialog import MetadataDialog
+from hyo2.soundspeedmanager.dialogs.reference_dialog import ReferenceDialog
 from hyo2.soundspeedmanager.dialogs.seacat_dialog import SeacatDialog
-
-from hyo2.soundspeed.profile.dicts import Dicts
+from hyo2.soundspeedmanager.dialogs.spreadsheet_dialog import SpreadSheetDialog
+from hyo2.soundspeedmanager.widgets.dataplots import DataPlots
+from hyo2.soundspeedmanager.widgets.widget import AbstractWidget
 
 logger = logging.getLogger(__name__)
 
@@ -44,8 +42,8 @@ class Editor(AbstractWidget):
         self.input_bar.setIconSize(QtCore.QSize(40, 40))
 
         # import
-        self.input_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'input.png')),
-                                           'Import Input Data', self)
+        self.input_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'input.png')),
+                                       'Import Input Data', self)
         self.input_act.setShortcut('Alt+I')
         # noinspection PyUnresolvedReferences
         self.input_act.triggered.connect(self.on_input_data)
@@ -53,8 +51,8 @@ class Editor(AbstractWidget):
         self.main_win.file_menu.addAction(self.input_act)
 
         # import
-        self.create_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'constant_gradient.png')),
-                                            'Constant-gradient Profile', self)
+        self.create_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'constant_gradient.png')),
+                                        'Constant-gradient Profile', self)
         # self.create_act.setShortcut('Alt+G')
         # noinspection PyUnresolvedReferences
         self.create_act.triggered.connect(self.on_create_data)
@@ -62,8 +60,8 @@ class Editor(AbstractWidget):
         self.main_win.file_menu.addAction(self.create_act)
 
         # clear
-        self.clear_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'clear.png')),
-                                           'Clear Data', self)
+        self.clear_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'clear.png')),
+                                       'Clear Data', self)
         self.clear_act.setShortcut('Alt+C')
         # noinspection PyUnresolvedReferences
         self.clear_act.triggered.connect(self.on_clear_data)
@@ -72,8 +70,8 @@ class Editor(AbstractWidget):
         self.input_bar.addAction(self.clear_act)
 
         # set ref
-        self.set_ref_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'ref.png')),
-                                             'Reference Cast', self)
+        self.set_ref_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'ref.png')),
+                                         'Reference Cast', self)
         self.set_ref_act.setShortcut('Alt+R')
         # noinspection PyUnresolvedReferences
         self.set_ref_act.triggered.connect(self.on_set_ref)
@@ -82,8 +80,8 @@ class Editor(AbstractWidget):
         self.main_win.file_menu.addAction(self.set_ref_act)
 
         # seacat
-        self.seacat_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'seacat.png')),
-                                            'Seabird CTD Setup', self)
+        self.seacat_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'seacat.png')),
+                                        'Seabird CTD Setup', self)
         self.seacat_act.setShortcut('Alt+B')
         # noinspection PyUnresolvedReferences
         self.seacat_act.triggered.connect(self.on_seacat)
@@ -95,8 +93,8 @@ class Editor(AbstractWidget):
         self.process_bar.setIconSize(QtCore.QSize(40, 40))
 
         # spreadsheet
-        self.spreadsheet_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'grid.png')),
-                                                 'Show/Edit Data Spreadsheet', self)
+        self.spreadsheet_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'grid.png')),
+                                             'Show/Edit Data Spreadsheet', self)
         self.spreadsheet_act.setShortcut('Alt+S')
         # noinspection PyUnresolvedReferences
         self.spreadsheet_act.triggered.connect(self.on_spreadsheet)
@@ -105,8 +103,8 @@ class Editor(AbstractWidget):
         self.main_win.edit_menu.addAction(self.spreadsheet_act)
 
         # metadata
-        self.metadata_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata.png')),
-                                              'Show/Edit Cast Metadata', self)
+        self.metadata_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata.png')),
+                                          'Show/Edit Cast Metadata', self)
         self.metadata_act.setShortcut('Alt+M')
         # noinspection PyUnresolvedReferences
         self.metadata_act.triggered.connect(self.on_metadata)
@@ -119,8 +117,8 @@ class Editor(AbstractWidget):
         self.main_win.edit_menu.addSeparator()
 
         # filter
-        self.filter_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'filter.png')),
-                                            'Filter/Smooth Data', self)
+        self.filter_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'filter.png')),
+                                        'Filter/Smooth Data', self)
         self.filter_act.setShortcut('Alt+F')
         # noinspection PyUnresolvedReferences
         self.filter_act.triggered.connect(self.on_data_filter)
@@ -129,16 +127,16 @@ class Editor(AbstractWidget):
         self.main_win.edit_menu.addAction(self.filter_act)
 
         # retrieve sal
-        self.sal_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'sal.png')),
-                                         'Retrieve Salinity', self)
+        self.sal_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'sal.png')),
+                                     'Retrieve Salinity', self)
         # self.sal_act.setShortcut('Alt+A')
         # noinspection PyUnresolvedReferences
         self.sal_act.triggered.connect(self.on_retrieve_sal)
         self.process_bar.addAction(self.sal_act)
 
         # retrieve temp/sal
-        self.temp_sal_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'temp_sal.png')),
-                                              'Retrieve Temperature/Salinity', self)
+        self.temp_sal_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'temp_sal.png')),
+                                          'Retrieve Temperature/Salinity', self)
         # self.temp_sal_act.setShortcut('Alt+T')
         # noinspection PyUnresolvedReferences
         self.temp_sal_act.triggered.connect(self.on_retrieve_temp_sal)
@@ -146,8 +144,8 @@ class Editor(AbstractWidget):
         self.main_win.edit_menu.addAction(self.temp_sal_act)
 
         # retrieve transducer sound speed
-        self.tss_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'tss.png')),
-                                         'Retrieve Transducer Sound Speed', self)
+        self.tss_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'tss.png')),
+                                     'Retrieve Transducer Sound Speed', self)
         # self.tss_act.setShortcut('Alt+W')
         # noinspection PyUnresolvedReferences
         self.tss_act.triggered.connect(self.on_retrieve_tss)
@@ -155,8 +153,8 @@ class Editor(AbstractWidget):
         self.main_win.edit_menu.addAction(self.tss_act)
 
         # extend profile
-        self.extend_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'extend.png')),
-                                            'Extend Profile', self)
+        self.extend_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'extend.png')),
+                                        'Extend Profile', self)
         # self.extend_act.setShortcut('Alt+E')
         # noinspection PyUnresolvedReferences
         self.extend_act.triggered.connect(self.on_extend_profile)
@@ -164,8 +162,8 @@ class Editor(AbstractWidget):
         self.main_win.edit_menu.addAction(self.extend_act)
 
         # preview thinning
-        self.thin_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'thinning.png')),
-                                          'Preview Thinning', self)
+        self.thin_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'thinning.png')),
+                                      'Preview Thinning', self)
         # self.thin_act.setShortcut('Alt+T')
         # noinspection PyUnresolvedReferences
         self.thin_act.triggered.connect(self.on_preview_thinning)
@@ -178,8 +176,8 @@ class Editor(AbstractWidget):
         self.process_bar.addSeparator()
 
         # restart processing
-        self.restart_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'restart.png')),
-                                             'Restart Processing', self)
+        self.restart_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'restart.png')),
+                                         'Restart Processing', self)
         # self.restart_act.setShortcut('Alt+N')
         # noinspection PyUnresolvedReferences
         self.restart_act.triggered.connect(self.on_restart_proc)
@@ -193,8 +191,8 @@ class Editor(AbstractWidget):
         self.main_win.edit_menu.addSeparator()
 
         # export
-        self.export_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'export.png')),
-                                            'Export Data', self)
+        self.export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export.png')),
+                                        'Export Data', self)
         self.export_act.setShortcut('Alt+X')
         # noinspection PyUnresolvedReferences
         self.export_act.triggered.connect(self.on_export_single_profile)
@@ -203,8 +201,8 @@ class Editor(AbstractWidget):
         self.main_win.edit_menu.addAction(self.export_act)
 
         # transmit
-        self.transmit_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'transmit.png')),
-                                              'Transmit Data', self)
+        self.transmit_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'transmit.png')),
+                                          'Transmit Data', self)
         self.transmit_act.setShortcut('Alt+T')
         # noinspection PyUnresolvedReferences
         self.transmit_act.triggered.connect(self.on_transmit_data)
@@ -213,8 +211,8 @@ class Editor(AbstractWidget):
         self.main_win.edit_menu.addAction(self.transmit_act)
 
         # save db
-        self.save_db_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'db_save.png')),
-                                             'Save to Database', self)
+        self.save_db_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'db_save.png')),
+                                         'Save to Database', self)
         self.save_db_act.setShortcut('Alt+D')
         # noinspection PyUnresolvedReferences
         self.save_db_act.triggered.connect(self.on_save_db)
@@ -225,7 +223,7 @@ class Editor(AbstractWidget):
         self.main_win.edit_menu.addSeparator()
 
         # automate steps
-        self.automate_processing_acts = QtWidgets.QAction("Automate processing", self)
+        self.automate_processing_acts = QtGui.QAction("Automate processing", self)
         self.automate_processing_acts.setShortcut("Ctrl+A")
         self.automate_processing_acts.setStatusTip("Automate the processing steps")
         # noinspection PyUnresolvedReferences
@@ -233,14 +231,14 @@ class Editor(AbstractWidget):
         self.main_win.edit_menu.addAction(self.automate_processing_acts)
 
         # buttons visibility
-        self.buttons_visibility_acts = QtWidgets.QAction("Change buttons visibility", self)
+        self.buttons_visibility_acts = QtGui.QAction("Change buttons visibility", self)
         self.buttons_visibility_acts.setStatusTip("Define which buttons are displayed on the toolbar")
         # noinspection PyUnresolvedReferences
         self.buttons_visibility_acts.triggered.connect(self.on_buttons_visibility)
         self.main_win.edit_menu.addAction(self.buttons_visibility_acts)
 
         # exit action
-        exit_action = QtWidgets.QAction("Exit", self)
+        exit_action = QtGui.QAction("Exit", self)
         exit_action.setShortcut("Ctrl+Q")
         exit_action.setStatusTip("Exit application")
         # noinspection PyUnresolvedReferences

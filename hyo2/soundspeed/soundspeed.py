@@ -8,10 +8,10 @@ import logging
 from typing import Optional, TYPE_CHECKING
 from appdirs import user_data_dir
 
-from hyo2.abc.lib.progress.abstract_progress import AbstractProgress
-from hyo2.abc.lib.progress.cli_progress import CliProgress
-from hyo2.abc.lib.gdal_aux import GdalAux
-from hyo2.abc.lib.helper import Helper
+from hyo2.abc2.lib.progress.abstract_progress import AbstractProgress
+from hyo2.abc2.lib.progress.cli_progress import CliProgress
+from hyo2.abc2.lib.gdal_aux import GdalAux
+from hyo2.abc2.lib.helper import Helper
 
 from hyo2.soundspeed import lib_info
 from hyo2.soundspeed import formats

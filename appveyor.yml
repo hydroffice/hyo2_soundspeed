@@ -45,16 +45,16 @@ install:
   - python --version
 
   - pip install coveralls PyYAML pytest pytest-cov wheel
-  # for hyo2.abc
+  # for hyo2.abc2
   - conda install appdirs bidict cartopy "gdal<3.0.0" matplotlib-base numpy psutil pyproj
-  - pip install PySide2
+  - pip install PySide6
   # for hyo2.soundspeed
   - conda install gsw netCDF4 pillow pyserial scipy
   - pip install https://github.com/hydroffice/hyo2_abc/archive/master.zip
 
 build: off
 build_script:
-  # --no-deps because of pip not detecting the installed hyo2.abc
+  # --no-deps because of pip not detecting the installed hyo2.abc2
   - pip install --no-deps .
   - conda list --show-channel-urls
 

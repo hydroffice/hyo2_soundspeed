@@ -1,6 +1,6 @@
 import logging
 
-from hyo2.abc.lib.helper import Helper
+from hyo2.abc2.lib.helper import Helper
 
 logger = logging.getLogger(__name__)
 

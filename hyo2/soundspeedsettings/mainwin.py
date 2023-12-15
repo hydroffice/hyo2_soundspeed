@@ -2,9 +2,9 @@ import logging
 import sys
 import traceback
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
-from hyo2.abc.app.dialogs.exception.exception_dialog import ExceptionDialog
+from hyo2.abc2.app.dialogs.exception.exception_dialog import ExceptionDialog
 
 from hyo2.soundspeed import lib_info
 from hyo2.soundspeedsettings import app_info

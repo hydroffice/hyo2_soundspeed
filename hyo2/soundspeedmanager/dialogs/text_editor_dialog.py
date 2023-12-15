@@ -1,7 +1,7 @@
 import os
 import logging
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 from hyo2.soundspeedmanager import app_info
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
@@ -48,7 +48,7 @@ class TextEditorDialog(AbstractDialog):
         icon = QtGui.QIcon()
         icon.addFile(os.path.join(self.media, 'lock.png'), QtCore.QSize(), QtGui.QIcon.Selected, QtGui.QIcon.Off)
         icon.addFile(os.path.join(self.media, 'unlock.png'), QtCore.QSize(), QtGui.QIcon.Selected, QtGui.QIcon.On)
-        self._lock_act = QtWidgets.QAction(icon, 'Lock/unlock editing', self)
+        self._lock_act = QtGui.QAction(icon, 'Lock/unlock editing', self)
         self._lock_act.setCheckable(True)
         self._lock_act.setShortcut('Ctrl+L')
         # noinspection PyUnresolvedReferences
@@ -59,7 +59,7 @@ class TextEditorDialog(AbstractDialog):
         icon = QtGui.QIcon()
         icon.addFile(os.path.join(self.media, 'html.png'), QtCore.QSize(), QtGui.QIcon.Selected, QtGui.QIcon.Off)
         icon.addFile(os.path.join(self.media, 'text.png'), QtCore.QSize(), QtGui.QIcon.Selected, QtGui.QIcon.On)
-        self._view_act = QtWidgets.QAction(icon, 'View as html or raw text', self)
+        self._view_act = QtGui.QAction(icon, 'View as html or raw text', self)
         self._view_act.setCheckable(True)
         self._view_act.setShortcut('Ctrl+T')
         # noinspection PyUnresolvedReferences
@@ -69,7 +69,7 @@ class TextEditorDialog(AbstractDialog):
         self._tools_bar.addSeparator()
 
         # save
-        self._save_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'save.png')), 'Save file', self)
+        self._save_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'save.png')), 'Save file', self)
         self._save_act.setShortcut('Ctrl+S')
         # noinspection PyUnresolvedReferences
         self._save_act.triggered.connect(self.on_save_file)

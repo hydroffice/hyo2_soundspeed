@@ -65,7 +65,7 @@ setup(
         "pyserial",
         "requests",
         "scipy"
-        # "PySide2"
+        # "PySide6"
     ],
     python_requires='>=3.5',
     entry_points={

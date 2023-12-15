@@ -1,6 +1,6 @@
 import logging
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 from hyo2.soundspeedsettings.widgets.widget import AbstractWidget
 from hyo2.soundspeed.profile.dicts import Dicts
@@ -144,8 +144,10 @@ class Listeners(AbstractWidget):
         vbox.addStretch()
         self.mvp_ip_address = QtWidgets.QLineEdit()
         octet = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])"
-        reg_ex = QtCore.QRegExp(r"^%s\.%s\.%s\.%s$" % (octet, octet, octet, octet))
-        validator = QtGui.QRegExpValidator(reg_ex)
+        rex = QtCore.QRegularExpression(r"^%s\.%s\.%s\.%s$" % (octet, octet, octet, octet))
+        if not rex.isValid():
+            logger.warning(rex.errorString())
+        validator = QtGui.QRegularExpressionValidator(rex)
         self.mvp_ip_address.setValidator(validator)
         vbox.addWidget(self.mvp_ip_address)
         vbox.addStretch()

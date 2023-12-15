@@ -1,5 +1,5 @@
 import logging
-from PySide2 import QtWidgets
+from PySide6 import QtWidgets
 
 from hyo2.soundspeedmanager.dialogs.flaggable_input_dialog import FlaggableInputDialog
 from hyo2.abc.lib.logging import set_logging

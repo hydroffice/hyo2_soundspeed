@@ -1,7 +1,7 @@
 import logging
 
 from hyo2.soundspeed.base.callbacks.fake_callbacks import FakeCallbacks
-from hyo2.abc.lib.logging import set_logging
+from hyo2.abc2.lib.logging import set_logging
 
 ns_list = ["hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"]
 set_logging(ns_list=ns_list)

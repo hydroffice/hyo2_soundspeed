@@ -10,7 +10,7 @@ except Exception:
 import traceback
 import logging
 
-from PySide2 import QtGui, QtWidgets
+from PySide6 import QtGui, QtWidgets
 
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
 from hyo2.soundspeedmanager.dialogs.seacat import add_btn, get_last_comport, AutoSeacat, SelectCastsDlg, \

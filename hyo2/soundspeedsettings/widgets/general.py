@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 from hyo2.soundspeedsettings.widgets.widget import AbstractWidget
 from hyo2.soundspeed.base.setup_sql import vessel_list, institution_list
@@ -61,8 +61,10 @@ class General(AbstractWidget):
         hbox.addWidget(label)
         # -- value
         self.current_project = QtWidgets.QLineEdit()
-        rex = QtCore.QRegExp('[a-zA-Z0-9_.-]+')
-        validator = QtGui.QRegExpValidator(rex)
+        rex = QtCore.QRegularExpression('[a-zA-Z0-9_.-]+')
+        if not rex.isValid():
+            logger.warning(rex.errorString())
+        validator = QtGui.QRegularExpressionValidator(rex)
         self.current_project.setValidator(validator)
         self.current_project.setReadOnly(True)
         self.current_project.setStyleSheet("QLineEdit { color: #666666 }")
@@ -203,8 +205,10 @@ class General(AbstractWidget):
         self.default_institution = QtWidgets.QComboBox()
         self.default_institution.setEditable(True)
         self.default_institution.addItems(institution_list)
-        rex = QtCore.QRegExp(r'[a-zA-Z0-9_.-\s]+')
-        validator = QtGui.QRegExpValidator(rex)
+        rex = QtCore.QRegularExpression(r'[a-zA-Z0-9_.\-\s]+')
+        if not rex.isValid():
+            logger.warning(rex.errorString())
+        validator = QtGui.QRegularExpressionValidator(rex)
         self.default_institution.setValidator(validator)
         hbox.addWidget(self.default_institution)
 
@@ -217,8 +221,10 @@ class General(AbstractWidget):
         hbox.addWidget(label)
         # -- value
         self.default_survey = QtWidgets.QLineEdit()
-        rex = QtCore.QRegExp(r'[a-zA-Z0-9_.-\s]+')
-        validator = QtGui.QRegExpValidator(rex)
+        rex = QtCore.QRegularExpression(r'[a-zA-Z0-9_.\-\s]+')
+        if not rex.isValid():
+            logger.warning(rex.errorString())
+        validator = QtGui.QRegularExpressionValidator(rex)
         self.default_survey.setValidator(validator)
         hbox.addWidget(self.default_survey)
 
@@ -233,8 +239,10 @@ class General(AbstractWidget):
         self.default_vessel = QtWidgets.QComboBox()
         self.default_vessel.setEditable(True)
         self.default_vessel.addItems(vessel_list)
-        rex = QtCore.QRegExp(r'[a-zA-Z0-9_.-\s]+')
-        validator = QtGui.QRegExpValidator(rex)
+        rex = QtCore.QRegularExpression(r'[a-zA-Z0-9_.\-\s]+')
+        if not rex.isValid():
+            logger.warning(rex.errorString())
+        validator = QtGui.QRegularExpressionValidator(rex)
         self.default_vessel.setValidator(validator)
         hbox.addWidget(self.default_vessel)
 

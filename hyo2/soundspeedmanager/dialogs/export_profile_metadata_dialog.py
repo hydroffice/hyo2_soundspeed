@@ -1,8 +1,8 @@
 import logging
 
-from PySide2 import QtCore, QtWidgets
+from PySide6 import QtCore, QtWidgets
 
-from hyo2.abc.lib.gdal_aux import GdalAux
+from hyo2.abc2.lib.gdal_aux import GdalAux
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
 from hyo2.soundspeedmanager.dialogs.export_profile_metadata_fields_dialog import ExportProfileMetadataFieldsDialog
 from hyo2.soundspeed.db.export import ExportDbFields

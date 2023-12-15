@@ -3,7 +3,7 @@ from datetime import datetime
 import numpy as np
 from scipy import interpolate
 # noinspection PyUnresolvedReferences
-from PySide2 import QtWidgets, QtCore
+from PySide6 import QtWidgets, QtCore
 import matplotlib
 # from matplotlib import rc_context as rc_context
 from matplotlib import pyplot as plt

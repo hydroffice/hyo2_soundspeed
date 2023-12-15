@@ -1,10 +1,10 @@
 import logging
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 from urllib.request import urlopen
 
-from hyo2.abc.lib.helper import Helper
-from hyo2.abc.app.web_renderer import WebRenderer
+from hyo2.abc2.lib.helper import Helper
+from hyo2.abc2.app.web_renderer import WebRenderer
 from hyo2.ssm_sis import app_info, lib_info
 from hyo2.ssm_sis.controlpanel import ControlPanel
 

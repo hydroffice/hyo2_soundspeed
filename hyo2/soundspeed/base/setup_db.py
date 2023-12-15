@@ -3,7 +3,7 @@ import logging
 import sqlite3
 import traceback
 
-from hyo2.abc.lib.helper import Helper
+from hyo2.abc2.lib.helper import Helper
 from hyo2.soundspeed.base.basedb import BaseDb
 from hyo2.soundspeed.base.setup_sql import CREATE_SETTINGS, CREATE_SETTINGS_VIEW, CREATE_CLIENT_LIST, \
     RENAME_SETTINGS, RENAME_CLIENT_LIST, DROP_OLD_SETTINGS, DROP_OLD_CLIENT_LIST, DROP_SETTINGS_VIEW, \

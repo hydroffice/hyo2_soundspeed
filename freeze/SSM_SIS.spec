@@ -104,10 +104,10 @@ output_folder = os.path.join("cartopy", "data", "shapefiles", "natural_earth", "
 cartopy_data = collect_folder_data(input_data_folder=share_folder, relative_output_folder=output_folder,
                                    recursively=True)
 
-abc_data = collect_pkg_data('hyo2.abc')
+abc_data = collect_pkg_data('hyo2.abc2')
 ss_data = collect_pkg_data('hyo2.soundspeed')
 ssm_sis_data = collect_pkg_data('hyo2.ssm_sis')
-pyside2_data = collect_pkg_data('PySide2')
+pyside6_data = collect_pkg_data('PySide6')
 
 icon_file = os.path.normpath(os.path.join(os.getcwd(), 'freeze', 'SSM_SIS.ico'))
 if is_darwin:
@@ -116,7 +116,7 @@ if is_darwin:
 a = Analysis(['SSM_SIS.py'],
          binaries=[],
          pathex=[],
-         hiddenimports=["PIL", "scipy._lib.messagestream", "cftime._cftime", "PySide2.QtPrintSupport",
+         hiddenimports=["PIL", "scipy._lib.messagestream", "cftime._cftime", "PySide6.QtPrintSupport",
                         "pyproj.datadir", "pkg_resources.py2_warn"],
          excludes=["IPython", "PyQt4", "PyQt5", "pandas", "sphinx", "sphinx_rtd_theme", "OpenGL_accelerate",
                    "FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter", "wx",
@@ -135,15 +135,15 @@ exe = EXE(pyz,
           console=True,
           icon=icon_file)
 coll = COLLECT(exe,
-           a.binaries,
-           a.zipfiles,
-           a.datas,
-           pyproj_data,
-           cartopy_data,
-           abc_data,
-           ss_data,
-           ssm_sis_data,
-           pyside2_data,
-           strip=None,
-           upx=True,
-           name='SSM_SIS.%s%s' % (ssm_version, beta))
+               a.binaries,
+               a.zipfiles,
+               a.datas,
+               pyproj_data,
+               cartopy_data,
+               abc_data,
+               ss_data,
+               ssm_sis_data,
+               pyside6_data,
+               strip=None,
+               upx=True,
+               name='SSM_SIS.%s%s' % (ssm_version, beta))

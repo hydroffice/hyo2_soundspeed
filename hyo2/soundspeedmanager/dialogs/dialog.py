@@ -1,9 +1,9 @@
 import logging
 import os
 
-from PySide2 import QtCore, QtWidgets
+from PySide6 import QtCore, QtWidgets
 
-from hyo2.abc.app.qt_progress import QtProgress
+from hyo2.abc2.app.qt_progress import QtProgress
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)

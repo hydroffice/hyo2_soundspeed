@@ -6,22 +6,17 @@ import traceback
 from datetime import datetime
 from urllib.request import urlopen
 
-from PySide2 import QtCore, QtGui, QtWidgets
-
-from hyo2.abc.app.qt_progress import QtProgress
-from hyo2.abc.app.dialogs.exception.exception_dialog import ExceptionDialog
-from hyo2.abc.app.tabs.info.info_tab import InfoTab
-from hyo2.abc.lib.helper import Helper
-
+from PySide6 import QtCore, QtGui, QtWidgets
+from hyo2.abc2.app.dialogs.exception.exception_dialog import ExceptionDialog
+from hyo2.abc2.app.qt_progress import QtProgress
+from hyo2.abc2.app.tabs.info.info_tab import InfoTab
+from hyo2.abc2.lib.helper import Helper
 from hyo2.soundspeed import lib_info
-from hyo2.soundspeedmanager import app_info
-
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
-
+from hyo2.soundspeedmanager import app_info
 from hyo2.soundspeedmanager.qt_callbacks import QtCallbacks
-
-from hyo2.soundspeedmanager.widgets.editor import Editor
 from hyo2.soundspeedmanager.widgets.database import Database
+from hyo2.soundspeedmanager.widgets.editor import Editor
 from hyo2.soundspeedmanager.widgets.server import Server
 # from hyo2.soundspeedmanager.widgets.refraction import Refraction
 from hyo2.soundspeedmanager.widgets.settings import Settings
@@ -38,7 +33,7 @@ class MainWin(QtWidgets.QMainWindow):
 
         # set the application name and the version
         self.name = app_info.app_name
-        self.version = app_info.app_version
+        self.version = app_info.app_version + '.1 ALPHA'
         self.setWindowTitle('%s v.%s' % (self.name, self.version))
         # noinspection PyArgumentList
         _app = QtCore.QCoreApplication.instance()
@@ -135,7 +130,7 @@ class MainWin(QtWidgets.QMainWindow):
         except Exception as e:
             # traceback.print_exc()
             self.has_sdm_support = False
-            logger.info("Support for Survey Monitor: OFF(%s)" % e)
+            logger.info("Support for Survey Monitor: OFF(%s)" % e, exc_info=True)
         # server
         self.tab_server = Server(lib=self.lib, main_win=self)
         # noinspection PyArgumentList

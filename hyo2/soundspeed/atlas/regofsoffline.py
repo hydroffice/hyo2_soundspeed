@@ -9,7 +9,7 @@ from hyo2.soundspeed.base.geodesy import Geodesy
 from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeed.profile.profile import Profile
 from hyo2.soundspeed.profile.profilelist import ProfileList
-from hyo2.abc.lib.progress.cli_progress import CliProgress
+from hyo2.abc2.lib.progress.cli_progress import CliProgress
 if TYPE_CHECKING:
     from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 
