@@ -1,7 +1,7 @@
 import logging
 
 import numpy as np
-from PySide2 import QtWidgets
+from PySide6 import QtWidgets
 from matplotlib import pyplot as plt
 
 from hyo2.soundspeed.profile.profile import Profile

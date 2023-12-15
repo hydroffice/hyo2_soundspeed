@@ -26,7 +26,7 @@ jobs:
         sudo -H conda config --add channels conda-forge
         sudo -H conda install appdirs bidict cartopy gdal matplotlib-base numpy psutil pyproj gsw netCDF4 pillow pyserial scipy
         sudo -H pip install --upgrade --force-reinstall pip wheel setuptools
-        sudo -H pip install PySide2
+        sudo -H pip install PySide6
         sudo -H pip install --no-deps https://github.com/hydroffice/hyo2_abc/archive/master.zip
         sudo -H pip install --no-deps .
     - name: Lint with flake8

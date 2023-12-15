@@ -7,7 +7,7 @@ from osgeo import ogr
 from osgeo import osr
 from pyproj import Geod
 
-from hyo2.abc.lib.gdal_aux import GdalAux
+from hyo2.abc2.lib.gdal_aux import GdalAux
 
 logger = logging.getLogger(__name__)
 

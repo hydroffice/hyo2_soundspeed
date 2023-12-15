@@ -1,7 +1,7 @@
 import os
 import logging
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 logger = logging.getLogger(__name__)
 
@@ -44,14 +44,14 @@ class Settings(AbstractWidget):
         self.mainLayout.addLayout(hbox)
 
         # view setup
-        self.view_act = QtWidgets.QAction('View Setup', self)
+        self.view_act = QtGui.QAction('View Setup', self)
         self.view_act.setShortcut('Ctrl+S')
         # noinspection PyUnresolvedReferences
         self.view_act.triggered.connect(self.on_view_setup)
         self.main_win.setup_menu.addAction(self.view_act)
 
         # edit setup
-        self.edit_act = QtWidgets.QAction('Edit Setup', self)
+        self.edit_act = QtGui.QAction('Edit Setup', self)
         # self.edit_act.setShortcut('Ctrl+Alt+S')
         # noinspection PyUnresolvedReferences
         self.edit_act.triggered.connect(self.on_edit_setup)

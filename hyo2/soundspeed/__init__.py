@@ -5,15 +5,15 @@ Sound Speed
 
 import os
 import logging
-from hyo2.abc.lib.lib_info import LibInfo
+from hyo2.abc2.lib.lib_info import LibInfo
 
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 name = "Sound Speed"
-__version__ = '2023.0.10'
-__copyright__ = 'Copyright 2023 University of New Hampshire, Center for Coastal and Ocean Mapping'
+__version__ = '2024.0.0'
+__copyright__ = 'Copyright 2024 University of New Hampshire, Center for Coastal and Ocean Mapping'
 
 lib_info = LibInfo()
 
@@ -35,7 +35,7 @@ lib_info.lib_support_email = "soundspeed@hydroffice.org"
 lib_info.lib_latest_url = "https://www.hydroffice.org/latest/soundspeed.txt"
 
 lib_info.lib_dep_dict = {
-    "hyo2.abc": "hyo2.abc",
+    "hyo2.abc22": "hyo2.abc2",
     "hyo2.soundspeed": "hyo2.soundspeed",
     "hyo2.surveydatamonitor": "hyo2.surveydatamonitor",
     "gsw": "gsw",
@@ -45,5 +45,5 @@ lib_info.lib_dep_dict = {
     "pyproj": "pyproj",
     "matplotlib": "matplotlib",
     "cartopy": "cartopy",
-    "PySide2": "PySide2"
+    "PySide6": "PySide6"
 }

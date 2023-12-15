@@ -1,9 +1,9 @@
 import logging
 import os
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
-from hyo2.abc.lib.helper import Helper
+from hyo2.abc2.lib.helper import Helper
 from hyo2.ssm_sis import app_info
 from hyo2.soundspeed.listener.sis.sis import Sis
 from hyo2.soundspeed.profile.profilelist import ProfileList
@@ -55,7 +55,7 @@ class ControlPanel(QtWidgets.QWidget):
         # set the tab size
         metrics = QtGui.QFontMetrics(font)
         # noinspection PyArgumentList
-        self.viewer.setTabStopWidth(3 * metrics.width(' '))
+        self.viewer.setTabStopDistance(3 * metrics.horizontalAdvance(' '))
         self.viewer.setReadOnly(True)
         self.vbox.addWidget(self.viewer)
 
@@ -145,8 +145,10 @@ class ControlPanel(QtWidgets.QWidget):
         self.set_output_ip = QtWidgets.QLineEdit("")
         hbox.addWidget(self.set_output_ip)
         octet = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])"
-        reg_ex = QtCore.QRegExp(r"^%s\.%s\.%s\.%s$" % (octet, octet, octet, octet))
-        validator = QtGui.QRegExpValidator(reg_ex)
+        rex = QtCore.QRegularExpression(r"^%s\.%s\.%s\.%s$" % (octet, octet, octet, octet))
+        if not rex.isValid():
+            logger.warning(rex.errorString())
+        validator = QtGui.QRegularExpressionValidator(rex)
         self.set_output_ip.setValidator(validator)
 
         # output port

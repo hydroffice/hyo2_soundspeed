@@ -1,6 +1,6 @@
 import logging
 
-from PySide2 import QtWidgets, QtCore
+from PySide6 import QtWidgets, QtCore
 from matplotlib import rc_context
 from matplotlib import pyplot as plt
 

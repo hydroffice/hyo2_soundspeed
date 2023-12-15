@@ -10,7 +10,7 @@ from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
 
 if TYPE_CHECKING:
-    from hyo2.abc.lib.progress.abstract_progress import AbstractProgress
+    from hyo2.abc2.lib.progress.abstract_progress import AbstractProgress
     from hyo2.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
     from hyo2.soundspeed.base.setup import Setup
 

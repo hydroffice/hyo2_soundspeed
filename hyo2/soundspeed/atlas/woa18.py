@@ -6,7 +6,7 @@ import logging
 from datetime import datetime as dt
 from typing import Union, TYPE_CHECKING
 
-from hyo2.abc.lib.onedrive import OneDrive
+from hyo2.abc2.lib.onedrive import OneDrive
 
 from hyo2.soundspeed.atlas.abstract import AbstractAtlas
 from hyo2.soundspeed.profile.profile import Profile

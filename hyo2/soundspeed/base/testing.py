@@ -2,7 +2,7 @@ import os
 import logging
 from typing import Optional
 
-from hyo2.abc.lib.testing import Testing
+from hyo2.abc2.lib.testing import Testing
 from hyo2.soundspeed import formats
 
 logger = logging.getLogger(__name__)

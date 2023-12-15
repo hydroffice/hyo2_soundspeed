@@ -2,7 +2,7 @@ import time
 from datetime import datetime as dt, timedelta
 import logging
 from enum import IntEnum
-from PySide2 import QtWidgets
+from PySide6 import QtWidgets
 
 from hyo2.abc.app.qt_progress import QtProgress
 from hyo2.abc.lib.logging import set_logging

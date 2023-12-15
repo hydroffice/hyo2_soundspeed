@@ -1,7 +1,7 @@
 import logging
 import os.path
 import shutil
-from hyo2.abc.lib.ftp import Ftp
+from hyo2.abc2.lib.ftp import Ftp
 
 logging.basicConfig(level=logging.DEBUG,
                     format="%(levelname)-9s %(name)s.%(funcName)s:%(lineno)d > %(message)s")

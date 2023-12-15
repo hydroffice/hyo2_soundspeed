@@ -6,7 +6,7 @@ from netCDF4 import Dataset
 import numpy as np
 import requests
 
-from hyo2.abc.lib.progress.cli_progress import CliProgress
+from hyo2.abc2.lib.progress.cli_progress import CliProgress
 
 from hyo2.soundspeed.atlas.abstract import AbstractAtlas
 from hyo2.soundspeed.profile.profile import Profile

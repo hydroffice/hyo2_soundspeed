@@ -1,7 +1,7 @@
 import logging
 import time
 
-from PySide2 import QtWidgets
+from PySide6 import QtWidgets
 
 from hyo2.abc.app.qt_progress import QtProgress
 

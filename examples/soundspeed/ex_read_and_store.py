@@ -1,13 +1,13 @@
 import os
 import logging
-from PySide2 import QtWidgets
+from PySide6 import QtWidgets
 from matplotlib import pyplot as plt
 
 from hyo2.soundspeedmanager import app_info
 from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
 from hyo2.soundspeed.base.testing import SoundSpeedTesting
 from hyo2.soundspeed.base.callbacks.fake_callbacks import FakeCallbacks
-from hyo2.abc.lib.logging import set_logging
+from hyo2.abc2.lib.logging import set_logging
 
 ns_list = ["hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"]
 set_logging(ns_list=ns_list)

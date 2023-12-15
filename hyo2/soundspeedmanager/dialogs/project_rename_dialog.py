@@ -1,6 +1,6 @@
 import logging
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
 
@@ -30,8 +30,10 @@ class ProjectRenameDialog(AbstractDialog):
         hbox.addStretch()
         # -- value
         self.old_project = QtWidgets.QLineEdit()
-        rex = QtCore.QRegExp('[a-zA-Z0-9_.-]+')
-        validator = QtGui.QRegExpValidator(rex)
+        rex = QtCore.QRegularExpression('[a-zA-Z0-9_.-]+')
+        if not rex.isValid():
+            logger.warning(rex.errorString())
+        validator = QtGui.QRegularExpressionValidator(rex)
         self.old_project.setValidator(validator)
         self.old_project.setText(self.lib.current_project)
         self.old_project.setReadOnly(True)
@@ -46,8 +48,10 @@ class ProjectRenameDialog(AbstractDialog):
         hbox.addStretch()
         # -- value
         self.new_project = QtWidgets.QLineEdit()
-        rex = QtCore.QRegExp('[a-zA-Z0-9_.-]+')
-        validator = QtGui.QRegExpValidator(rex)
+        rex = QtCore.QRegularExpression('[a-zA-Z0-9_.-]+')
+        if not rex.isValid():
+            logger.warning(rex.errorString())
+        validator = QtGui.QRegularExpressionValidator(rex)
         self.new_project.setValidator(validator)
         self.mainLayout.addWidget(self.new_project)
         # -- space

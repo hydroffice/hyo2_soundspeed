@@ -5,7 +5,7 @@ import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 import numpy as np
 # noinspection PyUnresolvedReferences
-from PySide2 import QtWidgets
+from PySide6 import QtWidgets
 from cartopy.feature import NaturalEarthFeature
 from matplotlib import rc_context
 

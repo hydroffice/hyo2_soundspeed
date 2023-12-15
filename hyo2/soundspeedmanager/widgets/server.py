@@ -1,7 +1,7 @@
 import os
 import logging
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 from hyo2.soundspeedmanager.widgets.widget import AbstractWidget
 from hyo2.soundspeedmanager.widgets.dataplots import DataPlots
@@ -64,7 +64,7 @@ class Server(AbstractWidget):
         self.start_btn.clicked.connect(self.on_start_server)
         self.start_btn.setToolTip("Start server mode")
         hbox.addWidget(self.start_btn)
-        self.start_server_act = QtWidgets.QAction('Start Server', self)
+        self.start_server_act = QtGui.QAction('Start Server', self)
         # self.start_server_act.setShortcut('Ctrl+Alt+S')
         # noinspection PyUnresolvedReferences
         self.start_server_act.triggered.connect(self.on_start_server)
@@ -76,7 +76,7 @@ class Server(AbstractWidget):
         self.force_btn.clicked.connect(self.on_force_server)
         self.force_btn.setToolTip("Force the transmission of a synthethic profile")
         hbox.addWidget(self.force_btn)
-        self.force_server_act = QtWidgets.QAction('Force Transmission', self)
+        self.force_server_act = QtGui.QAction('Force Transmission', self)
         # self.force_server_act.setShortcut('Ctrl+Alt+T')
         # noinspection PyUnresolvedReferences
         self.force_server_act.triggered.connect(self.on_force_server)
@@ -88,7 +88,7 @@ class Server(AbstractWidget):
         self.stop_btn.clicked.connect(self.on_stop_server)
         self.stop_btn.setToolTip("Stop server mode")
         hbox.addWidget(self.stop_btn)
-        self.stop_server_act = QtWidgets.QAction('Stop Server', self)
+        self.stop_server_act = QtGui.QAction('Stop Server', self)
         # self.stop_server_act.setShortcut('Ctrl+Alt+E')
         # noinspection PyUnresolvedReferences
         self.stop_server_act.triggered.connect(self.on_stop_server)

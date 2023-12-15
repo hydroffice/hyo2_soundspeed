@@ -1,7 +1,7 @@
 import os
 import logging
 
-from PySide2 import QtGui, QtWidgets
+from PySide6 import QtGui, QtWidgets
 
 from hyo2.soundspeedmanager.widgets.widget import AbstractWidget
 

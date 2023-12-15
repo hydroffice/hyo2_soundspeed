@@ -1,7 +1,7 @@
 import os
 import logging
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 from hyo2.soundspeed.profile.dicts import Dicts
 from hyo2.soundspeedmanager.widgets.widget import AbstractWidget
@@ -89,7 +89,7 @@ class Database(AbstractWidget):
         self.btn_new_project.clicked.connect(self.new_project)
         self.btn_new_project.setToolTip("Create a new project")
         self.manage_btn_box.addButton(self.btn_new_project, QtWidgets.QDialogButtonBox.ActionRole)
-        self.new_project_act = QtWidgets.QAction('New Project DB', self)
+        self.new_project_act = QtGui.QAction('New Project DB', self)
         self.new_project_act.setShortcut('Ctrl+N')
         # noinspection PyUnresolvedReferences
         self.new_project_act.triggered.connect(self.new_project)
@@ -101,7 +101,7 @@ class Database(AbstractWidget):
         self.btn_rename_project.clicked.connect(self.rename_project)
         self.btn_rename_project.setToolTip("Rename the current project")
         self.manage_btn_box.addButton(self.btn_rename_project, QtWidgets.QDialogButtonBox.ActionRole)
-        self.rename_project_act = QtWidgets.QAction('Rename Current Project DB', self)
+        self.rename_project_act = QtGui.QAction('Rename Current Project DB', self)
         # self.rename_project_act.setShortcut('Ctrl+R')
         # noinspection PyUnresolvedReferences
         self.rename_project_act.triggered.connect(self.rename_project)
@@ -113,7 +113,7 @@ class Database(AbstractWidget):
         self.btn_load_project.clicked.connect(self.switch_project)
         self.btn_load_project.setToolTip("Switch to another existing project")
         self.manage_btn_box.addButton(self.btn_load_project, QtWidgets.QDialogButtonBox.ActionRole)
-        self.load_project_act = QtWidgets.QAction('Switch Project DB', self)
+        self.load_project_act = QtGui.QAction('Switch Project DB', self)
         # self.load_project_act.setShortcut('Ctrl+L')
         # noinspection PyUnresolvedReferences
         self.load_project_act.triggered.connect(self.switch_project)
@@ -125,7 +125,7 @@ class Database(AbstractWidget):
         self.btn_import_data.clicked.connect(self.import_data)
         self.btn_import_data.setToolTip("Import data from another project")
         self.manage_btn_box.addButton(self.btn_import_data, QtWidgets.QDialogButtonBox.ActionRole)
-        self.import_data_act = QtWidgets.QAction('Import Data from Project DB', self)
+        self.import_data_act = QtGui.QAction('Import Data from Project DB', self)
         # self.import_data_act.setShortcut('Ctrl+I')
         # noinspection PyUnresolvedReferences
         self.import_data_act.triggered.connect(self.import_data)
@@ -137,7 +137,7 @@ class Database(AbstractWidget):
         self.btn_project_folder.clicked.connect(self.project_folder)
         self.btn_project_folder.setToolTip("Open projects folder")
         self.manage_btn_box.addButton(self.btn_project_folder, QtWidgets.QDialogButtonBox.ActionRole)
-        self.project_folder_act = QtWidgets.QAction('Open Projects DB Folder', self)
+        self.project_folder_act = QtGui.QAction('Open Projects DB Folder', self)
         # self.project_folder_act.setShortcut('Ctrl+P')
         # noinspection PyUnresolvedReferences
         self.project_folder_act.triggered.connect(self.project_folder)
@@ -149,7 +149,7 @@ class Database(AbstractWidget):
         self.btn_refresh_db.clicked.connect(self.update_table)
         self.btn_refresh_db.setToolTip("Refresh DB entries")
         self.manage_btn_box.addButton(self.btn_refresh_db, QtWidgets.QDialogButtonBox.ActionRole)
-        self.refresh_db_act = QtWidgets.QAction('Open Projects DB Folder', self)
+        self.refresh_db_act = QtGui.QAction('Open Projects DB Folder', self)
         # noinspection PyUnresolvedReferences
         self.refresh_db_act.triggered.connect(self.update_table)
         self.main_win.database_menu.addAction(self.refresh_db_act)
@@ -174,7 +174,7 @@ class Database(AbstractWidget):
         btn.clicked.connect(self.import_profiles)
         btn.setToolTip("Import multiple profiles")
         self.product_btn_box.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
-        self.import_profiles_act = QtWidgets.QAction('Import Multiple Profiles', self)
+        self.import_profiles_act = QtGui.QAction('Import Multiple Profiles', self)
         self.import_profiles_act.setShortcut('Ctrl+I')
         # noinspection PyUnresolvedReferences
         self.import_profiles_act.triggered.connect(self.import_profiles)
@@ -187,7 +187,7 @@ class Database(AbstractWidget):
         btn.clicked.connect(self.export_profile_switch)
         btn.setToolTip("Export profile data")
         self.product_btn_box.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
-        self.export_profiles_act = QtWidgets.QAction('Export Multiple Profiles', self)
+        self.export_profiles_act = QtGui.QAction('Export Multiple Profiles', self)
         self.export_profiles_act.setShortcut('Ctrl+X')
         # noinspection PyUnresolvedReferences
         self.export_profiles_act.triggered.connect(self.export_profile_switch)
@@ -199,7 +199,7 @@ class Database(AbstractWidget):
         btn.clicked.connect(self.plot_profiles)
         btn.setToolTip("Create plots with all the profiles")
         self.product_btn_box.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
-        self.plot_profiles_act = QtWidgets.QAction('Make Plots from Data', self)
+        self.plot_profiles_act = QtGui.QAction('Make Plots from Data', self)
         # self.plot_profiles_act.setShortcut('Ctrl+P')
         # noinspection PyUnresolvedReferences
         self.plot_profiles_act.triggered.connect(self.plot_profiles)
@@ -211,7 +211,7 @@ class Database(AbstractWidget):
         btn.clicked.connect(self.export_profile_metadata)
         btn.setToolTip("Export profile locations and metadata")
         self.product_btn_box.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
-        self.export_profile_metadata_act = QtWidgets.QAction('Export Data Info', self)
+        self.export_profile_metadata_act = QtGui.QAction('Export Data Info', self)
         # self.export_profile_metadata_act.setShortcut('Ctrl+D')
         # noinspection PyUnresolvedReferences
         self.export_profile_metadata_act.triggered.connect(self.export_profile_metadata)
@@ -223,7 +223,7 @@ class Database(AbstractWidget):
         btn.clicked.connect(self.output_folder)
         btn.setToolTip("Open the output folder")
         self.product_btn_box.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
-        self.output_folder_act = QtWidgets.QAction('Open Output Folder', self)
+        self.output_folder_act = QtGui.QAction('Open Output Folder', self)
         # self.output_folder_act.setShortcut('Ctrl+O')
         # noinspection PyUnresolvedReferences
         self.output_folder_act.triggered.connect(self.output_folder)
@@ -250,42 +250,42 @@ class Database(AbstractWidget):
         # single selection
         if len(rows) == 1:
 
-            map_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'map.png')),
+            map_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'map.png')),
                                         "Show map", self, toolTip="Show a map with the profile location",
                                         triggered=self.show_map_for_selected)
             menu.addAction(map_act)
 
-            stats_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'stats.png')),
+            stats_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'stats.png')),
                                           "Profile stats", self, toolTip="Get some statistical info about the profile",
                                           triggered=self.stats_profile)
             menu.addAction(stats_act)
 
-            metadata_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata_profile.png')),
+            metadata_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata_profile.png')),
                                              "Metadata info", self, toolTip="View/edit the profile metadata",
                                              triggered=self.metadata_profile)
             menu.addAction(metadata_act)
 
             menu.addMenu(qa_menu)
-            dqa_compare_ref_act = QtWidgets.QAction("DQA (with reference)", self,
+            dqa_compare_ref_act = QtGui.QAction("DQA (with reference)", self,
                                                     toolTip="Assess data quality by comparison with the reference cast",
                                                     triggered=self.dqa_full_profile)
             qa_menu.addAction(dqa_compare_ref_act)
-            dqa_at_surface_act = QtWidgets.QAction("DQA (at surface)", self, toolTip="DQA with surface sound speed",
+            dqa_at_surface_act = QtGui.QAction("DQA (at surface)", self, toolTip="DQA with surface sound speed",
                                                    triggered=self.dqa_at_surface)
             qa_menu.addAction(dqa_at_surface_act)
 
             menu.addSeparator()
 
-            load_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'load_profile.png')),
+            load_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'load_profile.png')),
                                          "Load profile", self, toolTip="Load a profile", triggered=self.load_profile)
             menu.addAction(load_act)
 
-            export_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'export_profile.png')),
+            export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export_profile.png')),
                                            "Export profile", self, toolTip="Export a single profile",
                                            triggered=self.export_single_profile)
             menu.addAction(export_act)
 
-            delete_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'delete.png')),
+            delete_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'delete.png')),
                                            "Delete profile", self, toolTip="Delete selected profile",
                                            triggered=self.delete_profile)
             menu.addAction(delete_act)
@@ -299,26 +299,26 @@ class Database(AbstractWidget):
 
         else:  # multiple selection
 
-            map_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'map.png')),
+            map_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'map.png')),
                                         "Show map", self, toolTip="Show a map with profiles location",
                                         triggered=self.show_map_for_selected)
             menu.addAction(map_act)
 
-            metadata_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata_profile.png')),
+            metadata_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata_profile.png')),
                                              "Edit metadata",
                                              self, toolTip="Edit common metadata fields for multiple profiles",
                                              triggered=self.metadata_profile)
             menu.addAction(metadata_act)
 
             if len(rows) == 2:
-                ray_tracing_comparison_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media,
+                ray_tracing_comparison_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media,
                                                                                         'raytracing_comparison.png')),
                                                                "Ray-tracing comparison", self,
                                                                toolTip="Compare ray-tracing using the selected pair",
                                                                triggered=self.ray_tracing_comparison)
                 menu.addAction(ray_tracing_comparison_act)
 
-                bias_plots_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'bias_plots.png')),
+                bias_plots_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'bias_plots.png')),
                                                    "Across-swath bias", self,
                                                    toolTip="Create depth and horizontal bias plots across the swath",
                                                    triggered=self.bias_plots)
@@ -326,28 +326,28 @@ class Database(AbstractWidget):
 
             menu.addMenu(qa_menu)
             if len(rows) == 2:
-                dqa_compare_two_act = QtWidgets.QAction("DQA (among selections)", self,
+                dqa_compare_two_act = QtGui.QAction("DQA (among selections)", self,
                                                         toolTip="Assess data quality by comparison between two casts",
                                                         triggered=self.dqa_full_profile)
                 qa_menu.addAction(dqa_compare_two_act)
 
-            dqa_at_surface_act = QtWidgets.QAction("DQA (at surface)", self, toolTip="DQA with surface sound speed",
+            dqa_at_surface_act = QtGui.QAction("DQA (at surface)", self, toolTip="DQA with surface sound speed",
                                                    triggered=self.dqa_at_surface)
             qa_menu.addAction(dqa_at_surface_act)
 
-            plot_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'plot_comparison.png')),
+            plot_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'plot_comparison.png')),
                                          "Comparison plot", self, toolTip="Plot profiles for comparison",
                                          triggered=self.plot_comparison)
             menu.addAction(plot_act)
 
             menu.addSeparator()
 
-            export_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'export_profile.png')),
+            export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export_profile.png')),
                                            "Export profiles", self, toolTip="Export multiple profiles",
                                            triggered=self.export_multi_profile)
             menu.addAction(export_act)
 
-            delete_act = QtWidgets.QAction(QtGui.QIcon(os.path.join(self.media, 'delete.png')),
+            delete_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'delete.png')),
                                            "Delete profiles", self, toolTip="Delete selected profiles",
                                            triggered=self.delete_profile)
             menu.addAction(delete_act)

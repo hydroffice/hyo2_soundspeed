@@ -5,14 +5,14 @@ Sound Speed Manager
 import logging
 import os
 
-from hyo2.abc.app.app_info import AppInfo
+from hyo2.abc2.app.app_info import AppInfo
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 name = "Sound Speed Manager"
-__version__ = "2023.0.10"
-__copyright__ = "Copyright 2023 University of New Hampshire, Center for Coastal and Ocean Mapping"
+__version__ = "2024.0.0"
+__copyright__ = "Copyright 2024 University of New Hampshire, Center for Coastal and Ocean Mapping"
 
 app_info = AppInfo()
 
