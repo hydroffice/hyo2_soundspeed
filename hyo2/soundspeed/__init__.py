@@ -35,7 +35,7 @@ lib_info.lib_support_email = "soundspeed@hydroffice.org"
 lib_info.lib_latest_url = "https://www.hydroffice.org/latest/soundspeed.txt"
 
 lib_info.lib_dep_dict = {
-    "hyo2.abc22": "hyo2.abc2",
+    "hyo2.abc2": "hyo2.abc2",
     "hyo2.soundspeed": "hyo2.soundspeed",
     "hyo2.surveydatamonitor": "hyo2.surveydatamonitor",
     "gsw": "gsw",

@@ -23,11 +23,14 @@ from hyo2.soundspeed import __version__ as ssm_version
 
 sys.setrecursionlimit(20000)
 
+is_alpha = True
 is_beta = False
-if is_beta:
-    beta = ".b%s" % datetime.now().strftime("%Y%m%d%H%M%S")
+if is_alpha:
+    alphabeta = ".a%s" % datetime.now().strftime("%Y%m%d%H%M%S")
+elif is_beta:
+    alphabeta = ".b%s" % datetime.now().strftime("%Y%m%d%H%M%S")
 else:
-    beta = str()
+    alphabeta = str()
 
 
 def collect_pkg_data(package, include_py_files=False, subdir=None):
@@ -106,11 +109,11 @@ output_folder = os.path.join("cartopy", "data", "shapefiles", "natural_earth", "
 cartopy_data = collect_folder_data(input_data_folder=share_folder, relative_output_folder=output_folder,
                                    recursively=True)
 
+# pyside6_data = collect_pkg_data('PySide6')
 abc_data = collect_pkg_data('hyo2.abc2')
 ss_data = collect_pkg_data('hyo2.soundspeed')
 ssm_data = collect_pkg_data('hyo2.soundspeedmanager')
 sss_data = collect_pkg_data('hyo2.soundspeedsettings')
-pyside6_data = collect_pkg_data('PySide6')
 try:
     sdm_data = collect_pkg_data('hyo2.surveydatamonitor')
 except ImportError:
@@ -123,12 +126,8 @@ if is_darwin:
 
 a = Analysis(['SoundSpeedManager.py'],
              pathex=[],
-             hiddenimports=["PIL", "scipy._lib.messagestream", "cftime._cftime", "PySide6.QtPrintSupport",
-                            "pyproj.datadir", "pkg_resources.py2_warn"],
-             excludes=["IPython", "PyQt4", "PyQt5", "PyQt6", "PySide2", "qgis",
-                       "pandas", "sphinx", "sphinx_rtd_theme", "OpenGL_accelerate",
-                       "FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter", "wx",
-                       "cartopy_offlinedata", "cartopy_userconfig"],
+             hiddenimports=[],
+             excludes=['wx', 'PySide2', 'PyQt5'],
              hookspath=None,
              runtime_hooks=None)
 
@@ -136,7 +135,7 @@ pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=True,
-          name='SoundSpeedManager.%s%s' % (ssm_version, beta),
+          name='SoundSpeedManager',
           debug=False,
           strip=None,
           upx=True,
@@ -146,6 +145,7 @@ coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
+               # pyside6_data,
                sdm_data,
                pyproj_data,
                cartopy_data,
@@ -153,7 +153,6 @@ coll = COLLECT(exe,
                ss_data,
                ssm_data,
                sss_data,
-               pyside6_data,
                strip=None,
                upx=True,
-               name='SoundSpeedManager.%s%s' % (ssm_version, beta))
+               name='SoundSpeedManager.%s%s' % (ssm_version, alphabeta))
