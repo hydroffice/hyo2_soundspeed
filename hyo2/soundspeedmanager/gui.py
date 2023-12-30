@@ -27,13 +27,11 @@ def qt_custom_handler(error_type: QtCore.QtMsgType, error_context: QtCore.QMessa
 
 QtCore.qInstallMessageHandler(qt_custom_handler)
 
-app = None
-
 
 def gui():
     """Create the application and show the Sound Speed Manager gui"""
     from hyo2.soundspeedmanager.mainwin import MainWin
-    global app
+    logger.debug("Init app ...")
     app = QtWidgets.QApplication()
     AppStyle.apply(app=app)
 
@@ -50,6 +48,7 @@ def gui():
         if reply == QtWidgets.QMessageBox.No:
             sys.exit(app.exit())
 
+    logger.debug("Init main win ...")
     main_win = MainWin()
     sys.excepthook = main_win.exception_hook  # install the exception hook
     main_win.show()
