@@ -25,8 +25,8 @@ class Server(AbstractWidget):
         self.main_layout.addLayout(hbox)
         hbox.addStretch()
         self.group_box = QtWidgets.QGroupBox("Synthetic Profile Server")
-        self.group_box.setMaximumHeight(120)
-        self.group_box.setFixedWidth(500)
+        self.group_box.setMaximumHeight(150)
+        self.group_box.setFixedWidth(580)
         hbox.addWidget(self.group_box)
         hbox.addStretch()
 
