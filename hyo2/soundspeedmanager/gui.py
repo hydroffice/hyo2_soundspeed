@@ -32,7 +32,7 @@ def gui():
     """Create the application and show the Sound Speed Manager gui"""
     from hyo2.soundspeedmanager.mainwin import MainWin
     logger.debug("Init app ...")
-    app = QtWidgets.QApplication()
+    app = QtWidgets.QApplication(sys.argv)
     AppStyle.apply(app=app)
 
     if Helper.is_script_already_running():

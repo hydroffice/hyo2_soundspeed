@@ -109,7 +109,6 @@ output_folder = os.path.join("cartopy", "data", "shapefiles", "natural_earth", "
 cartopy_data = collect_folder_data(input_data_folder=share_folder, relative_output_folder=output_folder,
                                    recursively=True)
 
-# pyside6_data = collect_pkg_data('PySide6')
 abc_data = collect_pkg_data('hyo2.abc2')
 ss_data = collect_pkg_data('hyo2.soundspeed')
 ssm_data = collect_pkg_data('hyo2.soundspeedmanager')
@@ -127,7 +126,7 @@ if is_darwin:
 a = Analysis(['SoundSpeedManager.py'],
              pathex=[],
              hiddenimports=[],
-             excludes=['wx', 'PySide2', 'PyQt5'],
+             excludes=['qgis', 'pandas', 'PyQt5', 'PySide2', 'shiboken2', 'wx'],
              hookspath=None,
              runtime_hooks=None)
 
