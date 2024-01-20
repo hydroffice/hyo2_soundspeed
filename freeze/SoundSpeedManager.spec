@@ -115,8 +115,8 @@ ssm_data = collect_pkg_data('hyo2.soundspeedmanager')
 sss_data = collect_pkg_data('hyo2.soundspeedsettings')
 try:
     sdm_data = collect_pkg_data('hyo2.surveydatamonitor')
-except ValueError:
-    print("skipping hyo2.surveydatamonitor")
+except Exception as e:
+    print("skipping hyo2.surveydatamonitor: %s" % e)
     sdm_data = TOC()
 
 icon_file = os.path.normpath(os.path.join(os.getcwd(), 'freeze', 'SoundSpeedManager.ico'))
