@@ -458,17 +458,18 @@ class MainWin(QtWidgets.QMainWindow):
                                               QtWidgets.QMessageBox.Ok)
 
     def check_nmea(self):
-        if self.lib.use_nmea():
+        if self.lib.use_nmea_0183():
             if not self.lib.listen_nmea():
-                msg = 'Unable to listening NMEA-0183.\nCheck whether another process is already using the NMEA-0183 port.'
+                msg = ('Unable to listening NMEA 0183.\n'
+                       'Check whether another process is already using the NMEA 0183 port.')
                 # noinspection PyCallByClass,PyArgumentList
-                QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - NMEA-0183", msg,
+                QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - NMEA 0183", msg,
                                               QtWidgets.QMessageBox.Ok)
         else:
             if not self.lib.stop_listen_nmea():
                 msg = 'Unable to stop listening Nmea.'
                 # noinspection PyCallByClass,PyArgumentList
-                QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - NMEA-0183", msg,
+                QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - NMEA 0183", msg,
                                               QtWidgets.QMessageBox.Ok)                
 
     def check_mvp(self):
@@ -586,8 +587,8 @@ class MainWin(QtWidgets.QMainWindow):
             tokens.append("W18")
         if self.lib.use_sippican():
             tokens.append("SIP")
-        if self.lib.use_nmea():
-            tokens.append("NMEA-0183")            
+        if self.lib.use_nmea_0183():
+            tokens.append("N0183")
         if self.lib.use_mvp():
             tokens.append("MVP")
         if self.lib.use_sis():
@@ -740,7 +741,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.old_sis_xyz_data = False
         if self.lib.use_sis():  # in case that SIS4 and SIS5 are enabled
             msg = self._update_gui_from_sis(msg=msg)
-        elif self.lib.use_nmea():  # in case that the NMEA listener is enabled
+        elif self.lib.use_nmea_0183():  # in case that the NMEA listener is enabled
             msg = self._update_gui_from_nmea_nav(msg=msg)
         self.statusBar().showMessage(msg, 2000)
 

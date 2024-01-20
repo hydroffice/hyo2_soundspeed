@@ -12,12 +12,14 @@ logger = logging.getLogger(__name__)
 
 class Setup:
 
+    SUPPORTED_VERSION = 6
+
     @classmethod
     def are_updates_required(cls, db_path):
         # logger.debug("check if version updates are required for %s" % db_path)
         db = SetupDb(os.path.dirname(db_path))
         # logger.debug(db.setup_version)
-        if db.setup_version < 5:
+        if db.setup_version < cls.SUPPORTED_VERSION:
             return True
         return False
 
@@ -25,8 +27,8 @@ class Setup:
     def apply_required_updates(cls, db_path):
         logger.debug("applying version updates %s" % db_path)
         db = SetupDb(os.path.dirname(db_path))
-        if db.setup_version < 5:
-            success = db.update_from_v1_to_v5()
+        if db.setup_version < cls.SUPPORTED_VERSION:
+            success = db.update_from_v1_to_v6()
             if success:
                 return True
         return False
@@ -65,7 +67,7 @@ class Setup:
         self.use_sis4 = None
         self.use_sis5 = None
         self.use_sippican = None
-        self.use_nmea = None        
+        self.use_nmea_0183 = None
         self.use_mvp = None
 
         # output
@@ -141,7 +143,7 @@ class Setup:
             release_folder, _ = os.path.split(db_path)
             db = SetupDb(release_folder)
 
-        if db.setup_version > 5:
+        if db.setup_version > self.SUPPORTED_VERSION:
             raise RuntimeError("unsupported setup version: %s" % db.setup_version)
 
         self.setup_version = db.setup_version
@@ -162,7 +164,7 @@ class Setup:
         self.use_sis4 = db.use_sis4
         self.use_sis5 = db.use_sis5
         self.use_sippican = db.use_sippican
-        self.use_nmea = db.use_nmea        
+        self.use_nmea_0183 = db.use_nmea_0183
         self.use_mvp = db.use_mvp
 
         # output
@@ -252,7 +254,7 @@ class Setup:
             db.use_sis4 = self.use_sis4
             db.use_sis5 = self.use_sis5
             db.use_sippican = self.use_sippican
-            db.use_nmea = self.use_nmea            
+            db.use_nmea_0183 = self.use_nmea_0183
             db.use_mvp = self.use_mvp
 
             # client list
@@ -336,7 +338,7 @@ class Setup:
         msg += "      <use_sis4: %s>\n" % self.use_sis4
         msg += "      <use_sis5: %s>\n" % self.use_sis5
         msg += "      <use_sippican: %s>\n" % self.use_sippican
-        msg += "      <use_nmea: %s>\n" % self.use_nmea        
+        msg += "      <use_nmea_0183: %s>\n" % self.use_nmea_0183
         msg += "      <use_mvp: %s>\n" % self.use_mvp
         msg += "    <output>\n"
         msg += "      <clients>\n"

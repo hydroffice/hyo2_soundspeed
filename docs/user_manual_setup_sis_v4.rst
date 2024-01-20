@@ -6,10 +6,10 @@ Sound Speed Manager - SIS v4 interaction
 .. index:: SIS; v4
 
 As with any communication between any software, whether it is on the same computer or between different computers on a
-network, some setup is required. For SIS and Sound Speed Manager, all communication is done across User Datagram Protocol (UDP). UDP on
-the same windows-based computer requires port numbers; UDP across a network requires both IP addresses on the network and port
-numbers from each computer. *The easiest way to find this information for a given computer is by typing "ipconfig" into a
-windows command prompt, and note the IPv4 Address.*
+network, some setup is required. For SIS and Sound Speed Manager, all communication is done across User Datagram
+Protocol (UDP). UDP on the same windows-based computer requires port numbers; UDP across a network requires both IP
+addresses on the network and port numbers from each computer. *The easiest way to find this information for a given
+computer is by typing "ipconfig" into a windows command prompt, and note the IPv4 Address.*
 
 In order for Sound Speed Manager to automatically interact with *Kongsberg SIS*, some initial configuration are required
 on the *SIS* side to make it to broadcast a specific subset of datagrams that can then be interpreted by the *SSP*

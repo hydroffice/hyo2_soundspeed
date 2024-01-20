@@ -121,7 +121,7 @@ class Listeners(AbstractWidget):
         hbox = QtWidgets.QHBoxLayout()
         self.left_layout.addLayout(hbox)
         hbox.addStretch()
-        self.label = QtWidgets.QLabel("NMEA-0183(*):")
+        self.label = QtWidgets.QLabel("NMEA 0183(*):")
         hbox.addWidget(self.label)
         hbox.addStretch()        
 

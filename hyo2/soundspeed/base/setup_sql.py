@@ -65,7 +65,7 @@ else:
 CREATE_SETTINGS = """-- noinspection SqlResolveForFile
  CREATE TABLE IF NOT EXISTS general(
      id integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
-     setup_version integer NOT NULL DEFAULT 5,
+     setup_version integer NOT NULL DEFAULT 6,
      setup_name text NOT NULL UNIQUE DEFAULT "default",
      setup_status text NOT NULL DEFAULT "inactive",
      /* input */
@@ -82,7 +82,7 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      use_sis integer NOT NULL DEFAULT 1,
      use_sis5 integer NOT NULL DEFAULT 0,
      use_sippican integer NOT NULL DEFAULT 0,
-     use_nmea integer NOT NULL DEFAULT 0,
+     use_nmea_0183 integer NOT NULL DEFAULT 0,
      use_mvp integer NOT NULL DEFAULT 0,
      /* listeners - sis4 */
      sis_listen_port integer NOT NULL DEFAULT 16103,
@@ -177,7 +177,7 @@ V1_V5_COPY_SETTINGS = """-- noinspection SqlResolveForFile
     INSERT INTO  general 
     (id, setup_name, setup_status, use_woa09, use_woa13, use_woa18, use_rtofs, 
     ssp_extension_source, ssp_salinity_source, ssp_temp_sal_source, ssp_up_or_down, rx_max_wait_time,
-    use_sis, use_sippican, use_nmea, use_mvp, sis_listen_port, sis_listen_timeout,
+    use_sis, use_sippican, use_nmea_0183, use_mvp, sis_listen_port, sis_listen_timeout,
     sis_auto_apply_manual_casts, sippican_listen_port, sippican_listen_timeout, nmea_listen_port,
     nmea_listen_timeout, mvp_ip_address, mvp_listen_port, mvp_listen_timeout, mvp_transmission_protocol,
     mvp_format, mvp_winch_port, mvp_fish_port, mvp_nav_port, mvp_system_port, mvp_sw_version,
@@ -217,10 +217,10 @@ V1_V5_COPY_SETTINGS = """-- noinspection SqlResolveForFile
     ELSE
         use_sippican
     END,
-    CASE WHEN typeof(use_nmea) == 'text' THEN
-        use_nmea == 'True'
+    CASE WHEN typeof(use_nmea_0183) == 'text' THEN
+        use_nmea_0183 == 'True'
     ELSE
-        use_nmea
+        use_nmea_0183
     END,
     CASE WHEN typeof(use_mvp) == 'text' THEN
         use_mvp == 'True'

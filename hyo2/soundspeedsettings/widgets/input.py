@@ -292,7 +292,7 @@ class Input(AbstractWidget):
         vbox = QtWidgets.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
-        label = QtWidgets.QLabel("Listen NMEA-0183:")
+        label = QtWidgets.QLabel("Listen NMEA 0183:")
         label.setFixedWidth(lbl_width)
         vbox.addWidget(label)
         vbox.addStretch()
@@ -300,9 +300,9 @@ class Input(AbstractWidget):
         vbox = QtWidgets.QVBoxLayout()
         hbox.addLayout(vbox)
         vbox.addStretch()
-        self.use_nmea = QtWidgets.QComboBox()
-        self.use_nmea.addItems(["True", "False"])
-        vbox.addWidget(self.use_nmea)
+        self.use_nmea_0183 = QtWidgets.QComboBox()
+        self.use_nmea_0183.addItems(["True", "False"])
+        vbox.addWidget(self.use_nmea_0183)
         vbox.addStretch()        
 
         # - use mvp
@@ -416,7 +416,7 @@ class Input(AbstractWidget):
         # noinspection PyUnresolvedReferences
         self.use_sippican.currentIndexChanged.connect(self.apply_use_sippican)
         # noinspection PyUnresolvedReferences
-        self.use_nmea.currentIndexChanged.connect(self.apply_use_nmea)
+        self.use_nmea_0183.currentIndexChanged.connect(self.apply_use_nmea_0183)
         # noinspection PyUnresolvedReferences        
         self.use_mvp.currentIndexChanged.connect(self.apply_use_mvp)
         # noinspection PyUnresolvedReferences
@@ -516,9 +516,9 @@ class Input(AbstractWidget):
         self.setup_changed()
         self.main_win.reload_settings()
 
-    def apply_use_nmea(self):
+    def apply_use_nmea_0183(self):
         # logger.debug("apply use Nmea")
-        self.db.use_nmea = self.use_nmea.currentText() == "True"
+        self.db.use_nmea_0183 = self.use_nmea_0183.currentText() == "True"
         self.setup_changed()
         self.main_win.reload_settings()        
 
@@ -605,10 +605,10 @@ class Input(AbstractWidget):
             self.use_sippican.setCurrentIndex(1)  # False
 
         # use nmea
-        if self.db.use_nmea:
-            self.use_nmea.setCurrentIndex(0)  # True
+        if self.db.use_nmea_0183:
+            self.use_nmea_0183.setCurrentIndex(0)  # True
         else:
-            self.use_nmea.setCurrentIndex(1)  # False            
+            self.use_nmea_0183.setCurrentIndex(1)  # False
 
         # use mvp
         if self.db.use_mvp:
