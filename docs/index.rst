@@ -23,6 +23,6 @@ HydrOffice Sound Speed's documentation
 
 
 .. note::
-	© University of New Hampshire, Center for Coastal and Ocean Mapping, 2022.  All rights reserved.  Portions of this
+	© University of New Hampshire, Center for Coastal and Ocean Mapping, 2024.  All rights reserved.  Portions of this
 	project were developed under a cooperative agreement with NOAA Coast Survey Development Laboratory, and contain
 	NOAA-developed code in the public domain.
