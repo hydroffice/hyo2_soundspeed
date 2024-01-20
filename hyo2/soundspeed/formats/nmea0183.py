@@ -21,7 +21,6 @@ class Nmea0183Nav:
     def __str__(self):
         return "Latitude: {0}, Longitude: {1}\n".format(self.latitude, self.longitude)
 
-
     
 class Nmea0183GGA(Nmea0183Nav):
 
@@ -47,7 +46,7 @@ class Nmea0183GGA(Nmea0183Nav):
             self.latitude = int(self.lat[:2]) + float(self.lat[2:])/60.
             if self.lat_dir == 'S':
                 self.latitude = -1.0 * self.latitude
-            #logger.debug("NMEA-0183 $$GGA lat: {}".format(self.latitude))
+            #logger.debug("NMEA 0183 $$GGA lat: {}".format(self.latitude))
         except Exception as e:
             logger.warning("unable to interpret latitude from {0} and {1}, {2}".format(self.lat, self.lat_dir, e))
 
@@ -55,13 +54,11 @@ class Nmea0183GGA(Nmea0183Nav):
             self.longitude = int(self.lon[:3]) + float(self.lon[3:])/60.
             if self.lon_dir == 'W':
                 self.longitude = -1.0 * self.longitude
-            #logger.debug("NMEA-0183 $$GGA lon: {}".format(self.longitude))
+            #logger.debug("NMEA 0183 $$GGA lon: {}".format(self.longitude))
         except Exception as e:
             logger.warning("unable to interpret longitude from {0} and {1}, {2}".format(self.lon, self.lon_dir, e))
 
 
-
-    
 class Nmea0183GLL(Nmea0183Nav):
 
     def __init__(self, data):
@@ -80,7 +77,7 @@ class Nmea0183GLL(Nmea0183Nav):
             self.latitude = int(self.lat[:2]) + float(self.lat[2:])/60.
             if self.lat_dir == 'S':
                 self.latitude = -1.0 * self.latitude
-            #logger.debug("NMEA-0183 $$GLL lat: {}".format(self.latitude))
+            #logger.debug("NMEA 0183 $$GLL lat: {}".format(self.latitude))
         except Exception as e:
             logger.warning("unable to interpret latitude from {0} and {1}, {2}".format(self.lat, self.lat_dir, e))
 
@@ -88,7 +85,7 @@ class Nmea0183GLL(Nmea0183Nav):
             self.longitude = int(self.lon[:3]) + float(self.lon[3:])/60.
             if self.lon_dir == 'W':
                 self.longitude = -1.0 * self.longitude
-            #logger.debug("NMEA-0183 $$GLL lon: {}".format(self.longitude))
+            #logger.debug("NMEA 0183 $$GLL lon: {}".format(self.longitude))
         except Exception as e:
             logger.warning("unable to interpret longitude from {0} and {1}, {2}".format(self.lon, self.lon_dir, e))
             

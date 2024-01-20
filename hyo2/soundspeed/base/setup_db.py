@@ -22,7 +22,7 @@ class SetupDb(BaseDb):
         self._check_default_setup()
         self.use_setup_name = use_setup_name
 
-    def update_from_v1_to_v5(self):
+    def update_from_v1_to_v6(self):
         if not self.conn:
             logger.error("Missing db connection")
             return False
@@ -464,14 +464,14 @@ class SetupDb(BaseDb):
     def use_sippican(self, value):
         self._setter_bool("use_sippican", value)
 
-    # --- use_nmea
+    # --- use_nmea_0183
     @property
-    def use_nmea(self):
-        return self._getter_bool("use_nmea")
+    def use_nmea_0183(self):
+        return self._getter_bool("use_nmea_0183")
 
-    @use_nmea.setter
-    def use_nmea(self, value):
-        self._setter_bool("use_nmea", value)        
+    @use_nmea_0183.setter
+    def use_nmea_0183(self, value):
+        self._setter_bool("use_nmea_0183", value)
 
     # --- use_mvp
     @property

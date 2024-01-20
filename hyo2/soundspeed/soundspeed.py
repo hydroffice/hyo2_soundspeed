@@ -956,10 +956,10 @@ class SoundSpeedLibrary:
 
     def retrieve_nmea(self) -> None:
         """Retrieve data from NMEA"""
-        if not self.use_nmea():
-            raise RuntimeError("use NMEA option is disabled")
+        if not self.use_nmea_0183():
+            raise RuntimeError("use NMEA 0183 option is disabled")
 
-        self.progress.start(text="Retrieve from NMEA")
+        self.progress.start(text="Retrieve from NMEA 0183")
 
         if not self.listen_nmea():
             raise RuntimeError("unable to listen NMEA")
@@ -2110,8 +2110,8 @@ class SoundSpeedLibrary:
     def use_sippican(self) -> bool:
         return self.setup.use_sippican
 
-    def use_nmea(self) -> bool:
-        return self.setup.use_nmea    
+    def use_nmea_0183(self) -> bool:
+        return self.setup.use_nmea_0183
 
     def use_mvp(self) -> bool:
         return self.setup.use_mvp

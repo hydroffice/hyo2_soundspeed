@@ -34,7 +34,7 @@ class Nmea(AbstractListener):
     def parse(self) -> None:
         this_data = self.data[:].decode("utf-8")
         if self.debug:
-            logger.debug("Received: %s)" % (this_data))
+            logger.debug("Received: %s)" % this_data)
 
         sentence_type = this_data[3:6]
 

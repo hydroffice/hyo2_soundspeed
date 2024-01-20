@@ -331,8 +331,8 @@ class QtCallbacks(AbstractCallbacks):
                 if self.nmea_listener.nav is not None:
                     if (self.nmea_listener.nav_latitude is not None) and (self.nmea_listener.nav_longitude is not None):
                         if self.ask_location_from_nmea():
-                            msg_lat = "Latitude retrieved from NMEA-0183 listener:"
-                            msg_lon = "Longitude retrieved from NMEA-0183 listener:"                            
+                            msg_lat = "Latitude retrieved from NMEA 0183 listener:"
+                            msg_lon = "Longitude retrieved from NMEA 0183 listener:"
                             default_lat = self.nmea_listener.nav_latitude
                             default_lon = self.nmea_listener.nav_longitude            
 
@@ -500,7 +500,7 @@ class QtCallbacks(AbstractCallbacks):
     def ask_location_from_nmea(self) -> bool:
         """Ask user whether retrieving location from NMEA"""
         msg = "Geographic location required for pressure/depth conversion and atlas lookup.\n" \
-              "Use geographic position from NMEA-0183?\nChoose 'no' to enter position manually."
+              "Use geographic position from NMEA 0183?\nChoose 'no' to enter position manually."
         # noinspection PyArgumentList,PyCallByClass
         ret = QtWidgets.QMessageBox.information(self._parent, "Location", msg,
                                                 QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)

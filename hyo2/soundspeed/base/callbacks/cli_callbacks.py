@@ -171,9 +171,9 @@ class CliCallbacks(AbstractCallbacks):
         return False
 
     def ask_location_from_nmea(self) -> bool:
-        """Ask user whether retrieving location from NMEA-0183"""
+        """Ask user whether retrieving location from NMEA 0183"""
         bool_msg = "Geographic location required for pressure/depth conversion and atlas lookup.\n" \
-                   "Use geographic position from NMEA-0183?\'y' for yes, other inputs to enter position manually."
+                   "Use geographic position from NMEA 0183?\'y' for yes, other inputs to enter position manually."
 
         raw = input(bool_msg)
         # print(raw)

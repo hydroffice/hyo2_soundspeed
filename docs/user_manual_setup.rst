@@ -10,4 +10,4 @@ Setup
     user_manual_setup_settings
     user_manual_setup_sis_v4
     user_manual_setup_sis_v5
-    user_manual_setup_nmea0183
+    user_manual_setup_nmea_0183
