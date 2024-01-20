@@ -38,9 +38,9 @@ Sonardyne (.pro)                                    X    X
 Turo (.nc)                                          X
 UNB (.unb)                                          X    X
 Valeport Midas/Monitor SVP/SVX2 (.000)              X
-Valeport MiniSVP (.txt)                             X
+Valeport MiniSVP/MiniCTD (.txt)                     X
 Valeport RapidSV/SVT (.txt)                         X
-Valeport Monitor CTD, Midas SVP/SVX2(.vpd)          X
+Valeport Monitor CTD, Midas SVP/SVX2 (.vpd)         X
 Valeport SWiFT SVP/CTD (.vp2)                       X
 =================================================== ==== =====
 
