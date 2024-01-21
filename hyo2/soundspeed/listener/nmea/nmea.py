@@ -2,8 +2,9 @@ import logging
 from datetime import datetime
 from typing import Optional, Union
 
+from hyo2.soundspeed.formats.nmea_0183.nmea_0183_gga import Nmea0183GGA
+from hyo2.soundspeed.formats.nmea_0183.nmea_0183_gll import Nmea0183GLL
 from hyo2.soundspeed.listener.abstract import AbstractListener
-from hyo2.soundspeed.formats import nmea0183
 
 logger = logging.getLogger(__name__)
 
@@ -16,9 +17,9 @@ class Nmea(AbstractListener):
         super(Nmea, self).__init__(port=port, ip=ip, timeout=timeout, target=target, name=name, debug=debug)
         self.desc = name
 
-        self.nav = None            # type: Union[nmea0183.Nmea0183GGA, nmea0183.Nmea0183GLL, None]
+        self.nav = None  # type: Optional[Union[Nmea0183GGA, Nmea0183GLL]]
         self.nav_last_time = None  # type: Optional[datetime]
-        
+
     @property
     def nav_latitude(self) -> Optional[float]:
         if self.nav is None:
@@ -29,7 +30,7 @@ class Nmea(AbstractListener):
     def nav_longitude(self) -> Optional[float]:
         if self.nav is None:
             return None
-        return self.nav.longitude            
+        return self.nav.longitude
 
     def parse(self) -> None:
         this_data = self.data[:].decode("utf-8")
@@ -39,14 +40,14 @@ class Nmea(AbstractListener):
         sentence_type = this_data[3:6]
 
         if sentence_type == 'GGA':
-            self.nav = nmea0183.Nmea0183GGA(this_data)
+            self.nav = Nmea0183GGA(this_data)
             self.nav_last_time = datetime.utcnow()
 
         elif sentence_type == 'GLL':
-            self.nav = nmea0183.Nmea0183GLL(this_data)
+            self.nav = Nmea0183GLL(this_data)
             self.nav_last_time = datetime.utcnow()
-        
+
     def __repr__(self):
         msg = "%s" % super(Nmea, self).__repr__()
-        # msg += "  <has data loaded: %s>\n" % self.has_data_loaded
+        msg += "  <nav last time: %s>\n" % self.nav_last_time
         return msg

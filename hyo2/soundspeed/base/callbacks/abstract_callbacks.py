@@ -1,12 +1,11 @@
-from abc import ABCMeta, abstractmethod
 import logging
+from abc import ABCMeta, abstractmethod
 from datetime import datetime
 from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from hyo2.soundspeed.listener.sis.sis import Sis
     from hyo2.soundspeed.listener.nmea.nmea import Nmea
-
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +15,7 @@ class GeneralAbstractCallbacks(metaclass=ABCMeta):
 
     def __init__(self) -> None:
         self.sis_listener = None  # type: Optional[Sis]
-        self.nmea_listener = None # type: Optional[Nmea]
+        self.nmea_listener = None  # type: Optional[Nmea]
 
     @abstractmethod
     def ask_number(self, title: Optional[str] = "", msg: Optional[str] = "Enter number", default: Optional[float] = 0.0,
