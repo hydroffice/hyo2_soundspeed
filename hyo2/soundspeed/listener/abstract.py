@@ -29,7 +29,7 @@ class AbstractListener(Thread):
 
         self.shutdown = Event()
         self.sock_in = None
-        self.data = None
+        self.data = None  # type: Optional[bytes]
         self.sender = None
 
     def init_sockets(self) -> bool:
