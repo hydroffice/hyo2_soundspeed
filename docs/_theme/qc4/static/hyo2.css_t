@@ -2,8 +2,8 @@
  * hyo2.css_t
  */
 
-{% set light_noaa = '#007ec6' %}
-{% set dark_hydroffice = '#235b8c' %}
+{% set light_noaa = '#c66300' %}
+{% set dark_hydroffice = '#C49B00' %}
 {% set dark_blue = '#164670' %}
 {% set blue = '#235b8c' %}
 {% set light_blue = '#368dd9' %}
@@ -13,7 +13,7 @@
 {% set very_light_orange = '#e5dfd5' %}
 {% set black = '#1a2126' %}
 {% set light_black = '#3e4549' %}
-{% set very_light_black = '#cccdce' %}
+{% set very_light_black = '#b6b7b8' %}
 {% set page_width = 965 %}
 {% set sidebar_width = 165 %}
 {% set body_font_stack = 'Optima, Segoe, "Segoe UI", Candara, Calibri, Arial, sans-serif' %}
@@ -227,7 +227,7 @@ div.body p, div.body dd, div.body li {
 }
 
 div.admonition {
-    background: #fafafa;
+    background: #FDFDF0;
     margin: 20px -30px;
     padding: 10px 30px;
     border-top: 1px solid #ccc;
@@ -237,7 +237,7 @@ div.admonition {
 div.admonition p.admonition-title {
     font-family: {{ headline_font_stack }};
     font-weight: normal;
-    font-size: 15px;
+    font-size: 14px;
     margin: 0 0 10px 0;
     padding: 0;
     line-height: 1;
@@ -255,6 +255,12 @@ dt:target, .highlight {
     background: #FAF3E8;
 }
 
+div.note {
+    font-size: 10px;
+    background-color: {{ very_ligh_black }};
+    border: 1px solid #ccc;
+}
+
 div.seealso {
     background-color: #ffc;
     border: 1px solid #ff6;
@@ -264,20 +270,12 @@ div.topic {
     background-color: #eee;
 }
 
-div.note {
-    font-size: 12px;
-    background-color: #f2efe1;
-    border: 1px solid #c7b25d;
-}
-
 div.warning {
-    font-size: 14px;
-    background-color: #f7f0f0;
-    border: 1px solid #cc5e5e;
+    background-color: #ffe4e4;
+    border: 1px solid #f66;
 }
 
 p.admonition-title {
-    font-size: 15px;
     display: inline;
 }
 
