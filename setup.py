@@ -30,8 +30,8 @@ def find_version(*file_paths):
 #                          POPULATE SETUP
 
 setup(
-    name="hyo2.soundspeed",
-    version=find_version("hyo2", "soundspeed", "__init__.py"),
+    name="hyo2.ssm2",
+    version=find_version("hyo2", "ssm2", "__init__.py"),
     license='LGPLv2.1 or CCOM-UNH Industrial Associate license',
 
     namespace_packages=[
@@ -92,15 +92,14 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         'Topic :: Scientific/Engineering :: GIS',
         'Topic :: Office/Business :: Office Suites',
     ],
     keywords="hydrography ocean mapping survey sound speed profiles",
-    author="Giuseppe Masetti(UNH,CCOM); Barry Gallagher(NOAA,OCS); " \
+    author="Giuseppe Masetti(UNH,JHC-CCOM); Barry Gallagher(NOAA,OCS); " \
            "Chen Zhang(NOAA,OCS)",
     author_email="gmasetti@ccom.unh.edu, barry.gallagher@noaa.gov, " \
                  "chen.zhang@noaa.gov",
