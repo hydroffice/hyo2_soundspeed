@@ -3,8 +3,8 @@ import logging
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
-from hyo2.soundspeedmanager.widgets.widget import AbstractWidget
-from hyo2.soundspeedmanager.widgets.dataplots import DataPlots
+from hyo2.ssm2.app.gui.soundspeedmanager.widgets.widget import AbstractWidget
+from hyo2.ssm2.app.gui.soundspeedmanager.widgets.dataplots import DataPlots
 
 logger = logging.getLogger(__name__)
 

@@ -1,4 +1,4 @@
-version: 2022.{build}-{branch}
+version: 2024.{build}-{branch}
 
 image: Visual Studio 2015
 
@@ -10,11 +10,11 @@ environment:
       PYTHON_ARCH: x64
       MINICONDA: C:\Miniconda37-x64
 
-    - PYTHON_VERSION: 3.6
+    - PYTHON_VERSION: 3.9
       PYTHON_ARCH: x64
       MINICONDA: C:\Miniconda37-x64
 
-    - PYTHON_VERSION: 3.7
+    - PYTHON_VERSION: 3.10
       PYTHON_ARCH: x64
       MINICONDA: C:\Miniconda37-x64
 
@@ -22,11 +22,11 @@ matrix:
 
   allow_failures:
 
-    - PYTHON_VERSION: 3.6
+    - PYTHON_VERSION: 3.9
       PYTHON_ARCH: x64
       MINICONDA: C:\Miniconda37-x64
 
-    - PYTHON_VERSION: 3.7
+    - PYTHON_VERSION: 3.10
       PYTHON_ARCH: x64
       MINICONDA: C:\Miniconda37-x64
 

@@ -2,9 +2,9 @@ import unittest
 import os
 import shutil
 
-from hyo2.soundspeedmanager import AppInfo
-from hyo2.soundspeed.atlas import atlases
-from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+from hyo2.ssm2.app.gui.soundspeedmanager import AppInfo
+from hyo2.ssm2.lib.atlas import atlases
+from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 
 class TestSoundSpeedAtlasAtlases(unittest.TestCase):

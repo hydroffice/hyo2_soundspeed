@@ -3,8 +3,8 @@ from PySide6 import QtCore, QtWidgets, QtGui
 import traceback
 import logging
 
-from hyo2.soundspeed.profile.oceanography import Oceanography
-from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
+from hyo2.ssm2.lib.profile.oceanography import Oceanography
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.dialog import AbstractDialog
 
 logger = logging.getLogger(__name__)
 

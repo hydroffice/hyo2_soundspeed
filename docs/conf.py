@@ -29,7 +29,7 @@ extensions = [
 ]
 
 # Whitelist pattern for tags (set to None to ignore all tags)
-smv_tag_whitelist = r'^(stable|v\.\d+\.\d+\.\d+)$'
+smv_tag_whitelist = r'^(stable|v2\.\d+\.\d+\.\d+)$'
 
 # Whitelist pattern for branches (set to None to ignore all branches -> BUG!)
 smv_branch_whitelist = r'^None$'
@@ -57,7 +57,7 @@ copyright = u'2024, CCOM/JHC,UNH'
 # The short X.Y version.
 version = '2024.0'
 # The full version, including alpha/beta/rc tags.
-release = '2024.0.1'
+release = '2024.0.0'
 
 numfig = True
 

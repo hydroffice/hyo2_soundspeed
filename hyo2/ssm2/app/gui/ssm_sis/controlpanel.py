@@ -4,9 +4,9 @@ import os
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from hyo2.abc2.lib.helper import Helper
-from hyo2.ssm_sis import app_info
-from hyo2.soundspeed.listener.sis.sis import Sis
-from hyo2.soundspeed.profile.profilelist import ProfileList
+from hyo2.ssm2.app.gui.ssm_sis import app_info
+from hyo2.ssm2.lib.listener.sis.sis import Sis
+from hyo2.ssm2.lib.profile.profilelist import ProfileList
 
 
 logger = logging.getLogger(__name__)

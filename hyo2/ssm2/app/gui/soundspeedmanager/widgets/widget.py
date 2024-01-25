@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 from hyo2.abc2.app.qt_progress import QtProgress
 
-from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 
 class AbstractWidget(QtWidgets.QMainWindow):

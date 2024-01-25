@@ -3,7 +3,7 @@ import time
 import traceback
 
 try:
-    from hyo2.soundspeed.listener.seacat.sbe_serialcomms import SeacatComms, UTF8Serial
+    from hyo2.ssm2.lib.listener.seacat.sbe_serialcomms import SeacatComms, UTF8Serial
 
 except Exception:
     print("Seacat serial communications module not found or failed to load")

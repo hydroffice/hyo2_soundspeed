@@ -2,10 +2,10 @@ import unittest
 import os
 import logging
 
-from hyo2.soundspeedmanager import AppInfo
-from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
-from hyo2.soundspeed.base.callbacks.fake_callbacks import FakeCallbacks
-from hyo2.soundspeed.base.testing import SoundSpeedTesting
+from hyo2.ssm2.app.gui.soundspeedmanager import AppInfo
+from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
+from hyo2.ssm2.lib.base.callbacks.fake_callbacks import FakeCallbacks
+from hyo2.ssm2.lib.base.testing import SoundSpeedTesting
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

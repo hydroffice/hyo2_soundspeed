@@ -3,10 +3,10 @@ from datetime import datetime as dt, date
 import logging
 from typing import Optional, Union, TYPE_CHECKING
 
-from hyo2.soundspeed.base.geodesy import Geodesy
-from hyo2.soundspeed.profile.profilelist import ProfileList
+from hyo2.ssm2.lib.base.geodesy import Geodesy
+from hyo2.ssm2.lib.profile.profilelist import ProfileList
 if TYPE_CHECKING:
-    from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+    from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 

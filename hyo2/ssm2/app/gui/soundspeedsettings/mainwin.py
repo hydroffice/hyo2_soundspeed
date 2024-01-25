@@ -6,15 +6,15 @@ from PySide6 import QtCore, QtGui, QtWidgets
 
 from hyo2.abc2.app.dialogs.exception.exception_dialog import ExceptionDialog
 
-from hyo2.soundspeed import lib_info
-from hyo2.soundspeedsettings import app_info
-from hyo2.soundspeedsettings.widgets.main import Main
-from hyo2.soundspeedsettings.widgets.general import General
-from hyo2.soundspeedsettings.widgets.input import Input
-from hyo2.soundspeedsettings.widgets.output import Output
-from hyo2.soundspeedsettings.widgets.listeners import Listeners
+from hyo2.ssm2 import lib_info
+from hyo2.ssm2.app.gui.soundspeedsettings import app_info
+from hyo2.ssm2.app.gui.soundspeedsettings.widgets.main import Main
+from hyo2.ssm2.app.gui.soundspeedsettings.widgets.general import General
+from hyo2.ssm2.app.gui.soundspeedsettings.widgets.input import Input
+from hyo2.ssm2.app.gui.soundspeedsettings.widgets.output import Output
+from hyo2.ssm2.app.gui.soundspeedsettings.widgets.listeners import Listeners
 
-from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 

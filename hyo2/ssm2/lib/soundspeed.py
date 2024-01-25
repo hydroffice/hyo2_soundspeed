@@ -1,38 +1,37 @@
-import time
+import copy
+import logging
 import os
 import re
-import copy
 import shutil
+import time
 import traceback
-import logging
 from typing import Optional, TYPE_CHECKING
+
 from appdirs import user_data_dir
 
-from hyo2.abc2.lib.progress.abstract_progress import AbstractProgress
-from hyo2.abc2.lib.progress.cli_progress import CliProgress
 from hyo2.abc2.lib.gdal_aux import GdalAux
 from hyo2.abc2.lib.helper import Helper
-
-from hyo2.soundspeed import lib_info
-from hyo2.soundspeed import formats
-from hyo2.soundspeed.atlas.atlases import Atlases
-from hyo2.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
-from hyo2.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
-from hyo2.soundspeed.base.setup import Setup
-from hyo2.soundspeed.db.db import ProjectDb
-from hyo2.soundspeed.listener.listeners import Listeners
-from hyo2.soundspeed.profile.profilelist import ProfileList
-from hyo2.soundspeed.profile.dicts import Dicts
-from hyo2.soundspeed.server.server import Server
-from hyo2.soundspeed.profile.ray_tracing.tracedprofile import TracedProfile
-from hyo2.soundspeed.profile.ray_tracing.diff_tracedprofiles import DiffTracedProfiles
-from hyo2.soundspeed.profile.ray_tracing.plot_tracedprofiles import PlotTracedProfiles
+from hyo2.abc2.lib.progress.abstract_progress import AbstractProgress
+from hyo2.abc2.lib.progress.cli_progress import CliProgress
+from hyo2.ssm2 import lib_info
+from hyo2.ssm2.lib import formats
+from hyo2.ssm2.lib.atlas.atlases import Atlases
+from hyo2.ssm2.lib.base.callbacks.abstract_callbacks import AbstractCallbacks
+from hyo2.ssm2.lib.base.callbacks.cli_callbacks import CliCallbacks
+from hyo2.ssm2.lib.base.setup import Setup
+from hyo2.ssm2.lib.db.db import ProjectDb
+from hyo2.ssm2.lib.listener.listeners import Listeners
+from hyo2.ssm2.lib.profile.dicts import Dicts
+from hyo2.ssm2.lib.profile.profilelist import ProfileList
+from hyo2.ssm2.lib.profile.ray_tracing.diff_tracedprofiles import DiffTracedProfiles
+from hyo2.ssm2.lib.profile.ray_tracing.plot_tracedprofiles import PlotTracedProfiles
+from hyo2.ssm2.lib.profile.ray_tracing.tracedprofile import TracedProfile
+from hyo2.ssm2.lib.server.server import Server
 
 if TYPE_CHECKING:
     from datetime import datetime
-    from hyo2.soundspeed.profile.profile import Profile
-    from hyo2.soundspeed.db.export import ExportDbFields
-
+    from hyo2.ssm2.lib.profile.profile import Profile
+    from hyo2.ssm2.lib.db.export import ExportDbFields
 
 logger = logging.getLogger(__name__)
 
@@ -406,7 +405,7 @@ class SoundSpeedLibrary:
             return False
 
         return self.listeners.mvp_to_process
-    
+
     # --- import data
 
     def import_data(self, data_path: str, data_format: str, skip_atlas: bool = False) -> None:
@@ -954,34 +953,6 @@ class SoundSpeedLibrary:
         self.ssp = ssp_list
         self.progress.end()
 
-    def retrieve_nmea(self) -> None:
-        """Retrieve data from NMEA"""
-        if not self.use_nmea_0183():
-            raise RuntimeError("use NMEA 0183 option is disabled")
-
-        self.progress.start(text="Retrieve from NMEA 0183")
-
-        if not self.listen_nmea():
-            raise RuntimeError("unable to listen NMEA")
-
-        # try to retrieve the location from NMEA
-        lat = None
-        lon = None
-        if self.listeners.nmea.nav:
-            from_nmea = self.cb.ask_location_from_nmea()
-            if from_nmea:
-                lat, lon = self.listeners.nmea.nav_latitude, self.listeners.nmea.nav_longitude
-        # if we don't have a location, ask user
-        if (lat is None) or (lon is None):
-            lat, lon = self.cb.ask_location()
-            if (lat is None) or (lon is None):
-                self.progress.end()
-                raise RuntimeError("missing geographic location required for database lookup")
-
-        ssp.meta.latitude = lat
-        ssp.meta.longitude = lon
-        self.progress.end()
-        
     # --- export data
 
     def export_data(self, data_formats: list, data_paths: Optional[dict],
@@ -1124,7 +1095,7 @@ class SoundSpeedLibrary:
                     prj_list.append(os.path.splitext(os.path.basename(f))[0])
             break
         prj_list.sort()
-        
+
         return prj_list
 
     def remove_data(self) -> bool:
@@ -1226,9 +1197,10 @@ class SoundSpeedLibrary:
         logger.debug('current profiles: %s' % len(cur_lst))
 
         # create list of current pks
-        cur_pks = list()
+        cur_pks = list()  # type: list[str]
         for cur_ssp in cur_lst:
-            cur_pks.append("%s;%s" % (cur_ssp[1], cur_ssp[2]))
+            cur_key = "%s;%s" % (cur_ssp[1], cur_ssp[2])
+            cur_pks.append(cur_key)
         # print(cur_pks)
 
         # copy after having checked that the profile is not already there
@@ -1856,12 +1828,6 @@ class SoundSpeedLibrary:
                 self.cur.insert_sis_speed(depth=12000.0, speed=1675.8, src=Dicts.sources['sis'],
                                           cond=30.9, temp=2.46, sal=34.70)
 
-            # si = self.cur.sis_thinned
-            # logger.debug('last sample: d: %s, temp: %s, sal: %s, speed: %s [%s|%s]'
-            #              % (self.cur.sis.depth[si][-1], self.cur.sis.temp[si][-1],
-            #                 self.cur.sis.sal[si][-1], self.cur.sis.speed[si][-1],
-            #                 self.cur.sis.source[si][-1], self.cur.sis.flag[si][-1]))
-
         return True
 
     # --- clear data
@@ -2123,7 +2089,7 @@ class SoundSpeedLibrary:
         return self.listeners.listen_sippican()
 
     def listen_nmea(self) -> bool:
-        return self.listeners.listen_nmea()    
+        return self.listeners.listen_nmea()
 
     def listen_mvp(self) -> bool:
         return self.listeners.listen_mvp()
@@ -2135,7 +2101,7 @@ class SoundSpeedLibrary:
         return self.listeners.stop_listen_sippican()
 
     def stop_listen_nmea(self) -> bool:
-        return self.listeners.stop_listen_nmea()    
+        return self.listeners.stop_listen_nmea()
 
     def stop_listen_mvp(self) -> bool:
         return self.listeners.stop_listen_mvp()

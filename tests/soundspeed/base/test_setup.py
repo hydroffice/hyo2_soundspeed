@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from hyo2.soundspeed.base.setup import Setup
+from hyo2.ssm2.lib.base.setup import Setup
 
 
 class TestSoundSpeedSetup(unittest.TestCase):

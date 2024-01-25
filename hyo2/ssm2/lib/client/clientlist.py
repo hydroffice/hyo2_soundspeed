@@ -3,9 +3,9 @@ import time
 import logging
 from typing import TYPE_CHECKING
 
-from hyo2.soundspeed.client.client import Client
+from hyo2.ssm2.lib.client.client import Client
 if TYPE_CHECKING:
-    from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+    from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 

@@ -7,33 +7,36 @@ from datetime import datetime
 from urllib.request import urlopen
 
 from PySide6 import QtCore, QtGui, QtWidgets
+
 from hyo2.abc2.app.dialogs.exception.exception_dialog import ExceptionDialog
 from hyo2.abc2.app.qt_progress import QtProgress
 from hyo2.abc2.app.tabs.info.info_tab import InfoTab
 from hyo2.abc2.lib.helper import Helper
-from hyo2.soundspeed import lib_info
-from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
-from hyo2.soundspeedmanager import app_info
-from hyo2.soundspeedmanager.qt_callbacks import QtCallbacks
-from hyo2.soundspeedmanager.widgets.database import Database
-from hyo2.soundspeedmanager.widgets.editor import Editor
-from hyo2.soundspeedmanager.widgets.server import Server
-# from hyo2.soundspeedmanager.widgets.refraction import Refraction
-from hyo2.soundspeedmanager.widgets.settings import Settings
+from hyo2.ssm2 import lib_info
+from hyo2.ssm2.app.gui.soundspeedmanager import app_info
+from hyo2.ssm2.app.gui.soundspeedmanager.qt_callbacks import QtCallbacks
+from hyo2.ssm2.app.gui.soundspeedmanager.widgets.database import Database
+from hyo2.ssm2.app.gui.soundspeedmanager.widgets.editor import Editor
+from hyo2.ssm2.app.gui.soundspeedmanager.widgets.server import Server
+from hyo2.ssm2.app.gui.soundspeedmanager.widgets.settings import Settings
+from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 
 
 class MainWin(QtWidgets.QMainWindow):
 
-    def __init__(self):
+    def __init__(self, beta: bool = False):
         QtWidgets.QMainWindow.__init__(self)
 
         logger.info("* > APP: initializing ...")
 
         # set the application name and the version
         self.name = app_info.app_name
-        self.version = app_info.app_version + '.1 ALPHA'
+        self.version = app_info.app_version
+        self.beta = beta
+        if self.beta:
+            self.version += ' BETA'
         self.setWindowTitle('%s v.%s' % (self.name, self.version))
         # noinspection PyArgumentList
         _app = QtCore.QCoreApplication.instance()
@@ -70,19 +73,22 @@ class MainWin(QtWidgets.QMainWindow):
         self.check_woa09()
         self.check_woa13()
         self.check_woa18()
-        # self.check_rtofs()  # no need to wait for the download at the beginning
         self.check_sis()
         self.check_sippican()
-        self.check_nmea()        
+        self.check_nmea()
         self.check_mvp()
 
         # init default settings
         settings = QtCore.QSettings()
         export_folder = settings.value("export_folder")
-        if (export_folder is None) or (not os.path.exists(export_folder)):
+        if export_folder is None:
+            settings.setValue("export_folder", self.lib.data_folder)
+        elif not os.path.exists(str(export_folder)):
             settings.setValue("export_folder", self.lib.data_folder)
         import_folder = settings.value("import_folder")
-        if (import_folder is None) or (not os.path.exists(import_folder)):
+        if import_folder is None:
+            settings.setValue("import_folder", self.lib.data_folder)
+        elif not os.path.exists(str(import_folder)):
             settings.setValue("import_folder", self.lib.data_folder)
 
         # menu
@@ -191,7 +197,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.release_checked = False
         self.old_sis_xyz_data = False
         self.old_sis_nav_data = False
-        self.old_nmea_nav_data = False        
+        self.old_nmea_nav_data = False
         timer = QtCore.QTimer(self)
         # noinspection PyUnresolvedReferences
         timer.timeout.connect(self.update_gui)
@@ -470,7 +476,7 @@ class MainWin(QtWidgets.QMainWindow):
                 msg = 'Unable to stop listening Nmea.'
                 # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - NMEA 0183", msg,
-                                              QtWidgets.QMessageBox.Ok)                
+                                              QtWidgets.QMessageBox.Ok)
 
     def check_mvp(self):
         if self.lib.use_mvp():
@@ -694,7 +700,7 @@ class MainWin(QtWidgets.QMainWindow):
             if self.old_nmea_nav_data:
                 logger.warning("%s: navigation message is too old (%d seconds)"
                                % (datetime.utcnow(), diff_time.total_seconds()))
-        
+
         # position
         msg += "  -  pos:"
         if self.old_nmea_nav_data:
@@ -718,11 +724,11 @@ class MainWin(QtWidgets.QMainWindow):
                 letter = "E"
             lon_min = float(60 * math.fabs(longitude - int(longitude)))
             lon_str = "%03d\N{DEGREE SIGN}%7.3f'%s" % (int(math.fabs(longitude)), lon_min, letter)
-            
+
             msg += "(%s, %s)" % (lat_str, lon_str)
 
         return msg
-    
+
     def update_gui(self):
 
         self.timer_execs += 1

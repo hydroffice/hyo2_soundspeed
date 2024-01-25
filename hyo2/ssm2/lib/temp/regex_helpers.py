@@ -1,4 +1,4 @@
-# TODO: Velocipy legacy: to be cleaned, then moved under hyo2.soundspeed.base
+# TODO: Velocipy legacy: to be cleaned, then moved under hyo2.ssm2.lib.base
 
 # builtins
 import datetime
@@ -6,12 +6,12 @@ import re
 from copy import deepcopy, copy
 from warnings import warn
 
-import hyo2.soundspeed.profile
+import hyo2.ssm2.lib.profile
 # 3rd party libs
 import numpy
-from hyo2.soundspeed.profile import dicts
+from hyo2.ssm2.lib.profile import dicts
 # our custom package
-from hyo2.soundspeed.temp import coordinates
+from hyo2.ssm2.lib.temp import coordinates
 
 """
 This module is using a lot of Regular Expressions and numpy.fromregex to read file formats.
@@ -311,7 +311,7 @@ class Profile(numpy.recarray):
         return p3
 
     def ConvertToSoundSpeedProfile(self):
-        p = hyo2.soundspeed.profile.profile.Profile()
+        p = hyo2.ssm2.lib.profile.profile.Profile()
         # translate metadata
         p.meta.sensor_type = dicts.Dicts.sensor_types.get(self.metadata.get('ImportFormat', ''),
                                                           dicts.Dicts.sensor_types['Unknown'])

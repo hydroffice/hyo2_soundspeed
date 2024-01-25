@@ -2,8 +2,8 @@ import logging
 
 from PySide6 import QtWidgets
 
-from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
-from hyo2.soundspeed.base.setup_sql import vessel_list, institution_list
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.dialog import AbstractDialog
+from hyo2.ssm2.lib.base.setup_sql import vessel_list, institution_list
 
 logger = logging.getLogger(__name__)
 

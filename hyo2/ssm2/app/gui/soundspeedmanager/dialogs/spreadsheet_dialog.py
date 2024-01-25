@@ -3,10 +3,10 @@ from PySide6 import QtCore, QtGui, QtWidgets
 import os
 import logging
 
-from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
-from hyo2.soundspeedmanager.dialogs.raw_data_model import RawDataModel
-from hyo2.soundspeedmanager.dialogs.proc_data_model import ProcDataModel
-from hyo2.soundspeedmanager.dialogs.sis_data_model import SisDataModel
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.dialog import AbstractDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.raw_data_model import RawDataModel
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.proc_data_model import ProcDataModel
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.sis_data_model import SisDataModel
 
 logger = logging.getLogger(__name__)
 

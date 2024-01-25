@@ -1,13 +1,14 @@
 import functools
+import logging
 import math
 import operator
-import logging
+
 import numpy as np
 
-from hyo2.soundspeed import __version__
-from hyo2.soundspeed.formats.writers.abstract import AbstractTextWriter
-from hyo2.soundspeed.profile.dicts import Dicts
-from hyo2.soundspeed.profile.oceanography import Oceanography as Oc
+from hyo2.ssm2 import __version__
+from hyo2.ssm2.lib.formats.writers.abstract import AbstractTextWriter
+from hyo2.ssm2.lib.profile.dicts import Dicts
+from hyo2.ssm2.lib.profile.oceanography import Oceanography as Oc
 
 logger = logging.getLogger(__name__)
 

@@ -1,7 +1,7 @@
 import logging
 
 from PySide6 import QtCore, QtWidgets
-from hyo2.soundspeed.listener.seacat import sbe_serialcomms
+from hyo2.ssm2.lib.listener.seacat import sbe_serialcomms
 
 logger = logging.getLogger(__name__)
 

@@ -19,12 +19,12 @@ import os
 from PyInstaller.building.build_main import Analysis, PYZ, EXE, COLLECT, TOC
 from PyInstaller.compat import is_darwin, is_win
 
-from hyo2.soundspeed import __version__ as ssm_version
+from hyo2.ssm2 import __version__ as ssm_version
 
 sys.setrecursionlimit(20000)
 
-is_alpha = True
-is_beta = False
+is_alpha = False
+is_beta = True
 if is_alpha:
     alphabeta = ".a%s" % datetime.now().strftime("%Y%m%d%H%M%S")
 elif is_beta:
@@ -110,9 +110,7 @@ cartopy_data = collect_folder_data(input_data_folder=share_folder, relative_outp
                                    recursively=True)
 
 abc_data = collect_pkg_data('hyo2.abc2')
-ss_data = collect_pkg_data('hyo2.soundspeed')
-ssm_data = collect_pkg_data('hyo2.soundspeedmanager')
-sss_data = collect_pkg_data('hyo2.soundspeedsettings')
+ssm2_data = collect_pkg_data('hyo2.ssm2')
 try:
     sdm_data = collect_pkg_data('hyo2.surveydatamonitor')
 except Exception as e:
@@ -149,9 +147,7 @@ coll = COLLECT(exe,
                pyproj_data,
                cartopy_data,
                abc_data,
-               ss_data,
-               ssm_data,
-               sss_data,
+               ssm2_data,
                strip=None,
                upx=True,
                name='SoundSpeedManager.%s%s' % (ssm_version, alphabeta))

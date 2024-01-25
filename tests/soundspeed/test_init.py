@@ -1,6 +1,6 @@
 import unittest
 
-from hyo2.soundspeed import lib_info
+from hyo2.ssm2 import lib_info
 
 
 class TestSoundSpeedInit(unittest.TestCase):
@@ -31,11 +31,11 @@ class TestSoundSpeedInit(unittest.TestCase):
         self.assertTrue("lgpl" in lib_info.lib_license.lower())
 
     def test_has_copyright(self):
-        from hyo2.soundspeed import __copyright__
+        from hyo2.ssm2 import __copyright__
         self.assertIsNot(len(__copyright__), 0)
 
     def test_has_current_year_in_copyright(self):
-        from hyo2.soundspeed import __copyright__
+        from hyo2.ssm2 import __copyright__
         from datetime import datetime
         self.assertTrue((("%s" % (datetime.now().year - 1)) in __copyright__) or
                         (("%s" % datetime.now().year) in __copyright__) or

@@ -1,18 +1,19 @@
+import logging
+import math
 import os
 import time
-import math
-import numpy as np
-import logging
 
-from hyo2.soundspeed import __version__ as soundspeed_version
-from hyo2.soundspeed.profile.metadata import Metadata
-from hyo2.soundspeed.profile.samples import Samples
-from hyo2.soundspeed.profile.more import More
-from hyo2.soundspeed.profile.dicts import Dicts
-from hyo2.soundspeed.profile.oceanography import Oceanography as Oc
-from hyo2.soundspeed.profile.ray_tracing.ray_tracing import RayTracing
-from hyo2.soundspeed.profile.ray_tracing.ray_path import RayPath
-from hyo2.soundspeed.profile.ray_tracing.tracedprofile import TracedProfile
+import numpy as np
+
+from hyo2.ssm2 import __version__ as soundspeed_version
+from hyo2.ssm2.lib.profile.dicts import Dicts
+from hyo2.ssm2.lib.profile.metadata import Metadata
+from hyo2.ssm2.lib.profile.more import More
+from hyo2.ssm2.lib.profile.oceanography import Oceanography as Oc
+from hyo2.ssm2.lib.profile.ray_tracing.ray_path import RayPath
+from hyo2.ssm2.lib.profile.ray_tracing.ray_tracing import RayTracing
+from hyo2.ssm2.lib.profile.ray_tracing.tracedprofile import TracedProfile
+from hyo2.ssm2.lib.profile.samples import Samples
 
 logger = logging.getLogger(__name__)
 
@@ -406,7 +407,7 @@ class Profile:
 
         valid_and_smoothed = self.proc.source[self.proc_valid] == Dicts.sources['smoothing']
         # noinspection PyUnresolvedReferences
-        if (valid_and_smoothed == True).all():
+        if (valid_and_smoothed is True).all():
             return
         # logger.debug(valid_and_smoothed)
 
@@ -1371,11 +1372,12 @@ class Profile:
         else:
             tt_inc = 0.01
 
-        draft1 = 0.0  # TODO
-        draft2 = 0.0  # TODO
+        # TODO: Retrieve drafts
+        draft1 = 0.0
+        draft2 = 0.0
         draft = max(draft1, draft2)
 
-        # Generate the travel time table for the two profiles.
+        # Generate the travel timetable for the two profiles.
         ray1 = self.compute_ray_paths(draft, [angle], res=tt_inc)[0]
         ray2 = profile.compute_ray_paths(draft, [angle], res=tt_inc)[0]
 

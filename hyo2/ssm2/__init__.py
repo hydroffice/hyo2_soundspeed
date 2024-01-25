@@ -1,6 +1,6 @@
 """
 Hydro-Package
-Sound Speed Manager 2
+Sound Speed 2
 """
 
 import os
@@ -11,7 +11,7 @@ from hyo2.abc2.lib.lib_info import LibInfo
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
-name = "Sound Speed Manager"
+name = "Sound Speed"
 __version__ = '2024.0.0'
 __copyright__ = 'Copyright 2024 University of New Hampshire, Center for Coastal and Ocean Mapping'
 

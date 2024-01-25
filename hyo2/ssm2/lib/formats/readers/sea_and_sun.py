@@ -2,9 +2,9 @@ import datetime as dt
 import locale
 import logging
 
-from hyo2.soundspeed.formats.readers.abstract import AbstractTextReader
-from hyo2.soundspeed.profile.dicts import Dicts
-from hyo2.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
+from hyo2.ssm2.lib.formats.readers.abstract import AbstractTextReader
+from hyo2.ssm2.lib.profile.dicts import Dicts
+from hyo2.ssm2.lib.base.callbacks.cli_callbacks import CliCallbacks
 
 logger = logging.getLogger(__name__)
 

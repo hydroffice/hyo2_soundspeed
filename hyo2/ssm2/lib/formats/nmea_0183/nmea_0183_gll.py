@@ -1,6 +1,6 @@
 import logging
 from typing import Optional
-from hyo2.soundspeed.formats.nmea_0183.nmea_0183_nav_abstract import Nmea0183NavAbstract
+from hyo2.ssm2.lib.formats.nmea_0183.nmea_0183_nav_abstract import Nmea0183NavAbstract
 
 logger = logging.getLogger(__name__)
 

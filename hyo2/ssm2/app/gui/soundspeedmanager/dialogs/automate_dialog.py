@@ -4,7 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.dialog import AbstractDialog
 
 
 class AutomateDialog(AbstractDialog):

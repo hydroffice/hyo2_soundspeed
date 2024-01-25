@@ -1,12 +1,12 @@
 import os
 import logging
 
-from hyo2.soundspeed.atlas.woa09 import Woa09
-from hyo2.soundspeed.atlas.woa13 import Woa13
-from hyo2.soundspeed.atlas.woa18 import Woa18
-from hyo2.soundspeed.atlas.rtofs import Rtofs
-from hyo2.soundspeed.atlas.regofsonline import RegOfsOnline
-from hyo2.soundspeed.atlas.regofsoffline import RegOfsOffline
+from hyo2.ssm2.lib.atlas.woa09 import Woa09
+from hyo2.ssm2.lib.atlas.woa13 import Woa13
+from hyo2.ssm2.lib.atlas.woa18 import Woa18
+from hyo2.ssm2.lib.atlas.rtofs import Rtofs
+from hyo2.ssm2.lib.atlas.regofsonline import RegOfsOnline
+from hyo2.ssm2.lib.atlas.regofsoffline import RegOfsOffline
 
 logger = logging.getLogger(__name__)
 

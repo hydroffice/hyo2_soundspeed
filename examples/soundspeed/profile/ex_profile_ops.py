@@ -1,14 +1,12 @@
 import logging
 
 import numpy as np
-from PySide6 import QtWidgets
 from matplotlib import pyplot as plt
 
-from hyo2.soundspeed.profile.profile import Profile
-from hyo2.abc.lib.logging import set_logging
+from hyo2.abc2.lib.logging import set_logging
+from hyo2.ssm2.lib.profile.profile import Profile
 
-ns_list = ["hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"]
-set_logging(ns_list=ns_list)
+set_logging(ns_list=["hyo2.abc2", "hyo2.ssm2"])
 
 logger = logging.getLogger(__name__)
 

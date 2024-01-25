@@ -3,8 +3,8 @@ import unittest
 from datetime import datetime
 import numpy as np
 
-from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
-from hyo2.soundspeed.profile.profilelist import ProfileList
+from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
+from hyo2.ssm2.lib.profile.profilelist import ProfileList
 
 
 class TestSoundSpeedDb(unittest.TestCase):

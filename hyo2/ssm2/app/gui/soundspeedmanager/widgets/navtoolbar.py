@@ -12,7 +12,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT
 from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatio
 from matplotlib.backend_bases import cursors
 
-from hyo2.soundspeed.profile.dicts import Dicts
+from hyo2.ssm2.lib.profile.dicts import Dicts
 
 logger = logging.getLogger(__name__)
 

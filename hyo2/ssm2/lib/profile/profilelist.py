@@ -1,8 +1,8 @@
 import logging
 from datetime import datetime
 
-from hyo2.soundspeed.profile.profile import Profile
-from hyo2.soundspeed.profile.dicts import Dicts
+from hyo2.ssm2.lib.profile.profile import Profile
+from hyo2.ssm2.lib.profile.dicts import Dicts
 
 logger = logging.getLogger(__name__)
 

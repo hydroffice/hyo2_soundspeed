@@ -3,16 +3,13 @@ import os
 
 from PySide6 import QtWidgets
 
-from hyo2.abc.lib.testing import Testing
-from hyo2.abc.lib.logging import set_logging
-from hyo2.abc.app.qt_progress import QtProgress
-from hyo2.soundspeedmanager import app_info
-from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
-from hyo2.soundspeedmanager.qt_callbacks import QtCallbacks
+from hyo2.abc2.app.qt_progress import QtProgress
+from hyo2.abc2.lib.logging import set_logging
+from hyo2.abc2.lib.testing import Testing
+from hyo2.ssm2.app.gui.soundspeedmanager.qt_callbacks import QtCallbacks
+from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
-
-ns_list = ["hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"]
-set_logging(ns_list=ns_list)
+set_logging(ns_list=["hyo2.abc2", "hyo2.ssm2"])
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +43,7 @@ tests = [
     # (43.753190, -76.826818),     # Lake Ontario
     # (47.457546, -89.347715),     # Lake Superior
     # (46.161403, -124.107396),    # Offshore of Colombia River
-    (37.689510, -122.298514)     # San Francisco Bay
+    (37.689510, -122.298514)  # San Francisco Bay
 ]
 
 test = tests[0]

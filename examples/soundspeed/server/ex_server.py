@@ -1,13 +1,11 @@
-import time
 import logging
+import time
 
-from hyo2.soundspeedmanager import app_info
-from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
-from hyo2.soundspeed.server.server import Server
-from hyo2.abc.lib.logging import set_logging
+from hyo2.abc2.lib.logging import set_logging
+from hyo2.ssm2.lib.server.server import Server
+from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
-ns_list = ["hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"]
-set_logging(ns_list=ns_list)
+set_logging(ns_list=["hyo2.abc2", "hyo2.ssm2"])
 
 logger = logging.getLogger(__name__)
 

@@ -6,14 +6,14 @@ os:
 
 env:
   - PYTHON_VERSION=3.8
-  - PYTHON_VERSION=3.6
-  - PYTHON_VERSION=3.7
+  - PYTHON_VERSION=3.9
+  - PYTHON_VERSION=3.10
 
 matrix:
   fast_finish: true
   allow_failures:
   - os: osx
-  - env: PYTHON_VERSION=3.7
+  - env: PYTHON_VERSION=3.10
 
 install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then MINICONDA_OS=Linux; else MINICONDA_OS=MacOSX; fi

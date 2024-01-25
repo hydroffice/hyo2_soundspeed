@@ -3,9 +3,9 @@ import logging
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
-from hyo2.soundspeedmanager import app_info
-from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
-from hyo2.soundspeedmanager.dialogs.text_editor import TextEditor
+from hyo2.ssm2.app.gui.soundspeedmanager import app_info
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.dialog import AbstractDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.text_editor import TextEditor
 
 logger = logging.getLogger(__name__)
 

@@ -3,8 +3,8 @@ from pathlib import Path
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
-from hyo2.soundspeedsettings.widgets.widget import AbstractWidget
-from hyo2.soundspeed.base.setup_sql import vessel_list, institution_list
+from hyo2.ssm2.app.gui.soundspeedsettings.widgets.widget import AbstractWidget
+from hyo2.ssm2.lib.base.setup_sql import vessel_list, institution_list
 
 logger = logging.getLogger(__name__)
 

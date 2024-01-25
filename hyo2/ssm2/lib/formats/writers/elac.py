@@ -1,8 +1,8 @@
 import numpy as np
 import logging
 
-from hyo2.soundspeed.formats.writers.abstract import AbstractTextWriter
-from hyo2.soundspeed.profile.oceanography import Oceanography as Oc
+from hyo2.ssm2.lib.formats.writers.abstract import AbstractTextWriter
+from hyo2.ssm2.lib.profile.oceanography import Oceanography as Oc
 
 logger = logging.getLogger(__name__)
 

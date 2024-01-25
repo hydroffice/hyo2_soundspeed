@@ -3,7 +3,7 @@ import logging
 
 from PySide6 import QtGui, QtWidgets
 
-from hyo2.soundspeedmanager.widgets.widget import AbstractWidget
+from hyo2.ssm2.app.gui.soundspeedmanager.widgets.widget import AbstractWidget
 
 logger = logging.getLogger(__name__)
 

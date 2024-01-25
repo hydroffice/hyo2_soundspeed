@@ -3,21 +3,21 @@ import logging
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
-from hyo2.soundspeed.profile.dicts import Dicts
-from hyo2.soundspeedmanager.widgets.widget import AbstractWidget
-from hyo2.soundspeedmanager.dialogs.plot_profiles_dialog import PlotProfilesDialog
-from hyo2.soundspeedmanager.dialogs.project_new_dialog import ProjectNewDialog
-from hyo2.soundspeedmanager.dialogs.project_rename_dialog import ProjectRenameDialog
-from hyo2.soundspeedmanager.dialogs.project_switch_dialog import ProjectSwitchDialog
-from hyo2.soundspeedmanager.dialogs.import_data_dialog import ImportDataDialog
-from hyo2.soundspeedmanager.dialogs.export_single_profile_dialog import ExportSingleProfileDialog
-from hyo2.soundspeedmanager.dialogs.export_multi_profile_dialog import ExportMultiProfileDialog
-from hyo2.soundspeedmanager.dialogs.import_multi_profile_dialog import ImportMultiProfileDialog
-from hyo2.soundspeedmanager.dialogs.plot_multi_profile_dialog import PlotMultiProfileDialog
-from hyo2.soundspeedmanager.dialogs.export_profile_metadata_dialog import ExportProfileMetadataDialog
-from hyo2.soundspeedmanager.dialogs.text_editor_dialog import TextEditorDialog
-from hyo2.soundspeedmanager.dialogs.metadata_dialog import MetadataDialog
-from hyo2.soundspeedmanager.dialogs.common_metadata_dialog import CommonMetadataDialog
+from hyo2.ssm2.lib.profile.dicts import Dicts
+from hyo2.ssm2.app.gui.soundspeedmanager.widgets.widget import AbstractWidget
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.plot_profiles_dialog import PlotProfilesDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.project_new_dialog import ProjectNewDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.project_rename_dialog import ProjectRenameDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.project_switch_dialog import ProjectSwitchDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.import_data_dialog import ImportDataDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.export_single_profile_dialog import ExportSingleProfileDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.export_multi_profile_dialog import ExportMultiProfileDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.import_multi_profile_dialog import ImportMultiProfileDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.plot_multi_profile_dialog import PlotMultiProfileDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.export_profile_metadata_dialog import ExportProfileMetadataDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.text_editor_dialog import TextEditorDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.metadata_dialog import MetadataDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.common_metadata_dialog import CommonMetadataDialog
 
 logger = logging.getLogger(__name__)
 

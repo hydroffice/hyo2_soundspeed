@@ -2,8 +2,8 @@ import unittest
 import os
 from io import IOBase
 
-from hyo2.soundspeedmanager import app_info
-from hyo2.soundspeed.base import files
+from hyo2.ssm2.app.gui.soundspeedmanager import app_info
+from hyo2.ssm2.lib.base import files
 
 
 class TestSoundSpeedBaseFiles(unittest.TestCase):

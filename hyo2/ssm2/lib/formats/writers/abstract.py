@@ -4,8 +4,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from hyo2.soundspeed.base.files import FileManager
-from hyo2.soundspeed.formats.abstract import AbstractFormat
+from hyo2.ssm2.lib.base.files import FileManager
+from hyo2.ssm2.lib.formats.abstract import AbstractFormat
 
 
 class AbstractWriter(AbstractFormat, metaclass=ABCMeta):

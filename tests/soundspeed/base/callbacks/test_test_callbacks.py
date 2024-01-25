@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from hyo2.soundspeed.base.callbacks.fake_callbacks import FakeCallbacks
+from hyo2.ssm2.lib.base.callbacks.fake_callbacks import FakeCallbacks
 
 
 class TestSoundSpeedTestCallbacks(unittest.TestCase):

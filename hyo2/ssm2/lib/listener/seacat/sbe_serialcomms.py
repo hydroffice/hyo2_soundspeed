@@ -13,8 +13,8 @@ except:
 
 import serial  # for serial/usb port communication with SBE instruments
 
-from hyo2.soundspeed.formats.readers import seabird as sbe_constants
-from hyo2.soundspeedmanager import __version__ as ssm_version
+from hyo2.ssm2.lib.formats.readers import seabird as sbe_constants
+from hyo2.ssm2.app.gui.soundspeedmanager import __version__ as ssm_version
 
 import logging
 

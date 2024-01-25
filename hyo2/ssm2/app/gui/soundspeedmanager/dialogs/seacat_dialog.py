@@ -12,8 +12,8 @@ import logging
 
 from PySide6 import QtGui, QtWidgets
 
-from hyo2.soundspeedmanager.dialogs.dialog import AbstractDialog
-from hyo2.soundspeedmanager.dialogs.seacat import add_btn, get_last_comport, AutoSeacat, SelectCastsDlg, \
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.dialog import AbstractDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.seacat import add_btn, get_last_comport, AutoSeacat, SelectCastsDlg, \
     save_last_comport, sbe_serialcomms, get_setting_string
 
 logger = logging.getLogger(__name__)

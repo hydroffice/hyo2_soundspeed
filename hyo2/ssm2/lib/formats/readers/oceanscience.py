@@ -6,12 +6,12 @@ import numpy
 
 logger = logging.getLogger(__name__)
 
-from hyo2.soundspeed.formats.readers.abstract import AbstractTextReader
-from hyo2.soundspeed.profile.dicts import Dicts
-from hyo2.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
-from hyo2.soundspeed.temp import coordinates
+from hyo2.ssm2.lib.formats.readers.abstract import AbstractTextReader
+from hyo2.ssm2.lib.profile.dicts import Dicts
+from hyo2.ssm2.lib.base.callbacks.cli_callbacks import CliCallbacks
+from hyo2.ssm2.lib.temp import coordinates
 
-from hyo2.soundspeed.temp.regex_helpers import Profile, parseNumbers, getMetaFromTimeRE, getMetaFromCoord
+from hyo2.ssm2.lib.temp.regex_helpers import Profile, parseNumbers, getMetaFromTimeRE, getMetaFromCoord
 
 
 class OceanScience(AbstractTextReader):

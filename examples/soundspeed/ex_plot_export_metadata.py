@@ -1,13 +1,11 @@
 import logging
 import os
 
-from hyo2.abc.lib.gdal_aux import GdalAux
-from hyo2.abc.lib.logging import set_logging
-# noinspection PyUnresolvedReferences
-from hyo2.soundspeedmanager import app_info
-from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+from hyo2.abc2.lib.gdal_aux import GdalAux
+from hyo2.abc2.lib.logging import set_logging
+from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
-set_logging(ns_list=["hyo2.abc", "hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"])
+set_logging(ns_list=["hyo2.abc2", "hyo2.ssm2"])
 logger = logging.getLogger(__name__)
 
 # create a project
@@ -23,7 +21,7 @@ lst = lib.db_list_profiles()
 logger.info("Profiles: %s" % len(lst))
 
 # plots/maps/exports
-# - mapt
+# - map
 lib.map_db_profiles(show_plot=True)
 lib.save_map_db_profiles()
 

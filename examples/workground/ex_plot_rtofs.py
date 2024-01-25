@@ -1,6 +1,6 @@
 import os
 import logging
-from hyo2.soundspeedmanager import AppInfo
+from hyo2.ssm2.app.gui.soundspeedmanager import AppInfo
 from PySide6 import QtWidgets
 from mpl_toolkits.basemap import Basemap
 import numpy as np
@@ -10,7 +10,7 @@ import netCDF4
 from hyo2.abc.lib.testing import Testing
 from hyo2.abc.lib.logging import set_logging
 
-ns_list = ["hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"]
+ns_list = ["hyo2.soundspeed", "hyo2.ssm2.app.gui.soundspeedmanager", "hyo2.soundspeedsettings"]
 set_logging(ns_list=ns_list)
 logger = logging.getLogger(__name__)
 

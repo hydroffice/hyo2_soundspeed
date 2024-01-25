@@ -2,11 +2,11 @@ import logging
 from abc import ABCMeta
 from typing import Optional, Set, TYPE_CHECKING
 
-from hyo2.soundspeed.profile.profilelist import ProfileList
+from hyo2.ssm2.lib.profile.profilelist import ProfileList
 
 if TYPE_CHECKING:
-    from hyo2.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
-    from hyo2.soundspeed.base.setup import Setup
+    from hyo2.ssm2.lib.base.callbacks.abstract_callbacks import AbstractCallbacks
+    from hyo2.ssm2.lib.base.setup import Setup
 
 logger = logging.getLogger(__name__)
 

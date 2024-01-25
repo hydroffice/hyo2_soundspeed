@@ -5,8 +5,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from hyo2.soundspeed.formats.writers.abstract import AbstractTextWriter
-from hyo2.soundspeed.profile.dicts import Dicts
+from hyo2.ssm2.lib.formats.writers.abstract import AbstractTextWriter
+from hyo2.ssm2.lib.profile.dicts import Dicts
 
 
 class Qps(AbstractTextWriter):

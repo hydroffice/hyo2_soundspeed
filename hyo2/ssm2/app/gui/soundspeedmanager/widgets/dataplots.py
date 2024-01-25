@@ -8,8 +8,8 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib import rc_context
 
-from hyo2.soundspeedmanager.widgets.widget import AbstractWidget
-from hyo2.soundspeedmanager.widgets.navtoolbar import NavToolbar
+from hyo2.ssm2.app.gui.soundspeedmanager.widgets.widget import AbstractWidget
+from hyo2.ssm2.app.gui.soundspeedmanager.widgets.navtoolbar import NavToolbar
 
 logger = logging.getLogger(__name__)
 

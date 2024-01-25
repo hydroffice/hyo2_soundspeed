@@ -1,16 +1,17 @@
-import sqlite3
-import os
 import datetime
-# import traceback
-import numpy as np
 import logging
+import os
+import sqlite3
+from typing import Optional
 
-from hyo2.soundspeed import lib_info
-from hyo2.soundspeed.db.point import Point, convert_point, adapt_point
-from hyo2.soundspeed.db.plot import PlotDb
-from hyo2.soundspeed.db.export import ExportDb
-from hyo2.soundspeed.profile.profilelist import ProfileList
-from hyo2.soundspeed.profile.dicts import Dicts
+import numpy as np
+
+from hyo2.ssm2 import lib_info
+from hyo2.ssm2.lib.db.export import ExportDb
+from hyo2.ssm2.lib.db.plot import PlotDb
+from hyo2.ssm2.lib.db.point import Point, convert_point, adapt_point
+from hyo2.ssm2.lib.profile.dicts import Dicts
+from hyo2.ssm2.lib.profile.profilelist import ProfileList
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +19,7 @@ logger = logging.getLogger(__name__)
 class ProjectDb:
     """Class that provides an interface to a SQLite db with Sound Speed data"""
 
-    def __init__(self, projects_folder=None, project_name=None):
+    def __init__(self, projects_folder: Optional[str] = None, project_name: Optional[str] = None) -> None:
 
         # in case that no data folder is passed
         if projects_folder is None:
@@ -624,7 +625,7 @@ class ProjectDb:
                                     "WHERE flag=? AND source!=? AND source!=? AND source!=? "
                                     "AND source!=? AND source!=? AND source!=? GROUP BY ssp_pk",
                                     (Dicts.flags['valid'], Dicts.sources['woa09_ext'], Dicts.sources['woa13_ext'],
-                                     Dicts.sources['woa18_ext'], Dicts.sources['rtofs_ext'], 
+                                     Dicts.sources['woa18_ext'], Dicts.sources['rtofs_ext'],
                                      Dicts.sources['gomofs_ext'], Dicts.sources['ref_ext'],)).fetchall()
 
         try:

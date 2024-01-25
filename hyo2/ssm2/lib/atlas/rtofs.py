@@ -8,13 +8,13 @@ import requests
 
 from hyo2.abc2.lib.progress.cli_progress import CliProgress
 
-from hyo2.soundspeed.atlas.abstract import AbstractAtlas
-from hyo2.soundspeed.profile.profile import Profile
-from hyo2.soundspeed.profile.profilelist import ProfileList
-from hyo2.soundspeed.profile.dicts import Dicts
-from hyo2.soundspeed.profile.oceanography import Oceanography as Oc
+from hyo2.ssm2.lib.atlas.abstract import AbstractAtlas
+from hyo2.ssm2.lib.profile.profile import Profile
+from hyo2.ssm2.lib.profile.profilelist import ProfileList
+from hyo2.ssm2.lib.profile.dicts import Dicts
+from hyo2.ssm2.lib.profile.oceanography import Oceanography as Oc
 if TYPE_CHECKING:
-    from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+    from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 

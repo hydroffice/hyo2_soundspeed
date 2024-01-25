@@ -4,10 +4,10 @@ import logging
 
 from PySide6 import QtCore, QtWidgets
 
-from hyo2.abc2.lib.logging import set_logging
 from hyo2.abc2.app.app_style import AppStyle
+from hyo2.abc2.lib.logging import set_logging
 
-set_logging(ns_list=["hyo2.abc2", "hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"])
+set_logging(ns_list=["hyo2.abc2", "hyo2.ssm2", "hyo2.sdm2"])
 logger = logging.getLogger(__name__)
 
 
@@ -28,12 +28,14 @@ QtCore.qInstallMessageHandler(qt_custom_handler)
 
 def gui():
     """Run the Sound Speed Settings gui"""
-    from hyo2.soundspeedsettings.mainwin import MainWin
-    from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+    from hyo2.ssm2.app.gui.soundspeedsettings.mainwin import MainWin
+    from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
+    logger.debug("Init app ...")
     app = QtWidgets.QApplication(sys.argv)
-    app.setStyleSheet(AppStyle.load_stylesheet())
+    AppStyle.apply(app=app)
 
+    logger.debug("Init main win ...")
     lib = SoundSpeedLibrary()
     main = MainWin(lib=lib)
     main.show()

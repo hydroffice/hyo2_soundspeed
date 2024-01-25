@@ -1,10 +1,9 @@
 import logging
 
-from hyo2.soundspeed.profile.oceanography import Oceanography as Oc
-from hyo2.abc.lib.logging import set_logging
+from hyo2.ssm2.lib.profile.oceanography import Oceanography as Oc
+from hyo2.abc2.lib.logging import set_logging
 
-ns_list = ["hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings"]
-set_logging(ns_list=ns_list)
+set_logging(ns_list=["hyo2.abc2", "hyo2.ssm2"])
 
 logger = logging.getLogger(__name__)
 

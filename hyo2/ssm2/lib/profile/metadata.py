@@ -4,7 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from hyo2.soundspeed.profile.dicts import Dicts
+from hyo2.ssm2.lib.profile.dicts import Dicts
 
 
 class Metadata:

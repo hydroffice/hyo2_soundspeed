@@ -3,7 +3,7 @@ import os
 
 from netCDF4 import Dataset
 
-from hyo2.soundspeedmanager import AppInfo
+from hyo2.ssm2.app.gui.soundspeedmanager import AppInfo
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

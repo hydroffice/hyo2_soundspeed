@@ -1,7 +1,7 @@
 from PySide6 import QtCore, QtWidgets
 
 from collections import OrderedDict
-from hyo2.soundspeed.profile.dicts import Dicts
+from hyo2.ssm2.lib.profile.dicts import Dicts
 
 QVariant = lambda value=None: value
 

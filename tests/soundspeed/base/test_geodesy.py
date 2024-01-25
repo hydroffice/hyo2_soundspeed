@@ -1,7 +1,7 @@
 import unittest
 import sys
 
-from hyo2.soundspeed.base.geodesy import Geodesy
+from hyo2.ssm2.lib.base.geodesy import Geodesy
 
 from osgeo import gdal
 

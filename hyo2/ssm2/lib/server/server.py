@@ -5,7 +5,7 @@ from datetime import datetime
 from threading import Thread, Event
 from typing import List, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
-    from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+    from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 

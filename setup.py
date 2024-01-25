@@ -42,10 +42,11 @@ setup(
     ]),
     package_data={
         "": [
-            'soundspeed/listener/seacat/CONFIG/*.*',
-            'soundspeedmanager/media/*.*',
-            'soundspeedmanager/media/LICENSE',
-            'soundspeedsettings/media/*.*',
+            'hyo2/lib/listener/seacat/CONFIG/*.*',
+            'hyo2/app/gui/soundspeedmanager/media/*.*',
+            'hyo2/app/gui/soundspeedmanager/media/LICENSE',
+            'hyo2/app/gui/soundspeedsettings/media/*.*',
+            'hyo2/app/gui/ssm_sis/media/*.*'
         ],
     },
     zip_safe=False,
@@ -57,7 +58,7 @@ setup(
     install_requires=[
         "appdirs",
         "gsw",
-        "hyo2.abc2>=2.2.1",
+        "hyo2.abc2>=2.2.2",
         "matplotlib",
         "netCDF4",
         "numpy",
@@ -67,11 +68,12 @@ setup(
         "scipy"
         # "PySide6"
     ],
-    python_requires='>=3.5',
+    python_requires='>=3.8',
     entry_points={
         "gui_scripts": [
-            'sound_speed_manager = hyo2.soundspeedmanager.gui:gui',
-            'sound_speed_settings = hyo2.soundspeedsettings.gui:gui',
+            'sound_speed_manager = hyo2.ssm2.app.gui.soundspeedmanager.gui:gui',
+            'sound_speed_settings = hyo2.ssm2.app.gui.soundspeedsettings.gui:gui',
+            'ssm_sis = hyo2.ssm2.app.gui.ssm_sis.gui:gui'
         ],
         "console_scripts": [
         ],

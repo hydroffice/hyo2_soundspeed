@@ -3,13 +3,13 @@ import sys
 import traceback
 
 from PySide6 import QtCore, QtWidgets, QtGui
+
 from hyo2.abc2.app.app_style import AppStyle
 from hyo2.abc2.lib.helper import Helper
 from hyo2.abc2.lib.logging import set_logging
-from hyo2.soundspeedmanager import app_info
+from hyo2.ssm2.app.gui.soundspeedmanager import app_info
 
-set_logging(ns_list=["hyo2.abc2", "hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings",
-                     "hyo2.surveydatamonitor"])
+set_logging(ns_list=["hyo2.abc2", "hyo2.ssm2", "hyo2.sdm2"])
 logger = logging.getLogger(__name__)
 
 
@@ -28,9 +28,10 @@ def qt_custom_handler(error_type: QtCore.QtMsgType, error_context: QtCore.QMessa
 QtCore.qInstallMessageHandler(qt_custom_handler)
 
 
-def gui():
+def gui(beta: bool = True):
     """Create the application and show the Sound Speed Manager gui"""
-    from hyo2.soundspeedmanager.mainwin import MainWin
+    from hyo2.ssm2.app.gui.soundspeedmanager.mainwin import MainWin
+
     logger.debug("Init app ...")
     app = QtWidgets.QApplication(sys.argv)
     AppStyle.apply(app=app)
@@ -49,7 +50,7 @@ def gui():
             sys.exit(app.exit())
 
     logger.debug("Init main win ...")
-    main_win = MainWin()
+    main_win = MainWin(beta=beta)
     sys.excepthook = main_win.exception_hook  # install the exception hook
     main_win.show()
     main_win.do()

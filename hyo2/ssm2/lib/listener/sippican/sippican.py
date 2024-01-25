@@ -3,10 +3,10 @@ from threading import Event
 
 logger = logging.getLogger(__name__)
 
-from hyo2.soundspeed.listener.abstract import AbstractListener
+from hyo2.ssm2.lib.listener.abstract import AbstractListener
 
 
-# from hyo2.soundspeed.formats.readers import sippican
+# from hyo2.ssm2.lib.formats.readers import sippican
 
 
 class Sippican(AbstractListener):

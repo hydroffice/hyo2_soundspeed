@@ -1,4 +1,4 @@
-# TODO: Velocipy legacy: to be cleaned, then moved under hyo2.soundspeed.base
+# TODO: Velocipy legacy: to be cleaned, then moved under hyo2.ssm2.lib.base
 """
 coordinates.py
 James Hiebert <james.hiebert@noaa.gov>

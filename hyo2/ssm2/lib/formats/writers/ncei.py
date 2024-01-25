@@ -8,10 +8,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from hyo2.soundspeed import __version__ as ssp_version
-from hyo2.soundspeed import __doc__ as ssp_name
-from hyo2.soundspeed.formats.writers.abstract import AbstractWriter
-from hyo2.soundspeed.profile.dicts import Dicts
+from hyo2.ssm2 import __version__ as ssp_version
+from hyo2.ssm2.lib import __doc__ as ssp_name
+from hyo2.ssm2.lib.formats.writers.abstract import AbstractWriter
+from hyo2.ssm2.lib.profile.dicts import Dicts
 
 
 class Ncei(AbstractWriter):

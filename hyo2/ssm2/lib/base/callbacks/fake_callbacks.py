@@ -4,7 +4,7 @@ import random
 import logging
 from typing import Optional
 
-from hyo2.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
+from hyo2.ssm2.lib.base.callbacks.abstract_callbacks import AbstractCallbacks
 
 logger = logging.getLogger(__name__)
 

@@ -7,8 +7,7 @@ from PySide6 import QtCore, QtWidgets
 from hyo2.abc2.lib.logging import set_logging
 from hyo2.abc2.app.app_style import AppStyle
 
-set_logging(ns_list=["hyo2.abc2", "hyo2.soundspeed", "hyo2.soundspeedmanager", "hyo2.soundspeedsettings",
-                     "hyo2.surveydatamonitor", "hyo2.ssm_sis",])
+set_logging(ns_list=["hyo2.abc2", "hyo2.ssm2", "hyo2.sdm2"])
 logger = logging.getLogger(__name__)
 
 
@@ -29,11 +28,13 @@ QtCore.qInstallMessageHandler(qt_custom_handler)
 
 def gui():
     """Create the application and show the SSM-SIS gui"""
-    from hyo2.ssm_sis.mainwin import MainWin
+    from hyo2.ssm2.app.gui.ssm_sis.mainwin import MainWin
 
-    app = QtWidgets.QApplication()
+    logger.debug("Init app ...")
+    app = QtWidgets.QApplication(sys.argv)
     AppStyle.apply(app=app)
 
+    logger.debug("Init main win ...")
     main_win = MainWin()
     main_win.show()
 

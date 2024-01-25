@@ -2,9 +2,9 @@ import logging
 from datetime import datetime
 from typing import Optional, Union
 
-from hyo2.soundspeed.formats.nmea_0183.nmea_0183_gga import Nmea0183GGA
-from hyo2.soundspeed.formats.nmea_0183.nmea_0183_gll import Nmea0183GLL
-from hyo2.soundspeed.listener.abstract import AbstractListener
+from hyo2.ssm2.lib.formats.nmea_0183.nmea_0183_gga import Nmea0183GGA
+from hyo2.ssm2.lib.formats.nmea_0183.nmea_0183_gll import Nmea0183GLL
+from hyo2.ssm2.lib.listener.abstract import AbstractListener
 
 logger = logging.getLogger(__name__)
 

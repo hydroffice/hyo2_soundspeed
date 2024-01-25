@@ -2,12 +2,12 @@ import time
 import logging
 from typing import TYPE_CHECKING
 
-from hyo2.soundspeed.listener.sis.sis import Sis
-from hyo2.soundspeed.listener.sippican.sippican import Sippican
-from hyo2.soundspeed.listener.nmea.nmea import Nmea
-from hyo2.soundspeed.listener.mvp.mvp import Mvp
+from hyo2.ssm2.lib.listener.sis.sis import Sis
+from hyo2.ssm2.lib.listener.sippican.sippican import Sippican
+from hyo2.ssm2.lib.listener.nmea.nmea import Nmea
+from hyo2.ssm2.lib.listener.mvp.mvp import Mvp
 if TYPE_CHECKING:
-    from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+    from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 

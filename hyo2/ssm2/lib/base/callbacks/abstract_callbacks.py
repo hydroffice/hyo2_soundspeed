@@ -4,8 +4,8 @@ from datetime import datetime
 from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from hyo2.soundspeed.listener.sis.sis import Sis
-    from hyo2.soundspeed.listener.nmea.nmea import Nmea
+    from hyo2.ssm2.lib.listener.sis.sis import Sis
+    from hyo2.ssm2.lib.listener.nmea.nmea import Nmea
 
 logger = logging.getLogger(__name__)
 

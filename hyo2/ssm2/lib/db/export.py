@@ -4,7 +4,7 @@ from osgeo import ogr
 from typing import Optional
 
 from hyo2.abc2.lib.gdal_aux import GdalAux
-from hyo2.soundspeed.profile.dicts import Dicts
+from hyo2.ssm2.lib.profile.dicts import Dicts
 
 logger = logging.getLogger(__name__)
 

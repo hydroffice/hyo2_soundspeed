@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from hyo2.soundspeed.base.basedb import BaseDb
+from hyo2.ssm2.lib.base.basedb import BaseDb
 
 
 class TestSoundSpeedBaseDbPoint(unittest.TestCase):

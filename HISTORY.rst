@@ -1,6 +1,14 @@
 History
 -------
 
+2024.0.0
+~~~~~~~~
+
+2024-01-26
+
+- Started migration from PySide2 to PySide6
+
+
 2020.0.0
 ~~~~~~~~
 

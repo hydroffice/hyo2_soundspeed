@@ -5,8 +5,8 @@ from PySide6 import QtCore, QtGui, QtWidgets
 
 logger = logging.getLogger(__name__)
 
-from hyo2.soundspeedmanager.widgets.widget import AbstractWidget
-from hyo2.soundspeedsettings.mainwin import MainWin
+from hyo2.ssm2.app.gui.soundspeedmanager.widgets.widget import AbstractWidget
+from hyo2.ssm2.app.gui.soundspeedsettings.mainwin import MainWin
 
 
 class Settings(AbstractWidget):

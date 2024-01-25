@@ -2,8 +2,8 @@ import logging
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
-from hyo2.soundspeedsettings.widgets.widget import AbstractWidget
-from hyo2.soundspeed.profile.dicts import Dicts
+from hyo2.ssm2.app.gui.soundspeedsettings.widgets.widget import AbstractWidget
+from hyo2.ssm2.lib.profile.dicts import Dicts
 
 logger = logging.getLogger(__name__)
 

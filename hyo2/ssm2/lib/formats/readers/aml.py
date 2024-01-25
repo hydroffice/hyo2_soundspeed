@@ -5,14 +5,14 @@ import math
 import os
 from typing import Optional, TYPE_CHECKING
 
-from hyo2.soundspeed.formats.readers.abstract import AbstractTextReader
-from hyo2.soundspeed.profile.dicts import Dicts
-from hyo2.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
+from hyo2.ssm2.lib.formats.readers.abstract import AbstractTextReader
+from hyo2.ssm2.lib.profile.dicts import Dicts
+from hyo2.ssm2.lib.base.callbacks.cli_callbacks import CliCallbacks
 
 if TYPE_CHECKING:
     from hyo2.abc2.lib.progress.abstract_progress import AbstractProgress
-    from hyo2.soundspeed.base.callbacks.abstract_callbacks import AbstractCallbacks
-    from hyo2.soundspeed.base.setup import Setup
+    from hyo2.ssm2.lib.base.callbacks.abstract_callbacks import AbstractCallbacks
+    from hyo2.ssm2.lib.base.setup import Setup
 
 logger = logging.getLogger(__name__)
 

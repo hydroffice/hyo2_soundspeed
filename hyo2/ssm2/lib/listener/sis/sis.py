@@ -8,11 +8,11 @@ import traceback
 from datetime import datetime
 from typing import Optional, Union
 
-from hyo2.soundspeed.listener.abstract import AbstractListener
-from hyo2.soundspeed.formats import km, kmall
-from hyo2.soundspeed.profile.profilelist import ProfileList
-from hyo2.soundspeed.profile.dicts import Dicts
-from hyo2.soundspeed.formats.writers.asvp import Asvp
+from hyo2.ssm2.lib.listener.abstract import AbstractListener
+from hyo2.ssm2.lib.formats import km, kmall
+from hyo2.ssm2.lib.profile.profilelist import ProfileList
+from hyo2.ssm2.lib.profile.dicts import Dicts
+from hyo2.ssm2.lib.formats.writers.asvp import Asvp
 
 
 logger = logging.getLogger(__name__)

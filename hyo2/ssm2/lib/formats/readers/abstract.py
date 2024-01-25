@@ -2,10 +2,10 @@ from abc import ABCMeta, abstractmethod
 import numpy as np
 import logging
 
-from hyo2.soundspeed.base.files import FileManager
-from hyo2.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
-from hyo2.soundspeed.formats.abstract import AbstractFormat
-from hyo2.soundspeed.profile.dicts import Dicts
+from hyo2.ssm2.lib.base.files import FileManager
+from hyo2.ssm2.lib.base.callbacks.cli_callbacks import CliCallbacks
+from hyo2.ssm2.lib.formats.abstract import AbstractFormat
+from hyo2.ssm2.lib.profile.dicts import Dicts
 
 logger = logging.getLogger(__name__)
 

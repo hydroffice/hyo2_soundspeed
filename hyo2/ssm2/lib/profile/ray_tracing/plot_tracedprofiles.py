@@ -9,7 +9,7 @@ import matplotlib
 from matplotlib import pyplot as plt
 import logging
 
-from hyo2.soundspeed.profile.ray_tracing.diff_tracedprofiles import DiffTracedProfiles
+from hyo2.ssm2.lib.profile.ray_tracing.diff_tracedprofiles import DiffTracedProfiles
 
 # matplotlib.use('qt5agg')
 logger = logging.getLogger(__name__)

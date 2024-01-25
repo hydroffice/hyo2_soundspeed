@@ -8,13 +8,13 @@ import numpy
 
 logger = logging.getLogger(__name__)
 
-from hyo2.soundspeed.formats.readers.abstract import AbstractTextReader
-from hyo2.soundspeed.profile.dicts import Dicts
-from hyo2.soundspeed.base.callbacks.cli_callbacks import CliCallbacks
+from hyo2.ssm2.lib.formats.readers.abstract import AbstractTextReader
+from hyo2.ssm2.lib.profile.dicts import Dicts
+from hyo2.ssm2.lib.base.callbacks.cli_callbacks import CliCallbacks
 
-from hyo2.soundspeed.temp.regex_helpers import Profile, getMetaFromCoord, robust_re_number, \
+from hyo2.ssm2.lib.temp.regex_helpers import Profile, getMetaFromCoord, robust_re_number, \
     parseNumbers
-from hyo2.soundspeed.temp import coordinates
+from hyo2.ssm2.lib.temp import coordinates
 
 # Note that Hex header is copied into the CNV header verbatim so these can be used in either.
 SEACAT_SBE19_HEX_YEAR = r'SEACAT\sPROFILER.*?(?P<day>\d+)/(?P<month>\d+)/(?P<year>\d+)'

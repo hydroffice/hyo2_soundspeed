@@ -4,7 +4,7 @@ import struct
 
 import numpy as np
 
-from hyo2.soundspeed.profile.dicts import Dicts
+from hyo2.ssm2.lib.profile.dicts import Dicts
 
 logger = logging.getLogger(__name__)
 

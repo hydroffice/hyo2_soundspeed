@@ -5,8 +5,8 @@ from urllib.request import urlopen
 
 from hyo2.abc2.lib.helper import Helper
 from hyo2.abc2.app.web_renderer import WebRenderer
-from hyo2.ssm_sis import app_info, lib_info
-from hyo2.ssm_sis.controlpanel import ControlPanel
+from hyo2.ssm2.app.gui.ssm_sis import app_info, lib_info
+from hyo2.ssm2.app.gui.ssm_sis.controlpanel import ControlPanel
 
 
 logger = logging.getLogger(__name__)
@@ -49,10 +49,10 @@ class MainWin(QtWidgets.QMainWindow):
             else:
                 url = "%s" % Helper(lib_info=lib_info).web_url()
             self._web.open(url=url)
-            logger.debug('check %s' % url)
+            # logger.debug('check %s' % url)
 
         except Exception as e:
-            logger.warning(e)
+            logger.warning(e, exc_info=True)
 
     @classmethod
     def _check_latest_release(cls):

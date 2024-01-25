@@ -4,11 +4,11 @@ import traceback
 import logging
 from typing import TYPE_CHECKING, Union
 
-from hyo2.soundspeed.profile.dicts import Dicts
-from hyo2.soundspeed.formats.writers.asvp import Asvp
-from hyo2.soundspeed.formats.writers.calc import Calc
+from hyo2.ssm2.lib.profile.dicts import Dicts
+from hyo2.ssm2.lib.formats.writers.asvp import Asvp
+from hyo2.ssm2.lib.formats.writers.calc import Calc
 if TYPE_CHECKING:
-    from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+    from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 

@@ -3,18 +3,18 @@ import os
 
 import numpy as np
 from PySide6 import QtCore, QtGui, QtWidgets
-from hyo2.soundspeed.profile.dicts import Dicts
-from hyo2.soundspeedmanager.dialogs.automate_dialog import AutomateDialog
-from hyo2.soundspeedmanager.dialogs.buttons_dialog import ButtonsDialog
-from hyo2.soundspeedmanager.dialogs.constant_gradient_profile_dialog import ConstantGradientProfileDialog
-from hyo2.soundspeedmanager.dialogs.export_single_profile_dialog import ExportSingleProfileDialog
-from hyo2.soundspeedmanager.dialogs.import_single_profile_dialog import ImportSingleProfileDialog
-from hyo2.soundspeedmanager.dialogs.metadata_dialog import MetadataDialog
-from hyo2.soundspeedmanager.dialogs.reference_dialog import ReferenceDialog
-from hyo2.soundspeedmanager.dialogs.seacat_dialog import SeacatDialog
-from hyo2.soundspeedmanager.dialogs.spreadsheet_dialog import SpreadSheetDialog
-from hyo2.soundspeedmanager.widgets.dataplots import DataPlots
-from hyo2.soundspeedmanager.widgets.widget import AbstractWidget
+from hyo2.ssm2.lib.profile.dicts import Dicts
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.automate_dialog import AutomateDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.buttons_dialog import ButtonsDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.constant_gradient_profile_dialog import ConstantGradientProfileDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.export_single_profile_dialog import ExportSingleProfileDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.import_single_profile_dialog import ImportSingleProfileDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.metadata_dialog import MetadataDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.reference_dialog import ReferenceDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.seacat_dialog import SeacatDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.spreadsheet_dialog import SpreadSheetDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.widgets.dataplots import DataPlots
+from hyo2.ssm2.app.gui.soundspeedmanager.widgets.widget import AbstractWidget
 
 logger = logging.getLogger(__name__)
 

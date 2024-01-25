@@ -1,7 +1,7 @@
 import unittest
 
-from hyo2.soundspeedmanager import app_info
-from hyo2.soundspeed.soundspeed import SoundSpeedLibrary
+from hyo2.ssm2.app.gui.soundspeedmanager import app_info
+from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 
 class TestSoundSpeedNewProject(unittest.TestCase):

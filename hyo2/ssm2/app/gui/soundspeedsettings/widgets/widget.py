@@ -3,7 +3,7 @@ import logging
 from PySide6 import QtWidgets
 
 from hyo2.abc2.app.qt_progress import QtProgress
-from hyo2.soundspeed.base.setup_db import SetupDb
+from hyo2.ssm2.lib.base.setup_db import SetupDb
 
 logger = logging.getLogger(__name__)
 
