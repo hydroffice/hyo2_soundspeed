@@ -4,7 +4,7 @@ from PySide6 import QtCore, QtGui, QtWidgets
 from urllib.request import urlopen
 
 from hyo2.abc2.lib.package.pkg_helper import PkgHelper
-from hyo2.abc2.app.web_renderer import WebRenderer
+from hyo2.abc2.app.browser.web_renderer import WebRenderer
 from hyo2.ssm2.app.gui.ssm_sis import app_info
 from hyo2.ssm2.app.gui.ssm_sis.controlpanel import ControlPanel
 
@@ -45,9 +45,9 @@ class MainWin(QtWidgets.QMainWindow):
     def _check_web_page(self, token: str = ""):
         try:
             if len(token) > 0:
-                url = "%s_%s" % (PkgHelper(lib_info=app_info).web_url(), token)
+                url = "%s_%s" % (PkgHelper(pkg_info=app_info).web_url(), token)
             else:
-                url = "%s" % PkgHelper(lib_info=app_info).web_url()
+                url = "%s" % PkgHelper(pkg_info=app_info).web_url()
             self._web.open(url=url)
             # logger.debug('check %s' % url)
 
@@ -57,7 +57,7 @@ class MainWin(QtWidgets.QMainWindow):
     @classmethod
     def _check_latest_release(cls):
         try:
-            response = urlopen(app_info.lib_latest_url, timeout=1)
+            response = urlopen(app_info.app_latest_url, timeout=1)
             latest_version = response.read().split()[0].decode()
             cur_maj, cur_min, cur_fix = app_info.app_version.split('.')
             lat_maj, lat_min, lat_fix = latest_version.split('.')
@@ -72,7 +72,7 @@ class MainWin(QtWidgets.QMainWindow):
                 logger.info("new bugfix available: %s" % latest_version)
 
         except Exception as e:
-            logger.warning(e)
+            logger.warning(e, exc_info=True)
 
     def _do_you_really_want(self, title="Quit", text="quit"):
         """helper function that show to the user a message windows asking to confirm an action"""
@@ -80,6 +80,7 @@ class MainWin(QtWidgets.QMainWindow):
         msg_box.setWindowTitle(title)
         msg_box.setIconPixmap(QtGui.QPixmap(app_info.app_icon_path).scaled(QtCore.QSize(36, 36)))
         msg_box.setText('Do you really want to %s?' % text)
+        # noinspection PyUnresolvedReferences
         msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         msg_box.setDefaultButton(QtWidgets.QMessageBox.No)
         return msg_box.exec_()

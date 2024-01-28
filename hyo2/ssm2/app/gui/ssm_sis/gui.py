@@ -5,7 +5,7 @@ import logging
 from PySide6 import QtCore, QtWidgets
 
 from hyo2.abc2.lib.logging import set_logging
-from hyo2.abc2.app.app_style import AppStyle
+from hyo2.abc2.app.app_style.app_style import AppStyle
 
 set_logging(ns_list=["hyo2.abc2", "hyo2.ssm2", "hyo2.sdm2"])
 logger = logging.getLogger(__name__)
