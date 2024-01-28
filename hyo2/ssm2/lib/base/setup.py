@@ -2,7 +2,7 @@ import logging
 import os
 from typing import Optional
 
-from hyo2.abc2.lib.helper import Helper
+from hyo2.abc2.lib.package.pkg_helper import PkgHelper
 from hyo2.ssm2.lib.base.setup_db import SetupDb
 from hyo2.ssm2.lib.profile.dicts import Dicts
 from hyo2.ssm2.lib.client.clientlist import ClientList
@@ -245,10 +245,10 @@ class Setup:
             db.use_woa18 = self.use_woa18
             db.use_rtofs = self.use_rtofs
             db.use_gomofs = self.use_gomofs
-            db.ssp_extension_source = Helper.first_match(Dicts.atlases, self.ssp_extension_source)
-            db.ssp_salinity_source = Helper.first_match(Dicts.atlases, self.ssp_salinity_source)
-            db.ssp_temp_sal_source = Helper.first_match(Dicts.atlases, self.ssp_temp_sal_source)
-            db.ssp_up_or_down = Helper.first_match(Dicts.ssp_directions, self.ssp_up_or_down)
+            db.ssp_extension_source = PkgHelper.first_match(Dicts.atlases, self.ssp_extension_source)
+            db.ssp_salinity_source = PkgHelper.first_match(Dicts.atlases, self.ssp_salinity_source)
+            db.ssp_temp_sal_source = PkgHelper.first_match(Dicts.atlases, self.ssp_temp_sal_source)
+            db.ssp_up_or_down = PkgHelper.first_match(Dicts.ssp_directions, self.ssp_up_or_down)
 
             db.rx_max_wait_time = self.rx_max_wait_time
             db.use_sis4 = self.use_sis4

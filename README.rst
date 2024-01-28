@@ -7,7 +7,7 @@ HydrOffice Sound Speed
         :alt: PyPi version
 
 .. image:: https://img.shields.io/badge/docs-latest-brightgreen.svg
-    :target: https://www.hydroffice.org/manuals/soundspeed/index.html
+    :target: https://www.hydroffice.org/manuals/ssm2/index.html
     :alt: Latest Documentation
 
 .. image:: https://ci.appveyor.com/api/projects/status/6krhsxkcqo0jrvu6?svg=true

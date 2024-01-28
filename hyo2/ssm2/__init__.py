@@ -5,8 +5,7 @@ Sound Speed 2
 
 import os
 import logging
-from hyo2.abc2.lib.lib_info import LibInfo
-
+from hyo2.abc2.lib.package.pkg_info import PkgInfo
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -15,35 +14,29 @@ name = "Sound Speed"
 __version__ = '2024.0.0'
 __copyright__ = 'Copyright 2024 University of New Hampshire, Center for Coastal and Ocean Mapping'
 
-lib_info = LibInfo()
-
-lib_info.lib_name = name
-lib_info.lib_version = __version__
-lib_info.lib_author = "Giuseppe Masetti(UNH,JHC-CCOM); Barry Gallagher(NOAA,OCS); " \
-                      "Chen Zhang(NOAA,OCS)"
-lib_info.lib_author_email = "gmasetti@ccom.unh.edu; barry.gallagher@noaa.gov; " \
-                            "chen.zhang@noaa.gov"
-
-lib_info.lib_license = "LGPLv2.1 or CCOM-UNH Industrial Associate license"
-lib_info.lib_license_url = "https://www.hydroffice.org/license/"
-
-lib_info.lib_path = os.path.abspath(os.path.dirname(__file__))
-
-lib_info.lib_url = "https://www.hydroffice.org/soundspeed/"
-lib_info.lib_manual_url = "https://www.hydroffice.org/manuals/ssm2/index.html"
-lib_info.lib_support_email = "soundspeed@hydroffice.org"
-lib_info.lib_latest_url = "https://www.hydroffice.org/latest/soundspeed.txt"
-
-lib_info.lib_dep_dict = {
-    "hyo2.abc2": "hyo2.abc2",
-    "hyo2.ssm2": "hyo2.ssm2",
-    "hyo2.surveydatamonitor": "hyo2.surveydatamonitor",
-    "gsw": "gsw",
-    "netCDF4": "netCDF4",
-    "gdal": "osgeo",
-    "numpy": "numpy",
-    "pyproj": "pyproj",
-    "matplotlib": "matplotlib",
-    "cartopy": "cartopy",
-    "PySide6": "PySide6"
-}
+pkg_info = PkgInfo(
+    name=name,
+    version=__version__,
+    author="Giuseppe Masetti(UNH,JHC-CCOM); Barry Gallagher(NOAA,OCS); Chen Zhang(NOAA,OCS)",
+    author_email="gmasetti@ccom.unh.edu; barry.gallagher@noaa.gov; chen.zhang@noaa.gov",
+    lic="LGPLv2.1 or CCOM-UNH Industrial Associate license",
+    lic_url="https://www.hydroffice.org/license/",
+    path=os.path.abspath(os.path.dirname(__file__)),
+    url="https://www.hydroffice.org/soundspeed/",
+    manual_url="https://www.hydroffice.org/manuals/ssm2/index.html",
+    support_email="soundspeed@hydroffice.org",
+    latest_url="https://www.hydroffice.org/latest/soundspeed.txt",
+    deps_dict={
+        "hyo2.abc2": "hyo2.abc2",
+        "hyo2.ssm2": "hyo2.ssm2",
+        "hyo2.sdm2": "hyo2.sdm2",
+        "gsw": "gsw",
+        "netCDF4": "netCDF4",
+        "gdal": "osgeo",
+        "numpy": "numpy",
+        "pyproj": "pyproj",
+        "matplotlib": "matplotlib",
+        "cartopy": "cartopy",
+        "PySide6": "PySide6"
+    }
+)

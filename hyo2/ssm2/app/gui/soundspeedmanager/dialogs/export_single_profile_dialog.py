@@ -2,7 +2,7 @@ from PySide6 import QtCore, QtWidgets
 
 import logging
 
-from hyo2.abc2.lib.helper import Helper
+from hyo2.abc2.lib.package.pkg_helper import PkgHelper
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.dialog import AbstractDialog
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.output_folders_dialog import OutputFoldersDialog
 from hyo2.ssm2.lib.profile.dicts import Dicts
@@ -259,7 +259,7 @@ class ExportSingleProfileDialog(AbstractDialog):
             opened_folders = list()
             for output_folder in output_folders.values():
                 if output_folder not in opened_folders:
-                    Helper.explore_folder(output_folder)  # open the output folder
+                    PkgHelper.explore_folder(output_folder)  # open the output folder
                     opened_folders.append(output_folder)
             self.progress.end()
 

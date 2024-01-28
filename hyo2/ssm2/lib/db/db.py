@@ -6,7 +6,7 @@ from typing import Optional
 
 import numpy as np
 
-from hyo2.ssm2 import lib_info
+from hyo2.ssm2 import pkg_info
 from hyo2.ssm2.lib.db.export import ExportDb
 from hyo2.ssm2.lib.db.plot import PlotDb
 from hyo2.ssm2.lib.db.point import Point, convert_point, adapt_point
@@ -151,7 +151,7 @@ class ProjectDb:
                     # noinspection SqlResolve
                     self.conn.execute("""
                                       INSERT INTO library VALUES (?, ?, ?)
-                                      """, (self.cur_version, "%s v.%s" % (lib_info.lib_name, lib_info.lib_version),
+                                      """, (self.cur_version, "%s v.%s" % (pkg_info.name, pkg_info.version),
                                             datetime.datetime.utcnow(),))
 
                 # check if the library version is old
@@ -874,7 +874,7 @@ class ProjectDb:
         # noinspection SqlResolve
         self.conn.execute("""
                           INSERT INTO library VALUES (?, ?, ?)
-                          """, (self.cur_version, "%s v.%s" % (lib_info.lib_name, lib_info.lib_version),
+                          """, (self.cur_version, "%s v.%s" % (pkg_info.name, pkg_info.version),
                                 datetime.datetime.utcnow(),))
 
     def __repr__(self):

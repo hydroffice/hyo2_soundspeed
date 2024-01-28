@@ -10,10 +10,10 @@ from typing import Optional, TYPE_CHECKING
 from appdirs import user_data_dir
 
 from hyo2.abc2.lib.gdal_aux import GdalAux
-from hyo2.abc2.lib.helper import Helper
+from hyo2.abc2.lib.package.pkg_helper import PkgHelper
 from hyo2.abc2.lib.progress.abstract_progress import AbstractProgress
 from hyo2.abc2.lib.progress.cli_progress import CliProgress
-from hyo2.ssm2 import lib_info
+from hyo2.ssm2 import pkg_info
 from hyo2.ssm2.lib import formats
 from hyo2.ssm2.lib.atlas.atlases import Atlases
 from hyo2.ssm2.lib.base.callbacks.abstract_callbacks import AbstractCallbacks
@@ -114,7 +114,7 @@ class SoundSpeedLibrary:
 
         # output data folder: where all the library data are written
         if data_folder is None:
-            data_folder = user_data_dir(lib_info.lib_name, "HydrOffice")
+            data_folder = user_data_dir(pkg_info.name, "HydrOffice")
         if not os.path.exists(data_folder):  # create it if it does not exist
             os.makedirs(data_folder)
         # logger.debug("library folder: %s" % data_folder)
@@ -137,7 +137,7 @@ class SoundSpeedLibrary:
     def make_release_folder(cls, data_folder: Optional[str] = None) -> str:
         # release data folder: release-specific data (as settings)
         releases_folder = cls.make_releases_folder(data_folder=data_folder)
-        release_folder = os.path.join(releases_folder, lib_info.lib_version[:lib_info.lib_version.rindex('.')])
+        release_folder = os.path.join(releases_folder, pkg_info.version[:pkg_info.version.rindex('.')])
         if not os.path.exists(release_folder):  # create it if it does not exist
             os.makedirs(release_folder)
         # logger.debug("release folder: %s" % self.release_folder)
@@ -225,7 +225,7 @@ class SoundSpeedLibrary:
         self._data_folder = value
 
     def open_data_folder(self) -> None:
-        Helper.explore_folder(self.data_folder)
+        PkgHelper.explore_folder(self.data_folder)
 
     # releases folder
 
@@ -240,7 +240,7 @@ class SoundSpeedLibrary:
         self._releases_folder = value
 
     def open_releases_folder(self) -> None:
-        Helper.explore_folder(self.releases_folder)
+        PkgHelper.explore_folder(self.releases_folder)
 
     # release folder
 
@@ -262,7 +262,7 @@ class SoundSpeedLibrary:
         return self.atlases.atlases_folder
 
     def open_atlases_folder(self) -> None:
-        Helper.explore_folder(self.atlases_folder)
+        PkgHelper.explore_folder(self.atlases_folder)
 
     @property
     def woa09_folder(self) -> str:
@@ -302,7 +302,7 @@ class SoundSpeedLibrary:
         self._projects_folder = value
 
     def open_projects_folder(self) -> None:
-        Helper.explore_folder(self.projects_folder)
+        PkgHelper.explore_folder(self.projects_folder)
 
     # outputs
 
@@ -317,7 +317,7 @@ class SoundSpeedLibrary:
         self._outputs_folder = value
 
     def open_outputs_folder(self) -> None:
-        Helper.explore_folder(self.outputs_folder)
+        PkgHelper.explore_folder(self.outputs_folder)
 
     # --- readers/writers
 

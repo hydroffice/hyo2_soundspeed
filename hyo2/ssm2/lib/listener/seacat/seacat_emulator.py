@@ -7,7 +7,7 @@ try:
 
 except Exception:
     print("Seacat serial communications module not found or failed to load")
-    print("Emulator will still work but the capture function will raise an exception")
+    print("Emulator will still work but the capture function will raise an pkg_exception")
 
 
     class UTF8Serial(serial.Serial):

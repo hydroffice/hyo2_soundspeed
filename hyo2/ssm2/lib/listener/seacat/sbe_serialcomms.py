@@ -14,7 +14,7 @@ except:
 import serial  # for serial/usb port communication with SBE instruments
 
 from hyo2.ssm2.lib.formats.readers import seabird as sbe_constants
-from hyo2.ssm2.app.gui.soundspeedmanager import __version__ as ssm_version
+from hyo2.ssm2 import __version__ as ssm_version
 
 import logging
 
@@ -44,7 +44,7 @@ class UTF8Serial(serial.Serial):
 
 
 class SeacatComms:
-    '''It seems that the serial module does not clean up nicely.  If an exception occurs the serial port may be held
+    '''It seems that the serial module does not clean up nicely.  If an pkg_exception occurs the serial port may be held
     until the program exits.
     Make sure to catch all exceptions and close( ) the comm object.
     c.close(); reload(Seacat); c=Seacat.SeacatComms.open_seacat('COM1')
@@ -113,7 +113,7 @@ class SeacatComms:
         except:
             traceback.print_exc()
             try:
-                self.comlink.close()  # in case there is an exception after we open the comlink
+                self.comlink.close()  # in case there is an pkg_exception after we open the comlink
             except:
                 pass
         if progbar:

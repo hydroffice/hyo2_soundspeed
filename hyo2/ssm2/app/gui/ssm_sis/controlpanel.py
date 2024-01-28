@@ -3,7 +3,7 @@ import os
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
-from hyo2.abc2.lib.helper import Helper
+from hyo2.abc2.lib.package.pkg_helper import PkgHelper
 from hyo2.ssm2.app.gui.ssm_sis import app_info
 from hyo2.ssm2.lib.listener.sis.sis import Sis
 from hyo2.ssm2.lib.profile.profilelist import ProfileList
@@ -278,7 +278,7 @@ class ControlPanel(QtWidgets.QWidget):
     @classmethod
     def click_open_manual(cls):
         logger.debug("open manual")
-        Helper.explore_folder("https://www.hydroffice.org/manuals/soundspeed/ssm_sis.html")
+        PkgHelper.explore_folder("https://www.hydroffice.org/manuals/ssm2/ssm_sis.html")
 
     def update_gui(self):
         if self.sis is None:

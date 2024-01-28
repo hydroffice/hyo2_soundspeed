@@ -1,6 +1,6 @@
 import logging
 
-from hyo2.abc2.lib.helper import Helper
+from hyo2.abc2.lib.package.pkg_helper import PkgHelper
 
 logger = logging.getLogger(__name__)
 
@@ -37,16 +37,16 @@ institution_list = [
     "UNH CCOM/JHC"
 ]
 
-if Helper.is_pydro():
+if PkgHelper.is_pydro():
     logger.debug("using pydro setup")
     default_use_woa_09 = 1
     default_use_woa_13 = 0
     default_use_woa_18 = 0
     default_use_rtofs = 0
     default_use_gomofs = 0
-    default_custom_woa09_folder = Helper.hstb_woa09_folder()
-    default_custom_woa13_folder = Helper.hstb_woa13_folder()
-    default_custom_woa18_folder = Helper.hstb_woa18_folder()
+    default_custom_woa09_folder = PkgHelper.hstb_woa09_folder()
+    default_custom_woa13_folder = PkgHelper.hstb_woa13_folder()
+    default_custom_woa18_folder = PkgHelper.hstb_woa18_folder()
     default_noaa_tools = 1
     default_default_institution = institution_list[0]
 

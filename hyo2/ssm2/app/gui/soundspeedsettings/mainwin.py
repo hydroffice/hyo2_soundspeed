@@ -4,9 +4,9 @@ import traceback
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
-from hyo2.abc2.app.dialogs.exception.exception_dialog import ExceptionDialog
+from hyo2.abc2.app.pkg_info.pkg_exception.pkg_exception_dialog import PkgExceptionDialog
 
-from hyo2.ssm2 import lib_info
+from hyo2.ssm2 import pkg_info
 from hyo2.ssm2.app.gui.soundspeedsettings import app_info
 from hyo2.ssm2.app.gui.soundspeedsettings.widgets.main import Main
 from hyo2.ssm2.app.gui.soundspeedsettings.widgets.general import General
@@ -112,7 +112,7 @@ class MainWin(QtWidgets.QMainWindow):
     def exception_hook(self, ex_type: type, ex_value: BaseException, tb: traceback) -> None:
         sys.__excepthook__(ex_type, ex_value, tb)
 
-        # first manage case of not being an exception (e.g., keyboard interrupts)
+        # first manage case of not being an pkg_exception (e.g., keyboard interrupts)
         if not issubclass(ex_type, Exception):
             msg = str(ex_value)
             if not msg:
@@ -121,10 +121,10 @@ class MainWin(QtWidgets.QMainWindow):
             self.close()
             return
 
-        dlg = ExceptionDialog(app_info=app_info, lib_info=lib_info, ex_type=ex_type, ex_value=ex_value, tb=tb)
+        dlg = PkgExceptionDialog(app_info=app_info, ex_type=ex_type, ex_value=ex_value, tb=tb)
         ret = dlg.exec_()
         if ret == QtWidgets.QDialog.Rejected:
             if not dlg.user_triggered:
                 self.close()
         else:
-            logger.warning("ignored exception")
+            logger.warning("ignored pkg_exception")

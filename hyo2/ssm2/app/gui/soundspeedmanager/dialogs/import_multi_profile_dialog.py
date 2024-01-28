@@ -3,8 +3,8 @@ import logging
 
 from PySide6 import QtCore, QtWidgets
 
-from hyo2.abc2.lib.helper import Helper
-from hyo2.ssm2 import lib_info
+from hyo2.abc2.lib.package.pkg_helper import PkgHelper
+from hyo2.ssm2 import pkg_info
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.dialog import AbstractDialog
 
 logger = logging.getLogger(__name__)
@@ -100,7 +100,7 @@ class ImportMultiProfileDialog(AbstractDialog):
         quantum = 100 / (nr_profiles * 2 + 1)
         self.progress.start()
 
-        self.main_win.change_info_url(Helper(lib_info=lib_info).web_url(suffix="%s" % name))
+        self.main_win.change_info_url(PkgHelper(pkg_info=pkg_info).web_url(suffix="%s" % name))
 
         for i, selection in enumerate(selections):
 

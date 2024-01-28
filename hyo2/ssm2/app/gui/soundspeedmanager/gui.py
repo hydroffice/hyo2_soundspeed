@@ -4,8 +4,8 @@ import traceback
 
 from PySide6 import QtCore, QtWidgets, QtGui
 
-from hyo2.abc2.app.app_style import AppStyle
-from hyo2.abc2.lib.helper import Helper
+from hyo2.abc2.app.app_style.app_style import AppStyle
+from hyo2.abc2.lib.package.pkg_helper import PkgHelper
 from hyo2.abc2.lib.logging import set_logging
 from hyo2.ssm2.app.gui.soundspeedmanager import app_info
 
@@ -28,7 +28,7 @@ def qt_custom_handler(error_type: QtCore.QtMsgType, error_context: QtCore.QMessa
 QtCore.qInstallMessageHandler(qt_custom_handler)
 
 
-def gui(beta: bool = True):
+def gui():
     """Create the application and show the Sound Speed Manager gui"""
     from hyo2.ssm2.app.gui.soundspeedmanager.mainwin import MainWin
 
@@ -36,7 +36,7 @@ def gui(beta: bool = True):
     app = QtWidgets.QApplication(sys.argv)
     AppStyle.apply(app=app)
 
-    if Helper.is_script_already_running():
+    if PkgHelper.is_script_already_running():
         txt = "The app is already running!"
         logger.warning(txt)
         msg_box = QtWidgets.QMessageBox()
@@ -50,8 +50,8 @@ def gui(beta: bool = True):
             sys.exit(app.exit())
 
     logger.debug("Init main win ...")
-    main_win = MainWin(beta=beta)
-    sys.excepthook = main_win.exception_hook  # install the exception hook
+    main_win = MainWin()
+    sys.excepthook = main_win.exception_hook  # install the pkg_exception hook
     main_win.show()
     main_win.do()
 

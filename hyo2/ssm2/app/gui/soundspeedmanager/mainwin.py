@@ -8,11 +8,10 @@ from urllib.request import urlopen
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
-from hyo2.abc2.app.dialogs.exception.exception_dialog import ExceptionDialog
+from hyo2.abc2.app.pkg_info.pkg_exception.pkg_exception_dialog import PkgExceptionDialog
+from hyo2.abc2.app.pkg_info.pkg_info_tab import PkgInfoTab
 from hyo2.abc2.app.qt_progress import QtProgress
-from hyo2.abc2.app.tabs.info.info_tab import InfoTab
-from hyo2.abc2.lib.helper import Helper
-from hyo2.ssm2 import lib_info
+from hyo2.abc2.lib.package.pkg_helper import PkgHelper
 from hyo2.ssm2.app.gui.soundspeedmanager import app_info
 from hyo2.ssm2.app.gui.soundspeedmanager.qt_callbacks import QtCallbacks
 from hyo2.ssm2.app.gui.soundspeedmanager.widgets.database import Database
@@ -26,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 class MainWin(QtWidgets.QMainWindow):
 
-    def __init__(self, beta: bool = False):
+    def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
 
         logger.info("* > APP: initializing ...")
@@ -34,8 +33,7 @@ class MainWin(QtWidgets.QMainWindow):
         # set the application name and the version
         self.name = app_info.app_name
         self.version = app_info.app_version
-        self.beta = beta
-        if self.beta:
+        if app_info.app_beta:
             self.version += ' BETA'
         self.setWindowTitle('%s v.%s' % (self.name, self.version))
         # noinspection PyArgumentList
@@ -69,7 +67,7 @@ class MainWin(QtWidgets.QMainWindow):
 
         # create the project
         self.lib = SoundSpeedLibrary(callbacks=QtCallbacks(parent=self), progress=QtProgress(parent=self))
-        logger.info("current configuration:\n%s" % Helper(lib_info=lib_info).package_info())
+        logger.info("current configuration:\n%s" % PkgHelper(pkg_info=app_info).pkg_info())
         self.check_woa09()
         self.check_woa13()
         self.check_woa18()
@@ -157,15 +155,15 @@ class MainWin(QtWidgets.QMainWindow):
                                              QtGui.QIcon(os.path.join(app_info.app_media_path, 'settings.png')), "")
         self.tabs.setTabToolTip(self.idx_setup, "Setup")
         # info
-        self.tab_info = InfoTab(main_win=self, lib_info=lib_info, app_info=app_info,
-                                with_online_manual=True,
-                                with_offline_manual=True,
-                                with_bug_report=True,
-                                with_hydroffice_link=True,
-                                with_ccom_link=True,
-                                with_noaa_link=True,
-                                with_unh_link=True,
-                                with_license=True)
+        self.tab_info = PkgInfoTab(main_win=self, app_info=app_info,
+                                   with_online_manual=True,
+                                   with_offline_manual=True,
+                                   with_bug_report=True,
+                                   with_hydroffice_link=True,
+                                   with_ccom_link=True,
+                                   with_noaa_link=True,
+                                   with_unh_link=True,
+                                   with_license=True)
         # noinspection PyArgumentList
         self.idx_info = self.tabs.insertTab(6, self.tab_info,
                                             QtGui.QIcon(os.path.join(app_info.app_media_path, 'info.png')), "")
@@ -257,7 +255,7 @@ class MainWin(QtWidgets.QMainWindow):
               '   %s\n\n' \
               'Do you want that I perform this operation for you?\n' \
               'Internet connection is required!\n' % self.lib.woa09_folder
-        # noinspection PyCallByClass,PyArgumentList
+        # noinspection PyCallByClass,PyArgumentList,PyUnresolvedReferences
         ret = QtWidgets.QMessageBox.information(self, "Sound Speed Manager - WOA09 Atlas", msg,
                                                 QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
         if ret == QtWidgets.QMessageBox.No:
@@ -284,7 +282,7 @@ class MainWin(QtWidgets.QMainWindow):
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
                   ' - restart Sound Speed Manager\n' % self.lib.woa09_folder
-            # noinspection PyCallByClass,PyArgumentList
+            # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
             QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - WOA09 Atlas", msg,
                                           QtWidgets.QMessageBox.Ok)
             logger.debug('WOA09: disabled')
@@ -312,7 +310,7 @@ class MainWin(QtWidgets.QMainWindow):
               '   %s\n\n' \
               'Do you want that I perform this operation for you?\n' \
               'Internet connection is required!\n' % self.lib.woa13_folder
-        # noinspection PyCallByClass,PyArgumentList
+        # noinspection PyCallByClass,PyArgumentList,PyUnresolvedReferences
         ret = QtWidgets.QMessageBox.information(self, "Sound Speed Manager - WOA13 Atlas", msg,
                                                 QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
         if ret == QtWidgets.QMessageBox.No:
@@ -343,7 +341,7 @@ class MainWin(QtWidgets.QMainWindow):
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
                   ' - restart Sound Speed Manager\n' % self.lib.woa13_folder
-            # noinspection PyCallByClass,PyArgumentList
+            # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
             QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - WOA13 Atlas", msg,
                                           QtWidgets.QMessageBox.Ok)
             logger.debug('WOA13: disabled')
@@ -371,7 +369,7 @@ class MainWin(QtWidgets.QMainWindow):
               '   %s\n\n' \
               'Do you want that I perform this operation for you?\n' \
               'Internet connection is required!\n' % self.lib.woa18_folder
-        # noinspection PyCallByClass,PyArgumentList
+        # noinspection PyCallByClass,PyArgumentList,PyUnresolvedReferences
         ret = QtWidgets.QMessageBox.information(self, "Sound Speed Manager - WOA18 Atlas", msg,
                                                 QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
         if ret == QtWidgets.QMessageBox.No:
@@ -402,7 +400,7 @@ class MainWin(QtWidgets.QMainWindow):
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
                   ' - restart Sound Speed Manager\n' % self.lib.woa18_folder
-            # noinspection PyCallByClass,PyArgumentList
+            # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
             QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - WOA18 Atlas", msg,
                                           QtWidgets.QMessageBox.Ok)
             logger.debug('WOA18: disabled')
@@ -427,7 +425,7 @@ class MainWin(QtWidgets.QMainWindow):
                   'this server (with port 9090 open):\n' \
                   ' - http://nomads.ncep.noaa.gov:9090\n\n' \
                   'You can disable the RTOFS support in Settings/Basic/Use RTOFS.\n'
-            # noinspection PyCallByClass,PyArgumentList
+            # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
             QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - RTOFS Atlas", msg,
                                           QtWidgets.QMessageBox.Ok)
             logger.debug('RTOFS: disabled')
@@ -439,13 +437,13 @@ class MainWin(QtWidgets.QMainWindow):
         if self.lib.use_sis():
             if not self.lib.listen_sis():
                 msg = 'Unable to listen SIS.\nCheck whether another process is already using the SIS port.'
-                # noinspection PyCallByClass,PyArgumentList
+                # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
                 QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - SIS", msg,
                                               QtWidgets.QMessageBox.Ok)
         else:
             if not self.lib.stop_listen_sis():
                 msg = 'Unable to stop listening SIS.'
-                # noinspection PyCallByClass,PyArgumentList
+                # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
                 QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - SIS", msg,
                                               QtWidgets.QMessageBox.Ok)
 
@@ -453,13 +451,13 @@ class MainWin(QtWidgets.QMainWindow):
         if self.lib.use_sippican():
             if not self.lib.listen_sippican():
                 msg = 'Unable to listening Sippican.\nCheck whether another process is already using the Sippican port.'
-                # noinspection PyCallByClass,PyArgumentList
+                # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
                 QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - Sippican", msg,
                                               QtWidgets.QMessageBox.Ok)
         else:
             if not self.lib.stop_listen_sippican():
                 msg = 'Unable to stop listening Sippican.'
-                # noinspection PyCallByClass,PyArgumentList
+                # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
                 QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - Sippican", msg,
                                               QtWidgets.QMessageBox.Ok)
 
@@ -468,13 +466,13 @@ class MainWin(QtWidgets.QMainWindow):
             if not self.lib.listen_nmea():
                 msg = ('Unable to listening NMEA 0183.\n'
                        'Check whether another process is already using the NMEA 0183 port.')
-                # noinspection PyCallByClass,PyArgumentList
+                # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
                 QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - NMEA 0183", msg,
                                               QtWidgets.QMessageBox.Ok)
         else:
             if not self.lib.stop_listen_nmea():
                 msg = 'Unable to stop listening Nmea.'
-                # noinspection PyCallByClass,PyArgumentList
+                # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
                 QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - NMEA 0183", msg,
                                               QtWidgets.QMessageBox.Ok)
 
@@ -482,13 +480,13 @@ class MainWin(QtWidgets.QMainWindow):
         if self.lib.use_mvp():
             if not self.lib.listen_mvp():
                 msg = 'Unable to listening MVP.\nCheck whether another process is already using the MVP port.'
-                # noinspection PyCallByClass,PyArgumentList
+                # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
                 QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - MVP", msg,
                                               QtWidgets.QMessageBox.Ok)
         else:
             if not self.lib.stop_listen_mvp():
                 msg = 'Unable to stop listening MVP.'
-                # noinspection PyCallByClass,PyArgumentList
+                # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
                 QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - MVP", msg,
                                               QtWidgets.QMessageBox.Ok)
 
@@ -792,7 +790,7 @@ class MainWin(QtWidgets.QMainWindow):
         # noinspection PyTypeChecker
         sys.__excepthook__(ex_type, ex_value, tb)
 
-        # first manage case of not being an exception (e.g., keyboard interrupts)
+        # first manage case of not being an pkg_exception (e.g., keyboard interrupts)
         if not issubclass(ex_type, Exception):
             msg = str(ex_value)
             if not msg:
@@ -801,13 +799,13 @@ class MainWin(QtWidgets.QMainWindow):
             self.close()
             return
 
-        dlg = ExceptionDialog(app_info=app_info, lib_info=lib_info, ex_type=ex_type, ex_value=ex_value, tb=tb)
+        dlg = PkgExceptionDialog(app_info=app_info, ex_type=ex_type, ex_value=ex_value, tb=tb)
         ret = dlg.exec_()
         if ret == QtWidgets.QDialog.Rejected:
             if not dlg.user_triggered:
                 self.close()
         else:
-            logger.warning("ignored exception")
+            logger.warning("ignored pkg_exception")
 
     # Quitting #
 
@@ -817,6 +815,7 @@ class MainWin(QtWidgets.QMainWindow):
         msg_box.setWindowTitle(title)
         msg_box.setIconPixmap(QtGui.QPixmap(app_info.app_icon_path).scaled(QtCore.QSize(36, 36)))
         msg_box.setText('Do you really want to %s?' % text)
+        # noinspection PyUnresolvedReferences
         msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         msg_box.setDefaultButton(QtWidgets.QMessageBox.No)
         return msg_box.exec_()
