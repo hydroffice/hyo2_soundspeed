@@ -43,6 +43,7 @@ def gui():
         msg_box.setWindowTitle("Multiple Instances of Sound Speed Manager")
         msg_box.setIconPixmap(QtGui.QPixmap(app_info.app_icon_path).scaled(QtCore.QSize(36, 36)))
         msg_box.setText('%s\n\nDo you want to continue? This might create issues.' % txt)
+        # noinspection PyUnresolvedReferences
         msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         msg_box.setDefaultButton(QtWidgets.QMessageBox.No)
         reply = msg_box.exec_()

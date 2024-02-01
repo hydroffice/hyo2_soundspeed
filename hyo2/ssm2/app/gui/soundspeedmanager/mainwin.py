@@ -123,7 +123,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.has_sdm_support = True
         try:  # try.. except to make SSM working also without SDM
             # noinspection PyUnresolvedReferences
-            from hyo2.surveydatamonitor.app.widgets.monitor import SurveyDataMonitor
+            from hyo2.sdm3.app.gui.surveydatamonitor.widgets.monitor import SurveyDataMonitor
             self.tab_monitor = SurveyDataMonitor(lib=self.lib, main_win=self)
             # noinspection PyArgumentList
             self.idx_monitor = self.tabs.insertTab(3, self.tab_monitor,

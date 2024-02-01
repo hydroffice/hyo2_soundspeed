@@ -1,10 +1,11 @@
 """
 Hydro-Package
-Sound Speed 2
+Sound Speed Manager 2
 """
 
-import os
 import logging
+import os
+
 from hyo2.abc2.lib.package.pkg_info import PkgInfo
 
 logger = logging.getLogger(__name__)
@@ -29,7 +30,7 @@ pkg_info = PkgInfo(
     deps_dict={
         "hyo2.abc2": "hyo2.abc2",
         "hyo2.ssm2": "hyo2.ssm2",
-        "hyo2.sdm2": "hyo2.sdm2",
+        "hyo2.sdm3": "hyo2.sdm3",
         "gsw": "gsw",
         "netCDF4": "netCDF4",
         "gdal": "osgeo",
