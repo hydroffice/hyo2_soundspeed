@@ -25,6 +25,8 @@ class Kmall:
         b'#SDE': 'Sensor (S) data from depth (DE) sensor',
         b'#SHI': 'Sensor (S) data for height (HI)',
 
+        b'#SSM': 'Sound Speed Manager (SSM) datagram',
+
         b'#CPO': 'Compatibility (C) data for position (PO)',
         b'#CHE': 'Compatibility (C) data for heave (HE)',
     }
@@ -76,6 +78,57 @@ class Kmall:
                % (self.id, self.dg_time, self.sounder_id)
 
 
+class KmallSSM(Kmall):
+    def __init__(self, data, debug: bool = False):
+        super().__init__(data)
+
+        common = struct.unpack("<4H", self.data[20:28])
+        # common_length = common[0]
+        # logger.debug("common part -> length: %d/%d" % (common_length, self.length))
+        # common_sensor_system = common[1]
+        # logger.debug("common part -> sensor system: %d" % common_sensor_system)
+        common_sensor_status = common[2]
+        self.inactive_sensor = (common_sensor_status & 1) != 1
+        self.invalid_data = (common_sensor_status & 16) == 16
+        # if self.inactive_sensor or self.invalid_data:
+        #     logger.debug("common part -> sensor status: %s (inactive: %s, invalid: %s)"
+        #                  % (common_sensor_status, self.inactive_sensor, self.invalid_data))
+
+        data_blk = struct.unpack("<2fIfI2d", self.data[28:64])
+        self.tss = data_blk[0]
+        # logger.debug('TSS: %s m/s' % (self.tss, ))
+        self.transducer_depth = data_blk[1]
+        # logger.debug('transducer depth re WL: %.3f m' % (self.transducer_depth))
+        # ping_time_sec = data_blk[2]
+        # logger.debug('ping time sec: %s' % ping_time_sec)
+        # ping_datetime = Kmall.kmall_datetime(ping_time_sec, 0)
+        # logger.debug('ping datetime: %s' % ping_datetime.strftime('%Y-%m-%d %H:%M:%S.%f'))
+        self.mean_depth = data_blk[3]
+        # logger.debug('ping avg depth: %s' % self.mean_depth)
+        # nav_time_sec = data_blk[4]
+        # logger.debug('nav time sec: %s' % nav_time_sec)
+        # nav_datetime = Kmall.kmall_datetime(nav_time_sec, 0)
+        # logger.debug('nav datetime: %s' % nav_datetime.strftime('%Y-%m-%d %H:%M:%S.%f'))
+        self.latitude = data_blk[5]
+        self.longitude = data_blk[6]
+        if debug:
+            logger.debug('SSM -> pos: %.7f, %.7f' % (self.latitude, self.longitude))
+
+        final_length = struct.unpack("<I", self.data[-4:])
+        self.is_valid = final_length != self.length
+        # logger.debug('#SPO is valid: %s' % self.is_valid)
+        if not self.is_valid:
+            logger.warning('SSM -> Invalid length: %s != %s' % (final_length, self.length))
+
+    def __str__(self):
+        output = Kmall.__str__(self)
+        output += '\tTSS: %.2f m/s\n\tTransducer depth: %.2f m.\n' % (self.tss, self.transducer_depth)
+        output += '\tLat/Lon: %lf %lf\n' % (self.latitude, self.longitude)
+        output += '\tMean depth: %.2f m\n' % self.mean_depth
+
+        return output
+
+
 class KmallMRZ(Kmall):
     def __init__(self, data, debug: bool = False):
         super().__init__(data)
@@ -117,7 +170,7 @@ class KmallMRZ(Kmall):
         self.tss = ping_info[36]
         # logger.debug('TSS: %s m/s' % (self.tss, ))
         transducer_depth_m = ping_info[37]
-        z_water_level_re_ref_point_m = ping_info[38]
+        # z_water_level_re_ref_point_m = ping_info[38]
         # logger.debug('WL re RP: %.3f m, transducer depth re WL: %.3f m'
         #              % (z_water_level_re_ref_point_m, transducer_depth_m))
         self.transducer_depth = transducer_depth_m
@@ -155,7 +208,7 @@ class KmallMRZ(Kmall):
                 #              % (i, len(self.data[start_sounding:end_sounding])))
                 break
             sounding = struct.unpack(sounding_struct, self.data[start_sounding:end_sounding])
-            sounding_idx = sounding[0]
+            # sounding_idx = sounding[0]
             # logger.debug("sounding -> #%d" % (sounding_idx, ))
             sounding_detection_type = sounding[2]
             # logger.debug("sounding -> detection type: %s" % (sounding_detection_type, ))

@@ -265,6 +265,26 @@ class Input(AbstractWidget):
         vbox.addWidget(self.use_sis5)
         vbox.addStretch()
 
+        # - use nmea
+        hbox = QtWidgets.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        # -- label
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtWidgets.QLabel("Listen NMEA 0183:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- value
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.use_nmea_0183 = QtWidgets.QComboBox()
+        self.use_nmea_0183.addItems(["True", "False"])
+        vbox.addWidget(self.use_nmea_0183)
+        vbox.addStretch()
+
         # - use sippican
         hbox = QtWidgets.QHBoxLayout()
         self.right_layout.addLayout(hbox)
@@ -284,26 +304,6 @@ class Input(AbstractWidget):
         self.use_sippican.addItems(["True", "False"])
         vbox.addWidget(self.use_sippican)
         vbox.addStretch()
-
-        # - use nmea
-        hbox = QtWidgets.QHBoxLayout()
-        self.right_layout.addLayout(hbox)
-        # -- label
-        vbox = QtWidgets.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        label = QtWidgets.QLabel("Listen NMEA 0183:")
-        label.setFixedWidth(lbl_width)
-        vbox.addWidget(label)
-        vbox.addStretch()
-        # -- value
-        vbox = QtWidgets.QVBoxLayout()
-        hbox.addLayout(vbox)
-        vbox.addStretch()
-        self.use_nmea_0183 = QtWidgets.QComboBox()
-        self.use_nmea_0183.addItems(["True", "False"])
-        vbox.addWidget(self.use_nmea_0183)
-        vbox.addStretch()        
 
         # - use mvp
         hbox = QtWidgets.QHBoxLayout()
@@ -414,9 +414,9 @@ class Input(AbstractWidget):
         # noinspection PyUnresolvedReferences
         self.use_sis5.currentIndexChanged.connect(self.apply_use_sis)
         # noinspection PyUnresolvedReferences
-        self.use_sippican.currentIndexChanged.connect(self.apply_use_sippican)
+        self.use_nmea_0183.currentIndexChanged.connect(self.apply_use_sis)
         # noinspection PyUnresolvedReferences
-        self.use_nmea_0183.currentIndexChanged.connect(self.apply_use_nmea_0183)
+        self.use_sippican.currentIndexChanged.connect(self.apply_use_sippican)
         # noinspection PyUnresolvedReferences        
         self.use_mvp.currentIndexChanged.connect(self.apply_use_mvp)
         # noinspection PyUnresolvedReferences
@@ -495,18 +495,20 @@ class Input(AbstractWidget):
             self.db.use_sis4 = use_value
             if use_value:
                 self.use_sis5.setCurrentText("False")
+                self.use_nmea_0183.setCurrentText("False")
         elif self.sender() is self.use_sis5:
             use_value = self.use_sis5.currentText() == "True"
             self.db.use_sis5 = use_value
             if use_value:
                 self.use_sis4.setCurrentText("False")
+                self.use_nmea_0183.setCurrentText("False")
+        elif self.sender() is self.use_nmea_0183:
+            use_value = self.use_nmea_0183.currentText() == "True"
+            self.db.use_nmea_0183 = use_value
+            if use_value:
+                self.use_sis4.setCurrentText("False")
+                self.use_sis5.setCurrentText("False")
 
-        self.setup_changed()
-        self.main_win.reload_settings()
-
-    def apply_use_sis5(self):
-        # logger.debug("apply use SIS")
-        self.db.use_sis5 = self.use_sis5.currentText() == "True"
         self.setup_changed()
         self.main_win.reload_settings()
 
@@ -515,12 +517,6 @@ class Input(AbstractWidget):
         self.db.use_sippican = self.use_sippican.currentText() == "True"
         self.setup_changed()
         self.main_win.reload_settings()
-
-    def apply_use_nmea_0183(self):
-        # logger.debug("apply use Nmea")
-        self.db.use_nmea_0183 = self.use_nmea_0183.currentText() == "True"
-        self.setup_changed()
-        self.main_win.reload_settings()        
 
     def apply_use_mvp(self):
         # logger.debug("apply use MVP")

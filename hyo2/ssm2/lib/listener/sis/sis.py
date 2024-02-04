@@ -52,7 +52,9 @@ class Sis(AbstractListener):
 
     class Sis5:
         def __init__(self):
-            self.datagrams = [b'#MRZ', b'#SPO', b'#SVP']
+            self.datagrams = [b'#SSM', b'#MRZ', b'#SPO', b'#SVP']
+            self.ssm = None  # type: Optional[kmall.KmallSSM]
+            self.ssm_count = 0
             self.mrz = None  # type: Optional[kmall.KmallMRZ]
             self.mrz_count = 0
             self.spo = None  # type: Optional[kmall.KmallSPO]
@@ -98,27 +100,33 @@ class Sis(AbstractListener):
             self.sis4.ssp = None
 
     @property
-    def nav(self) -> Union[km.KmNav, kmall.KmallSPO]:
+    def nav(self) -> Union[km.KmNav, kmall.KmallSPO, kmall.KmallSSM]:
         if self.use_sis5:
+            if self.sis5.ssm:
+                return self.sis5.ssm
             return self.sis5.spo
         else:
             return self.sis4.nav
 
     def clear_nav(self) -> None:
         if self.use_sis5:
+            self.sis5.ssm = None
             self.sis5.spo = None
         else:
             self.sis4.nav = None
 
     @property
-    def xyz(self) -> Union[km.KmXyz88, kmall.KmallMRZ]:
+    def xyz(self) -> Union[km.KmXyz88, kmall.KmallMRZ, kmall.KmallSSM]:
         if self.use_sis5:
+            if self.sis5.ssm:
+                return self.sis5.ssm
             return self.sis5.mrz
         else:
             return self.sis4.xyz88
 
     def clear_xyz(self) -> None:
         if self.use_sis5:
+            self.sis5.ssm = None
             self.sis5.mrz = None
         else:
             self.sis4.xyz88 = None
@@ -126,10 +134,16 @@ class Sis(AbstractListener):
     @property
     def xyz_transducer_depth(self) -> Optional[float]:
         if self.use_sis5:
+
+            if self.sis5.ssm:
+                return self.sis5.ssm.transducer_depth
+
             if self.sis5.mrz is None:
                 return None
             return self.sis5.mrz.transducer_depth
+
         else:
+
             if self.sis4.xyz88 is None:
                 return None
             return self.sis4.xyz88.transducer_draft
@@ -137,10 +151,16 @@ class Sis(AbstractListener):
     @property
     def xyz_transducer_sound_speed(self) -> Optional[float]:
         if self.use_sis5:
+
+            if self.sis5.ssm:
+                return self.sis5.ssm.tss
+
             if self.sis5.mrz is None:
                 return None
             return self.sis5.mrz.tss
+
         else:
+
             if self.sis4.xyz88 is None:
                 return None
             return self.sis4.xyz88.sound_speed
@@ -148,17 +168,28 @@ class Sis(AbstractListener):
     @property
     def xyz_mean_depth(self) -> float:
         if self.use_sis5:
+
+            if self.sis5.ssm:
+                return self.sis5.ssm.mean_depth
+
             return self.sis5.mrz.mean_depth
+
         else:
             return self.sis4.xyz88.mean_depth
 
     @property
     def nav_latitude(self) -> Optional[float]:
         if self.use_sis5:
+
+            if self.sis5.ssm:
+                return self.sis5.ssm.latitude
+
             if self.sis5.spo is None:
                 return None
             return self.sis5.spo.latitude
+
         else:
+
             if self.sis4.nav is None:
                 return None
             return self.sis4.nav.latitude
@@ -166,10 +197,16 @@ class Sis(AbstractListener):
     @property
     def nav_longitude(self) -> Optional[float]:
         if self.use_sis5:
+
+            if self.sis5.ssm:
+                return self.sis5.ssm.longitude
+
             if self.sis5.spo is None:
                 return None
             return self.sis5.spo.longitude
+
         else:
+
             if self.sis4.nav is None:
                 return None
             return self.sis4.nav.longitude
@@ -177,10 +214,16 @@ class Sis(AbstractListener):
     @property
     def nav_timestamp(self) -> Optional[float]:
         if self.use_sis5:
+
+            if self.sis5.ssm:
+                return self.sis5.ssm.dg_time
+
             if self.sis5.spo is None:
                 return None
             return self.sis5.spo.dg_time
+
         else:
+
             if self.sis4.nav is None:
                 return None
             return self.sis4.nav.dg_time
@@ -298,7 +341,18 @@ class Sis(AbstractListener):
                 logger.debug("Ignoring received datagram")
             return
 
-        if self.cur_id == b'#MRZ':
+        if self.cur_id == b'#SSM':
+            ssm = kmall.KmallSSM(this_data, self.debug)
+            if ssm.invalid_data or ssm.inactive_sensor:
+                return
+            self.sis5.ssm = ssm
+            self.sis5.ssm_count += 1
+            self.nav_last_time = datetime.utcnow()
+            self.xyz_last_time = datetime.utcnow()
+            if self.debug:
+                logger.debug("Parsed")
+
+        elif self.cur_id == b'#MRZ':
             partition = struct.unpack("<2H", this_data[20:24])
             nr_of_datagrams = partition[0]
             datagram_nr = partition[1]
@@ -405,6 +459,7 @@ class Sis(AbstractListener):
     def info(self) -> str:
         msg = "Received datagrams:\n"
         if self.use_sis5:
+            msg += "- SSM: %d\n" % self.sis5.ssm_count
             msg += "- MRZ: %d\n" % self.sis5.mrz_count
             msg += "- SPO: %d\n" % self.sis5.spo_count
             msg += "- SVP: %d\n" % self.sis5.svp_count

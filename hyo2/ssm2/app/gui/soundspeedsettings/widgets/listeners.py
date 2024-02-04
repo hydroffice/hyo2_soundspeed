@@ -81,42 +81,6 @@ class Listeners(AbstractWidget):
 
         self.left_layout.addSpacing(12)
 
-        # SIPPICAN
-        hbox = QtWidgets.QHBoxLayout()
-        self.left_layout.addLayout(hbox)
-        hbox.addStretch()
-        self.label = QtWidgets.QLabel("Sippican(*):")
-        hbox.addWidget(self.label)
-        hbox.addStretch()
-
-        # - sippican_listen_port
-        hbox = QtWidgets.QHBoxLayout()
-        self.left_layout.addLayout(hbox)
-        # -- label
-        label = QtWidgets.QLabel("Listen port:")
-        label.setFixedWidth(lbl_width)
-        hbox.addWidget(label)
-        # -- value
-        self.sippican_listen_port = QtWidgets.QLineEdit()
-        validator = QtGui.QIntValidator(0, 99999)
-        self.sippican_listen_port.setValidator(validator)
-        hbox.addWidget(self.sippican_listen_port)
-
-        # - sippican_listen_timeout
-        hbox = QtWidgets.QHBoxLayout()
-        self.left_layout.addLayout(hbox)
-        # -- label
-        label = QtWidgets.QLabel("Listen timeout:")
-        label.setFixedWidth(lbl_width)
-        hbox.addWidget(label)
-        # -- value
-        self.sippican_listen_timeout = QtWidgets.QLineEdit()
-        validator = QtGui.QIntValidator(0, 99999)
-        self.sippican_listen_timeout.setValidator(validator)
-        hbox.addWidget(self.sippican_listen_timeout)
-
-        self.left_layout.addSpacing(12)
-
         # NMEA
         hbox = QtWidgets.QHBoxLayout()
         self.left_layout.addLayout(hbox)
@@ -150,6 +114,42 @@ class Listeners(AbstractWidget):
         validator = QtGui.QIntValidator(0, 99999)
         self.nmea_listen_timeout.setValidator(validator)
         hbox.addWidget(self.nmea_listen_timeout)
+
+        self.left_layout.addSpacing(12)
+
+        # SIPPICAN
+        hbox = QtWidgets.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        hbox.addStretch()
+        self.label = QtWidgets.QLabel("Sippican(*):")
+        hbox.addWidget(self.label)
+        hbox.addStretch()
+
+        # - sippican_listen_port
+        hbox = QtWidgets.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        label = QtWidgets.QLabel("Listen port:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.sippican_listen_port = QtWidgets.QLineEdit()
+        validator = QtGui.QIntValidator(0, 99999)
+        self.sippican_listen_port.setValidator(validator)
+        hbox.addWidget(self.sippican_listen_port)
+
+        # - sippican_listen_timeout
+        hbox = QtWidgets.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        label = QtWidgets.QLabel("Listen timeout:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.sippican_listen_timeout = QtWidgets.QLineEdit()
+        validator = QtGui.QIntValidator(0, 99999)
+        self.sippican_listen_timeout.setValidator(validator)
+        hbox.addWidget(self.sippican_listen_timeout)
         
         self.left_layout.addStretch()
 
