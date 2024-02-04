@@ -22,6 +22,8 @@ class Asvp(AbstractTextWriter):
         super(Asvp, self).__init__()
         self.desc = "Kongsberg"
         self._ext.add('asvp')
+        self._ext.add('abs')
+        self._ext.add('ssp')
         self.header = None  # required for checksum
 
     def write(self, ssp, data_path, data_file=None, project=''):
@@ -29,10 +31,8 @@ class Asvp(AbstractTextWriter):
 
         self.ssp = ssp
         self._write(data_path=data_path, data_file=data_file)
-
         self._write_header()
         self._write_body()
-
         self.finalize()
 
         # this part write the absorption files only if the temp and the sal are present
@@ -41,14 +41,23 @@ class Asvp(AbstractTextWriter):
                 and (np.sum(self.ssp.cur.sis.speed[ti]) != 0):
 
             asvp_base_name = self.fod.basename
+
+            # first write the SSP file
+            s01_file = "%s.ssp" % asvp_base_name
+            self._write(data_path=data_path, data_file=s01_file)
+            self._write_ssp()
+            self.finalize()
+
+            # then write all the abs files
             for abs_freq in self.abs_freqs:
                 abs_file = "%s_%dkHz.abs" % (asvp_base_name, abs_freq)
                 self._write(data_path=data_path, data_file=abs_file)
                 self._write_header_abs(abs_freq)
                 self._write_body_abs(abs_freq)
+                self.finalize()
 
         else:
-            logger.warning("not temperature and/or salinity to create absorption files")
+            logger.warning("not temperature and/or salinity to create the SSP and the absorption files")
 
         # logger.debug('*** %s ***: done' % self.driver)
         return True
@@ -63,9 +72,12 @@ class Asvp(AbstractTextWriter):
         # logger.debug('generating body')
         body = self._convert_body(fmt=Dicts.kng_formats['ASVP'])
         self.fod.io.write(body)
-        self.fod.io.close()
 
-    def _write_header_abs(self, freq):
+    def _write_ssp(self):
+        s01_data = self.convert(self.ssp, Dicts.kng_formats['S01'])
+        self.fod.io.write(s01_data)
+
+    def _write_header_abs(self, _):
         # logger.debug('generating header for %d kHz' % freq)
 
         ti = self.ssp.cur.sis_thinned
@@ -99,8 +111,8 @@ class Asvp(AbstractTextWriter):
                     has_skipped_salinity = True
                 continue
 
-            abs = Oc.attenuation(f=freq, t=self.ssp.cur.sis.temp[ti][i], d=self.ssp.cur.sis.depth[ti][i],
-                                 s=self.ssp.cur.sis.sal[ti][i], ph=8.1)
+            abs_value = Oc.attenuation(f=freq, t=self.ssp.cur.sis.temp[ti][i], d=self.ssp.cur.sis.depth[ti][i],
+                                       s=self.ssp.cur.sis.sal[ti][i], ph=8.1)
 
             if i == 0:  # first
                 delta = (self.ssp.cur.sis.depth[ti][0] + self.ssp.cur.sis.depth[ti][1]) / 2.0
@@ -113,16 +125,15 @@ class Asvp(AbstractTextWriter):
                 delta = ((self.ssp.cur.sis.depth[ti][i + 1] + self.ssp.cur.sis.depth[ti][i]) / 2.0 -
                          (self.ssp.cur.sis.depth[ti][i] + self.ssp.cur.sis.depth[ti][i - 1]) / 2.0)
 
-            top_mean += abs * delta
+            top_mean += abs_value * delta
             bottom_mean += delta
 
             mean_abs = top_mean / bottom_mean
 
             body += "%.3f %.3f %.3f %s\n" \
-                    % (self.ssp.cur.sis.depth[ti][i], abs, mean_abs, "999.000")
+                    % (self.ssp.cur.sis.depth[ti][i], abs_value, mean_abs, "999.000")
 
         self.fod.io.write(body)
-        self.fod.io.close()
 
     def convert(self, ssp, fmt):
         """Convert a profile in a given Kongsberg format"""

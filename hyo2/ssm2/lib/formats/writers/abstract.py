@@ -42,7 +42,7 @@ class AbstractTextWriter(AbstractWriter, metaclass=ABCMeta):
     def __init__(self):
         super(AbstractTextWriter, self).__init__()
 
-    def _write(self, data_path, data_file, encoding='utf8', append=False, binary=False):
+    def _write(self, data_path: str, data_file: str, encoding='utf8', append=False, binary=False):
         """Helper function to write the raw file"""
 
         # data_path = os.path.join(data_path, self.name.lower())  # commented to avoid the creation of sub-folders
