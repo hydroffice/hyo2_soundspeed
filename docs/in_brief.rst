@@ -3,7 +3,7 @@ In Brief
 ********
 
 
-.. image:: https://github.com/hydroffice/hyo2_soundspeed/raw/master/hyo2/soundspeedmanager/media/app_icon.png
+.. image:: https://github.com/hydroffice/hyo2_soundspeed/raw/master/hyo2/ssm2/app/gui/soundspeedmanager/media/app_icon.png
     :alt: logo
 
 The Sound Speed package is part of the `HydrOffice <https://www.hydroffice.org/license/>`_ framework. HydrOffice is
@@ -90,14 +90,14 @@ Currently implemented features
 
 * Network reception of data from:
 
-  * Kongsberg Maritime SIS
-  * Kongsberg Maritime K-Controller (*experimental*)
+  * Kongsberg Maritime SIS4 and SIS5
+  * Basic NMEA 0183 streams (only GGA and GLL)
   * Sippican systems
   * Moving Vessel Profiler (MVP) systems
 
 * Data visualization and interactive graphical inspection (e.g., outlier removal, point additions) of sound speed, temperature and salinity profiles
 
-* Use of the World Ocean Atlas of 2009/2013 (WOA09/13) and Real-Time Ocean Forecast System (RTOFS) for tasks such as:
+* Use of the World Ocean Atlas of 2009/2013/2018 (WOA09/13/18) and Real-Time Ocean Forecast System (RTOFS) for tasks such as:
 
   * Salinity augmentation for Sippican XBT probes
   * Temperature/salinity augmentation for Sippican XSV probes and SVP sensors
@@ -119,7 +119,7 @@ Currently implemented features
   * ELAC Hydrostar (.sva)
   * Hypack (.vel)
   * iXBlue (.txt)
-  * Kongsberg Maritime (.asvp and .abs)
+  * Kongsberg Maritime (.asvp, .ssp and .abs)
   * NCEI (.nc)
   * QPS (.bsvp)
   * Sonardyne (.pro)
@@ -129,8 +129,7 @@ Currently implemented features
 
 * Network transmission of processed casts to data acquisition systems (see :ref:`app_b_connection_settings`):
 
-  * Kongsberg Maritime SIS
-  * Kongsberg Maritime K-Controller (*experimental*)
+  * Kongsberg Maritime SIS4 and SIS5
   * QPS QINSy
   * Reson PDS2000
   * Hypack
