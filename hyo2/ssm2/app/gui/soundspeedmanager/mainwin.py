@@ -542,7 +542,7 @@ class MainWin(QtWidgets.QMainWindow):
         new_release = False
         new_bugfix = False
         try:
-            response = urlopen('http://www.hydroffice.org/latest/soundspeedmanager.txt', timeout=2)
+            response = urlopen(app_info.app_latest_url, timeout=2)
             latest_version = response.read().split()[0].decode()
 
             cur_maj, cur_min, cur_fix = app_info.app_version.split('.')
@@ -559,8 +559,8 @@ class MainWin(QtWidgets.QMainWindow):
 
             self.release_checked = True
 
-        except Exception as e:
-            # logger.info("unable to check latest release (reason: %s)" % e)
+        except Exception as _:
+            # logger.info("unable to check latest release (reason: %s)" % _)
             return
 
         if new_release:
