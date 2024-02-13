@@ -56,3 +56,22 @@ The package is jointly developed by NOAA OCS and UNH CCOM.
 
 .. image:: https://www.hydroffice.org/static/mysoundspeed/img/noaa_ccom.png
     :alt: joint
+
+
+Key Features
+------------
+* Accommodates commonly-used sound speed profile formats
+* Ensures compatibility with various data sources
+* Integrates with common data acquisition and integration applications (like Kongsberg SIS)
+* Includes real-time and climatological models to improve the accuracy of your data
+* Collects and manages data efficiency through built-in database functionalities
+* Offers tools for analysis and visualization
+
+Technical Details
+------------
+* Language: Python 3
+* Current Release: 2023.0.10
+
+Further Information
+------------
+Refer to the `documentation <https://www.hydroffice.org/manuals/ssm2/stable/index.html>`_
