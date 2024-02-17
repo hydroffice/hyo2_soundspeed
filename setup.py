@@ -86,7 +86,7 @@ setup(
                       read("AUTHORS.rst") + "\n\n\"\"\"\"\"\"\"\n\n" +
                       read(os.path.join("docs", "developer_guide_how_to_contribute.rst"))),
     url="https://github.com/hydroffice/hyo2_soundspeed",
-    classifiers=[  #
+    classifiers=[  # https://pypi.python.org/pypi?%3Aaction=list_classifiers
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Science/Research',
         'Natural Language :: English',
