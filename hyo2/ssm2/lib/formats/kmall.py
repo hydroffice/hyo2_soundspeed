@@ -88,31 +88,60 @@ class KmallSSM(Kmall):
         # common_sensor_system = common[1]
         # logger.debug("common part -> sensor system: %d" % common_sensor_system)
         common_sensor_status = common[2]
-        self.inactive_sensor = (common_sensor_status & 1) != 1
+        self.inactive_navigation = (common_sensor_status & 1) != 1
+        self.inactive_pinging = (common_sensor_status & 2) != 2
         self.invalid_data = (common_sensor_status & 16) == 16
-        # if self.inactive_sensor or self.invalid_data:
-        #     logger.debug("common part -> sensor status: %s (inactive: %s, invalid: %s)"
-        #                  % (common_sensor_status, self.inactive_sensor, self.invalid_data))
+        if debug:
+            if self.invalid_data:
+                logger.debug("common part -> sensor status: %s (invalid data: %s)"
+                             % (common_sensor_status, self.invalid_data))
 
         data_blk = struct.unpack("<2fIfI2d", self.data[28:64])
-        self.tss = data_blk[0]
-        # logger.debug('TSS: %s m/s' % (self.tss, ))
-        self.transducer_depth = data_blk[1]
-        # logger.debug('transducer depth re WL: %.3f m' % (self.transducer_depth))
-        # ping_time_sec = data_blk[2]
-        # logger.debug('ping time sec: %s' % ping_time_sec)
-        # ping_datetime = Kmall.kmall_datetime(ping_time_sec, 0)
-        # logger.debug('ping datetime: %s' % ping_datetime.strftime('%Y-%m-%d %H:%M:%S.%f'))
-        self.mean_depth = data_blk[3]
-        # logger.debug('ping avg depth: %s' % self.mean_depth)
-        # nav_time_sec = data_blk[4]
-        # logger.debug('nav time sec: %s' % nav_time_sec)
-        # nav_datetime = Kmall.kmall_datetime(nav_time_sec, 0)
-        # logger.debug('nav datetime: %s' % nav_datetime.strftime('%Y-%m-%d %H:%M:%S.%f'))
-        self.latitude = data_blk[5]
-        self.longitude = data_blk[6]
-        if debug:
-            logger.debug('SSM -> pos: %.7f, %.7f' % (self.latitude, self.longitude))
+        if self.inactive_pinging:
+
+            if debug:
+                logger.debug("common part -> sensor status: %s (inactive pinging: %s)"
+                             % (common_sensor_status, self.inactive_pinging))
+
+            self.tss = None
+            self.transducer_depth = None
+            self.mean_depth = None
+
+        else:
+
+            self.tss = data_blk[0]
+            if debug:
+                logger.debug('TSS: %s m/s' % self.tss)
+            self.transducer_depth = data_blk[1]
+            if debug:
+                logger.debug('transducer depth re WL: %s m' % self.transducer_depth)
+            # ping_time_sec = data_blk[2]
+            # logger.debug('ping time sec: %s' % ping_time_sec)
+            # ping_datetime = Kmall.kmall_datetime(ping_time_sec, 0)
+            # logger.debug('ping datetime: %s' % ping_datetime.strftime('%Y-%m-%d %H:%M:%S.%f'))
+            self.mean_depth = data_blk[3]
+            if debug:
+                logger.debug('ping avg depth: %s' % self.mean_depth)
+
+        if self.inactive_navigation:
+
+            if debug:
+                logger.debug("common part -> sensor status: %s (inactive navigation: %s)"
+                             % (common_sensor_status, self.inactive_navigation))
+
+            self.latitude = None
+            self.longitude = None
+
+        else:
+
+            # nav_time_sec = data_blk[4]
+            # logger.debug('nav time sec: %s' % nav_time_sec)
+            # nav_datetime = Kmall.kmall_datetime(nav_time_sec, 0)
+            # logger.debug('nav datetime: %s' % nav_datetime.strftime('%Y-%m-%d %H:%M:%S.%f'))
+            self.latitude = data_blk[5]
+            self.longitude = data_blk[6]
+            if debug:
+                logger.debug('SSM -> pos: %.7f, %.7f' % (self.latitude, self.longitude))
 
         final_length = struct.unpack("<I", self.data[-4:])
         self.is_valid = final_length != self.length

@@ -181,6 +181,8 @@ class MainWin(QtWidgets.QMainWindow):
                                  "background-color:rgba(255,163,102);}"
         self.purple_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
                                  "background-color:rgba(221,160,221,128);}"
+        self.khaki_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
+                                "background-color:rgba(240,230,140,128);}"
         self.red_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
                               "background-color:rgba(255,0,0,128);}"
         self.yellow_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
@@ -778,8 +780,10 @@ class MainWin(QtWidgets.QMainWindow):
             if self.lib.has_mvp_to_process() or self.lib.has_sippican_to_process():
                 self.statusBar().setStyleSheet(self.orange_stylesheet)
             else:
-                if self.old_sis_nav_data or self.old_sis_xyz_data or self.old_nmea_nav_data:
+                if self.old_sis_nav_data or self.old_nmea_nav_data:
                     self.statusBar().setStyleSheet(self.purple_stylesheet)
+                elif self.old_sis_xyz_data:
+                    self.statusBar().setStyleSheet(self.khaki_stylesheet)
                 else:
                     self.statusBar().setStyleSheet(self.normal_stylesheet)
 

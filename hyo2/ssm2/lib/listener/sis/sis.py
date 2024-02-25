@@ -338,19 +338,20 @@ class Sis(AbstractListener):
 
         if self.cur_id not in self.sis5.datagrams:
             if self.debug:
-                logger.debug("Ignoring received datagram")
+                logger.debug("%s: Ignoring received datagram" % self.cur_id)
             return
 
         if self.cur_id == b'#SSM':
             ssm = kmall.KmallSSM(this_data, self.debug)
-            if ssm.invalid_data or ssm.inactive_sensor:
+            if ssm.invalid_data or ssm.inactive_navigation:
                 return
             self.sis5.ssm = ssm
             self.sis5.ssm_count += 1
             self.nav_last_time = datetime.utcnow()
-            self.xyz_last_time = datetime.utcnow()
+            if not ssm.inactive_pinging:
+                self.xyz_last_time = datetime.utcnow()
             if self.debug:
-                logger.debug("Parsed")
+                logger.debug("%s: Parsed" % self.cur_id)
 
         elif self.cur_id == b'#MRZ':
             partition = struct.unpack("<2H", this_data[20:24])
@@ -361,10 +362,10 @@ class Sis(AbstractListener):
                 self.sis5.mrz_count += 1
                 self.xyz_last_time = datetime.utcnow()
                 if self.debug:
-                    logger.info("%d/%d -> Parsed" % (datagram_nr, nr_of_datagrams))
+                    logger.info("%s: %d/%d -> Parsed" % (self.cur_id, datagram_nr, nr_of_datagrams))
             else:
                 if self.debug:
-                    logger.info("%d/%d -> Ignored" % (datagram_nr, nr_of_datagrams))
+                    logger.info("%s: %d/%d -> Ignored" % (self.cur_id, datagram_nr, nr_of_datagrams))
 
         elif self.cur_id == b'#SPO':
             spo = kmall.KmallSPO(this_data, self.debug)
@@ -374,13 +375,13 @@ class Sis(AbstractListener):
             self.sis5.spo_count += 1
             self.nav_last_time = datetime.utcnow()
             if self.debug:
-                logger.debug("Parsed")
+                logger.debug("%s: Parsed" % self.cur_id)
 
         elif self.cur_id == b'#SVP':
             self.sis5.svp = kmall.KmallSVP(this_data, self.debug)
             self.sis5.svp_count += 1
             if self.debug:
-                logger.debug("Parsed")
+                logger.debug("%s: Parsed" % self.cur_id)
 
         else:
             logger.error("Missing parser for datagram type: %s" % self.cur_id)
