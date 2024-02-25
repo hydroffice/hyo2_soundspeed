@@ -206,7 +206,7 @@ class Asvp(AbstractTextWriter):
         lon_min = int(60 * math.fabs(longitude - int(longitude)))
         lon_decimal_min = int(100 * (60 * math.fabs(longitude - int(longitude)) - lon_min))
         body += "{0:02d}{1:02d}.{2:02d},{3:s},".format(int(math.fabs(longitude)), lon_min, lon_decimal_min, hem)
-        body += "0.0,"
+        body += "0.0,,"
         body += "Source: hyo2.soundspeed,"
 
         # calculate checksum, XOR of all bytes after the $
