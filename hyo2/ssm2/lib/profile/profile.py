@@ -406,6 +406,7 @@ class Profile:
         verbose = False  # set to True for verbose intermediate steps
 
         valid_and_smoothed = self.proc.source[self.proc_valid] == Dicts.sources['smoothing']
+        # PLEASE IGNORE THE WARNING 'PEP8: E712'
         # noinspection PyUnresolvedReferences
         if (valid_and_smoothed == True).all():
             return

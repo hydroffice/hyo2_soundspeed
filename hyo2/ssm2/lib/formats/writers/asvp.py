@@ -20,6 +20,7 @@ class Asvp(AbstractTextWriter):
 
     def __init__(self):
         super(Asvp, self).__init__()
+        self.name = "asvp/ssp"
         self.desc = "Kongsberg"
         self._ext.add('asvp')
         self._ext.add('abs')
