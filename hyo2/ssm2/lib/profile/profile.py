@@ -407,7 +407,7 @@ class Profile:
 
         valid_and_smoothed = self.proc.source[self.proc_valid] == Dicts.sources['smoothing']
         # noinspection PyUnresolvedReferences
-        if (valid_and_smoothed is True).all():
+        if (valid_and_smoothed == True).all():
             return
         # logger.debug(valid_and_smoothed)
 
