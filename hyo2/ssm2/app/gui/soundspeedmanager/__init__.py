@@ -11,7 +11,7 @@ app_media_path = os.path.join(app_path, "media")
 
 app_info = pkg_info.app_info(
     app_name="Sound Speed Manager",
-    app_beta=True,
+    app_beta=False,
     app_path=app_path,
     app_media_path=app_media_path,
     app_license_path=os.path.join(app_media_path, "LICENSE"),

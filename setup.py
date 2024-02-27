@@ -58,7 +58,7 @@ setup(
     install_requires=[
         "appdirs",
         "gsw",
-        "hyo2.abc2>=2.2.2",
+        "hyo2.abc2>=2.3.1",
         "matplotlib",
         "netCDF4",
         "numpy",

@@ -24,7 +24,7 @@ from hyo2.ssm2 import __version__ as ssm_version
 sys.setrecursionlimit(20000)
 
 is_alpha = False
-is_beta = True
+is_beta = False
 if is_alpha:
     alphabeta = ".a%s" % datetime.now().strftime("%Y%m%d%H%M%S")
 elif is_beta:
