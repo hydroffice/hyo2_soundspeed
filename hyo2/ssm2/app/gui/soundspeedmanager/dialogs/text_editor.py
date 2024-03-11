@@ -30,7 +30,7 @@ class TextEditor(QtWidgets.QTextEdit):
         # set the tab size
         metrics = QtGui.QFontMetrics(font)
         # noinspection PyArgumentList
-        self.setTabStopWidth(3 * metrics.width(' '))
+        self.setTabStopDistance(3 * metrics.horizontalAdvance(' '))
 
     @property
     def dirty(self):

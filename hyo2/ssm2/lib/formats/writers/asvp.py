@@ -2,6 +2,7 @@ import functools
 import logging
 import math
 import operator
+import os
 
 import numpy as np
 
@@ -31,7 +32,12 @@ class Asvp(AbstractTextWriter):
         # logger.debug('*** %s ***: start' % self.driver)
 
         self.ssp = ssp
-        self._write(data_path=data_path, data_file=data_file)
+        if data_file is None:
+            asvp_base_name = os.path.basename(self.ssp.cur.meta.original_path)
+        else:
+            asvp_base_name = data_file
+        asvp_file = "%s.asvp" % asvp_base_name
+        self._write(data_path=data_path, data_file=asvp_file)
         self._write_header()
         self._write_body()
         self.finalize()
@@ -40,8 +46,6 @@ class Asvp(AbstractTextWriter):
         ti = self.ssp.cur.sis_thinned
         if (np.sum(self.ssp.cur.sis.temp[ti]) != 0) and (np.sum(self.ssp.cur.sis.sal[ti]) != 0) \
                 and (np.sum(self.ssp.cur.sis.speed[ti]) != 0):
-
-            asvp_base_name = self.fod.basename
 
             # first write the SSP file
             s01_file = "%s.ssp" % asvp_base_name
