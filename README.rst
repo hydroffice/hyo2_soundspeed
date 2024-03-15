@@ -43,8 +43,8 @@ HydrOffice Sound Speed
 General Info
 ------------
 
-.. image:: https://www.hydroffice.org/static/mysoundspeed/img/logo.png
-    :alt: logo
+.. image:: https://www.hydroffice.org/static/app_soundspeed/img/logo.png
+    :alt: logo ssm
 
 HydrOffice is a research development environment for ocean mapping. Its aim is to provide a collection of
 hydro-packages to deal with specific issues in such a field, speeding up both algorithms testing and
@@ -52,14 +52,14 @@ research-2-operation.
 
 This package provides functionalities to manage sound speed profiles.
 
-The package is jointly developed by NOAA OCS and UNH CCOM.
+The package is jointly developed by NOAA OCS and UNH JHC/CCOM.
 
-.. image:: https://www.hydroffice.org/static/mysoundspeed/img/noaa_ccom.png
-    :alt: joint
+.. image:: https://www.hydroffice.org/static/app_soundspeed/img/noaa_ccom.png
+    :alt: joint efforts
 
 
-Key Features
-------------
+Key Features:
+
 * Accommodates commonly-used sound speed profile formats
 * Ensures compatibility with various data sources
 * Integrates with common data acquisition and integration applications (like Kongsberg SIS)
@@ -67,11 +67,5 @@ Key Features
 * Collects and manages data efficiency through built-in database functionalities
 * Offers tools for analysis and visualization
 
-Technical Details
-------------
-* Language: Python 3
-* Current Release: 2023.0.10
 
-Further Information
-------------
-Refer to the `documentation <https://www.hydroffice.org/manuals/ssm2/stable/index.html>`_
+For further information, visit the `manual <https://www.hydroffice.org/manuals/ssm2/index.html>`_.
