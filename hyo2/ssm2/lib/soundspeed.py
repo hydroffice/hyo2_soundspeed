@@ -987,8 +987,8 @@ class SoundSpeedLibrary:
             idx = self.name_writers.index(name)
             writer = self.writers[idx]
 
-            # special case for Kongsberg asvp format
-            if name == 'asvp':
+            # special case for Kongsberg asvp/ssp format
+            if name == 'asvp/ssp':
 
                 tolerances = [0.01, 0.03, 0.06, 0.1, 0.5]
                 for tolerance in tolerances:

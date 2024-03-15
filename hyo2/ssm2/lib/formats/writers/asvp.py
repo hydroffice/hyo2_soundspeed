@@ -42,8 +42,8 @@ class Asvp(AbstractTextWriter):
         self._write_body()
         self.finalize()
 
-        # this part write the absorption files only if the temp and the sal are present
         ti = self.ssp.cur.sis_thinned
+        # this part write the absorption files only if the temp and the sal are present
         if (np.sum(self.ssp.cur.sis.temp[ti]) != 0) and (np.sum(self.ssp.cur.sis.sal[ti]) != 0) \
                 and (np.sum(self.ssp.cur.sis.speed[ti]) != 0):
 
