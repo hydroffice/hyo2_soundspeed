@@ -112,7 +112,7 @@ cartopy_data = collect_folder_data(input_data_folder=share_folder, relative_outp
 abc_data = collect_pkg_data('hyo2.abc2')
 ssm2_data = collect_pkg_data('hyo2.ssm2')
 try:
-    sdm_data = collect_pkg_data('hyo2.surveydatamonitor')
+    sdm_data = collect_pkg_data('hyo2.sdm3')
 except Exception as e:
     print("skipping hyo2.surveydatamonitor: %s" % e)
     sdm_data = TOC()
