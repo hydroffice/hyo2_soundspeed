@@ -74,7 +74,7 @@ The main functionalities include:
 With a long-term support and development plan, Sound Speed Manager is a turnkey application ready
 to be used (and extended) by professionals and institutions in the hydrographic community.
 
-The package is jointly developed by the `Center for Coastal and Ocean Mapping, UNH<https://ccom.unh.edu/>`_ and
+The package is jointly developed by the `Center for Coastal and Ocean Mapping, UNH <https://ccom.unh.edu/>`_ and
 `NOAA Coast Survey Development Laboratory (CSDL) <https://www.nauticalcharts.noaa.gov/>`_.
 
 .. image:: https://www.hydroffice.org/static/app_soundspeed/img/noaa_ccom.png

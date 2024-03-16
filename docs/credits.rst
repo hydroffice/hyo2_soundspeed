@@ -4,7 +4,7 @@
 Credits
 *******
 
-Sound Speed library and manager are jointly developed by the `Center for Coastal and Ocean Mapping, UNH<https://ccom.unh.edu/>`_ and
+Sound Speed library and manager are jointly developed by the `Center for Coastal and Ocean Mapping, UNH <https://ccom.unh.edu/>`_ and
 `NOAA Coast Survey Development Laboratory (CSDL) <https://www.nauticalcharts.noaa.gov/>`_.
 
 

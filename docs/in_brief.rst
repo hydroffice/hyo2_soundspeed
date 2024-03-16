@@ -12,13 +12,13 @@ accurate processing and management of sound speed profiles for underwater acoust
 SSM has merged together functionalities present in several applications that process sound speed profiles (SSP):
 
 * *Velocipy*, an application originally developed at the `NOAA Coast Survey Development Laboratory (CSDL) <https://www.nauticalcharts.noaa.gov/>`_
-  as part of the `Pydro environment<https://svn.pydro.noaa.gov/Docs/html/Pydro/universe_overview.html>`_.
+  as part of the `Pydro environment <https://svn.pydro.noaa.gov/Docs/html/Pydro/universe_overview.html>`_.
 
-* *SVP Editor*, an application originally developed at the `Center for Coastal and Ocean Mapping, UNH<https://ccom.unh.edu/>`_
+* *SVP Editor*, an application originally developed at the `Center for Coastal and Ocean Mapping, UNH <https://ccom.unh.edu/>`_
   for the MAC project (`Multibeam Advisory Committee <http://mac.unols.org/>`_)
   under the NSF grant 1150574.
 
-* *SSP Manager*, an application developed at the `Center for Coastal and Ocean Mapping, UNH<https://ccom.unh.edu/>`_
+* *SSP Manager*, an application developed at the `Center for Coastal and Ocean Mapping, UNH <https://ccom.unh.edu/>`_
   as part of the HydrOffice framework under NOAA grants NA10NOS4000073 and NA15NOS4000200.
 
 SSM has been designed to ease integration into existing data acquisition workflows.
@@ -40,7 +40,7 @@ The main functionalities include:
 With a long-term support and development plan, Sound Speed Manager is a turnkey application ready
 to be used (and extended) by professionals and institutions in the hydrographic community.
 
-The package is jointly developed by the `Center for Coastal and Ocean Mapping, UNH<https://ccom.unh.edu/>`_ and
+The package is jointly developed by the `Center for Coastal and Ocean Mapping, UNH <https://ccom.unh.edu/>`_ and
 `NOAA Coast Survey Development Laboratory (CSDL) <https://www.nauticalcharts.noaa.gov/>`_.
 
 The current development of Sound Speed Manager is partially supported by:
