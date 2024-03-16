@@ -4,7 +4,7 @@ Credits
 Authors
 ~~~~~~~
 
-HydrOffice Sound Speed is developed and maintained by:
+The package developers and maintainers are:
 
 - `Giuseppe Masetti <mailto:gmasetti@ccom.unh.edu>`_
 
@@ -16,7 +16,9 @@ HydrOffice Sound Speed is developed and maintained by:
 Contributors
 ~~~~~~~~~~~~
 
-The following wonderful people contributed directly or indirectly to this project:
+Other past and present contributors are:
+
+- `Hugh Barker <mailto:hugh.barker@csiro.au>`_
 
 - `Jonathan Beaudoin <mailto:beaudoin@qps.nl>`_
 
@@ -30,9 +32,11 @@ The following wonderful people contributed directly or indirectly to this projec
 
 - `Paul Johnson <mailto:pjohnson@ccom.unh.edu>`_
 
-- `Damian Manda <damian.manda@noaa.gov>`_
+- `Damian Manda <mailto:damian.manda@noaa.gov>`_
 
-- `Jean-Guy Nistad <jean-guy.nistad@bsh.de>`_  
+- `Jean-Guy Nistad <mailto:jean-guy.nistad@bsh.de>`_
+
+- `Collen Peters <mailto:colleen.peters@kd.kongsberg.com>`_
 
 - `Patrice Ponchant <mailto:patrice.ponchant@fugro.com>`_
 

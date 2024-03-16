@@ -6,30 +6,42 @@ In Brief
 .. image:: https://github.com/hydroffice/hyo2_soundspeed/raw/master/hyo2/ssm2/app/gui/soundspeedmanager/media/app_icon.png
     :alt: logo
 
-The Sound Speed package is part of the `HydrOffice <https://www.hydroffice.org/license/>`_ framework. HydrOffice is
-a research development environment for ocean mapping. It provides a collection of hydro-packages, each of them dealing
-with a specific issue of the field. The main goal is to speed up both algorithms testing and research-to-operation (R2O).
+Sound Speed Manager (SSM) is a software application that provides the user with a streamlined workflow to perform
+accurate processing and management of sound speed profiles for underwater acoustic systems.
 
-The Sound Speed package provides both a library and an application with functionalities to manage sound speed profiles,
-and to provide pre-processing ocean mapping tools to help bridge the gap between sound speed profiling instrumentation
-and multibeam echosounder acquisition systems.
+SSM has merged together functionalities present in several applications that process sound speed profiles (SSP):
 
-It has been developing with the aim to merge together functionalities present in several applications that process sound
-speed profiles (SSP) for underwater acoustic systems:
+* *Velocipy*, an application originally developed at the `NOAA Coast Survey Development Laboratory (CSDL) <https://www.nauticalcharts.noaa.gov/>`_
+  as part of the `Pydro environment<https://svn.pydro.noaa.gov/Docs/html/Pydro/universe_overview.html>`_.
 
-* *Velocipy*, an application originally developed at the `NOAA Coast Survey Development Laboratory (CSDL) <http://www.nauticalcharts.noaa.gov/>`_
-  as part of the Pydro environment.
-
-* *SVP Editor*, an application originally developed at the `Center for Coastal and Ocean Mapping (CCOM, UNH) <http://ccom.unh.edu/>`_
+* *SVP Editor*, an application originally developed at the `Center for Coastal and Ocean Mapping, UNH<https://ccom.unh.edu/>`_
   for the MAC project (`Multibeam Advisory Committee <http://mac.unols.org/>`_)
   under the NSF grant 1150574.
 
-* *SSP Manager*, an application developed at the `Center for Coastal and Ocean Mapping (CCOM, UNH) <http://ccom.unh.edu/>`_
+* *SSP Manager*, an application developed at the `Center for Coastal and Ocean Mapping, UNH<https://ccom.unh.edu/>`_
   as part of the HydrOffice framework under NOAA grants NA10NOS4000073 and NA15NOS4000200.
 
-In the integration of all these implementations to the current package several improvements have been
-introduced to enhance code maintainability (e.g., Python 3 support) and to store the collected data for further
-processing and analysis.
+SSM has been designed to ease integration into existing data acquisition workflows.
+The liberal open source license used by the project (specifically, GNU LGPL) provides for understanding
+of the chosen processing solutions through ready inspection of the source code, as well as the ability
+to adapt the application to specific organization needs.
+
+This adaptation is eased by the modular design of the application, with the NOAA-specific
+functionalities organized so that they can be easily deactivated for non-NOAA users.
+
+The main functionalities include:
+
+* Wide support of commonly-used sound speed profile formats
+* Compatibility with various data sources
+* Integration with common data acquisition/integration applications (e.g., Kongsberg SIS)
+* Profile enhancement based on real-time and climatologic models
+* Database management of the collected data with built-in functionalities for analysis and visualization.
+
+With a long-term support and development plan, Sound Speed Manager is a turnkey application ready
+to be used (and extended) by professionals and institutions in the hydrographic community.
+
+The package is jointly developed by the `Center for Coastal and Ocean Mapping, UNH<https://ccom.unh.edu/>`_ and
+`NOAA Coast Survey Development Laboratory (CSDL) <https://www.nauticalcharts.noaa.gov/>`_.
 
 The current development of Sound Speed Manager is partially supported by:
 

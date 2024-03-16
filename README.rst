@@ -46,26 +46,38 @@ General Info
 .. image:: https://www.hydroffice.org/static/app_soundspeed/img/logo.png
     :alt: logo ssm
 
-HydrOffice is a research development environment for ocean mapping. Its aim is to provide a collection of
-hydro-packages to deal with specific issues in such a field, speeding up both algorithms testing and
-research-2-operation.
+The HydrOffice's Sound Speed package provides a library and tools to manage sound speed profiles.
+The package is part of HydrOffice, a research development framework for ocean mapping.  HydrOffice aims to provide
+a collection of hydro-packages to deal with specific issues in the field, speeding up both algorithms testing and
+research-to-operation (R2O).
 
-This package provides functionalities to manage sound speed profiles.
+Among the tools developed in the package, Sound Speed Manager (SSM) is a software application that provides the user
+with a streamlined workflow to perform accurate processing and management of sound speed profiles
+for underwater acoustic systems.
 
-The package is jointly developed by NOAA OCS and UNH JHC/CCOM.
+SSM has been designed to ease integration into existing data acquisition workflows.
+The liberal open source license used by the project (specifically, GNU LGPL) provides for understanding
+of the chosen processing solutions through ready inspection of the source code, as well as the ability
+to adapt the application to specific organization needs.
+
+This adaptation is eased by the modular design of the application, with the NOAA-specific
+functionalities organized so that they can be easily deactivated for non-NOAA users.
+
+The main functionalities include:
+
+* Wide support of commonly-used sound speed profile formats
+* Compatibility with various data sources
+* Integration with common data acquisition/integration applications (e.g., Kongsberg SIS)
+* Profile enhancement based on real-time and climatologic models
+* Database management of the collected data with built-in functionalities for analysis and visualization.
+
+With a long-term support and development plan, Sound Speed Manager is a turnkey application ready
+to be used (and extended) by professionals and institutions in the hydrographic community.
+
+The package is jointly developed by the `Center for Coastal and Ocean Mapping, UNH<https://ccom.unh.edu/>`_ and
+`NOAA Coast Survey Development Laboratory (CSDL) <https://www.nauticalcharts.noaa.gov/>`_.
 
 .. image:: https://www.hydroffice.org/static/app_soundspeed/img/noaa_ccom.png
     :alt: joint efforts
-
-
-Key Features:
-
-* Accommodates commonly-used sound speed profile formats
-* Ensures compatibility with various data sources
-* Integrates with common data acquisition and integration applications (like Kongsberg SIS)
-* Includes real-time and climatological models to improve the accuracy of your data
-* Collects and manages data efficiency through built-in database functionalities
-* Offers tools for analysis and visualization
-
 
 For further information, visit the `manual <https://www.hydroffice.org/manuals/ssm2/index.html>`_.

@@ -4,11 +4,11 @@
 Credits
 *******
 
-Sound Speed library and manager are based on an ongoing joint development between the NOAA's `Office of Coastal Survey
-<http://www.nauticalcharts.noaa.gov/>`_ and UNH's `Center for Coastal and Ocean Mapping <http://ccom.unh.edu>`_.
+Sound Speed library and manager are jointly developed by the `Center for Coastal and Ocean Mapping, UNH<https://ccom.unh.edu/>`_ and
+`NOAA Coast Survey Development Laboratory (CSDL) <https://www.nauticalcharts.noaa.gov/>`_.
 
 
-HydrOffice Sound Speed is developed and maintained by:
+The package developers and maintainers are:
 
 - `Giuseppe Masetti <mailto:gmasetti@ccom.unh.edu>`_
 
@@ -16,7 +16,7 @@ HydrOffice Sound Speed is developed and maintained by:
 
 - `Chen Zhang <mailto:chen.zhang@noaa.gov>`_
 
-Other contributors:
+Other past and present contributors are:
 
 - `Hugh Barker <mailto:hugh.barker@csiro.au>`_
 
@@ -35,6 +35,8 @@ Other contributors:
 - `Damian Manda <mailto:damian.manda@noaa.gov>`_
 
 - `Jean-Guy Nistad <mailto:jean-guy.nistad@bsh.de>`_
+
+- `Collen Peters <mailto:colleen.peters@kd.kongsberg.com>`_
 
 - `Patrice Ponchant <mailto:patrice.ponchant@fugro.com>`_
 

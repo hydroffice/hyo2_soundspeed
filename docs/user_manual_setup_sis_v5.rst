@@ -6,7 +6,10 @@ Sound Speed Manager - SIS v5 interaction
 .. index:: SIS; v5
 .. index:: K-Controller
 
-SIS v5 is currently supported through the Data Distribution application (usually installed with SIS v5).
+SIS v5 is currently supported in two ways:
+
+* Through the Data Distribution application (usually installed with SIS v5).
+* Using the dedicated *Sound Speed Manager (SSM) IP and port* field (**only for SIS v5.14+**).
 
 This method covers both cases:
 
@@ -16,8 +19,8 @@ This method covers both cases:
 
 .. _ssm_sis5_sis_settings:
 
-SIS v5 settings
----------------
+SIS v5 settings (through Data Distribution)
+-------------------------------------------
 
 Verify Data Distribution settings in SIS v5:
 
@@ -58,13 +61,36 @@ settings (see :numref:`data_dist_exe_fig`):
     Data Distribution requires to have SIS v5 in execution.
     Setups with the K-Controller interacting with acquisition software different from SIS v5 are *currently* unsupported.
 
+.. _ssm_sis5_sis_settings_2:
+
+SIS v5 settings (using *Sound Speed Manager (SSM) IP and port* field)
+---------------------------------------------------------------------
+
+This solution is available only in SIS 5.14 (and higher):
+
+* In the SIS *Tools* menu, open the *Parameter Setup*.
+* Navigate to the *sound speed* menu.
+* In the *Sound Speed Manager (SSM) IP and port* field (see :numref:`sis_sound_speed_menu_fig`), enter the IP address of the SSM workstation and the port number (e.g., 16103). If SIS and SSM are on the same computer, use: 127.0.0.1:16103
+* Restart SIS.
+
+.. _sis_sound_speed_menu_fig:
+
+.. figure:: ./_static/sis_sound_speed_menu.png
+    :width: 640px
+    :align: center
+    :alt: figure with SIS Sound Speed menu
+    :figclass: align-center
+
+    SSM datagram configuration in SIS.
+
 .. _ssm_sis5_ssm_settings:
 
 SSM settings
 ------------
 
 Open in editing mode the Sound Speed Manager’s Setup Tab, then set the SIS listen port (that you have set in
-the Data Distribution Configuration) in the Listeners sub-tab (see :numref:`ssm_sis5_p1_fig`).
+the Data Distribution Configuration or in the *Sound Speed Manager (SSM) IP and port* field) in the Listeners
+sub-tab (see :numref:`ssm_sis5_p1_fig`).
 
 .. _ssm_sis5_p1_fig:
 
