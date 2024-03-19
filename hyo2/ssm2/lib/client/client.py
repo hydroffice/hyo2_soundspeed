@@ -68,6 +68,13 @@ class Client:
                 logger.info("issue in preparing the data")
                 return False
 
+            si = prj.cur.sis_thinned
+            thin_profile_length = prj.cur.sis.flag[si].size
+            logger.debug("thin profile size: %d (with tolerance: %.3f)" % (thin_profile_length, tolerance))
+            if thin_profile_length >= 1000:
+                logger.info("too many samples, attempting with a lower tolerance")
+                continue
+
             asvp = Asvp()
             tx_data = asvp.convert(prj.ssp, fmt=kng_fmt)
             # print(tx_data)
@@ -75,6 +82,11 @@ class Client:
             logger.debug("tx data size: %d (with tolerance: %.3f)" % (tx_data_size, tolerance))
             if tx_data_size < self.UDP_DATA_LIMIT:
                 break
+            tx_data = None
+
+        if tx_data is None:
+            logger.info("issue in thinning the data")
+            return False
 
         return self._transmit(tx_data)
 
