@@ -47,8 +47,8 @@ class RayTracing:
                 total_time[j + 1] = total_time[j] + log(tan(gamma[j + 1] / 2.0) / tan(gamma[j] / 2.0)) / gradient[j]
                 total_range[j + 1] = total_range[j] + radius[j] * (cos(gamma[j]) - cos(gamma[j + 1]))
 
-        # Note the last radius doen't get computed but that isn't important
-        # we always want to be in the last layer, so we use the comptutations at the next to last layer
+        # Note the last radius doesn't get computed but that isn't important
+        # we always want to be in the last layer, so we use the computations at the next to last layer
         # and interpolate to the depth/time which is before the end of the last layer
         return gradient, gamma, radius, total_time, total_range
 
@@ -77,8 +77,8 @@ class RayTracing:
             if nr_end_layer < nr_layers or b_project:  # SVP deep enough
 
                 tau = travel_times[ind] - total_time[nr_end_layer]
-                # Note the last radius doen't get computed but that isn't important
-                # we always want to be in the last layer, so we use the comptutations at the next to last layer
+                # Note the last radius doesn't get computed but that isn't important
+                # we always want to be in the last layer, so we use the computations at the next to last layer
                 # and interpolate to the depth/time which is before the end of the last layer
                 if radius[nr_end_layer] == 0:
 
@@ -114,7 +114,7 @@ class RayTracing:
                             -cos(2 * arctan(tan(gamma[nr_end_layer] / 2.0) * exp(gradient[nr_end_layer] * tau))) + cos(
                         gamma[nr_end_layer])) + total_range[nr_end_layer]
 
-                # this would translate to acrosstrack, alongtrack components if we passed in pitch, roll, launchangle
+                # this would translate to across-track, along-track components if we passed in pitch, roll, launch angle
                 # result[0]=finalrange*LaunchVector[0]/sqrt(LaunchVector[1]*LaunchVector[1]+LaunchVector[0]*LaunchVector[0])
                 # result[1]=finalrange*LaunchVector[1]/sqrt(LaunchVector[1]*LaunchVector[1]+LaunchVector[0]*LaunchVector[0])
                 # result[2]=finaldepth
