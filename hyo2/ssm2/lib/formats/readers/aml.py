@@ -48,10 +48,10 @@ class Aml(AbstractTextReader):
                 self.header = "[header]"
                 self.date = "date"
                 self.time = "time"
-                self.lat = "latitude"
-                self.long = "longitude"
-                self.lat2 = "gpslatitude"
-                self.long2 = "gpslongitude"
+                self.lat = "gpslatitude"
+                self.long = "gpslongitude"
+                self.lat2 = "latitude"
+                self.long2 = "longitude"
                 self.serial = "serialnumber"
                 self.serial2 = "sn"
 
@@ -199,6 +199,8 @@ class Aml(AbstractTextReader):
         time = None
         lat = None
         lon = None
+        lat2 = None
+        lon2 = None
 
         for row_nr, line in enumerate(self.lines):
 
@@ -251,16 +253,6 @@ class Aml(AbstractTextReader):
                             lat = None
                         continue
 
-                    if (tokens[0].lower() == self._aml.lat2) and (lat is None):
-                        try:
-                            if not math.isclose(float(tokens[1]), 0.0):
-                                lat = float(tokens[1])
-                            else:
-                                lat = None
-                        except ValueError:  # it may be no-lock
-                            lat = None
-                        continue
-
                     if tokens[0].lower() == self._aml.long:
                         try:
                             if not math.isclose(float(tokens[1]), 0.0):
@@ -271,14 +263,24 @@ class Aml(AbstractTextReader):
                             lon = None
                         continue
 
-                    if (tokens[0].lower() == self._aml.long2) and (lon is None):
+                    if tokens[0].lower() == self._aml.lat2:
                         try:
                             if not math.isclose(float(tokens[1]), 0.0):
-                                lon = float(tokens[1])
+                                lat2 = float(tokens[1])
                             else:
-                                lon = None
+                                lat2 = None
                         except ValueError:  # it may be no-lock
-                            lon = None
+                            lat2 = None
+                        continue
+
+                    if tokens[0].lower() == self._aml.long2:
+                        try:
+                            if not math.isclose(float(tokens[1]), 0.0):
+                                lon2 = float(tokens[1])
+                            else:
+                                lon2 = None
+                        except ValueError:  # it may be no-lock
+                            lon2 = None
                         continue
 
                     if tokens[0].lower() == self._aml.serial:
@@ -315,6 +317,12 @@ class Aml(AbstractTextReader):
                 (self.ssp.cur.meta.latitude is None) and (self.ssp.cur.meta.longitude is None):
             self.ssp.cur.meta.latitude = lat
             self.ssp.cur.meta.longitude = lon
+            logger.debug("retrieved GPS location: (%s, %s)" % (self.ssp.cur.meta.longitude, self.ssp.cur.meta.latitude))
+
+        elif (lat2 is not None) and (lon2 is not None) and \
+                (self.ssp.cur.meta.latitude is None) and (self.ssp.cur.meta.longitude is None):
+            self.ssp.cur.meta.latitude = lat2
+            self.ssp.cur.meta.longitude = lon2
             logger.debug("retrieved location: (%s, %s)" % (self.ssp.cur.meta.longitude, self.ssp.cur.meta.latitude))
 
         if (date is not None) and (time is not None):
