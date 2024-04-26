@@ -33,8 +33,8 @@ class Client:
 
         logger.info("transmitting to %s: [%s:%s:%s]" % (self.name, self.ip, self.port, self.protocol))
 
-        if self.protocol == "HYPACK":
-            success = self.send_hyp_format(prj=prj)
+        if (self.protocol == "HYPACK") or (self.protocol == "EA440"):
+            success = self.send_aml_format(prj=prj)
         else:
             success = self.send_kng_format(prj=prj, server_mode=server_mode)
 
@@ -90,10 +90,13 @@ class Client:
 
         return self._transmit(tx_data)
 
-    def send_hyp_format(self, prj: 'SoundSpeedLibrary') -> bool:
-        logger.info("using hyp format")
+    def send_aml_format(self, prj: 'SoundSpeedLibrary') -> bool:
+        logger.info("using aml format")
         calc = Calc()
-        tx_data = calc.convert(prj.ssp)
+        if self.protocol == "HYPACK":
+            tx_data = calc.convert(prj.ssp)
+        elif self.protocol == "EA440":
+            tx_data = calc.convert(prj.ssp).replace("\n", "\r\n")
         return self._transmit(tx_data)
 
     def _transmit(self, tx_data: Union[bytes, str]) -> bool:
