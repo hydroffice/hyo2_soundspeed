@@ -33,7 +33,7 @@ class Client:
 
         logger.info("transmitting to %s: [%s:%s:%s]" % (self.name, self.ip, self.port, self.protocol))
 
-        if self.protocol == "HYPACK":
+        if (self.protocol == "HYPACK"):
             success = self.send_hyp_format(prj=prj)
         else:
             success = self.send_kng_format(prj=prj, server_mode=server_mode)
@@ -51,6 +51,9 @@ class Client:
         if (self.protocol == "QINSY") or (self.protocol == "PDS2000"):
             kng_fmt = Dicts.kng_formats['S12']
             logger.info("forcing S12 format")
+        if (self.protocol == "EA440"):
+            kng_fmt = Dicts.kng_formats['S01']
+            logger.info("forcing S01 format")
 
         apply_thin = True
         apply_12k = True
@@ -60,6 +63,9 @@ class Client:
             tolerances = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5]
         elif self.protocol == "PDS2000":
             apply_12k = False
+        elif self.protocol == "EA440":
+            apply_12k = False
+            logger.info("bypassing the 12k meter depth extension")
 
         tx_data = None
         for tolerance in tolerances:
@@ -91,9 +97,10 @@ class Client:
         return self._transmit(tx_data)
 
     def send_hyp_format(self, prj: 'SoundSpeedLibrary') -> bool:
-        logger.info("using hyp format")
+        logger.info("using hypack format")
         calc = Calc()
         tx_data = calc.convert(prj.ssp)
+
         return self._transmit(tx_data)
 
     def _transmit(self, tx_data: Union[bytes, str]) -> bool:
