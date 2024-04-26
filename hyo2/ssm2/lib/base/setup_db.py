@@ -234,6 +234,7 @@ class SetupDb(BaseDb):
             try:
                 self.conn.execute(""" DELETE FROM client_list WHERE name=? AND setup_id=?""",
                                   (client_name, self.active_setup_id,))
+                self.commit()
                 # logger.info("deleted client: %s" % client_name)
 
             except sqlite3.Error as e:
@@ -247,6 +248,7 @@ class SetupDb(BaseDb):
             try:
                 self.conn.execute(""" DELETE FROM client_list WHERE setup_id=?""",
                                   (self.active_setup_id,))
+                self.commit()
                 # logger.info("deleted clients")
 
             except sqlite3.Error as e:
