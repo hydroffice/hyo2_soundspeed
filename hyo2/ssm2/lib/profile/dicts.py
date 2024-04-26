@@ -168,6 +168,7 @@ class Dicts:
         ("PDS2000", 2),
         ("QINSY", 3),
         ("KCTRL", 4),
+        ("EA440", 5),        
 
     ])
 
