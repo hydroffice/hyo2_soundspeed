@@ -30,7 +30,7 @@ install:
 
   - pip install coveralls PyYAML pytest pytest-cov wheel
   # for hyo2.abc2
-  - conda install appdirs bidict cartopy gdal matplotlib-base numpy psutil pyproj
+  - conda install appdirs cartopy gdal matplotlib-base numpy psutil pyproj
   - pip install PySide6
   - pip install https://github.com/hydroffice/hyo2_abc/archive/master.zip
   # for hyo2.soundspeed

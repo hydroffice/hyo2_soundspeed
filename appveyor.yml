@@ -46,7 +46,7 @@ install:
 
   - pip install coveralls PyYAML pytest pytest-cov wheel
   # for hyo2.abc2
-  - conda install appdirs bidict cartopy "gdal<3.0.0" matplotlib-base numpy psutil pyproj
+  - conda install appdirs cartopy "gdal<3.0.0" matplotlib-base numpy psutil pyproj
   - pip install PySide6
   # for hyo2.soundspeed
   - conda install gsw netCDF4 pillow pyserial scipy
