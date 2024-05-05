@@ -8,8 +8,6 @@ from matplotlib import rc_context, cbook
 # noinspection PyProtectedMember
 from matplotlib.backend_bases import _Mode, MouseButton
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT
-# noinspection PyProtectedMember
-from matplotlib.backends.qt_compat import _devicePixelRatioF, _setDevicePixelRatio
 from matplotlib.backend_bases import cursors
 
 from hyo2.ssm2.lib.profile.dicts import Dicts
@@ -49,42 +47,40 @@ class NavToolbar(NavigationToolbar2QT):
         self.plot_win = plot_win
         self.prj = prj
 
+        self._lastCursor = None
         self._active = None
+        self._id_press = None
+        self._id_release = None
         self._xypress = None
         self._ids_flag = None
         self._flag_mode = None
         self._flag_start = None
         self._flag_end = None
-        self.insert_sample = None
 
-        # prepare to modify the class toolitems
-        old_toolitems = NavigationToolbar2QT.toolitems
-        NavigationToolbar2QT.toolitems = (
-            ('Home', 'Reset view', 'home', 'home'),
-            ('Back', 'Previous view', 'back', 'back'),
-            ('Forward', 'Next view', 'forward', 'forward'),
+        self.toolitems = [
+            ('Home', 'Reset original view', 'home', 'home'),
+            ('Back', 'Back to previous view', 'back', 'back'),
+            ('Forward', 'Forward to next view', 'forward', 'forward'),
             (None, None, None, None),
-            ('Pan', 'Pan on plot', 'move', 'pan'),
-            ('Scale', 'Scale plot', 'scale', 'scale'),
-            ('Zoom in', 'Zoom in area', 'zoomin', 'zoom_in'),
-            ('Zoom out', 'Zoom out area', 'zoomout', 'zoom_out'),
-            ('Flag', 'Flag samples', 'flag', 'flag'),
-            ('Unflag', 'Unflag samples', 'unflag', 'unflag'),
-            ('Insert', 'Insert samples', 'insert', 'insert'),
-            (None, None, None, None),
-            ('Flagged', 'Show/hide flagged', 'flagged', 'flagged_plot'),
-            ('Grid', 'Toggle grids', 'plot_grid', 'grid_plot'),
-            ('Legend', 'Toggle legends', 'plot_legend', 'legend_plot'),
+            ('Pan', 'Pan on plot', 'move', 'pan'),  # MOD
+            ('Scale', 'Scale plot', 'scale', 'scale'),  # MOD
+            ('Zoom in', 'Zoom in area', 'zoomin', 'zoom_in'),  # MOD
+            ('Zoom out', 'Zoom out area', 'zoomout', 'zoom_out'),  # MOD
+            ('Flag', 'Flag samples', 'flag', 'flag'),  # NEW
+            ('Unflag', 'Unflag samples', 'unflag', 'unflag'),  # NEW
+            ('Insert', 'Insert samples', 'insert', 'insert'),  # NEW
+            (None, None, None, None),  # NEW
+            ('Flagged', 'Show/hide flagged', 'flagged', 'flagged_plot'),  # NEW
+            ('Grid', 'Toggle grids', 'plot_grid', 'grid_plot'),  # NEW
+            ('Legend', 'Toggle legends', 'plot_legend', 'legend_plot'),  # NEW
             ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
-            ("Customize", "Edit axis, curve and image parameters",
-             "qt5_editor_options", "edit_parameters"),
+            ('Customize', 'Edit axis, curve and image parameters', 'qt5_editor_options', 'edit_parameters'),
             (None, None, None, None),
-            ('Save', 'Save the figure', 'filesave', 'save_figure'),
-          )
+            ('Save', 'Save the figure', 'filesave', 'save_figure')
+        ]
+
         super().__init__(canvas=canvas, parent=parent, coordinates=coordinates)
         self.setIconSize(QtCore.QSize(24, 24))
-        # set back the class toolitems
-        NavigationToolbar2QT.toolitems = old_toolitems
 
         # set checkable buttons
         self._actions['scale'].setCheckable(True)
@@ -103,7 +99,7 @@ class NavToolbar(NavigationToolbar2QT):
         self.canvas.mpl_connect('button_press_event', self.press)
         self.canvas.mpl_connect('button_release_event', self.release)
 
-        # Add the x,y location widget at the right side of the toolbar
+        # Add the x,y location widget on the right side of the toolbar
         self.mon_label = None
         if self.coordinates:
             frame = QtWidgets.QFrame()
@@ -126,27 +122,32 @@ class NavToolbar(NavigationToolbar2QT):
             vbox.addWidget(self.mon_label)
             # vbox.addStretch()
 
-    def reset(self):
-        self._active = None
-        self._xypress = None
-        self._ids_flag = None
-        self._flag_mode = None
-        self._flag_start = None
-        self._flag_end = None
-        self.insert_sample = None
-
     def _icon(self, name):
         # Modified to use local icons
-        icon_path = os.path.join(self.media, name)
-        if not os.path.exists(icon_path):
-            # noinspection PyProtectedMember
-            icon_path = str(cbook._get_data_path('images', name))
-            logger.warning("using icon at %s" % icon_path)
-        pm = QtGui.QPixmap(icon_path)
-        _setDevicePixelRatio(pm, _devicePixelRatioF(self))
+
+        filename = os.path.join(self.media, name)
+        if not os.path.exists(filename):
+
+            # use a high-resolution icon with suffix '_large' if available
+            # note: user-provided icons may not have '_large' versions
+            path_regular = cbook._get_data_path('images', name)
+            path_large = path_regular.with_name(
+                path_regular.name.replace('.png', '_large.png'))
+            filename = str(path_large if path_large.exists() else path_regular)
+
+        pm = QtGui.QPixmap(filename)
+        pm.setDevicePixelRatio(
+            self.devicePixelRatioF() or 1)  # rarely, devicePixelRatioF=0
+        if self.palette().color(self.backgroundRole()).value() < 128:
+            icon_color = self.palette().color(self.foregroundRole())
+            mask = pm.createMaskFromColor(
+                QtGui.QColor('black'),
+                QtCore.Qt.MaskMode.MaskOutColor)
+            pm.fill(icon_color)
+            pm.setMask(mask)
         return QtGui.QIcon(pm)
 
-    def _active_button(self):
+    def _update_buttons_checked(self):
         # sync button checkstates to match active mode
         logger.debug("Mode: %s" % self._active)
         self._actions['pan'].setChecked(self._active == 'PAN')
@@ -157,7 +158,19 @@ class NavToolbar(NavigationToolbar2QT):
         self._actions['unflag'].setChecked(self._active == 'UNFLAG')
         self._actions['insert'].setChecked(self._active == 'INSERT')
 
-    # ### actions ###
+    # ### ACTIONS ###
+
+    def reset(self) -> None:
+        logger.debug("reset")
+        self._lastCursor = None
+        self._active = None
+        self._id_press = None
+        self._id_release = None
+        self._xypress = None
+        self._ids_flag = None
+        self._flag_mode = None
+        self._flag_start = None
+        self._flag_end = None
 
     def press(self, event):
         # print("press", event.button)
@@ -180,139 +193,9 @@ class NavToolbar(NavigationToolbar2QT):
         # print("release", event.button)
         pass
 
-    # --- mouse movements ---
+    # --- pan/scale ---
 
-    def mouse_move(self, event):
-        self._update_cursor(event)
-
-        if event.inaxes and event.inaxes.get_navigate():
-            plt_label = event.inaxes.get_label()
-            try:
-                s = "d:%.2f" % event.ydata
-                if plt_label == "speed":
-                    s += ", vs:%.2f" % event.xdata
-                elif plt_label == "temp":
-                    s += ", t:%.2f" % event.xdata
-                elif plt_label == "sal":
-                    s += ", s:%.2f" % event.xdata
-            except (ValueError, OverflowError):
-                if self._active:
-                    self.set_message('%s' % self._active)
-                else:
-                    self.set_message('')
-                return
-
-            artists = [a for a in event.inaxes.get_children() if a.contains(event)]
-            if artists:
-                a = max(enumerate(artists), key=lambda x: x[1].zorder)[1]
-                if a is not event.inaxes.patch:
-                    data = a.get_cursor_data(event)
-                    if data is not None:
-                        s += '[%s]' % a.format_cursor_data(data)
-
-            if self._active:
-                self.set_message('%s | %s' % (s, self._active.lower()))
-            else:
-                self.set_message(s)
-
-            if self._active == 'INSERT':
-                # logger.debug("insert mode")
-                msg = str()
-                if self.insert_sample:  # we are adding a 2-step sample
-
-                    if plt_label == "speed":
-                        msg += "1-step insert [d:%.2f" % event.ydata
-                    else:
-                        if not self.insert_sample.temp:
-                            msg += "now set temp [d:%.2f" % self.insert_sample.depth
-                        elif not self.insert_sample.sal:
-                            msg += "now set sal [d:%.2f" % self.insert_sample.depth
-
-                    if self.insert_sample.speed:
-                        msg += ", vs:%.2f" % self.insert_sample.speed
-                    else:
-                        if plt_label == "speed":
-                            msg += ", vs:%.2f" % event.xdata
-                        else:
-                            msg += ", vs:*"
-
-                    if self.insert_sample.temp:
-                        msg += ", t:%.2f" % self.insert_sample.temp
-                    else:
-                        if plt_label == "temp":
-                            msg += ", t:%.2f" % event.xdata
-                        else:
-                            msg += ", t:*"
-
-                    if self.insert_sample.sal:
-                        msg += ", s:%.2f]" % self.insert_sample.sal
-                    else:
-                        if plt_label == "sal":
-                            msg += ", s:%.2f]" % event.xdata
-                        else:
-                            msg += ", s:*]"
-
-                else:  # we don't know if the user will select a 2-step insertion or directly a sound speed value
-
-                    if plt_label == "speed":
-                        msg += "1-step insert [d:%.2f" % event.ydata
-                    else:
-                        msg += "2-step insert [d:%.2f" % event.ydata
-
-                    if plt_label == "speed":
-                        msg += ", vs:%.2f" % event.xdata
-                    else:
-                        msg += ", vs:*"
-
-                    if plt_label == "temp":
-                        msg += ", t:%.2f" % event.xdata
-                    else:
-                        msg += ", t:*"
-
-                    if plt_label == "sal":
-                        msg += ", s:%.2f]" % event.xdata
-                    else:
-                        msg += ", s:*]"
-
-                self.mon_label.setText(msg)
-
-            else:
-                self.mon_label.setText('')
-
-        else:
-            if self._active:
-                self.set_message('%s' % self._active.lower())
-
-            else:
-                self.set_message('')
-
-            self.mon_label.setText('')
-
-    def _update_cursor(self, event):
-        """Set cursor by mode"""
-
-        if not event.inaxes or not self._active:
-            if self._lastCursor != cursors.POINTER:
-                self.set_cursor(cursors.POINTER)
-                self._lastCursor = cursors.POINTER
-        else:
-            if (self._active == 'ZOOM_IN') or (self._active == 'ZOOM_OUT') or (self._active == 'INSERT')\
-                    or (self._active == 'FLAG') or (self._active == 'UNFLAG'):
-                if self._lastCursor != cursors.SELECT_REGION:
-                    self.set_cursor(cursors.SELECT_REGION)
-                    self._lastCursor = cursors.SELECT_REGION
-
-            elif (self._active == 'PAN') or (self._active == 'SCALE'):
-                if self._lastCursor != cursors.MOVE:
-                    self.set_cursor(cursors.MOVE)
-                    self._lastCursor = cursors.MOVE
-
-            else:
-                raise RuntimeError("Unsupported cursor mode: %s" % self._active)
-
-    # --- pan ---
-
-    def pan(self, *args):
+    def pan(self) -> None:
         self.mode = _Mode.NONE
         if self._active == 'PAN':
             self._active = None
@@ -333,9 +216,9 @@ class NavToolbar(NavigationToolbar2QT):
 
         # logger.debug("active: %s" % self._active)
         self.set_message(self._active)
-        self._active_button()
+        self._update_buttons_checked()
 
-    def scale(self, *args):
+    def scale(self) -> None:
         self.mode = _Mode.NONE
         if self._active == 'SCALE':
             self._active = None
@@ -356,56 +239,54 @@ class NavToolbar(NavigationToolbar2QT):
 
         # logger.debug("active: %s" % self._active)
         self.set_message(self._active)
-        self._active_button()
+        self._update_buttons_checked()
 
     def press_pan(self, event):
-        if event.button != MouseButton.LEFT:
+        """Callback for mouse button press in pan/zoom mode."""
+        logger.debug("mode: %s" % self._active)
+
+        if (event.button not in [MouseButton.LEFT]
+                or event.x is None or event.y is None):
             return
-        if self._active == "PAN":
-            # logger.debug("Press pan")
-            super().press_pan(event=event)
-        elif self._active == "SCALE":
-            # logger.debug("Press scale")
-            if (event.button not in [MouseButton.LEFT, MouseButton.RIGHT]
-                    or event.x is None or event.y is None):
-                return
-            axes = [a for a in self.canvas.figure.get_axes()
-                    if a.in_axes(event) and a.get_navigate() and a.can_pan()]
-            if not axes:
-                return
-            if self._nav_stack() is None:
-                self.push_current()  # set the home button to this view
-            for ax in axes:
-                # MODIFIED for passing MouseButton.RIGHT
+        axes = [a for a in self.canvas.figure.get_axes()
+                if a.in_axes(event) and a.get_navigate() and a.can_pan()]
+        if not axes:
+            return
+        if self._nav_stack() is None:
+            self.push_current()  # set the home button to this view
+        for ax in axes:
+            # MOD
+            if self._active == 'SCALE':
                 ax.start_pan(event.x, event.y, MouseButton.RIGHT)
-            self.canvas.mpl_disconnect(self._id_drag)
-            id_drag = self.canvas.mpl_connect("motion_notify_event", self.drag_pan)
+            else:
+                ax.start_pan(event.x, event.y, event.button)
+        self.canvas.mpl_disconnect(self._id_drag)
+        id_drag = self.canvas.mpl_connect("motion_notify_event", self.drag_pan)
+        # MOD
+        if self._active == 'SCALE':
+            self._pan_info = self._PanInfo(
+                button=MouseButton.RIGHT, axes=axes, cid=id_drag)
+        else:
             self._pan_info = self._PanInfo(
                 button=event.button, axes=axes, cid=id_drag)
 
     def drag_pan(self, event):
-        if self._active == "PAN":
-            # logger.debug("Drag pan")
-            super().drag_pan(event=event)
-        elif self._active == "SCALE":
-            # logger.debug("Drag scale")
-            for ax in self._pan_info.axes:
-                # Using the recorded button at the press is safer than the current
-                # button, as multiple buttons can get pressed during motion.
-                # MODIFIED for passing MouseButton.RIGHT
-                ax.drag_pan(MouseButton.RIGHT, event.key, event.x, event.y)
-            self.canvas.draw_idle()
+        logger.debug("mode: %s" % self._active)
 
-    def release_pan(self, event):
-        if self._active == "PAN":
-            # logger.debug("Release pan")
-            super().release_pan(event=event)
-        elif self._active == "SCALE":
-            super().release_pan(event=event)
+        """Callback for dragging in pan/zoom mode."""
+        for ax in self._pan_info.axes:
+            # Using the recorded button at the press is safer than the current
+            # button, as multiple buttons can get pressed during motion.
+            # MOD
+            if self._active == 'SCALE':
+                ax.drag_pan(MouseButton.RIGHT, event.key, event.x, event.y)
+            else:
+                ax.drag_pan(self._pan_info.button, event.key, event.x, event.y)
+        self.canvas.draw_idle()
 
     # --- zoom in/out ---
 
-    def zoom_in(self, *args):
+    def zoom_in(self):
         self.mode = _Mode.NONE
         if self._active == 'ZOOM_IN':
             self._active = None
@@ -426,9 +307,9 @@ class NavToolbar(NavigationToolbar2QT):
 
         # logger.debug("active: %s" % self._active)
         self.set_message(self._active)
-        self._active_button()
+        self._update_buttons_checked()
 
-    def zoom_out(self, *args):
+    def zoom_out(self):
         self.mode = _Mode.NONE
         if self._active == 'ZOOM_OUT':
             self._active = None
@@ -449,16 +330,32 @@ class NavToolbar(NavigationToolbar2QT):
 
         # logger.debug("active: %s" % self._active)
         self.set_message(self._active)
-        self._active_button()
+        self._update_buttons_checked()
 
     def press_zoom(self, event):
-        if self._active == "ZOOM_IN":
-            super().press_zoom(event=event)
-        elif self._active == "ZOOM_OUT":
-            super().press_zoom(event=event)
-            self._zoom_info = self._ZoomInfo(direction="out", start_xy=self._zoom_info.start_xy,
-                                             axes=self._zoom_info.axes, cid=self._zoom_info.cid,
-                                             cbar=self._zoom_info.cbar)
+        """Callback for mouse button press in zoom to rect mode."""
+        if (event.button not in [MouseButton.LEFT, MouseButton.RIGHT]
+                or event.x is None or event.y is None):
+            return
+        axes = [a for a in self.canvas.figure.get_axes()
+                if a.in_axes(event) and a.get_navigate() and a.can_zoom()]
+        if not axes:
+            return
+        if self._nav_stack() is None:
+            self.push_current()  # set the home button to this view
+        id_zoom = self.canvas.mpl_connect(
+            "motion_notify_event", self.drag_zoom)
+        # A colorbar is one-dimensional, so we extend the zoom rectangle out
+        # to the edge of the Axes bbox in the other dimension. To do that we
+        # store the orientation of the colorbar for later.
+        if hasattr(axes[0], "_colorbar"):
+            cbar = axes[0]._colorbar.orientation
+        else:
+            cbar = None
+        # MOD
+        self._zoom_info = self._ZoomInfo(
+            direction="in" if self._active == "ZOOM_IN" else "out",
+            start_xy=(event.x, event.y), axes=axes, cid=id_zoom, cbar=cbar)
 
     # --- flag ---
 
@@ -483,7 +380,7 @@ class NavToolbar(NavigationToolbar2QT):
 
         # logger.debug("active: %s" % self._active)
         self.set_message(self._active)
-        self._active_button()
+        self._update_buttons_checked()
 
     def press_flag(self, event):
         # logger.debug("Press flag")
@@ -625,7 +522,7 @@ class NavToolbar(NavigationToolbar2QT):
             self.canvas.widgetlock(self)
 
         self.set_message(self._active)
-        self._active_button()
+        self._update_buttons_checked()
 
     def press_unflag(self, event):
         # logger.debug("Press unflag")
@@ -797,118 +694,273 @@ class NavToolbar(NavigationToolbar2QT):
         # logger.debug("FLAG > drag > (%.3f, %.3f)(%.3f, %.3f)" % (x, y, last_x, last_y))
         self.draw_rubberband(event, x, y, last_x, last_y)
 
-    # --- insert ---
+    def insert(self) -> None:
+        logger.debug("insert")
+        self._update_buttons_checked()
 
-    def insert(self):
-        self.mode = _Mode.NONE
-        if self._active == 'INSERT':
-            self._active = None
-            if self._id_press:
-                self.canvas.mpl_disconnect(self._id_press)
-            if self._id_release:
-                self.canvas.mpl_disconnect(self._id_release)
-            self.canvas.widgetlock.release(self)
-        else:
-            self._active = 'INSERT'
-            if self._id_press:
-                self.canvas.mpl_disconnect(self._id_press)
-            self._id_press = self.canvas.mpl_connect('button_press_event', self.press_insert)
-            if self._id_release:
-                self.canvas.mpl_disconnect(self._id_release)
-            self._id_release = self.canvas.mpl_connect('button_release_event', self.release_insert)
-            self.canvas.widgetlock(self)
+    def flagged_plot(self) -> None:
+        logger.debug("flagged plot")
+        self._update_buttons_checked()
 
-        # logger.debug("active: %s" % self._active)
-        self.set_message(self._active)
-        self._active_button()
+    def grid_plot(self) -> None:
+        logger.debug("grid plot")
+        self._update_buttons_checked()
 
-    def press_insert(self, event):
-        """Mouse press callback for insert"""
+    def legend_plot(self) -> None:
+        logger.debug("legend plot")
+        self._update_buttons_checked()
 
-        # store the pressed button
-        if event.button != MouseButton.LEFT:  # left
-            self.insert_sample = None
-            return
-        # logger.debug("INSERT > press > button #%s" % event.button)
+    # --- mouse movements ---
 
-        # x, y = event.x, event.y  # cursor position in pixel
-        xd, yd = event.xdata, event.ydata  # cursor position in data coords
-        # using %s since they might be None
-        # logger.debug("INSERT > press > loc (%s,%s)(%s,%s)" % (x, y, xd, yd))
+    def mouse_move(self, event):
+        self._update_cursor(event)
 
-        if not self.insert_sample:
-            self.insert_sample = Sample()
+        if event.inaxes and event.inaxes.get_navigate():
+            plt_label = event.inaxes.get_label()
+            try:
+                s = "d:%.2f" % event.ydata
+                if plt_label == "speed":
+                    s += ", ss:%.2f" % event.xdata
+                elif plt_label == "temp":
+                    s += ", t:%.2f" % event.xdata
+                elif plt_label == "sal":
+                    s += ", s:%.2f" % event.xdata
+            except (ValueError, OverflowError):
+                if self._active:
+                    self.set_message('%s' % self._active)
+                else:
+                    self.set_message('')
+                return
 
-        # click outside the axes
-        if event.inaxes is None:
-            return
+            artists = [a for a in event.inaxes.get_children() if a.contains(event)]
+            if artists:
+                a = max(enumerate(artists), key=lambda x: x[1].zorder)[1]
+                if a is not event.inaxes.patch:
+                    data = a.get_cursor_data(event)
+                    if data is not None:
+                        s += '[%s]' % a.format_cursor_data(data)
 
-        plt_label = event.inaxes.get_label()
-        if plt_label == "speed":  # we store both y and x
-            if self.insert_sample.temp:
-                self.insert_sample.temp = None
-            if self.insert_sample.sal:
-                self.insert_sample.sal = None
-            self.insert_sample.depth = yd
-            self.insert_sample.speed = xd
-
-        elif plt_label == "temp":  # we don't overwrite y, if present
-            if not self.insert_sample.depth:
-                self.insert_sample.depth = yd
-            self.insert_sample.temp = xd
-
-        elif plt_label == "sal":  # we don't overwrite y, if present
-            if not self.insert_sample.depth:
-                self.insert_sample.depth = yd
-            self.insert_sample.sal = xd
-
-        if self.insert_sample.speed:
-            self.prj.cur.insert_proc_speed(depth=self.insert_sample.depth, speed=self.insert_sample.speed)
-            self.insert_sample = None
-            self.plot_win.update_data()
-
-        elif self.insert_sample.temp and self.insert_sample.sal:
-            self.prj.cur.insert_proc_temp_sal(depth=self.insert_sample.depth, temp=self.insert_sample.temp,
-                                              sal=self.insert_sample.sal)
-            self.insert_sample = None
-            self.plot_win.update_data()
-
-    def release_insert(self, event):
-        """the release mouse button callback in insert mode"""
-        self.canvas.draw_idle()
-
-    # --- plotting ---
-
-    def flagged_plot(self):
-        flagged_flag = self._actions['flagged_plot'].isChecked()
-        # logger.debug("plot flagged: %s" % flagged_flag)
-        self.plot_win.set_invalid_visibility(flagged_flag)
-
-        self.canvas.draw_idle()
-
-    def grid_plot(self):
-        grid_flag = self._actions['grid_plot'].isChecked()
-        # logger.debug("plot grid: %s" % grid_flag)
-
-        with rc_context(self.rc_context):
-            for a in self.canvas.figure.get_axes():
-                a.grid(grid_flag)
-
-        self.canvas.draw_idle()
-
-    def legend_plot(self):
-        legend_flag = self._actions['legend_plot'].isChecked()
-        # logger.debug("plot legend: %s" % legend_flag)
-
-        with rc_context(self.rc_context):
-            if legend_flag:
-                for a in self.canvas.figure.get_axes():
-                    a.legend(loc='lower left')
+            if self._active:
+                self.set_message('%s | %s' % (s, self._active.lower()))
             else:
-                for a in self.canvas.figure.get_axes():
-                    try:
-                        a.legend_.remove()
-                    except AttributeError:
-                        logger.info("missing legend to remove")
+                self.set_message(s)
 
-        self.canvas.draw_idle()
+            if self._active == 'INSERT':
+                # logger.debug("insert mode")
+                msg = str()
+                if self.insert_sample:  # we are adding a 2-step sample
+
+                    if plt_label == "speed":
+                        msg += "1-step insert [d:%.2f" % event.ydata
+                    else:
+                        if not self.insert_sample.temp:
+                            msg += "now set temp [d:%.2f" % self.insert_sample.depth
+                        elif not self.insert_sample.sal:
+                            msg += "now set sal [d:%.2f" % self.insert_sample.depth
+
+                    if self.insert_sample.speed:
+                        msg += ", vs:%.2f" % self.insert_sample.speed
+                    else:
+                        if plt_label == "speed":
+                            msg += ", ss:%.2f" % event.xdata
+                        else:
+                            msg += ", ss:*"
+
+                    if self.insert_sample.temp:
+                        msg += ", t:%.2f" % self.insert_sample.temp
+                    else:
+                        if plt_label == "temp":
+                            msg += ", t:%.2f" % event.xdata
+                        else:
+                            msg += ", t:*"
+
+                    if self.insert_sample.sal:
+                        msg += ", s:%.2f]" % self.insert_sample.sal
+                    else:
+                        if plt_label == "sal":
+                            msg += ", s:%.2f]" % event.xdata
+                        else:
+                            msg += ", s:*]"
+
+                else:  # we don't know if the user will select a 2-step insertion or directly a sound speed value
+
+                    if plt_label == "speed":
+                        msg += "1-step insert [d:%.2f" % event.ydata
+                    else:
+                        msg += "2-step insert [d:%.2f" % event.ydata
+
+                    if plt_label == "speed":
+                        msg += ", vs:%.2f" % event.xdata
+                    else:
+                        msg += ", vs:*"
+
+                    if plt_label == "temp":
+                        msg += ", t:%.2f" % event.xdata
+                    else:
+                        msg += ", t:*"
+
+                    if plt_label == "sal":
+                        msg += ", s:%.2f]" % event.xdata
+                    else:
+                        msg += ", s:*]"
+
+                self.mon_label.setText(msg)
+
+            else:
+                self.mon_label.setText('')
+
+        else:
+            if self._active:
+                self.set_message('%s' % self._active.lower())
+
+            else:
+                self.set_message('')
+
+            self.mon_label.setText('')
+
+    def _update_cursor(self, event):
+        """Set cursor by mode"""
+
+        if not event.inaxes or not self._active:
+            if self._lastCursor != cursors.POINTER:
+                self.canvas.set_cursor(cursors.POINTER)
+                self._lastCursor = cursors.POINTER
+        else:
+            if (self._active == 'ZOOM_IN') or (self._active == 'ZOOM_OUT') or (self._active == 'INSERT')\
+                    or (self._active == 'FLAG') or (self._active == 'UNFLAG'):
+                if self._lastCursor != cursors.SELECT_REGION:
+                    self.canvas.set_cursor(cursors.SELECT_REGION)
+                    self._lastCursor = cursors.SELECT_REGION
+
+            elif (self._active == 'PAN') or (self._active == 'SCALE'):
+                if self._lastCursor != cursors.MOVE:
+                    self.canvas.set_cursor(cursors.MOVE)
+                    self._lastCursor = cursors.MOVE
+
+            else:
+                raise RuntimeError("Unsupported cursor mode: %s" % self._active)
+
+    # def __init__(self, canvas, parent, plot_win, prj, coordinates=True):
+    #
+    #     self.insert_sample = None
+
+    #
+    # def reset(self):
+
+    #     self.insert_sample = None
+
+    # # --- insert ---
+    #
+    # def insert(self):
+    #     self.mode = _Mode.NONE
+    #     if self._active == 'INSERT':
+    #         self._active = None
+    #         if self._id_press:
+    #             self.canvas.mpl_disconnect(self._id_press)
+    #         if self._id_release:
+    #             self.canvas.mpl_disconnect(self._id_release)
+    #         self.canvas.widgetlock.release(self)
+    #     else:
+    #         self._active = 'INSERT'
+    #         if self._id_press:
+    #             self.canvas.mpl_disconnect(self._id_press)
+    #         self._id_press = self.canvas.mpl_connect('button_press_event', self.press_insert)
+    #         if self._id_release:
+    #             self.canvas.mpl_disconnect(self._id_release)
+    #         self._id_release = self.canvas.mpl_connect('button_release_event', self.release_insert)
+    #         self.canvas.widgetlock(self)
+    #
+    #     # logger.debug("active: %s" % self._active)
+    #     self.set_message(self._active)
+    #     self._active_button()
+    #
+    # def press_insert(self, event):
+    #     """Mouse press callback for insert"""
+    #
+    #     # store the pressed button
+    #     if event.button != MouseButton.LEFT:  # left
+    #         self.insert_sample = None
+    #         return
+    #     # logger.debug("INSERT > press > button #%s" % event.button)
+    #
+    #     # x, y = event.x, event.y  # cursor position in pixel
+    #     xd, yd = event.xdata, event.ydata  # cursor position in data coords
+    #     # using %s since they might be None
+    #     # logger.debug("INSERT > press > loc (%s,%s)(%s,%s)" % (x, y, xd, yd))
+    #
+    #     if not self.insert_sample:
+    #         self.insert_sample = Sample()
+    #
+    #     # click outside the axes
+    #     if event.inaxes is None:
+    #         return
+    #
+    #     plt_label = event.inaxes.get_label()
+    #     if plt_label == "speed":  # we store both y and x
+    #         if self.insert_sample.temp:
+    #             self.insert_sample.temp = None
+    #         if self.insert_sample.sal:
+    #             self.insert_sample.sal = None
+    #         self.insert_sample.depth = yd
+    #         self.insert_sample.speed = xd
+    #
+    #     elif plt_label == "temp":  # we don't overwrite y, if present
+    #         if not self.insert_sample.depth:
+    #             self.insert_sample.depth = yd
+    #         self.insert_sample.temp = xd
+    #
+    #     elif plt_label == "sal":  # we don't overwrite y, if present
+    #         if not self.insert_sample.depth:
+    #             self.insert_sample.depth = yd
+    #         self.insert_sample.sal = xd
+    #
+    #     if self.insert_sample.speed:
+    #         self.prj.cur.insert_proc_speed(depth=self.insert_sample.depth, speed=self.insert_sample.speed)
+    #         self.insert_sample = None
+    #         self.plot_win.update_data()
+    #
+    #     elif self.insert_sample.temp and self.insert_sample.sal:
+    #         self.prj.cur.insert_proc_temp_sal(depth=self.insert_sample.depth, temp=self.insert_sample.temp,
+    #                                           sal=self.insert_sample.sal)
+    #         self.insert_sample = None
+    #         self.plot_win.update_data()
+    #
+    # def release_insert(self, event):
+    #     """the release mouse button callback in insert mode"""
+    #     self.canvas.draw_idle()
+    #
+    # # --- plotting ---
+    #
+    # def flagged_plot(self):
+    #     flagged_flag = self._actions['flagged_plot'].isChecked()
+    #     # logger.debug("plot flagged: %s" % flagged_flag)
+    #     self.plot_win.set_invalid_visibility(flagged_flag)
+    #
+    #     self.canvas.draw_idle()
+    #
+    # def grid_plot(self):
+    #     grid_flag = self._actions['grid_plot'].isChecked()
+    #     # logger.debug("plot grid: %s" % grid_flag)
+    #
+    #     with rc_context(self.rc_context):
+    #         for a in self.canvas.figure.get_axes():
+    #             a.grid(grid_flag)
+    #
+    #     self.canvas.draw_idle()
+    #
+    # def legend_plot(self):
+    #     legend_flag = self._actions['legend_plot'].isChecked()
+    #     # logger.debug("plot legend: %s" % legend_flag)
+    #
+    #     with rc_context(self.rc_context):
+    #         if legend_flag:
+    #             for a in self.canvas.figure.get_axes():
+    #                 a.legend(loc='lower left')
+    #         else:
+    #             for a in self.canvas.figure.get_axes():
+    #                 try:
+    #                     a.legend_.remove()
+    #                 except AttributeError:
+    #                     logger.info("missing legend to remove")
+    #
+    #     self.canvas.draw_idle()
