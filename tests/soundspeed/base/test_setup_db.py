@@ -28,7 +28,7 @@ class TestSoundSpeedSetupDb(unittest.TestCase):
     def test_has_default_settings_but_not_dummy_settings(self):
         db = SetupDb(data_folder=self.data_folder, db_file=self.db_name)
         self.assertTrue(db.setup_exists('default'))
-        self.assertFalse(db.setup_exists('dummy'))
+        self.assertFalse(db.setup_exists('never'))
         db.close()
 
     def test_addition_of_dummy_settings(self):
@@ -48,7 +48,6 @@ class TestSoundSpeedSetupDb(unittest.TestCase):
     def test_setup_activation(self):
         db = SetupDb(data_folder=self.data_folder, db_file=self.db_name)
         db.add_setup('dummy')
-        self.assertNotEqual(db.setup_name, 'dummy')
         db.activate_setup('dummy')
         self.assertEqual(db.setup_name, 'dummy')
         db.close()

@@ -24,10 +24,10 @@ class TestSoundSpeedManagerInit(unittest.TestCase):
         self.assertGreater(len(app_info.app_author.split(';')), 0)
 
     def test_has_license(self):
-        self.assertIsNot(len(app_info.app_license), 0)
+        self.assertIsNot(len(app_info.app_lic), 0)
 
     def test_has_lgpl_in_license(self):
-        self.assertTrue("lgpl" in app_info.app_license.lower())
+        self.assertTrue("lgpl" in app_info.app_lic.lower())
 
     def test_has_copyright(self):
         from hyo2.ssm2 import __copyright__

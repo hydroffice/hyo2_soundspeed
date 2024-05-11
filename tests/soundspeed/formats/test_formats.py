@@ -2,7 +2,6 @@ import unittest
 import os
 import logging
 
-from hyo2.ssm2.app.gui.soundspeedmanager import AppInfo
 from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 from hyo2.ssm2.lib.base.callbacks.fake_callbacks import FakeCallbacks
 from hyo2.ssm2.lib.base.testing import SoundSpeedTesting
@@ -16,7 +15,7 @@ reduced_testing = True
 class TestSoundSpeedFormats(unittest.TestCase):
 
     def setUp(self):
-        self.output_formats = ["asvp", "caris", "csv", "elac", "hypack", "ixblue", "qps", "sonardyne", "unb", ]
+        self.output_formats = ["asvp/ssp", "caris", "csv", "elac", "hypack", "ixblue", "qps", "sonardyne", "unb", ]
         data_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir))
         self.testing = SoundSpeedTesting(root_folder=data_folder)
         self.data_output = self.testing.output_data_folder()

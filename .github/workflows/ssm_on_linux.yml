@@ -25,6 +25,7 @@ jobs:
         conda install appdirs cartopy gdal matplotlib-base numpy psutil pyproj qt-material
         conda install gsw netCDF4 pillow pyserial scipy
         pip install PySide6
+        sudo apt-get install -y libegl1
         pip install hyo2.abc2
         pip install --no-deps .
     - name: Lint with flake8

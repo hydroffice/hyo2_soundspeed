@@ -3,7 +3,6 @@ import os
 import shutil
 import logging
 
-from hyo2.ssm2.app.gui.soundspeedmanager import AppInfo
 from hyo2.ssm2.lib.atlas.regofsonline import RegOfsOnline
 from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
