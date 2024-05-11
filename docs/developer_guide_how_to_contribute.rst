@@ -3,16 +3,6 @@
 How to contribute
 -----------------
 
-.. index::
-    single: open source
-    single: contribution
-    single: code of conduct
-    single: PEP; 8
-    single: PEP; 257
-    single: documentation
-    single: compatibility
-    single: history
-
 Every open source project lives from the generous help by contributors that sacrifice their time and this is no different.
 
 Public Repositories
@@ -46,7 +36,7 @@ Here are a few hints and rules to get you started:
    In the best case, we can mold it into something, in the worst case the pull request gets politely closed.
    There's absolutely nothing to fear.
 
-Thank you for considering to contribute! If you have any question or concerns, feel free to reach out to us (see :ref:`credits-label`).
+Thank you for considering to contribute! If you have any question or concerns, feel free to reach out to us.
 
 .. _`short tutorial`: https://gist.github.com/giumas/67abeffcbf49d00703a57cbafac8b118
 .. _`GitHub`: https://github.com/hydroffice/hyo_soundspeed
