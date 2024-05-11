@@ -28,7 +28,7 @@ logger.info('output folder: %s' % data_output)
 # test readers/writers
 logger.info('test: *** START ***')
 filters = ["valeport", ]
-formats = ["caris", "csv", "elac", "hypack", "ixblue", "asvp", "qps", "sonardyne", "unb", ]
+formats = ["caris", "csv", "elac", "hypack", "ixblue", "asvp/ssp", "qps", "sonardyne", "unb", ]
 data_outputs = dict()
 for format in formats:
     data_outputs[format] = data_output

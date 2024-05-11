@@ -492,8 +492,8 @@ class QtCallbacks(AbstractCallbacks):
               "Use geographic position from SIS?\nChoose 'no' to enter position manually."
         # noinspection PyArgumentList,PyCallByClass
         ret = QtWidgets.QMessageBox.information(self._parent, "Location", msg,
-                                                QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
-        if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.No)
+        if ret == QtWidgets.QMessageBox.StandardButton.No:
             return False
         return True
 
@@ -503,8 +503,8 @@ class QtCallbacks(AbstractCallbacks):
               "Use geographic position from NMEA 0183?\nChoose 'no' to enter position manually."
         # noinspection PyArgumentList,PyCallByClass
         ret = QtWidgets.QMessageBox.information(self._parent, "Location", msg,
-                                                QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
-        if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.No)
+        if ret == QtWidgets.QMessageBox.StandardButton.No:
             return False
         return True    
 

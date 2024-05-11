@@ -161,8 +161,8 @@ class TextEditorDialog(AbstractDialog):
         msg_box.setWindowTitle(title)
         msg_box.setIconPixmap(QtGui.QPixmap(app_info.app_icon_path).scaled(QtCore.QSize(36, 36)))
         msg_box.setText('There are unsaved changes!\nDo you really want to %s?' % text)
-        msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-        msg_box.setDefaultButton(QtWidgets.QMessageBox.No)
+        msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+        msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.No)
         return msg_box.exec_()
 
     def closeEvent(self, event):

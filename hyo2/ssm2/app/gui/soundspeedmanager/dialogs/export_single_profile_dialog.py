@@ -138,7 +138,7 @@ class ExportSingleProfileDialog(AbstractDialog):
         if len(self.selected_writers) == 0:
             msg = "Select output formats before data export!"
             # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         # special case for Fugro ISS format
@@ -152,7 +152,7 @@ class ExportSingleProfileDialog(AbstractDialog):
             if self.lib.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']:
                 msg = "Attempt to export a synthetic profile in NCEI format!"
                 # noinspection PyCallByClass,PyArgumentList
-                QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.StandardButton.Ok)
                 return
 
             if self.lib.current_project == 'default':
@@ -161,7 +161,7 @@ class ExportSingleProfileDialog(AbstractDialog):
                 if self.lib.setup.noaa_tools:
                     msg += "\n\nRecommend in project_survey format, e.g. OPR-P999-RA-17_H12345"
                 # noinspection PyCallByClass,PyArgumentList
-                QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.StandardButton.Ok)
                 return
 
             if self.lib.setup.noaa_tools and self.lib.not_noaa_project(self.lib.current_project):
@@ -171,7 +171,7 @@ class ExportSingleProfileDialog(AbstractDialog):
                           "Rename the project in the Database tab!\n\n" \
                           "Recommend \"project_survey\" format, e.g. OPR-P999-RA-17_H12345"
                     # noinspection PyCallByClass,PyArgumentList
-                    QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.Ok)
+                    QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.StandardButton.Ok)
                     return
 
             if not self.lib.ssp.cur.meta.survey or \
@@ -182,7 +182,7 @@ class ExportSingleProfileDialog(AbstractDialog):
                       "- Load the profile (if not already loaded)\n" \
                       "- Set the missing values using the Metadata button on the Editor tool bar\n"
                 # noinspection PyCallByClass,PyArgumentList
-                QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.warning(self, "Export warning", msg, QtWidgets.QMessageBox.StandardButton.Ok)
                 return
 
             # special case for Fugro ISS format with NCEI format
@@ -248,7 +248,7 @@ class ExportSingleProfileDialog(AbstractDialog):
             self.progress.end()
             msg = "Issue in exporting the data.\nReason: %s" % e
             # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Export error", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.critical(self, "Export error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         # opening the output folder
@@ -267,6 +267,6 @@ class ExportSingleProfileDialog(AbstractDialog):
             self.progress.end()
             msg = "Profile successfully exported!"
             # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.information(self, "Export profile", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.information(self, "Export profile", msg, QtWidgets.QMessageBox.StandardButton.Ok)
 
         self.accept()

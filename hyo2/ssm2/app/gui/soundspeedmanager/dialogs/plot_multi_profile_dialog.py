@@ -117,7 +117,7 @@ class PlotMultiProfileDialog(AbstractDialog):
                 if not success:
                     # noinspection PyCallByClass,PyArgumentList
                     QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile #%02d!" % pk,
-                                                  QtWidgets.QMessageBox.Ok)
+                                                  QtWidgets.QMessageBox.StandardButton.Ok)
                     continue
 
                 _x_min = self.lib.cur.proc.speed[self.lib.cur.proc_valid].min()
@@ -196,7 +196,7 @@ class PlotMultiProfileDialog(AbstractDialog):
                 if not success:
                     # noinspection PyCallByClass,PyArgumentList
                     QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile #%02d!" % pk,
-                                                  QtWidgets.QMessageBox.Ok)
+                                                  QtWidgets.QMessageBox.StandardButton.Ok)
                     continue
 
                 _x_min = self.lib.cur.proc.temp[self.lib.cur.proc_valid].min()
@@ -275,7 +275,7 @@ class PlotMultiProfileDialog(AbstractDialog):
                 if not success:
                     # noinspection PyCallByClass,PyArgumentList
                     QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile #%02d!" % pk,
-                                                  QtWidgets.QMessageBox.Ok)
+                                                  QtWidgets.QMessageBox.StandardButton.Ok)
                     continue
 
                 _x_min = self.lib.cur.proc.sal[self.lib.cur.proc_valid].min()

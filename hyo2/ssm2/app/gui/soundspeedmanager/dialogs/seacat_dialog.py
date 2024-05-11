@@ -257,7 +257,7 @@ class SeacatDialog(AbstractDialog):
                     msg = "Do you want to set the clock to " + datetime.datetime.utcnow().isoformat()
                     # noinspection PyCallByClass
                     ret = QtWidgets.QMessageBox.question(self, "Confirm Seacat Time Change", msg,
-                                                         QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                                                         QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
                     if ret == QtWidgets.QMessageBox.Yes:
                         cat.set_datetime(datetime.datetime.utcnow())
                 except Exception:
@@ -283,7 +283,7 @@ class SeacatDialog(AbstractDialog):
                                                                                           dt_now.isoformat())
                         # noinspection PyCallByClass
                         ret = QtWidgets.QMessageBox.question(self, "Time Mismatch", msg,
-                                                             QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                                                             QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
                         if ret == QtWidgets.QMessageBox.Yes:
                             bSetTime = True
 
@@ -294,7 +294,7 @@ class SeacatDialog(AbstractDialog):
                                                          "Do you want to clear the Seacat memory now" +
                                                          "\nAnd set the clock" * bSetTime + "?"
                                                                                             "\n\nAlso - note the battery voltages:\n\n" + volt_messages,
-                                                         QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                                                         QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
                     if ret == QtWidgets.QMessageBox.Yes:
                         if bSetTime:
                             cat.set_datetime(datetime.datetime.utcnow())
@@ -362,7 +362,7 @@ class SeacatDialog(AbstractDialog):
                                   "will automatically be found next time?\n\nCopy+Rename to: %s" % better_name
                             # noinspection PyCallByClass
                             ret = QtWidgets.QMessageBox.question(self, "Copy and Rename?", msg,
-                                                                 QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                                                                 QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
                             if ret == QtWidgets.QMessageBox.Yes:
                                 shutil.copyfile(conname, better_name)
                     else:

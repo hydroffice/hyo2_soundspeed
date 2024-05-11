@@ -117,7 +117,7 @@ class Server(AbstractWidget):
         if self.lib.server_is_alive():
             msg = "The server mode is already started!"
             # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         self.main_win.switch_to_server_tab()
@@ -128,8 +128,8 @@ class Server(AbstractWidget):
               "This Mode will OVERWRITE the current SIS SSP.\n"
         # noinspection PyCallByClass,PyArgumentList
         ret = QtWidgets.QMessageBox.warning(self, "Server mode", msg,
-                                            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-        if ret == QtWidgets.QMessageBox.No:
+                                            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+        if ret == QtWidgets.QMessageBox.StandardButton.No:
             return
 
         uni_clients = self.lib.server.list_uni_clients()
@@ -141,10 +141,10 @@ class Server(AbstractWidget):
             msg += "\nDo you still want to transmit the profiles to them?\n"
             # noinspection PyCallByClass,PyArgumentList
             ret = QtWidgets.QMessageBox.warning(self, "Server mode", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.Yes:
                 use_uni_clients = True
-            elif ret == QtWidgets.QMessageBox.No:
+            elif ret == QtWidgets.QMessageBox.StandardButton.No:
                 use_uni_clients = False
             else:
                 logger.debug("Cancelled by user.")
@@ -156,7 +156,7 @@ class Server(AbstractWidget):
                 msg += "Reason: %s\n" % err
             msg += "\nDouble-check the server settings and be sure that SIS is properly configured."
             # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Server mode", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.critical(self, "Server mode", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         self.lib.start_server()
@@ -172,7 +172,7 @@ class Server(AbstractWidget):
         if not self.lib.server_is_alive():
             msg = "First start the server mode!"
             # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         self.lib.force_server()
@@ -186,7 +186,7 @@ class Server(AbstractWidget):
         if not self.lib.server_is_alive():
             msg = "First start the server mode!"
             # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         self.lib.stop_server()
@@ -202,7 +202,7 @@ class Server(AbstractWidget):
             for err in self.lib.server.runtime_errors:
                 msg += "Reason: %s\n" % err
             # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
     def _activate_gui(self):

@@ -81,8 +81,8 @@ class Refraction(AbstractWidget):
         msg = "Do you really want to enable the Refraction Monitor?\n\n"
         # noinspection PyCallByClass
         ret = QtWidgets.QMessageBox.warning(self, "Refraction Monitor", msg,
-                                            QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
-        if ret == QtWidgets.QMessageBox.No:
+                                            QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.No)
+        if ret == QtWidgets.QMessageBox.StandardButton.No:
             return
 
     @classmethod

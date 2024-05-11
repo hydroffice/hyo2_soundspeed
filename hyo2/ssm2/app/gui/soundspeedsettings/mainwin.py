@@ -100,7 +100,7 @@ class MainWin(QtWidgets.QMainWindow):
         except RuntimeError as e:
             msg = "Issue in reloading settings\n%s" % e
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.critical(self, "Settings error", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.critical(self, "Settings error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
     def setup_changed(self):

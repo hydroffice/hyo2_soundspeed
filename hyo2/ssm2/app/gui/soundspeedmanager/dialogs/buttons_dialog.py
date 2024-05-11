@@ -93,5 +93,5 @@ class ButtonsDialog(AbstractDialog):
         msg = "The new visibility settings for the buttons have been saved. \n" \
               "Close and re-open the app to apply the changes!"
         # noinspection PyCallByClass,PyArgumentList
-        QtWidgets.QMessageBox.information(self, "Buttons visibility", msg, QtWidgets.QMessageBox.Ok)
+        QtWidgets.QMessageBox.information(self, "Buttons visibility", msg, QtWidgets.QMessageBox.StandardButton.Ok)
         self.accept()

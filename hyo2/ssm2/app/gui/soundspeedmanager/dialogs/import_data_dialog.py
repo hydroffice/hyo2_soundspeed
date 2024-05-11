@@ -66,7 +66,7 @@ class ImportDataDialog(AbstractDialog):
         if len(path) == 0:
             msg = "Set the path to the project db!"
             # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.warning(self, "Import warning", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Import warning", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
         logger.debug('input db: %s' % path)
 
@@ -75,12 +75,12 @@ class ImportDataDialog(AbstractDialog):
         if len(pk_issues) == 0:
             msg = "Successfully imported %d profile(s)" % len(pk_done)
             # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.information(self, "Import data", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.information(self, "Import data", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             self.accept()
 
         else:
             msg = "Issue in importing %s profile(s)\n" % ", ".join(["#%02d" % pk for pk in pk_issues])
             msg += "Possible primary key duplication!"
             # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.warning(self, "Import warning", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Import warning", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return

@@ -6,7 +6,7 @@ from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.text_editor_dialog import TextE
 from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 from hyo2.abc.lib.logging import set_logging
 
-ns_list = ["hyo2.soundspeed", "hyo2.ssm2.app.gui.soundspeedmanager", "hyo2.soundspeedsettings"]
+ns_list = ["hyo2.ssm2"]
 set_logging(ns_list=ns_list)
 
 logger = logging.getLogger(__name__)

@@ -379,8 +379,8 @@ class General(AbstractWidget):
             msg = "Do you want to just clear the folder path?"
             # noinspection PyCallByClass
             ret = QtWidgets.QMessageBox.information(self, "WOA09 Folder", msg,
-                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return
             selection = ""
         logger.debug('user selection: %s' % selection)
@@ -392,7 +392,7 @@ class General(AbstractWidget):
 
         msg = "Restart the application to apply changes!"
         # noinspection PyCallByClass
-        QtWidgets.QMessageBox.information(self, "WOA09 Folder", msg, QtWidgets.QMessageBox.Ok)
+        QtWidgets.QMessageBox.information(self, "WOA09 Folder", msg, QtWidgets.QMessageBox.StandardButton.Ok)
 
     def on_woa13_folder(self):
         logger.debug("user wants to set the folder for woa13")
@@ -406,8 +406,8 @@ class General(AbstractWidget):
             msg = "Do you want to just clear the folder path?"
             # noinspection PyCallByClass
             ret = QtWidgets.QMessageBox.information(self, "WOA13 Folder", msg,
-                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return
             selection = ""
         logger.debug('user selection: %s' % selection)
@@ -419,7 +419,7 @@ class General(AbstractWidget):
 
         msg = "Restart the application to apply changes!"
         # noinspection PyCallByClass
-        QtWidgets.QMessageBox.information(self, "WOA13 Folder", msg, QtWidgets.QMessageBox.Ok)
+        QtWidgets.QMessageBox.information(self, "WOA13 Folder", msg, QtWidgets.QMessageBox.StandardButton.Ok)
 
     def on_woa18_folder(self):
         logger.debug("user wants to set the folder for woa18")
@@ -433,8 +433,8 @@ class General(AbstractWidget):
             msg = "Do you want to just clear the folder path?"
             # noinspection PyCallByClass
             ret = QtWidgets.QMessageBox.information(self, "WOA18 Folder", msg,
-                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return
             selection = ""
         logger.debug('user selection: %s' % selection)
@@ -446,7 +446,7 @@ class General(AbstractWidget):
 
         msg = "Restart the application to apply changes!"
         # noinspection PyCallByClass
-        QtWidgets.QMessageBox.information(self, "WOA18 Folder", msg, QtWidgets.QMessageBox.Ok)
+        QtWidgets.QMessageBox.information(self, "WOA18 Folder", msg, QtWidgets.QMessageBox.StandardButton.Ok)
 
     def apply_noaa_tools(self):
         # logger.debug("apply NOAA tools: %s" % self.noaa_tools.currentText())

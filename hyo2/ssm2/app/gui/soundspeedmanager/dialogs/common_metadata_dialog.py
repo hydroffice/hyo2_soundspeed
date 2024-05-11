@@ -168,7 +168,7 @@ class CommonMetadataDialog(AbstractDialog):
             if not success:
                 # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile #%s!" % pk,
-                                              QtWidgets.QMessageBox.Ok)
+                                              QtWidgets.QMessageBox.StandardButton.Ok)
                 continue
 
             # apply changes
@@ -187,7 +187,7 @@ class CommonMetadataDialog(AbstractDialog):
             except RuntimeError as e:
                 msg = "Issue in apply changes\n%s" % e
                 # noinspection PyCallByClass,PyArgumentList
-                QtWidgets.QMessageBox.critical(self, "Metadata error", msg, QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.critical(self, "Metadata error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
                 continue
 
             # we store the metadata to the db
@@ -195,7 +195,7 @@ class CommonMetadataDialog(AbstractDialog):
                 msg = "Unable to save to db!"
                 # noinspection PyCallByClass,PyArgumentList
                 QtWidgets.QMessageBox.warning(self, "Database warning for profile #%s" % pk, msg,
-                                              QtWidgets.QMessageBox.Ok)
+                                              QtWidgets.QMessageBox.StandardButton.Ok)
                 continue
 
         self.main_win.data_stored()

@@ -196,7 +196,7 @@ class ConstantGradientProfileDialog(AbstractDialog):
         except Exception as e:
             msg = "Issue in depth fields!\n\n%s" % e
             # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.warning(self, "Constant-gradient profile", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Constant-gradient profile", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         try:
@@ -208,7 +208,7 @@ class ConstantGradientProfileDialog(AbstractDialog):
         except Exception as e:
             msg = "Issue in temperature fields!\n\n%s" % e
             # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.warning(self, "Constant-gradient profile", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Constant-gradient profile", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         try:
@@ -220,7 +220,7 @@ class ConstantGradientProfileDialog(AbstractDialog):
         except Exception as e:
             msg = "Issue in salinity fields!\n\n%s" % e
             # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.warning(self, "Constant-gradient profile", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Constant-gradient profile", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         try:
@@ -232,7 +232,7 @@ class ConstantGradientProfileDialog(AbstractDialog):
         except Exception as e:
             msg = "Issue in speed fields!\n\n%s" % e
             # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.warning(self, "Constant-gradient profile", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Constant-gradient profile", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         try:
@@ -245,7 +245,7 @@ class ConstantGradientProfileDialog(AbstractDialog):
             traceback.print_exc()
             msg = "Issue in creating the profile:\n\n> %s" % e
             # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Creation error", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.critical(self, "Creation error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         self.accept()

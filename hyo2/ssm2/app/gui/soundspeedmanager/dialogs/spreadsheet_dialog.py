@@ -80,8 +80,8 @@ class SpreadSheetDialog(AbstractDialog):
             msg = "Do you really want to manually edit the processed data?"
             # noinspection PyCallByClass,PyArgumentList
             ret = QtWidgets.QMessageBox.warning(self, "Spreadsheet", msg,
-                                                QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 self.editable.setChecked(False)
                 return
             self.proc_table.model().setEditable(True)

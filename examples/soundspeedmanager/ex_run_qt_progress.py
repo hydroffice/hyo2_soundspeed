@@ -3,7 +3,7 @@ import time
 
 from PySide6 import QtWidgets
 
-from hyo2.abc.app.qt_progress import QtProgress
+from hyo2.abc2.app.qt_progress import QtProgress
 
 app = QtWidgets.QApplication([])
 
@@ -24,4 +24,4 @@ print("canceled? %s" % progress.canceled)
 
 progress.end()
 
-# app.exec_()
+# app.exec()

@@ -71,8 +71,8 @@ class Settings(AbstractWidget):
             msg = "Do you really want to change the settings?"
             # noinspection PyCallByClass
             ret = QtWidgets.QMessageBox.warning(self, "Settings", msg,
-                                                QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 self.editable.setChecked(False)
                 return
             self.settings_widget.set_editable(True)

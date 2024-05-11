@@ -386,7 +386,7 @@ class Database(AbstractWidget):
         success = self.lib.load_profile(pk)
         if not success:
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile!", QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile!", QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         if self.lib.has_ssp():
@@ -412,7 +412,7 @@ class Database(AbstractWidget):
         success = self.lib.load_profile(pk, skip_atlas=True)
         if not success:
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile!", QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile!", QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         msg = self.lib.profile_stats()
@@ -442,7 +442,7 @@ class Database(AbstractWidget):
             success = self.lib.load_profile(pk, skip_atlas=True)
             if not success:
                 # noinspection PyCallByClass
-                QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile!", QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile!", QtWidgets.QMessageBox.StandardButton.Ok)
                 return
 
             dlg = MetadataDialog(lib=self.lib, main_win=self.main_win, parent=self)
@@ -481,7 +481,7 @@ class Database(AbstractWidget):
         success = self.lib.load_profile(pk)
         if not success:
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile!", QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile!", QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         dlg = ExportSingleProfileDialog(lib=self.lib, main_win=self.main_win, parent=self)
@@ -549,8 +549,8 @@ class Database(AbstractWidget):
         else:
             msg = "Do you really want to delete %d profiles?" % len(rows)
         # noinspection PyCallByClass
-        ret = QtWidgets.QMessageBox.warning(self, "Database", msg, QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
-        if ret == QtWidgets.QMessageBox.No:
+        ret = QtWidgets.QMessageBox.warning(self, "Database", msg, QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.No)
+        if ret == QtWidgets.QMessageBox.StandardButton.No:
             return
 
         # actually perform the removal

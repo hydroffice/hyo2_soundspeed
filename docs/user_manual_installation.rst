@@ -42,7 +42,7 @@ If you decide to install the package in a Python environment, the dependencies a
 * `scipy <https://github.com/scipy/scipy>`_
 * `pyproj <https://github.com/jswhit/pyproj>`_
 * `pyserial <https://github.com/pyserial/pyserial>`_
-* `PySide2 <https://github.com/pyside/pyside2-setup>`_ *(only for the application)*
+* `PySide6 <https://github.com/qtproject/pyside-pyside-setup>`_ *(only for the application)*
 
 If you want to install the last stable version (from PyPI):
 

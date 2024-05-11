@@ -80,8 +80,8 @@ class ImportMultiProfileDialog(AbstractDialog):
                   % desc
             # noinspection PyCallByClass,PyArgumentList
             ret = QtWidgets.QMessageBox.warning(self, "Pre-processed source warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return
 
         # ask the file path to the user
@@ -115,7 +115,7 @@ class ImportMultiProfileDialog(AbstractDialog):
                 self.progress.end()
                 msg = "Issue in importing the file #%s: %s\n\n> %s" % (i, selection, e)
                 # noinspection PyCallByClass,PyArgumentList
-                QtWidgets.QMessageBox.critical(self, "Import error", msg, QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.critical(self, "Import error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
                 return
 
         self.progress.end()

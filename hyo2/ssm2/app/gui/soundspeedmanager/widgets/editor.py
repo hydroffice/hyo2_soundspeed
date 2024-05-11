@@ -263,13 +263,13 @@ class Editor(AbstractWidget):
         if not self.lib.has_ssp():
             msg = "Unable to retrieve a profile"
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Input Data", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Input Data", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         if self.lib.cur.data.num_samples == 0:
             msg = "Unable to retrieve samples from the profile"
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Input Data", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Input Data", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         self.main_win.data_imported()
@@ -290,13 +290,13 @@ class Editor(AbstractWidget):
         if not self.lib.has_ssp():
             msg = "Unable to retrieve a profile"
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Input Data", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Input Data", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         if self.lib.cur.data.num_samples == 0:
             msg = "Unable to retrieve samples from the profile"
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Input Data", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Input Data", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         self.main_win.data_imported()
@@ -360,7 +360,7 @@ class Editor(AbstractWidget):
         if not self.lib.filter_cur_data():
             msg = "Issue in filtering/smoothing the profile"
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Filter/Smooth", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Filter/Smooth", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         self.dataplots.update_data()
@@ -376,13 +376,13 @@ class Editor(AbstractWidget):
         if self.lib.cur.meta.sensor_type not in [Dicts.sensor_types['XBT'], ]:
             msg = "This is a XBT-specific function!"
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Salinity", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Salinity", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         if not self.lib.replace_cur_salinity():
             msg = "Issue in replacing the salinity"
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Salinity", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Salinity", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         self.dataplots.update_data()
@@ -399,13 +399,13 @@ class Editor(AbstractWidget):
                                                  Dicts.sensor_types['MVP']]:
             msg = "This is a XSV- and SVP-specific function!"
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Temperature/Salinity", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Temperature/Salinity", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         if not self.lib.replace_cur_temp_sal():
             msg = "Issue in replacing temperature and salinity"
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Temperature/Salinity", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Temperature/Salinity", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         self.dataplots.update_data()
@@ -421,7 +421,7 @@ class Editor(AbstractWidget):
         if not self.lib.add_cur_tss():
             msg = "Issue in retrieving transducer sound speed"
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Sound speed", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Sound speed", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         self.dataplots.update_data()
@@ -439,7 +439,7 @@ class Editor(AbstractWidget):
                   "- The extension source does not have a profile at the geographic location.\n" \
                   "Use another source or manually extend the profile!"
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Profile extension", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Profile extension", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         self.dataplots.update_data()
@@ -459,7 +459,7 @@ class Editor(AbstractWidget):
             if not self.lib.prepare_sis(thin_tolerance=tolerance):
                 msg = "Issue in preview the thinning"
                 # noinspection PyCallByClass
-                QtWidgets.QMessageBox.warning(self, "Thinning preview", msg, QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.warning(self, "Thinning preview", msg, QtWidgets.QMessageBox.StandardButton.Ok)
                 return
 
             # checking for number of samples
@@ -481,7 +481,7 @@ class Editor(AbstractWidget):
         if not self.lib.has_ssp():
             msg = "Import data before visualize them in a spreadsheet!"
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Spreadsheet warning", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Spreadsheet warning", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
         dlg = SpreadSheetDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
@@ -494,7 +494,7 @@ class Editor(AbstractWidget):
         if not self.lib.has_ssp():
             msg = "Import data before visualize metadata!"
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Metadata warning", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Metadata warning", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
         dlg = MetadataDialog(lib=self.lib, main_win=self.main_win, parent=self)
         dlg.exec_()
@@ -505,7 +505,7 @@ class Editor(AbstractWidget):
         if not self.lib.has_ssp():
             msg = "You need to first import data!"
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Data Warning", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Data Warning", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return False
 
         min_samples = 5
@@ -522,8 +522,8 @@ class Editor(AbstractWidget):
                   "Do you really want to continue?"
             # noinspection PyCallByClass
             ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
         if all(i == 0 for i in self.lib.cur.proc.temp[self.lib.cur.proc_valid][:min_samples]):
@@ -533,8 +533,8 @@ class Editor(AbstractWidget):
                   "Do you really want to continue?"
             # noinspection PyCallByClass
             ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
         if min_temp < -2.0:
@@ -544,8 +544,8 @@ class Editor(AbstractWidget):
                   "Do you really want to continue?" % min_temp
             # noinspection PyCallByClass
             ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
         if max_temp > 35.0:
@@ -555,8 +555,8 @@ class Editor(AbstractWidget):
                   "Do you really want to continue?" % max_temp
             # noinspection PyCallByClass
             ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
         if len(self.lib.cur.proc.sal) < min_samples:
@@ -565,8 +565,8 @@ class Editor(AbstractWidget):
                   "Do you really want to continue?"
             # noinspection PyCallByClass
             ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
         if all(i == 0 for i in self.lib.cur.proc.sal[self.lib.cur.proc_valid][:min_samples]):
@@ -576,8 +576,8 @@ class Editor(AbstractWidget):
                   "Do you really want to continue?"
             # noinspection PyCallByClass
             ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
         if min_sal < 2.0:
@@ -587,8 +587,8 @@ class Editor(AbstractWidget):
                   "Do you really want to continue?" % min_sal
             # noinspection PyCallByClass
             ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
         if max_sal > 42.0:
@@ -598,8 +598,8 @@ class Editor(AbstractWidget):
                   "Do you really want to continue?" % max_sal
             # noinspection PyCallByClass
             ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
         if len(self.lib.cur.proc.speed) < min_samples:
@@ -608,8 +608,8 @@ class Editor(AbstractWidget):
                   "Do you really want to continue?"
             # noinspection PyCallByClass
             ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
         if all(i == 0 for i in self.lib.cur.proc.speed[self.lib.cur.proc_valid][:min_samples]):
@@ -619,8 +619,8 @@ class Editor(AbstractWidget):
                   "Do you really want to continue?"
             # noinspection PyCallByClass
             ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
         return True
@@ -640,8 +640,8 @@ class Editor(AbstractWidget):
                   % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
             # noinspection PyCallByClass
             ret = QtWidgets.QMessageBox.warning(self, "Synthetic source warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return
 
         if self.lib.cur.meta.probe_type in [Dicts.probe_types['ASVP'],
@@ -653,8 +653,8 @@ class Editor(AbstractWidget):
                   % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
             # noinspection PyCallByClass
             ret = QtWidgets.QMessageBox.warning(self, "Pre-processed source warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return
 
         dlg = ExportSingleProfileDialog(lib=self.lib, main_win=self.main_win, parent=self)
@@ -679,8 +679,8 @@ class Editor(AbstractWidget):
                   % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
             # noinspection PyCallByClass
             ret = QtWidgets.QMessageBox.warning(self, "Synthetic source warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return
 
         if self.lib.cur.meta.probe_type in [Dicts.probe_types['ASVP'],
@@ -692,14 +692,14 @@ class Editor(AbstractWidget):
                   % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
             # noinspection PyCallByClass
             ret = QtWidgets.QMessageBox.warning(self, "Pre-processed source warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            if ret == QtWidgets.QMessageBox.No:
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return
 
         if not self.lib.transmit_ssp():
             msg = "Possible issue in profile transmission."
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Profile transmission", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Profile transmission", msg, QtWidgets.QMessageBox.StandardButton.Ok)
 
         self.on_save_db(auto_save=True)
         self.dataplots.update_data()
@@ -724,8 +724,8 @@ class Editor(AbstractWidget):
                       % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
                 # noinspection PyCallByClass
                 ret = QtWidgets.QMessageBox.warning(self, "Synthetic source warning", msg,
-                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-                if ret == QtWidgets.QMessageBox.No:
+                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+                if ret == QtWidgets.QMessageBox.StandardButton.No:
                     return
 
             if self.lib.cur.meta.probe_type in [Dicts.probe_types['ASVP'],
@@ -738,14 +738,14 @@ class Editor(AbstractWidget):
                       % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
                 # noinspection PyCallByClass
                 ret = QtWidgets.QMessageBox.warning(self, "Pre-processed source warning", msg,
-                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-                if ret == QtWidgets.QMessageBox.No:
+                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+                if ret == QtWidgets.QMessageBox.StandardButton.No:
                     return
 
         if not self.lib.store_data():
             msg = "Unable to save to db!"
             # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Database warning", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, "Database warning", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         self.main_win.data_stored()

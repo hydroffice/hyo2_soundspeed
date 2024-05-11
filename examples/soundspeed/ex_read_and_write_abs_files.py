@@ -28,9 +28,9 @@ logger.info('output folder: %s' % data_output)
 # test readers/writers
 logger.info('test: *** START ***')
 filters = ["castaway", ]
-formats = ["asvp", ]
+formats = ["asvp/ssp", ]
 data_outputs = dict()
-data_outputs["asvp"] = data_output
+data_outputs["asvp/ssp"] = data_output
 tests = testing.input_dict_test_files(inclusive_filters=filters)
 # print(tests)
 

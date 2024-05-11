@@ -81,8 +81,8 @@ class MainWin(QtWidgets.QMainWindow):
         msg_box.setIconPixmap(QtGui.QPixmap(app_info.app_icon_path).scaled(QtCore.QSize(36, 36)))
         msg_box.setText('Do you really want to %s?' % text)
         # noinspection PyUnresolvedReferences
-        msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-        msg_box.setDefaultButton(QtWidgets.QMessageBox.No)
+        msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+        msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.No)
         return msg_box.exec_()
 
     def closeEvent(self, event):

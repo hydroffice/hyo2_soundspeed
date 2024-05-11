@@ -476,13 +476,13 @@ class MetadataDialog(AbstractDialog):
                         if self.lib.ssp.loaded_from_db:
                             msg = "Unable to remove old profile!"
                             # noinspection PyArgumentList
-                            QtWidgets.QMessageBox.warning(self, "Database warning", msg, QtWidgets.QMessageBox.Ok)
+                            QtWidgets.QMessageBox.warning(self, "Database warning", msg, QtWidgets.QMessageBox.StandardButton.Ok)
                             return
 
             except Exception as e:
                 msg = "Unable to interpret position or location!\n\n%s" % e
                 # noinspection PyArgumentList
-                QtWidgets.QMessageBox.warning(self, "Database warning", msg, QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.warning(self, "Database warning", msg, QtWidgets.QMessageBox.StandardButton.Ok)
                 return
 
             self.lib.cur.meta.latitude = latitude
@@ -504,7 +504,7 @@ class MetadataDialog(AbstractDialog):
         except RuntimeError as e:
             msg = "Issue in apply changes\n%s" % e
             # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Metadata error", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.critical(self, "Metadata error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         # update proc_time widget
@@ -516,7 +516,7 @@ class MetadataDialog(AbstractDialog):
             if not self.lib.store_data():
                 msg = "Unable to save to db!"
                 # noinspection PyArgumentList
-                QtWidgets.QMessageBox.warning(self, "Database warning", msg, QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.warning(self, "Database warning", msg, QtWidgets.QMessageBox.StandardButton.Ok)
                 return
             else:
                 self.main_win.data_stored()

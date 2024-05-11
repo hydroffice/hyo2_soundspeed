@@ -9,7 +9,7 @@ from hyo2.abc2.lib.package.pkg_helper import PkgHelper
 from hyo2.abc2.lib.logging import set_logging
 from hyo2.ssm2.app.gui.soundspeedmanager import app_info
 
-set_logging(ns_list=["hyo2.abc2", "hyo2.ssm2", "hyo2.sdm2"])
+set_logging(ns_list=["hyo2.abc2", "hyo2.ssm2", "hyo2.sdm3"])
 logger = logging.getLogger(__name__)
 
 
@@ -43,11 +43,10 @@ def gui():
         msg_box.setWindowTitle("Multiple Instances of Sound Speed Manager")
         msg_box.setIconPixmap(QtGui.QPixmap(app_info.app_icon_path).scaled(QtCore.QSize(36, 36)))
         msg_box.setText('%s\n\nDo you want to continue? This might create issues.' % txt)
-        # noinspection PyUnresolvedReferences
-        msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-        msg_box.setDefaultButton(QtWidgets.QMessageBox.No)
+        msg_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+        msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.No)
         reply = msg_box.exec_()
-        if reply == QtWidgets.QMessageBox.No:
+        if reply == QtWidgets.QMessageBox.StandardButton.No:
             sys.exit(app.exit())
 
     logger.debug("Init main win ...")

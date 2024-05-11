@@ -102,7 +102,7 @@ class ProcDataModel(QtCore.QAbstractTableModel):
         except ValueError:
             msg = "invalid input: %s" % value
             # noinspection PyArgumentList
-            QtWidgets.QMessageBox.critical(self.table, "Spreadsheet", msg, QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.critical(self.table, "Spreadsheet", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return False
 
         # switch among columns
@@ -111,8 +111,8 @@ class ProcDataModel(QtCore.QAbstractTableModel):
                 # noinspection PyArgumentList
                 ret = QtWidgets.QMessageBox.warning(self.table, "Spreadsheet",
                                                     "Do you really want to set the pressure to %s?" % user_value,
-                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
-                if ret == QtWidgets.QMessageBox.No:
+                                                    QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.No)
+                if ret == QtWidgets.QMessageBox.StandardButton.No:
                     return False
             self.prj.cur.proc.pressure[r] = user_value
 
@@ -123,21 +123,21 @@ class ProcDataModel(QtCore.QAbstractTableModel):
                     # noinspection PyArgumentList
                     QtWidgets.QMessageBox.critical(self.table, "Spreadsheet",
                                                    "Invalid input: %s" % user_value,
-                                                   QtWidgets.QMessageBox.Ok)
+                                                   QtWidgets.QMessageBox.StandardButton.Ok)
                     return False
             elif r == (self.prj.cur.proc.num_samples - 1):  # last sample
                 if self.prj.cur.proc.depth[-2] > user_value:
                     # noinspection PyArgumentList
                     QtWidgets.QMessageBox.critical(self.table, "Spreadsheet",
                                                    "Invalid input: %s" % user_value,
-                                                   QtWidgets.QMessageBox.Ok)
+                                                   QtWidgets.QMessageBox.StandardButton.Ok)
                     return False
             else:
                 if (self.prj.cur.proc.depth[r - 1] > user_value) or (self.prj.cur.proc.depth[r + 1] < user_value):
                     # noinspection PyArgumentList
                     QtWidgets.QMessageBox.critical(self.table, "Spreadsheet",
                                                    "Invalid input: %s" % user_value,
-                                                   QtWidgets.QMessageBox.Ok)
+                                                   QtWidgets.QMessageBox.StandardButton.Ok)
                     return False
             self.prj.cur.proc.depth[r] = user_value
 
@@ -146,8 +146,8 @@ class ProcDataModel(QtCore.QAbstractTableModel):
                 # noinspection PyArgumentList
                 ret = QtWidgets.QMessageBox.warning(self.table, "Spreadsheet",
                                                     "Do you really want to set the speed to %s?" % user_value,
-                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
-                if ret == QtWidgets.QMessageBox.No:
+                                                    QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.No)
+                if ret == QtWidgets.QMessageBox.StandardButton.No:
                     return False
             self.prj.cur.proc.speed[r] = user_value
 
@@ -156,8 +156,8 @@ class ProcDataModel(QtCore.QAbstractTableModel):
                 # noinspection PyArgumentList
                 ret = QtWidgets.QMessageBox.warning(self.table, "Spreadsheet",
                                                     "Do you really want to set the temperature to %s?" % user_value,
-                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
-                if ret == QtWidgets.QMessageBox.No:
+                                                    QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.No)
+                if ret == QtWidgets.QMessageBox.StandardButton.No:
                     return False
             self.prj.cur.proc.temp[r] = user_value
 
@@ -166,8 +166,8 @@ class ProcDataModel(QtCore.QAbstractTableModel):
                 # noinspection PyArgumentList
                 ret = QtWidgets.QMessageBox.warning(self.table, "Spreadsheet",
                                                     "Do you really want to set the conductivity to %s?" % user_value,
-                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
-                if ret == QtWidgets.QMessageBox.No:
+                                                    QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.No)
+                if ret == QtWidgets.QMessageBox.StandardButton.No:
                     return False
             self.prj.cur.proc.conductivity[r] = user_value
 
@@ -176,8 +176,8 @@ class ProcDataModel(QtCore.QAbstractTableModel):
                 # noinspection PyArgumentList
                 ret = QtWidgets.QMessageBox.warning(self.table, "Spreadsheet",
                                                     "Do you really want to set the salinity to %s?" % user_value,
-                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
-                if ret == QtWidgets.QMessageBox.No:
+                                                    QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.No)
+                if ret == QtWidgets.QMessageBox.StandardButton.No:
                     return False
             self.prj.cur.proc.sal[r] = user_value
 
@@ -186,8 +186,8 @@ class ProcDataModel(QtCore.QAbstractTableModel):
                 # noinspection PyArgumentList
                 ret = QtWidgets.QMessageBox.warning(self.table, "Spreadsheet",
                                                     "Do you really want to set the data source to %s?" % user_value,
-                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
-                if ret == QtWidgets.QMessageBox.No:
+                                                    QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.No)
+                if ret == QtWidgets.QMessageBox.StandardButton.No:
                     return False
             self.prj.cur.proc.source[r] = user_value
 
@@ -196,8 +196,8 @@ class ProcDataModel(QtCore.QAbstractTableModel):
                 # noinspection PyArgumentList
                 ret = QtWidgets.QMessageBox.warning(self.table, "Spreadsheet",
                                                     "Do you really want to set the data flag to %s?" % user_value,
-                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No)
-                if ret == QtWidgets.QMessageBox.No:
+                                                    QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.No)
+                if ret == QtWidgets.QMessageBox.StandardButton.No:
                     return False
             self.prj.cur.proc.flag[r] = user_value
 

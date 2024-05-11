@@ -1,16 +1,22 @@
-from matplotlib.backends.qt_compat import QtCore, QtGui, QtWidgets
-
-import os
 import logging
+import os
+from typing import TYPE_CHECKING
 
 import numpy as np
-from matplotlib import rc_context, cbook
-# noinspection PyProtectedMember
-from matplotlib.backend_bases import _Mode, MouseButton
+from matplotlib import cbook, rc_context
+# noinspection PyProtectedMember,PyUnresolvedReferences
+from matplotlib.backend_bases import _Mode, MouseButton, cursors, MouseEvent
+from matplotlib.backend_tools import Cursors
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT
-from matplotlib.backend_bases import cursors
+# noinspection PyUnresolvedReferences
+from matplotlib.backends.qt_compat import QtCore, QtGui, QtWidgets
 
 from hyo2.ssm2.lib.profile.dicts import Dicts
+
+if TYPE_CHECKING:
+    from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+    from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
+    from hyo2.ssm2.app.gui.soundspeedmanager.widgets.dataplots import DataPlots
 
 logger = logging.getLogger(__name__)
 
@@ -42,20 +48,22 @@ class NavToolbar(NavigationToolbar2QT):
         'grid.alpha': 0.2,
     }
 
-    def __init__(self, canvas, parent, plot_win, prj, coordinates=True):
+    def __init__(self, canvas: 'FigureCanvas', parent: QtWidgets.QWidget, plot_win: 'DataPlots',
+                 prj: 'SoundSpeedLibrary', coordinates: bool = True):
 
         self.plot_win = plot_win
         self.prj = prj
 
-        self._lastCursor = None
-        self._active = None
-        self._id_press = None
-        self._id_release = None
-        self._xypress = None
-        self._ids_flag = None
-        self._flag_mode = None
-        self._flag_start = None
-        self._flag_end = None
+        self._lastCursor: None | Cursors = None
+        self._active: None | str = None
+        self._id_press: None | int = None
+        self._id_release: None | int = None
+        self._xypress: None | list = None
+        self._ids_flag: None | tuple = None
+        self._flag_mode: None | str = None
+        self._flag_start: None | tuple = None
+        self._flag_end: None | tuple = None
+        self.insert_sample = None
 
         self.toolitems = [
             ('Home', 'Reset original view', 'home', 'home'),
@@ -80,6 +88,10 @@ class NavToolbar(NavigationToolbar2QT):
         ]
 
         super().__init__(canvas=canvas, parent=parent, coordinates=coordinates)
+        # noinspection PyProtectedMember
+        self._pan_info: None | super()._PanInfo = None
+        # noinspection PyProtectedMember
+        self._zoom_info: None | super()._ZoomInfo = None
         self.setIconSize(QtCore.QSize(24, 24))
 
         # set checkable buttons
@@ -96,7 +108,9 @@ class NavToolbar(NavigationToolbar2QT):
         self._actions['legend_plot'].setCheckable(True)
         self._actions['legend_plot'].setChecked(False)
 
+        # noinspection PyTypeChecker
         self.canvas.mpl_connect('button_press_event', self.press)
+        # noinspection PyTypeChecker
         self.canvas.mpl_connect('button_release_event', self.release)
 
         # Add the x,y location widget on the right side of the toolbar
@@ -122,7 +136,9 @@ class NavToolbar(NavigationToolbar2QT):
             vbox.addWidget(self.mon_label)
             # vbox.addStretch()
 
-    def _icon(self, name):
+    # ################### Helper functions ###################
+
+    def _icon(self, name: str) -> QtGui.QIcon:
         # Modified to use local icons
 
         filename = os.path.join(self.media, name)
@@ -130,6 +146,7 @@ class NavToolbar(NavigationToolbar2QT):
 
             # use a high-resolution icon with suffix '_large' if available
             # note: user-provided icons may not have '_large' versions
+            # noinspection PyUnresolvedReferences,PyProtectedMember
             path_regular = cbook._get_data_path('images', name)
             path_large = path_regular.with_name(
                 path_regular.name.replace('.png', '_large.png'))
@@ -147,8 +164,8 @@ class NavToolbar(NavigationToolbar2QT):
             pm.setMask(mask)
         return QtGui.QIcon(pm)
 
-    def _update_buttons_checked(self):
-        # sync button checkstates to match active mode
+    def _update_buttons_checked(self) -> None:
+        # sync button check states to match active mode
         logger.debug("Mode: %s" % self._active)
         self._actions['pan'].setChecked(self._active == 'PAN')
         self._actions['scale'].setChecked(self._active == 'SCALE')
@@ -157,560 +174,6 @@ class NavToolbar(NavigationToolbar2QT):
         self._actions['flag'].setChecked(self._active == 'FLAG')
         self._actions['unflag'].setChecked(self._active == 'UNFLAG')
         self._actions['insert'].setChecked(self._active == 'INSERT')
-
-    # ### ACTIONS ###
-
-    def reset(self) -> None:
-        logger.debug("reset")
-        self._lastCursor = None
-        self._active = None
-        self._id_press = None
-        self._id_release = None
-        self._xypress = None
-        self._ids_flag = None
-        self._flag_mode = None
-        self._flag_start = None
-        self._flag_end = None
-
-    def press(self, event):
-        # print("press", event.button)
-        if event.button == 3:
-            menu = QtWidgets.QMenu(self)
-            menu.addAction(self._actions['home'])
-            menu.addSeparator()
-            menu.addAction(self._actions['pan'])
-            menu.addAction(self._actions['scale'])
-            menu.addAction(self._actions['zoom_in'])
-            menu.addAction(self._actions['zoom_out'])
-            menu.addSeparator()
-            menu.addAction(self._actions['flag'])
-            menu.addAction(self._actions['unflag'])
-            menu.addAction(self._actions['insert'])
-            menu.popup(QtGui.QCursor.pos())
-            menu.exec_()
-
-    def release(self, event):
-        # print("release", event.button)
-        pass
-
-    # --- pan/scale ---
-
-    def pan(self) -> None:
-        self.mode = _Mode.NONE
-        if self._active == 'PAN':
-            self._active = None
-            if self._id_press:
-                self.canvas.mpl_disconnect(self._id_press)
-            if self._id_release:
-                self.canvas.mpl_disconnect(self._id_release)
-            self.canvas.widgetlock.release(self)
-        else:
-            self._active = 'PAN'
-            if self._id_press:
-                self.canvas.mpl_disconnect(self._id_press)
-            self._id_press = self.canvas.mpl_connect('button_press_event', self.press_pan)
-            if self._id_release:
-                self.canvas.mpl_disconnect(self._id_release)
-            self._id_release = self.canvas.mpl_connect('button_release_event', self.release_pan)
-            self.canvas.widgetlock(self)
-
-        # logger.debug("active: %s" % self._active)
-        self.set_message(self._active)
-        self._update_buttons_checked()
-
-    def scale(self) -> None:
-        self.mode = _Mode.NONE
-        if self._active == 'SCALE':
-            self._active = None
-            if self._id_press:
-                self.canvas.mpl_disconnect(self._id_press)
-            if self._id_release:
-                self.canvas.mpl_disconnect(self._id_release)
-            self.canvas.widgetlock.release(self)
-        else:
-            self._active = 'SCALE'
-            if self._id_press:
-                self.canvas.mpl_disconnect(self._id_press)
-            self._id_press = self.canvas.mpl_connect('button_press_event', self.press_pan)
-            if self._id_release:
-                self.canvas.mpl_disconnect(self._id_release)
-            self._id_release = self.canvas.mpl_connect('button_release_event', self.release_pan)
-            self.canvas.widgetlock(self)
-
-        # logger.debug("active: %s" % self._active)
-        self.set_message(self._active)
-        self._update_buttons_checked()
-
-    def press_pan(self, event):
-        """Callback for mouse button press in pan/zoom mode."""
-        logger.debug("mode: %s" % self._active)
-
-        if (event.button not in [MouseButton.LEFT]
-                or event.x is None or event.y is None):
-            return
-        axes = [a for a in self.canvas.figure.get_axes()
-                if a.in_axes(event) and a.get_navigate() and a.can_pan()]
-        if not axes:
-            return
-        if self._nav_stack() is None:
-            self.push_current()  # set the home button to this view
-        for ax in axes:
-            # MOD
-            if self._active == 'SCALE':
-                ax.start_pan(event.x, event.y, MouseButton.RIGHT)
-            else:
-                ax.start_pan(event.x, event.y, event.button)
-        self.canvas.mpl_disconnect(self._id_drag)
-        id_drag = self.canvas.mpl_connect("motion_notify_event", self.drag_pan)
-        # MOD
-        if self._active == 'SCALE':
-            self._pan_info = self._PanInfo(
-                button=MouseButton.RIGHT, axes=axes, cid=id_drag)
-        else:
-            self._pan_info = self._PanInfo(
-                button=event.button, axes=axes, cid=id_drag)
-
-    def drag_pan(self, event):
-        logger.debug("mode: %s" % self._active)
-
-        """Callback for dragging in pan/zoom mode."""
-        for ax in self._pan_info.axes:
-            # Using the recorded button at the press is safer than the current
-            # button, as multiple buttons can get pressed during motion.
-            # MOD
-            if self._active == 'SCALE':
-                ax.drag_pan(MouseButton.RIGHT, event.key, event.x, event.y)
-            else:
-                ax.drag_pan(self._pan_info.button, event.key, event.x, event.y)
-        self.canvas.draw_idle()
-
-    # --- zoom in/out ---
-
-    def zoom_in(self):
-        self.mode = _Mode.NONE
-        if self._active == 'ZOOM_IN':
-            self._active = None
-            if self._id_press:
-                self.canvas.mpl_disconnect(self._id_press)
-            if self._id_release:
-                self.canvas.mpl_disconnect(self._id_release)
-            self.canvas.widgetlock.release(self)
-        else:
-            self._active = 'ZOOM_IN'
-            if self._id_press:
-                self.canvas.mpl_disconnect(self._id_press)
-            self._id_press = self.canvas.mpl_connect('button_press_event', self.press_zoom)
-            if self._id_release:
-                self.canvas.mpl_disconnect(self._id_release)
-            self._id_release = self.canvas.mpl_connect('button_release_event', self.release_zoom)
-            self.canvas.widgetlock(self)
-
-        # logger.debug("active: %s" % self._active)
-        self.set_message(self._active)
-        self._update_buttons_checked()
-
-    def zoom_out(self):
-        self.mode = _Mode.NONE
-        if self._active == 'ZOOM_OUT':
-            self._active = None
-            if self._id_press:
-                self.canvas.mpl_disconnect(self._id_press)
-            if self._id_release:
-                self.canvas.mpl_disconnect(self._id_release)
-            self.canvas.widgetlock.release(self)
-        else:
-            self._active = 'ZOOM_OUT'
-            if self._id_press:
-                self.canvas.mpl_disconnect(self._id_press)
-            self._id_press = self.canvas.mpl_connect('button_press_event', self.press_zoom)
-            if self._id_release:
-                self.canvas.mpl_disconnect(self._id_release)
-            self._id_release = self.canvas.mpl_connect('button_release_event', self.release_zoom)
-            self.canvas.widgetlock(self)
-
-        # logger.debug("active: %s" % self._active)
-        self.set_message(self._active)
-        self._update_buttons_checked()
-
-    def press_zoom(self, event):
-        """Callback for mouse button press in zoom to rect mode."""
-        if (event.button not in [MouseButton.LEFT, MouseButton.RIGHT]
-                or event.x is None or event.y is None):
-            return
-        axes = [a for a in self.canvas.figure.get_axes()
-                if a.in_axes(event) and a.get_navigate() and a.can_zoom()]
-        if not axes:
-            return
-        if self._nav_stack() is None:
-            self.push_current()  # set the home button to this view
-        id_zoom = self.canvas.mpl_connect(
-            "motion_notify_event", self.drag_zoom)
-        # A colorbar is one-dimensional, so we extend the zoom rectangle out
-        # to the edge of the Axes bbox in the other dimension. To do that we
-        # store the orientation of the colorbar for later.
-        if hasattr(axes[0], "_colorbar"):
-            cbar = axes[0]._colorbar.orientation
-        else:
-            cbar = None
-        # MOD
-        self._zoom_info = self._ZoomInfo(
-            direction="in" if self._active == "ZOOM_IN" else "out",
-            start_xy=(event.x, event.y), axes=axes, cid=id_zoom, cbar=cbar)
-
-    # --- flag ---
-
-    def flag(self):
-        self.mode = _Mode.NONE
-        if self._active == 'FLAG':
-            self._active = None
-            if self._id_press:
-                self.canvas.mpl_disconnect(self._id_press)
-            if self._id_release:
-                self.canvas.mpl_disconnect(self._id_release)
-            self.canvas.widgetlock.release(self)
-        else:
-            self._active = 'FLAG'
-            if self._id_press:
-                self.canvas.mpl_disconnect(self._id_press)
-            self._id_press = self.canvas.mpl_connect('button_press_event', self.press_flag)
-            if self._id_release:
-                self.canvas.mpl_disconnect(self._id_release)
-            self._id_release = self.canvas.mpl_connect('button_release_event', self.release_flag)
-            self.canvas.widgetlock(self)
-
-        # logger.debug("active: %s" % self._active)
-        self.set_message(self._active)
-        self._update_buttons_checked()
-
-    def press_flag(self, event):
-        # logger.debug("Press flag")
-
-        # store the pressed button
-        if event.button != MouseButton.LEFT:  # left
-            return
-        # logger.debug("FLAG > press > button #%s" % event.button)
-
-        x, y = event.x, event.y  # cursor position in pixel
-        xd, yd = event.xdata, event.ydata  # cursor position in data coords
-        # logger.debug("FLAG > press > loc (%.3f,%.3f)(%.3f,%.3f)" % (x, y, xd, yd))
-
-        self._xypress = []  # clear past press
-        self._flag_start = None  # clear past data
-        self._flag_end = None  # clear past data
-        for i, ax in enumerate(self.canvas.figure.get_axes()):
-            if ((x is not None) and (y is not None) and
-                    ax.in_axes(event) and  # if the given mouse event (in display coords) in axes
-                    ax.get_navigate() and  # whether the axes responds to navigation commands
-                    ax.can_zoom()):  # if this axes supports the zoom box button functionality.
-                # noinspection PyProtectedMember
-                self._xypress.append((x, y, ax, i, ax._get_view()))
-                self._flag_start = (xd, yd, ax)
-                # logger.debug("FLAG > press > axes %s" % ax.get_label())
-
-        # connect drag/press/release events
-        id1 = self.canvas.mpl_connect('motion_notify_event', self._drag_flag)
-        id2 = self.canvas.mpl_connect('key_press_event', self._switch_on_flag_mode)
-        id3 = self.canvas.mpl_connect('key_release_event', self._switch_off_flag_mode)
-        self._ids_flag = id1, id2, id3
-        self._flag_mode = event.key
-        # logger.debug("FLAG > press > key: %s" % self._flag_mode)
-
-    def release_flag(self, event):
-        # logger.debug("Release flag")
-        # disconnect callbacks
-        for flag_id in self._ids_flag:
-            self.canvas.mpl_disconnect(flag_id)
-        self._ids_flag = []
-        # remove flagging area
-        self.remove_rubberband()
-
-        if not self._xypress:  # invalid first click
-            return
-
-        if not event.inaxes:
-
-            # we assume that the axis is the same as the first click
-            event.inaxes = self._xypress[0][2]
-
-            # what are the axis bounds in display coords?
-            y_down, y_up = self._xypress[0][2].get_ylim()
-            x_left, x_right = self._xypress[0][2].get_xlim()
-            ax_left, ax_down = self._xypress[0][2].transData.transform((x_left, y_down))
-            ax_right, ax_up = self._xypress[0][2].transData.transform((x_right, y_up))
-            # logger.debug("bottom-left: %s, %s" % (ax_left, ax_down))
-            # logger.debug("top-right: %s, %s" % (ax_right, ax_up))
-
-            # what are the clicked display coords in data coords?
-            inv = self._xypress[0][2].transData.inverted()
-            click_xdata, click_ydata = inv.transform((event.x, event.y))
-            # logger.debug("clicked data: %s, %s" % (click_xdata, click_ydata))
-
-            # in which direction was the click outside the axis?
-            # logger.debug("released outside axes: %s, %s" % (event.x, event.y))
-            if event.x > ax_right:
-                event.xdata = x_right
-                # logger.debug("right")
-            elif event.x < ax_left:
-                event.xdata = x_left
-                # logger.debug("left")
-            else:
-                event.xdata = click_xdata
-
-            if event.y > ax_up:
-                event.ydata = y_up
-                # logger.debug("up")
-            elif event.y < ax_down:
-                event.ydata = y_down
-                # logger.debug("down")
-            else:
-                event.ydata = click_ydata
-
-        # retrieve valid initial and ending points
-        xd_start, yd_start, ax = self._flag_start
-        xd_end, yd_end = event.xdata, event.ydata
-        if (xd_end is None) or (yd_end is None):
-            if self._flag_end is None:  # nothing to do.. the drag was to small/invalid
-                return
-            xd_end, yd_end = self._flag_end
-        # calculate min/max
-        min_xd, max_xd = min(xd_start, xd_end), max(xd_start, xd_end)
-        min_yd, max_yd = min(yd_start, yd_end), max(yd_start, yd_end)
-        # logger.debug("FLAG > x: %.3f %.3f, y: %.3f %.3f" % (min_xd, max_xd, min_yd, max_yd))
-        yd2, yd1 = ax.get_ylim()  # bottom-to-top and the y-axis is reverted !!
-        xd1, xd2 = ax.get_xlim()  # left-to-right
-        min_xd, max_xd = max(min_xd, xd1), min(max_xd, xd2)
-        min_yd, max_yd = max(min_yd, yd1), min(max_yd, yd2)
-        # logger.debug("FLAG > x: %.3f %.3f, y: %.3f %.3f" % (min_xd, max_xd, min_yd, max_yd))
-
-        # actually do the flagging
-        plt_label = event.inaxes.get_label()
-        y_selected = np.logical_and(self.prj.cur.proc.depth > min_yd, self.prj.cur.proc.depth < max_yd)
-        if plt_label == 'speed':
-            x_selected = np.logical_and(self.prj.cur.proc.speed > min_xd, self.prj.cur.proc.speed < max_xd)
-        elif plt_label == 'temp':
-            x_selected = np.logical_and(self.prj.cur.proc.temp > min_xd, self.prj.cur.proc.temp < max_xd)
-        else:  # sal
-            x_selected = np.logical_and(self.prj.cur.proc.sal > min_xd, self.prj.cur.proc.sal < max_xd)
-        selected = np.logical_and(y_selected, x_selected)
-        self.prj.cur.proc.flag[np.logical_and(self.plot_win.vi, selected)] = Dicts.flags['user']
-        self.plot_win.update_data()
-
-        self.canvas.draw_idle()
-        self._xypress = None
-        self._flag_start = None
-        self._flag_end = None
-        self._flag_mode = None
-
-    def unflag(self):
-        # logger.debug("Unflag")
-        self.mode = _Mode.NONE
-        if self._active == 'UNFLAG':
-            self._active = None
-            if self._id_press:
-                self.canvas.mpl_disconnect(self._id_press)
-            if self._id_release:
-                self.canvas.mpl_disconnect(self._id_release)
-            self.canvas.widgetlock.release(self)
-        else:
-            self._active = 'UNFLAG'
-            if self._id_press:
-                self.canvas.mpl_disconnect(self._id_press)
-            self._id_press = self.canvas.mpl_connect('button_press_event', self.press_unflag)
-            if self._id_release:
-                self.canvas.mpl_disconnect(self._id_release)
-            self._id_release = self.canvas.mpl_connect('button_release_event', self.release_unflag)
-            self.canvas.widgetlock(self)
-
-        self.set_message(self._active)
-        self._update_buttons_checked()
-
-    def press_unflag(self, event):
-        # logger.debug("Press unflag")
-
-        # store the pressed button
-        if event.button != MouseButton.LEFT:  # left
-            return
-        # logger.debug("UNFLAG > press > button #%s" % self._button_pressed)
-
-        x, y = event.x, event.y  # cursor position in pixel
-        xd, yd = event.xdata, event.ydata  # cursor position in data coords
-        # logger.debug("UNFLAG > press > loc (%.3f,%.3f)(%.3f,%.3f)" % (x, y, xd, yd))
-
-        self._xypress = []  # clear past press
-        self._flag_start = None  # clear past data
-        self._flag_end = None  # clear past data
-        for i, ax in enumerate(self.canvas.figure.get_axes()):
-            if ((x is not None) and (y is not None) and
-                    ax.in_axes(event) and  # if the given mouse event (in display coords) in axes
-                    ax.get_navigate() and  # whether the axes responds to navigation commands
-                    ax.can_zoom()):  # if this axes supports the zoom box button functionality.
-                # noinspection PyProtectedMember
-                self._xypress.append((x, y, ax, i, ax._get_view()))
-                self._flag_start = (xd, yd, ax)
-                # logger.debug("FLAG > press > axes %s" % ax.get_label())
-
-        # connect drag/press/release events
-        id1 = self.canvas.mpl_connect('motion_notify_event', self._drag_flag)
-        id2 = self.canvas.mpl_connect('key_press_event', self._switch_on_flag_mode)
-        id3 = self.canvas.mpl_connect('key_release_event', self._switch_off_flag_mode)
-        self._ids_flag = id1, id2, id3
-        self._flag_mode = event.key
-        # logger.debug("UNFLAG > press > key: %s" % self._flag_mode)
-
-    def release_unflag(self, event):
-        # logger.debug("Release unflag")
-        # disconnect callbacks
-        for flag_id in self._ids_flag:
-            self.canvas.mpl_disconnect(flag_id)
-        self._ids_flag = []
-        # remove flagging area
-        self.remove_rubberband()
-
-        if not self._xypress:  # invalid first click
-            return
-
-        if not event.inaxes:
-
-            # we assume that the axis is the same as the first click
-            event.inaxes = self._xypress[0][2]
-
-            # what are the axis bounds in display coords?
-            y_down, y_up = self._xypress[0][2].get_ylim()
-            x_left, x_right = self._xypress[0][2].get_xlim()
-            ax_left, ax_down = self._xypress[0][2].transData.transform((x_left, y_down))
-            ax_right, ax_up = self._xypress[0][2].transData.transform((x_right, y_up))
-            # logger.debug("bottom-left: %s, %s" % (ax_left, ax_down))
-            # logger.debug("top-right: %s, %s" % (ax_right, ax_up))
-
-            # what are the clicked display coords in data coords?
-            inv = self._xypress[0][2].transData.inverted()
-            click_xdata, click_ydata = inv.transform((event.x, event.y))
-            # logger.debug("clicked data: %s, %s" % (click_xdata, click_ydata))
-
-            # in which direction was the click outside the axis?
-            # logger.debug("released outside axes: %s, %s" % (event.x, event.y))
-            if event.x > ax_right:
-                event.xdata = x_right
-                # logger.debug("right")
-            elif event.x < ax_left:
-                event.xdata = x_left
-                # logger.debug("left")
-            else:
-                event.xdata = click_xdata
-
-            if event.y > ax_up:
-                event.ydata = y_up
-                # logger.debug("up")
-            elif event.y < ax_down:
-                event.ydata = y_down
-                # logger.debug("down")
-            else:
-                event.ydata = click_ydata
-
-        # retrieve valid initial and ending points
-        xd_start, yd_start, ax = self._flag_start
-        xd_end, yd_end = event.xdata, event.ydata
-        if (xd_end is None) or (yd_end is None):
-            if self._flag_end is None:  # nothing to do.. the drag was to small/invalid
-                return
-            xd_end, yd_end = self._flag_end
-        # calculate min/max
-        min_xd, max_xd = min(xd_start, xd_end), max(xd_start, xd_end)
-        min_yd, max_yd = min(yd_start, yd_end), max(yd_start, yd_end)
-        # logger.debug("UNFLAG > x: %.3f %.3f, y: %.3f %.3f" % (min_xd, max_xd, min_yd, max_yd))
-        yd2, yd1 = ax.get_ylim()  # bottom-to-top and the y-axis is reverted !!
-        xd1, xd2 = ax.get_xlim()  # left-to-right
-        min_xd, max_xd = max(min_xd, xd1), min(max_xd, xd2)
-        min_yd, max_yd = max(min_yd, yd1), min(max_yd, yd2)
-        # logger.debug("UNFLAG > x: %.3f %.3f, y: %.3f %.3f" % (min_xd, max_xd, min_yd, max_yd))
-
-        plt_label = event.inaxes.get_label()
-        y_selected = np.logical_and(self.prj.cur.proc.depth > min_yd, self.prj.cur.proc.depth < max_yd)
-        if plt_label == 'speed':
-            x_selected = np.logical_and(self.prj.cur.proc.speed > min_xd, self.prj.cur.proc.speed < max_xd)
-        elif plt_label == 'temp':
-            x_selected = np.logical_and(self.prj.cur.proc.temp > min_xd, self.prj.cur.proc.temp < max_xd)
-        else:  # sal
-            x_selected = np.logical_and(self.prj.cur.proc.sal > min_xd, self.prj.cur.proc.sal < max_xd)
-        selected = np.logical_and(y_selected, x_selected)
-        self.prj.cur.proc.flag[np.logical_and(self.plot_win.ii, selected)] = Dicts.flags['valid']
-        self.plot_win.update_data()
-
-        self.canvas.draw_idle()
-        self._xypress = None
-        self._flag_start = None
-        self._flag_end = None
-        self._flag_mode = None
-
-    # flag/unflag helper methods
-
-    def _switch_on_flag_mode(self, event):
-        """optional key-press switch in flagging mode (used for x- and y- selections)"""
-
-        self._flag_mode = event.key
-        if self._flag_mode == "x":
-            logger.debug("FLAG > switch > x-selection: ON")
-        elif self._flag_mode == "y":
-            logger.debug("FLAG > switch > y-selection: ON")
-
-        self.mouse_move(event)
-
-    def _switch_off_flag_mode(self, event):
-        """optional key-press switch in flagging mode (used for x- and y- selections)"""
-
-        self._flag_mode = None
-        if event.key == "x":
-            logger.debug("FLAG > switch > x-selection: OFF")
-        elif event.key == "y":
-            logger.debug("FLAG > switch > y-selection: OFF")
-
-        self.mouse_move(event)
-
-    def _drag_flag(self, event):
-        """the mouse-motion dragging callback in flaggin mode"""
-
-        if not self._xypress:  # return if missing valid initial click
-            return
-
-        xd, yd = event.xdata, event.ydata
-        if (xd is not None) and (yd is not None):
-            self._flag_end = (xd, yd)
-
-        x, y = event.x, event.y
-        last_x, last_y, ax, _, _ = self._xypress[0]
-
-        # adjust x, last, y, last
-        x1, y1, x2, y2 = ax.bbox.extents
-        x, last_x = max(min(x, last_x), x1), min(max(x, last_x), x2)
-        y, last_y = max(min(y, last_y), y1), min(max(y, last_y), y2)
-        # key-specific mode
-        if self._flag_mode == "x":  # x-selection
-            x1, y1, x2, y2 = ax.bbox.extents
-            y, last_y = y1, y2
-        elif self._flag_mode == "y":  # y-selection
-            x1, y1, x2, y2 = ax.bbox.extents
-            x, last_x = x1, x2
-
-        # logger.debug("FLAG > drag > (%.3f, %.3f)(%.3f, %.3f)" % (x, y, last_x, last_y))
-        self.draw_rubberband(event, x, y, last_x, last_y)
-
-    def insert(self) -> None:
-        logger.debug("insert")
-        self._update_buttons_checked()
-
-    def flagged_plot(self) -> None:
-        logger.debug("flagged plot")
-        self._update_buttons_checked()
-
-    def grid_plot(self) -> None:
-        logger.debug("grid plot")
-        self._update_buttons_checked()
-
-    def legend_plot(self) -> None:
-        logger.debug("legend plot")
-        self._update_buttons_checked()
-
-    # --- mouse movements ---
 
     def mouse_move(self, event):
         self._update_cursor(event)
@@ -840,127 +303,674 @@ class NavToolbar(NavigationToolbar2QT):
             else:
                 raise RuntimeError("Unsupported cursor mode: %s" % self._active)
 
-    # def __init__(self, canvas, parent, plot_win, prj, coordinates=True):
-    #
-    #     self.insert_sample = None
+    def reset(self) -> None:
+        logger.debug("reset")
+        self._lastCursor = None
+        self._active = None
+        self._id_press = None
+        self._id_release = None
+        self._xypress = None
+        self._ids_flag = None
+        self._flag_mode = None
+        self._flag_start = None
+        self._flag_end = None
+        self.insert_sample = None
 
-    #
-    # def reset(self):
+        self._pan_info = None
+        self._zoom_info = None
 
-    #     self.insert_sample = None
+    def press(self, event: MouseEvent) -> None:
+        # print("press", event.button)
+        if event.button == 3:
+            menu = QtWidgets.QMenu(self)
+            menu.addAction(self._actions['home'])
+            menu.addSeparator()
+            menu.addAction(self._actions['pan'])
+            menu.addAction(self._actions['scale'])
+            menu.addAction(self._actions['zoom_in'])
+            menu.addAction(self._actions['zoom_out'])
+            menu.addSeparator()
+            menu.addAction(self._actions['flag'])
+            menu.addAction(self._actions['unflag'])
+            menu.addAction(self._actions['insert'])
+            menu.popup(QtGui.QCursor.pos())
+            menu.exec_()
 
-    # # --- insert ---
-    #
-    # def insert(self):
-    #     self.mode = _Mode.NONE
-    #     if self._active == 'INSERT':
-    #         self._active = None
-    #         if self._id_press:
-    #             self.canvas.mpl_disconnect(self._id_press)
-    #         if self._id_release:
-    #             self.canvas.mpl_disconnect(self._id_release)
-    #         self.canvas.widgetlock.release(self)
-    #     else:
-    #         self._active = 'INSERT'
-    #         if self._id_press:
-    #             self.canvas.mpl_disconnect(self._id_press)
-    #         self._id_press = self.canvas.mpl_connect('button_press_event', self.press_insert)
-    #         if self._id_release:
-    #             self.canvas.mpl_disconnect(self._id_release)
-    #         self._id_release = self.canvas.mpl_connect('button_release_event', self.release_insert)
-    #         self.canvas.widgetlock(self)
-    #
-    #     # logger.debug("active: %s" % self._active)
-    #     self.set_message(self._active)
-    #     self._active_button()
-    #
-    # def press_insert(self, event):
-    #     """Mouse press callback for insert"""
-    #
-    #     # store the pressed button
-    #     if event.button != MouseButton.LEFT:  # left
-    #         self.insert_sample = None
-    #         return
-    #     # logger.debug("INSERT > press > button #%s" % event.button)
-    #
-    #     # x, y = event.x, event.y  # cursor position in pixel
-    #     xd, yd = event.xdata, event.ydata  # cursor position in data coords
-    #     # using %s since they might be None
-    #     # logger.debug("INSERT > press > loc (%s,%s)(%s,%s)" % (x, y, xd, yd))
-    #
-    #     if not self.insert_sample:
-    #         self.insert_sample = Sample()
-    #
-    #     # click outside the axes
-    #     if event.inaxes is None:
-    #         return
-    #
-    #     plt_label = event.inaxes.get_label()
-    #     if plt_label == "speed":  # we store both y and x
-    #         if self.insert_sample.temp:
-    #             self.insert_sample.temp = None
-    #         if self.insert_sample.sal:
-    #             self.insert_sample.sal = None
-    #         self.insert_sample.depth = yd
-    #         self.insert_sample.speed = xd
-    #
-    #     elif plt_label == "temp":  # we don't overwrite y, if present
-    #         if not self.insert_sample.depth:
-    #             self.insert_sample.depth = yd
-    #         self.insert_sample.temp = xd
-    #
-    #     elif plt_label == "sal":  # we don't overwrite y, if present
-    #         if not self.insert_sample.depth:
-    #             self.insert_sample.depth = yd
-    #         self.insert_sample.sal = xd
-    #
-    #     if self.insert_sample.speed:
-    #         self.prj.cur.insert_proc_speed(depth=self.insert_sample.depth, speed=self.insert_sample.speed)
-    #         self.insert_sample = None
-    #         self.plot_win.update_data()
-    #
-    #     elif self.insert_sample.temp and self.insert_sample.sal:
-    #         self.prj.cur.insert_proc_temp_sal(depth=self.insert_sample.depth, temp=self.insert_sample.temp,
-    #                                           sal=self.insert_sample.sal)
-    #         self.insert_sample = None
-    #         self.plot_win.update_data()
-    #
-    # def release_insert(self, event):
-    #     """the release mouse button callback in insert mode"""
-    #     self.canvas.draw_idle()
-    #
-    # # --- plotting ---
-    #
-    # def flagged_plot(self):
-    #     flagged_flag = self._actions['flagged_plot'].isChecked()
-    #     # logger.debug("plot flagged: %s" % flagged_flag)
-    #     self.plot_win.set_invalid_visibility(flagged_flag)
-    #
-    #     self.canvas.draw_idle()
-    #
-    # def grid_plot(self):
-    #     grid_flag = self._actions['grid_plot'].isChecked()
-    #     # logger.debug("plot grid: %s" % grid_flag)
-    #
-    #     with rc_context(self.rc_context):
-    #         for a in self.canvas.figure.get_axes():
-    #             a.grid(grid_flag)
-    #
-    #     self.canvas.draw_idle()
-    #
-    # def legend_plot(self):
-    #     legend_flag = self._actions['legend_plot'].isChecked()
-    #     # logger.debug("plot legend: %s" % legend_flag)
-    #
-    #     with rc_context(self.rc_context):
-    #         if legend_flag:
-    #             for a in self.canvas.figure.get_axes():
-    #                 a.legend(loc='lower left')
-    #         else:
-    #             for a in self.canvas.figure.get_axes():
-    #                 try:
-    #                     a.legend_.remove()
-    #                 except AttributeError:
-    #                     logger.info("missing legend to remove")
-    #
-    #     self.canvas.draw_idle()
+    def release(self, event: MouseEvent) -> None:
+        # print("release", event.button)
+        pass
+
+    # ################### ACTIONS ###################
+
+    # ------------------- pan / scale  -------------------
+
+    def pan(self) -> None:
+        self.mode = _Mode.NONE
+        if self._active == 'PAN':
+            self._active = None
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self.canvas.widgetlock.release(self)
+        else:
+            self._active = 'PAN'
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            # noinspection PyTypeChecker
+            self._id_press = self.canvas.mpl_connect('button_press_event', self.press_pan)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self._id_release = self.canvas.mpl_connect('button_release_event', self.release_pan)
+            self.canvas.widgetlock(self)
+
+        # logger.debug("active: %s" % self._active)
+        self.set_message(self._active)
+        self._update_buttons_checked()
+
+    def scale(self) -> None:
+        self.mode = _Mode.NONE
+        if self._active == 'SCALE':
+            self._active = None
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self.canvas.widgetlock.release(self)
+        else:
+            self._active = 'SCALE'
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            # noinspection PyTypeChecker
+            self._id_press = self.canvas.mpl_connect('button_press_event', self.press_pan)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self._id_release = self.canvas.mpl_connect('button_release_event', self.release_pan)
+            self.canvas.widgetlock(self)
+
+        # logger.debug("active: %s" % self._active)
+        self.set_message(self._active)
+        self._update_buttons_checked()
+
+    def press_pan(self, event: MouseEvent) -> None:
+        """Callback for mouse button press in pan/zoom mode."""
+        logger.debug("mode: %s" % self._active)
+
+        if (event.button not in [MouseButton.LEFT]
+                or event.x is None or event.y is None):
+            return
+        axes = [a for a in self.canvas.figure.get_axes()
+                if a.in_axes(event) and a.get_navigate() and a.can_pan()]
+        if not axes:
+            return
+        if self._nav_stack() is None:
+            self.push_current()  # set the home button to this view
+        for ax in axes:
+            # MOD
+            if self._active == 'SCALE':
+                ax.start_pan(event.x, event.y, MouseButton.RIGHT)
+            else:
+                ax.start_pan(event.x, event.y, event.button)
+        self.canvas.mpl_disconnect(self._id_drag)
+        # noinspection PyTypeChecker
+        id_drag = self.canvas.mpl_connect("motion_notify_event", self.drag_pan)
+        # MOD
+        if self._active == 'SCALE':
+            self._pan_info = self._PanInfo(button=MouseButton.RIGHT, axes=axes, cid=id_drag)
+        else:
+            self._pan_info = self._PanInfo(button=MouseButton.LEFT, axes=axes, cid=id_drag)
+
+    def drag_pan(self, event: MouseEvent) -> None:
+        logger.debug("mode: %s" % self._active)
+
+        """Callback for dragging in pan/zoom mode."""
+        for ax in self._pan_info.axes:
+            # Using the recorded button at the press is safer than the current
+            # button, as multiple buttons can get pressed during motion.
+            # MOD
+            if self._active == 'SCALE':
+                ax.drag_pan(MouseButton.RIGHT, event.key, event.x, event.y)
+            else:
+                ax.drag_pan(self._pan_info.button, event.key, event.x, event.y)
+        self.canvas.draw_idle()
+
+    #  ------------------- zoom in / out  -------------------
+
+    def zoom_in(self) -> None:
+        self.mode = _Mode.NONE
+        if self._active == 'ZOOM_IN':
+            self._active = None
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self.canvas.widgetlock.release(self)
+        else:
+            self._active = 'ZOOM_IN'
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            # noinspection PyTypeChecker
+            self._id_press = self.canvas.mpl_connect('button_press_event', self.press_zoom)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self._id_release = self.canvas.mpl_connect('button_release_event', self.release_zoom)
+            self.canvas.widgetlock(self)
+
+        # logger.debug("active: %s" % self._active)
+        self.set_message(self._active)
+        self._update_buttons_checked()
+
+    def zoom_out(self) -> None:
+        self.mode = _Mode.NONE
+        if self._active == 'ZOOM_OUT':
+            self._active = None
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self.canvas.widgetlock.release(self)
+        else:
+            self._active = 'ZOOM_OUT'
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            # noinspection PyTypeChecker
+            self._id_press = self.canvas.mpl_connect('button_press_event', self.press_zoom)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self._id_release = self.canvas.mpl_connect('button_release_event', self.release_zoom)
+            self.canvas.widgetlock(self)
+
+        # logger.debug("active: %s" % self._active)
+        self.set_message(self._active)
+        self._update_buttons_checked()
+
+    def press_zoom(self, event: MouseEvent) -> None:
+        """Callback for mouse button press in zoom to rect mode."""
+        if (event.button not in [MouseButton.LEFT, MouseButton.RIGHT]
+                or event.x is None or event.y is None):
+            return
+        axes = [a for a in self.canvas.figure.get_axes()
+                if a.in_axes(event) and a.get_navigate() and a.can_zoom()]
+        if not axes:
+            return
+        if self._nav_stack() is None:
+            self.push_current()  # set the home button to this view
+        id_zoom = self.canvas.mpl_connect(
+            "motion_notify_event", self.drag_zoom)
+        # A colorbar is one-dimensional, so we extend the zoom rectangle out
+        # to the edge of the Axes bbox in the other dimension. To do that we
+        # store the orientation of the colorbar for later.
+        if hasattr(axes[0], "_colorbar"):
+            # noinspection PyProtectedMember
+            cbar = axes[0]._colorbar.orientation
+        else:
+            cbar = None
+        # MOD
+        self._zoom_info = self._ZoomInfo(
+            direction="in" if self._active == "ZOOM_IN" else "out",
+            start_xy=(event.x, event.y), axes=axes, cid=id_zoom, cbar=cbar)
+
+    #  ------------------- flag / unflag -------------------
+
+    def flag(self) -> None:
+        self.mode = _Mode.NONE
+        if self._active == 'FLAG':
+            self._active = None
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self.canvas.widgetlock.release(self)
+        else:
+            self._active = 'FLAG'
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            # noinspection PyTypeChecker
+            self._id_press = self.canvas.mpl_connect('button_press_event', self.press_flag)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            # noinspection PyTypeChecker
+            self._id_release = self.canvas.mpl_connect('button_release_event', self.release_flag)
+            self.canvas.widgetlock(self)
+
+        # logger.debug("active: %s" % self._active)
+        self.set_message(self._active)
+        self._update_buttons_checked()
+
+    def press_flag(self, event: MouseEvent) -> None:
+        # logger.debug("Press flag")
+
+        # store the pressed button
+        if event.button != MouseButton.LEFT:  # left
+            return
+        # logger.debug("FLAG > press > button #%s" % event.button)
+
+        x, y = event.x, event.y  # cursor position in pixel
+        xd, yd = event.xdata, event.ydata  # cursor position in data coords
+        # logger.debug("FLAG > press > loc (%.3f,%.3f)(%.3f,%.3f)" % (x, y, xd, yd))
+
+        self._xypress = []  # clear past press
+        self._flag_start = None  # clear past data
+        self._flag_end = None  # clear past data
+        for i, ax in enumerate(self.canvas.figure.get_axes()):
+            if ((x is not None) and (y is not None) and
+                    ax.in_axes(event) and  # if the given mouse event (in display coords) in axes
+                    ax.get_navigate() and  # whether the axes responds to navigation commands
+                    ax.can_zoom()):  # if this axes supports the zoom box button functionality.
+                # noinspection PyProtectedMember
+                self._xypress.append((x, y, ax, i, ax._get_view()))
+                self._flag_start = (xd, yd, ax)
+                # logger.debug("FLAG > press > axes %s" % ax.get_label())
+
+        # connect drag/press/release events
+        # noinspection PyTypeChecker
+        id1 = self.canvas.mpl_connect('motion_notify_event', self._drag_flag)
+        # noinspection PyTypeChecker
+        id2 = self.canvas.mpl_connect('key_press_event', self._switch_on_flag_mode)
+        # noinspection PyTypeChecker
+        id3 = self.canvas.mpl_connect('key_release_event', self._switch_off_flag_mode)
+        self._ids_flag = id1, id2, id3
+        self._flag_mode = event.key
+        # logger.debug("FLAG > press > key: %s" % self._flag_mode)
+
+    def release_flag(self, event: MouseEvent) -> None:
+        # logger.debug("Release flag")
+        # disconnect callbacks
+        for flag_id in self._ids_flag:
+            self.canvas.mpl_disconnect(flag_id)
+        self._ids_flag = []
+        # remove flagging area
+        self.remove_rubberband()
+
+        if not self._xypress:  # invalid first click
+            return
+
+        if not event.inaxes:
+
+            # we assume that the axis is the same as the first click
+            event.inaxes = self._xypress[0][2]
+
+            # what are the axis bounds in display coords?
+            y_down, y_up = self._xypress[0][2].get_ylim()
+            x_left, x_right = self._xypress[0][2].get_xlim()
+            ax_left, ax_down = self._xypress[0][2].transData.transform((x_left, y_down))
+            ax_right, ax_up = self._xypress[0][2].transData.transform((x_right, y_up))
+            # logger.debug("bottom-left: %s, %s" % (ax_left, ax_down))
+            # logger.debug("top-right: %s, %s" % (ax_right, ax_up))
+
+            # what are the clicked display coords in data coords?
+            inv = self._xypress[0][2].transData.inverted()
+            click_xdata, click_ydata = inv.transform((event.x, event.y))
+            # logger.debug("clicked data: %s, %s" % (click_xdata, click_ydata))
+
+            # in which direction was the click outside the axis?
+            # logger.debug("released outside axes: %s, %s" % (event.x, event.y))
+            if event.x > ax_right:
+                event.xdata = x_right
+                # logger.debug("right")
+            elif event.x < ax_left:
+                event.xdata = x_left
+                # logger.debug("left")
+            else:
+                event.xdata = click_xdata
+
+            if event.y > ax_up:
+                event.ydata = y_up
+                # logger.debug("up")
+            elif event.y < ax_down:
+                event.ydata = y_down
+                # logger.debug("down")
+            else:
+                event.ydata = click_ydata
+
+        # retrieve valid initial and ending points
+        xd_start, yd_start, ax = self._flag_start
+        xd_end, yd_end = event.xdata, event.ydata
+        if (xd_end is None) or (yd_end is None):
+            if self._flag_end is None:  # nothing to do.. the drag was to small/invalid
+                return
+            xd_end, yd_end = self._flag_end
+        # calculate min/max
+        min_xd, max_xd = min(xd_start, xd_end), max(xd_start, xd_end)
+        min_yd, max_yd = min(yd_start, yd_end), max(yd_start, yd_end)
+        # logger.debug("FLAG > x: %.3f %.3f, y: %.3f %.3f" % (min_xd, max_xd, min_yd, max_yd))
+        yd2, yd1 = ax.get_ylim()  # bottom-to-top and the y-axis is reverted !!
+        xd1, xd2 = ax.get_xlim()  # left-to-right
+        min_xd, max_xd = max(min_xd, xd1), min(max_xd, xd2)
+        min_yd, max_yd = max(min_yd, yd1), min(max_yd, yd2)
+        # logger.debug("FLAG > x: %.3f %.3f, y: %.3f %.3f" % (min_xd, max_xd, min_yd, max_yd))
+
+        # actually do the flagging
+        plt_label = event.inaxes.get_label()
+        y_selected = np.logical_and(self.prj.cur.proc.depth > min_yd, self.prj.cur.proc.depth < max_yd)
+        if plt_label == 'speed':
+            x_selected = np.logical_and(self.prj.cur.proc.speed > min_xd, self.prj.cur.proc.speed < max_xd)
+        elif plt_label == 'temp':
+            x_selected = np.logical_and(self.prj.cur.proc.temp > min_xd, self.prj.cur.proc.temp < max_xd)
+        else:  # sal
+            x_selected = np.logical_and(self.prj.cur.proc.sal > min_xd, self.prj.cur.proc.sal < max_xd)
+        selected = np.logical_and(y_selected, x_selected)
+        self.prj.cur.proc.flag[np.logical_and(self.plot_win.vi, selected)] = Dicts.flags['user']
+        self.plot_win.update_data()
+
+        self.canvas.draw_idle()
+        self._xypress = None
+        self._flag_start = None
+        self._flag_end = None
+        self._flag_mode = None
+
+    def unflag(self) -> None:
+        # logger.debug("Unflag")
+        self.mode = _Mode.NONE
+        if self._active == 'UNFLAG':
+            self._active = None
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self.canvas.widgetlock.release(self)
+        else:
+            self._active = 'UNFLAG'
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            # noinspection PyTypeChecker
+            self._id_press = self.canvas.mpl_connect('button_press_event', self.press_unflag)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            # noinspection PyTypeChecker
+            self._id_release = self.canvas.mpl_connect('button_release_event', self.release_unflag)
+            self.canvas.widgetlock(self)
+
+        self.set_message(self._active)
+        self._update_buttons_checked()
+
+    def press_unflag(self, event: MouseEvent) -> None:
+        # logger.debug("Press unflag")
+
+        # store the pressed button
+        if event.button != MouseButton.LEFT:  # left
+            return
+        # logger.debug("UNFLAG > press > button #%s" % self._button_pressed)
+
+        x, y = event.x, event.y  # cursor position in pixel
+        xd, yd = event.xdata, event.ydata  # cursor position in data coords
+        # logger.debug("UNFLAG > press > loc (%.3f,%.3f)(%.3f,%.3f)" % (x, y, xd, yd))
+
+        self._xypress = []  # clear past press
+        self._flag_start = None  # clear past data
+        self._flag_end = None  # clear past data
+        for i, ax in enumerate(self.canvas.figure.get_axes()):
+            if ((x is not None) and (y is not None) and
+                    ax.in_axes(event) and  # if the given mouse event (in display coords) in axes
+                    ax.get_navigate() and  # whether the axes responds to navigation commands
+                    ax.can_zoom()):  # if this axes supports the zoom box button functionality.
+                # noinspection PyProtectedMember
+                self._xypress.append((x, y, ax, i, ax._get_view()))
+                self._flag_start = (xd, yd, ax)
+                # logger.debug("FLAG > press > axes %s" % ax.get_label())
+
+        # connect drag/press/release events
+        # noinspection PyTypeChecker
+        id1 = self.canvas.mpl_connect('motion_notify_event', self._drag_flag)
+        # noinspection PyTypeChecker
+        id2 = self.canvas.mpl_connect('key_press_event', self._switch_on_flag_mode)
+        # noinspection PyTypeChecker
+        id3 = self.canvas.mpl_connect('key_release_event', self._switch_off_flag_mode)
+        self._ids_flag = id1, id2, id3
+        self._flag_mode = event.key
+        # logger.debug("UNFLAG > press > key: %s" % self._flag_mode)
+
+    def release_unflag(self, event: MouseEvent) -> None:
+        # logger.debug("Release unflag")
+        # disconnect callbacks
+        for flag_id in self._ids_flag:
+            self.canvas.mpl_disconnect(flag_id)
+        self._ids_flag = []
+        # remove flagging area
+        self.remove_rubberband()
+
+        if not self._xypress:  # invalid first click
+            return
+
+        if not event.inaxes:
+
+            # we assume that the axis is the same as the first click
+            event.inaxes = self._xypress[0][2]
+
+            # what are the axis bounds in display coords?
+            y_down, y_up = self._xypress[0][2].get_ylim()
+            x_left, x_right = self._xypress[0][2].get_xlim()
+            ax_left, ax_down = self._xypress[0][2].transData.transform((x_left, y_down))
+            ax_right, ax_up = self._xypress[0][2].transData.transform((x_right, y_up))
+            # logger.debug("bottom-left: %s, %s" % (ax_left, ax_down))
+            # logger.debug("top-right: %s, %s" % (ax_right, ax_up))
+
+            # what are the clicked display coords in data coords?
+            inv = self._xypress[0][2].transData.inverted()
+            click_xdata, click_ydata = inv.transform((event.x, event.y))
+            # logger.debug("clicked data: %s, %s" % (click_xdata, click_ydata))
+
+            # in which direction was the click outside the axis?
+            # logger.debug("released outside axes: %s, %s" % (event.x, event.y))
+            if event.x > ax_right:
+                event.xdata = x_right
+                # logger.debug("right")
+            elif event.x < ax_left:
+                event.xdata = x_left
+                # logger.debug("left")
+            else:
+                event.xdata = click_xdata
+
+            if event.y > ax_up:
+                event.ydata = y_up
+                # logger.debug("up")
+            elif event.y < ax_down:
+                event.ydata = y_down
+                # logger.debug("down")
+            else:
+                event.ydata = click_ydata
+
+        # retrieve valid initial and ending points
+        xd_start, yd_start, ax = self._flag_start
+        xd_end, yd_end = event.xdata, event.ydata
+        if (xd_end is None) or (yd_end is None):
+            if self._flag_end is None:  # nothing to do.. the drag was to small/invalid
+                return
+            xd_end, yd_end = self._flag_end
+        # calculate min/max
+        min_xd, max_xd = min(xd_start, xd_end), max(xd_start, xd_end)
+        min_yd, max_yd = min(yd_start, yd_end), max(yd_start, yd_end)
+        # logger.debug("UNFLAG > x: %.3f %.3f, y: %.3f %.3f" % (min_xd, max_xd, min_yd, max_yd))
+        yd2, yd1 = ax.get_ylim()  # bottom-to-top and the y-axis is reverted !!
+        xd1, xd2 = ax.get_xlim()  # left-to-right
+        min_xd, max_xd = max(min_xd, xd1), min(max_xd, xd2)
+        min_yd, max_yd = max(min_yd, yd1), min(max_yd, yd2)
+        # logger.debug("UNFLAG > x: %.3f %.3f, y: %.3f %.3f" % (min_xd, max_xd, min_yd, max_yd))
+
+        plt_label = event.inaxes.get_label()
+        y_selected = np.logical_and(self.prj.cur.proc.depth > min_yd, self.prj.cur.proc.depth < max_yd)
+        if plt_label == 'speed':
+            x_selected = np.logical_and(self.prj.cur.proc.speed > min_xd, self.prj.cur.proc.speed < max_xd)
+        elif plt_label == 'temp':
+            x_selected = np.logical_and(self.prj.cur.proc.temp > min_xd, self.prj.cur.proc.temp < max_xd)
+        else:  # sal
+            x_selected = np.logical_and(self.prj.cur.proc.sal > min_xd, self.prj.cur.proc.sal < max_xd)
+        selected = np.logical_and(y_selected, x_selected)
+        self.prj.cur.proc.flag[np.logical_and(self.plot_win.ii, selected)] = Dicts.flags['valid']
+        self.plot_win.update_data()
+
+        self.canvas.draw_idle()
+        self._xypress = None
+        self._flag_start = None
+        self._flag_end = None
+        self._flag_mode = None
+
+    # flag/unflag helper methods
+
+    def _switch_on_flag_mode(self, event: MouseEvent) -> None:
+        """optional key-press switch in flagging mode (used for x- and y- selections)"""
+
+        self._flag_mode = event.key
+        if self._flag_mode == "x":
+            logger.debug("FLAG > switch > x-selection: ON")
+        elif self._flag_mode == "y":
+            logger.debug("FLAG > switch > y-selection: ON")
+
+        self.mouse_move(event)
+
+    def _switch_off_flag_mode(self, event: MouseEvent) -> None:
+        """optional key-press switch in flagging mode (used for x- and y- selections)"""
+
+        self._flag_mode = None
+        if event.key == "x":
+            logger.debug("FLAG > switch > x-selection: OFF")
+        elif event.key == "y":
+            logger.debug("FLAG > switch > y-selection: OFF")
+
+        self.mouse_move(event)
+
+    def _drag_flag(self, event: MouseEvent) -> None:
+        """the mouse-motion dragging callback in flagging mode"""
+
+        if not self._xypress:  # return if missing valid initial click
+            return
+
+        xd, yd = event.xdata, event.ydata
+        if (xd is not None) and (yd is not None):
+            self._flag_end = (xd, yd)
+
+        x, y = event.x, event.y
+        last_x, last_y, ax, _, _ = self._xypress[0]
+
+        # adjust x, last, y, last
+        x1, y1, x2, y2 = ax.bbox.extents
+        x, last_x = max(min(x, last_x), x1), min(max(x, last_x), x2)
+        y, last_y = max(min(y, last_y), y1), min(max(y, last_y), y2)
+        # key-specific mode
+        if self._flag_mode == "x":  # x-selection
+            x1, y1, x2, y2 = ax.bbox.extents
+            y, last_y = y1, y2
+        elif self._flag_mode == "y":  # y-selection
+            x1, y1, x2, y2 = ax.bbox.extents
+            x, last_x = x1, x2
+
+        # logger.debug("FLAG > drag > (%.3f, %.3f)(%.3f, %.3f)" % (x, y, last_x, last_y))
+        self.draw_rubberband(event, x, y, last_x, last_y)
+
+    #  ------------------- insert  -------------------
+
+    def insert(self) -> None:
+        self.mode = _Mode.NONE
+        if self._active == 'INSERT':
+            self._active = None
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            self.canvas.widgetlock.release(self)
+        else:
+            self._active = 'INSERT'
+            if self._id_press:
+                self.canvas.mpl_disconnect(self._id_press)
+            # noinspection PyTypeChecker
+            self._id_press = self.canvas.mpl_connect('button_press_event', self.press_insert)
+            if self._id_release:
+                self.canvas.mpl_disconnect(self._id_release)
+            # noinspection PyTypeChecker
+            self._id_release = self.canvas.mpl_connect('button_release_event', self.release_insert)
+            self.canvas.widgetlock(self)
+
+        # logger.debug("active: %s" % self._active)
+        self.set_message(self._active)
+        self._update_buttons_checked()
+
+    def press_insert(self, event: MouseEvent) -> None:
+        """Mouse press callback for insert"""
+
+        # store the pressed button
+        if event.button != MouseButton.LEFT:  # left
+            self.insert_sample = None
+            return
+        # logger.debug("INSERT > press > button #%s" % event.button)
+
+        # x, y = event.x, event.y  # cursor position in pixel
+        xd, yd = event.xdata, event.ydata  # cursor position in data coords
+        # using %s since they might be None
+        # logger.debug("INSERT > press > loc (%s,%s)(%s,%s)" % (x, y, xd, yd))
+
+        if not self.insert_sample:
+            self.insert_sample = Sample()
+
+        # click outside the axes
+        if event.inaxes is None:
+            return
+
+        plt_label = event.inaxes.get_label()
+        if plt_label == "speed":  # we store both y and x
+            if self.insert_sample.temp:
+                self.insert_sample.temp = None
+            if self.insert_sample.sal:
+                self.insert_sample.sal = None
+            self.insert_sample.depth = yd
+            self.insert_sample.speed = xd
+
+        elif plt_label == "temp":  # we don't overwrite y, if present
+            if not self.insert_sample.depth:
+                self.insert_sample.depth = yd
+            self.insert_sample.temp = xd
+
+        elif plt_label == "sal":  # we don't overwrite y, if present
+            if not self.insert_sample.depth:
+                self.insert_sample.depth = yd
+            self.insert_sample.sal = xd
+
+        if self.insert_sample.speed:
+            self.prj.cur.insert_proc_speed(depth=self.insert_sample.depth, speed=self.insert_sample.speed)
+            self.insert_sample = None
+            self.plot_win.update_data()
+
+        elif self.insert_sample.temp and self.insert_sample.sal:
+            self.prj.cur.insert_proc_temp_sal(depth=self.insert_sample.depth, temp=self.insert_sample.temp,
+                                              sal=self.insert_sample.sal)
+            self.insert_sample = None
+            self.plot_win.update_data()
+
+    def release_insert(self, _: MouseEvent) -> None:
+        """the release mouse button callback in insert mode"""
+        self.canvas.draw_idle()
+
+    # ------------------ plotting ---------------------
+
+    def flagged_plot(self):
+        flagged_flag = self._actions['flagged_plot'].isChecked()
+        # logger.debug("plot flagged: %s" % flagged_flag)
+        self.plot_win.set_invalid_visibility(flagged_flag)
+
+        self.canvas.draw_idle()
+
+    def grid_plot(self):
+        grid_flag = self._actions['grid_plot'].isChecked()
+        # logger.debug("plot grid: %s" % grid_flag)
+
+        with rc_context(self.rc_context):
+            for a in self.canvas.figure.get_axes():
+                a.grid(grid_flag)
+
+        self.canvas.draw_idle()
+
+    def legend_plot(self):
+        legend_flag = self._actions['legend_plot'].isChecked()
+        # logger.debug("plot legend: %s" % legend_flag)
+
+        with rc_context(self.rc_context):
+            if legend_flag:
+                for a in self.canvas.figure.get_axes():
+                    a.legend(loc='lower left')
+            else:
+                for a in self.canvas.figure.get_axes():
+                    try:
+                        a.legend_.remove()
+                    except AttributeError:
+                        logger.info("missing legend to remove")
+
+        self.canvas.draw_idle()
