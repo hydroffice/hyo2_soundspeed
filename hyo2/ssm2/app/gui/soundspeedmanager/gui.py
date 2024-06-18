@@ -5,6 +5,7 @@ import traceback
 from PySide6 import QtCore, QtWidgets, QtGui
 
 from hyo2.abc2.app.app_style.app_style import AppStyle
+from hyo2.abc2.lib.gdal_aux import GdalAux
 from hyo2.abc2.lib.package.pkg_helper import PkgHelper
 from hyo2.abc2.lib.logging import set_logging
 from hyo2.ssm2.app.gui.soundspeedmanager import app_info
@@ -50,6 +51,7 @@ def gui():
             sys.exit(app.exit())
 
     logger.debug("Init main win ...")
+    GdalAux.check_gdal_data(verbose=True)
     main_win = MainWin()
     sys.excepthook = main_win.exception_hook  # install the pkg_exception hook
     main_win.show()

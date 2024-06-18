@@ -17,7 +17,7 @@ import os
 from PyInstaller.building.build_main import Analysis, PYZ, EXE, COLLECT, TOC
 from PyInstaller.compat import is_darwin, is_win
 
-from hyo2.ssm_sis import __version__ as ssm_version
+from hyo2.ssm2.app.gui.ssm_sis import app_info
 
 sys.setrecursionlimit(20000)
 
@@ -77,7 +77,6 @@ def python_path() -> str:
 
 
 def collect_folder_data(input_data_folder: str, relative_output_folder: str, recursively: bool = False):
-
     data_toc = TOC()
     if not os.path.exists(input_data_folder):
         print("issue with folder: %s" % input_data_folder)
@@ -105,8 +104,7 @@ cartopy_data = collect_folder_data(input_data_folder=share_folder, relative_outp
                                    recursively=True)
 
 abc_data = collect_pkg_data('hyo2.abc2')
-ss_data = collect_pkg_data('hyo2.soundspeed')
-ssm_sis_data = collect_pkg_data('hyo2.ssm_sis')
+ssm_data = collect_pkg_data('hyo2.ssm2')
 pyside6_data = collect_pkg_data('PySide6')
 
 icon_file = os.path.normpath(os.path.join(os.getcwd(), 'freeze', 'SSM_SIS.ico'))
@@ -114,21 +112,22 @@ if is_darwin:
     icon_file = os.path.normpath(os.path.join(os.getcwd(), 'freeze', 'SSM_SIS.icns'))
 
 a = Analysis(['SSM_SIS.py'],
-         binaries=[],
-         pathex=[],
-         hiddenimports=["PIL", "scipy._lib.messagestream", "cftime._cftime", "PySide6.QtPrintSupport",
-                        "pyproj.datadir", "pkg_resources.py2_warn"],
-         excludes=["IPython", "PyQt4", "PyQt5", "pandas", "sphinx", "sphinx_rtd_theme", "OpenGL_accelerate",
-                   "FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter", "wx",
-                   "cartopy_offlinedata", "cartopy_userconfig"],
-         hookspath=None,
-         runtime_hooks=None)
+             binaries=[],
+             pathex=[],
+             hiddenimports=["PIL", "scipy._lib.messagestream", "cftime._cftime", "PySide6.QtPrintSupport",
+                            "pyproj.datadir", "pkg_resources.py2_warn"],
+             excludes=["IPython", "PyQt4", "PyQt5", "pandas", "sphinx", "sphinx_rtd_theme", "OpenGL_accelerate",
+                       "PySide2",
+                       "FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter", "wx",
+                       "cartopy_offlinedata", "cartopy_userconfig"],
+             hookspath=None,
+             runtime_hooks=None)
 
 pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=True,
-          name='SSM_SIS.%s%s' % (ssm_version, beta),
+          name='SSM_SIS',
           debug=False,
           strip=None,
           upx=True,
@@ -141,9 +140,8 @@ coll = COLLECT(exe,
                pyproj_data,
                cartopy_data,
                abc_data,
-               ss_data,
-               ssm_sis_data,
+               ssm_data,
                pyside6_data,
                strip=None,
                upx=True,
-               name='SSM_SIS.%s%s' % (ssm_version, beta))
+               name='SSM_SIS.%s%s' % (app_info.app_version, beta))
