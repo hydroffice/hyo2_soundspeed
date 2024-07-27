@@ -19,7 +19,6 @@ class FormattedInputDialog(QtWidgets.QDialog):
         self.ok_btn = QtWidgets.QPushButton("OK")
         cancel_btn = QtWidgets.QPushButton("Cancel")
         self.check_box = QtWidgets.QCheckBox("Nonstandard project name")
-        self.check_box_checked = False
         layout = QtWidgets.QVBoxLayout()
         hbox = QtWidgets.QHBoxLayout()
         hbox.addWidget(self.ok_btn)
@@ -54,10 +53,6 @@ class FormattedInputDialog(QtWidgets.QDialog):
         return rtn
 
     def _check_state(self, state=None):
-        if state == QtCore.Qt.Checked:
-            self.check_box_checked = True
-        elif state == QtCore.Qt.Unchecked:
-            self.check_box_checked = False
         input_text = self.line_edit.text()
         status = self.validator.validate(input_text, 0)[0]
         if status == QtGui.QValidator.Acceptable:
@@ -68,7 +63,7 @@ class FormattedInputDialog(QtWidgets.QDialog):
             self.ok_btn.setEnabled(False)
         else:
             color = '#f6989d'  # red
-            if len(input_text) >= 5 and input_text.find(' ') < 0 and self.check_box_checked:
+            if len(input_text) >= 5 and input_text.find(' ') < 0 and self.check_box.isChecked():
                 self.ok_btn.setEnabled(True)  # make nonstandard input acceptable
             else:
                 self.ok_btn.setEnabled(False)
