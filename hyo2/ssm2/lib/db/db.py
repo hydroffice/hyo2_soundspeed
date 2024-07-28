@@ -39,7 +39,7 @@ class ProjectDb:
         self.export = ExportDb(db=self)
 
         # add variable used to store the connection to the database
-        self.conn = None
+        self.conn: sqlite3.Connection | None = None
 
         self.tmp_data = None
         self.tmp_ssp_pk = None
@@ -264,6 +264,8 @@ class ProjectDb:
                                         FROM ssp a LEFT OUTER JOIN ssp_pk b ON a.pk=b.id
                                   """)
 
+                self.conn.commit()
+
             return True
 
         except sqlite3.Error as e:
@@ -374,6 +376,8 @@ class ProjectDb:
                 self.conn.execute("""
                                   INSERT INTO ssp_pk VALUES (NULL, ?, ?)
                                   """, (utc_time, point,))
+                self.conn.commit()
+
         except sqlite3.Error as e:
             logger.error("during ssp pk check, %s: %s" % (type(e), e))
             return False
@@ -401,6 +405,8 @@ class ProjectDb:
             self.conn.execute("""DELETE FROM data WHERE ssp_pk=?""", (self.tmp_ssp_pk,))
             # logger.info("deleted %s pk entries from data" % self.tmp_ssp_pk)
 
+            self.conn.commit()
+
         except sqlite3.Error as e:
             logger.error("during deletion from data, %s: %s" % (type(e), e))
             return False
@@ -409,6 +415,8 @@ class ProjectDb:
             # noinspection SqlResolve
             self.conn.execute("""DELETE FROM proc WHERE ssp_pk=?""", (self.tmp_ssp_pk,))
             # logger.info("deleted %s pk entries from proc" % self.tmp_ssp_pk)
+
+            self.conn.commit()
 
         except sqlite3.Error as e:
             logger.error("during deletion from proc, %s: %s" % (type(e), e))
@@ -419,6 +427,8 @@ class ProjectDb:
             self.conn.execute("""DELETE FROM sis WHERE ssp_pk=?""", (self.tmp_ssp_pk,))
             # logger.info("deleted %s pk entries from sis" % self.tmp_ssp_pk)
 
+            self.conn.commit()
+
         except sqlite3.Error as e:
             logger.error("during deletion from sis, %s: %s" % (type(e), e))
             return False
@@ -427,6 +437,8 @@ class ProjectDb:
             # noinspection SqlResolve
             self.conn.execute("""DELETE FROM ssp WHERE pk=?""", (self.tmp_ssp_pk,))
             # logger.info("deleted %s pk entry from ssp" % self.tmp_ssp_pk)
+
+            self.conn.commit()
 
         except sqlite3.Error as e:
             logger.error("during deletion from ssp, %s: %s" % (type(e), e))
@@ -437,6 +449,8 @@ class ProjectDb:
                 # noinspection SqlResolve
                 self.conn.execute("""DELETE FROM ssp_pk WHERE id=?""", (self.tmp_ssp_pk,))
                 # logger.info("deleted %s id entry from ssp_pk" % self.tmp_ssp_pk)
+
+                self.conn.commit()
 
             except sqlite3.Error as e:
                 logger.error("during deletion from ssp_pk, %s: %s" % (type(e), e))
@@ -475,6 +489,8 @@ class ProjectDb:
                                     ))
             # logger.info("insert new %s pk in ssp" % self.tmp_ssp_pk)
 
+            self.conn.commit()
+
         except sqlite3.Error as e:
             logger.error("during ssp addition, %s: %s" % (type(e), e))
             return False
@@ -504,6 +520,8 @@ class ProjectDb:
                                         self.tmp_data.data.source[i],
                                         self.tmp_data.data.flag[i],
                                         ))
+
+                self.conn.commit()
                 added_samples += 1
             except sqlite3.IntegrityError as e:
                 logger.info("skipping row #%s due to %s: %s" % (i, type(e), e))
@@ -540,6 +558,8 @@ class ProjectDb:
                                         self.tmp_data.proc.source[i],
                                         self.tmp_data.proc.flag[i],
                                         ))
+
+                self.conn.commit()
                 added_samples += 1
 
             except sqlite3.IntegrityError as e:
@@ -575,6 +595,8 @@ class ProjectDb:
                                         self.tmp_data.sis.source[i],
                                         self.tmp_data.sis.flag[i],
                                         ))
+
+                self.conn.commit()
                 added_samples += 1
 
             except sqlite3.IntegrityError as e:
@@ -876,6 +898,8 @@ class ProjectDb:
                           INSERT INTO library VALUES (?, ?, ?)
                           """, (self.cur_version, "%s v.%s" % (pkg_info.name, pkg_info.version),
                                 datetime.datetime.utcnow(),))
+
+        self.conn.commit()
 
     def __repr__(self):
         msg = "<%s>\n" % self.__class__.__name__

@@ -52,6 +52,7 @@ class SetupDb(BaseDb):
                 else:
                     logger.error("foreign keys not active")
                     return False
+                self.commit()
             return True
 
         except sqlite3.Error as e:
@@ -75,6 +76,7 @@ class SetupDb(BaseDb):
                 self.conn.execute(CREATE_SETTINGS)
                 self.conn.execute(CREATE_CLIENT_LIST)
                 self.conn.execute(CREATE_SETTINGS_VIEW)
+                self.commit()
             return True
 
         except sqlite3.Error as e:
@@ -127,6 +129,8 @@ class SetupDb(BaseDb):
                 self.conn.execute(""" INSERT INTO client_list (setup_id) VALUES(?) """, (ret[0],))
                 # logger.info("inserted %s settings values" % setup_name)
 
+                self.commit()
+
                 return True
 
             except sqlite3.Error as e:
@@ -149,6 +153,8 @@ class SetupDb(BaseDb):
                 self.conn.execute(""" DELETE FROM general WHERE setup_name=? """, (setup_name,))
                 # logger.info("deleted profile: %s" % setup_name)
 
+                self.commit()
+
                 return True
 
             except sqlite3.Error as e:
@@ -168,6 +174,7 @@ class SetupDb(BaseDb):
                 # set active just the passed profile
                 self.conn.execute(""" UPDATE general SET setup_status="active" WHERE setup_name=? """, (setup_name,))
                 # logger.info("activated profile: %s" % setup_name)
+                self.commit()
                 return True
 
             except sqlite3.Error as e:
@@ -285,6 +292,7 @@ class SetupDb(BaseDb):
             try:
                 self.conn.execute(""" UPDATE general SET """ + attrib + """=? WHERE id=? """,
                                   (value, self.active_setup_id,))
+                self.commit()
             except sqlite3.Error as e:
                 logger.error("while setting %s, %s: %s" % (attrib, type(e), e))
         # logger.info("%s = %d" % (attrib, value))
@@ -300,6 +308,7 @@ class SetupDb(BaseDb):
             try:
                 self.conn.execute(""" UPDATE general SET """ + attrib + """=? WHERE id=? """,
                                   (value, self.active_setup_id,))
+                self.commit()
             except sqlite3.Error as e:
                 logger.error("while setting %s, %s: %s" % (attrib, type(e), e))
         # logger.info("%s = %s" % (attrib, value))
@@ -340,6 +349,7 @@ class SetupDb(BaseDb):
             try:
                 self.conn.execute(""" UPDATE general SET """ + attrib + """=? WHERE id=? """,
                                   (value, self.active_setup_id,))
+                self.commit()
             except sqlite3.Error as e:
                 logger.error("while setting %s, %s: %s" % (attrib, type(e), e))
         # logger.info("%s = %s" % (attrib, value))
