@@ -42,11 +42,11 @@ class ExportSingleProfileDialog(AbstractDialog):
         self.fmtLayout = QtWidgets.QHBoxLayout()
         hbox.addLayout(self.fmtLayout)
         # -- left
-        self.leftButtonBox = QtWidgets.QDialogButtonBox(QtCore.Qt.Vertical)
+        self.leftButtonBox = QtWidgets.QDialogButtonBox(QtCore.Qt.Orientation.Vertical)
         self.leftButtonBox.setFixedWidth(100)
         self.fmtLayout.addWidget(self.leftButtonBox)
         # -- right
-        self.rightButtonBox = QtWidgets.QDialogButtonBox(QtCore.Qt.Vertical)
+        self.rightButtonBox = QtWidgets.QDialogButtonBox(QtCore.Qt.Orientation.Vertical)
         self.rightButtonBox.setFixedWidth(100)
         self.fmtLayout.addWidget(self.rightButtonBox)
         hbox.addStretch()
@@ -69,9 +69,9 @@ class ExportSingleProfileDialog(AbstractDialog):
                 self.selected_writers.append(name)
 
             if (idx % 2) == 0:
-                self.leftButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+                self.leftButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
             else:
-                self.rightButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+                self.rightButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
 
         # noinspection PyUnresolvedReferences
         self.leftButtonBox.clicked.connect(self.on_select_writer_btn)
@@ -165,8 +165,10 @@ class ExportSingleProfileDialog(AbstractDialog):
                 return
 
             if self.lib.setup.noaa_tools and self.lib.not_noaa_project(self.lib.current_project):
-                current_project, format_ok = self.lib.cb.ask_formatted_text(default=self.lib.noaa_project)
-                if self.lib.not_noaa_project(current_project, format_ok):
+                current_project, accepted = self.lib.cb.ask_formatted_text(default=self.lib.noaa_project)
+                if not accepted:
+                    return
+                if self.lib.not_noaa_project(current_project, accepted):
                     msg = "The project name cannot be used for NCEI export.\n\n" \
                           "Rename the project in the Database tab!\n\n" \
                           "Recommend \"project_survey\" format, e.g. OPR-P999-RA-17_H12345"

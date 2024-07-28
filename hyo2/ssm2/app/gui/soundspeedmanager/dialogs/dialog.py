@@ -20,7 +20,7 @@ class AbstractDialog(QtWidgets.QDialog):
         self.main_win = main_win
         self.lib = lib
 
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags())
 
         # progress dialog
         self.progress = QtProgress(parent=self)
