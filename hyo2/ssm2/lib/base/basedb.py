@@ -11,33 +11,34 @@ class BaseDb(metaclass=ABCMeta):
     """ Abstract class that provides an interface to a SQLite db """
 
     class Point:
-        def __init__(self, x, y):
-            self.x, self.y = x, y
+        def __init__(self, x: float, y: float) -> None:
+            self.x = x
+            self.y = y
 
-        def __repr__(self):
+        def __repr__(self) -> str:
             return "(%f;%f)" % (self.x, self.y)
 
     @staticmethod
-    def adapt_point(point):
+    def adapt_point(point: Point) -> str:
         return "%f;%f" % (point.x, point.y)
 
     @staticmethod
-    def convert_point(s):
-        x, y = map(float, s.split(";"))
+    def convert_point(s: bytes) -> Point:
+        x, y = map(float, s.split(b";"))
         return BaseDb.Point(x, y)
 
     @staticmethod
-    def clean_name(some_var):
+    def clean_name(some_var: str) -> str:
         return ''.join(char for char in some_var if char.isalnum())
 
-    def __init__(self, db_path):
+    def __init__(self, db_path: str) -> None:
         super(BaseDb, self).__init__()
 
-        self.name = "_DB"
-        self.db_path = db_path
-        self.conn = None
+        self.name: str = "_DB"
+        self.db_path: str = db_path
+        self.conn: sqlite3.Connection | None = None
 
-    def check_table_total_rows(self, table_name, print_out=False):
+    def check_table_total_rows(self, table_name: str, print_out: bool = False) -> int:
         """ Returns the total number of rows in the database """
         table_name = BaseDb.clean_name(table_name)
 
@@ -48,7 +49,7 @@ class BaseDb(metaclass=ABCMeta):
 
         return ret[0]
 
-    def check_table_cols_settings(self, table_name, print_out=False):
+    def check_table_cols_settings(self, table_name: str, print_out: bool = False) -> list:
         """ Returns column information"""
         table_name = BaseDb.clean_name(table_name)
 
@@ -63,7 +64,7 @@ class BaseDb(metaclass=ABCMeta):
 
         return info
 
-    def check_tables_values_in_cols(self, table_name, print_out=False):
+    def check_tables_values_in_cols(self, table_name: str, print_out: bool = False) -> dict[int, int]:
         """ Returns a dictionary with columns as keys and the number of not-null entries
 
         Args:
@@ -89,7 +90,7 @@ class BaseDb(metaclass=ABCMeta):
 
         return col_dict
 
-    def reconnect_or_create(self):
+    def reconnect_or_create(self) -> None:
         """ Reconnection to an existing database or create a new db """
         if self.conn:
             # logger.info("Already connected")
@@ -132,11 +133,11 @@ class BaseDb(metaclass=ABCMeta):
             raise RuntimeError("Unable to build tables: the DB is encrypted or is not a database")
 
     @abstractmethod
-    def build_tables(self):
+    def build_tables(self) -> bool:
         """ Abstract method to be implemented to create tables structure """
         pass
 
-    def disconnect(self):
+    def disconnect(self) -> bool:
         """ Disconnect from the current database """
         if self.conn is None:
             # logger.info("Already disconnected")
@@ -152,10 +153,10 @@ class BaseDb(metaclass=ABCMeta):
             logger.error("Unable to disconnect: %s" % e)
             return False
 
-    def close(self):
+    def close(self) -> None:
         self.disconnect()
 
-    def commit(self):
+    def commit(self) -> bool:
         if self.conn is None:
             return False
 
