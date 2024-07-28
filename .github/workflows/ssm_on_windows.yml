@@ -10,19 +10,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.11
     - name: setup-conda
-      uses: s-weigand/setup-conda@v1.2.1
+      uses: s-weigand/setup-conda@v1.2.2
       with:
         update-conda: true
         python-version: 3.11
     - name: Install dependencies
       run: |
         conda config --add channels conda-forge
-        conda install appdirs cartopy gdal matplotlib-base numpy psutil pyproj qt-material
+        conda install python=3.11 appdirs cartopy gdal matplotlib-base numpy=1.* psutil pyproj qt-material
         conda install gsw netCDF4 pillow pyserial scipy
         pip install PySide6
         pip install hyo2.abc2

@@ -21,8 +21,8 @@ class TestSoundSpeedBaseDbPoint(unittest.TestCase):
 
     def test_if_convert_point_works(self):
         point = BaseDb.Point(x=self.x, y=self.y)
-        self.assertAlmostEqual(BaseDb.convert_point("%f;%f" % (self.x, self.y)).x, point.x)
-        self.assertAlmostEqual(BaseDb.convert_point("%f;%f" % (self.x, self.y)).y, point.y)
+        self.assertAlmostEqual(BaseDb.convert_point(b"%f;%f" % (self.x, self.y)).x, point.x)
+        self.assertAlmostEqual(BaseDb.convert_point(b"%f;%f" % (self.x, self.y)).y, point.y)
 
 
 class TestSoundSpeedBaseDb(unittest.TestCase):

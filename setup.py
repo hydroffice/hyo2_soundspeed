@@ -61,7 +61,7 @@ setup(
         "hyo2.abc2>=2.3.5",
         "matplotlib",
         "netCDF4",
-        "numpy",
+        "numpy<2.0.0",
         "pillow",
         "pyserial",
         "requests",
