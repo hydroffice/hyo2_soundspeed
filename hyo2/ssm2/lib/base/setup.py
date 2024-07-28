@@ -1,6 +1,5 @@
 import logging
 import os
-from typing import Optional
 
 from hyo2.abc2.lib.package.pkg_helper import PkgHelper
 from hyo2.ssm2.lib.base.setup_db import SetupDb
@@ -15,7 +14,7 @@ class Setup:
     SUPPORTED_VERSION = 6
 
     @classmethod
-    def are_updates_required(cls, db_path):
+    def are_updates_required(cls, db_path: str) -> bool:
         # logger.debug("check if version updates are required for %s" % db_path)
         db = SetupDb(os.path.dirname(db_path))
         # logger.debug(db.setup_version)
@@ -24,7 +23,7 @@ class Setup:
         return False
 
     @classmethod
-    def apply_required_updates(cls, db_path):
+    def apply_required_updates(cls, db_path: str) -> bool:
         logger.debug("applying version updates %s" % db_path)
         db = SetupDb(os.path.dirname(db_path))
         if db.setup_version < cls.SUPPORTED_VERSION:
@@ -33,92 +32,91 @@ class Setup:
                 return True
         return False
 
-    def __init__(self, release_folder, use_setup_name=None):
+    def __init__(self, release_folder: str, use_setup_name: str | None = None):
         self.use_setup_name = use_setup_name
 
-        self.setup_version = None
-        self.setup_id = None
-        self.setup_name = None
+        self.setup_version: int | None = None
+        self.setup_id: int | None = None
+        self.setup_name: str | None = None
 
         # input
-        self.use_woa09 = None
-        self.use_woa13 = None
-        self.use_woa18 = None
-        self.use_rtofs = None
-        self.use_cbofs = None
-        self.use_dbofs = None
-        self.use_gomofs = None
-        self.use_nyofs = None
-        self.use_sjrofs = None
-        self.use_ngofs = None
-        self.use_tbofs = None
-        self.use_leofs = None
-        self.use_lhofs = None
-        self.use_lmofs = None
-        self.use_loofs = None
-        self.use_lsofs = None
-        self.use_creofs = None
-        self.use_sfbofs = None
-        self.ssp_extension_source = None
-        self.ssp_salinity_source = None
-        self.ssp_temp_sal_source = None
-        self.ssp_up_or_down = None
-        self.rx_max_wait_time = None
-        self.use_sis4 = None
-        self.use_sis5 = None
-        self.use_sippican = None
-        self.use_nmea_0183 = None
-        self.use_mvp = None
+        self.use_woa09: bool | None = None
+        self.use_woa13: bool | None = None
+        self.use_woa18: bool | None = None
+        self.use_rtofs: bool | None = None
+        self.use_cbofs: bool | None = None
+        self.use_dbofs: bool | None = None
+        self.use_gomofs: bool | None = None
+        self.use_nyofs: bool | None = None
+        self.use_sjrofs: bool | None = None
+        self.use_ngofs: bool | None = None
+        self.use_tbofs: bool | None = None
+        self.use_leofs: bool | None = None
+        self.use_lhofs: bool | None = None
+        self.use_lmofs: bool | None = None
+        self.use_loofs: bool | None = None
+        self.use_lsofs: bool | None = None
+        self.use_creofs: bool | None = None
+        self.use_sfbofs: bool | None = None
+        self.ssp_extension_source: str | None = None
+        self.ssp_salinity_source: str | None = None
+        self.ssp_temp_sal_source: str | None = None
+        self.ssp_up_or_down: str | None = None
+        self.rx_max_wait_time: int | None = None
+        self.use_sis4: bool | None = None
+        self.use_sis5: bool | None = None
+        self.use_sippican: bool | None = None
+        self.use_nmea_0183: bool | None = None
+        self.use_mvp: bool | None = None
 
         # output
         self.client_list = ClientList()
 
         # listeners - sis
-        self.sis_listen_port = None
-        self.sis_listen_timeout = None
+        self.sis_listen_port: int | None = None
+        self.sis_listen_timeout: int | None = None
         # output - sis 4 and 5
-        self.sis_auto_apply_manual_casts = None
+        self.sis_auto_apply_manual_casts: bool | None = None
         # listeners - sippican
-        self.sippican_listen_port = None
-        self.sippican_listen_timeout = None
+        self.sippican_listen_port: int | None = None
+        self.sippican_listen_timeout: int | None = None
         # listeners - nmea
-        self.nmea_listen_port = None
-        self.nmea_listen_timeout = None        
+        self.nmea_listen_port: int | None = None
+        self.nmea_listen_timeout: int | None = None
         # listeners - mvp
-        self.mvp_ip_address = None
-        self.mvp_listen_port = None
-        self.mvp_listen_timeout = None
+        self.mvp_ip_address: str | None = None
+        self.mvp_listen_port: int | None = None
+        self.mvp_listen_timeout: int | None = None
         self.mvp_transmission_protocol = None
-        self.mvp_format = None
-        self.mvp_winch_port = None
-        self.mvp_fish_port = None
-        self.mvp_nav_port = None
-        self.mvp_system_port = None
-        self.mvp_sw_version = None
-        self.mvp_instrument_id = None
-        self.mvp_instrument = None
+        self.mvp_format: str | None = None
+        self.mvp_winch_port: int | None = None
+        self.mvp_fish_port: int | None = None
+        self.mvp_nav_port: int | None = None
+        self.mvp_system_port: int | None = None
+        self.mvp_sw_version: str | None = None
+        self.mvp_instrument_id: str | None = None
+        self.mvp_instrument: str | None = None
 
         # server
-        self.server_source = None
-        self.server_apply_surface_sound_speed = None
-        self.server_auto_export_on_send = None
-        self.server_max_failed_attempts = None
+        self.server_source: str | None = None
+        self.server_apply_surface_sound_speed: bool | None = None
+        self.server_max_failed_attempts: int | None = None
 
         # current settings
-        self.current_project = None
-        self.custom_projects_folder = None
-        self.custom_outputs_folder = None
-        self.custom_woa09_folder = None
-        self.custom_woa13_folder = None
-        self.custom_woa18_folder = None
-        self.noaa_tools = None
-        self.default_institution = None
-        self.default_survey = None
-        self.default_vessel = None
-        self.auto_apply_default_metadata = None
+        self.current_project: str | None = None
+        self.custom_projects_folder: str | None = None
+        self.custom_outputs_folder: str | None = None
+        self.custom_woa09_folder: str | None = None
+        self.custom_woa13_folder: str | None = None
+        self.custom_woa18_folder: str | None = None
+        self.noaa_tools: bool | None = None
+        self.default_institution: str | None = None
+        self.default_survey: str | None = None
+        self.default_vessel: str | None = None
+        self.auto_apply_default_metadata: bool | None = None
 
         # loading settings
-        self.release_folder = release_folder
+        self.release_folder: str | None = release_folder
         self.load_from_db()
 
     @property
@@ -126,12 +124,12 @@ class Setup:
         return self.use_sis4 or self.use_sis5
 
     @property
-    def db(self):
+    def db(self) -> SetupDb:
         """Usually the data_folder is set when the project is instantiated, so this is safe"""
         # logger.debug("release_folder: %s, use setup: %s" % (self.release_folder, self.use_setup_name))
         return SetupDb(self.release_folder, use_setup_name=self.use_setup_name)
 
-    def load_from_db(self, db_path: Optional[str] = None):
+    def load_from_db(self, db_path: str | None = None) -> None:
         """Load/reload the setting from the setup db"""
         # logger.info("*** > SETUP: loading ...")
 
@@ -228,7 +226,7 @@ class Setup:
 
         # logger.info("*** > SETUP: loaded!")
 
-    def save_to_db(self):
+    def save_to_db(self) -> None:
         """Save setup to db"""
         logger.info("*** > SETUP: saving ...")
 
@@ -319,7 +317,7 @@ class Setup:
 
         logger.info("*** > SETUP: saved!")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         msg = "  <setup:%s:%s>\n" % (self.setup_id, self.setup_name)
 
         msg += "    <setup version: %s>\n" % self.setup_version
@@ -360,7 +358,6 @@ class Setup:
         msg += "    <server>\n"
         msg += "      <server_source: %s>\n" % self.server_source
         msg += "      <server_apply_surface_sound_speed: %s>\n" % self.server_apply_surface_sound_speed
-        msg += "      <server_auto_export_on_send: %s>\n" % self.server_auto_export_on_send
         msg += "      <server_max_failed_attempts: %s>\n" % self.server_max_failed_attempts
         msg += "    <current settings>\n"
         msg += "      <current_project: %s>\n" % self.current_project
