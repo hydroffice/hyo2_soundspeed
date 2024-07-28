@@ -310,6 +310,7 @@ class Setup:
             db.default_vessel = self.default_vessel
             db.auto_apply_default_metadata = self.auto_apply_default_metadata
 
+            db.commit()
             db.close()
 
         except Exception as e:

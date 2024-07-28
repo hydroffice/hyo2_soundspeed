@@ -227,6 +227,7 @@ class SetupDb(BaseDb):
                                                   VALUES(?, ?, ?, ?, ?) """,
                                   (self.active_setup_id, client_name, client_ip, client_port, client_protocol))
                 # logger.info("inserted %s client values" % client_name, client_ip, client_port, client_protocol)
+                self.commit()
                 return True
 
             except sqlite3.Error as e:
