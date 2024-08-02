@@ -273,9 +273,9 @@ class DataPlots(AbstractWidget):
                                                     color=self.seafloor_color,
                                                     linestyle=':',
                                                     label='depth')
-        self.speed_draft.set_ydata(None)
-        self.speed_sensor.set_xdata(None)
-        self.speed_seafloor.set_ydata(None)
+        self.speed_draft.set_ydata([None])
+        self.speed_sensor.set_xdata([None])
+        self.speed_seafloor.set_ydata([None])
 
         self.speed_ax.set_label("speed")
 
@@ -549,9 +549,9 @@ class DataPlots(AbstractWidget):
 
             if not self.lib.use_sis():  # in case that SIS was disabled
                 if self.speed_draft:
-                    self.speed_draft.set_ydata(None)
+                    self.speed_draft.set_ydata([None])
                 if self.speed_sensor:
-                    self.speed_sensor.set_xdata(None)
+                    self.speed_sensor.set_xdata([None])
                 return
 
             # plot title
@@ -562,17 +562,17 @@ class DataPlots(AbstractWidget):
                 return
 
             if self.lib.listeners.sis.xyz is None:
-                self.speed_draft.set_ydata(None)
-                self.speed_sensor.set_xdata(None)
+                self.speed_draft.set_ydata([None])
+                self.speed_sensor.set_xdata([None])
             else:
                 # sensor speed
                 if self.lib.listeners.sis.xyz_transducer_sound_speed is None:
-                    self.speed_sensor.set_xdata(None)
+                    self.speed_sensor.set_xdata([None])
                 else:
                     self.speed_sensor.set_xdata([self.lib.listeners.sis.xyz_transducer_sound_speed, ])
                 # draft
                 if self.lib.listeners.sis.xyz_transducer_depth is None:
-                    self.speed_draft.set_ydata(None)
+                    self.speed_draft.set_ydata([None])
                 else:
                     self.speed_draft.set_ydata([self.lib.listeners.sis.xyz_transducer_depth, ])
                 # seafloor
@@ -580,7 +580,7 @@ class DataPlots(AbstractWidget):
                 if mean_depth:
                     self.speed_seafloor.set_ydata([mean_depth, ])
                 else:
-                    self.speed_seafloor.set_ydata(None)
+                    self.speed_seafloor.set_ydata([None])
 
     def update_all_limits(self):
         self.update_depth_limits()
