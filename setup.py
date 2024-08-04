@@ -42,11 +42,11 @@ setup(
     ]),
     package_data={
         "": [
-            'hyo2/lib/listener/seacat/CONFIG/*.*',
-            'hyo2/app/gui/soundspeedmanager/media/*.*',
-            'hyo2/app/gui/soundspeedmanager/media/LICENSE',
-            'hyo2/app/gui/soundspeedsettings/media/*.*',
-            'hyo2/app/gui/ssm_sis/media/*.*'
+            'hyo2/ssm2/lib/listener/seacat/CONFIG/*.*',
+            'hyo2/ssm2/app/gui/soundspeedmanager/media/*.*',
+            'hyo2/ssm2/app/gui/soundspeedmanager/media/LICENSE',
+            'hyo2/ssm2/app/gui/soundspeedsettings/media/*.*',
+            'hyo2/ssm2/app/gui/ssm_sis/media/*.*'
         ],
     },
     zip_safe=False,
