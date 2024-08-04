@@ -245,7 +245,7 @@ class Output(AbstractWidget):
         while True:
             # noinspection PyCallByClass
             protocol, ok = QtWidgets.QInputDialog.getText(self, "New client",
-                                                          "Input the protocol (SIS, KCTRL, HYPACK, PDS2000, or QINSY)",
+                                                          "Input the protocol (SIS, KCTRL, HYPACK, PDS2000, QINSY, or EA440)",
                                                           QtWidgets.QLineEdit.Normal,
                                                           "SIS")
             if not ok:
