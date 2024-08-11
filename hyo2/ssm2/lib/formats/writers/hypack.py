@@ -49,7 +49,7 @@ class Hypack(AbstractTextWriter):
         if self.ssp.cur.meta.utc_time:
             date_string = "%s" % self.ssp.cur.meta.utc_time.strftime("%H:%M %m/%d/%Y")
         else:
-            date_string = "%s" % datetime.datetime.now().strftime("%H:%M %m/%d/%Y")
+            date_string = "%s" % datetime.datetime.now(datetime.timezone.utc).strftime("%H:%M %m/%d/%Y")
 
         header += "FTP NEW 3 " + position_string + " " + date_string + "\r\n"
             
