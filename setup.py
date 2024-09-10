@@ -57,6 +57,7 @@ setup(
     ],
     install_requires=[
         "appdirs",
+        "cartopy",
         "gsw",
         "hyo2.abc2>=2.3.5",
         "matplotlib",
