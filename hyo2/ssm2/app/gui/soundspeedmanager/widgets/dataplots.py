@@ -273,9 +273,6 @@ class DataPlots(AbstractWidget):
                                                     color=self.seafloor_color,
                                                     linestyle=':',
                                                     label='depth')
-        self.speed_draft.set_ydata(None)
-        self.speed_sensor.set_xdata(None)
-        self.speed_seafloor.set_ydata(None)
 
         self.speed_ax.set_label("speed")
 
