@@ -163,7 +163,7 @@ class RegOfsOnline(AbstractAtlas):
             logger.critical("while converting location to grid coords, %s" % e)
             return None
 
-        ocean_time = self._file.variables['ocean_time']
+        ocean_time = self._file.variables['time']
         datetime_retrieved = num2date(ocean_time[0], units=ocean_time.units, calendar=ocean_time.calendar)
         logger.debug(('Query datetime:\t\t\t%s' % original_datestamp.isoformat()))
         logger.debug("Retrieved datetime:\t\t%s" % datetime_retrieved.isoformat())
@@ -363,12 +363,12 @@ class RegOfsOnline(AbstractAtlas):
         #                 nos.gomofs.regulargrid.n006.20200601.t00z.nc
         if (name == self.Model.NGOFS.name) or (name == self.Model.CREOFS.name) or (name == self.Model.SFBOFS.name):
             url = 'https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/%s/MODELS/%s/%s/%s/' \
-                  'nos.%s.regulargrid.n003.%s.t03z.nc' \
+                  '%s.t03z.%s.regulargrid.n003.nc' \
                   % (name.upper(), input_date.strftime("%Y"), input_date.strftime("%m"), input_date.strftime("%d"),
                      name.lower(), input_date.strftime("%Y%m%d"))
         else:
             url = 'https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/%s/MODELS/%s/%s/%s/' \
-                  'nos.%s.regulargrid.n003.%s.t00z.nc' \
+                  '%s.t00z.%s.regulargrid.n003.nc' \
                   % (name.upper(), input_date.strftime("%Y"), input_date.strftime("%m"), input_date.strftime("%d"),
                      name.lower(), input_date.strftime("%Y%m%d"))
         return url

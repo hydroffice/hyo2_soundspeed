@@ -47,7 +47,7 @@ class ModelOptions(IntEnum):
 
 
 # Choose Model
-switch = ModelOptions.WOA18  # Choose a ModelOptions Value to test
+switch = ModelOptions.GoMOFS  # Choose a ModelOptions Value to test
 
 app = QtWidgets.QApplication([])  # PySide stuff (start)
 mw = QtWidgets.QMainWindow()
@@ -62,9 +62,9 @@ tests = [
     # (72.852028, -67.315431, dt.utcnow())      # Baffin Bay
     # (18.2648113, 16.1761115, dt.utcnow()),    # in land -> middle of Africa
     # (39.725989, -104.967745, dt.utcnow())     # in land -> Denver, CO
-    (37.985427, -76.311156, dt.utcnow()),     # Chesapeake Bay
+    # (37.985427, -76.311156, dt.utcnow()),     # Chesapeake Bay
     # (39.162802, -75.278057, dt.utcnow()),     # Deleware Bay
-    # (43.026480, -70.318824, dt.utcnow()),     # offshore Portsmouth
+    (43.026480, -70.318824, dt.utcnow()),     # offshore Portsmouth
     # (40.662218, -74.049306, dt.utcnow())      # New York Harbor
     # (30.382518, -81.573615, dt.utcnow())      # Mill Cove, St. Johns River
     # (28.976225, -92.078882, dt. utcnow())     # Offshore Louisiana
@@ -291,4 +291,4 @@ for test in tests:
         raise RuntimeError("invalid switch value: %s" % switch)
     logger.info("execution time: %.3f s" % (time.time() - start_time))
 
-app.exec_()  # no need to actually run the message loop
+app.exec()  # no need to actually run the message loop
