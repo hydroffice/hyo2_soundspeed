@@ -6,8 +6,8 @@ HydrOffice Sound Speed Manager
 
 |
 
-.. image:: https://img.shields.io/pypi/v/hyo2.ssm2.lib.svg
-    :target: https://pypi.python.org/pypi/hyo2.soundspeed
+.. image:: https://img.shields.io/pypi/v/hyo2.ssm2.svg
+    :target: https://pypi.python.org/pypi/hyo2.ssm2
     :alt: PyPi version
 
 .. image:: https://img.shields.io/badge/docs-latest-brightgreen.svg
