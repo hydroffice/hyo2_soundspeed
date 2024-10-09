@@ -80,3 +80,27 @@ The package is jointly developed by the `Center for Coastal and Ocean Mapping, U
     :alt: joint efforts
 
 For further information, visit the `manual <https://www.hydroffice.org/manuals/ssm2/index.html>`_.
+
+Development quick-start on Ubuntu 24.04
+---------------------------------------
+
+Make sure gdal is install including development headers::
+
+    sudo apt install libgdal-dev
+
+Create a virtual environment::
+
+    mkdir ~/HydrOffice/
+    cd ~/HydrOffice/
+    python3 -m venv .venv
+    source .venv/bin/activate
+
+Clone the repositories::
+
+    git clone https://github.com/hydroffice/hyo2_abc2.git
+    git clone https://github.com/hydroffice/hyo2_soundspeed.git
+
+Install using pip in development mode::
+
+    pip install -e hyo2_abc2
+    pip install -e hyo2_soundspeed
