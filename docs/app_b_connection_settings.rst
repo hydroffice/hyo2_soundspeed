@@ -450,7 +450,7 @@ Kongsberg EA440
 
 The Konsgsberg EA440/EA640 single-beam echo sounder data acquisition system accepts SVP transmissions from the *Sound Speed* package. A method to verify reception of the cast is not currently known thus the user should confirm reception in the acquisition system.
 
-In the *Setup* tab of the EA440 software, open the *Installation* window and under *I/O Setup*, configure the IP address and port number where the casts transmitted from the *Sound Speed* package (:numref:`ea440_1_fig`).
+In the *Setup* tab of the EA440 software, open the *Installation* window and under *I/O Setup*, configure the IP address and port number where the casts transmitted from the *Sound Speed* package should be received (:numref:`ea440_1_fig`).
 
 .. _ea440_1_fig:
 
@@ -462,7 +462,7 @@ In the *Setup* tab of the EA440 software, open the *Installation* window and und
 
     Add a new LAN Port to receive casts from SSP package.
 
-Under *Sensor Installation*, Add a new sensor with type *Sound Velocity Profile AML CALC*. Select the newly created LAN Port as the port associated with this sensor. Enable both the speed and temperature profiles (:numref:`ea440_2_fig`).
+Under *Sensor Installation*, Add a new sensor with type *Sound Velocity Profile EM*. Select the newly created LAN Port as the port associated with this sensor. Make sure that the S01 datagram is enabled (:numref:`ea440_2_fig`).
 
 .. _ea440_2_fig:
 
@@ -472,7 +472,7 @@ Under *Sensor Installation*, Add a new sensor with type *Sound Velocity Profile 
     :alt: alternate text
     :figclass: align-center
 
-    Add a new sensor in the AML CALC format to decode casts from SSP package.
+    Add a new sensor in the EM S01 format to decode casts from SSP package.
 
 Open the *Monitor* window to verify successfull reception of a cast from the *Sound Speed* package (:numref:`ea440_3_fig`). Make sure that the *Sound Speed* package is properly configured with an Output client using the EA440 protocol to accomplish this test.
 
@@ -509,3 +509,4 @@ Under *Sound Velocity Profile*, select *Profile From Network* as source. Recepti
     :figclass: align-center
 
     Sound speed profile received from the *Sound Speed* package and displayed in the EA440 software
+

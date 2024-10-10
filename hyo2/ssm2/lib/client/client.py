@@ -51,6 +51,9 @@ class Client:
         if (self.protocol == "QINSY") or (self.protocol == "PDS2000"):
             kng_fmt = Dicts.kng_formats['S12']
             logger.info("forcing S12 format")
+        if (self.protocol == "EA440"):
+            kng_fmt = Dicts.kng_formats['S01']
+            logger.info("forcing S01 format")
 
         apply_thin = True
         apply_12k = True
@@ -58,7 +61,7 @@ class Client:
         if self.protocol == "QINSY":
             apply_12k = False
             tolerances = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5]
-        elif self.protocol == "PDS2000":
+        elif (self.protocol == "PDS2000") or (self.protocol == "EA440"):
             apply_12k = False
 
         tx_data = None
@@ -93,10 +96,8 @@ class Client:
     def send_aml_format(self, prj: 'SoundSpeedLibrary') -> bool:
         logger.info("using aml format")
         calc = Calc()
-        if self.protocol == "HYPACK":
-            tx_data = calc.convert(prj.ssp)
-        elif self.protocol == "EA440":
-            tx_data = calc.convert(prj.ssp).replace("\n", "\r\n")
+        tx_data = calc.convert(prj.ssp)
+
         return self._transmit(tx_data)
 
     def _transmit(self, tx_data: Union[bytes, str]) -> bool:
