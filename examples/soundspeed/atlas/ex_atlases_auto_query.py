@@ -31,23 +31,23 @@ class ModelOptions(IntEnum):
     SJROFS = 14  # RG = False
 
     # Gulf of Mexico
-    NGOFS = 20  # RG = True     # Format is GoMOFS
+    NGOFS2 = 20  # RG = True     # Format is GoMOFS
     TBOFS = 21  # RG = True     # Format is GoMOFS
 
     # Great Lakes
     LEOFS = 30  # RG = True     # Format is GoMOFS
-    LHOFS = 31  # RG = False
-    LMOFS = 32  # RG = False
+    LMHOFS = 31  # RG = False
     LOOFS = 33  # RG = False
     LSOFS = 34  # RG = False
 
     # Pacific Coast
-    CREOFS = 40  # RG = True     # Format is GoMOFS
+    SSCOFS = 40  # RG = True     # Format is GoMOFS
     SFBOFS = 41  # RG = True     # Format is GoMOFS
+    WCOFS = 42  # RG = True     # Format is GoMOFS
 
 
 # Choose Model
-switch = ModelOptions.GoMOFS  # Choose a ModelOptions Value to test
+switch = ModelOptions.WCOFS  # Choose a ModelOptions Value to test
 
 app = QtWidgets.QApplication([])  # PySide stuff (start)
 mw = QtWidgets.QMainWindow()
@@ -64,7 +64,7 @@ tests = [
     # (39.725989, -104.967745, dt.utcnow())     # in land -> Denver, CO
     # (37.985427, -76.311156, dt.utcnow()),     # Chesapeake Bay
     # (39.162802, -75.278057, dt.utcnow()),     # Deleware Bay
-    (43.026480, -70.318824, dt.utcnow()),     # offshore Portsmouth
+    # (43.026480, -70.318824, dt.utcnow()),     # offshore Portsmouth
     # (40.662218, -74.049306, dt.utcnow())      # New York Harbor
     # (30.382518, -81.573615, dt.utcnow())      # Mill Cove, St. Johns River
     # (28.976225, -92.078882, dt. utcnow())     # Offshore Louisiana
@@ -76,6 +76,7 @@ tests = [
     # (47.457546, -89.347715, dt.utcnow())      # Lake Superior
     # (46.161403, -124.107396, dt.utcnow())     # Offshore of Colombia River
     # (37.689510, -122.298514, dt.utcnow())     # San Francisco Bay
+    (37.779088, -124.209048, dt.utcnow())     # Offshore San Francisco (West Coast)
 ]
 
 if switch is ModelOptions.WOA09:
@@ -147,12 +148,12 @@ elif switch is ModelOptions.SJROFS:
         lib.download_sjrofs()
     logger.info("has SJROFS: %s" % lib.has_sjrofs())
 
-elif switch is ModelOptions.NGOFS:
+elif switch is ModelOptions.NGOFS2:
 
-    # download the current-time ngofs
-    if not lib.has_ngofs():
-        lib.download_ngofs()
-    logger.info("has NGOFS: %s" % lib.has_ngofs())
+    # download the current-time ngofs2
+    if not lib.has_ngofs2():
+        lib.download_ngofs2()
+    logger.info("has NGOFS2: %s" % lib.has_ngofs2())
 
 elif switch is ModelOptions.TBOFS:
 
@@ -168,20 +169,12 @@ elif switch is ModelOptions.LEOFS:
         lib.download_leofs()
     logger.info("has LEOFS: %s" % lib.has_leofs())
 
-elif switch is ModelOptions.LHOFS:
+elif switch is ModelOptions.LMHOFS:
 
-    # download the current-time lhofs
-    if not lib.has_lhofs():
-        lib.download_lhofs()
-    logger.info("has LHOFS: %s" % lib.has_lhofs())
-
-elif switch is ModelOptions.LMOFS:
-
-    # download the current-time lmofs
-    if not lib.has_lmofs():
-        lib.download_lmofs()
-    logger.info("has LMOFS: %s" % lib.has_lmofs())
-
+    # download the current-time lmhofs
+    if not lib.has_lmhofs():
+        lib.download_lmhofs()
+    logger.info("has LMHOFS: %s" % lib.has_lmhofs())
 
 elif switch is ModelOptions.LOOFS:
 
@@ -192,17 +185,17 @@ elif switch is ModelOptions.LOOFS:
 
 elif switch is ModelOptions.LSOFS:
 
-    # download the current-time lhofs
-    if not lib.has_lhofs():
-        lib.download_lhofs()
-    logger.info("has LHOFS: %s" % lib.has_lhofs())
+    # download the current-time lmhofs
+    if not lib.has_lmhofs():
+        lib.download_lmhofs()
+    logger.info("has LMHOFS: %s" % lib.has_lmhofs())
 
-elif switch is ModelOptions.CREOFS:
+elif switch is ModelOptions.SSCOFS:
 
-    # download the current-time creofs
-    if not lib.has_creofs():
-        lib.download_creofs()
-    logger.info("has CREOFS: %s" % lib.has_creofs())
+    # download the current-time sscofs
+    if not lib.has_sscofs():
+        lib.download_sscofs()
+    logger.info("has SSCOFS: %s" % lib.has_sscofs())
 
 elif switch is ModelOptions.SFBOFS:
 
@@ -210,6 +203,13 @@ elif switch is ModelOptions.SFBOFS:
     if not lib.has_sfbofs():
         lib.download_sfbofs()
     logger.info("has SFBOFS: %s" % lib.has_sfbofs())
+
+elif switch is ModelOptions.WCOFS:
+
+    # download the current-time wcofs
+    if not lib.has_wcofs():
+        lib.download_wcofs()
+    logger.info("has WCOFS: %s" % lib.has_wcofs())
 
 else:
     raise RuntimeError("invalid switch value: %s" % switch)
@@ -269,24 +269,24 @@ for test in tests:
         logger.info("NYOFS profiles:\n%s" % lib.atlases.nyofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.SJROFS:
         logger.info("SJROFS profiles:\n%s" % lib.atlases.sjrofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
-    elif switch is ModelOptions.NGOFS:
-        logger.info("NGOFS profiles:\n%s" % lib.atlases.ngofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
+    elif switch is ModelOptions.NGOFS2:
+        logger.info("NGOFS2 profiles:\n%s" % lib.atlases.ngofs2.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.TBOFS:
         logger.info("TBOFS profiles:\n%s" % lib.atlases.tbofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.LEOFS:
         logger.info("LEOFS profiles:\n%s" % lib.atlases.leofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
-    elif switch is ModelOptions.LHOFS:
-        logger.info("LHOFS profiles:\n%s" % lib.atlases.lhofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
-    elif switch is ModelOptions.LMOFS:
-        logger.info("LMOFS profiles:\n%s" % lib.atlases.lmofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
+    elif switch is ModelOptions.LMHOFS:
+        logger.info("LMHOFS profiles:\n%s" % lib.atlases.lmhofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.LOOFS:
         logger.info("LOOFS profiles:\n%s" % lib.atlases.loofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.LSOFS:
         logger.info("LSOFS profiles:\n%s" % lib.atlases.lsofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
-    elif switch is ModelOptions.CREOFS:
-        logger.info("CREOFS profiles:\n%s" % lib.atlases.creofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
+    elif switch is ModelOptions.SSCOFS:
+        logger.info("SSCOFS profiles:\n%s" % lib.atlases.sscofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     elif switch is ModelOptions.SFBOFS:
         logger.info("SFBOFS profiles:\n%s" % lib.atlases.sfbofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
+    elif switch is ModelOptions.WCOFS:
+        logger.info("WCOFS profiles:\n%s" % lib.atlases.wcofs.query(lat=test[0], lon=test[1], dtstamp=test[2]))
     else:
         raise RuntimeError("invalid switch value: %s" % switch)
     logger.info("execution time: %.3f s" % (time.time() - start_time))

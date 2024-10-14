@@ -119,19 +119,19 @@ class TestSoundSpeedAtlasRegofsOnline(unittest.TestCase):
 
     def test_creation_of_Ngofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        ngofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.NGOFS)
-        self.assertTrue('regofs' in ngofs.data_folder)
-        self.assertFalse(ngofs.is_present())
+        ngofs2 = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.NGOFS2)
+        self.assertTrue('regofs' in ngofs2.data_folder)
+        self.assertFalse(ngofs2.is_present())
         prj.close()
 
     def test_download_db_from_Ngofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        ngofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.NGOFS)
-        ngofs.download_db(server_mode=True)
+        ngofs2 = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.NGOFS2)
+        ngofs2.download_db(server_mode=True)
 
         # to avoid test failures
-        if not ngofs.is_present():
-            logger.warning("unable to download NGOFS data")
+        if not ngofs2.is_present():
+            logger.warning("unable to download NGOFS2 data")
         # self.assertTrue(rtofs.is_present())
 
         prj.close()
@@ -176,38 +176,19 @@ class TestSoundSpeedAtlasRegofsOnline(unittest.TestCase):
 
     # def test_creation_of_Lhofs(self):
     #     prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-    #     lhofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.LHOFS)
-    #     self.assertTrue('regofs' in lhofs.data_folder)
-    #     self.assertFalse(lhofs.is_present())
+    #     lmhofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.LMHOFS)
+    #     self.assertTrue('regofs' in lmhofs.data_folder)
+    #     self.assertFalse(lmhofs.is_present())
     #     prj.close()
     #
     # def test_download_db_from_Lhofs(self):
     #     prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-    #     lhofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.LHOFS)
-    #     lhofs.download_db(server_mode=True)
+    #     lmhofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.LMHOFS)
+    #     lmhofs.download_db(server_mode=True)
     #
     #     # to avoid test failures
-    #     if not lhofs.is_present():
-    #         logger.warning("unable to download LHOFS data")
-    #     # self.assertTrue(rtofs.is_present())
-    #
-    #     prj.close()
-
-    # def test_creation_of_Lmofs(self):
-    #     prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-    #     lmofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.LMOFS)
-    #     self.assertTrue('regofs' in lmofs.data_folder)
-    #     self.assertFalse(lmofs.is_present())
-    #     prj.close()
-    #
-    # def test_download_db_from_Lmofs(self):
-    #     prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-    #     lmofs = RegOfs(data_folder=prj.regofs_folder, prj=prj, model=RegOfs.Model.LMOFS)
-    #     lmofs.download_db(server_mode=True)
-    #
-    #     # to avoid test failures
-    #     if not lmofs.is_present():
-    #         logger.warning("unable to download LMOFS data")
+    #     if not lmhofs.is_present():
+    #         logger.warning("unable to download LMHOFS data")
     #     # self.assertTrue(rtofs.is_present())
     #
     #     prj.close()
@@ -252,19 +233,19 @@ class TestSoundSpeedAtlasRegofsOnline(unittest.TestCase):
 
     def test_creation_of_Creofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        creofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.CREOFS)
-        self.assertTrue('regofs' in creofs.data_folder)
-        self.assertFalse(creofs.is_present())
+        sscofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.SSCOFS)
+        self.assertTrue('regofs' in sscofs.data_folder)
+        self.assertFalse(sscofs.is_present())
         prj.close()
 
     def test_download_db_from_Creofs(self):
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
-        creofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.CREOFS)
-        creofs.download_db(server_mode=True)
+        sscofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.SSCOFS)
+        sscofs.download_db(server_mode=True)
 
         # to avoid test failures
-        if not creofs.is_present():
-            logger.warning("unable to download CREOFS data")
+        if not sscofs.is_present():
+            logger.warning("unable to download SSCOFS data")
         # self.assertTrue(rtofs.is_present())
 
         prj.close()
@@ -285,6 +266,25 @@ class TestSoundSpeedAtlasRegofsOnline(unittest.TestCase):
         if not sfbofs.is_present():
             logger.warning("unable to download SFBOFS data")
         # self.assertTrue(rtofs.is_present())
+
+        prj.close()
+
+    def test_creation_of_wcofs(self):
+        prj = SoundSpeedLibrary(data_folder=self.cur_dir)
+        wcofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.WCOFS)
+        self.assertTrue('regofs' in wcofs.data_folder)
+        self.assertFalse(wcofs.is_present())
+        prj.close()
+
+    def test_download_db_from_wcofs(self):
+        prj = SoundSpeedLibrary(data_folder=self.cur_dir)
+        wcofs = RegOfsOnline(data_folder=prj.regofs_folder, prj=prj, model=RegOfsOnline.Model.WCOFS)
+        wcofs.download_db(server_mode=True)
+
+        # to avoid test failures
+        if not wcofs.is_present():
+            logger.warning("unable to download WCOFS data")
+        # self.assertTrue(wcofs.is_present())
 
         prj.close()
 

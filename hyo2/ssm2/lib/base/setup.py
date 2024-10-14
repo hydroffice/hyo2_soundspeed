@@ -49,14 +49,13 @@ class Setup:
         self.use_gomofs: bool | None = None
         self.use_nyofs: bool | None = None
         self.use_sjrofs: bool | None = None
-        self.use_ngofs: bool | None = None
+        self.use_ngofs2: bool | None = None
         self.use_tbofs: bool | None = None
         self.use_leofs: bool | None = None
-        self.use_lhofs: bool | None = None
-        self.use_lmofs: bool | None = None
+        self.use_lmhofs: bool | None = None
         self.use_loofs: bool | None = None
         self.use_lsofs: bool | None = None
-        self.use_creofs: bool | None = None
+        self.use_sscofs: bool | None = None
         self.use_sfbofs: bool | None = None
         self.ssp_extension_source: str | None = None
         self.ssp_salinity_source: str | None = None

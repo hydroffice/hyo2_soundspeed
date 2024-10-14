@@ -16,6 +16,7 @@ from hyo2.ssm2.lib.profile.profile import Profile
 from hyo2.ssm2.lib.profile.profilelist import ProfileList
 from hyo2.ssm2.lib.profile.dicts import Dicts
 from hyo2.ssm2.lib.profile.oceanography import Oceanography as Oc
+
 if TYPE_CHECKING:
     from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
@@ -28,26 +29,26 @@ class RegOfsOnline(AbstractAtlas):
     class Model(IntEnum):
 
         # East Coast
-        CBOFS = 10      # RG = True     # Format is GoMOFS
-        DBOFS = 11      # RG = True     # Format is GoMOFS
-        GoMOFS = 12     # RG = True     # Format is GoMOFS
-        NYOFS = 13      # RG = False
-        SJROFS = 14     # RG = False
+        CBOFS = 10  # RG = True     # Format is GoMOFS
+        DBOFS = 11  # RG = True     # Format is GoMOFS
+        GoMOFS = 12  # RG = True     # Format is GoMOFS
+        NYOFS = 13  # RG = False
+        SJROFS = 14  # RG = False
 
         # Gulf of Mexico
-        NGOFS = 20      # RG = True     # Format is GoMOFS
-        TBOFS = 21      # RG = True     # Format is GoMOFS
+        NGOFS2 = 20  # RG = True     # Format is GoMOFS
+        TBOFS = 21  # RG = True     # Format is GoMOFS
 
         # Great Lakes
-        LEOFS = 30      # RG = True     # Format is GoMOFS
-        LHOFS = 31      # RG = False
-        LMOFS = 32      # RG = False
-        LOOFS = 33      # RG = False
-        LSOFS = 34      # RG = False
+        LEOFS = 30  # RG = True     # Format is GoMOFS
+        LMHOFS = 31  # RG = True    # Format is GoMOFS
+        LOOFS = 33  # RG = True     # Format is GoMOFS
+        LSOFS = 34  # RG = True     # Format is GoMOFS
 
         # Pacific Coast
-        CREOFS = 40     # RG = True     # Format is GoMOFS
-        SFBOFS = 41     # RG = True     # Format is GoMOFS
+        SSCOFS = 40  # RG = True     # Format is GoMOFS
+        SFBOFS = 41  # RG = True     # Format is GoMOFS
+        WCOFS = 42  # RG = True     # Format is GoMOFS
 
     regofs_model_descs = {
         Model.CBOFS: "Chesapeake Bay Operational Forecast System",
@@ -55,15 +56,15 @@ class RegOfsOnline(AbstractAtlas):
         Model.GoMOFS: "Gulf of Maine Operational Forecast System",
         Model.NYOFS: "Port of New York and New Jersey Operational Forecast System",
         Model.SJROFS: "St. John's River Operational Forecast System",
-        Model.NGOFS: "Northern Gulf of Mexico Operational Forecast System",
+        Model.NGOFS2: "Northern Gulf of Mexico Operational Forecast System",
         Model.TBOFS: "Tampa Bay Operational Forecast System",
         Model.LEOFS: "Lake Erie Operational Forecast System",
-        Model.LHOFS: "Lake Huron Operational Forecast System",
-        Model.LMOFS: "Lake Michigan Operational Forecast System",
+        Model.LMHOFS: "Lake Michigan and Huron Operational Forecast System",
         Model.LOOFS: "Lake Ontario Operational Forecast System",
         Model.LSOFS: "Lake Superior Operational Forecast System",
-        Model.CREOFS: "Columbia River Estuary Operational Forecast System",
-        Model.SFBOFS: "San Francisco Bay Operational Forecast System"
+        Model.SSCOFS: "Salish Sea and Columbia River Operational Forecast System",
+        Model.SFBOFS: "San Francisco Bay Operational Forecast System",
+        Model.WCOFS: "West Coast Operational Forecast System"
     }
 
     def __init__(self, data_folder: str, prj: 'SoundSpeedLibrary',
@@ -189,7 +190,13 @@ class RegOfsOnline(AbstractAtlas):
         # Need +1 on the north and east indices since it is the "stop" value in these slices
         t = self._file.variables['temp'][self._day_idx, :][..., lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
         # logger.debug('t shape: %s' % (t.shape, ))
-        s = self._file.variables['salt'][self._day_idx, :][..., lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
+        # https://ponce.sdsu.edu/lakesalinityworld.html#:~:text=The%20salinity%20of%20Lake%20Superior,between%200.05%20and%200.60%20ppt.
+        if self.name == self.Model.LMHOFS.name:
+            s = np.full_like(t, 0.3)
+        elif self.name == self.Model.LOOFS.name:
+            s = np.full_like(t, 0.5)
+        else:
+            s = self._file.variables['salt'][self._day_idx, :][..., lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
         # Set 'unfilled' elements to NANs (BUT when the entire array has valid data, it returns numpy.ndarray)
         if isinstance(t, np.ma.core.MaskedArray):
             t_mask = t.mask
@@ -342,16 +349,17 @@ class RegOfsOnline(AbstractAtlas):
 
     def _build_check_url(self, input_date: dt, name: str) -> str:
         """make up the url to use for salinity and temperature"""
-        # Primary server: https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/GOMOFS/MODELS/2020/06/01/
-        #                 nos.gomofs.regulargrid.n006.20200601.t00z.nc
-        if (name == self.Model.NGOFS.name) or (name == self.Model.CREOFS.name) or (name == self.Model.SFBOFS.name):
+        # Primary server: https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/GOMOFS/MODELS/2024/10/14/
+        #                 gomofs.t00z.20241014.regulargrid.n003.nc
+        if (name == self.Model.NGOFS2.name) or (name == self.Model.SSCOFS.name) or (name == self.Model.SFBOFS.name) or (
+                name == self.Model.WCOFS.name):
             url = 'https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/%s/MODELS/%s/%s/%s/' \
-                  'nos.%s.regulargrid.n003.%s.t03z.nc' \
+                  '%s.t03z.%s.regulargrid.n003.nc' \
                   % (name.upper(), input_date.strftime("%Y"), input_date.strftime("%m"), input_date.strftime("%d"),
                      name.lower(), input_date.strftime("%Y%m%d"))
         else:
             url = 'https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/%s/MODELS/%s/%s/%s/' \
-                  'nos.%s.regulargrid.n003.%s.t00z.nc' \
+                  '%s.t00z.%s.regulargrid.n003.nc' \
                   % (name.upper(), input_date.strftime("%Y"), input_date.strftime("%m"), input_date.strftime("%d"),
                      name.lower(), input_date.strftime("%Y%m%d"))
 
@@ -359,9 +367,10 @@ class RegOfsOnline(AbstractAtlas):
 
     def _build_opendap_url(self, input_date: dt, name: str) -> str:
         """make up the url to use for salinity and temperature"""
-        # Primary server: https://prod.opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/GOMOFS/MODELS/2020/06/01/
-        #                 nos.gomofs.regulargrid.n006.20200601.t00z.nc
-        if (name == self.Model.NGOFS.name) or (name == self.Model.CREOFS.name) or (name == self.Model.SFBOFS.name):
+        # Primary server: https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/GOMOFS/MODELS/2024/10/14/
+        #                 gomofs.t00z.20241014.regulargrid.n003.nc.html
+        if (name == self.Model.NGOFS2.name) or (name == self.Model.SSCOFS.name) or (name == self.Model.SFBOFS.name) or (
+                name == self.Model.WCOFS.name):
             url = 'https://opendap.co-ops.nos.noaa.gov/thredds/dodsC/NOAA/%s/MODELS/%s/%s/%s/' \
                   '%s.t03z.%s.regulargrid.n003.nc' \
                   % (name.upper(), input_date.strftime("%Y"), input_date.strftime("%m"), input_date.strftime("%d"),
@@ -373,7 +382,7 @@ class RegOfsOnline(AbstractAtlas):
                      name.lower(), input_date.strftime("%Y%m%d"))
         return url
 
-    def _download_files(self, dtstamp: dt, server_mode: bool = False):
+    def _download_files(self, dtstamp: dt, server_mode: bool = False) -> bool:
         """Actually, just try to connect with the remote files
         For a given queried date, we may have to use the forecast from the previous
         day since the current nowcast doesn't hold data for today (solved?)

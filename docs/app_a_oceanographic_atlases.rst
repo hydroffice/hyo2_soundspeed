@@ -73,17 +73,17 @@ Regional Operational Forecast System Model  Descriptor  Support
 Chesapeake Bay                              CBOFS       X
 Deleware Bay                                DBOFS       X
 Gulf of Maine                               GoMOFS      X
-New York and New Jersey                     NYOFS
-St. John’s River                            SJROFS
-Northern Gulf of Mexico                     NGOFS       X
+Northern Gulf of Mexico 2                   NGOFS2      X
 Tampa Bay                                   TBOFS       X
 Lake Erie                                   LEOFS       X
-Lake Huron                                  LHOFS
-Lake Michigan                               LMOFS
-Lake Ontario                                LOOFS
-Lake Superior                               LSOFS
-Columbia River Estuary                      CREOFS      X
-Sanfrancisco Bay                            SFBOFS      X
+Lake Michignan and Huron                    LMHOFS      X
+Lake Ontario                                LOOFS       X
+Lake Superior                               LSOFS       X
+Salish Sea and Columbia River               SSCOFS      X
+San Francisco Bay                           SFBOFS      X
+West Coast                                  WCOFS       X
+New York and New Jersey                     NYOFS
+St. John’s River                            SJROFS
 =========================================== =========== =======
 
 

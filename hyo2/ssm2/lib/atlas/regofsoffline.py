@@ -27,19 +27,19 @@ class RegOfsOffline:
         SJROFS = 14  # RG = False
 
         # Gulf of Mexico
-        NGOFS = 20  # RG = True     # Format is GoMOFS
+        NGOFS2 = 20  # RG = True     # Format is GoMOFS
         TBOFS = 21  # RG = True     # Format is GoMOFS
 
         # Great Lakes
         LEOFS = 30  # RG = True     # Format is GoMOFS
-        LHOFS = 31  # RG = False
-        LMOFS = 32  # RG = False
-        LOOFS = 33  # RG = False
-        LSOFS = 34  # RG = False
+        LMHOFS = 31  # RG = True    # Format is GoMOFS
+        LOOFS = 33  # RG = True     # Format is GoMOFS
+        LSOFS = 34  # RG = True     # Format is GoMOFS
 
         # Pacific Coast
-        CREOFS = 40  # RG = True     # Format is GoMOFS
+        SSCOFS = 40  # RG = True     # Format is GoMOFS
         SFBOFS = 41  # RG = True     # Format is GoMOFS
+        WCOFS = 42  # RG = True     # Format is GoMOFS
 
     # noinspection DuplicatedCode
     regofs_model_descs = \
@@ -49,15 +49,15 @@ class RegOfsOffline:
             Model.GoMOFS: "Gulf of Maine Operational Forecast System",
             Model.NYOFS: "Port of New York and New Jersey Operational Forecast System",
             Model.SJROFS: "St. John's River Operational Forecast System",
-            Model.NGOFS: "Northern Gulf of Mexico Operational Forecast System",
+            Model.NGOFS2: "Northern Gulf of Mexico Operational Forecast System",
             Model.TBOFS: "Tampa Bay Operational Forecast System",
             Model.LEOFS: "Lake Erie Operational Forecast System",
-            Model.LHOFS: "Lake Huron Operational Forecast System",
-            Model.LMOFS: "Lake Michigan Operational Forecast System",
+            Model.LMHOFS: "Lake Michigan and Huron Operational Forecast System",
             Model.LOOFS: "Lake Ontario Operational Forecast System",
             Model.LSOFS: "Lake Superior Operational Forecast System",
-            Model.CREOFS: "Columbia River Estuary Operational Forecast System",
-            Model.SFBOFS: "San Francisco Bay Operational Forecast System"
+            Model.SSCOFS: "Salish Sea and Columbia River Operational Forecast System",
+            Model.SFBOFS: "San Francisco Bay Operational Forecast System",
+            Model.WCOFS: "West Coast Operational Forecast System"
         }
 
     def __init__(self, data_folder: str, prj: 'SoundSpeedLibrary') -> None:

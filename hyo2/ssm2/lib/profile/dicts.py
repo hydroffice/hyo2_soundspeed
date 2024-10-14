@@ -28,16 +28,16 @@ class Dicts:
         ('DBOFS', 7),  # since DB v.3
         ('NYOFS', 8),  # since DB v.3
         ('SJROFS', 9),  # since DB v.3
-        ('NGOFS', 10),  # since DB v.3
+        ('NGOFS2', 10),  # since DB v.3
         ('TBOFS', 11),  # since DB v.3
         ('LEOFS', 12),  # since DB v.3
-        ('LHOFS', 13),  # since DB v.3
-        ('LMOFS', 14),  # since DB v.3
+        ('LMHOFS', 13),  # since DB v.3
         ('LOOFS', 15),  # since DB v.3
         ('LSOFS', 16),  # since DB v.3
-        ('CREOFS', 17),  # since DB v.3
+        ('SSCOFS', 17),  # since DB v.3
         ('SFBOFS', 18),  # since DB v.3
         ('WOA18', 19),  # since DB v.4
+        ('WCOFS', 20),  # since DB v.4
 
         ('SVP', 101),
         ('Castaway', 102),

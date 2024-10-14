@@ -80,15 +80,15 @@ class Atlases:
         self.gomofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.GoMOFS)
         self.nyofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.NYOFS)
         self.sjrofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.SJROFS)
-        self.ngofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.NGOFS)
+        self.ngofs2 = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.NGOFS2)
         self.tbofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.TBOFS)
         self.leofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.LEOFS)
-        self.lhofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.LHOFS)
-        self.lmofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.LMOFS)
+        self.lmhofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.LMHOFS)
         self.loofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.LOOFS)
         self.lsofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.LSOFS)
-        self.creofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.CREOFS)
+        self.sscofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.SSCOFS)
         self.sfbofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.SFBOFS)
+        self.wcofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.WCOFS)
 
         self.offofs = RegOfsOffline(data_folder=self._regofs_folder, prj=self.prj)
 
@@ -128,13 +128,13 @@ class Atlases:
         msg += "  %s" % self.gomofs
         msg += "  %s" % self.nyofs
         msg += "  %s" % self.sjrofs
-        msg += "  %s" % self.ngofs
+        msg += "  %s" % self.ngofs2
         msg += "  %s" % self.tbofs
         msg += "  %s" % self.leofs
-        msg += "  %s" % self.lhofs
-        msg += "  %s" % self.lmofs
+        msg += "  %s" % self.lmhofs
         msg += "  %s" % self.loofs
         msg += "  %s" % self.lsofs
-        msg += "  %s" % self.creofs
+        msg += "  %s" % self.sscofs
         msg += "  %s" % self.sfbofs
+        msg += "  %s" % self.wcofs
         return msg
