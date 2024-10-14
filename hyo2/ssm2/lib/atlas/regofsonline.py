@@ -299,6 +299,8 @@ class RegOfsOnline(AbstractAtlas):
         ssp.clone_data_to_proc()
         ssp.init_sis()
 
+        print(ssp)
+
         profiles = ProfileList()
         profiles.append_profile(ssp)
 
