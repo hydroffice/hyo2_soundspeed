@@ -583,7 +583,8 @@ class Profile:
                     self.data.flag[i] = Dicts.flags['valid']  # switch back to valid the last flagged one
 
         if np.sum(self.data_valid) <= 1:
-            raise RuntimeError('Unable to locate the upcast values. Double check their presence in the input file.')
+            raise RuntimeError('Unable to retrieve the cast values. Double check their presence in the input file and '
+                               'the direction of the cast values in the SSM setup.')
 
         if ssp_direction == Dicts.ssp_directions['up']:
             logger.debug("flipping data for up direction")
