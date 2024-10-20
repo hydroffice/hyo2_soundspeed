@@ -56,19 +56,20 @@ setup(
         "coverage"
     ],
     install_requires=[
+        "hyo2.abc2>=2.3.10",
         "appdirs",
+        "cartopy",
         "gsw",
-        "hyo2.abc2>=2.3.5",
         "matplotlib",
         "netCDF4",
         "numpy<2.0.0",
         "pillow",
         "pyserial",
+        "PySide6"
         "requests",
-        "scipy"
-        # "PySide6"
+        "scipy",
     ],
-    python_requires='>=3.8',
+    python_requires='>=3.11',
     entry_points={
         "gui_scripts": [
             'sound_speed_manager = hyo2.ssm2.app.gui.soundspeedmanager.gui:gui',
@@ -94,9 +95,8 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         'Topic :: Scientific/Engineering :: GIS',
         'Topic :: Office/Business :: Office Suites',
     ],

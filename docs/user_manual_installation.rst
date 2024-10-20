@@ -37,15 +37,15 @@ If you decide to install the package in a Python environment, the dependencies a
 * `gdal <https://github.com/OSGeo/gdal>`_
 * `gsw <https://github.com/TEOS-10/python-gsw>`_ *(version == 3.0.6)*
 * `matplotlib <https://github.com/matplotlib/matplotlib>`_
-* `pillow <https://github.com/python-pillow/Pillow>`_
 * `netCDF4 <https://github.com/Unidata/netcdf4-python>`_
 * `numpy <https://github.com/numpy/numpy>`_
-* `scipy <https://github.com/scipy/scipy>`_
+* `pillow <https://github.com/python-pillow/Pillow>`_
 * `pyproj <https://github.com/jswhit/pyproj>`_
 * `pyserial <https://github.com/pyserial/pyserial>`_
 * `PySide6 <https://github.com/qtproject/pyside-pyside-setup>`_ *(only for the application)*
 * `qt-material <https://github.com/UN-GCPDS/qt-material>`_ *(only for the application)*
 * `requests <https://github.com/psf/requests>`_
+* `scipy <https://github.com/scipy/scipy>`_
 
 If you want to install the last stable version (from PyPI):
 

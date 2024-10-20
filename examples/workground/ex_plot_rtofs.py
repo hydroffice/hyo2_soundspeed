@@ -1,16 +1,17 @@
 import os
 import logging
-from hyo2.ssm2.app.gui.soundspeedmanager import AppInfo
-from PySide6 import QtWidgets
-from mpl_toolkits.basemap import Basemap
+
 import numpy as np
-from matplotlib import pyplot as plt
 import netCDF4
+import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
 
 from hyo2.abc.lib.testing import Testing
 from hyo2.abc.lib.logging import set_logging
 
-ns_list = ["hyo2.soundspeed", "hyo2.ssm2.app.gui.soundspeedmanager", "hyo2.soundspeedsettings"]
+
+ns_list = ["hyo2.abc2"]
 set_logging(ns_list=ns_list)
 logger = logging.getLogger(__name__)
 
@@ -24,45 +25,34 @@ logger.debug("path: %s" % nc_path)
 file = netCDF4.Dataset(nc_path)
 lat = file.variables['Latitude'][:]
 lon = file.variables['Longitude'][:]
-data = file.variables['temperature'][0, 0, :, :]
+temp = file.variables['temperature'][0, 0, :, :]
 
 file.close()
 
-# There is a quirk to the global NetCDF files that isn't in the NOMADS data, namely that there are junk values
-# of longitude (lon>500) in the rightmost column of the longitude array (they are ignored by the model itself).
-# So we have to work around them a little with NaN substitution.
-lon = np.where(np.greater_equal(lon, 500), np.nan, lon)
+# Handle longitude wrapping if necessary
+lon = np.where(lon > 180, lon - 360, lon)
 
-# Plot the field using Basemap. Start with setting the map projection using the limits of the lat/lon data itself
-plt.figure()
+plt.figure(dpi=100)
+ax = plt.axes(projection=ccrs.PlateCarree())
+ax.set_global()
 
-m = Basemap(projection='mill', lat_ts=10, llcrnrlon=np.nanmin(lon), urcrnrlon=np.nanmax(lon),
-            llcrnrlat=lat.min(), urcrnrlat=lat.max(), resolution='c')
+# Add coastlines and gridlines
+ax.coastlines(resolution='110m', linewidth=1)
+ax.gridlines(draw_labels=True)
 
-# Convert geographic to projected coords
-x, y = m(lon, lat)
-# # logger.debug("xs: %s" % x)
-# # logger.debug("ys: %s" % y)
+# Add land and ocean features
+ax.add_feature(cfeature.LAND, zorder=0, edgecolor='black')
+ax.add_feature(cfeature.OCEAN, zorder=0)
 
-# Plot using the fast pcolormesh
-ma_x = np.ma.array(x, mask=np.isnan(x))
-ma_x = np.ma.array(ma_x, mask=np.greater_equal(ma_x, 1e30))
-ma_y = np.ma.array(y, mask=np.isnan(y))
-ma_y = np.ma.array(ma_y, mask=np.greater_equal(ma_y, 1e30))
-# logger.debug("xs: %s" % ma_x)
-# logger.debug("ys: %s" % ma_y)
+# Plot temperature (adjust cmap and vmin/vmax for better visualization if needed)
+temp_plot = ax.contourf(lon, lat, temp, levels=60, transform=ccrs.PlateCarree(), cmap='coolwarm')
 
-cs = m.pcolor(ma_x, ma_y, data, cmap=plt.cm.viridis)
+# Add colorbar
+cbar = plt.colorbar(temp_plot, orientation='vertical', pad=0.05, aspect=30)
+cbar.set_label('Temperature (°C)')
 
-# Add lines and grids
-m.drawcoastlines()
-m.fillcontinents()
-m.drawmapboundary()
-m.drawparallels(np.arange(-90., 120., 30.), labels=[1, 0, 0, 0])
-m.drawmeridians(np.arange(-180., 180., 60.), labels=[0, 0, 0, 1])
+# Add title
+plt.title('Sea Surface Temperature from NOAA RTOFS')
 
-# Add a colorbar and title
-plt.colorbar(cs)
-plt.title('Global RTOFS - Sea Surface Temperature - 20181016')
-
+# Show the plot
 plt.show()

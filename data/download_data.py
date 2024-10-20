@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 clear_download_folder = False
 
-# list of files to download
+# list of files to download from https://nomads.ncep.noaa.gov/pub/data/nccf/com/rtofs/prod/
 data_files = [
     "rtofs_glo_3dz_f024_daily_3zsio.nc",
     "rtofs_glo_3dz_f024_daily_3ztio.nc"
