@@ -80,3 +80,7 @@ The package is jointly developed by the `Center for Coastal and Ocean Mapping, U
     :alt: joint efforts
 
 For further information, visit the `manual <https://www.hydroffice.org/manuals/ssm2/index.html>`_.
+
+.. note::
+   If you want to help improving SSM, this is the recommended
+   `starting point <https://www.hydroffice.org/manuals/ssm2/stable/developer_guide_how_to_contribute.html>`_.

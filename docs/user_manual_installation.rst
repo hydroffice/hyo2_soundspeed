@@ -32,7 +32,8 @@ Installation as stand-alone Python package
 
 If you decide to install the package in a Python environment, the dependencies are:
 
-* `basemap <https://github.com/matplotlib/basemap>`_
+* `appdirs <https://github.com/ActiveState/appdirs>`_
+* `cartopy <https://github.com/SciTools/cartopy>`_
 * `gdal <https://github.com/OSGeo/gdal>`_
 * `gsw <https://github.com/TEOS-10/python-gsw>`_ *(version == 3.0.6)*
 * `matplotlib <https://github.com/matplotlib/matplotlib>`_
@@ -43,10 +44,12 @@ If you decide to install the package in a Python environment, the dependencies a
 * `pyproj <https://github.com/jswhit/pyproj>`_
 * `pyserial <https://github.com/pyserial/pyserial>`_
 * `PySide6 <https://github.com/qtproject/pyside-pyside-setup>`_ *(only for the application)*
+* `qt-material <https://github.com/UN-GCPDS/qt-material>`_ *(only for the application)*
+* `requests <https://github.com/psf/requests>`_
 
 If you want to install the last stable version (from PyPI):
 
-* `pip install hyo2.soundspeed`
+* `pip install hyo2.ssm2`
 
 Or, if you prefer the bleeding edge code:
 
