@@ -52,7 +52,6 @@ setup(
     zip_safe=False,
     setup_requires=[
         "setuptools",
-        "wheel",
         "coverage"
     ],
     install_requires=[
@@ -65,7 +64,7 @@ setup(
         "numpy<2.0.0",
         "pillow",
         "pyserial",
-        "PySide6"
+        "PySide6",
         "requests",
         "scipy",
     ],
