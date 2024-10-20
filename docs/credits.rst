@@ -18,6 +18,8 @@ The package developers and maintainers are:
 
 Other past and present contributors are:
 
+- `Roland Arsenault <roland.arsenault@unh.edu>`_
+
 - `Hugh Barker <mailto:hugh.barker@csiro.au>`_
 
 - `Jonathan Beaudoin <mailto:beaudoin@qps.nl>`_
@@ -43,6 +45,8 @@ Other past and present contributors are:
 - `Glen Rice <mailto:glen.rice@noaa.gov>`_
 
 - `Jack Riley <mailto:jack.riley@noaa.gov>`_
+
+- `Val Schmidt <val.schmidt@unh.edu>`_
 
 - `Matthew Sharr <mailto:matthew.sharr@noaa.gov>`_
 
