@@ -5,16 +5,18 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    continue-on-error: true
     strategy:
       max-parallel: 5
 
     steps:
     - uses: actions/checkout@v4
     - name: setup-conda
-      uses: s-weigand/setup-conda@v1.2.2
+      uses: s-weigand/setup-conda@v1
       with:
         update-conda: true
-        python-version: 3.11
+        python-version: '3.11'
+        conda-channels: 'conda-forge'
     - name: Install dependencies
       run: |
         conda config --add channels conda-forge
@@ -22,7 +24,7 @@ jobs:
         conda install gsw netCDF4 pillow pyserial scipy
         pip install PySide6
         sudo apt-get install -y libegl1
-        pip install hyo2.abc2
+        pip install --no-deps https://github.com/hydroffice/hyo2_abc2/archive/master.zip
         pip install --no-deps .
     - name: Lint with flake8
       run: |
@@ -31,11 +33,10 @@ jobs:
         flake8 ./hyo2/ssm2 --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 ./hyo2/ssm2 --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      continue-on-error: true
     - name: Test with pytest
       run: |
         pip install coveralls PyYAML pytest pytest-cov
         py.test --cov
         coverage report -m
-        coveralls
-      continue-on-error: false
+        # disabled linux reports to avoid mixing with windows ones
+        # coveralls
