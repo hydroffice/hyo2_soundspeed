@@ -208,6 +208,9 @@ class MainWin(QtWidgets.QMainWindow):
         self.data_cleared()
         self.tabs.blockSignals(False)
 
+        # using in app tests
+        self.skip_do_you_really_quit = False
+
         logger.info("* > APP: initialized!")
 
     def on_change(self, i):
@@ -830,16 +833,23 @@ class MainWin(QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         """ actions to be done before close the app """
+        if self.skip_do_you_really_quit:
+            self._close(event=event)
+            return
+
         reply = self._do_you_really_want("Quit", "quit %s" % app_info.app_name)
         # reply = QtWidgets.QMessageBox.Yes
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
-            event.accept()
-            self.lib.close()
-            if self.has_sdm_support:
-                self.tab_monitor.stop_plotting()
-            super(MainWin, self).closeEvent(event)
+            self._close(event)
         else:
             event.ignore()
+
+    def _close(self, event):
+        event.accept()
+        self.lib.close()
+        if self.has_sdm_support:
+            self.tab_monitor.stop_plotting()
+        super(MainWin, self).closeEvent(event)
 
     # -------------------------- development-only --------------------------
 

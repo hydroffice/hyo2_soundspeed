@@ -2,6 +2,8 @@
 [run]
 branch = True
 source = hyo2.ssm2
+omit =
+    hyo2/ssm2/app/*
 
 [report]
 # Regexes for lines to exclude from consideration
