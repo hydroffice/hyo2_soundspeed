@@ -28,7 +28,8 @@ class Oceanography:
     # ### PRESSURE/DEPTH METHODS ###
 
     @classmethod
-    def p2d(cls, p, lat: float = 30.0, dyn_height: int | None = None, debug: bool = False) -> float:
+    def p2d(cls, p: float | np.ndarray, lat: float = 30.0, dyn_height: int | None = None, debug: bool = False) \
+            -> float | np.ndarray:
         """Convert pressure to depth"""
         try:
             return cls.p2d_gsw(p=p, lat=lat, dyn_height=dyn_height)
@@ -39,14 +40,14 @@ class Oceanography:
             return cls.p2d_backup(p=p, lat=lat)
 
     @classmethod
-    def p2d_gsw(cls, p, lat: float, dyn_height: int | None) -> float:
+    def p2d_gsw(cls, p: float | np.ndarray, lat: float, dyn_height: int | None) -> float | np.ndarray:
 
         if not isinstance(p, np.ndarray):
             p = np.array(p, ndmin=1, copy=False)
 
         if dyn_height is None:
             depth = -gsw.conversions.z_from_p(p=p, lat=lat)
-            return depth[0]
+            return depth
 
         depth = -gsw.conversions.z_from_p(p=p, lat=lat, geo_strf_dyn_height=dyn_height)
         for val in depth:
@@ -54,10 +55,10 @@ class Oceanography:
                 logger.info("nan in gsw.conversions.z_from_p with dyn_height")
                 return -gsw.conversions.z_from_p(p=p, lat=lat)
 
-        return depth[0]
+        return depth
 
     @classmethod
-    def p2d_backup(cls, p, lat: float) -> float:
+    def p2d_backup(cls, p: float | np.ndarray, lat: float) -> float | np.ndarray:
         """Convert pressure to depth
 
         If the latitude is not passed, a default value of 30.0 is used.
@@ -84,7 +85,8 @@ class Oceanography:
         return d / g
 
     @classmethod
-    def d2p(cls, d, lat: float = 30.0, dyn_height: int | None = None, debug: bool = False) -> float:
+    def d2p(cls, d: float | np.ndarray, lat: float = 30.0, dyn_height: int | None = None, debug: bool = False) \
+            -> float | np.ndarray:
         """Convert pressure to depth"""
         try:
             return cls.d2p_gsw(d=d, lat=lat, dyn_height=dyn_height)
@@ -95,14 +97,14 @@ class Oceanography:
             return cls.d2p_backup(d=d, lat=lat)
 
     @classmethod
-    def d2p_gsw(cls, d, lat: float, dyn_height: int | None) -> float:
+    def d2p_gsw(cls, d: float | np.ndarray, lat: float, dyn_height: int | None) -> float | np.ndarray:
 
         if not isinstance(d, np.ndarray):
             d = np.array(d, ndmin=1, copy=False)
 
         if dyn_height is None:
             pressure = gsw.conversions.p_from_z(z=-d, lat=lat)
-            return pressure[0]
+            return pressure
 
         pressure = gsw.conversions.p_from_z(z=-d, lat=lat, geo_strf_dyn_height=dyn_height)
         for val in pressure:
@@ -110,10 +112,10 @@ class Oceanography:
                 logger.info("nan in gsw.conversions.p_from_z with dyn_height")
                 return gsw.conversions.p_from_z(z=-d, lat=lat)
 
-        return pressure[0]
+        return pressure
 
     @classmethod
-    def d2p_backup(cls, d, lat: float) -> float:
+    def d2p_backup(cls, d: float | np.ndarray, lat: float) -> float | np.ndarray:
         """Convert depth to pressure
 
         ref: Leroy and Parthiot(1998)

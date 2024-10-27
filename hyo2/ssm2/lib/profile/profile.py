@@ -840,6 +840,8 @@ class Profile:
         user_invalid = self.sis.flag == Dicts.flags['user']  # user-invalidate samples
         possible = np.logical_or(valid, user_invalid)  # possible samples
         ip = np.indices(self.sis.flag.shape)[0][possible]  # indices of possible samples
+        if len(ip) < 2:
+            raise RuntimeError("Too few valid samples: %d! Check cast direction" % len(ip))
 
         # find depth index both in the valid and in the possible samples
         try:

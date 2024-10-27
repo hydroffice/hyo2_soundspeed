@@ -27,7 +27,7 @@ logger.info('output folder: %s' % data_output)
 
 # test readers/writers
 logger.info('test: *** START ***')
-filters = ["valeport", ]
+filters = ["aml", ]
 formats = ["caris", "csv", "elac", "hypack", "ixblue", "asvp/ssp", "qps", "sonardyne", "unb", ]
 data_outputs = dict()
 for format in formats:
@@ -35,9 +35,15 @@ for format in formats:
 tests = testing.input_dict_test_files(inclusive_filters=filters)
 # print(tests)
 
+reduced_testing = True
+
 # import each identified file
 for idx, testfile in enumerate(tests.keys()):
     logger.info("test: * New profile: #%03d *" % idx)
+
+    if reduced_testing and (os.path.basename(testfile)[0] != "_"):
+        logger.debug("Skip!")
+        continue
 
     # import
     lib.import_data(data_path=testfile, data_format=tests[testfile].name)

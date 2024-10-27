@@ -1,6 +1,4 @@
 import unittest
-import os
-import shutil
 import logging
 
 from hyo2.ssm2.lib.atlas.rtofs import Rtofs
@@ -11,26 +9,15 @@ logger = logging.getLogger()
 
 class TestSoundSpeedAtlasRtofs(unittest.TestCase):
 
-    def setUp(self):
-        self.cur_dir = os.path.abspath(os.path.dirname(__file__))
-
-    def tearDown(self):
-        dir_items = os.listdir(self.cur_dir)
-        for item in dir_items:
-            if item.split('.')[-1] == 'db':
-                os.remove(os.path.join(self.cur_dir, item))
-            if item == 'atlases':
-                shutil.rmtree(os.path.join(self.cur_dir, item))
-
     def test_creation_of_Rtofs(self):
-        prj = SoundSpeedLibrary(data_folder=self.cur_dir)
+        prj = SoundSpeedLibrary()
         rtofs = Rtofs(data_folder=prj.rtofs_folder, prj=prj)
         self.assertTrue('rtofs' in rtofs.data_folder)
         self.assertFalse(rtofs.is_present())
         prj.close()
 
     def test_download_db_from_Rtofs(self):
-        prj = SoundSpeedLibrary(data_folder=self.cur_dir)
+        prj = SoundSpeedLibrary()
         rtofs = Rtofs(data_folder=prj.data_folder, prj=prj)
         rtofs.download_db(server_mode=True)
 
