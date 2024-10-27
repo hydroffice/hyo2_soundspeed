@@ -157,7 +157,7 @@ class RegOfsOnline(AbstractAtlas):
         try:
             lat_idx, lon_idx = self.grid_coords(lat, lon, dtstamp=dtstamp, server_mode=server_mode)
             if lat_idx is None:
-                logger.info("location outside of %s coverage" % self.name)
+                logger.info("troubles with data source or location outside of %s coverage" % self.name)
                 return None
 
         except TypeError as e:

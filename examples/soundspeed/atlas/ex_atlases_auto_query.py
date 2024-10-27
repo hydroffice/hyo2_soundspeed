@@ -47,7 +47,7 @@ class ModelOptions(IntEnum):
 
 
 # Choose Model
-switch = ModelOptions.WCOFS  # Choose a ModelOptions Value to test
+switch = ModelOptions.RTOFS  # Choose a ModelOptions Value to test
 
 app = QtWidgets.QApplication([])  # PySide stuff (start)
 mw = QtWidgets.QMainWindow()
@@ -58,7 +58,7 @@ lib = SoundSpeedLibrary(progress=QtProgress(parent=mw), callbacks=QtCallbacks(pa
 # Choose test location
 tests = [
 
-    # (-19.1, 74.16, dt.utcnow()),              # Indian Ocean
+    # (-19.1, 74.17, dt.utcnow()),              # Indian Ocean
     # (72.852028, -67.315431, dt.utcnow())      # Baffin Bay
     # (18.2648113, 16.1761115, dt.utcnow()),    # in land -> middle of Africa
     # (39.725989, -104.967745, dt.utcnow())     # in land -> Denver, CO
