@@ -2,10 +2,10 @@
 [run]
 branch = True
 source = hyo2.ssm2
-omit =
-    hyo2/ssm2/app/*
 
 [report]
+omit = */app/*
+
 # Regexes for lines to exclude from consideration
 exclude_lines =
     # Have to re-enable the standard pragma

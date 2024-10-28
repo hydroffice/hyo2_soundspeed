@@ -104,6 +104,7 @@ class Rtofs(AbstractAtlas):
         return self._has_data_loaded
 
     def _clean_rtofs_folder(self, skip_folder: str | None = None) -> None:
+        # logger.debug("RTOFS folder to clean: %s" % self.data_folder)
         for item in os.listdir(self.data_folder):
             full_path = os.path.join(self.data_folder, item)
 
