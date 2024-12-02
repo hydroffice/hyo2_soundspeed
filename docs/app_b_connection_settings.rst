@@ -444,3 +444,69 @@ not currently known thus the user must confirm reception in the acquisition syst
     :figclass: align-center
 
     While running PDS2000 in acquisition mode, you can verify reception in the Status displays and the “Raw Data” displays. Check the date, time, latitude, longitude against what you sent from SSP package.
+
+Kongsberg EA440
+---------------
+
+The Konsgsberg EA440/EA640 single-beam echo sounder data acquisition system accepts SVP transmissions from the *Sound Speed* package. A method to verify reception of the cast is not currently known thus the user should confirm reception in the acquisition system.
+
+In the *Setup* tab of the EA440 software, open the *Installation* window and under *I/O Setup*, configure the IP address and port number where the casts transmitted from the *Sound Speed* package should be received (:numref:`ea440_1_fig`).
+
+.. _ea440_1_fig:
+
+.. figure:: ./_static/ea440_1.png
+    :width: 600px
+    :align: center
+    :alt: alternate text
+    :figclass: align-center
+
+    Add a new LAN Port to receive casts from SSP package.
+
+Under *Sensor Installation*, add a new sensor with type *Sound Velocity Profile EM*. Select the newly created LAN Port as the port associated with this sensor. Make sure that the S01 datagram is enabled (:numref:`ea440_2_fig`).
+
+.. _ea440_2_fig:
+
+.. figure:: ./_static/ea440_2.png
+    :width: 600px
+    :align: center
+    :alt: alternate text
+    :figclass: align-center
+
+    Add a new sensor in the EM S01 format to decode casts from SSP package.
+
+Open the *Monitor* window to verify successfull reception of a cast from the *Sound Speed* package (:numref:`ea440_3_fig`). Make sure that the *Sound Speed* package is properly configured with an Output client using the EA440 protocol to accomplish this test.
+
+    .. _ea440_3_fig:
+
+.. figure:: ./_static/ea440_3.png
+    :width: 600px
+    :align: center
+    :alt: alternate text
+    :figclass: align-center
+
+    Verify successfull reception of a cast from the *Sound Speed* package using the *Monitor* window
+
+In the *Setup* tab of the EA440 software, open the *Environment* window and under *Water Column*, make sure that the sound speed and temperature sources are set to *Profile* (:numref:`ea440_4_fig`).
+
+    .. _ea440_4_fig:
+
+.. figure:: ./_static/ea440_4.png
+    :width: 600px
+    :align: center
+    :alt: alternate text
+    :figclass: align-center
+
+    Source selection for sound speed and temperature
+
+Under *Sound Velocity Profile*, select *Profile From Network* as source. Reception of a new cast from the *Sound Speed* package should immediately update in the sound speed plot (:numref:`ea440_5_fig`).
+
+    .. _ea440_5_fig:
+
+.. figure:: ./_static/ea440_5.png
+    :width: 600px
+    :align: center
+    :alt: alternate text
+    :figclass: align-center
+
+    Sound speed profile received from the *Sound Speed* package and displayed in the EA440 software
+
