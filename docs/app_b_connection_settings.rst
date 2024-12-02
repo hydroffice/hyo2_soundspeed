@@ -462,7 +462,7 @@ In the *Setup* tab of the EA440 software, open the *Installation* window and und
 
     Add a new LAN Port to receive casts from SSP package.
 
-Under *Sensor Installation*, Add a new sensor with type *Sound Velocity Profile EM*. Select the newly created LAN Port as the port associated with this sensor. Make sure that the S01 datagram is enabled (:numref:`ea440_2_fig`).
+Under *Sensor Installation*, add a new sensor with type *Sound Velocity Profile EM*. Select the newly created LAN Port as the port associated with this sensor. Make sure that the S01 datagram is enabled (:numref:`ea440_2_fig`).
 
 .. _ea440_2_fig:
 

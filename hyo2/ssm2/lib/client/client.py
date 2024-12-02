@@ -33,8 +33,8 @@ class Client:
 
         logger.info("transmitting to %s: [%s:%s:%s]" % (self.name, self.ip, self.port, self.protocol))
 
-        if (self.protocol == "HYPACK") or (self.protocol == "EA440"):
-            success = self.send_aml_format(prj=prj)
+        if (self.protocol == "HYPACK"):
+            success = self.send_hyp_format(prj=prj)
         else:
             success = self.send_kng_format(prj=prj, server_mode=server_mode)
 
@@ -61,8 +61,11 @@ class Client:
         if self.protocol == "QINSY":
             apply_12k = False
             tolerances = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5]
-        elif (self.protocol == "PDS2000") or (self.protocol == "EA440"):
+        elif self.protocol == "PDS2000":
             apply_12k = False
+        elif self.protocol == "EA440":
+            apply_12k = False
+            logger.info("bypassing the 12k meter depth extension")
 
         tx_data = None
         for tolerance in tolerances:
@@ -93,8 +96,8 @@ class Client:
 
         return self._transmit(tx_data)
 
-    def send_aml_format(self, prj: 'SoundSpeedLibrary') -> bool:
-        logger.info("using aml format")
+    def send_hyp_format(self, prj: 'SoundSpeedLibrary') -> bool:
+        logger.info("using hypack format")
         calc = Calc()
         tx_data = calc.convert(prj.ssp)
 
