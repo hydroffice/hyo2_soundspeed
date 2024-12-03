@@ -831,6 +831,15 @@ class SetupDb(BaseDb):
     def default_vessel(self, value: str) -> None:
         self._setter_str("default_vessel", value)
 
+    # --- average sound speed
+    @property
+    def average_sound_speed(self) -> bool:
+        return self._getter_bool("average_sound_speed")
+
+    @average_sound_speed.setter
+    def average_sound_speed(self, value: bool) -> None:
+        self._setter_bool("average_sound_speed", value)
+        
     # --- auto_apply_default_metadata
     @property
     def auto_apply_default_metadata(self) -> bool:

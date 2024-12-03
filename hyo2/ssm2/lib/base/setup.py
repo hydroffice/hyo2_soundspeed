@@ -115,6 +115,7 @@ class Setup:
         self.default_institution: str | None = None
         self.default_survey: str | None = None
         self.default_vessel: str | None = None
+        self.average_sound_speed: bool | None = None
         self.auto_apply_default_metadata: bool | None = None
 
         # loading settings
@@ -221,6 +222,7 @@ class Setup:
         self.default_institution = db.default_institution
         self.default_survey = db.default_survey
         self.default_vessel = db.default_vessel
+        self.average_sound_speed = db.average_sound_speed
         self.auto_apply_default_metadata = db.auto_apply_default_metadata
 
         db.close()
@@ -314,6 +316,7 @@ class Setup:
             db.default_institution = self.default_institution
             db.default_survey = self.default_survey
             db.default_vessel = self.default_vessel
+            db.average_sound_speed = self.average_sound_speed
             db.auto_apply_default_metadata = self.auto_apply_default_metadata
 
             db.commit()
@@ -379,6 +382,7 @@ class Setup:
         msg += "      <default_institution: %s>\n" % self.default_institution
         msg += "      <default_survey: %s>\n" % self.default_survey
         msg += "      <default_vessel: %s>\n" % self.default_vessel
+        msg += "      <average sound speed: %s>\n" % self.average_sound_speed        
         msg += "      <auto_apply_default_metadata: %s>\n" % self.auto_apply_default_metadata
 
         return msg
