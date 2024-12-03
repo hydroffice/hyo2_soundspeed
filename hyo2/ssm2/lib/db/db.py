@@ -646,9 +646,8 @@ class ProjectDb:
                 if probe_type not in Dicts.probe_types.values():
                     probe_type = Dicts.probe_types['Future']
 
-                # special handling for surface sound speed, min depth, max depth
+                # special handling for surface sound speed, mean sound speed, min depth, max depth
                 try:
-                    ss_at_min_depth = str()
                     min_depth = str()
                     for row_min in sql_min:
                         if row_min['ssp_pk'] == row['pk']:
@@ -658,6 +657,14 @@ class ProjectDb:
                     if min_depth == '':
                         logger.warning("unable to retrieve min depth for profile: %s -> skipping" % row['pk'])
                         continue
+                except Exception as e:
+                    logger.warning("profile %s: %s -> skipping" % (e, row['pk']))
+                    continue
+
+                try:
+                    mean_ss = str()
+                    ssp = self.profile_by_pk(row['pk'])
+                    mean_ss = '%0.2f' % ssp.cur.proc_speed_mean
                 except Exception as e:
                     logger.warning("profile %s: %s -> skipping" % (e, row['pk']))
                     continue
@@ -709,12 +716,13 @@ class ProjectDb:
                                  row['conductivity_uom'],  # 18
                                  row['salinity_uom'],  # 19
                                  ss_at_min_depth,  # 20
-                                 min_depth,  # 21
-                                 max_depth,  # 22
-                                 max_raw_depth,  # 23
-                                 ))
-
-            return ssp_list
+                                 mean_ss,  # 21
+                                 min_depth,  # 22
+                                 max_depth,  # 23
+                                 max_raw_depth,  # 24
+                ))
+                
+        return ssp_list
 
         except sqlite3.Error as e:
             logger.error("%s: %s" % (type(e), e))
