@@ -38,6 +38,7 @@ class Dicts:
         ('SFBOFS', 18),  # since DB v.3
         ('WOA18', 19),  # since DB v.4
         ('WCOFS', 20),  # since DB v.4
+        ('WOA23', 21),  # since DB v.7
 
         ('SVP', 101),
         ('Castaway', 102),
@@ -150,7 +151,7 @@ class Dicts:
         ('smoothing', 9),  # since DB v.2
         ('gomofs_ext', 10),  # since DB v.3
         ('woa18_ext', 11),  # since DB v.3
-
+        ('woa23_ext', 12),  # since DB v.7
     ])
 
     booleans = OrderedDict([
@@ -178,6 +179,7 @@ class Dicts:
         ("ref", 3),
         ("GoMOFS", 4),  # since DB v.3
         ("WOA18", 5),  # since DB v.4
+        ("WOA23", 6),  # since DB v.7
 
     ])
 
@@ -188,6 +190,7 @@ class Dicts:
         ("RTOFS", 2),
         ("GoMOFS", 3),  # since DB v.3
         ("WOA18", 4),  # since DB v.4
+        ("WOA23", 5),  # since DB v.7
 
     ])
 
@@ -260,13 +263,15 @@ class Dicts:
         ('EXT_RTOFS', 'ext.from RTOFS'),
         ('EXT_GoMOFS', 'ext.from GoMOFS'),  # since DB v.3
         ('EXT_REF', 'ext.from ref'),
+        ('EXT_WOA23', 'ext.from WOA23'),  # since DB v.7
 
         ('REP_SAL_WOA09', 'sal.from WOA09'),
         ('REP_SAL_WOA13', 'sal.from WOA13'),
         ('REP_SAL_RTOFS', 'sal.from RTOFS'),
         ('REP_SAL_GoMOFS', 'sal.from GoMOFS'),  # since DB v.3
-        ('REP_SAL_WOA18', 'sal.from WOA18'), # since DB v.4
+        ('REP_SAL_WOA18', 'sal.from WOA18'),  # since DB v.4
         ('REP_SAL_REF', 'sal.from ref'),
+        ('REP_SAL_WOA23', 'sal.from WOA23'),  # since DB v.7
 
         ('REP_TEMP_SAL_WOA09', 'temp./sal.from WOA09'),
         ('REP_TEMP_SAL_WOA13', 'temp./sal.from WOA13'),
@@ -274,6 +279,7 @@ class Dicts:
         ('REP_TEMP_SAL_GoMOFS', 'temp./sal.from GoMOFS'),  # since DB v.3
         ('REP_TEMP_SAL_REF', 'temp./sal.from ref'),
         ('REP_TEMP_SAL_WOA18', 'temp./sal.from WOA18'),  # since DB v.4
+        ('REP_TEMP_SAL_WOA23', 'temp./sal.from WOA23'),  # since DB v.7
 
         ('RECALC_SPD', 'recalc.speed'),
         ('ADD_TSS', 'added tss'),

@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class Setup:
 
-    SUPPORTED_VERSION = 6
+    SUPPORTED_VERSION = 7
 
     @classmethod
     def are_updates_required(cls, db_path: str) -> bool:
@@ -27,7 +27,7 @@ class Setup:
         logger.debug("applying version updates %s" % db_path)
         db = SetupDb(os.path.dirname(db_path))
         if db.setup_version < cls.SUPPORTED_VERSION:
-            success = db.update_from_v1_to_v6()
+            success = db.update_from_v1_to_v7()
             if success:
                 return True
         return False
@@ -43,6 +43,7 @@ class Setup:
         self.use_woa09: bool | None = None
         self.use_woa13: bool | None = None
         self.use_woa18: bool | None = None
+        self.use_woa23: bool | None = None
         self.use_rtofs: bool | None = None
         self.use_cbofs: bool | None = None
         self.use_dbofs: bool | None = None
@@ -108,6 +109,7 @@ class Setup:
         self.custom_woa09_folder: str | None = None
         self.custom_woa13_folder: str | None = None
         self.custom_woa18_folder: str | None = None
+        self.custom_woa23_folder: str | None = None
         self.noaa_tools: bool | None = None
         self.default_institution: str | None = None
         self.default_survey: str | None = None
@@ -151,6 +153,7 @@ class Setup:
         self.use_woa09 = db.use_woa09
         self.use_woa13 = db.use_woa13
         self.use_woa18 = db.use_woa18
+        self.use_woa23 = db.use_woa23
         self.use_rtofs = db.use_rtofs
         self.use_gomofs = db.use_gomofs
         self.ssp_extension_source = Dicts.atlases[db.ssp_extension_source]
@@ -212,6 +215,7 @@ class Setup:
         self.custom_woa09_folder = db.custom_woa09_folder
         self.custom_woa13_folder = db.custom_woa13_folder
         self.custom_woa18_folder = db.custom_woa18_folder
+        self.custom_woa23_folder = db.custom_woa23_folder
         self.noaa_tools = db.noaa_tools
         self.default_institution = db.default_institution
         self.default_survey = db.default_survey
@@ -240,6 +244,7 @@ class Setup:
             db.use_woa09 = self.use_woa09
             db.use_woa13 = self.use_woa13
             db.use_woa18 = self.use_woa18
+            db.use_woa23 = self.use_woa23
             db.use_rtofs = self.use_rtofs
             db.use_gomofs = self.use_gomofs
             db.ssp_extension_source = PkgHelper.first_match(Dicts.atlases, self.ssp_extension_source)
@@ -303,6 +308,7 @@ class Setup:
             db.custom_woa09_folder = self.custom_woa09_folder
             db.custom_woa13_folder = self.custom_woa13_folder
             db.custom_woa18_folder = self.custom_woa18_folder
+            db.custom_woa23_folder = self.custom_woa23_folder
             db.noaa_tools = self.noaa_tools
             db.default_institution = self.default_institution
             db.default_survey = self.default_survey
@@ -326,6 +332,7 @@ class Setup:
         msg += "      <use_woa09: %s>\n" % self.use_woa09
         msg += "      <use_woa13: %s>\n" % self.use_woa13
         msg += "      <use_woa18: %s>\n" % self.use_woa18
+        msg += "      <use_woa23: %s>\n" % self.use_woa23
         msg += "      <use_rtofs: %s>\n" % self.use_rtofs
         msg += "      <use_gomofs: %s>\n" % self.use_gomofs
         msg += "      <ssp_extension_source: %s>\n" % self.ssp_extension_source
@@ -366,6 +373,7 @@ class Setup:
         msg += "      <woa09 folder: %s>\n" % self.custom_woa09_folder
         msg += "      <woa13 folder: %s>\n" % self.custom_woa13_folder
         msg += "      <woa18 folder: %s>\n" % self.custom_woa18_folder
+        msg += "      <woa23 folder: %s>\n" % self.custom_woa23_folder
         msg += "      <noaa tools: %s>\n" % self.noaa_tools
         msg += "      <default_institution: %s>\n" % self.default_institution
         msg += "      <default_survey: %s>\n" % self.default_survey

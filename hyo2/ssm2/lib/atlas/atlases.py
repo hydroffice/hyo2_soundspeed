@@ -4,6 +4,7 @@ import logging
 from hyo2.ssm2.lib.atlas.woa09 import Woa09
 from hyo2.ssm2.lib.atlas.woa13 import Woa13
 from hyo2.ssm2.lib.atlas.woa18 import Woa18
+from hyo2.ssm2.lib.atlas.woa23 import Woa23
 from hyo2.ssm2.lib.atlas.rtofs import Rtofs
 from hyo2.ssm2.lib.atlas.regofsonline import RegOfsOnline
 from hyo2.ssm2.lib.atlas.regofsoffline import RegOfsOffline
@@ -57,6 +58,18 @@ class Atlases:
             os.makedirs(woa18_folder)
         # logger.info("woa18 path: %s" % woa18_folder)
 
+        # woa23
+        if (self.prj.setup.custom_woa23_folder is None) or (self.prj.setup.custom_woa23_folder == ""):
+            woa23_folder = os.path.join(self._atlases_folder, "woa23")
+        else:
+            if os.path.exists(os.path.abspath(self.prj.setup.custom_woa23_folder)):
+                woa23_folder = self.prj.setup.custom_woa23_folder
+            else:
+                woa23_folder = os.path.join(self._atlases_folder, "woa23")
+        if not os.path.exists(woa23_folder):
+            os.makedirs(woa23_folder)
+        # logger.info("woa23 path: %s" % woa23_folder)
+
         # rtofs
         rtofs_folder = os.path.join(self._atlases_folder, "rtofs")
         if not os.path.exists(rtofs_folder):
@@ -73,6 +86,7 @@ class Atlases:
         self.woa09 = Woa09(data_folder=woa09_folder, prj=self.prj)
         self.woa13 = Woa13(data_folder=woa13_folder, prj=self.prj)
         self.woa18 = Woa18(data_folder=woa18_folder, prj=self.prj)
+        self.woa23 = Woa23(data_folder=woa23_folder, prj=self.prj)
         self.rtofs = Rtofs(data_folder=rtofs_folder, prj=self.prj)
 
         self.cbofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.CBOFS)
@@ -109,6 +123,10 @@ class Atlases:
         return self.woa18.data_folder
 
     @property
+    def woa23_folder(self):
+        return self.woa23.data_folder
+
+    @property
     def rtofs_folder(self):
         return self.rtofs.data_folder
 
@@ -122,6 +140,7 @@ class Atlases:
         msg += "  %s" % self.woa09
         msg += "  %s" % self.woa13
         msg += "  %s" % self.woa18
+        msg += "  %s" % self.woa23
         msg += "  %s" % self.rtofs
         msg += "  %s" % self.cbofs
         msg += "  %s" % self.dbofs

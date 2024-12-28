@@ -7,7 +7,7 @@ from hyo2.abc2.lib.package.pkg_helper import PkgHelper
 from hyo2.ssm2.lib.base.basedb import BaseDb
 from hyo2.ssm2.lib.base.setup_sql import CREATE_SETTINGS, CREATE_SETTINGS_VIEW, CREATE_CLIENT_LIST, \
     RENAME_SETTINGS, RENAME_CLIENT_LIST, DROP_OLD_SETTINGS, DROP_OLD_CLIENT_LIST, DROP_SETTINGS_VIEW, \
-    V1_V5_COPY_SETTINGS, V1_V5_COPY_CLIENT_LIST
+    V1_V7_COPY_SETTINGS, V1_V7_COPY_CLIENT_LIST
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ class SetupDb(BaseDb):
         self._check_default_setup()
         self.use_setup_name = use_setup_name
 
-    def update_from_v1_to_v6(self) -> bool:
+    def update_from_v1_to_v7(self) -> bool:
         if not self.conn:
             logger.error("Missing db connection")
             return False
@@ -40,8 +40,8 @@ class SetupDb(BaseDb):
                 self.conn.execute(CREATE_SETTINGS_VIEW)
 
             with self.conn:
-                self.conn.execute(V1_V5_COPY_SETTINGS)
-                self.conn.execute(V1_V5_COPY_CLIENT_LIST)
+                self.conn.execute(V1_V7_COPY_SETTINGS)
+                self.conn.execute(V1_V7_COPY_CLIENT_LIST)
                 self.conn.execute(DROP_OLD_SETTINGS)
                 self.conn.execute(DROP_OLD_CLIENT_LIST)
 
@@ -404,6 +404,15 @@ class SetupDb(BaseDb):
     def use_woa18(self, value: bool) -> None:
         self._setter_bool("use_woa18", value)
 
+    # --- use_woa23
+    @property
+    def use_woa23(self) -> bool:
+        return self._getter_bool("use_woa23")
+
+    @use_woa23.setter
+    def use_woa23(self, value: bool) -> None:
+        self._setter_bool("use_woa23", value)
+
     # --- use_rtofs
     @property
     def use_rtofs(self) -> bool:
@@ -763,6 +772,15 @@ class SetupDb(BaseDb):
     @custom_woa18_folder.setter
     def custom_woa18_folder(self, value: str) -> None:
         self._setter_str("custom_woa18_folder", value)
+
+    # --- custom_woa23_folder
+    @property
+    def custom_woa23_folder(self) -> str:
+        return self._getter_str("custom_woa23_folder")
+
+    @custom_woa23_folder.setter
+    def custom_woa23_folder(self, value: str) -> None:
+        self._setter_str("custom_woa23_folder", value)
 
     # --- noaa tools
     @property

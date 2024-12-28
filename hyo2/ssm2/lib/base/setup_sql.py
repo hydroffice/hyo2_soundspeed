@@ -42,11 +42,13 @@ if PkgHelper.is_pydro():
     default_use_woa_09 = 1
     default_use_woa_13 = 0
     default_use_woa_18 = 0
+    default_use_woa_23 = 0
     default_use_rtofs = 0
     default_use_gomofs = 0
     default_custom_woa09_folder = PkgHelper.hstb_woa09_folder()
     default_custom_woa13_folder = PkgHelper.hstb_woa13_folder()
     default_custom_woa18_folder = PkgHelper.hstb_woa18_folder()
+    default_custom_woa23_folder = PkgHelper.hstb_woa23_folder()
     default_noaa_tools = 1
     default_default_institution = institution_list[0]
 
@@ -54,24 +56,27 @@ else:
     default_use_woa_09 = 1
     default_use_woa_13 = 0
     default_use_woa_18 = 0
+    default_use_woa_23 = 0
     default_use_rtofs = 0
     default_use_gomofs = 0
     default_custom_woa09_folder = ""
     default_custom_woa13_folder = ""
     default_custom_woa18_folder = ""
+    default_custom_woa23_folder = ""
     default_noaa_tools = 0
     default_default_institution = ""
 
 CREATE_SETTINGS = """-- noinspection SqlResolveForFile
  CREATE TABLE IF NOT EXISTS general(
      id integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
-     setup_version integer NOT NULL DEFAULT 6,
+     setup_version integer NOT NULL DEFAULT 7,
      setup_name text NOT NULL UNIQUE DEFAULT "default",
      setup_status text NOT NULL DEFAULT "inactive",
      /* input */
      use_woa09 integer NOT NULL DEFAULT %d,
      use_woa13 integer NOT NULL DEFAULT %d,
      use_woa18 integer NOT NULL DEFAULT %d,
+     use_woa23 integer NOT NULL DEFAULT %d,
      use_rtofs integer NOT NULL DEFAULT %d,
      use_gomofs integer NOT NULL DEFAULT %d,     
      ssp_extension_source text NOT NULL DEFAULT "WOA09",
@@ -118,15 +123,17 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      custom_outputs_folder text DEFAULT "",
      custom_woa09_folder text DEFAULT "%s",
      custom_woa13_folder text DEFAULT "%s",
-     custom_woa18_folder text DEFAULT "%s",     
+     custom_woa18_folder text DEFAULT "%s",  
+     custom_woa23_folder text DEFAULT "%s",         
      noaa_tools integer NOT NULL DEFAULT %d,
      default_institution text NOT NULL DEFAULT "%s",
      default_survey text NOT NULL DEFAULT "",
      default_vessel text NOT NULL DEFAULT "",
      auto_apply_default_metadata integer NOT NULL DEFAULT 1
-     ) """ % (default_use_woa_09, default_use_woa_13, default_use_woa_18,
+     ) """ % (default_use_woa_09, default_use_woa_13, default_use_woa_18, default_use_woa_23,
               default_use_rtofs, default_use_gomofs,
               default_custom_woa09_folder, default_custom_woa13_folder, default_custom_woa18_folder,
+              default_custom_woa23_folder,
               default_noaa_tools, default_default_institution)
 
 CREATE_CLIENT_LIST = """-- noinspection SqlResolveForFile
@@ -171,19 +178,21 @@ DROP_SETTINGS_VIEW = """-- noinspection SqlResolveForFile
     DROP VIEW settings_view
     """
 
-# COPY V1 -> V2
+# COPY V1 -> V6
 
-V1_V5_COPY_SETTINGS = """-- noinspection SqlResolveForFile
+V1_V7_COPY_SETTINGS = """-- noinspection SqlResolveForFile
     INSERT INTO  general 
-    (id, setup_name, setup_status, use_woa09, use_woa13, use_woa18, use_rtofs, 
+    (id, setup_name, setup_status, 
+    use_woa09, use_woa13, use_woa18, use_woa23, use_rtofs, 
     ssp_extension_source, ssp_salinity_source, ssp_temp_sal_source, ssp_up_or_down, rx_max_wait_time,
     use_sis, use_sippican, use_nmea_0183, use_mvp, sis_listen_port, sis_listen_timeout,
     sis_auto_apply_manual_casts, sippican_listen_port, sippican_listen_timeout, nmea_listen_port,
     nmea_listen_timeout, mvp_ip_address, mvp_listen_port, mvp_listen_timeout, mvp_transmission_protocol,
     mvp_format, mvp_winch_port, mvp_fish_port, mvp_nav_port, mvp_system_port, mvp_sw_version,
     mvp_instrument_id, mvp_instrument, server_source, server_apply_surface_sound_speed, current_project,
-    custom_projects_folder, custom_outputs_folder, custom_woa09_folder, custom_woa13_folder, noaa_tools,
-    default_institution, default_survey, default_vessel, auto_apply_default_metadata) 
+    custom_projects_folder, custom_outputs_folder, 
+    custom_woa09_folder, custom_woa13_folder, custom_woa18_folder, custom_woa23_folder, 
+    noaa_tools, default_institution, default_survey, default_vessel, auto_apply_default_metadata) 
     SELECT 
     id, setup_name, setup_status, 
     CASE WHEN typeof(use_woa09) == 'text' THEN
@@ -200,7 +209,12 @@ V1_V5_COPY_SETTINGS = """-- noinspection SqlResolveForFile
         use_woa18 == 'False'
     ELSE
         use_woa18
-    END,     
+    END, 
+    CASE WHEN typeof(use_woa23) == 'text' THEN
+        use_woa23 == 'False'
+    ELSE
+        use_woa23
+    END,         
     CASE WHEN typeof(use_rtofs) == 'text' THEN
         use_rtofs == 'True'
     ELSE
@@ -244,7 +258,8 @@ V1_V5_COPY_SETTINGS = """-- noinspection SqlResolveForFile
         server_apply_surface_sound_speed
     END, 
     current_project, custom_projects_folder,
-    custom_outputs_folder, custom_woa09_folder, custom_woa13_folder, 
+    custom_outputs_folder, 
+    custom_woa09_folder, custom_woa13_folder, custom_woa18_folder, custom_woa23_folder,
     CASE WHEN typeof(noaa_tools) == 'text' THEN
         noaa_tools == 'True'
     ELSE
@@ -260,7 +275,7 @@ V1_V5_COPY_SETTINGS = """-- noinspection SqlResolveForFile
     FROM general_old
     """
 
-V1_V5_COPY_CLIENT_LIST = """-- noinspection SqlResolveForFile
+V1_V7_COPY_CLIENT_LIST = """-- noinspection SqlResolveForFile
     INSERT INTO client_list (id, setup_id, name, ip, port, protocol) 
     SELECT 
     id, setup_id, name, ip, port, protocol
