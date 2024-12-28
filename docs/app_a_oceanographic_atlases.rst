@@ -13,23 +13,8 @@ World Ocean Atlas
 The World Ocean Atlas is a 3-dimensional grid of mean temperature and salinity for the world’s oceans
 that is based upon a large set of archived oceanographic measurements in the World Ocean Database.
 
-More information about the World Ocean Atlas 2009 (WOA09) can be found
-`online <http://www.nodc.noaa.gov/OC5/WOA09/pr_woa09.html>`_
-
-The WOA09 netCDF temperature and salinity grids used by the package can be accessed
-from `http://www.nodc.noaa.gov/OC5/WOA09/netcdf_data.html <http://www.nodc.noaa.gov/OC5/WOA09/netcdf_data.html>`_
-
-The files required are:
-
-* *temperature_annual_1deg.nc*
-* *temperature_seasonal_1deg.nc*
-* *temperature_monthly_1deg.nc*
-* *salinity_annual_1deg.nc*
-* *salinity_seasonal_1deg.nc*
-* *salinity_monthly_1deg.nc*
-
-Basin and land/sea masks can be downloaded
-from: `http://www.nodc.noaa.gov/OC5/WOA09/masks09.html <http://www.nodc.noaa.gov/OC5/WOA09/masks09.html>`_
+More information about the World Ocean Atlas (WOA) can be found
+`online <https://www.ncei.noaa.gov/products/world-ocean-atlas>`_
 
 
 Global Real-Time Ocean Forecast System
@@ -120,7 +105,7 @@ likely with the use of the basin mask file provided with the WOA09 data set.
 WOA13-based and WOA18-based profiles
 ------------------------------------
 
-.. index:: WOA; WOA13; WOA18
+.. index:: WOA; WOA13; WOA18; WOA23
 
 WOA13 represents the ocean state variables of temperature and salinity with more detail and less uncertainty than
 WOA09 due to large increases in data holdings and better temporal and spatial coverage coupled with refined analysis
@@ -133,8 +118,14 @@ and quality control techniques:
 In the specific, the package uses the WOA13v2 release that was prepared to address both methodology concerns and,
 to a lesser extent, quality control concerns which have surfaced since the initial release of WOA13.
 
-WOA18 was released September 30, 2018. It includes approximately 3 million new oceanographic casts added to the WOD,
+WOA18 was released on September 30, 2018. It includes approximately 3 million new oceanographic casts added to the WOD,
 as well as renewed and updated quality control.
+
+WOA23 was released on February 14, 2024. It includes temperature, salinity, oxygen (and parameters Apparent Oxygen
+Utilization and percent oxygen saturation) and inorganic nutrients (phosphate, silicate, and nitrate).
+WOA23 includes approximately 1.8 million new oceanographic casts added to the WOD since WOA18’s release, as well as
+renewed and updated quality controls.
+
 
 .. _rtofs_based_profiles:
 

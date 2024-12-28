@@ -97,7 +97,7 @@ As this particular transmission protocol is used by other acquisition systems, i
 what the *Sound Speed* package does to the cast data to satisfy the input criteria for *SIS*.
 
 The transmission procedure used by the SSP package will format the temperature and salinity profiles
-into the Kongsberg Maritime format. Since the WOA09/RTOFS grids only extend to a maximum depth of 5,500 m,
+into the Kongsberg Maritime format. Since the WOA/RTOFS grids only extend to a maximum depth of 5,500 m,
 the profile undergoes a final extrapolation to a depth of 12,000 m to satisfy *SIS v4* input criteria,
 this is done with temperature and salinity values measured in the Mariana Trench by *Taira et al. (2005)*.
 

@@ -63,7 +63,7 @@ The :ref:`operator_mode` represents the primary mode, and it is used to convert 
 to graphically edit them, and to export/send the resulting profiles for use by underwater acoustic systems.
 Optional steps are the augmentation with measurements from a reference cast (to either improve salinity modeling
 or extrapolate the cast to the required depth), either manually specifiying a loaded profile as reference cast,
-or deriving the reference from oceanographic models (currently, WOA09, WOA13, WOA18 and RTOFS) as described
+or deriving the reference from oceanographic models (currently, WOA09, WOA13, WOA18, WOA23 and RTOFS) as described
 in :ref:`app_a_oceanographic_atlases`.
 
 The :ref:`server_mode` was developed to deliver WOA/RTOFS-derived synthetic SSPs to one or more network clients in
@@ -109,7 +109,7 @@ Currently implemented features
 
 * Data visualization and interactive graphical inspection (e.g., outlier removal, point additions) of sound speed, temperature and salinity profiles
 
-* Use of the World Ocean Atlas of 2009/2013/2018 (WOA09/13/18) and Real-Time Ocean Forecast System (RTOFS) for tasks such as:
+* Use of the World Ocean Atlas of 2009/2013/2018 (WOA09/13/18/23) and Real-Time Ocean Forecast System (RTOFS) for tasks such as:
 
   * Salinity augmentation for Sippican XBT probes
   * Temperature/salinity augmentation for Sippican XSV probes and SVP sensors

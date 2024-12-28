@@ -63,9 +63,9 @@ Supplemental Data Space Requirements
 Approximately 500 MB of additional disk space is required for the WOA09 db set optionally required
 (but warmly suggested) by this hydro-package. If not available, the package will attempt to download it.
 
-.. index:: WOA; WOA13; WOA18
+.. index:: WOA; WOA13; WOA18; WOA23
 
-Among other improvements, the WOA13 and WOA18 dbs provide a much better spatial resolution, but this comes with a much
+Among other improvements, the WOA13, WOA18 and WOA23 dbs provide a much better spatial resolution, but this comes with a much
 larger data size (~18 GB).
 
 Alternatively, it is also possible to adopt a manual installation procedure:
@@ -76,8 +76,8 @@ Alternatively, it is also possible to adopt a manual installation procedure:
 
 By default, SSM looks for databases at:
 
-* "C:/Documents and Settings/**<username>**/Application Data/HydrOffice/Sound Speed/atlases/**[woa09|woa13|woa18]**" (Windows XP), or
-* "C:/Users/**<username>**/AppData/Local/HydrOffice/Sound Speed/atlases/**[woa09|woa13|woa18]**" (newer Windows OS)
+* "C:/Documents and Settings/**<username>**/Application Data/HydrOffice/Sound Speed/atlases/**[woa09|woa13|woa18|woa23]**" (Windows XP), or
+* "C:/Users/**<username>**/AppData/Local/HydrOffice/Sound Speed/atlases/**[woa09|woa13|woa18|woa23]**" (newer Windows OS)
 
 .. _woa18_folders:
 .. figure:: ./_static/woa18_folders.png
@@ -92,4 +92,4 @@ For the manual installation, when the atlas is composed of multiple zip files (e
 be unzipped under the same folder (e.g., :numref:`data_monitor_tool_tab`).
 
 .. note:: If a previous version of the application was installed, *Sound Speed Manager* will try to localize past
-    installations of WOA databases (WOA09, WOA13 and WOA18).
+    installations of WOA databases (WOA09, WOA13, WOA18 and WOA23).
