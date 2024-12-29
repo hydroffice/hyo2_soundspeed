@@ -71,6 +71,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.check_woa09()
         self.check_woa13()
         self.check_woa18()
+        self.check_woa23()
         self.check_sis()
         self.check_sippican()
         self.check_nmea()
@@ -417,6 +418,66 @@ class MainWin(QtWidgets.QMainWindow):
 
         logger.debug('WOA18: enabled')
 
+    def check_woa23(self):
+        """ helper function that looks after WOA23 database"""
+        if not self.lib.use_woa23():
+            logger.debug('WOA23: disabled by settings')
+            return
+
+        if self.lib.has_woa23():
+            logger.debug('WOA23: enabled')
+            return
+
+        msg = 'The WOA23 atlas is required by some advanced application functions.\n\n' \
+              'The data set (~4GB) can be retrieved from:\n' \
+              '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
+              'gma72_usnh_edu/EYRfBTuu-e9IlgiBYl_W5sEB0Ea6FVpLUmT26ic8ivHxqA?e=Wp5qYO&download=1\n' \
+              '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
+              'gma72_usnh_edu/Eeuy-EBSbQVGm8w3B9WxiRkBrmDU38bdpK5je7YyNVo7Dw?e=v5eXqV&download=1\n' \
+              'then unzipped it into:\n' \
+              '   %s\n\n' \
+              'Do you want that I perform this operation for you?\n' \
+              'Internet connection is required!\n' % self.lib.woa23_folder
+        # noinspection PyCallByClass,PyArgumentList,PyUnresolvedReferences
+        ret = QtWidgets.QMessageBox.information(
+            self, "Sound Speed Manager - WOA23 Atlas", msg,
+            QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.No)
+        if ret == QtWidgets.QMessageBox.StandardButton.No:
+            msg = 'You can also manually install it. The steps are:\n' \
+                  ' - download the archive from:\n' \
+                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
+                  'gma72_usnh_edu/EYRfBTuu-e9IlgiBYl_W5sEB0Ea6FVpLUmT26ic8ivHxqA?e=Wp5qYO&download=1\n' \
+                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
+                  'gma72_usnh_edu/Eeuy-EBSbQVGm8w3B9WxiRkBrmDU38bdpK5je7YyNVo7Dw?e=v5eXqV&download=1\n' \
+                  ' - unzip the archive into:\n' \
+                  '   %s\n' \
+                  ' - restart Sound Speed Manager\n' % self.lib.woa23_folder
+            # noinspection PyCallByClass,PyArgumentList
+            QtWidgets.QMessageBox.information(self, "Sound Speed Manager - WOA23 Atlas", msg,
+                                              QtWidgets.QMessageBox.StandardButton.Ok)
+            logger.debug('WOA23: disabled')
+            return
+
+        success = self.lib.download_woa23()
+        if not success:
+            msg = 'Unable to retrieve the WOA23 atlas.\n\n ' \
+                  'You may manually install it. The steps are:\n' \
+                  ' - download the archive from:\n' \
+                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
+                  'gma72_usnh_edu/EYRfBTuu-e9IlgiBYl_W5sEB0Ea6FVpLUmT26ic8ivHxqA?e=Wp5qYO&download=1\n' \
+                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
+                  'gma72_usnh_edu/Eeuy-EBSbQVGm8w3B9WxiRkBrmDU38bdpK5je7YyNVo7Dw?e=v5eXqV&download=1\n' \
+                  ' - unzip the archive into:\n' \
+                  '   %s\n' \
+                  ' - restart Sound Speed Manager\n' % self.lib.woa23_folder
+            # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
+            QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - WOA23 Atlas", msg,
+                                          QtWidgets.QMessageBox.StandardButton.Ok)
+            logger.debug('WOA23: disabled')
+            return
+
+        logger.debug('WOA233: enabled')
+
     def check_rtofs(self):
         """ helper function that looks after RTOFS connection"""
         if not self.lib.use_rtofs():
@@ -598,6 +659,8 @@ class MainWin(QtWidgets.QMainWindow):
             tokens.append("W13")
         if self.lib.use_woa18():
             tokens.append("W18")
+        if self.lib.use_woa23():
+            tokens.append("W23")
         if self.lib.use_sippican():
             tokens.append("SIP")
         if self.lib.use_nmea_0183():
@@ -811,7 +874,7 @@ class MainWin(QtWidgets.QMainWindow):
             return
 
         dlg = PkgExceptionDialog(app_info=app_info, ex_type=ex_type, ex_value=ex_value, tb=tb)
-        ret = dlg.exec_()
+        ret = dlg.exec()
         if ret == QtWidgets.QDialog.DialogCode.Rejected:
             if not dlg.user_triggered:
                 self.close()
@@ -829,7 +892,7 @@ class MainWin(QtWidgets.QMainWindow):
         # noinspection PyUnresolvedReferences
         msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
         msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.No)
-        return msg_box.exec_()
+        return msg_box.exec()
 
     def closeEvent(self, event):
         """ actions to be done before close the app """

@@ -46,7 +46,7 @@ def gui():
         msg_box.setText('%s\n\nDo you want to continue? This might create issues.' % txt)
         msg_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
         msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.No)
-        reply = msg_box.exec_()
+        reply = msg_box.exec()
         if reply == QtWidgets.QMessageBox.StandardButton.No:
             sys.exit(app.exit())
 

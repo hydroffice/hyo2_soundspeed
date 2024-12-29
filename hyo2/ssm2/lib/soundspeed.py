@@ -19,6 +19,7 @@ from hyo2.ssm2.lib.atlas.atlases import Atlases
 from hyo2.ssm2.lib.base.callbacks.abstract_callbacks import AbstractCallbacks
 from hyo2.ssm2.lib.base.callbacks.cli_callbacks import CliCallbacks
 from hyo2.ssm2.lib.base.setup import Setup
+from hyo2.ssm2.lib.base.setup_db import SetupDb
 from hyo2.ssm2.lib.db.db import ProjectDb
 from hyo2.ssm2.lib.listener.listeners import Listeners
 from hyo2.ssm2.lib.profile.dicts import Dicts
@@ -280,6 +281,11 @@ class SoundSpeedLibrary:
         return self.atlases.woa18_folder
 
     @property
+    def woa23_folder(self) -> str:
+        """Get the woa23 atlas folder"""
+        return self.atlases.woa23_folder
+
+    @property
     def rtofs_folder(self) -> str:
         """Get the rtofs atlas folder"""
         return self.atlases.rtofs_folder
@@ -467,6 +473,10 @@ class SoundSpeedLibrary:
                 pr.woa18 = self.atlases.woa18.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
                                                     dtstamp=pr.meta.utc_time)
 
+            if self.use_woa23() and self.has_woa23():
+                pr.woa23 = self.atlases.woa23.query(lat=pr.meta.latitude, lon=pr.meta.longitude,
+                                                    dtstamp=pr.meta.utc_time)
+
             if self.use_rtofs():
                 # noinspection PyBroadException
                 try:
@@ -543,6 +553,25 @@ class SoundSpeedLibrary:
             return
 
         self.ssp = self.atlases.woa18.query(lat=lat, lon=lon, dtstamp=utc_time)
+
+    def retrieve_woa23(self) -> None:
+        """Retrieve data from WOA23 atlas"""
+
+        if not self.has_woa23():
+            logger.error("missing WOA23 atlas data set")
+            return
+
+        lat, lon = self.cb.ask_location()
+        if (lat is None) or (lon is None):
+            logger.error("missing geographic location required for database lookup")
+            return
+
+        utc_time = self.cb.ask_date()
+        if utc_time is None:
+            logger.error("missing date required for database lookup")
+            return
+
+        self.ssp = self.atlases.woa23.query(lat=lat, lon=lon, dtstamp=utc_time)
 
     def retrieve_rtofs(self) -> None:
         """Retrieve data from RTOFS atlas"""
@@ -1111,7 +1140,8 @@ class SoundSpeedLibrary:
         if (self.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']) and \
                 ((self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA09']) or
                  (self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA13']) or
-                 (self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA18'])):
+                 (self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA18']) or
+                 (self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA23'])):
             tmp_ssp = copy.deepcopy(self.ssp)
             del tmp_ssp.l[1:]
             success = db.remove_casts(tmp_ssp)
@@ -1142,7 +1172,8 @@ class SoundSpeedLibrary:
         if (self.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']) and \
                 ((self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA09']) or
                  (self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA13']) or
-                 (self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA18'])):
+                 (self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA18']) or
+                 (self.ssp.l[0].meta.probe_type == Dicts.probe_types['WOA23'])):
             tmp_ssp = copy.deepcopy(self.ssp)
             del tmp_ssp.l[1:]
             success = db.add_casts(tmp_ssp)
@@ -1315,6 +1346,11 @@ class SoundSpeedLibrary:
 
         if self.use_woa18() and self.has_woa18() and not skip_atlas:
             self.ssp.cur.woa18 = self.atlases.woa18.query(lat=self.ssp.cur.meta.latitude,
+                                                          lon=self.ssp.cur.meta.longitude,
+                                                          dtstamp=self.ssp.cur.meta.utc_time)
+
+        if self.use_woa23() and self.has_woa23() and not skip_atlas:
+            self.ssp.cur.woa23 = self.atlases.woa23.query(lat=self.ssp.cur.meta.latitude,
                                                           lon=self.ssp.cur.meta.longitude,
                                                           dtstamp=self.ssp.cur.meta.utc_time)
 
@@ -1607,6 +1643,14 @@ class SoundSpeedLibrary:
                 return False
             self.cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_WOA18'])
 
+        elif self.setup.ssp_salinity_source == Dicts.atlases['WOA23']:
+            if not self.has_woa23():
+                logger.warning("missing WOA23 profile")
+                return False
+            if not self.cur.replace_proc_sal(self.cur.woa23):
+                return False
+            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_WOA23'])
+
         else:
             logger.warning("unknown atlases: %s" % self.setup.ssp_salinity_source)
             return False
@@ -1668,6 +1712,14 @@ class SoundSpeedLibrary:
             if not self.cur.replace_proc_temp_sal(self.cur.woa18):
                 return False
             self.cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_WOA18'])
+
+        elif self.setup.ssp_temp_sal_source == Dicts.atlases['WOA23']:
+            if not self.has_woa23():
+                logger.warning("missing WOA23 profile")
+                return False
+            if not self.cur.replace_proc_temp_sal(self.cur.woa23):
+                return False
+            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_WOA23'])
 
         else:
             logger.warning("unknown atlases: %s" % self.setup.ssp_temp_sal_source)
@@ -1759,6 +1811,13 @@ class SoundSpeedLibrary:
                 logger.warning("missing WOA18 profile")
                 return False
             if not self.cur.extend_profile(self.cur.woa18, ext_type=Dicts.sources['woa18_ext']):
+                return False
+
+        elif self.setup.ssp_extension_source == Dicts.atlases['WOA23']:
+            if not self.has_woa23():
+                logger.warning("missing WOA23 profile")
+                return False
+            if not self.cur.extend_profile(self.cur.woa23, ext_type=Dicts.sources['woa23_ext']):
                 return False
 
         else:
@@ -1859,7 +1918,7 @@ class SoundSpeedLibrary:
 
     # --- settings
 
-    def settings_db(self) -> ProjectDb:
+    def settings_db(self) -> SetupDb:
         return self.setup.db
 
     def reload_settings_from_db(self) -> None:
@@ -1905,6 +1964,9 @@ class SoundSpeedLibrary:
 
     def use_woa18(self) -> bool:
         return self.setup.use_woa18
+
+    def use_woa23(self) -> bool:
+        return self.setup.use_woa23
 
     def use_rtofs(self) -> bool:
         return self.setup.use_rtofs
@@ -1956,6 +2018,9 @@ class SoundSpeedLibrary:
 
     def has_woa18(self) -> bool:
         return self.atlases.woa18.is_present()
+
+    def has_woa23(self) -> bool:
+        return self.atlases.woa23.is_present()
 
     def has_rtofs(self) -> bool:
         return self.atlases.rtofs.is_present()
@@ -2010,6 +2075,9 @@ class SoundSpeedLibrary:
 
     def download_woa18(self) -> bool:
         return self.atlases.woa18.download_db()
+
+    def download_woa23(self) -> bool:
+        return self.atlases.woa23.download_db()
 
     def download_rtofs(self, datestamp: Optional['datetime'] = None) -> bool:
         return self.atlases.rtofs.download_db(dtstamp=datestamp)

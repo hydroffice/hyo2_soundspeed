@@ -123,39 +123,25 @@ If desired, the edited version can then be set as the new reference cast and wil
 Prior to setting a cast as the reference cast, it is advisable to store it in database such that future sessions
 do not need to repeat any reference cast processing.
 
-Refraction monitor
-==================
+Statusbar information
+=====================
 
-.. note::
-    This plugin is currently disabled.
+.. index:: statusbar
 
-An experimental feature has been set up to allow the user to establish the impact
-of their currently loaded sound speed profile on the refraction correction by plotting swath data
-with the new sound speed profile applied prior to sending the profile to the multibeam echosounder.
+SSM shows handy information on the statusbar like the active sources (e.g., W23 for WOA23) and data from the listeners
+(e.g. navigation from SIS5).
 
-This provides a preview of the effect of the new sound speed profile allowing appropriate action
-if the results are not as expected without introducing artifacts into the multibeam data stream.
+Furthermore, SSM statusbar shows different colors to capture user attention in case of issues (e.g., ‘Not pinging for a
+while’ alert). :numref:`statusbar_colors` summarizes the possible statuses shown in the SSM taskbar.
 
-.. Figure – Refraction monitor showing the effects of new sound speed profile before its application, as well as the application of a bias using the Profile Correction slider (at the bottom)
+.. _statusbar_colors:
+.. figure:: ./_static/statusbar_colors.png
+    :width: 640px
+    :align: center
+    :alt: statusbar colors
+    :figclass: align-center
 
-.. As an example scenario, the currently loaded profile is requested from *SIS* and is set as the reference profile.
-    A new WOA profile can then be generated using the reported position from *SIS*.
-
-.. The refraction monitor can thus be used to evaluate if the profile in use by *SIS* does a better refraction correction
-    than the WOA profile. The refraction correction from the WOA profile can be adjusted using the slider bar
-    in the *Refraction Monitor*, this adds a bias to the WOA profile (units are dm/s) and then recomputes
-    the new potential swath profile using the adjusted WOA profile.
-    If the user decided to send this profile to *SIS* and if the refraction corrector was non-zero,
-    the package will ask the user whether or not they want to apply this corrector to the currently loaded profile
-    prior to sending it to the echosounder.
-
-.. A few other notes on the *Refraction Monitor*:
-    * If the *Refraction Monitor* window is closed, the slider bar corrector value is ignored during transmission of a profile.
-    * The *Refraction Monitor* window will close automatically when the package closes a profile or generates a new profile.
-    * If running in *Server mode*, the slider bar corrector value is applied during transmission without user confirmation.
-    * The slider bar corrector value is reset to zero after transmission of the profile both for measured profiles and server profiles.
-
-.. index:: refraction; monitor
+    The possible statuses shown in the SSM taskbar.
 
 Network data reception
 ======================

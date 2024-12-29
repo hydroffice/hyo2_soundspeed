@@ -1,16 +1,21 @@
 import logging
+from typing import TYPE_CHECKING
 
 from PySide6 import QtGui, QtWidgets
 
 from hyo2.ssm2.lib.profile.dicts import Dicts
 from hyo2.ssm2.app.gui.soundspeedsettings.widgets.widget import AbstractWidget
 
+if TYPE_CHECKING:
+    from hyo2.ssm2.app.gui.soundspeedsettings.mainwin import MainWin
+    from hyo2.ssm2.lib.base.setup_db import SetupDb
+
 logger = logging.getLogger(__name__)
 
 
 class Input(AbstractWidget):
 
-    def __init__(self, main_win, db):
+    def __init__(self, main_win: "MainWin", db: "SetupDb") -> None:
         AbstractWidget.__init__(self, main_win=main_win, db=db)
 
         lbl_width = 120
@@ -111,6 +116,26 @@ class Input(AbstractWidget):
         self.use_woa18 = QtWidgets.QComboBox()
         self.use_woa18.addItems(["True", "False"])
         vbox.addWidget(self.use_woa18)
+        vbox.addStretch()
+
+        # - use woa23
+        hbox = QtWidgets.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        label = QtWidgets.QLabel("Use WOA23:")
+        label.setFixedWidth(lbl_width)
+        vbox.addWidget(label)
+        vbox.addStretch()
+        # -- value
+        vbox = QtWidgets.QVBoxLayout()
+        hbox.addLayout(vbox)
+        vbox.addStretch()
+        self.use_woa23 = QtWidgets.QComboBox()
+        self.use_woa23.addItems(["True", "False"])
+        vbox.addWidget(self.use_woa23)
         vbox.addStretch()
 
         # - use rtofs
@@ -393,35 +418,21 @@ class Input(AbstractWidget):
         self.setup_changed()  # to trigger the first data population
 
         # -- connect functions:
-        # noinspection PyUnresolvedReferences
         self.use_woa09.currentIndexChanged.connect(self.apply_use_woa09)
-        # noinspection PyUnresolvedReferences
         self.use_woa13.currentIndexChanged.connect(self.apply_use_woa13)
-        # noinspection PyUnresolvedReferences
         self.use_woa18.currentIndexChanged.connect(self.apply_use_woa18)
-        # noinspection PyUnresolvedReferences
+        self.use_woa23.currentIndexChanged.connect(self.apply_use_woa23)
         self.use_rtofs.currentIndexChanged.connect(self.apply_use_rtofs)
-        # noinspection PyUnresolvedReferences
         self.use_gomofs.currentIndexChanged.connect(self.apply_use_gomofs)
-        # noinspection PyUnresolvedReferences
         self.extension_source.currentIndexChanged.connect(self.apply_extension_source)
-        # noinspection PyUnresolvedReferences
         self.salinity_source.currentIndexChanged.connect(self.apply_salinity_source)
-        # noinspection PyUnresolvedReferences
         self.temp_sal_source.currentIndexChanged.connect(self.apply_temp_sal_source)
-        # noinspection PyUnresolvedReferences
         self.use_sis4.currentIndexChanged.connect(self.apply_use_sis)
-        # noinspection PyUnresolvedReferences
         self.use_sis5.currentIndexChanged.connect(self.apply_use_sis)
-        # noinspection PyUnresolvedReferences
         self.use_nmea_0183.currentIndexChanged.connect(self.apply_use_sis)
-        # noinspection PyUnresolvedReferences
         self.use_sippican.currentIndexChanged.connect(self.apply_use_sippican)
-        # noinspection PyUnresolvedReferences        
         self.use_mvp.currentIndexChanged.connect(self.apply_use_mvp)
-        # noinspection PyUnresolvedReferences
         self.rx_max_wait_time.textChanged.connect(self.apply_rx_max_wait_time)
-        # noinspection PyUnresolvedReferences
         self.profile_direction.currentIndexChanged.connect(self.apply_profile_direction)
 
     def apply_profile_direction(self):
@@ -456,6 +467,15 @@ class Input(AbstractWidget):
 
         if self.main_win.main_win:
             self.main_win.main_win.check_woa18()
+
+    def apply_use_woa23(self):
+        # logger.debug("apply use woa23: %s" % self.use_woa23.currentText())
+        self.db.use_woa23 = self.use_woa23.currentText() == "True"
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+        if self.main_win.main_win:
+            self.main_win.main_win.check_woa23()
 
     def apply_use_rtofs(self):
         # logger.debug("apply use rtofs: %s" % self.use_rtofs.currentText())
@@ -554,6 +574,12 @@ class Input(AbstractWidget):
             self.use_woa18.setCurrentIndex(0)  # True
         else:
             self.use_woa18.setCurrentIndex(1)  # False
+
+        # use woa23
+        if self.db.use_woa23:
+            self.use_woa23.setCurrentIndex(0)  # True
+        else:
+            self.use_woa23.setCurrentIndex(1)  # False
 
         # use rtofs
         if self.db.use_rtofs:

@@ -1,23 +1,28 @@
-import os
 import logging
+import os
+from typing import TYPE_CHECKING
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
-from hyo2.ssm2.lib.profile.dicts import Dicts
-from hyo2.ssm2.app.gui.soundspeedmanager.widgets.widget import AbstractWidget
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.common_metadata_dialog import CommonMetadataDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.export_multi_profile_dialog import ExportMultiProfileDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.export_profile_metadata_dialog import ExportProfileMetadataDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.export_single_profile_dialog import ExportSingleProfileDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.import_data_dialog import ImportDataDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.import_multi_profile_dialog import ImportMultiProfileDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.metadata_dialog import MetadataDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.plot_multi_profile_dialog import PlotMultiProfileDialog
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.plot_profiles_dialog import PlotProfilesDialog
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.project_new_dialog import ProjectNewDialog
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.project_rename_dialog import ProjectRenameDialog
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.project_switch_dialog import ProjectSwitchDialog
-from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.import_data_dialog import ImportDataDialog
-from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.export_single_profile_dialog import ExportSingleProfileDialog
-from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.export_multi_profile_dialog import ExportMultiProfileDialog
-from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.import_multi_profile_dialog import ImportMultiProfileDialog
-from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.plot_multi_profile_dialog import PlotMultiProfileDialog
-from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.export_profile_metadata_dialog import ExportProfileMetadataDialog
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.text_editor_dialog import TextEditorDialog
-from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.metadata_dialog import MetadataDialog
-from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.common_metadata_dialog import CommonMetadataDialog
+from hyo2.ssm2.app.gui.soundspeedmanager.widgets.widget import AbstractWidget
+from hyo2.ssm2.lib.profile.dicts import Dicts
+
+if TYPE_CHECKING:
+    from hyo2.ssm2.app.gui.soundspeedmanager.mainwin import MainWin
+    from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +31,7 @@ class Database(AbstractWidget):
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
 
-    def __init__(self, main_win, lib):
+    def __init__(self, main_win: 'MainWin', lib: 'SoundSpeedLibrary') -> None:
         AbstractWidget.__init__(self, main_win=main_win, lib=lib)
 
         lbl_width = 60
@@ -60,12 +65,10 @@ class Database(AbstractWidget):
         self.ssp_list = QtWidgets.QTableWidget()
         self.ssp_list.setSortingEnabled(True)
         self.ssp_list.setFocus()
-        self.ssp_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
-        self.ssp_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.ssp_list.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        # noinspection PyUnresolvedReferences
+        self.ssp_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.ssp_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.ssp_list.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ssp_list.customContextMenuRequested.connect(self.make_context_menu)
-        # noinspection PyUnresolvedReferences
         self.ssp_list.itemDoubleClicked.connect(self.load_profile)
         hbox.addWidget(self.ssp_list)
 
@@ -79,78 +82,61 @@ class Database(AbstractWidget):
         # --- manage button box
         project_vbox = QtWidgets.QVBoxLayout()
         self.project_box.setLayout(project_vbox)
-        # noinspection PyUnresolvedReferences
-        self.manage_btn_box = QtWidgets.QDialogButtonBox(QtCore.Qt.Vertical)
+        self.manage_btn_box = QtWidgets.QDialogButtonBox(QtCore.Qt.Orientation.Vertical)
         project_vbox.addWidget(self.manage_btn_box)
 
         # ---- new project
         self.btn_new_project = QtWidgets.QPushButton("New project")
-        # noinspection PyUnresolvedReferences
         self.btn_new_project.clicked.connect(self.new_project)
         self.btn_new_project.setToolTip("Create a new project")
-        self.manage_btn_box.addButton(self.btn_new_project, QtWidgets.QDialogButtonBox.ActionRole)
+        self.manage_btn_box.addButton(self.btn_new_project, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         self.new_project_act = QtGui.QAction('New Project DB', self)
         self.new_project_act.setShortcut('Ctrl+N')
-        # noinspection PyUnresolvedReferences
         self.new_project_act.triggered.connect(self.new_project)
         self.main_win.database_menu.addAction(self.new_project_act)
 
         # ---- rename project
         self.btn_rename_project = QtWidgets.QPushButton("Rename project")
-        # noinspection PyUnresolvedReferences
         self.btn_rename_project.clicked.connect(self.rename_project)
         self.btn_rename_project.setToolTip("Rename the current project")
-        self.manage_btn_box.addButton(self.btn_rename_project, QtWidgets.QDialogButtonBox.ActionRole)
+        self.manage_btn_box.addButton(self.btn_rename_project, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         self.rename_project_act = QtGui.QAction('Rename Current Project DB', self)
-        # self.rename_project_act.setShortcut('Ctrl+R')
-        # noinspection PyUnresolvedReferences
         self.rename_project_act.triggered.connect(self.rename_project)
         self.main_win.database_menu.addAction(self.rename_project_act)
 
         # ---- load project
         self.btn_load_project = QtWidgets.QPushButton("Switch project")
-        # noinspection PyUnresolvedReferences
         self.btn_load_project.clicked.connect(self.switch_project)
         self.btn_load_project.setToolTip("Switch to another existing project")
-        self.manage_btn_box.addButton(self.btn_load_project, QtWidgets.QDialogButtonBox.ActionRole)
+        self.manage_btn_box.addButton(self.btn_load_project, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         self.load_project_act = QtGui.QAction('Switch Project DB', self)
-        # self.load_project_act.setShortcut('Ctrl+L')
-        # noinspection PyUnresolvedReferences
         self.load_project_act.triggered.connect(self.switch_project)
         self.main_win.database_menu.addAction(self.load_project_act)
 
         # ---- import data
         self.btn_import_data = QtWidgets.QPushButton("Import data")
-        # noinspection PyUnresolvedReferences
         self.btn_import_data.clicked.connect(self.import_data)
         self.btn_import_data.setToolTip("Import data from another project")
-        self.manage_btn_box.addButton(self.btn_import_data, QtWidgets.QDialogButtonBox.ActionRole)
+        self.manage_btn_box.addButton(self.btn_import_data, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         self.import_data_act = QtGui.QAction('Import Data from Project DB', self)
-        # self.import_data_act.setShortcut('Ctrl+I')
-        # noinspection PyUnresolvedReferences
         self.import_data_act.triggered.connect(self.import_data)
         self.main_win.database_menu.addAction(self.import_data_act)
 
         # ---- project folder
         self.btn_project_folder = QtWidgets.QPushButton("Open folder")
-        # noinspection PyUnresolvedReferences
         self.btn_project_folder.clicked.connect(self.project_folder)
         self.btn_project_folder.setToolTip("Open projects folder")
-        self.manage_btn_box.addButton(self.btn_project_folder, QtWidgets.QDialogButtonBox.ActionRole)
+        self.manage_btn_box.addButton(self.btn_project_folder, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         self.project_folder_act = QtGui.QAction('Open Projects DB Folder', self)
-        # self.project_folder_act.setShortcut('Ctrl+P')
-        # noinspection PyUnresolvedReferences
         self.project_folder_act.triggered.connect(self.project_folder)
         self.main_win.database_menu.addAction(self.project_folder_act)
 
         # ---- refresh DB
         self.btn_refresh_db = QtWidgets.QPushButton("Refresh DB")
-        # noinspection PyUnresolvedReferences
         self.btn_refresh_db.clicked.connect(self.update_table)
         self.btn_refresh_db.setToolTip("Refresh DB entries")
-        self.manage_btn_box.addButton(self.btn_refresh_db, QtWidgets.QDialogButtonBox.ActionRole)
+        self.manage_btn_box.addButton(self.btn_refresh_db, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         self.refresh_db_act = QtGui.QAction('Open Projects DB Folder', self)
-        # noinspection PyUnresolvedReferences
         self.refresh_db_act.triggered.connect(self.update_table)
         self.main_win.database_menu.addAction(self.refresh_db_act)
 
@@ -164,72 +150,56 @@ class Database(AbstractWidget):
         # --- manage button box
         profiles_vbox = QtWidgets.QVBoxLayout()
         self.profiles_box.setLayout(profiles_vbox)
-        # noinspection PyUnresolvedReferences
-        self.product_btn_box = QtWidgets.QDialogButtonBox(QtCore.Qt.Vertical)
+        self.product_btn_box = QtWidgets.QDialogButtonBox(QtCore.Qt.Orientation.Vertical)
         profiles_vbox.addWidget(self.product_btn_box)
 
         # ---- import profiles
         btn = QtWidgets.QPushButton("Import profiles")
-        # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.import_profiles)
         btn.setToolTip("Import multiple profiles")
-        self.product_btn_box.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        self.product_btn_box.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         self.import_profiles_act = QtGui.QAction('Import Multiple Profiles', self)
         self.import_profiles_act.setShortcut('Ctrl+I')
-        # noinspection PyUnresolvedReferences
         self.import_profiles_act.triggered.connect(self.import_profiles)
         self.main_win.database_menu.addSeparator()
         self.main_win.database_menu.addAction(self.import_profiles_act)
 
         # ---- export profiles
         btn = QtWidgets.QPushButton("Export profiles")
-        # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.export_profile_switch)
         btn.setToolTip("Export profile data")
-        self.product_btn_box.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        self.product_btn_box.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         self.export_profiles_act = QtGui.QAction('Export Multiple Profiles', self)
         self.export_profiles_act.setShortcut('Ctrl+X')
-        # noinspection PyUnresolvedReferences
         self.export_profiles_act.triggered.connect(self.export_profile_switch)
         self.main_win.database_menu.addAction(self.export_profiles_act)
 
         # ---- plot profiles
         btn = QtWidgets.QPushButton("Make plots")
-        # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.plot_profiles)
         btn.setToolTip("Create plots with all the profiles")
-        self.product_btn_box.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        self.product_btn_box.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         self.plot_profiles_act = QtGui.QAction('Make Plots from Data', self)
-        # self.plot_profiles_act.setShortcut('Ctrl+P')
-        # noinspection PyUnresolvedReferences
         self.plot_profiles_act.triggered.connect(self.plot_profiles)
         self.main_win.database_menu.addAction(self.plot_profiles_act)
 
         # ---- export metadata
         btn = QtWidgets.QPushButton("Export info")
-        # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.export_profile_metadata)
         btn.setToolTip("Export profile locations and metadata")
-        self.product_btn_box.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        self.product_btn_box.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         self.export_profile_metadata_act = QtGui.QAction('Export Data Info', self)
-        # self.export_profile_metadata_act.setShortcut('Ctrl+D')
-        # noinspection PyUnresolvedReferences
         self.export_profile_metadata_act.triggered.connect(self.export_profile_metadata)
         self.main_win.database_menu.addAction(self.export_profile_metadata_act)
 
         # ---- output folder
         btn = QtWidgets.QPushButton("Output folder")
-        # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.output_folder)
         btn.setToolTip("Open the output folder")
-        self.product_btn_box.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+        self.product_btn_box.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         self.output_folder_act = QtGui.QAction('Open Output Folder', self)
-        # self.output_folder_act.setShortcut('Ctrl+O')
-        # noinspection PyUnresolvedReferences
         self.output_folder_act.triggered.connect(self.output_folder)
         self.main_win.database_menu.addAction(self.output_folder_act)
-
-        # self.main_layout.addStretch()
 
         self.update_table()
         logger.debug("Database tab is now initialized")
@@ -250,106 +220,111 @@ class Database(AbstractWidget):
         # single selection
         if len(rows) == 1:
 
-            map_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'map.png')),
-                                        "Show map", self, toolTip="Show a map with the profile location",
-                                        triggered=self.show_map_for_selected)
+            map_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'map.png')), "Show map", self)
+            map_act.setToolTip("Show a map with the profile location")
+            map_act.triggered.connect(self.show_map_for_selected)
             menu.addAction(map_act)
 
-            stats_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'stats.png')),
-                                          "Profile stats", self, toolTip="Get some statistical info about the profile",
-                                          triggered=self.stats_profile)
+            stats_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'stats.png')), "Profile stats", self)
+            stats_act.setToolTip("Get some statistical info about the profile")
+            stats_act.triggered.connect(self.stats_profile)
             menu.addAction(stats_act)
 
-            metadata_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata_profile.png')),
-                                             "Metadata info", self, toolTip="View/edit the profile metadata",
-                                             triggered=self.metadata_profile)
+            metadata_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata_profile.png')), "Metadata info",
+                                         self)
+            metadata_act.setToolTip("View/edit the profile metadata")
+            metadata_act.triggered.connect(self.metadata_profile)
             menu.addAction(metadata_act)
 
             menu.addMenu(qa_menu)
-            dqa_compare_ref_act = QtGui.QAction("DQA (with reference)", self,
-                                                    toolTip="Assess data quality by comparison with the reference cast",
-                                                    triggered=self.dqa_full_profile)
+            dqa_compare_ref_act = QtGui.QAction("DQA (with reference)", self)
+            dqa_compare_ref_act.setToolTip("Assess data quality by comparison with the reference cast")
+            dqa_compare_ref_act.triggered.connect(self.dqa_full_profile)
             qa_menu.addAction(dqa_compare_ref_act)
-            dqa_at_surface_act = QtGui.QAction("DQA (at surface)", self, toolTip="DQA with surface sound speed",
-                                                   triggered=self.dqa_at_surface)
+
+            dqa_at_surface_act = QtGui.QAction("DQA (at surface)", self)
+            dqa_at_surface_act.setToolTip("DQA with surface sound speed")
+            dqa_at_surface_act.triggered.connect(self.dqa_at_surface)
             qa_menu.addAction(dqa_at_surface_act)
 
             menu.addSeparator()
 
-            load_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'load_profile.png')),
-                                         "Load profile", self, toolTip="Load a profile", triggered=self.load_profile)
+            load_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'load_profile.png')), "Load profile", self)
+            load_act.setToolTip("Load a profile")
+            load_act.triggered.connect(self.load_profile)
             menu.addAction(load_act)
 
-            export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export_profile.png')),
-                                           "Export profile", self, toolTip="Export a single profile",
-                                           triggered=self.export_single_profile)
+            export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export_profile.png')), "Export profile",
+                                       self)
+            export_act.setToolTip("Export a single profile")
+            export_act.triggered.connect(self.export_single_profile)
             menu.addAction(export_act)
 
-            delete_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'delete.png')),
-                                           "Delete profile", self, toolTip="Delete selected profile",
-                                           triggered=self.delete_profile)
+            delete_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'delete.png')), "Delete profile", self)
+            delete_act.setToolTip("Delete selected profile")
+            delete_act.triggered.connect(self.delete_profile)
             menu.addAction(delete_act)
 
             def handle_menu_hovered(action):
-                # noinspection PyArgumentList
                 QtWidgets.QToolTip.showText(QtGui.QCursor.pos(), action.toolTip(), menu, menu.actionGeometry(action))
 
-            # noinspection PyUnresolvedReferences
             menu.hovered.connect(handle_menu_hovered)
 
         else:  # multiple selection
 
-            map_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'map.png')),
-                                        "Show map", self, toolTip="Show a map with profiles location",
-                                        triggered=self.show_map_for_selected)
+            map_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'map.png')), "Show map", self)
+            map_act.setToolTip("Show a map with profiles location")
+            map_act.triggered.connect(self.show_map_for_selected)
             menu.addAction(map_act)
 
             metadata_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata_profile.png')),
-                                             "Edit metadata",
-                                             self, toolTip="Edit common metadata fields for multiple profiles",
-                                             triggered=self.metadata_profile)
+                                         "Edit metadata", self)
+            metadata_act.setToolTip("Edit common metadata fields for multiple profiles")
+            metadata_act.triggered.connect(self.metadata_profile)
             menu.addAction(metadata_act)
 
             if len(rows) == 2:
-                ray_tracing_comparison_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media,
-                                                                                        'raytracing_comparison.png')),
-                                                               "Ray-tracing comparison", self,
-                                                               toolTip="Compare ray-tracing using the selected pair",
-                                                               triggered=self.ray_tracing_comparison)
+                ray_tracing_comparison_act = QtGui.QAction(
+                    QtGui.QIcon(os.path.join(self.media, 'raytracing_comparison.png')), "Ray-tracing comparison", self)
+                ray_tracing_comparison_act.setToolTip("Compare ray-tracing using the selected pair")
+                ray_tracing_comparison_act.triggered.connect(self.ray_tracing_comparison)
                 menu.addAction(ray_tracing_comparison_act)
 
                 bias_plots_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'bias_plots.png')),
-                                                   "Across-swath bias", self,
-                                                   toolTip="Create depth and horizontal bias plots across the swath",
-                                                   triggered=self.bias_plots)
+                                               "Across-swath bias", self)
+                bias_plots_act.setToolTip("Create depth and horizontal bias plots across the swath")
+                bias_plots_act.triggered.connect(self.bias_plots)
                 menu.addAction(bias_plots_act)
 
             menu.addMenu(qa_menu)
             if len(rows) == 2:
-                dqa_compare_two_act = QtGui.QAction("DQA (among selections)", self,
-                                                        toolTip="Assess data quality by comparison between two casts",
-                                                        triggered=self.dqa_full_profile)
+                dqa_compare_two_act = QtGui.QAction("DQA (among selections)", self)
+                dqa_compare_two_act.setToolTip("Assess data quality by comparison between two casts")
+                dqa_compare_two_act.triggered.connect(self.dqa_full_profile)
                 qa_menu.addAction(dqa_compare_two_act)
 
-            dqa_at_surface_act = QtGui.QAction("DQA (at surface)", self, toolTip="DQA with surface sound speed",
-                                                   triggered=self.dqa_at_surface)
+            dqa_at_surface_act = QtGui.QAction("DQA (at surface)", self)
+            dqa_at_surface_act.setToolTip("DQA with surface sound speed")
+            dqa_at_surface_act.triggered.connect(self.dqa_at_surface)
             qa_menu.addAction(dqa_at_surface_act)
 
             plot_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'plot_comparison.png')),
-                                         "Comparison plot", self, toolTip="Plot profiles for comparison",
-                                         triggered=self.plot_comparison)
+                                     "Comparison plot", self)
+            plot_act.setToolTip("Plot profiles for comparison")
+            plot_act.triggered.connect(self.plot_comparison)
             menu.addAction(plot_act)
 
             menu.addSeparator()
 
-            export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export_profile.png')),
-                                           "Export profiles", self, toolTip="Export multiple profiles",
-                                           triggered=self.export_multi_profile)
+            export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export_profile.png')), "Export profiles",
+                                       self)
+            export_act.setToolTip("Export multiple profiles")
+            export_act.triggered.connect(self.export_multi_profile)
             menu.addAction(export_act)
 
-            delete_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'delete.png')),
-                                           "Delete profiles", self, toolTip="Delete selected profiles",
-                                           triggered=self.delete_profile)
+            delete_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'delete.png')), "Delete profiles", self)
+            delete_act.setToolTip("Delete selected profiles")
+            delete_act.triggered.connect(self.delete_profile)
             menu.addAction(delete_act)
 
             def handle_menu_hovered(action):
@@ -359,7 +334,7 @@ class Database(AbstractWidget):
             # noinspection PyUnresolvedReferences
             menu.hovered.connect(handle_menu_hovered)
 
-        menu.exec_(self.ssp_list.mapToGlobal(pos))
+        menu.exec(self.ssp_list.mapToGlobal(pos))
 
     def load_profile(self):
         logger.debug("user want to load a profile")
@@ -367,14 +342,12 @@ class Database(AbstractWidget):
         # check if any selection
         rows = self.ssp_list.selectionModel().selectedRows()
         if len(rows) != 1:
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "Database",
                                               "You need to select a single profile before loading it!")
             return
 
         if (self.ssp_list.item(rows[0].row(), 3).text() == "Future") or \
                 (self.ssp_list.item(rows[0].row(), 4).text() == "Future"):
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "Database",
                                               "You cannot load the selected profile from the database!\n\n"
                                               "If you need to access it, update to a newer version of "
@@ -385,8 +358,8 @@ class Database(AbstractWidget):
         pk = int(self.ssp_list.item(rows[0].row(), 0).text())
         success = self.lib.load_profile(pk)
         if not success:
-            # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile!", QtWidgets.QMessageBox.StandardButton.Ok)
+            QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile!",
+                                          QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         if self.lib.has_ssp():
@@ -403,7 +376,6 @@ class Database(AbstractWidget):
         # check if any selection
         rows = self.ssp_list.selectionModel().selectedRows()
         if len(rows) != 1:
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "Database", "Select a single profile before exporting it!")
             return
 
@@ -411,8 +383,8 @@ class Database(AbstractWidget):
         pk = int(self.ssp_list.item(rows[0].row(), 0).text())
         success = self.lib.load_profile(pk, skip_atlas=True)
         if not success:
-            # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile!", QtWidgets.QMessageBox.StandardButton.Ok)
+            QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile!",
+                                          QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         msg = self.lib.profile_stats()
@@ -420,7 +392,7 @@ class Database(AbstractWidget):
             basename = "%s_%03d_stats" % (self.lib.current_project, pk)
             dlg = TextEditorDialog(title="Profile Statistical Info", basename=basename, body=msg,
                                    main_win=self, lib=self.lib, parent=self)
-            dlg.exec_()
+            dlg.exec()
 
         # finally, we clear the just loaded data
         self.lib.clear_data()
@@ -441,12 +413,12 @@ class Database(AbstractWidget):
             pk = int(self.ssp_list.item(rows[0].row(), 0).text())
             success = self.lib.load_profile(pk, skip_atlas=True)
             if not success:
-                # noinspection PyCallByClass
-                QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile!", QtWidgets.QMessageBox.StandardButton.Ok)
+                QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile!",
+                                              QtWidgets.QMessageBox.StandardButton.Ok)
                 return
 
             dlg = MetadataDialog(lib=self.lib, main_win=self.main_win, parent=self)
-            dlg.exec_()
+            dlg.exec()
 
         else:  # multiple selection
 
@@ -456,7 +428,7 @@ class Database(AbstractWidget):
             logger.debug("pks: %s" % (pks,))
 
             dlg = CommonMetadataDialog(lib=self.lib, main_win=self.main_win, pks=pks, parent=self)
-            dlg.exec_()
+            dlg.exec()
 
         # finally, we clear the just loaded data
         self.lib.clear_data()
@@ -472,7 +444,6 @@ class Database(AbstractWidget):
         # check if any selection
         rows = self.ssp_list.selectionModel().selectedRows()
         if len(rows) != 1:
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "Database", "Select a single profile before exporting it!")
             return
 
@@ -480,12 +451,12 @@ class Database(AbstractWidget):
         pk = int(self.ssp_list.item(rows[0].row(), 0).text())
         success = self.lib.load_profile(pk)
         if not success:
-            # noinspection PyCallByClass
-            QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile!", QtWidgets.QMessageBox.StandardButton.Ok)
+            QtWidgets.QMessageBox.warning(self, "Database", "Unable to load profile!",
+                                          QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         dlg = ExportSingleProfileDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        dlg.exec_()
+        dlg.exec()
 
         # finally, we clear the just loaded data
         self.lib.clear_data()
@@ -500,7 +471,6 @@ class Database(AbstractWidget):
         # check if any selection
         rows = self.ssp_list.selectionModel().selectedRows()
         if len(rows) < 2:
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "Database", "Select multiple profiles before plotting them!")
             return
 
@@ -509,7 +479,7 @@ class Database(AbstractWidget):
             pks.append(int(self.ssp_list.item(row.row(), 0).text()))
 
         dlg = PlotMultiProfileDialog(main_win=self.main_win, lib=self.lib, pks=pks, parent=self)
-        dlg.exec_()
+        dlg.exec()
         dlg.raise_window()
 
     def export_multi_profile(self):
@@ -521,7 +491,6 @@ class Database(AbstractWidget):
         # check if any selection
         rows = self.ssp_list.selectionModel().selectedRows()
         if len(rows) < 2:
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "Database", "Select multiple profiles before exporting them!")
             return
 
@@ -530,7 +499,7 @@ class Database(AbstractWidget):
             pks.append(int(self.ssp_list.item(row.row(), 0).text()))
 
         dlg = ExportMultiProfileDialog(main_win=self.main_win, lib=self.lib, pks=pks, parent=self)
-        dlg.exec_()
+        dlg.exec()
 
     def delete_profile(self):
         logger.debug("user want to delete a profile")
@@ -538,7 +507,6 @@ class Database(AbstractWidget):
         # check if any selection
         rows = self.ssp_list.selectionModel().selectedRows()
         if len(rows) == 0:
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "Database", "You need to select a profile before deleting it!")
             return
 
@@ -548,8 +516,9 @@ class Database(AbstractWidget):
             msg = "Do you really want to delete profile #%02d?" % pk
         else:
             msg = "Do you really want to delete %d profiles?" % len(rows)
-        # noinspection PyCallByClass
-        ret = QtWidgets.QMessageBox.warning(self, "Database", msg, QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.No)
+        ret = QtWidgets.QMessageBox.warning(
+            self, "Database", msg,
+            QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.No)
         if ret == QtWidgets.QMessageBox.StandardButton.No:
             return
 
@@ -558,7 +527,6 @@ class Database(AbstractWidget):
             pk = int(self.ssp_list.item(row.row(), 0).text())
             success = self.lib.delete_db_profile(pk)
             if not success:
-                # noinspection PyCallByClass
                 QtWidgets.QMessageBox.critical(self, "Database", "Unable to remove the #%02d profile!" % pk)
 
         self.main_win.data_removed()
@@ -573,9 +541,9 @@ class Database(AbstractWidget):
             msg = self.lib.dqa_at_surface(pk)
             if msg is not None:
                 basename = "%s_%03d_dqa_surface" % (self.lib.current_project, pk)
-                dlg = TextEditorDialog(title="Surface DQA", basename=basename, body=msg,
-                                       main_win=self, lib=self.lib, parent=self)
-                dlg.exec_()
+                dlg = TextEditorDialog(title="Surface DQA", basename=basename, body=msg, main_win=self, lib=self.lib,
+                                       parent=self)
+                dlg.exec()
 
     def dqa_full_profile(self):
         logger.debug("user want to do a profile DQA")
@@ -585,7 +553,6 @@ class Database(AbstractWidget):
 
             pk = int(self.ssp_list.item(rows[0].row(), 0).text())
             if self.lib.ref is None:
-                # noinspection PyCallByClass
                 QtWidgets.QMessageBox.information(self, "DQA compare with reference cast",
                                                   "You should set reference cast first!")
                 return
@@ -593,9 +560,7 @@ class Database(AbstractWidget):
                 try:
                     msg = self.lib.dqa_full_profile(pk)
                 except RuntimeError as e:
-                    # noinspection PyCallByClass
-                    QtWidgets.QMessageBox.critical(self, "DQA error",
-                                                   "%s" % e)
+                    QtWidgets.QMessageBox.critical(self, "DQA error", "%s" % e)
                     return
 
         elif len(rows) == 2:
@@ -606,14 +571,10 @@ class Database(AbstractWidget):
                 msg = self.lib.dqa_full_profile(pk, pk_ref)
 
             except RuntimeError as e:
-                # noinspection PyCallByClass
-                QtWidgets.QMessageBox.critical(self, "DQA error",
-                                               "%s" % e)
+                QtWidgets.QMessageBox.critical(self, "DQA error", "%s" % e)
                 return
 
         else:
-
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "DQA comparison",
                                               "You need to select 1 or 2 profiles to do DQA comparison!")
             return
@@ -622,14 +583,13 @@ class Database(AbstractWidget):
             basename = "%s_dqa" % self.lib.current_project
             dlg = TextEditorDialog(title="Profile DQA", basename=basename, body=msg, init_size=QtCore.QSize(800, 800),
                                    main_win=self, lib=self.lib, parent=self)
-            dlg.exec_()
+            dlg.exec()
 
     def ray_tracing_comparison(self):
         logger.debug("user want to do a comparison between two ray-traced profiles")
 
         rows = self.ssp_list.selectionModel().selectedRows()
         if len(rows) != 2:
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "Ray-Tracing comparison",
                                               "You need to select exactly 2 profiles to do this comparison!")
             return
@@ -645,8 +605,6 @@ class Database(AbstractWidget):
             self.lib.ray_tracing_comparison(pk1, pk2)
 
         except RuntimeError as e:
-            # traceback.print_stack()
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.critical(self, "Ray-Tracing error", "%s" % e)
             self.progress.end()
             return
@@ -658,7 +616,6 @@ class Database(AbstractWidget):
 
         rows = self.ssp_list.selectionModel().selectedRows()
         if len(rows) != 2:
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "Across-swath bias plots",
                                               "You need to select exactly 2 profiles to create these plots!")
             return
@@ -674,8 +631,6 @@ class Database(AbstractWidget):
             self.lib.bias_plots(pk1, pk2)
             self.progress.end()
         except RuntimeError as e:
-            # traceback.print_stack()
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.critical(self, "Bias plots error", "%s" % e)
             self.progress.end()
             return
@@ -686,7 +641,7 @@ class Database(AbstractWidget):
         self.main_win.switch_to_database_tab()
 
         dlg = ProjectNewDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        success = dlg.exec_()
+        success = dlg.exec()
 
         if success:
             self.update_table()
@@ -697,7 +652,7 @@ class Database(AbstractWidget):
         self.main_win.switch_to_database_tab()
 
         dlg = ProjectRenameDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        success = dlg.exec_()
+        success = dlg.exec()
 
         if success:
             self.update_table()
@@ -708,7 +663,7 @@ class Database(AbstractWidget):
         self.main_win.switch_to_database_tab()
 
         dlg = ProjectSwitchDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        dlg.exec_()
+        dlg.exec()
 
         self.update_table()
 
@@ -718,7 +673,7 @@ class Database(AbstractWidget):
         self.main_win.switch_to_database_tab()
 
         dlg = ImportDataDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        dlg.exec_()
+        dlg.exec()
 
         self.update_table()
 
@@ -739,7 +694,6 @@ class Database(AbstractWidget):
 
         self.main_win.switch_to_database_tab()
 
-        # noinspection PyCallByClass
         QtWidgets.QMessageBox.warning(self, "Warning about multi-profile import",
                                       "The multi-profile dialog allows you to directly\n"
                                       "import profiles into the database, BUT skipping\n"
@@ -750,7 +704,7 @@ class Database(AbstractWidget):
                                       "and saved back into the database.")
 
         dlg = ImportMultiProfileDialog(main_win=self.main_win, lib=self.lib, parent=self)
-        dlg.exec_()
+        dlg.exec()
 
         self.update_table()
 
@@ -764,16 +718,12 @@ class Database(AbstractWidget):
 
         nr_rows = len(rows)
         if nr_rows == 0:
-
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "Profile Export", "You need to select at least 1 profile!")
 
         elif nr_rows == 1:
-
             self.export_single_profile()
 
         else:
-
             self.export_multi_profile()
 
     def export_profile_metadata(self):
@@ -781,7 +731,7 @@ class Database(AbstractWidget):
 
         self.main_win.switch_to_database_tab()
         dlg = ExportProfileMetadataDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        dlg.exec_()
+        dlg.exec()
 
     def plot_profiles(self):
         logger.debug("user want to plot profiles")
@@ -789,7 +739,7 @@ class Database(AbstractWidget):
         self.main_win.switch_to_database_tab()
 
         dlg = PlotProfilesDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        success = dlg.exec_()
+        success = dlg.exec()
 
         if success and not dlg.only_saved:
             self.lib.raise_plot_window()
@@ -801,7 +751,6 @@ class Database(AbstractWidget):
 
         rows = self.ssp_list.selectionModel().selectedRows()
         if len(rows) == 0:
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.information(self, "Map", "You need to select at least profile for the map!")
             return
 
@@ -818,11 +767,10 @@ class Database(AbstractWidget):
         class NumberWidgetItem(QtWidgets.QTableWidgetItem):
 
             def __lt__(self, other):
-                # noinspection PyBroadException
                 try:
                     return float(self.text()) < float(other.text())
 
-                except Exception:
+                except (ValueError, TypeError):
                     return True
 
         class LocationWidgetItem(QtWidgets.QTableWidgetItem):
@@ -833,13 +781,12 @@ class Database(AbstractWidget):
                 self_lat = self.text()[:-1].split(';')[-1]
                 other_lat = other.text()[:-1].split(';')[-1]
                 logger.debug("%s %s < %s %s" % (self_lon, self_lat, other_lon, other_lat))
-                # noinspection PyBroadException
                 try:
                     if self_lon == other_lon:
                         return float(self_lat) < float(other_lat)
                     return float(self_lon) < float(other_lon)
 
-                except Exception:
+                except (ValueError, TypeError):
                     return True
 
         # set the top label
@@ -903,8 +850,8 @@ class Database(AbstractWidget):
                 if not processed:
                     item.setBackground(QtGui.QColor(200, 100, 100, 50))
 
-                item.setTextAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignHCenter)
-                item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
+                item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignVCenter | QtCore.Qt.AlignmentFlag.AlignHCenter)
+                item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
 
                 self.ssp_list.setItem(i, j, item)
 

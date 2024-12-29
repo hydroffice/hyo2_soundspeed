@@ -377,7 +377,7 @@ class ImportSingleProfileDialog(AbstractDialog):
     def on_click_seabird_ctd(self):
         logger.debug("Open Seabird CTD dialog")
         dlg = SeacatDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        ret = dlg.exec_()
+        ret = dlg.exec()
         if ret != QtWidgets.QDialog.Accepted:
             logger.info("Seabird CTD dialog closed without selection")
             return

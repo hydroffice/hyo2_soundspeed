@@ -1,16 +1,21 @@
 import logging
+from typing import TYPE_CHECKING
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from hyo2.ssm2.app.gui.soundspeedsettings.widgets.widget import AbstractWidget
 from hyo2.ssm2.lib.profile.dicts import Dicts
 
+if TYPE_CHECKING:
+    from hyo2.ssm2.app.gui.soundspeedsettings.mainwin import MainWin
+    from hyo2.ssm2.lib.base.setup_db import SetupDb
+
 logger = logging.getLogger(__name__)
 
 
 class Output(AbstractWidget):
 
-    def __init__(self, main_win, db):
+    def __init__(self, main_win: "MainWin", db: "SetupDb") -> None:
         AbstractWidget.__init__(self, main_win=main_win, db=db)
 
         lbl_width = 120
@@ -40,8 +45,8 @@ class Output(AbstractWidget):
         vbox.addStretch()
         # -- list
         self.client_list = QtWidgets.QTableWidget()
-        self.client_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
-        self.client_list.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.client_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.client_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         hbox.addWidget(self.client_list)
         # -- button box
         vbox = QtWidgets.QVBoxLayout()
@@ -52,13 +57,13 @@ class Output(AbstractWidget):
         vbox.addStretch()
         # --- new setup
         self.btn_new_client = QtWidgets.QPushButton("New client")
-        self.btn_box.addButton(self.btn_new_client, QtWidgets.QDialogButtonBox.ActionRole)
+        self.btn_box.addButton(self.btn_new_client, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         # --- delete setup
         self.btn_delete_client = QtWidgets.QPushButton("Delete client")
-        self.btn_box.addButton(self.btn_delete_client, QtWidgets.QDialogButtonBox.ActionRole)
+        self.btn_box.addButton(self.btn_delete_client, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         # --- refresh
         self.btn_refresh_list = QtWidgets.QPushButton("Refresh")
-        self.btn_box.addButton(self.btn_refresh_list, QtWidgets.QDialogButtonBox.ActionRole)
+        self.btn_box.addButton(self.btn_refresh_list, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
 
         # - left and right sub-frames
         hbox = QtWidgets.QHBoxLayout()
@@ -246,7 +251,7 @@ class Output(AbstractWidget):
             # noinspection PyCallByClass
             protocol, ok = QtWidgets.QInputDialog.getText(self, "New client",
                                                           "Input the protocol (SIS, KCTRL, HYPACK, PDS2000, or QINSY)",
-                                                          QtWidgets.QLineEdit.Normal,
+                                                          QtWidgets.QLineEdit.EchoMode.Normal,
                                                           "SIS")
             if not ok:
                 return
@@ -361,8 +366,8 @@ class Output(AbstractWidget):
                 if j == 0:  # skip the id
                     continue
                 item = QtWidgets.QTableWidgetItem("%s" % field)
-                item.setTextAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignHCenter)
-                item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
+                item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignVCenter | QtCore.Qt.AlignmentFlag.AlignHCenter)
+                item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
                 self.client_list.setItem(i, j - 1, item)
 
         self.client_list.resizeColumnsToContents()

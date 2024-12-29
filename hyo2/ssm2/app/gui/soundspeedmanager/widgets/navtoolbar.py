@@ -334,7 +334,7 @@ class NavToolbar(NavigationToolbar2QT):
             menu.addAction(self._actions['unflag'])
             menu.addAction(self._actions['insert'])
             menu.popup(QtGui.QCursor.pos())
-            menu.exec_()
+            menu.exec()
 
     def release(self, event: MouseEvent) -> None:
         # print("release", event.button)

@@ -32,8 +32,8 @@ class Settings(AbstractWidget):
         self.editable.setIconSize(QtCore.QSize(30, 30))
         self.editable.setFixedHeight(34)
         edit_icon = QtGui.QIcon()
-        edit_icon.addFile(os.path.join(self.media, 'lock.png'), state=QtGui.QIcon.Off)
-        edit_icon.addFile(os.path.join(self.media, 'unlock.png'), state=QtGui.QIcon.On)
+        edit_icon.addFile(os.path.join(self.media, 'lock.png'), state=QtGui.QIcon.State.Off)
+        edit_icon.addFile(os.path.join(self.media, 'unlock.png'), state=QtGui.QIcon.State.On)
         self.editable.setIcon(edit_icon)
         self.editable.setCheckable(True)
         # noinspection PyUnresolvedReferences

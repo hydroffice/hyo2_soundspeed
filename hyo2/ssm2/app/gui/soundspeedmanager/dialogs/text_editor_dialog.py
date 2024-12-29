@@ -163,7 +163,7 @@ class TextEditorDialog(AbstractDialog):
         msg_box.setText('There are unsaved changes!\nDo you really want to %s?' % text)
         msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
         msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.No)
-        return msg_box.exec_()
+        return msg_box.exec()
 
     def closeEvent(self, event):
         """ actions to be done before close the app """

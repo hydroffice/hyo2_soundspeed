@@ -84,8 +84,8 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      ssp_temp_sal_source text NOT NULL DEFAULT "WOA09",
      ssp_up_or_down text NOT NULL DEFAULT "down",
      rx_max_wait_time integer NOT NULL DEFAULT 20,
-     use_sis integer NOT NULL DEFAULT 1,
-     use_sis5 integer NOT NULL DEFAULT 0,
+     use_sis integer NOT NULL DEFAULT 0,
+     use_sis5 integer NOT NULL DEFAULT 1,
      use_sippican integer NOT NULL DEFAULT 0,
      use_nmea_0183 integer NOT NULL DEFAULT 0,
      use_mvp integer NOT NULL DEFAULT 0,
@@ -140,9 +140,9 @@ CREATE_CLIENT_LIST = """-- noinspection SqlResolveForFile
  CREATE TABLE IF NOT EXISTS client_list(
      id integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
      setup_id INTEGER NOT NULL,
-     name text NOT NULL DEFAULT "Local test",
+     name text NOT NULL DEFAULT "Local SIS5",
      ip text NOT NULL DEFAULT "127.0.0.1",
-     port integer NOT NULL DEFAULT 4001,
+     port integer NOT NULL DEFAULT 14002,
      protocol text NOT NULL DEFAULT "SIS",
      CONSTRAINT setup_id_fk
      FOREIGN KEY(setup_id) REFERENCES general(id)

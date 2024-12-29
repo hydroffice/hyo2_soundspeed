@@ -1,9 +1,10 @@
 import logging
 import os
+from typing import TYPE_CHECKING
 
 import numpy as np
 from PySide6 import QtCore, QtGui, QtWidgets
-from hyo2.ssm2.lib.profile.dicts import Dicts
+
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.automate_dialog import AutomateDialog
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.buttons_dialog import ButtonsDialog
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.constant_gradient_profile_dialog import ConstantGradientProfileDialog
@@ -15,6 +16,11 @@ from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.seacat_dialog import SeacatDial
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.spreadsheet_dialog import SpreadSheetDialog
 from hyo2.ssm2.app.gui.soundspeedmanager.widgets.dataplots import DataPlots
 from hyo2.ssm2.app.gui.soundspeedmanager.widgets.widget import AbstractWidget
+from hyo2.ssm2.lib.profile.dicts import Dicts
+
+if TYPE_CHECKING:
+    from hyo2.ssm2.app.gui.soundspeedmanager.mainwin import MainWin
+    from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +29,7 @@ class Editor(AbstractWidget):
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
 
-    def __init__(self, main_win, lib):
+    def __init__(self, main_win: 'MainWin', lib: 'SoundSpeedLibrary') -> None:
         AbstractWidget.__init__(self, main_win=main_win, lib=lib)
 
         settings = QtCore.QSettings()
@@ -45,7 +51,6 @@ class Editor(AbstractWidget):
         self.input_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'input.png')),
                                        'Import Input Data', self)
         self.input_act.setShortcut('Alt+I')
-        # noinspection PyUnresolvedReferences
         self.input_act.triggered.connect(self.on_input_data)
         self.input_bar.addAction(self.input_act)
         self.main_win.file_menu.addAction(self.input_act)
@@ -53,17 +58,13 @@ class Editor(AbstractWidget):
         # import
         self.create_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'constant_gradient.png')),
                                         'Constant-gradient Profile', self)
-        # self.create_act.setShortcut('Alt+G')
-        # noinspection PyUnresolvedReferences
         self.create_act.triggered.connect(self.on_create_data)
-        # self.input_bar.addAction(self.create_act)
         self.main_win.file_menu.addAction(self.create_act)
 
         # clear
         self.clear_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'clear.png')),
                                        'Clear Data', self)
         self.clear_act.setShortcut('Alt+C')
-        # noinspection PyUnresolvedReferences
         self.clear_act.triggered.connect(self.on_clear_data)
         # set hidden, but the whole action is candidate to deletion
         self.clear_act.setVisible(False)
@@ -73,7 +74,6 @@ class Editor(AbstractWidget):
         self.set_ref_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'ref.png')),
                                          'Reference Cast', self)
         self.set_ref_act.setShortcut('Alt+R')
-        # noinspection PyUnresolvedReferences
         self.set_ref_act.triggered.connect(self.on_set_ref)
         if settings.value("editor_buttons/reference", 1) == 1:
             self.input_bar.addAction(self.set_ref_act)
@@ -83,7 +83,6 @@ class Editor(AbstractWidget):
         self.seacat_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'seacat.png')),
                                         'Seabird CTD Setup', self)
         self.seacat_act.setShortcut('Alt+B')
-        # noinspection PyUnresolvedReferences
         self.seacat_act.triggered.connect(self.on_seacat)
         if settings.value("input_buttons/seacat_plugin", 1) == 1:
             self.input_bar.addAction(self.seacat_act)
@@ -96,7 +95,6 @@ class Editor(AbstractWidget):
         self.spreadsheet_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'grid.png')),
                                              'Show/Edit Data Spreadsheet', self)
         self.spreadsheet_act.setShortcut('Alt+S')
-        # noinspection PyUnresolvedReferences
         self.spreadsheet_act.triggered.connect(self.on_spreadsheet)
         if settings.value("editor_buttons/spreadsheet", 0) == 1:
             self.process_bar.addAction(self.spreadsheet_act)
@@ -106,7 +104,6 @@ class Editor(AbstractWidget):
         self.metadata_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'metadata.png')),
                                           'Show/Edit Cast Metadata', self)
         self.metadata_act.setShortcut('Alt+M')
-        # noinspection PyUnresolvedReferences
         self.metadata_act.triggered.connect(self.on_metadata)
         if settings.value("editor_buttons/metadata", 1) == 1:
             self.process_bar.addAction(self.metadata_act)
@@ -120,7 +117,6 @@ class Editor(AbstractWidget):
         self.filter_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'filter.png')),
                                         'Filter/Smooth Data', self)
         self.filter_act.setShortcut('Alt+F')
-        # noinspection PyUnresolvedReferences
         self.filter_act.triggered.connect(self.on_data_filter)
         if settings.value("editor_buttons/filter", 1) == 1:
             self.process_bar.addAction(self.filter_act)
@@ -129,16 +125,12 @@ class Editor(AbstractWidget):
         # retrieve sal
         self.sal_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'sal.png')),
                                      'Retrieve Salinity', self)
-        # self.sal_act.setShortcut('Alt+A')
-        # noinspection PyUnresolvedReferences
         self.sal_act.triggered.connect(self.on_retrieve_sal)
         self.process_bar.addAction(self.sal_act)
 
         # retrieve temp/sal
         self.temp_sal_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'temp_sal.png')),
                                           'Retrieve Temperature/Salinity', self)
-        # self.temp_sal_act.setShortcut('Alt+T')
-        # noinspection PyUnresolvedReferences
         self.temp_sal_act.triggered.connect(self.on_retrieve_temp_sal)
         self.process_bar.addAction(self.temp_sal_act)
         self.main_win.edit_menu.addAction(self.temp_sal_act)
@@ -146,8 +138,6 @@ class Editor(AbstractWidget):
         # retrieve transducer sound speed
         self.tss_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'tss.png')),
                                      'Retrieve Transducer Sound Speed', self)
-        # self.tss_act.setShortcut('Alt+W')
-        # noinspection PyUnresolvedReferences
         self.tss_act.triggered.connect(self.on_retrieve_tss)
         self.process_bar.addAction(self.tss_act)
         self.main_win.edit_menu.addAction(self.tss_act)
@@ -155,8 +145,6 @@ class Editor(AbstractWidget):
         # extend profile
         self.extend_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'extend.png')),
                                         'Extend Profile', self)
-        # self.extend_act.setShortcut('Alt+E')
-        # noinspection PyUnresolvedReferences
         self.extend_act.triggered.connect(self.on_extend_profile)
         self.process_bar.addAction(self.extend_act)
         self.main_win.edit_menu.addAction(self.extend_act)
@@ -164,10 +152,7 @@ class Editor(AbstractWidget):
         # preview thinning
         self.thin_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'thinning.png')),
                                       'Preview Thinning', self)
-        # self.thin_act.setShortcut('Alt+T')
-        # noinspection PyUnresolvedReferences
         self.thin_act.triggered.connect(self.on_preview_thinning)
-        # self.thin_act.setVisible(False)
         if settings.value("editor_buttons/thinning", 0) == 1:
             self.process_bar.addAction(self.thin_act)
         self.main_win.edit_menu.addAction(self.thin_act)
@@ -178,8 +163,6 @@ class Editor(AbstractWidget):
         # restart processing
         self.restart_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'restart.png')),
                                          'Restart Processing', self)
-        # self.restart_act.setShortcut('Alt+N')
-        # noinspection PyUnresolvedReferences
         self.restart_act.triggered.connect(self.on_restart_proc)
         if settings.value("editor_buttons/restart", 1) == 1:
             self.process_bar.addAction(self.restart_act)
@@ -194,7 +177,6 @@ class Editor(AbstractWidget):
         self.export_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'export.png')),
                                         'Export Data', self)
         self.export_act.setShortcut('Alt+X')
-        # noinspection PyUnresolvedReferences
         self.export_act.triggered.connect(self.on_export_single_profile)
         if settings.value("editor_buttons/export", 1) == 1:
             self.output_bar.addAction(self.export_act)
@@ -204,7 +186,6 @@ class Editor(AbstractWidget):
         self.transmit_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'transmit.png')),
                                           'Transmit Data', self)
         self.transmit_act.setShortcut('Alt+T')
-        # noinspection PyUnresolvedReferences
         self.transmit_act.triggered.connect(self.on_transmit_data)
         if settings.value("editor_buttons/transmit", 1) == 1:
             self.output_bar.addAction(self.transmit_act)
@@ -214,7 +195,6 @@ class Editor(AbstractWidget):
         self.save_db_act = QtGui.QAction(QtGui.QIcon(os.path.join(self.media, 'db_save.png')),
                                          'Save to Database', self)
         self.save_db_act.setShortcut('Alt+D')
-        # noinspection PyUnresolvedReferences
         self.save_db_act.triggered.connect(self.on_save_db)
         if settings.value("editor_buttons/database", 0) == 1:
             self.output_bar.addAction(self.save_db_act)
@@ -226,14 +206,12 @@ class Editor(AbstractWidget):
         self.automate_processing_acts = QtGui.QAction("Automate processing", self)
         self.automate_processing_acts.setShortcut("Ctrl+A")
         self.automate_processing_acts.setStatusTip("Automate the processing steps")
-        # noinspection PyUnresolvedReferences
         self.automate_processing_acts.triggered.connect(self.on_automate_processing)
         self.main_win.edit_menu.addAction(self.automate_processing_acts)
 
         # buttons visibility
         self.buttons_visibility_acts = QtGui.QAction("Change buttons visibility", self)
         self.buttons_visibility_acts.setStatusTip("Define which buttons are displayed on the toolbar")
-        # noinspection PyUnresolvedReferences
         self.buttons_visibility_acts.triggered.connect(self.on_buttons_visibility)
         self.main_win.edit_menu.addAction(self.buttons_visibility_acts)
 
@@ -241,7 +219,6 @@ class Editor(AbstractWidget):
         exit_action = QtGui.QAction("Exit", self)
         exit_action.setShortcut("Ctrl+Q")
         exit_action.setStatusTip("Exit application")
-        # noinspection PyUnresolvedReferences
         exit_action.triggered.connect(self.main_win.close)
         self.main_win.file_menu.addSeparator()
         self.main_win.file_menu.addAction(exit_action)
@@ -256,19 +233,17 @@ class Editor(AbstractWidget):
 
         self.main_win.switch_to_editor_tab()
         dlg = ImportSingleProfileDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        ret = dlg.exec_()
-        if ret != QtWidgets.QDialog.Accepted:
+        ret = dlg.exec()
+        if ret != QtWidgets.QDialog.DialogCode.Accepted:
             return
 
         if not self.lib.has_ssp():
             msg = "Unable to retrieve a profile"
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.warning(self, "Input Data", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         if self.lib.cur.data.num_samples == 0:
             msg = "Unable to retrieve samples from the profile"
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.warning(self, "Input Data", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
@@ -283,19 +258,17 @@ class Editor(AbstractWidget):
 
         self.main_win.switch_to_editor_tab()
         dlg = ConstantGradientProfileDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        ret = dlg.exec_()
-        if ret != QtWidgets.QDialog.Accepted:
+        ret = dlg.exec()
+        if ret != QtWidgets.QDialog.DialogCode.Accepted:
             return
 
         if not self.lib.has_ssp():
             msg = "Unable to retrieve a profile"
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.warning(self, "Input Data", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         if self.lib.cur.data.num_samples == 0:
             msg = "Unable to retrieve samples from the profile"
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.warning(self, "Input Data", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
@@ -331,8 +304,8 @@ class Editor(AbstractWidget):
     def on_seacat(self):
         logger.debug("Open Seabird CTD dialog")
         dlg = SeacatDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        ret = dlg.exec_()
-        if ret != QtWidgets.QDialog.Accepted:
+        ret = dlg.exec()
+        if ret != QtWidgets.QDialog.DialogCode.Accepted:
             logger.info("Seabird CTD dialog closed without selection")
             return
 
@@ -341,7 +314,7 @@ class Editor(AbstractWidget):
 
         self.main_win.switch_to_editor_tab()
         dlg = ReferenceDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        success = dlg.exec_()
+        success = dlg.exec()
         if success:
             self.main_win.data_imported()
 
@@ -359,7 +332,6 @@ class Editor(AbstractWidget):
 
         if not self.lib.filter_cur_data():
             msg = "Issue in filtering/smoothing the profile"
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.warning(self, "Filter/Smooth", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
@@ -375,13 +347,11 @@ class Editor(AbstractWidget):
 
         if self.lib.cur.meta.sensor_type not in [Dicts.sensor_types['XBT'], ]:
             msg = "This is a XBT-specific function!"
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.warning(self, "Salinity", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         if not self.lib.replace_cur_salinity():
             msg = "Issue in replacing the salinity"
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.warning(self, "Salinity", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
@@ -398,13 +368,11 @@ class Editor(AbstractWidget):
                                                  Dicts.sensor_types['SVP'],
                                                  Dicts.sensor_types['MVP']]:
             msg = "This is a XSV- and SVP-specific function!"
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.warning(self, "Temperature/Salinity", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
         if not self.lib.replace_cur_temp_sal():
             msg = "Issue in replacing temperature and salinity"
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.warning(self, "Temperature/Salinity", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
@@ -420,7 +388,6 @@ class Editor(AbstractWidget):
 
         if not self.lib.add_cur_tss():
             msg = "Issue in retrieving transducer sound speed"
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.warning(self, "Sound speed", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
@@ -438,7 +405,6 @@ class Editor(AbstractWidget):
                   "- The profile from the extension source is too short. Check it on the plots!\n" \
                   "- The extension source does not have a profile at the geographic location.\n" \
                   "Use another source or manually extend the profile!"
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.warning(self, "Profile extension", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
@@ -458,7 +424,6 @@ class Editor(AbstractWidget):
 
             if not self.lib.prepare_sis(thin_tolerance=tolerance):
                 msg = "Issue in preview the thinning"
-                # noinspection PyCallByClass
                 QtWidgets.QMessageBox.warning(self, "Thinning preview", msg, QtWidgets.QMessageBox.StandardButton.Ok)
                 return
 
@@ -480,11 +445,10 @@ class Editor(AbstractWidget):
 
         if not self.lib.has_ssp():
             msg = "Import data before visualize them in a spreadsheet!"
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.warning(self, "Spreadsheet warning", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
         dlg = SpreadSheetDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        dlg.exec_()
+        dlg.exec()
 
     def on_metadata(self):
         logger.debug('user wants to read/edit metadata')
@@ -493,18 +457,16 @@ class Editor(AbstractWidget):
 
         if not self.lib.has_ssp():
             msg = "Import data before visualize metadata!"
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.warning(self, "Metadata warning", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
         dlg = MetadataDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        dlg.exec_()
+        dlg.exec()
 
     def _run_safety_checks_on_output(self):
         logger.debug('running safety checks on output')
 
         if not self.lib.has_ssp():
             msg = "You need to first import data!"
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.warning(self, "Data Warning", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return False
 
@@ -520,9 +482,9 @@ class Editor(AbstractWidget):
 
             msg = "Suspect short temperature profile detected!\n\n" \
                   "Do you really want to continue?"
-            # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            ret = QtWidgets.QMessageBox.warning(
+                self, "Data Warning", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
@@ -531,9 +493,9 @@ class Editor(AbstractWidget):
             msg = "Suspect zero values in the temperature profile detected!\n" \
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
                   "Do you really want to continue?"
-            # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            ret = QtWidgets.QMessageBox.warning(
+                self, "Data Warning", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
@@ -542,9 +504,9 @@ class Editor(AbstractWidget):
             msg = "Suspect low value (%.2f) in the temperature profile detected!\n" \
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
                   "Do you really want to continue?" % min_temp
-            # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            ret = QtWidgets.QMessageBox.warning(
+                self, "Data Warning", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
@@ -553,9 +515,9 @@ class Editor(AbstractWidget):
             msg = "Suspect high value (%.2f) in the temperature profile detected!\n" \
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
                   "Do you really want to continue?" % max_temp
-            # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            ret = QtWidgets.QMessageBox.warning(
+                self, "Data Warning", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
@@ -563,9 +525,9 @@ class Editor(AbstractWidget):
 
             msg = "Suspect short salinity profile detected!\n\n" \
                   "Do you really want to continue?"
-            # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            ret = QtWidgets.QMessageBox.warning(
+                self, "Data Warning", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
@@ -574,9 +536,9 @@ class Editor(AbstractWidget):
             msg = "Suspect zero values in the salinity profile detected!\n" \
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
                   "Do you really want to continue?"
-            # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            ret = QtWidgets.QMessageBox.warning(
+                self, "Data Warning", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
@@ -585,9 +547,9 @@ class Editor(AbstractWidget):
             msg = "Suspect low value (%.2f) in the salinity profile detected!\n" \
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
                   "Do you really want to continue?" % min_sal
-            # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            ret = QtWidgets.QMessageBox.warning(
+                self, "Data Warning", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
@@ -596,9 +558,9 @@ class Editor(AbstractWidget):
             msg = "Suspect high value (%.2f) in the salinity profile detected!\n" \
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
                   "Do you really want to continue?" % max_sal
-            # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            ret = QtWidgets.QMessageBox.warning(
+                self, "Data Warning", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
@@ -606,9 +568,9 @@ class Editor(AbstractWidget):
 
             msg = "Suspect short sound speed profile detected!\n\n" \
                   "Do you really want to continue?"
-            # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            ret = QtWidgets.QMessageBox.warning(
+                self, "Data Warning", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
@@ -617,9 +579,9 @@ class Editor(AbstractWidget):
             msg = "Suspect zero values in the sound speed profile detected!\n" \
                   "Invalid values can heavily affect the quality of sonar data.\n\n" \
                   "Do you really want to continue?"
-            # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.warning(self, "Data Warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            ret = QtWidgets.QMessageBox.warning(
+                self, "Data Warning", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return False
 
@@ -638,9 +600,9 @@ class Editor(AbstractWidget):
 
             msg = "Do you really want to export a profile\nbased on synthetic %s data?" \
                   % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
-            # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.warning(self, "Synthetic source warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            ret = QtWidgets.QMessageBox.warning(
+                self, "Synthetic source warning", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return
 
@@ -651,15 +613,15 @@ class Editor(AbstractWidget):
 
             msg = "Do you really want to export a profile\nbased on pre-processed %s data?" \
                   % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
-            # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.warning(self, "Pre-processed source warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            ret = QtWidgets.QMessageBox.warning(
+                self, "Pre-processed source warning", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return
 
         dlg = ExportSingleProfileDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        result = dlg.exec_()
-        if result == QtWidgets.QDialog.Accepted:
+        result = dlg.exec()
+        if result == QtWidgets.QDialog.DialogCode.Accepted:
             self.on_save_db(auto_save=True)
 
         self.dataplots.update_data()
@@ -677,9 +639,9 @@ class Editor(AbstractWidget):
 
             msg = "Do you really want to transmit a profile\nbased on synthetic %s data?" \
                   % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
-            # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.warning(self, "Synthetic source warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            ret = QtWidgets.QMessageBox.warning(
+                self, "Synthetic source warning", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return
 
@@ -690,15 +652,14 @@ class Editor(AbstractWidget):
 
             msg = "Do you really want to transmit a profile\nbased on pre-processed %s data?" \
                   % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
-            # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.warning(self, "Pre-processed source warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            ret = QtWidgets.QMessageBox.warning(
+                self, "Pre-processed source warning", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return
 
         if not self.lib.transmit_ssp():
             msg = "Possible issue in profile transmission."
-            # noinspection PyCallByClass
             QtWidgets.QMessageBox.warning(self, "Profile transmission", msg, QtWidgets.QMessageBox.StandardButton.Ok)
 
         self.on_save_db(auto_save=True)
@@ -722,9 +683,9 @@ class Editor(AbstractWidget):
 
                 msg = "Do you really want to store a profile based \non synthetic %s data?\n" \
                       % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
-                # noinspection PyCallByClass
-                ret = QtWidgets.QMessageBox.warning(self, "Synthetic source warning", msg,
-                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+                ret = QtWidgets.QMessageBox.warning(
+                    self, "Synthetic source warning", msg,
+                    QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
                 if ret == QtWidgets.QMessageBox.StandardButton.No:
                     return
 
@@ -736,9 +697,9 @@ class Editor(AbstractWidget):
                 msg = "Do you really want to store a profile based \non pre-processed %s data?\n\n" \
                       "This operation may OVERWRITE existing raw data \nin the database!" \
                       % Dicts.first_match(Dicts.probe_types, self.lib.cur.meta.probe_type)
-                # noinspection PyCallByClass
-                ret = QtWidgets.QMessageBox.warning(self, "Pre-processed source warning", msg,
-                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+                ret = QtWidgets.QMessageBox.warning(
+                    self, "Pre-processed source warning", msg,
+                    QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
                 if ret == QtWidgets.QMessageBox.StandardButton.No:
                     return
 
@@ -757,7 +718,7 @@ class Editor(AbstractWidget):
         self.main_win.switch_to_editor_tab()
 
         dlg = AutomateDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        dlg.exec_()
+        dlg.exec()
 
     def on_buttons_visibility(self):
 
@@ -766,7 +727,7 @@ class Editor(AbstractWidget):
         self.main_win.switch_to_editor_tab()
 
         dlg = ButtonsDialog(lib=self.lib, main_win=self.main_win, parent=self)
-        dlg.exec_()
+        dlg.exec()
 
     def data_cleared(self):
         # bars

@@ -1,10 +1,15 @@
 import os
 import logging
+from typing import TYPE_CHECKING
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from hyo2.ssm2.app.gui.soundspeedmanager.widgets.widget import AbstractWidget
 from hyo2.ssm2.app.gui.soundspeedmanager.widgets.dataplots import DataPlots
+
+if TYPE_CHECKING:
+    from hyo2.ssm2.app.gui.soundspeedmanager.mainwin import MainWin
+    from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +18,7 @@ class Server(AbstractWidget):
     here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
 
-    def __init__(self, main_win, lib):
+    def __init__(self, main_win: 'MainWin', lib: 'SoundSpeedLibrary') -> None:
         AbstractWidget.__init__(self, main_win=main_win, lib=lib)
 
         # create the overall layout
@@ -39,7 +44,6 @@ class Server(AbstractWidget):
         img = QtGui.QImage(os.path.join(self.media, 'server.png'))
         if img.isNull():
             raise RuntimeError("unable to open server image")
-        # noinspection PyCallByClass,PyArgumentList
         img_label.setPixmap(QtGui.QPixmap.fromImage(img))
         group_layout.addWidget(img_label)
         # - text
@@ -60,37 +64,28 @@ class Server(AbstractWidget):
         hbox.addStretch()
         # -- start
         self.start_btn = QtWidgets.QPushButton("Start server")
-        # noinspection PyUnresolvedReferences
         self.start_btn.clicked.connect(self.on_start_server)
         self.start_btn.setToolTip("Start server mode")
         hbox.addWidget(self.start_btn)
         self.start_server_act = QtGui.QAction('Start Server', self)
-        # self.start_server_act.setShortcut('Ctrl+Alt+S')
-        # noinspection PyUnresolvedReferences
         self.start_server_act.triggered.connect(self.on_start_server)
         self.main_win.server_menu.addAction(self.start_server_act)
 
         # -- force
         self.force_btn = QtWidgets.QPushButton("Send SSP now")
-        # noinspection PyUnresolvedReferences
         self.force_btn.clicked.connect(self.on_force_server)
         self.force_btn.setToolTip("Force the transmission of a synthethic profile")
         hbox.addWidget(self.force_btn)
         self.force_server_act = QtGui.QAction('Force Transmission', self)
-        # self.force_server_act.setShortcut('Ctrl+Alt+T')
-        # noinspection PyUnresolvedReferences
         self.force_server_act.triggered.connect(self.on_force_server)
         self.main_win.server_menu.addAction(self.force_server_act)
 
         # -- stop
         self.stop_btn = QtWidgets.QPushButton("Stop server")
-        # noinspection PyUnresolvedReferences
         self.stop_btn.clicked.connect(self.on_stop_server)
         self.stop_btn.setToolTip("Stop server mode")
         hbox.addWidget(self.stop_btn)
         self.stop_server_act = QtGui.QAction('Stop Server', self)
-        # self.stop_server_act.setShortcut('Ctrl+Alt+E')
-        # noinspection PyUnresolvedReferences
         self.stop_server_act.triggered.connect(self.on_stop_server)
         self.main_win.server_menu.addAction(self.stop_server_act)
 
@@ -106,9 +101,7 @@ class Server(AbstractWidget):
 
         self.activated_server = False
         timer = QtCore.QTimer(self)
-        # noinspection PyUnresolvedReferences
         timer.timeout.connect(self.update_gui)
-        # noinspection PyArgumentList
         timer.start(2000)
 
     def on_start_server(self):
@@ -116,7 +109,6 @@ class Server(AbstractWidget):
 
         if self.lib.server_is_alive():
             msg = "The server mode is already started!"
-            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
@@ -126,9 +118,9 @@ class Server(AbstractWidget):
               "The Server Mode creates sound speed profiles based on oceanographic models.\n" \
               "Thus, it is meant for use in transit, NOT for systematic seabed mapping.\n" \
               "This Mode will OVERWRITE the current SIS SSP.\n"
-        # noinspection PyCallByClass,PyArgumentList
-        ret = QtWidgets.QMessageBox.warning(self, "Server mode", msg,
-                                            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+        ret = QtWidgets.QMessageBox.warning(
+            self, "Server mode", msg,
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
         if ret == QtWidgets.QMessageBox.StandardButton.No:
             return
 
@@ -139,10 +131,10 @@ class Server(AbstractWidget):
             for uni_client in uni_clients:
                 msg += "- %s\n" % uni_client
             msg += "\nDo you still want to transmit the profiles to them?\n"
-            # noinspection PyCallByClass,PyArgumentList
-            ret = QtWidgets.QMessageBox.warning(self, "Server mode", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
-            if ret == QtWidgets.QMessageBox.Yes:
+            ret = QtWidgets.QMessageBox.warning(
+                self, "Server mode", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.Yes:
                 use_uni_clients = True
             elif ret == QtWidgets.QMessageBox.StandardButton.No:
                 use_uni_clients = False
@@ -155,7 +147,6 @@ class Server(AbstractWidget):
             for err in self.lib.server.settings_errors:
                 msg += "Reason: %s\n" % err
             msg += "\nDouble-check the server settings and be sure that SIS is properly configured."
-            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.critical(self, "Server mode", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
@@ -171,7 +162,6 @@ class Server(AbstractWidget):
 
         if not self.lib.server_is_alive():
             msg = "First start the server mode!"
-            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
@@ -185,7 +175,6 @@ class Server(AbstractWidget):
 
         if not self.lib.server_is_alive():
             msg = "First start the server mode!"
-            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
@@ -201,7 +190,6 @@ class Server(AbstractWidget):
             msg = "Server Mode automatically stopped!\n"
             for err in self.lib.server.runtime_errors:
                 msg += "Reason: %s\n" % err
-            # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 

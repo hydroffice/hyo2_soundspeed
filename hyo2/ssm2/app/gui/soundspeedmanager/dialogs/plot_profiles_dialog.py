@@ -127,7 +127,7 @@ class PlotProfilesDialog(AbstractDialog):
                 self.reject()
 
         dialog = DateDialog(date_start=ssp_times[0][0], date_end=ssp_times[-1][0], parent=self)
-        ret = dialog.exec_()
+        ret = dialog.exec()
         if ret == QtWidgets.QDialog.Accepted:
             dates = dialog.cal_start_date.selectedDate().toPython(), \
                     dialog.cal_end_date.selectedDate().toPython()

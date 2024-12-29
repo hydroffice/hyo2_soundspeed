@@ -1,17 +1,22 @@
 import logging
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from hyo2.ssm2.app.gui.soundspeedsettings.widgets.widget import AbstractWidget
 from hyo2.ssm2.lib.base.setup_sql import vessel_list, institution_list
 
+if TYPE_CHECKING:
+    from hyo2.ssm2.app.gui.soundspeedsettings.mainwin import MainWin
+    from hyo2.ssm2.lib.base.setup_db import SetupDb
+
 logger = logging.getLogger(__name__)
 
 
 class General(AbstractWidget):
 
-    def __init__(self, main_win, db):
+    def __init__(self, main_win: "MainWin", db: "SetupDb") -> None:
         AbstractWidget.__init__(self, main_win=main_win, db=db)
 
         lbl_width = 120
@@ -86,7 +91,6 @@ class General(AbstractWidget):
         # -- button
         btn = QtWidgets.QPushButton("...")
         btn.setMaximumWidth(24)
-        # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_projects_folder)
         hbox.addWidget(btn)
 
@@ -104,7 +108,6 @@ class General(AbstractWidget):
         # -- button
         btn = QtWidgets.QPushButton("...")
         btn.setMaximumWidth(24)
-        # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_outputs_folder)
         hbox.addWidget(btn)
 
@@ -122,7 +125,6 @@ class General(AbstractWidget):
         # -- button
         btn = QtWidgets.QPushButton("...")
         btn.setMaximumWidth(24)
-        # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_woa09_folder)
         hbox.addWidget(btn)
 
@@ -140,7 +142,6 @@ class General(AbstractWidget):
         # -- button
         btn = QtWidgets.QPushButton("...")
         btn.setMaximumWidth(24)
-        # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_woa13_folder)
         hbox.addWidget(btn)
 
@@ -158,8 +159,24 @@ class General(AbstractWidget):
         # -- button
         btn = QtWidgets.QPushButton("...")
         btn.setMaximumWidth(24)
-        # noinspection PyUnresolvedReferences
         btn.clicked.connect(self.on_woa18_folder)
+        hbox.addWidget(btn)
+
+        # - path to woa23
+        hbox = QtWidgets.QHBoxLayout()
+        self.left_layout.addLayout(hbox)
+        # -- label
+        label = QtWidgets.QLabel("Path to WOA23:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # -- value
+        self.woa23_folder = QtWidgets.QLineEdit()
+        self.woa23_folder.setReadOnly(True)
+        hbox.addWidget(self.woa23_folder)
+        # -- button
+        btn = QtWidgets.QPushButton("...")
+        btn.setMaximumWidth(24)
+        btn.clicked.connect(self.on_woa23_folder)
         hbox.addWidget(btn)
 
         # - NOAA Tools
@@ -278,24 +295,17 @@ class General(AbstractWidget):
         self.setup_changed()  # to trigger the first data population
 
         # methods
-        # noinspection PyUnresolvedReferences
         self.default_institution.editTextChanged.connect(self.apply_default_institution)
-        # noinspection PyUnresolvedReferences
         self.default_survey.textChanged.connect(self.modified_default_survey)
-        # noinspection PyUnresolvedReferences
         self.default_survey.returnPressed.connect(self.apply_default_survey)
-        # noinspection PyUnresolvedReferences
         self.default_vessel.editTextChanged.connect(self.apply_default_vessel)
-        # noinspection PyUnresolvedReferences
         self.default_vessel.currentIndexChanged.connect(self.apply_default_vessel)
-        # noinspection PyUnresolvedReferences
         self.projects_folder.textChanged.connect(self.apply_custom_folders)
-        # noinspection PyUnresolvedReferences
         self.outputs_folder.textChanged.connect(self.apply_custom_folders)
-        # noinspection PyUnresolvedReferences
         self.woa09_folder.textChanged.connect(self.apply_custom_folders)
-        # noinspection PyUnresolvedReferences
         self.woa13_folder.textChanged.connect(self.apply_custom_folders)
+        self.woa18_folder.textChanged.connect(self.apply_custom_folders)
+        self.woa23_folder.textChanged.connect(self.apply_custom_folders)
         # noinspection PyUnresolvedReferences
         self.noaa_tools.currentIndexChanged.connect(self.apply_noaa_tools)
         # noinspection PyUnresolvedReferences
@@ -330,6 +340,7 @@ class General(AbstractWidget):
         self.db.custom_woa09_folder = self.woa09_folder.text()
         self.db.custom_woa13_folder = self.woa13_folder.text()
         self.db.custom_woa18_folder = self.woa18_folder.text()
+        self.db.custom_woa23_folder = self.woa23_folder.text()
         self.setup_changed()
         self.main_win.reload_settings()
 
@@ -340,7 +351,7 @@ class General(AbstractWidget):
         settings = QtCore.QSettings()
         # noinspection PyCallByClass
         selection = QtWidgets.QFileDialog.getExistingDirectory(self, "Path to projects",
-                                                               settings.value("export_folder"))
+                                                               str(settings.value("export_folder")))
         if not selection:
             return
         logger.debug('user selection: %s' % selection)
@@ -357,7 +368,7 @@ class General(AbstractWidget):
         settings = QtCore.QSettings()
         # noinspection PyCallByClass
         selection = QtWidgets.QFileDialog.getExistingDirectory(self, "Path to outputs",
-                                                               settings.value("export_folder"))
+                                                               str(settings.value("export_folder")))
         if not selection:
             return
         logger.debug('user selection: %s' % selection)
@@ -374,12 +385,13 @@ class General(AbstractWidget):
         settings = QtCore.QSettings()
         # noinspection PyCallByClass
         selection = QtWidgets.QFileDialog.getExistingDirectory(self, "Path to WOA09",
-                                                               settings.value("export_folder"))
+                                                               str(settings.value("export_folder")))
         if not selection:
             msg = "Do you want to just clear the folder path?"
             # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.information(self, "WOA09 Folder", msg,
-                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            ret = QtWidgets.QMessageBox.information(
+                self, "WOA09 Folder", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return
             selection = ""
@@ -401,12 +413,13 @@ class General(AbstractWidget):
         settings = QtCore.QSettings()
         # noinspection PyCallByClass
         selection = QtWidgets.QFileDialog.getExistingDirectory(self, "Path to WOA13",
-                                                               settings.value("export_folder"))
+                                                               str(settings.value("export_folder")))
         if not selection:
             msg = "Do you want to just clear the folder path?"
             # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.information(self, "WOA13 Folder", msg,
-                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            ret = QtWidgets.QMessageBox.information(
+                self, "WOA13 Folder", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return
             selection = ""
@@ -428,12 +441,13 @@ class General(AbstractWidget):
         settings = QtCore.QSettings()
         # noinspection PyCallByClass
         selection = QtWidgets.QFileDialog.getExistingDirectory(self, "Path to WOA18",
-                                                               settings.value("export_folder"))
+                                                               str(settings.value("export_folder")))
         if not selection:
             msg = "Do you want to just clear the folder path?"
             # noinspection PyCallByClass
-            ret = QtWidgets.QMessageBox.information(self, "WOA18 Folder", msg,
-                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            ret = QtWidgets.QMessageBox.information(
+                self, "WOA18 Folder", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return
             selection = ""
@@ -447,6 +461,34 @@ class General(AbstractWidget):
         msg = "Restart the application to apply changes!"
         # noinspection PyCallByClass
         QtWidgets.QMessageBox.information(self, "WOA18 Folder", msg, QtWidgets.QMessageBox.StandardButton.Ok)
+
+    def on_woa23_folder(self):
+        logger.debug("user wants to set the folder for woa23")
+
+        # ask the file path to the user
+        settings = QtCore.QSettings()
+        # noinspection PyCallByClass
+        selection = QtWidgets.QFileDialog.getExistingDirectory(self, "Path to WOA23",
+                                                               str(settings.value("export_folder")))
+        if not selection:
+            msg = "Do you want to just clear the folder path?"
+            # noinspection PyCallByClass
+            ret = QtWidgets.QMessageBox.information(
+                self, "WOA23 Folder", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            if ret == QtWidgets.QMessageBox.StandardButton.No:
+                return
+            selection = ""
+        logger.debug('user selection: %s' % selection)
+
+        self.db.custom_woa23_folder = str(Path(selection))
+
+        self.setup_changed()
+        self.main_win.reload_settings()
+
+        msg = "Restart the application to apply changes!"
+        # noinspection PyCallByClass
+        QtWidgets.QMessageBox.information(self, "WOA23 Folder", msg, QtWidgets.QMessageBox.StandardButton.Ok)
 
     def apply_noaa_tools(self):
         # logger.debug("apply NOAA tools: %s" % self.noaa_tools.currentText())
@@ -484,6 +526,9 @@ class General(AbstractWidget):
 
         # woa18_folder
         self.woa18_folder.setText("%s" % Path(self.db.custom_woa18_folder))
+
+        # woa23_folder
+        self.woa23_folder.setText("%s" % Path(self.db.custom_woa23_folder))
 
         # noaa tools and default_vessel
         if self.db.noaa_tools:

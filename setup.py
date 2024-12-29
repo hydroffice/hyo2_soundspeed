@@ -55,7 +55,7 @@ setup(
         "coverage"
     ],
     install_requires=[
-        "hyo2.abc2>=2.3.10",
+        "hyo2.abc2>=2.3.12",
         "appdirs",
         "cartopy",
         "gsw",

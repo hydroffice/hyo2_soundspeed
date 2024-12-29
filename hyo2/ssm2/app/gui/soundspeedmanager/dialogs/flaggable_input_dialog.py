@@ -39,7 +39,7 @@ class FlaggableInputDialog(QtWidgets.QDialog):
     @classmethod
     def get_text_with_flag(cls, parent, title="", msg="", flag_label=""):
         dialog = cls(parent, title, msg, flag_label)
-        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+        if dialog.exec() == QtWidgets.QDialog.Accepted:
             rtn = dialog.line_edit.text(), dialog.flag.isChecked()
         else:
             rtn = None, False

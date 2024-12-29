@@ -1,16 +1,21 @@
 import logging
+from typing import TYPE_CHECKING
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from hyo2.ssm2.app.gui.soundspeedsettings.widgets.widget import AbstractWidget
 from hyo2.ssm2.lib.profile.dicts import Dicts
 
+if TYPE_CHECKING:
+    from hyo2.ssm2.app.gui.soundspeedsettings.mainwin import MainWin
+    from hyo2.ssm2.lib.base.setup_db import SetupDb
+
 logger = logging.getLogger(__name__)
 
 
 class Listeners(AbstractWidget):
 
-    def __init__(self, main_win, db):
+    def __init__(self, main_win: "MainWin", db: "SetupDb") -> None:
         AbstractWidget.__init__(self, main_win=main_win, db=db)
 
         lbl_width = 120

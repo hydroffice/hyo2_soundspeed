@@ -103,7 +103,7 @@ class ExportProfileMetadataDialog(AbstractDialog):
                 filter_fields.fields[ff] = settings.value("export_field_%s" % ff, "true") == "true"
 
             dlg = ExportProfileMetadataFieldsDialog(filter_fields=filter_fields, parent=self)
-            ret = dlg.exec_()
+            ret = dlg.exec()
             if ret:
                 logger.debug("fields: %s" % (dlg.filter_fields.fields, ))
 

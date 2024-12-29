@@ -158,7 +158,7 @@ class ExportMultiProfileDialog(AbstractDialog):
         if select_output_folder:
 
             dlg = OutputFoldersDialog(main_win=self.main_win, lib=self.lib, writers=self.selected_writers, parent=self)
-            dlg.exec_()
+            dlg.exec()
             output_folders = dlg.output_folders
             if len(output_folders) == 0:
                 return

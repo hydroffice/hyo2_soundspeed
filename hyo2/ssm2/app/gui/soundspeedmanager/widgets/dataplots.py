@@ -1,15 +1,19 @@
-from datetime import datetime
 import logging
+from datetime import datetime
+from typing import TYPE_CHECKING
 
 import numpy as np
 from PySide6 import QtCore, QtWidgets
-
+from matplotlib import rc_context
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from matplotlib import rc_context
 
-from hyo2.ssm2.app.gui.soundspeedmanager.widgets.widget import AbstractWidget
 from hyo2.ssm2.app.gui.soundspeedmanager.widgets.navtoolbar import NavToolbar
+from hyo2.ssm2.app.gui.soundspeedmanager.widgets.widget import AbstractWidget
+
+if TYPE_CHECKING:
+    from hyo2.ssm2.app.gui.soundspeedmanager.mainwin import MainWin
+    from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +36,7 @@ class DataPlots(AbstractWidget):
         'grid.alpha': 0.2,
     }
 
-    def __init__(self, main_win, lib, server_mode=False):
+    def __init__(self, main_win: 'MainWin', lib: 'SoundSpeedLibrary', server_mode: bool = False) -> None:
         AbstractWidget.__init__(self, main_win=main_win, lib=lib)
 
         self.server_mode = server_mode
@@ -51,7 +55,8 @@ class DataPlots(AbstractWidget):
         self.invalid_color = '#999966'
         self.woa09_color = '#ffaaaa'
         self.woa13_color = '#ffcc88'
-        self.woa18_color = '#e6d200'
+        self.woa18_color = '#c9b800'
+        self.woa23_color = '#db7474'
         self.rtofs_color = '#99cc00'
         self.gomofs_color = '#6cbdbb'
         self.ref_color = '#ff6600'
@@ -73,7 +78,7 @@ class DataPlots(AbstractWidget):
             self.f.patch.set_alpha(0.0)
             self.c = FigureCanvas(self.f)
             self.c.setParent(self.top_widget)
-            self.c.setFocusPolicy(QtCore.Qt.ClickFocus)  # key for press events!!!
+            self.c.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)  # key for press events!!!
             self.c.setFocus()
             self.vbox.addWidget(self.c)
 
@@ -90,6 +95,7 @@ class DataPlots(AbstractWidget):
         self.speed_sensor = None
         self.speed_seafloor = None
         self.speed_sis = None
+        # WOA09
         self.speed_woa09 = None
         self.temp_woa09 = None
         self.sal_woa09 = None
@@ -99,6 +105,7 @@ class DataPlots(AbstractWidget):
         self.speed_woa09_max = None
         self.temp_woa09_max = None
         self.sal_woa09_max = None
+        # WOA13
         self.speed_woa13 = None
         self.temp_woa13 = None
         self.sal_woa13 = None
@@ -108,6 +115,7 @@ class DataPlots(AbstractWidget):
         self.speed_woa13_max = None
         self.temp_woa13_max = None
         self.sal_woa13_max = None
+        # WOA18
         self.speed_woa18 = None
         self.temp_woa18 = None
         self.sal_woa18 = None
@@ -117,22 +125,36 @@ class DataPlots(AbstractWidget):
         self.speed_woa18_max = None
         self.temp_woa18_max = None
         self.sal_woa18_max = None
+        # WOA23
+        self.speed_woa23 = None
+        self.temp_woa23 = None
+        self.sal_woa23 = None
+        self.speed_woa23_min = None
+        self.temp_woa23_min = None
+        self.sal_woa23_min = None
+        self.speed_woa23_max = None
+        self.temp_woa23_max = None
+        self.sal_woa23_max = None
+        # RTOFS
         self.speed_rtofs = None
         self.temp_rtofs = None
         self.sal_rtofs = None
+        # GOMOFS
         self.speed_gomofs = None
         self.temp_gomofs = None
         self.sal_gomofs = None
+        # REF
         self.speed_ref = None
         self.temp_ref = None
         self.sal_ref = None
+        # valid
         self.speed_valid = None
         self.temp_valid = None
         self.sal_valid = None
+        # invalid
         self.speed_invalid = None
         self.temp_invalid = None
         self.sal_invalid = None
-        # events
 
         if not self.server_mode:
             # toolbar
@@ -212,6 +234,26 @@ class DataPlots(AbstractWidget):
                                                            linestyle=':',
                                                            label='WOA18 max'
                                                            )
+        if self.lib.cur.woa23:
+            self.speed_woa23, = self.speed_ax.plot(self.lib.cur.woa23.l[0].proc.speed,
+                                                   self.lib.cur.woa23.l[0].proc.depth,
+                                                   color=self.woa23_color,
+                                                   linestyle='--',
+                                                   label='WOA23 avg'
+                                                   )
+            if len(self.lib.cur.woa23.l) == 3:
+                self.speed_woa23_min, = self.speed_ax.plot(self.lib.cur.woa23.l[1].proc.speed,
+                                                           self.lib.cur.woa23.l[1].proc.depth,
+                                                           color=self.woa23_color,
+                                                           linestyle=':',
+                                                           label='WOA23 min'
+                                                           )
+                self.speed_woa23_max, = self.speed_ax.plot(self.lib.cur.woa23.l[2].proc.speed,
+                                                           self.lib.cur.woa23.l[2].proc.depth,
+                                                           color=self.woa23_color,
+                                                           linestyle=':',
+                                                           label='WOA23 max'
+                                                           )
         if self.lib.cur.rtofs:
             self.speed_rtofs, = self.speed_ax.plot(self.lib.cur.rtofs.l[0].proc.speed,
                                                    self.lib.cur.rtofs.l[0].proc.depth,
@@ -273,9 +315,9 @@ class DataPlots(AbstractWidget):
                                                     color=self.seafloor_color,
                                                     linestyle=':',
                                                     label='depth')
-        self.speed_draft.set_ydata(None)
-        self.speed_sensor.set_xdata(None)
-        self.speed_seafloor.set_ydata(None)
+        self.speed_draft.set_ydata(np.array([None]))
+        self.speed_sensor.set_xdata(np.array([None]))
+        self.speed_seafloor.set_ydata(np.array([None]))
 
         self.speed_ax.set_label("speed")
 
@@ -344,6 +386,27 @@ class DataPlots(AbstractWidget):
                                                          color=self.woa18_color,
                                                          linestyle=':',
                                                          label='WOA18 max'
+                                                         )
+        if self.lib.cur.woa23:
+
+            self.temp_woa23, = self.temp_ax.plot(self.lib.cur.woa23.l[0].proc.temp,
+                                                 self.lib.cur.woa23.l[0].proc.depth,
+                                                 color=self.woa23_color,
+                                                 linestyle='--',
+                                                 label='WOA23 avg'
+                                                 )
+            if len(self.lib.cur.woa23.l) == 3:
+                self.temp_woa23_min, = self.temp_ax.plot(self.lib.cur.woa23.l[1].proc.temp,
+                                                         self.lib.cur.woa23.l[1].proc.depth,
+                                                         color=self.woa23_color,
+                                                         linestyle=':',
+                                                         label='WOA23 min'
+                                                         )
+                self.temp_woa23_max, = self.temp_ax.plot(self.lib.cur.woa23.l[2].proc.temp,
+                                                         self.lib.cur.woa23.l[2].proc.depth,
+                                                         color=self.woa23_color,
+                                                         linestyle=':',
+                                                         label='WOA23 max'
                                                          )
         if self.lib.cur.rtofs:
             self.temp_rtofs, = self.temp_ax.plot(self.lib.cur.rtofs.l[0].proc.temp,
@@ -448,6 +511,26 @@ class DataPlots(AbstractWidget):
                                                        linestyle=':',
                                                        label='WOA18 max'
                                                        )
+        if self.lib.cur.woa23:
+            self.sal_woa23, = self.sal_ax.plot(self.lib.cur.woa23.l[0].proc.sal,
+                                               self.lib.cur.woa23.l[0].proc.depth,
+                                               color=self.woa23_color,
+                                               linestyle='--',
+                                               label='WOA23 avg'
+                                               )
+            if len(self.lib.cur.woa23.l) == 3:
+                self.sal_woa23_min, = self.sal_ax.plot(self.lib.cur.woa23.l[1].proc.sal,
+                                                       self.lib.cur.woa23.l[1].proc.depth,
+                                                       color=self.woa23_color,
+                                                       linestyle=':',
+                                                       label='WOA23 min'
+                                                       )
+                self.sal_woa23_max, = self.sal_ax.plot(self.lib.cur.woa23.l[2].proc.sal,
+                                                       self.lib.cur.woa23.l[2].proc.depth,
+                                                       color=self.woa23_color,
+                                                       linestyle=':',
+                                                       label='WOA23 max'
+                                                       )
         if self.lib.cur.rtofs:
             self.sal_rtofs, = self.sal_ax.plot(self.lib.cur.rtofs.l[0].proc.sal,
                                                self.lib.cur.rtofs.l[0].proc.depth,
@@ -549,9 +632,9 @@ class DataPlots(AbstractWidget):
 
             if not self.lib.use_sis():  # in case that SIS was disabled
                 if self.speed_draft:
-                    self.speed_draft.set_ydata(None)
+                    self.speed_draft.set_ydata(np.array([None]))
                 if self.speed_sensor:
-                    self.speed_sensor.set_xdata(None)
+                    self.speed_sensor.set_xdata(np.array([None]))
                 return
 
             # plot title
@@ -562,17 +645,17 @@ class DataPlots(AbstractWidget):
                 return
 
             if self.lib.listeners.sis.xyz is None:
-                self.speed_draft.set_ydata(None)
-                self.speed_sensor.set_xdata(None)
+                self.speed_draft.set_ydata(np.array([None]))
+                self.speed_sensor.set_xdata(np.array([None]))
             else:
                 # sensor speed
                 if self.lib.listeners.sis.xyz_transducer_sound_speed is None:
-                    self.speed_sensor.set_xdata(None)
+                    self.speed_sensor.set_xdata(np.array([None]))
                 else:
                     self.speed_sensor.set_xdata([self.lib.listeners.sis.xyz_transducer_sound_speed, ])
                 # draft
                 if self.lib.listeners.sis.xyz_transducer_depth is None:
-                    self.speed_draft.set_ydata(None)
+                    self.speed_draft.set_ydata(np.array([None]))
                 else:
                     self.speed_draft.set_ydata([self.lib.listeners.sis.xyz_transducer_depth, ])
                 # seafloor
@@ -580,7 +663,7 @@ class DataPlots(AbstractWidget):
                 if mean_depth:
                     self.speed_seafloor.set_ydata([mean_depth, ])
                 else:
-                    self.speed_seafloor.set_ydata(None)
+                    self.speed_seafloor.set_ydata(np.array([None]))
 
     def update_all_limits(self):
         self.update_depth_limits()

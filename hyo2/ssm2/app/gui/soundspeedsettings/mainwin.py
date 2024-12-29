@@ -1,12 +1,12 @@
 import logging
 import sys
 import traceback
+from typing import Type
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from hyo2.abc2.app.pkg_info.pkg_exception.pkg_exception_dialog import PkgExceptionDialog
 
-from hyo2.ssm2 import pkg_info
 from hyo2.ssm2.app.gui.soundspeedsettings import app_info
 from hyo2.ssm2.app.gui.soundspeedsettings.widgets.main import Main
 from hyo2.ssm2.app.gui.soundspeedsettings.widgets.general import General
@@ -50,7 +50,7 @@ class MainWin(QtWidgets.QMainWindow):
 
         # make tabs
         self.tabs = QtWidgets.QTabWidget()
-        self.tabs.setTabPosition(QtWidgets.QTabWidget.South)
+        self.tabs.setTabPosition(QtWidgets.QTabWidget.TabPosition.South)
         self.setCentralWidget(self.tabs)
         self.tabs.setIconSize(QtCore.QSize(45, 45))
 
@@ -107,12 +107,13 @@ class MainWin(QtWidgets.QMainWindow):
         """Method used to update all the tabs (except the main)"""
         tabs_nr = self.tabs.count()
         for i in range(tabs_nr):
+            # noinspection PyUnresolvedReferences
             self.tabs.widget(i).setup_changed()
 
-    def exception_hook(self, ex_type: type, ex_value: BaseException, tb: traceback) -> None:
+    def exception_hook(self, ex_type: Type[BaseException], ex_value: BaseException, tb: traceback) -> None:
         sys.__excepthook__(ex_type, ex_value, tb)
 
-        # first manage case of not being an pkg_exception (e.g., keyboard interrupts)
+        # first manage case of not being a pkg_exception (e.g., keyboard interrupts)
         if not issubclass(ex_type, Exception):
             msg = str(ex_value)
             if not msg:
@@ -123,7 +124,7 @@ class MainWin(QtWidgets.QMainWindow):
 
         dlg = PkgExceptionDialog(app_info=app_info, ex_type=ex_type, ex_value=ex_value, tb=tb)
         ret = dlg.exec_()
-        if ret == QtWidgets.QDialog.Rejected:
+        if ret == QtWidgets.QDialog.DialogCode.Rejected:
             if not dlg.user_triggered:
                 self.close()
         else:

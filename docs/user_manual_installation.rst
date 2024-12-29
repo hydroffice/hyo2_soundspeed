@@ -35,7 +35,8 @@ If you decide to install the package in a Python environment, the dependencies a
 * `appdirs <https://github.com/ActiveState/appdirs>`_
 * `cartopy <https://github.com/SciTools/cartopy>`_
 * `gdal <https://github.com/OSGeo/gdal>`_
-* `gsw <https://github.com/TEOS-10/python-gsw>`_ *(version == 3.0.6)*
+* `gsw <https://github.com/TEOS-10/python-gsw>`_
+* `hyo2.abc2 <https://github.com/hydroffice/hyo2_abc2>`_
 * `matplotlib <https://github.com/matplotlib/matplotlib>`_
 * `netCDF4 <https://github.com/Unidata/netcdf4-python>`_
 * `numpy <https://github.com/numpy/numpy>`_
