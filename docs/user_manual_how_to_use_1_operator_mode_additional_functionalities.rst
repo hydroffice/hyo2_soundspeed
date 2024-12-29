@@ -55,7 +55,6 @@ These shortcomings are overcome through the use of the “W” datagram in *SIS*
 to dynamically request this datagram from *SIS* (though it is possible to have *SIS* broadcast it
 as discussed in the section :ref:`method_B`).
 
-.. note:: *SIS5* functionality is currently unavailable.
 
 Seabird CTD
 -----------

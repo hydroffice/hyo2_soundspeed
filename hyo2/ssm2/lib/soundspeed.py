@@ -948,7 +948,7 @@ class SoundSpeedLibrary:
         prog_quantum = 50 / len(self.setup.client_list.clients)
 
         for client in self.setup.client_list.clients:
-            client.request_profile_from_sis4(prj=self)
+            client.request_profile_from_sis(prj=self)
             self.progress.add(prog_quantum)
 
         if not self.listeners.sis.ssp:
