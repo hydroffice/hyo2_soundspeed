@@ -178,6 +178,16 @@ DROP_SETTINGS_VIEW = """-- noinspection SqlResolveForFile
     DROP VIEW settings_view
     """
 
+# ALTER TABLES/VIEWS
+
+ALTER_OLD_SETTINGS_USE_WOA23 = """-- noinspection SqlResolveForFile
+    ALTER TABLE general_old ADD COLUMN use_woa23 INTEGER DEFAULT 0
+"""
+
+ALTER_OLD_SETTINGS_CUSTOM_WOA23_FOLDER = """-- noinspection SqlResolveForFile
+    ALTER TABLE general_old ADD COLUMN custom_woa23_folder TEXT DEFAULT ''
+"""
+
 # COPY V1 -> V6
 
 V1_V7_COPY_SETTINGS = """-- noinspection SqlResolveForFile
@@ -210,11 +220,7 @@ V1_V7_COPY_SETTINGS = """-- noinspection SqlResolveForFile
     ELSE
         use_woa18
     END, 
-    CASE WHEN typeof(use_woa23) == 'text' THEN
-        use_woa23 == 'False'
-    ELSE
-        use_woa23
-    END,         
+    use_woa23,         
     CASE WHEN typeof(use_rtofs) == 'text' THEN
         use_rtofs == 'True'
     ELSE

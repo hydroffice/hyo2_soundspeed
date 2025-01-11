@@ -7,7 +7,7 @@ from hyo2.abc2.lib.package.pkg_helper import PkgHelper
 from hyo2.ssm2.lib.base.basedb import BaseDb
 from hyo2.ssm2.lib.base.setup_sql import CREATE_SETTINGS, CREATE_SETTINGS_VIEW, CREATE_CLIENT_LIST, \
     RENAME_SETTINGS, RENAME_CLIENT_LIST, DROP_OLD_SETTINGS, DROP_OLD_CLIENT_LIST, DROP_SETTINGS_VIEW, \
-    V1_V7_COPY_SETTINGS, V1_V7_COPY_CLIENT_LIST
+    V1_V7_COPY_SETTINGS, V1_V7_COPY_CLIENT_LIST, ALTER_OLD_SETTINGS_USE_WOA23, ALTER_OLD_SETTINGS_CUSTOM_WOA23_FOLDER
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +38,10 @@ class SetupDb(BaseDb):
                 self.conn.execute(CREATE_SETTINGS)
                 self.conn.execute(CREATE_CLIENT_LIST)
                 self.conn.execute(CREATE_SETTINGS_VIEW)
+
+            with self.conn:
+                self.conn.execute(ALTER_OLD_SETTINGS_USE_WOA23)
+                self.conn.execute(ALTER_OLD_SETTINGS_CUSTOM_WOA23_FOLDER)
 
             with self.conn:
                 self.conn.execute(V1_V7_COPY_SETTINGS)

@@ -13,7 +13,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 def read(*parts):
     # intentionally *not* adding an encoding option to open, See:
     #   https://github.com/pypa/virtualenv/issues/201#issuecomment-3145690
-    with codecs.open(os.path.join(here, *parts), 'r') as fp:
+    with codecs.open(str(os.path.join(here, *parts)), 'r') as fp:
         return fp.read()
 
 
@@ -55,7 +55,7 @@ setup(
         "coverage"
     ],
     install_requires=[
-        "hyo2.abc2>=2.3.12",
+        "hyo2.abc2>=2.4.0",
         "appdirs",
         "cartopy",
         "gsw",
