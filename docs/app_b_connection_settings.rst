@@ -10,6 +10,8 @@ Settings for data reception
 Moving Vessel Profiler
 ----------------------
 
+.. index:: MVP
+
 The MVP controller interface can be configured to transmit data via UDP using a variety of data format
 and transmission protocols (:ref:`mvp_configuration_fig`).
 
@@ -48,6 +50,8 @@ The date/time stamp embedded in the filename will be the time of the cast.
 Sippican
 --------
 
+.. index:: Sippican
+
 There does not currently exist any internal mechanism in the Sippican software to broadcast data via UDP,
 this capability has been included to accommodate vessels that use UDP network broadcasts
 to log data from various systems. The expected data format is the Sippican native ``.EDF`` file format.
@@ -76,6 +80,8 @@ as the *Sound Speed* package will wait up to the 'RX timeout' value defined in t
 
 Kongsberg SIS v4
 ----------------
+
+.. index:: SIS v4
 
 *SIS v4* does not require additional configuration to receive sound speed files since it always listens on port 4001
 for input sound speed data.
@@ -125,6 +131,8 @@ All other package functionalities are suspended during this wait period.
 
 Hypack
 ------
+
+.. index:: Hypack
 
 The *Sound Speed* package can transmit data to *HYPACK* using *HYPACK*'s driver
 for Moving Vessel Profiler (MVP) systems (``MVP.dll`` version 23.3.0.0 and above). The next figures provide a guidance on how to configure
@@ -258,6 +266,8 @@ If the MVP driver has been configured as per :numref:`hypack_6_fig`, a new sound
 QINSy
 -----
 
+.. index:: QINSy
+
 QINSy accepts the same SVP transmission protocol as *SIS*, but a method to verify reception of the cast is
 not currently known thus the user should confirm reception in the acquisition system.
 
@@ -365,6 +375,8 @@ not currently known thus the user should confirm reception in the acquisition sy
 PDS2000
 -------
 
+.. index:: PDS2000
+
 PDS2000 accepts the same SVP transmission protocol as SIS, but a method to verify reception of the cast is
 not currently known thus the user must confirm reception in the acquisition system.
 
@@ -445,8 +457,11 @@ not currently known thus the user must confirm reception in the acquisition syst
 
     While running PDS2000 in acquisition mode, you can verify reception in the Status displays and the “Raw Data” displays. Check the date, time, latitude, longitude against what you sent from SSP package.
 
-Kongsberg EA440
----------------
+
+Kongsberg EA440/EA640
+---------------------
+
+.. index:: EA440, EA640
 
 The Konsgsberg EA440/EA640 single-beam echo sounder data acquisition system accepts SVP transmissions from the *Sound Speed* package. A method to verify reception of the cast is not currently known thus the user should confirm reception in the acquisition system.
 
