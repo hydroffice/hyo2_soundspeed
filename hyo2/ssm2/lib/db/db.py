@@ -19,7 +19,8 @@ logger = logging.getLogger(__name__)
 class ProjectDb:
     """Class that provides an interface to a SQLite db with Sound Speed data"""
 
-    def __init__(self, projects_folder: Optional[str] = None, project_name: Optional[str] = None) -> None:
+    def __init__(self, projects_folder: Optional[str] = None, project_name: Optional[str] = None,
+                 info_loc: bool = True) -> None:
 
         # in case that no data folder is passed
         if projects_folder is None:
@@ -32,7 +33,8 @@ class ProjectDb:
 
         # the passed project name is used to identify the project database to open
         self.db_path = os.path.abspath(os.path.join(projects_folder, self.clean_project_name(project_name) + ".db"))
-        logger.debug('current project db: %s' % self.db_path)
+        if info_loc:
+            logger.debug('current project db: %s' % self.db_path)
 
         # add plotting and exporting capabilities
         self.plot = PlotDb(db=self)
@@ -283,6 +285,8 @@ class ProjectDb:
                 if not self._delete_old_ssp_no_commit():
                     raise sqlite3.Error("unable to clean ssp")
 
+                logger.debug("Deleted profile #%s" % self.tmp_ssp_pk)
+
             # actually commit all the cast deletions
             self.conn.commit()
 
@@ -321,6 +325,8 @@ class ProjectDb:
                 if self.tmp_data.sis is not None:
                     if not self._add_sis_no_commit():
                         raise sqlite3.Error("unable to add ssp sis data samples")
+
+                logger.debug("Added profile #%s" % self.tmp_ssp_pk)
 
             # commit all the casts
             self.conn.commit()
@@ -436,6 +442,8 @@ class ProjectDb:
             except sqlite3.Error as e:
                 logger.error("during deletion from ssp_pk, %s: %s" % (type(e), e))
                 return False
+
+        # logger.debug("Deleted profile #%s" % self.tmp_ssp_pk)
 
         return True
 

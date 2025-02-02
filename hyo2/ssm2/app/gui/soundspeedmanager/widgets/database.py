@@ -502,20 +502,22 @@ class Database(AbstractWidget):
         dlg.exec()
 
     def delete_profile(self):
-        logger.debug("user want to delete a profile")
 
         # check if any selection
         rows = self.ssp_list.selectionModel().selectedRows()
-        if len(rows) == 0:
+        nr_rows = len(rows)
+        if nr_rows == 0:
             QtWidgets.QMessageBox.information(self, "Database", "You need to select a profile before deleting it!")
             return
 
+        logger.debug("user want to delete %d profiles" % nr_rows)
+
         # ask if the user want to delete it
-        if len(rows) == 1:
+        if nr_rows == 1:
             pk = int(self.ssp_list.item(rows[0].row(), 0).text())
             msg = "Do you really want to delete profile #%02d?" % pk
         else:
-            msg = "Do you really want to delete %d profiles?" % len(rows)
+            msg = "Do you really want to delete %d profiles?" % nr_rows
         ret = QtWidgets.QMessageBox.warning(
             self, "Database", msg,
             QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.No)

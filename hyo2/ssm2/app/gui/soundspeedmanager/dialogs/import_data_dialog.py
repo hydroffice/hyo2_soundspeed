@@ -70,7 +70,9 @@ class ImportDataDialog(AbstractDialog):
             return
         logger.debug('input db: %s' % path)
 
+        self.progress.start(title="Importing profiles", init_value=30.0)
         pk_issues, pk_done = self.lib.db_import_data_from_db(path)
+        self.progress.end()
 
         if len(pk_issues) == 0:
             msg = "Successfully imported %d profile(s)" % len(pk_done)

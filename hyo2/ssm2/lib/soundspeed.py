@@ -1376,7 +1376,7 @@ class SoundSpeedLibrary:
 
     def delete_db_profile(self, pk: int) -> bool:
         """Retrieve a profile by primary key"""
-        db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
+        db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project, info_loc=False)
         ret = db.delete_profile_by_pk(pk=pk)
         db.disconnect()
         return ret
