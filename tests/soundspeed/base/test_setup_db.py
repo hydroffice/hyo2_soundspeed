@@ -2,6 +2,7 @@ import unittest
 import os
 
 from hyo2.ssm2.lib.base.setup_db import SetupDb
+from hyo2.ssm2.lib.base.setup_sql import setup_version
 
 
 class TestSoundSpeedSetupDb(unittest.TestCase):
@@ -83,7 +84,7 @@ class TestSoundSpeedSetupDb(unittest.TestCase):
 
     def test_compare_setup_version(self):
         db = SetupDb(data_folder=self.data_folder, db_file=self.db_name)
-        self.assertLessEqual(db.setup_version, 6)
+        self.assertLessEqual(db.setup_version, setup_version)
         db.close()
 
     def test_checked_use_woa09(self):

@@ -3,6 +3,7 @@ import os
 
 from hyo2.abc2.lib.package.pkg_helper import PkgHelper
 from hyo2.ssm2.lib.base.setup_db import SetupDb
+from hyo2.ssm2.lib.base.setup_sql import setup_version
 from hyo2.ssm2.lib.profile.dicts import Dicts
 from hyo2.ssm2.lib.client.clientlist import ClientList
 
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class Setup:
 
-    SUPPORTED_VERSION = 7
+    SUPPORTED_VERSION = setup_version
 
     @classmethod
     def are_updates_required(cls, db_path: str) -> bool:

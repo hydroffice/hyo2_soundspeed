@@ -4,6 +4,8 @@ from hyo2.abc2.lib.package.pkg_helper import PkgHelper
 
 logger = logging.getLogger(__name__)
 
+setup_version = 7
+
 vessel_list = [
     "RA Rainier (ship)",
     "R3 Rainier - Launch 2803",
@@ -69,7 +71,7 @@ else:
 CREATE_SETTINGS = """-- noinspection SqlResolveForFile
  CREATE TABLE IF NOT EXISTS general(
      id integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
-     setup_version integer NOT NULL DEFAULT 7,
+     setup_version integer NOT NULL DEFAULT %d,
      setup_name text NOT NULL UNIQUE DEFAULT "default",
      setup_status text NOT NULL DEFAULT "inactive",
      /* input */
@@ -130,7 +132,8 @@ CREATE_SETTINGS = """-- noinspection SqlResolveForFile
      default_survey text NOT NULL DEFAULT "",
      default_vessel text NOT NULL DEFAULT "",
      auto_apply_default_metadata integer NOT NULL DEFAULT 1
-     ) """ % (default_use_woa_09, default_use_woa_13, default_use_woa_18, default_use_woa_23,
+     ) """ % (setup_version,
+              default_use_woa_09, default_use_woa_13, default_use_woa_18, default_use_woa_23,
               default_use_rtofs, default_use_gomofs,
               default_custom_woa09_folder, default_custom_woa13_folder, default_custom_woa18_folder,
               default_custom_woa23_folder,
