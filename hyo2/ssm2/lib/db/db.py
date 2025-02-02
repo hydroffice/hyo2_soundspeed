@@ -49,14 +49,14 @@ class ProjectDb:
         self.reconnect_or_create()
 
     @staticmethod
-    def clean_name(some_var):
+    def clean_name(some_var: str) -> str:
         return ''.join(char for char in some_var if char.isalnum())
 
     @staticmethod
-    def clean_project_name(some_var):
+    def clean_project_name(some_var: str) -> str:
         return ''.join(char for char in some_var if char.isalnum() or char in ['-', '_', '.'])
 
-    def reconnect_or_create(self):
+    def reconnect_or_create(self) -> None:
         """ Reconnection to an existing database or create a new db """
         if self.conn:
             logger.info("already connected")
@@ -75,9 +75,7 @@ class ProjectDb:
             raise RuntimeError("Unable to connect: %s" % e)
 
         try:
-            with self.conn:
-                self.conn.execute('PRAGMA foreign_keys=ON')
-                self.conn.commit()
+            self.conn.execute('PRAGMA foreign_keys=ON')
 
         except sqlite3.Error as e:
             raise RuntimeError("Unable to activate foreign keys: %s" % e)
@@ -100,13 +98,15 @@ class ProjectDb:
         except sqlite3.Error as e:
             raise RuntimeError("Unable to register numpy float adapter: %s - %s" % (type(e), e))
 
-        built = self.build_tables()
+        built = self._build_tables_no_commit()
         if not isinstance(built, bool):
             raise RuntimeError("invalid return from 'build_tables' method, must be boolean")
         if not built:
             raise RuntimeError("Unable to build tables: the DB is encrypted or is not a database")
 
-    def disconnect(self):
+        self.conn.commit()
+
+    def disconnect(self) -> bool:
         """ Disconnect from the current database """
         if not self.conn:
             # logger.info("Already disconnected")
@@ -121,150 +121,144 @@ class ProjectDb:
             logger.error("Unable to disconnect: %s" % e)
             return False
 
-    def close(self):
-        self.disconnect()
-
-    def build_tables(self):
+    def _build_tables_no_commit(self) -> bool:
         if not self.conn:
             logger.error("missing db connection")
             return False
 
         try:
-            with self.conn:
-                if not self.conn.execute("PRAGMA foreign_keys"):
-                    # logger.error("foreign keys not active")
-                    return False
+            if not self.conn.execute("PRAGMA foreign_keys"):
+                # logger.error("foreign keys not active")
+                return False
 
-                self.conn.execute("""
-                                  CREATE TABLE IF NOT EXISTS library(
-                                     version int PRIMARY KEY NOT NULL DEFAULT %d,
-                                     creator_info text,
-                                     creation timestamp NOT NULL)
-                                  """ % self.cur_version)
+            self.conn.execute("""
+                              CREATE TABLE IF NOT EXISTS library(
+                                 version int PRIMARY KEY NOT NULL DEFAULT %d,
+                                 creator_info text,
+                                 creation timestamp NOT NULL)
+                              """ % self.cur_version)
 
-                # check if the library table is empty
-                # noinspection SqlResolve
-                ret = self.conn.execute("""SELECT COUNT(*) FROM library""").fetchone()
-                # logger.debug("library content: %s" % (list(ret), ))
-                # if not present, add it
-                if ret[0] == 0:
-                    # noinspection SqlResolve
-                    self.conn.execute("""
-                                      INSERT INTO library VALUES (?, ?, ?)
-                                      """, (self.cur_version, "%s v.%s" % (pkg_info.name, pkg_info.version),
-                                            datetime.datetime.utcnow(),))
-
-                # check if the library version is old
-                # noinspection SqlResolve
-                ret = self.conn.execute("""SELECT version FROM library""").fetchone()
-                if ret[0] < 3:
-                    logger.debug("updated old library version from %s to %s" % (ret[0], self.cur_version))
-                    self._updates_to_version_3(old_version=ret[0])
-
-                self.conn.execute("""
-                                  CREATE TABLE IF NOT EXISTS ssp_pk(
-                                     id INTEGER PRIMARY KEY,
-                                     cast_datetime timestamp NOT NULL,
-                                     cast_position point NOT NULL)
-                                  """)
-
+            # check if the library table is empty
+            # noinspection SqlResolve
+            ret = self.conn.execute("""SELECT COUNT(*) FROM library""").fetchone()
+            # logger.debug("library content: %s" % (list(ret), ))
+            # if not present, add it
+            if ret[0] == 0:
                 # noinspection SqlResolve
                 self.conn.execute("""
-                                  CREATE TABLE IF NOT EXISTS ssp(
-                                     pk integer NOT NULL,
-                                     sensor_type integer NOT NULL,
-                                     probe_type integer NOT NULL,
-                                     original_path text NOT NULL DEFAULT '',
-                                     institution text NOT NULL DEFAULT '',
-                                     survey text NOT NULL DEFAULT '',
-                                     vessel text NOT NULL DEFAULT '',
-                                     sn text NOT NULL DEFAULT '',
-                                     proc_time timestamp,
-                                     proc_info text NOT NULL DEFAULT '',
-                                     surveylines text NOT NULL DEFAULT '',                                     
-                                     comments text NOT NULL DEFAULT '',
-                                     pressure_uom text NOT NULL DEFAULT '',
-                                     depth_uom text NOT NULL DEFAULT '',
-                                     speed_uom text NOT NULL DEFAULT '',
-                                     temperature_uom text NOT NULL DEFAULT '',
-                                     conductivity_uom text NOT NULL DEFAULT '',
-                                     salinity_uom text NOT NULL DEFAULT '',
-                                     PRIMARY KEY (pk),
-                                     FOREIGN KEY(pk) REFERENCES ssp_pk(id))
-                                  """)
+                                  INSERT INTO library VALUES (?, ?, ?)
+                                  """, (self.cur_version, "%s v.%s" % (pkg_info.name, pkg_info.version),
+                                        datetime.datetime.utcnow(),))
 
-                # noinspection SqlResolve
-                self.conn.execute("""
-                                  CREATE TABLE IF NOT EXISTS data(
-                                     ssp_pk integer NOT NULL,
-                                     pressure real,
-                                     depth real NOT NULL,
-                                     speed real,
-                                     temperature real,
-                                     conductivity real,
-                                     salinity real,
-                                     source int NOT NULL DEFAULT  0,
-                                     flag int NOT NULL DEFAULT 0,
-                                     FOREIGN KEY(ssp_pk)
-                                        REFERENCES ssp(pk))
-                                  """)
+            # check if the library version is old
+            # noinspection SqlResolve
+            ret = self.conn.execute("""SELECT version FROM library""").fetchone()
+            if ret[0] < 3:
+                logger.debug("updated old library version from %s to %s" % (ret[0], self.cur_version))
+                self._updates_to_version_3_no_commit(old_version=ret[0])
 
-                # noinspection SqlResolve
-                self.conn.execute("""
-                                  CREATE TABLE IF NOT EXISTS proc(
-                                     ssp_pk integer NOT NULL,
-                                     pressure real,
-                                     depth real NOT NULL,
-                                     speed real,
-                                     temperature real,
-                                     conductivity real,
-                                     salinity real,
-                                     source int NOT NULL DEFAULT  0,
-                                     flag int NOT NULL DEFAULT 0,
-                                     FOREIGN KEY(ssp_pk)
-                                        REFERENCES ssp(pk))
-                                  """)
+            self.conn.execute("""
+                              CREATE TABLE IF NOT EXISTS ssp_pk(
+                                 id INTEGER PRIMARY KEY,
+                                 cast_datetime timestamp NOT NULL,
+                                 cast_position point NOT NULL)
+                              """)
 
-                # noinspection SqlResolve
-                self.conn.execute("""
-                                  CREATE TABLE IF NOT EXISTS sis(
-                                     ssp_pk integer NOT NULL,
-                                     pressure real,
-                                     depth real NOT NULL,
-                                     speed real,
-                                     temperature real,
-                                     conductivity real,
-                                     salinity real,
-                                     source int NOT NULL DEFAULT  0,
-                                     flag int NOT NULL DEFAULT 0,
-                                     FOREIGN KEY(ssp_pk)
-                                        REFERENCES ssp(pk))
-                                  """)
+            # noinspection SqlResolve
+            self.conn.execute("""
+                              CREATE TABLE IF NOT EXISTS ssp(
+                                 pk integer NOT NULL,
+                                 sensor_type integer NOT NULL,
+                                 probe_type integer NOT NULL,
+                                 original_path text NOT NULL DEFAULT '',
+                                 institution text NOT NULL DEFAULT '',
+                                 survey text NOT NULL DEFAULT '',
+                                 vessel text NOT NULL DEFAULT '',
+                                 sn text NOT NULL DEFAULT '',
+                                 proc_time timestamp,
+                                 proc_info text NOT NULL DEFAULT '',
+                                 surveylines text NOT NULL DEFAULT '',                                     
+                                 comments text NOT NULL DEFAULT '',
+                                 pressure_uom text NOT NULL DEFAULT '',
+                                 depth_uom text NOT NULL DEFAULT '',
+                                 speed_uom text NOT NULL DEFAULT '',
+                                 temperature_uom text NOT NULL DEFAULT '',
+                                 conductivity_uom text NOT NULL DEFAULT '',
+                                 salinity_uom text NOT NULL DEFAULT '',
+                                 PRIMARY KEY (pk),
+                                 FOREIGN KEY(pk) REFERENCES ssp_pk(id))
+                              """)
 
-                # noinspection SqlResolve
-                self.conn.execute("""
-                                  CREATE VIEW IF NOT EXISTS ssp_view AS
-                                     SELECT pk, cast_datetime, cast_position,
-                                        sensor_type, probe_type,
-                                        original_path,
-                                        institution,
-                                        survey,
-                                        vessel,
-                                        sn,
-                                        proc_time,
-                                        proc_info,
-                                        surveylines,
-                                        comments,
-                                        pressure_uom,
-                                        depth_uom,
-                                        speed_uom,
-                                        temperature_uom,
-                                        conductivity_uom,
-                                        salinity_uom
-                                        FROM ssp a LEFT OUTER JOIN ssp_pk b ON a.pk=b.id
-                                  """)
+            # noinspection SqlResolve
+            self.conn.execute("""
+                              CREATE TABLE IF NOT EXISTS data(
+                                 ssp_pk integer NOT NULL,
+                                 pressure real,
+                                 depth real NOT NULL,
+                                 speed real,
+                                 temperature real,
+                                 conductivity real,
+                                 salinity real,
+                                 source int NOT NULL DEFAULT  0,
+                                 flag int NOT NULL DEFAULT 0,
+                                 FOREIGN KEY(ssp_pk)
+                                    REFERENCES ssp(pk))
+                              """)
 
-                self.conn.commit()
+            # noinspection SqlResolve
+            self.conn.execute("""
+                              CREATE TABLE IF NOT EXISTS proc(
+                                 ssp_pk integer NOT NULL,
+                                 pressure real,
+                                 depth real NOT NULL,
+                                 speed real,
+                                 temperature real,
+                                 conductivity real,
+                                 salinity real,
+                                 source int NOT NULL DEFAULT  0,
+                                 flag int NOT NULL DEFAULT 0,
+                                 FOREIGN KEY(ssp_pk)
+                                    REFERENCES ssp(pk))
+                              """)
+
+            # noinspection SqlResolve
+            self.conn.execute("""
+                              CREATE TABLE IF NOT EXISTS sis(
+                                 ssp_pk integer NOT NULL,
+                                 pressure real,
+                                 depth real NOT NULL,
+                                 speed real,
+                                 temperature real,
+                                 conductivity real,
+                                 salinity real,
+                                 source int NOT NULL DEFAULT  0,
+                                 flag int NOT NULL DEFAULT 0,
+                                 FOREIGN KEY(ssp_pk)
+                                    REFERENCES ssp(pk))
+                              """)
+
+            # noinspection SqlResolve
+            self.conn.execute("""
+                              CREATE VIEW IF NOT EXISTS ssp_view AS
+                                 SELECT pk, cast_datetime, cast_position,
+                                    sensor_type, probe_type,
+                                    original_path,
+                                    institution,
+                                    survey,
+                                    vessel,
+                                    sn,
+                                    proc_time,
+                                    proc_info,
+                                    surveylines,
+                                    comments,
+                                    pressure_uom,
+                                    depth_uom,
+                                    speed_uom,
+                                    temperature_uom,
+                                    conductivity_uom,
+                                    salinity_uom
+                                    FROM ssp a LEFT OUTER JOIN ssp_pk b ON a.pk=b.id
+                              """)
 
             return True
 
@@ -272,66 +266,64 @@ class ProjectDb:
             logger.error("during building tables, %s: %s" % (type(e), e))
             return False
 
-    def remove_casts(self, ssp):
-        if not isinstance(ssp, ProfileList):
-            raise RuntimeError("not passed a ProfileList, but %s" % type(ssp))
+    def remove_casts(self, ssp: ProfileList) -> bool:
 
         if not self.conn:
             logger.error("missing db connection")
             return False
 
         try:
-            with self.conn:
+            for i, self.tmp_data in enumerate(ssp.l):
 
-                for i, self.tmp_data in enumerate(ssp.l):
+                # logger.info("got a new SSP to remove:\n%s" % self.tmp_data)
 
-                    # logger.info("got a new SSP to store:\n%s" % self.tmp_data)
+                if not self._get_ssp_pk():
+                    raise sqlite3.Error("unable to get ssp pk: %s" % self.tmp_ssp_pk)
 
-                    if not self._get_ssp_pk():
-                        raise sqlite3.Error("unable to get ssp pk: %s" % self.tmp_ssp_pk)
+                if not self._delete_old_ssp_no_commit():
+                    raise sqlite3.Error("unable to clean ssp")
 
-                    if not self._delete_old_ssp():
-                        raise sqlite3.Error("unable to clean ssp")
+            # actually commit all the cast deletions
+            self.conn.commit()
 
             return True
 
         except sqlite3.Error as e:
-            logger.error("during adding casts, %s: %s" % (type(e), e))
+            logger.error("during removing casts, %s: %s" % (type(e), e))
             return False
 
-    def add_casts(self, ssp):
-        if not isinstance(ssp, ProfileList):
-            raise RuntimeError("not passed a ProfileList, but %s" % type(ssp))
+    def add_casts(self, ssp: ProfileList) -> bool:
 
         if not self.conn:
             logger.error("missing db connection")
             return False
 
         try:
-            with self.conn:
+            for i, self.tmp_data in enumerate(ssp.l):
 
-                for i, self.tmp_data in enumerate(ssp.l):
+                # logger.info("got a new SSP to store:\n%s" % self.tmp_data)
 
-                    # logger.info("got a new SSP to store:\n%s" % self.tmp_data)
+                if not self._get_ssp_pk():
+                    raise sqlite3.Error("unable to get ssp pk: %s" % self.tmp_ssp_pk)
 
-                    if not self._get_ssp_pk():
-                        raise sqlite3.Error("unable to get ssp pk: %s" % self.tmp_ssp_pk)
+                if not self._delete_old_ssp_no_commit():
+                    raise sqlite3.Error("unable to clean ssp")
 
-                    if not self._delete_old_ssp():
-                        raise sqlite3.Error("unable to clean ssp")
+                if not self._add_ssp_no_commit():
+                    raise sqlite3.Error("unable to add ssp")
 
-                    if not self._add_ssp():
-                        raise sqlite3.Error("unable to add ssp")
+                if not self._add_data_no_commit():
+                    raise sqlite3.Error("unable to add ssp raw data samples")
 
-                    if not self._add_data():
-                        raise sqlite3.Error("unable to add ssp raw data samples")
+                if not self._add_proc_no_commit():
+                    raise sqlite3.Error("unable to add ssp processed data samples")
 
-                    if not self._add_proc():
-                        raise sqlite3.Error("unable to add ssp processed data samples")
+                if self.tmp_data.sis is not None:
+                    if not self._add_sis_no_commit():
+                        raise sqlite3.Error("unable to add ssp sis data samples")
 
-                    if self.tmp_data.sis is not None:
-                        if not self._add_sis():
-                            raise sqlite3.Error("unable to add ssp sis data samples")
+            # commit all the casts
+            self.conn.commit()
 
             return True
 
@@ -376,7 +368,6 @@ class ProjectDb:
                 self.conn.execute("""
                                   INSERT INTO ssp_pk VALUES (NULL, ?, ?)
                                   """, (utc_time, point,))
-                self.conn.commit()
 
         except sqlite3.Error as e:
             logger.error("during ssp pk check, %s: %s" % (type(e), e))
@@ -397,15 +388,13 @@ class ProjectDb:
 
         return True
 
-    def _delete_old_ssp(self, full=False):
+    def _delete_old_ssp_no_commit(self, full=False):
         """Delete all the entries with the selected pk, with 'full' also the pk from ssp_pk"""
 
         try:
             # noinspection SqlResolve
             self.conn.execute("""DELETE FROM data WHERE ssp_pk=?""", (self.tmp_ssp_pk,))
             # logger.info("deleted %s pk entries from data" % self.tmp_ssp_pk)
-
-            self.conn.commit()
 
         except sqlite3.Error as e:
             logger.error("during deletion from data, %s: %s" % (type(e), e))
@@ -416,8 +405,6 @@ class ProjectDb:
             self.conn.execute("""DELETE FROM proc WHERE ssp_pk=?""", (self.tmp_ssp_pk,))
             # logger.info("deleted %s pk entries from proc" % self.tmp_ssp_pk)
 
-            self.conn.commit()
-
         except sqlite3.Error as e:
             logger.error("during deletion from proc, %s: %s" % (type(e), e))
             return False
@@ -427,8 +414,6 @@ class ProjectDb:
             self.conn.execute("""DELETE FROM sis WHERE ssp_pk=?""", (self.tmp_ssp_pk,))
             # logger.info("deleted %s pk entries from sis" % self.tmp_ssp_pk)
 
-            self.conn.commit()
-
         except sqlite3.Error as e:
             logger.error("during deletion from sis, %s: %s" % (type(e), e))
             return False
@@ -437,8 +422,6 @@ class ProjectDb:
             # noinspection SqlResolve
             self.conn.execute("""DELETE FROM ssp WHERE pk=?""", (self.tmp_ssp_pk,))
             # logger.info("deleted %s pk entry from ssp" % self.tmp_ssp_pk)
-
-            self.conn.commit()
 
         except sqlite3.Error as e:
             logger.error("during deletion from ssp, %s: %s" % (type(e), e))
@@ -450,15 +433,13 @@ class ProjectDb:
                 self.conn.execute("""DELETE FROM ssp_pk WHERE id=?""", (self.tmp_ssp_pk,))
                 # logger.info("deleted %s id entry from ssp_pk" % self.tmp_ssp_pk)
 
-                self.conn.commit()
-
             except sqlite3.Error as e:
                 logger.error("during deletion from ssp_pk, %s: %s" % (type(e), e))
                 return False
 
         return True
 
-    def _add_ssp(self):
+    def _add_ssp_no_commit(self):
 
         try:
             # noinspection SqlResolve
@@ -489,15 +470,13 @@ class ProjectDb:
                                     ))
             # logger.info("insert new %s pk in ssp" % self.tmp_ssp_pk)
 
-            self.conn.commit()
-
         except sqlite3.Error as e:
             logger.error("during ssp addition, %s: %s" % (type(e), e))
             return False
 
         return True
 
-    def _add_data(self):
+    def _add_data_no_commit(self):
 
         sz = self.tmp_data.data.num_samples
         # logger.info("num samples to add: %s" % sz)
@@ -521,7 +500,6 @@ class ProjectDb:
                                         self.tmp_data.data.flag[i],
                                         ))
 
-                self.conn.commit()
                 added_samples += 1
             except sqlite3.IntegrityError as e:
                 logger.info("skipping row #%s due to %s: %s" % (i, type(e), e))
@@ -535,7 +513,7 @@ class ProjectDb:
         # logger.info("added %s raw samples" % added_samples)
         return True
 
-    def _add_proc(self):
+    def _add_proc_no_commit(self):
 
         sz = self.tmp_data.proc.num_samples
         # logger.info("max processed samples to add: %s" % sz)
@@ -559,7 +537,6 @@ class ProjectDb:
                                         self.tmp_data.proc.flag[i],
                                         ))
 
-                self.conn.commit()
                 added_samples += 1
 
             except sqlite3.IntegrityError as e:
@@ -572,7 +549,7 @@ class ProjectDb:
         # logger.info("added %s processed samples" % added_samples)
         return True
 
-    def _add_sis(self):
+    def _add_sis_no_commit(self):
 
         sz = self.tmp_data.sis.num_samples
         # logger.info("max sis samples to add: %s" % sz)
@@ -596,7 +573,6 @@ class ProjectDb:
                                         self.tmp_data.sis.flag[i],
                                         ))
 
-                self.conn.commit()
                 added_samples += 1
 
             except sqlite3.IntegrityError as e:
@@ -617,19 +593,18 @@ class ProjectDb:
             logger.error("missing db connection")
             return None
 
-        with self.conn:
-            try:
-                # ssp spatial timestamp
-                # noinspection SqlResolve
-                ts_list = self.conn.execute("""
-                                             SELECT cast_datetime, pk FROM ssp_view ORDER BY cast_datetime
-                                             """).fetchall()
-                # logger.info("retrieved %s timestamps from ssp view" % len(ts_list))
-                return ts_list
+        try:
+            # ssp spatial timestamp
+            # noinspection SqlResolve
+            ts_list = self.conn.execute("""
+                                         SELECT cast_datetime, pk FROM ssp_view ORDER BY cast_datetime
+                                         """).fetchall()
+            # logger.info("retrieved %s timestamps from ssp view" % len(ts_list))
+            return ts_list
 
-            except sqlite3.Error as e:
-                logger.error("retrieving the time stamp list, %s: %s" % (type(e), e))
-                return None
+        except sqlite3.Error as e:
+            logger.error("retrieving the time stamp list, %s: %s" % (type(e), e))
+            return None
 
     def list_profiles(self):
         if not self.conn:
@@ -651,85 +626,86 @@ class ProjectDb:
                                      Dicts.sources['gomofs_ext'], Dicts.sources['ref_ext'],)).fetchall()
 
         try:
-            with self.conn:
-                for row in sql:
+            for row in sql:
 
-                    # special handling in case of unknown future sensor type
-                    sensor_type = row['sensor_type']
-                    if sensor_type not in Dicts.sensor_types.values():
-                        sensor_type = Dicts.sensor_types['Future']
+                # special handling in case of unknown future sensor type
+                sensor_type = row['sensor_type']
+                if sensor_type not in Dicts.sensor_types.values():
+                    sensor_type = Dicts.sensor_types['Future']
 
-                    # special handling in case of unknown future probe type
-                    probe_type = row['probe_type']
-                    if probe_type not in Dicts.probe_types.values():
-                        probe_type = Dicts.probe_types['Future']
+                # special handling in case of unknown future probe type
+                probe_type = row['probe_type']
+                if probe_type not in Dicts.probe_types.values():
+                    probe_type = Dicts.probe_types['Future']
 
-                    # special handling for surface sound speed, min depth, max depth
-                    try:
-                        min_depth = str()
-                        for row_min in sql_min:
-                            if row_min['ssp_pk'] == row['pk']:
-                                ss_at_min_depth = '%0.2f' % row_min['speed']
-                                min_depth = '%0.2f' % row_min['depth']
-                                break
-                        if min_depth == '':
-                            logger.warning("unable to retrieve min depth for profile: %s -> skipping" % row['pk'])
-                            continue
-                    except Exception as e:
-                        logger.warning("profile %s: %s -> skipping" % (e, row['pk']))
+                # special handling for surface sound speed, min depth, max depth
+                try:
+                    ss_at_min_depth = str()
+                    min_depth = str()
+                    for row_min in sql_min:
+                        if row_min['ssp_pk'] == row['pk']:
+                            ss_at_min_depth = '%0.2f' % row_min['speed']
+                            min_depth = '%0.2f' % row_min['depth']
+                            break
+                    if min_depth == '':
+                        logger.warning("unable to retrieve min depth for profile: %s -> skipping" % row['pk'])
                         continue
+                except Exception as e:
+                    logger.warning("profile %s: %s -> skipping" % (e, row['pk']))
+                    continue
 
-                    try:
-                        max_depth = str()
-                        for row_max in sql_max:
-                            if row_max['ssp_pk'] == row['pk']:
-                                max_depth = '%0.2f' % row_max['depth']
-                                break
-                        if max_depth == '':
-                            logger.warning("unable to retrieve max depth for profile: %s -> skipping" % row['pk'])
-                            continue
-                    except Exception as e:
-                        logger.warning("profile %s: %s -> skipping" % (e, row['pk']))
+                try:
+                    max_depth = str()
+                    for row_max in sql_max:
+                        if row_max['ssp_pk'] == row['pk']:
+                            max_depth = '%0.2f' % row_max['depth']
+                            break
+                    if max_depth == '':
+                        logger.warning("unable to retrieve max depth for profile: %s -> skipping" % row['pk'])
                         continue
+                except Exception as e:
+                    logger.warning("profile %s: %s -> skipping" % (e, row['pk']))
+                    continue
 
-                    try:
-                        max_raw_depth = str()
-                        for row_raw in sql_raw:
-                            if row_raw['ssp_pk'] == row['pk']:
-                                max_raw_depth = '%0.2f' % row_raw['depth']
-                                break
-                        if max_raw_depth == '':
-                            logger.warning("unable to retrieve max raw depth for profile: %s -> skipping" % row['pk'])
-                            continue
-                    except Exception as e:
-                        logger.warning("profile %s: %s -> skipping" % (e, row['pk']))
+                try:
+                    max_raw_depth = str()
+                    for row_raw in sql_raw:
+                        if row_raw['ssp_pk'] == row['pk']:
+                            max_raw_depth = '%0.2f' % row_raw['depth']
+                            break
+                    if max_raw_depth == '':
+                        logger.warning("unable to retrieve max raw depth for profile: %s -> skipping" % row['pk'])
                         continue
+                except Exception as e:
+                    logger.warning("profile %s: %s -> skipping" % (e, row['pk']))
+                    continue
 
-                    ssp_list.append((row['pk'],  # 0
-                                     row['cast_datetime'],  # 1
-                                     row['cast_position'],  # 2
-                                     sensor_type,  # 3
-                                     probe_type,  # 4
-                                     row['original_path'],  # 5
-                                     row['institution'],  # 6
-                                     row['survey'],  # 7
-                                     row['vessel'],  # 8
-                                     row['sn'],  # 9
-                                     row['proc_time'],  # 10
-                                     row['proc_info'],  # 11
-                                     row['surveylines'],  # 12
-                                     row['comments'],  # 13
-                                     row['pressure_uom'],  # 14
-                                     row['depth_uom'],  # 15
-                                     row['speed_uom'],  # 16
-                                     row['temperature_uom'],  # 17
-                                     row['conductivity_uom'],  # 18
-                                     row['salinity_uom'],  # 19
-                                     ss_at_min_depth,  # 20
-                                     min_depth,  # 21
-                                     max_depth,  # 22
-                                     max_raw_depth,  # 23
-                                     ))
+                ssp_list.append((row['pk'],  # 0
+                                 row['cast_datetime'],  # 1
+                                 row['cast_position'],  # 2
+                                 sensor_type,  # 3
+                                 probe_type,  # 4
+                                 row['original_path'],  # 5
+                                 row['institution'],  # 6
+                                 row['survey'],  # 7
+                                 row['vessel'],  # 8
+                                 row['sn'],  # 9
+                                 row['proc_time'],  # 10
+                                 row['proc_info'],  # 11
+                                 row['surveylines'],  # 12
+                                 row['comments'],  # 13
+                                 row['pressure_uom'],  # 14
+                                 row['depth_uom'],  # 15
+                                 row['speed_uom'],  # 16
+                                 row['temperature_uom'],  # 17
+                                 row['conductivity_uom'],  # 18
+                                 row['salinity_uom'],  # 19
+                                 ss_at_min_depth,  # 20
+                                 min_depth,  # 21
+                                 max_depth,  # 22
+                                 max_raw_depth,  # 23
+                                 ))
+
             return ssp_list
 
         except sqlite3.Error as e:
@@ -746,122 +722,121 @@ class ProjectDb:
         ssp = ProfileList()
         ssp.append()
 
-        with self.conn:
-            try:
-                # ssp spatial timestamp
-                # noinspection SqlResolve
-                ssp_idx = self.conn.execute("SELECT * FROM ssp_pk WHERE id=?", (pk,)).fetchone()
+        try:
+            # ssp spatial timestamp
+            # noinspection SqlResolve
+            ssp_idx = self.conn.execute("SELECT * FROM ssp_pk WHERE id=?", (pk,)).fetchone()
 
-                ssp.cur.meta.utc_time = ssp_idx['cast_datetime']
-                ssp.cur.meta.longitude = ssp_idx['cast_position'].x
-                ssp.cur.meta.latitude = ssp_idx['cast_position'].y
+            ssp.cur.meta.utc_time = ssp_idx['cast_datetime']
+            ssp.cur.meta.longitude = ssp_idx['cast_position'].x
+            ssp.cur.meta.latitude = ssp_idx['cast_position'].y
 
-            except sqlite3.Error as e:
-                logger.error("spatial timestamp for %s pk > %s: %s" % (pk, type(e), e))
-                return None
+        except sqlite3.Error as e:
+            logger.error("spatial timestamp for %s pk > %s: %s" % (pk, type(e), e))
+            return None
 
-            try:
-                # ssp metadata
-                # noinspection SqlResolve
-                ssp_meta = self.conn.execute("SELECT * FROM ssp WHERE pk=?", (pk,)).fetchone()
+        try:
+            # ssp metadata
+            # noinspection SqlResolve
+            ssp_meta = self.conn.execute("SELECT * FROM ssp WHERE pk=?", (pk,)).fetchone()
 
-                # special handling in case of unknown future sensor type
-                ssp.cur.meta.sensor_type = ssp_meta['sensor_type']
-                if ssp.cur.meta.sensor_type not in Dicts.sensor_types.values():
-                    ssp.cur.meta.sensor_type = Dicts.sensor_types['Future']
+            # special handling in case of unknown future sensor type
+            ssp.cur.meta.sensor_type = ssp_meta['sensor_type']
+            if ssp.cur.meta.sensor_type not in Dicts.sensor_types.values():
+                ssp.cur.meta.sensor_type = Dicts.sensor_types['Future']
 
-                # special handling in case of unknown future probe type
-                ssp.cur.meta.probe_type = ssp_meta['probe_type']
-                if ssp.cur.meta.probe_type not in Dicts.probe_types.values():
-                    ssp.cur.meta.probe_type = Dicts.probe_types['Future']
+            # special handling in case of unknown future probe type
+            ssp.cur.meta.probe_type = ssp_meta['probe_type']
+            if ssp.cur.meta.probe_type not in Dicts.probe_types.values():
+                ssp.cur.meta.probe_type = Dicts.probe_types['Future']
 
-                ssp.cur.meta.original_path = ssp_meta['original_path']
-                ssp.cur.meta.institution = ssp_meta['institution']
-                ssp.cur.meta.survey = ssp_meta['survey']
-                ssp.cur.meta.vessel = ssp_meta['vessel']
-                ssp.cur.meta.sn = ssp_meta['sn']
-                ssp.cur.meta.proc_time = ssp_meta['proc_time']
-                ssp.cur.meta.proc_info = ssp_meta['proc_info']
-                ssp.cur.meta.comments = ssp_meta['comments']
-                ssp.cur.meta.surveylines = ssp_meta['surveylines']
+            ssp.cur.meta.original_path = ssp_meta['original_path']
+            ssp.cur.meta.institution = ssp_meta['institution']
+            ssp.cur.meta.survey = ssp_meta['survey']
+            ssp.cur.meta.vessel = ssp_meta['vessel']
+            ssp.cur.meta.sn = ssp_meta['sn']
+            ssp.cur.meta.proc_time = ssp_meta['proc_time']
+            ssp.cur.meta.proc_info = ssp_meta['proc_info']
+            ssp.cur.meta.comments = ssp_meta['comments']
+            ssp.cur.meta.surveylines = ssp_meta['surveylines']
 
-                ssp.cur.meta.pressure_uom = ssp_meta['pressure_uom']
-                ssp.cur.meta.depth_uom = ssp_meta['depth_uom']
-                ssp.cur.meta.speed_uom = ssp_meta['speed_uom']
-                ssp.cur.meta.temperature_uom = ssp_meta['temperature_uom']
-                ssp.cur.meta.conductivity_uom = ssp_meta['conductivity_uom']
-                ssp.cur.meta.salinity_uom = ssp_meta['salinity_uom']
+            ssp.cur.meta.pressure_uom = ssp_meta['pressure_uom']
+            ssp.cur.meta.depth_uom = ssp_meta['depth_uom']
+            ssp.cur.meta.speed_uom = ssp_meta['speed_uom']
+            ssp.cur.meta.temperature_uom = ssp_meta['temperature_uom']
+            ssp.cur.meta.conductivity_uom = ssp_meta['conductivity_uom']
+            ssp.cur.meta.salinity_uom = ssp_meta['salinity_uom']
 
-            except sqlite3.Error as e:
-                logger.error("ssp meta for %s pk > %s: %s" % (pk, type(e), e))
-                return None
+        except sqlite3.Error as e:
+            logger.error("ssp meta for %s pk > %s: %s" % (pk, type(e), e))
+            return None
 
-            # raw data
-            try:
-                # noinspection SqlResolve
-                ssp_samples = self.conn.execute("SELECT * FROM data WHERE ssp_pk=?", (pk,)).fetchall()
-                num_samples = len(ssp_samples)
-                ssp.cur.init_data(num_samples)
-                # logger.debug("raw data samples: %s" % num_samples)
-                for i in range(num_samples):
-                    # print(ssp_samples[i])
+        # raw data
+        try:
+            # noinspection SqlResolve
+            ssp_samples = self.conn.execute("SELECT * FROM data WHERE ssp_pk=?", (pk,)).fetchall()
+            num_samples = len(ssp_samples)
+            ssp.cur.init_data(num_samples)
+            # logger.debug("raw data samples: %s" % num_samples)
+            for i in range(num_samples):
+                # print(ssp_samples[i])
 
-                    ssp.cur.data.pressure[i] = ssp_samples[i]['pressure']
-                    ssp.cur.data.depth[i] = ssp_samples[i]['depth']
-                    ssp.cur.data.speed[i] = ssp_samples[i]['speed']
-                    ssp.cur.data.temp[i] = ssp_samples[i]['temperature']
-                    ssp.cur.data.conductivity[i] = ssp_samples[i]['conductivity']
-                    ssp.cur.data.sal[i] = ssp_samples[i]['salinity']
-                    ssp.cur.data.source[i] = ssp_samples[i]['source']
-                    ssp.cur.data.flag[i] = ssp_samples[i]['flag']
+                ssp.cur.data.pressure[i] = ssp_samples[i]['pressure']
+                ssp.cur.data.depth[i] = ssp_samples[i]['depth']
+                ssp.cur.data.speed[i] = ssp_samples[i]['speed']
+                ssp.cur.data.temp[i] = ssp_samples[i]['temperature']
+                ssp.cur.data.conductivity[i] = ssp_samples[i]['conductivity']
+                ssp.cur.data.sal[i] = ssp_samples[i]['salinity']
+                ssp.cur.data.source[i] = ssp_samples[i]['source']
+                ssp.cur.data.flag[i] = ssp_samples[i]['flag']
 
-            except sqlite3.Error as e:
-                logger.error("reading raw samples for %s pk, %s: %s" % (pk, type(e), e))
-                return None
+        except sqlite3.Error as e:
+            logger.error("reading raw samples for %s pk, %s: %s" % (pk, type(e), e))
+            return None
 
-            # proc data
-            try:
-                # noinspection SqlResolve
-                ssp_samples = self.conn.execute("SELECT * FROM proc WHERE ssp_pk=?", (pk,)).fetchall()
-                num_samples = len(ssp_samples)
-                ssp.cur.init_proc(num_samples)
-                # logger.debug("proc data samples: %s" % num_samples)
-                for i in range(num_samples):
-                    # print(ssp_samples[i])
-                    ssp.cur.proc.pressure[i] = ssp_samples[i]['pressure']
-                    ssp.cur.proc.depth[i] = ssp_samples[i]['depth']
-                    ssp.cur.proc.speed[i] = ssp_samples[i]['speed']
-                    ssp.cur.proc.temp[i] = ssp_samples[i]['temperature']
-                    ssp.cur.proc.conductivity[i] = ssp_samples[i]['conductivity']
-                    ssp.cur.proc.sal[i] = ssp_samples[i]['salinity']
-                    ssp.cur.proc.source[i] = ssp_samples[i]['source']
-                    ssp.cur.proc.flag[i] = ssp_samples[i]['flag']
+        # proc data
+        try:
+            # noinspection SqlResolve
+            ssp_samples = self.conn.execute("SELECT * FROM proc WHERE ssp_pk=?", (pk,)).fetchall()
+            num_samples = len(ssp_samples)
+            ssp.cur.init_proc(num_samples)
+            # logger.debug("proc data samples: %s" % num_samples)
+            for i in range(num_samples):
+                # print(ssp_samples[i])
+                ssp.cur.proc.pressure[i] = ssp_samples[i]['pressure']
+                ssp.cur.proc.depth[i] = ssp_samples[i]['depth']
+                ssp.cur.proc.speed[i] = ssp_samples[i]['speed']
+                ssp.cur.proc.temp[i] = ssp_samples[i]['temperature']
+                ssp.cur.proc.conductivity[i] = ssp_samples[i]['conductivity']
+                ssp.cur.proc.sal[i] = ssp_samples[i]['salinity']
+                ssp.cur.proc.source[i] = ssp_samples[i]['source']
+                ssp.cur.proc.flag[i] = ssp_samples[i]['flag']
 
-            except sqlite3.Error as e:
-                logger.error("reading raw samples for %s pk, %s: %s" % (pk, type(e), e))
-                return None
+        except sqlite3.Error as e:
+            logger.error("reading raw samples for %s pk, %s: %s" % (pk, type(e), e))
+            return None
 
-            # sis data
-            try:
-                # noinspection SqlResolve
-                ssp_samples = self.conn.execute("SELECT * FROM sis WHERE ssp_pk=?", (pk,)).fetchall()
-                num_samples = len(ssp_samples)
-                ssp.cur.init_sis(num_samples)
-                # logger.debug("sis data samples: %s" % num_samples)
-                for i in range(num_samples):
-                    # print(ssp_samples[i])
-                    ssp.cur.sis.pressure[i] = ssp_samples[i]['depth']
-                    ssp.cur.sis.depth[i] = ssp_samples[i]['depth']
-                    ssp.cur.sis.speed[i] = ssp_samples[i]['speed']
-                    ssp.cur.sis.temp[i] = ssp_samples[i]['temperature']
-                    ssp.cur.sis.conductivity[i] = ssp_samples[i]['conductivity']
-                    ssp.cur.sis.sal[i] = ssp_samples[i]['salinity']
-                    ssp.cur.sis.source[i] = ssp_samples[i]['source']
-                    ssp.cur.sis.flag[i] = ssp_samples[i]['flag']
+        # sis data
+        try:
+            # noinspection SqlResolve
+            ssp_samples = self.conn.execute("SELECT * FROM sis WHERE ssp_pk=?", (pk,)).fetchall()
+            num_samples = len(ssp_samples)
+            ssp.cur.init_sis(num_samples)
+            # logger.debug("sis data samples: %s" % num_samples)
+            for i in range(num_samples):
+                # print(ssp_samples[i])
+                ssp.cur.sis.pressure[i] = ssp_samples[i]['depth']
+                ssp.cur.sis.depth[i] = ssp_samples[i]['depth']
+                ssp.cur.sis.speed[i] = ssp_samples[i]['speed']
+                ssp.cur.sis.temp[i] = ssp_samples[i]['temperature']
+                ssp.cur.sis.conductivity[i] = ssp_samples[i]['conductivity']
+                ssp.cur.sis.sal[i] = ssp_samples[i]['salinity']
+                ssp.cur.sis.source[i] = ssp_samples[i]['source']
+                ssp.cur.sis.flag[i] = ssp_samples[i]['flag']
 
-            except sqlite3.Error as e:
-                logger.error("reading sis samples for %s pk, %s: %s" % (pk, type(e), e))
-                return None
+        except sqlite3.Error as e:
+            logger.error("reading sis samples for %s pk, %s: %s" % (pk, type(e), e))
+            return None
 
         # This is the only way for the library to load a profile from the project database
         ssp.loaded_from_db = True
@@ -872,14 +847,15 @@ class ProjectDb:
         """Delete all the entries related to a SSP primary key"""
         self.tmp_ssp_pk = pk
 
-        with self.conn:
-            if not self._delete_old_ssp(full=True):
-                raise RuntimeError("unable to delete ssp with pk: %s" % pk)
+        if not self._delete_old_ssp_no_commit(full=True):
+            raise RuntimeError("unable to delete ssp with pk: %s" % pk)
+
+        self.conn.commit()
 
         self.tmp_ssp_pk = None
         return True
 
-    def _updates_to_version_3(self, old_version):
+    def _updates_to_version_3_no_commit(self, old_version: int) -> None:
         # noinspection SqlResolve
 
         # - 'ssp' table
@@ -899,9 +875,7 @@ class ProjectDb:
                           """, (self.cur_version, "%s v.%s" % (pkg_info.name, pkg_info.version),
                                 datetime.datetime.utcnow(),))
 
-        self.conn.commit()
-
-    def __repr__(self):
+    def __repr__(self) -> str:
         msg = "<%s>\n" % self.__class__.__name__
 
         msg += "  <path: %s>" % self.db_path
