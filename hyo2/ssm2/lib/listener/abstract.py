@@ -3,7 +3,7 @@ import time
 import socket
 import struct
 from threading import Thread, Event
-from typing import Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -11,10 +11,8 @@ logger = logging.getLogger(__name__)
 class AbstractListener(Thread):
     """Common abstract listener"""
 
-    def __init__(self, port: int = 4001, ip: str = "0.0.0.0", timeout: int = 1,
-                 datagrams: Optional[list] = None,
-                 target: Optional[object] = None, name: Optional[str] = "Abstract",
-                 debug: bool = False) -> None:
+    def __init__(self, port: int = 4001, ip: str = "0.0.0.0", timeout: int = 1, datagrams: list | None = None,
+                 target: Any | None = None, name: str | None = "Abstract", debug: bool = False) -> None:
         Thread.__init__(self, target=target, name=name)
         self.name = self.__class__.__name__
         self.desc = "Abstract listener"  # a human-readable description
@@ -27,10 +25,9 @@ class AbstractListener(Thread):
             self.datagrams = list()
         self.debug = debug
 
-        self.shutdown = Event()
-        self.sock_in = None
-        self.data = None  # type: Optional[bytes]
-        self.sender = None
+        self.shutdown: Event = Event()
+        self.sock_in: socket.socket | None = None
+        self.data: bytes | None = None
 
     def init_sockets(self) -> bool:
         self.sock_in = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -87,7 +84,7 @@ class AbstractListener(Thread):
             count += 1
 
             try:
-                self.data, self.sender = self.sock_in.recvfrom(2 ** 16)
+                self.data, _ = self.sock_in.recvfrom(2 ** 16)
 
             except socket.timeout:
                 if self.debug:
@@ -98,7 +95,6 @@ class AbstractListener(Thread):
             self.parse()
 
         self.data = None
-        self.sender = None
         self.sock_in.close()
         # logger.debug("%s end" % self.name)
 

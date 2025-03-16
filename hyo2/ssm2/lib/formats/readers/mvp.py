@@ -2,10 +2,14 @@ import datetime as dt
 import struct
 import os
 import logging
+from typing import TYPE_CHECKING
 
 from hyo2.ssm2.lib.formats.readers.abstract import AbstractTextReader
 from hyo2.ssm2.lib.profile.dicts import Dicts
 from hyo2.ssm2.lib.base.callbacks.cli_callbacks import CliCallbacks
+if TYPE_CHECKING:
+    from hyo2.ssm2.lib.base.callbacks.abstract_callbacks import AbstractCallbacks
+    from hyo2.ssm2.lib.base.setup import Setup
 
 logger = logging.getLogger(__name__)
 
@@ -42,49 +46,14 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
         self.samples_header = None
 
         # for listener
-        self.file_content = None
-        self.header = None
-        self.footer = None
-        self.protocol = None
-        self.format = None
+        self.file_content: list[bytes] | None = None
+        self.header: bytes | None = None
+        self.footer: bytes | None = None
+        self.protocol: int | None = None
+        self.format: str | None = None
 
-    def init_from_listener(self, header, data_blocks, footer, protocol, fmt):
-
-        self.init_data()  # create a new empty profile list
-        self.ssp.append()  # append a new profile
-
-        # initialize probe/sensor type
-        self.ssp.cur.meta.sensor_type = Dicts.sensor_types["MVP"]
-        self.ssp.cur.meta.probe_type = Dicts.probe_types["MVP"]
-
-        self.file_content = data_blocks
-
-        self.header = header
-        self.footer = footer
-        self.protocol = protocol
-        self.format = fmt
-
-        logger.info("reading ...")
-        logger.info("data blocks: %s" % len(self.file_content))
-
-        self.total_data = str()
-        self._unify_packets()
-
-        self.lines = self.total_data.splitlines()
-
-        try:
-            # log.info("got data:\n%s" % self.total_data)
-            self._parse_header()
-            self._parse_body()
-
-        except RuntimeError as e:
-            logger.error("error in data parsing, did you select the correct data format?")
-            raise e
-
-        self.ssp.cur.clone_data_to_proc()
-        self.ssp.cur.init_sis()
-
-    def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):  # UNUSED
+    def read(self, data_path: str, settings: 'Setup', callbacks: 'AbstractCallbacks' = CliCallbacks(),
+             progress = None):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings
@@ -138,83 +107,112 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
         logger.debug('*** %s ***: done' % self.driver)
         return True
 
-    def _parse_header(self):
+    def init_from_listener(self, header: bytes, data_blocks: list[bytes], footer: bytes,
+                           protocol: int, fmt: str, settings: 'Setup', callbacks: 'AbstractCallbacks' = CliCallbacks()) -> None:
 
-        logger.info("reading > header")
+        self.file_content = data_blocks
+        self.header = header
+        self.footer = footer
+        self.protocol = protocol
+        self.format = fmt
+
+        self.s = settings
+        self.cb = callbacks
+
+        self.init_data()  # create a new empty profile list
+        self.ssp.append()  # append a new profile
+
+        # initialize probe/sensor type
+        self.ssp.cur.meta.sensor_type = Dicts.sensor_types["MVP"]
+        self.ssp.cur.meta.probe_type = Dicts.probe_types["MVP"]
+
+        logger.info("Retrieved %d data block(s)" % len(self.file_content))
+
+        self.total_data = str()
+        self._unify_packets()
+
+        self.lines = self.total_data.splitlines()
+
+        try:
+            self._parse_header()
+            if self.ssp.cur.meta.utc_time is not None:
+                self.ssp.cur.meta.original_path = "MVP_%s" % self.ssp.cur.meta.utc_time.strftime("%Y%m%d_%H%M%S")
+            self._parse_body()
+
+        except RuntimeError as e:
+            logger.error("error in data parsing, did you select the correct data format?")
+            raise e
+
+        self.fix()
+        self.finalize()
+
+    def _parse_header(self) -> None:
+
+        logger.info("Parsing header [%s] ..." % self.format)
 
         if self.format == self.formats["ASVP"]:
-            logger.info("parsing header [ASVP]")
             self._parse_asvp_header()
 
         elif self.format == self.formats["CALC"]:
-            logger.info("parsing header [CALC]")
             self._parse_calc_header()
 
         elif self.format == self.formats["S12"]:
-            logger.info("parsing header [S12]")
             self._parse_s12_header()
 
         elif self.format == self.formats["M1"]:
-            logger.info("parsing header [M1]")
             self._parse_m1_header()
 
         elif self.format == self.formats["S05"]:
-            logger.info("parsing header [S05]")
             self._parse_s05_header()
 
         elif self.format == self.formats["S52"]:
-            logger.info("parsing header [S52]")
             self._parse_s05_header()
 
         elif self.format == self.formats["S10"]:
-            logger.info("parsing header [S10]")
             self._parse_s10_header()
 
         else:
-            raise RuntimeError("unknown format: %s" % self.format)
+            raise RuntimeError("Unknown format: %s" % self.format)
 
-    def _parse_body(self):
-        logger.info("reading > body")
+        logger.info("Parsing header [%s] ..." % self.format)
 
-        # this assume that the user configured the correct format.
+    def _parse_body(self) -> None:
+
+        logger.info("Parsing body [%s] ..." % self.format)
+
+        # this assumes that the user configured the correct format.
         if self.format == self.formats["ASVP"]:
-            logger.info("parsing body [ASVP]")
             self._parse_asvp_body()
 
         elif self.format == self.formats["CALC"]:
-            logger.info("parsing body [CALC]")
             self._parse_calc_body()
 
         elif self.format == self.formats["S12"]:
-            logger.info("parsing body [S12]")
             self._parse_s12_body()
 
         elif self.format == self.formats["M1"]:
-            logger.info("parsing body [M1]")
             self._parse_m1_body()
 
         elif self.format == self.formats["S05"]:
-            logger.info("parsing body [S05]")
             self._parse_s05_body()
 
         elif self.format == self.formats["S52"]:
-            logger.info("parsing body [S52]")
             self._parse_s05_body()
 
         elif self.format == self.formats["S10"]:
-            logger.info("parsing body [S10]")
             self._parse_s10_body()
 
         else:
-            raise RuntimeError("unknown format: %s" % self.format)
+            raise RuntimeError("Unknown format: %s" % self.format)
 
-        logger.info("read %s samples" % self.ssp.cur.data.num_samples)
+        logger.info("Parsing body [%s] ... DONE" % self.format)
+        logger.info("Read %d samples" % self.ssp.cur.data.num_samples)
 
-    def _unify_packets(self):
+    def _unify_packets(self) -> None:
         """unify all the received blocks"""
 
         for block_count in range(len(self.file_content)):
-            logger.info("%s block has length %.1f KB"
+            logger.info("#%d block has length %.1f KB"
                         % (block_count, len(self.file_content[block_count]) / 1024))
 
             if self.protocol == self.protocols["NAVO_ISS60"]:
@@ -227,12 +225,14 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
                 self.total_data += packet_data.decode()
                 logger.info("packet %s/%s [%.1f KB]"
                             % (packet_number + 1, total_num_packets, total_num_bytes / 1024))
+
             elif self.protocol == self.protocols["UNDEFINED"]:
                 self.total_data += self.file_content[block_count].decode()
+
             else:
                 raise RuntimeError("unknown protocol %s" % self.protocol)
 
-    def _parse_asvp_header(self):
+    def _parse_asvp_header(self) -> None:
 
         try:
             head_line = self.lines[0]
@@ -275,7 +275,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
         self.samples_offset = len(head_line)
         logger.info("samples offset: %s" % self.samples_offset)
 
-    def _parse_asvp_body(self):
+    def _parse_asvp_body(self) -> None:
         count = 0
         for line in self.total_data[self.samples_offset:len(self.total_data)].splitlines():
             try:
@@ -289,7 +289,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
             count += 1
         self.ssp.cur.data_resize(count)
 
-    def _parse_calc_header(self):
+    def _parse_calc_header(self) -> None:
         try:
             # Date [dd/mm/yyyy]:  09/04/2013
             date_field = self.total_data.splitlines()[-1].split()[-1]
@@ -346,7 +346,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
 
         self.ssp.cur.init_data(len(self.total_data.splitlines()))
 
-    def _parse_calc_body(self):
+    def _parse_calc_body(self) -> None:
 
         count = 0
         for line in self.total_data.splitlines()[5:-9]:
@@ -366,7 +366,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
 
         self.ssp.cur.data_resize(count)
 
-    def _parse_m1_header(self):
+    def _parse_m1_header(self) -> None:
 
         lines = self.total_data.splitlines()
 
@@ -461,7 +461,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
 
         self.ssp.cur.init_data(len(lines) - self.samples_offset)
 
-    def _parse_m1_body(self):
+    def _parse_m1_body(self) -> None:
 
         lines = self.total_data.splitlines()
 
@@ -539,7 +539,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
 
         self.ssp.cur.data_resize(count)
 
-    def _parse_s12_header(self):
+    def _parse_s12_header(self) -> None:
         try:
             # $MVS12,00002,0095,132409,09,04,2013,6.75,1514.76,18.795,31.9262,
             header_fields = self.total_data.splitlines()[0].split(",")
@@ -620,7 +620,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
         except (ValueError, IndexError, TypeError) as e:
             logger.error("skipping first line: %s" % e)
 
-    def _parse_s12_body(self):
+    def _parse_s12_body(self) -> None:
         count = 1  # given the first data are on the header
         for line in self.total_data.splitlines()[1:-1]:
 
@@ -636,7 +636,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
             count += 1
         self.ssp.cur.data_resize(count)
 
-    def _parse_s05_header(self):
+    def _parse_s05_header(self) -> None:
         try:
             # $MVS12,00002,0095,132409,09,04,2013,6.75,1514.76,18.795,31.9262,
             header_fields = self.total_data.splitlines()[0].split(",")
@@ -716,7 +716,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
         except (ValueError, IndexError, TypeError) as e:
             logger.error("skipping first line: %s" % e)
 
-    def _parse_s05_body(self):
+    def _parse_s05_body(self) -> None:
         count = 1  # given the first data are on the header
         for line in self.total_data.splitlines()[1:-1]:
 
@@ -731,7 +731,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
             count += 1
         self.ssp.cur.data_resize(count)
 
-    def _parse_s10_header(self):
+    def _parse_s10_header(self) -> None:
         try:
             # $MVS12,00002,0095,132409,09,04,2013,6.75,1514.76,18.795,31.9262,
             header_fields = self.total_data.splitlines()[0].split(",")
@@ -811,7 +811,7 @@ class Mvp(AbstractTextReader):  # TODO: ATYPICAL READER!!!
         except (ValueError, IndexError, TypeError) as e:
             logger.error("skipping first line: %s" % e)
 
-    def _parse_s10_body(self):
+    def _parse_s10_body(self) -> None:
         count = 1  # given the first data are on the header
         for line in self.total_data.splitlines()[1:-1]:
 

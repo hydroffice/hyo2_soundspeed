@@ -3,7 +3,7 @@ import math
 import numpy as np
 from netCDF4 import Dataset
 import logging
-from datetime import datetime as dt
+from datetime import datetime as dt, timezone
 from typing import Union, TYPE_CHECKING
 
 from hyo2.abc2.lib.onedrive import OneDrive
@@ -150,7 +150,7 @@ class Woa09(AbstractAtlas):
     def query(self, lat: float, lon: float, dtstamp: Union[dt, None] = None, server_mode: bool = False):
         """Query WOA09 for passed location and timestamp"""
         if dtstamp is None:
-            dtstamp = dt.utcnow()
+            dtstamp = dt.now(tz=timezone.utc)
         if not isinstance(dtstamp, dt):
             raise RuntimeError("invalid datetime passed: %s" % type(dtstamp))
         logger.debug("query: %s @ (%.6f, %.6f)" % (dtstamp, lon, lat))

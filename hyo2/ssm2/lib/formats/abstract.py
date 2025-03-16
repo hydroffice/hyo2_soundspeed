@@ -18,13 +18,13 @@ class AbstractFormat(metaclass=ABCMeta):
         self.name = self.__class__.__name__.lower()
         self.desc = "Abstract Format"  # a human-readable description
         self.version = "0.1.0"
-        self._ssp = None  # type: Optional[ProfileList]
+        self._ssp: ProfileList | None = None
         self._ext = set()
         self._project = str()
         self.multicast_support = False
 
-        self.s = None  # type: Optional[Setup]
-        self.cb = None  # type: Optional[AbstractCallbacks]
+        self.s: Setup | None = None
+        self.cb: AbstractCallbacks | None = None
 
     @property
     def ssp(self) -> Optional[ProfileList]:

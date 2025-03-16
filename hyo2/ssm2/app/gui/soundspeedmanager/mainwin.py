@@ -179,7 +179,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.normal_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
                                  "background-color:rgba(0,0,0,0);}"
         self.orange_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
-                                 "background-color:rgba(255,163,102);}"
+                                 "background-color:rgba(255,163,102,128);}"
         self.purple_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
                                  "background-color:rgba(221,160,221,128);}"
         self.khaki_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
