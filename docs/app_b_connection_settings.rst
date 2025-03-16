@@ -41,7 +41,7 @@ for the communication settings).
 
 Boxes D and E refer to raw instrument transmission settings that are configurable for future use.
 Since casts received from an MVP system do not have a filename embedded in the data stream,
-the *Sound Speed* package will name casts received using the following convention: ``YYYYMMDD_HHMMSS_MVP``.
+the *Sound Speed* package will name casts received using the following convention: ``MVP_[YYYYMMDD]_[HHMMSS]``.
 The date/time stamp embedded in the filename will be the time of the cast.
 
 .. note:: Once the MVP listener is activated, a "MVP" token will be visualized on the left side of the SSM's status bar.
