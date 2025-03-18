@@ -269,8 +269,9 @@ class DataPlots(AbstractWidget):
                                                     label='GoMOFS'
                                                     )
         if self.lib.has_ref():
-            self.speed_ref, = self.speed_ax.plot(self.lib.ref.l[0].proc.speed,
-                                                 self.lib.ref.l[0].proc.depth,
+            vi = self.lib.ref.l[0].proc_valid
+            self.speed_ref, = self.speed_ax.plot(self.lib.ref.l[0].proc.speed[vi],
+                                                 self.lib.ref.l[0].proc.depth[vi],
                                                  color=self.ref_color,
                                                  linestyle='--',
                                                  label='ref'
@@ -423,8 +424,9 @@ class DataPlots(AbstractWidget):
                                                   label='GoMOFS'
                                                   )
         if self.lib.has_ref():
-            self.temp_ref, = self.temp_ax.plot(self.lib.ref.l[0].proc.temp,
-                                               self.lib.ref.l[0].proc.depth,
+            vi = self.lib.ref.l[0].proc_valid
+            self.temp_ref, = self.temp_ax.plot(self.lib.ref.l[0].proc.temp[vi],
+                                               self.lib.ref.l[0].proc.depth[vi],
                                                color=self.ref_color,
                                                linestyle='--',
                                                label='ref'
@@ -546,8 +548,9 @@ class DataPlots(AbstractWidget):
                                                 label='GoMOFS'
                                                 )
         if self.lib.has_ref():
-            self.sal_ref, = self.sal_ax.plot(self.lib.ref.l[0].proc.sal,
-                                             self.lib.ref.l[0].proc.depth,
+            vi = self.lib.ref.l[0].proc_valid
+            self.sal_ref, = self.sal_ax.plot(self.lib.ref.l[0].proc.sal[vi],
+                                             self.lib.ref.l[0].proc.depth[vi],
                                              color=self.ref_color,
                                              linestyle='--',
                                              label='ref'
