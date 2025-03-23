@@ -2,6 +2,7 @@ import logging
 import math
 import os
 import time
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -14,6 +15,9 @@ from hyo2.ssm2.lib.profile.ray_tracing.ray_path import RayPath
 from hyo2.ssm2.lib.profile.ray_tracing.ray_tracing import RayTracing
 from hyo2.ssm2.lib.profile.ray_tracing.tracedprofile import TracedProfile
 from hyo2.ssm2.lib.profile.samples import Samples
+if TYPE_CHECKING:
+    from hyo2.ssm2.lib.profile.profilelist import ProfileList
+
 
 logger = logging.getLogger(__name__)
 
@@ -1020,7 +1024,7 @@ class Profile:
 
             self.proc.num_samples += 1
 
-    def extend_profile(self, extender, ext_type):
+    def extend_profile(self, extender: 'ProfileList', ext_type: int) -> bool:
         """ Use the extender samples to extend the profile """
         logger.debug("extension source type: %s" % Dicts.first_match(Dicts.sources, ext_type))
         try:
@@ -1180,21 +1184,30 @@ class Profile:
     def update_proc_time(self):
         self.meta.update_proc_time()
 
-    def replace_proc_sal(self, source):
+    def replace_proc_sal(self, source: 'ProfileList') -> bool:
         try:
-            self.proc.sal = np.interp(self.proc.depth[:], source.cur.proc.depth[:], source.cur.proc.sal[:])
+            src_vi = source.cur.proc_valid
+            self.proc.sal = np.interp(
+                self.proc.depth[:], source.cur.proc.depth[src_vi][:], source.cur.proc.sal[src_vi][:])
+
         except Exception as e:
             logger.warning("in replace salinity, %s" % e)
             return False
+
         return True
 
-    def replace_proc_temp_sal(self, source):
+    def replace_proc_temp_sal(self, source: 'ProfileList') -> bool:
         try:
-            self.proc.temp = np.interp(self.proc.depth[:], source.cur.proc.depth[:], source.cur.proc.temp[:])
-            self.proc.sal = np.interp(self.proc.depth[:], source.cur.proc.depth[:], source.cur.proc.sal[:])
+            src_vi = source.cur.proc_valid
+            self.proc.temp = np.interp(
+                self.proc.depth[:], source.cur.proc.depth[src_vi][:], source.cur.proc.temp[src_vi][:])
+            self.proc.sal = np.interp(
+                self.proc.depth[:], source.cur.proc.depth[src_vi][:], source.cur.proc.sal[src_vi][:])
+
         except Exception as e:
             logger.warning("in replace temp/sal, %s" % e)
             return False
+
         return True
 
     # - thinning
@@ -1439,10 +1452,10 @@ class Profile:
                    % (
                        p1,
                        ray1.data[ni, 0],  # travel time
-                       np.average([ray1.data[ni, 1], ray2.data[ni, 1]]),  # avg. depth
+                       float(np.average([ray1.data[ni, 1], ray2.data[ni, 1]])),  # avg. depth
                        np.absolute(delta_depth[ni]),  # depth diff.
                        pct_diff[ni],  # pct. depth diff.
-                       np.average([ray1.data[ni, 2], ray2.data[ni, 2]]),  # avg. cross-track
+                       float(np.average([ray1.data[ni, 2], ray2.data[ni, 2]])),  # avg. cross-track
                        np.absolute(ray1.data[ni, 2] - ray2.data[ni, 2]),  # cross-track diff.
                        100.0 * np.absolute(ray1.data[ni, 2] - ray2.data[ni, 2]) /
                        max(ray1.data[ni, 2], ray2.data[ni, 2]),  # pct. cross-track diff.

@@ -46,19 +46,19 @@ class SoundSpeedLibrary:
         # logger.info("** > LIB: initializing ...")
 
         # callbacks
-        self.cb = callbacks
+        self.cb: AbstractCallbacks = callbacks
         # progress bar
-        self.progress = progress
+        self.progress: AbstractProgress = progress
 
-        self.ssp = None  # current profile
-        self.ref = None  # reference profile
+        self.ssp: ProfileList | None = None  # current profile
+        self.ref: ProfileList | None = None  # reference profile
 
         # take care of all the required folders
-        self._data_folder = None
-        self._releases_folder = None
-        self._release_folder = None
-        self._projects_folder = None
-        self._outputs_folder = None
+        self._data_folder: str | None = None
+        self._releases_folder: str | None = None
+        self._release_folder: str | None = None
+        self._projects_folder: str | None = None
+        self._outputs_folder: str | None = None
         # _noaa_project format OPR-Xnnn-XX-nn
         self._noaa_project = None
         self._noaa_project_validate = re.compile(r"^(OPR-[A-Z]\d{3}-[A-Z]{2}-\d{2})")

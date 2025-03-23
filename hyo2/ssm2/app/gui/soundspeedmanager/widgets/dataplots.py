@@ -269,9 +269,9 @@ class DataPlots(AbstractWidget):
                                                     label='GoMOFS'
                                                     )
         if self.lib.has_ref():
-            vi = self.lib.ref.l[0].proc_valid
-            self.speed_ref, = self.speed_ax.plot(self.lib.ref.l[0].proc.speed[vi],
-                                                 self.lib.ref.l[0].proc.depth[vi],
+            ref_vi = self.lib.ref.cur.proc_valid
+            self.speed_ref, = self.speed_ax.plot(self.lib.ref.cur.proc.speed[ref_vi],
+                                                 self.lib.ref.cur.proc.depth[ref_vi],
                                                  color=self.ref_color,
                                                  linestyle='--',
                                                  label='ref'
@@ -424,9 +424,9 @@ class DataPlots(AbstractWidget):
                                                   label='GoMOFS'
                                                   )
         if self.lib.has_ref():
-            vi = self.lib.ref.l[0].proc_valid
-            self.temp_ref, = self.temp_ax.plot(self.lib.ref.l[0].proc.temp[vi],
-                                               self.lib.ref.l[0].proc.depth[vi],
+            ref_vi = self.lib.ref.cur.proc_valid
+            self.temp_ref, = self.temp_ax.plot(self.lib.ref.cur.proc.temp[ref_vi],
+                                               self.lib.ref.cur.proc.depth[ref_vi],
                                                color=self.ref_color,
                                                linestyle='--',
                                                label='ref'
@@ -548,9 +548,9 @@ class DataPlots(AbstractWidget):
                                                 label='GoMOFS'
                                                 )
         if self.lib.has_ref():
-            vi = self.lib.ref.l[0].proc_valid
-            self.sal_ref, = self.sal_ax.plot(self.lib.ref.l[0].proc.sal[vi],
-                                             self.lib.ref.l[0].proc.depth[vi],
+            ref_vi = self.lib.ref.cur.proc_valid
+            self.sal_ref, = self.sal_ax.plot(self.lib.ref.cur.proc.sal[ref_vi],
+                                             self.lib.ref.cur.proc.depth[ref_vi],
                                              color=self.ref_color,
                                              linestyle='--',
                                              label='ref'
