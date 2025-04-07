@@ -51,6 +51,7 @@ def gui():
             sys.exit(app.exit())
 
     logger.debug("Init main win ...")
+    GdalAux.check_proj4_data(verbose=True)
     GdalAux.check_gdal_data(verbose=True)
     main_win = MainWin()
     sys.excepthook = main_win.exception_hook  # install the pkg_exception hook
