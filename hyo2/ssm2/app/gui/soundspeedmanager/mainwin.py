@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 class MainWin(QtWidgets.QMainWindow):
 
-    def __init__(self):
+    def __init__(self, use_sdm4: bool = False):
         QtWidgets.QMainWindow.__init__(self)
 
         logger.info("* > APP: initializing ...")
@@ -67,6 +67,8 @@ class MainWin(QtWidgets.QMainWindow):
 
         # create the project
         self.lib = SoundSpeedLibrary(callbacks=QtCallbacks(parent=self), progress=QtProgress(parent=self))
+        if use_sdm4:
+            app_info.edit_deps_dict(delete_key="hyo2.sdm3", new_key="hyo2.sdm4", new_value="hyo2.sdm4")
         logger.info("current configuration:\n%s" % PkgHelper(pkg_info=app_info).pkg_info())
         self.check_woa09()
         self.check_woa13()
@@ -123,8 +125,13 @@ class MainWin(QtWidgets.QMainWindow):
         # survey data monitor
         self.has_sdm_support = True
         try:  # try.. except to make SSM working also without SDM
-            # noinspection PyUnresolvedReferences
-            from hyo2.sdm3.app.gui.surveydatamonitor.widgets.monitor import SurveyDataMonitor
+            if use_sdm4:
+                # noinspection PyUnresolvedReferences
+                from hyo2.sdm4.app.gui.surveydatamonitor.widgets.monitor import SurveyDataMonitor
+            else:
+                # noinspection PyUnresolvedReferences
+                from hyo2.sdm3.app.gui.surveydatamonitor.widgets.monitor import SurveyDataMonitor
+
             self.tab_monitor = SurveyDataMonitor(lib=self.lib, main_win=self)
             # noinspection PyArgumentList
             self.idx_monitor = self.tabs.insertTab(3, self.tab_monitor,
@@ -132,11 +139,11 @@ class MainWin(QtWidgets.QMainWindow):
                                                        os.path.join(app_info.app_media_path, 'surveydatamonitor.png')),
                                                    "")
             self.tabs.setTabToolTip(self.idx_monitor, "Survey Data Monitor")
-            logger.info("Support for Survey Monitor: ON")
+            logger.info("Support for Survey Monitor: ON %s" % ("[BETA]" if use_sdm4 else ""))
         except Exception as e:
             # traceback.print_exc()
             self.has_sdm_support = False
-            logger.info("Support for Survey Monitor: OFF(%s)" % e, exc_info=True)
+            logger.info("Support for Survey Monitor: OFF [%s]" % e, exc_info=True)
         # server
         self.tab_server = Server(lib=self.lib, main_win=self)
         # noinspection PyArgumentList

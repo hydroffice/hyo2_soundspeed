@@ -29,7 +29,7 @@ def qt_custom_handler(error_type: QtCore.QtMsgType, error_context: QtCore.QMessa
 QtCore.qInstallMessageHandler(qt_custom_handler)
 
 
-def gui():
+def gui(use_sdm4: bool = False):
     """Create the application and show the Sound Speed Manager gui"""
     from hyo2.ssm2.app.gui.soundspeedmanager.mainwin import MainWin
 
@@ -53,7 +53,7 @@ def gui():
     logger.debug("Init main win ...")
     GdalAux.check_proj4_data(verbose=True)
     GdalAux.check_gdal_data(verbose=True)
-    main_win = MainWin()
+    main_win = MainWin(use_sdm4=use_sdm4)
     sys.excepthook = main_win.exception_hook  # install the pkg_exception hook
     main_win.show()
     main_win.do()
