@@ -722,7 +722,7 @@ class ProjectDb:
                                  max_raw_depth,  # 24
                 ))
                 
-        return ssp_list
+            return ssp_list
 
         except sqlite3.Error as e:
             logger.error("%s: %s" % (type(e), e))
