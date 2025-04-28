@@ -263,6 +263,18 @@ class General(AbstractWidget):
         self.default_vessel.setValidator(validator)
         hbox.addWidget(self.default_vessel)
 
+        # - option weighted harmonic mean sound speed
+        hbox = QtWidgets.QHBoxLayout()
+        self.right_layout.addLayout(hbox)
+        # -- label
+        label = QtWidgets.QLabel("Average sound speed:")
+        label.setFixedWidth(lbl_width)
+        hbox.addWidget(label)
+        # - value
+        self.average_sound_speed = QtWidgets.QComboBox()
+        self.average_sound_speed.addItems(["True", "False"])
+        hbox.addWidget(self.average_sound_speed)        
+        
         # - auto_apply_default_metadata
         hbox = QtWidgets.QHBoxLayout()
         self.right_layout.addLayout(hbox)
@@ -309,6 +321,7 @@ class General(AbstractWidget):
         # noinspection PyUnresolvedReferences
         self.noaa_tools.currentIndexChanged.connect(self.apply_noaa_tools)
         # noinspection PyUnresolvedReferences
+        self.average_sound_speed.currentIndexChanged.connect(self.apply_average_sound_speed)
         self.auto_apply_default_metadata.currentIndexChanged.connect(self.apply_auto_apply_default_metadata)
 
     def apply_default_institution(self):
@@ -496,6 +509,12 @@ class General(AbstractWidget):
         self.setup_changed()
         self.main_win.reload_settings()
 
+    def apply_average_sound_speed(self):
+        logger.debug("apply average sound speed: %s" % self.average_sound_speed.currentText())
+        self.db.average_sound_speed = self.average_sound_speed.currentText() == "True"
+        self.setup_changed()
+        self.main_win.reload_settings()
+        
     def apply_auto_apply_default_metadata(self):
         # logger.debug("auto_apply_default_metadata: %s" % self.auto_apply_default_metadata.currentText())
         self.db.auto_apply_default_metadata = self.auto_apply_default_metadata.currentText() == "True"
@@ -542,8 +561,14 @@ class General(AbstractWidget):
         self.default_institution.setEditText("%s" % self.db.default_institution)
 
         # default_survey
-        self.default_survey.setText("%s" % self.db.default_survey)
+        self.default_survey.setText("%s" % self.db.default_survey)  
 
+        # average sound speed
+        if self.db.average_sound_speed:
+            self.average_sound_speed.setCurrentIndex(0)  # True
+        else:
+            self.average_sound_speed.setCurrentIndex(1)  # False
+        
         # auto_apply_default_metadata
         if self.db.auto_apply_default_metadata:
             self.auto_apply_default_metadata.setCurrentIndex(0)  # True

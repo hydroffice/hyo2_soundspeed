@@ -799,17 +799,29 @@ class Database(AbstractWidget):
         # prepare the table
         self.ssp_list.setSortingEnabled(False)
         self.ssp_list.clear()
-        self.ssp_list.setColumnCount(25)
-        self.ssp_list.setHorizontalHeaderLabels(['id', 'time', 'location',
-                                                 'sensor', 'probe', 'ss@min depth', 'mean speed',
-                                                 'min depth', 'max depth', 'max depth[no ext]',
-                                                 'original path', 'institution',
-                                                 'survey', 'vessel', 'sn',
-                                                 'processing time', 'processing info', 'surveylines', 'comments',
-                                                 'pressure uom', 'depth uom', 'speed uom',
-                                                 'temperature uom', 'conductivity uom', 'salinity uom',
-                                                 ])
-
+        if self.lib.setup.average_sound_speed is True:
+            self.ssp_list.setColumnCount(25)
+            self.ssp_list.setHorizontalHeaderLabels(['id', 'time', 'location',
+                                                     'sensor', 'probe', 'ss@min depth', 'mean speed',
+                                                     'min depth', 'max depth', 'max depth[no ext]',
+                                                     'original path', 'institution',
+                                                     'survey', 'vessel', 'sn',
+                                                     'processing time', 'processing info', 'surveylines', 'comments',
+                                                     'pressure uom', 'depth uom', 'speed uom',
+                                                     'temperature uom', 'conductivity uom', 'salinity uom',
+            ])
+        else:
+            self.ssp_list.setColumnCount(24)
+            self.ssp_list.setHorizontalHeaderLabels(['id', 'time', 'location',
+                                                     'sensor', 'probe', 'ss@min depth',
+                                                     'min depth', 'max depth', 'max depth[no ext]',
+                                                     'original path', 'institution',
+                                                     'survey', 'vessel', 'sn',
+                                                     'processing time', 'processing info', 'surveylines', 'comments',
+                                                     'pressure uom', 'depth uom', 'speed uom',
+                                                     'temperature uom', 'conductivity uom', 'salinity uom',
+            ])
+            
         # populate the table
         self.ssp_list.setRowCount(len(lst))
 

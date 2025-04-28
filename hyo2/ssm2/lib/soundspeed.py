@@ -1196,7 +1196,7 @@ class SoundSpeedLibrary:
         if project is None:
             project = self.current_project
 
-        db = ProjectDb(projects_folder=self.projects_folder, project_name=project)
+        db = ProjectDb(projects_folder=self.projects_folder, project_name=project, setup=self.setup)
         lst = db.list_profiles()
         db.disconnect()
         return lst

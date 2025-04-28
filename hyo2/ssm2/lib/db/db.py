@@ -20,7 +20,7 @@ class ProjectDb:
     """Class that provides an interface to a SQLite db with Sound Speed data"""
 
     def __init__(self, projects_folder: Optional[str] = None, project_name: Optional[str] = None,
-                 info_loc: bool = True) -> None:
+                 setup: Optional[str] = None, info_loc: bool = True) -> None:
 
         # in case that no data folder is passed
         if projects_folder is None:
@@ -43,6 +43,9 @@ class ProjectDb:
         # add variable used to store the connection to the database
         self.conn: sqlite3.Connection | None = None
 
+        # settings
+        self.settings = setup
+        
         self.tmp_data = None
         self.tmp_ssp_pk = None
 
@@ -662,9 +665,12 @@ class ProjectDb:
                     continue
 
                 try:
-                    mean_ss = str()
-                    ssp = self.profile_by_pk(row['pk'])
-                    mean_ss = '%0.2f' % ssp.cur.proc_speed_mean
+                    if self.settings.average_sound_speed is True:
+                        mean_ss = str()
+                        ssp = self.profile_by_pk(row['pk'])
+                        mean_ss = '%0.2f' % ssp.cur.proc_speed_mean
+                    else:
+                        mean_ss = None
                 except Exception as e:
                     logger.warning("profile %s: %s -> skipping" % (e, row['pk']))
                     continue
@@ -695,32 +701,59 @@ class ProjectDb:
                     logger.warning("profile %s: %s -> skipping" % (e, row['pk']))
                     continue
 
-                ssp_list.append((row['pk'],  # 0
-                                 row['cast_datetime'],  # 1
-                                 row['cast_position'],  # 2
-                                 sensor_type,  # 3
-                                 probe_type,  # 4
-                                 row['original_path'],  # 5
-                                 row['institution'],  # 6
-                                 row['survey'],  # 7
-                                 row['vessel'],  # 8
-                                 row['sn'],  # 9
-                                 row['proc_time'],  # 10
-                                 row['proc_info'],  # 11
-                                 row['surveylines'],  # 12
-                                 row['comments'],  # 13
-                                 row['pressure_uom'],  # 14
-                                 row['depth_uom'],  # 15
-                                 row['speed_uom'],  # 16
-                                 row['temperature_uom'],  # 17
-                                 row['conductivity_uom'],  # 18
-                                 row['salinity_uom'],  # 19
-                                 ss_at_min_depth,  # 20
-                                 mean_ss,  # 21
-                                 min_depth,  # 22
-                                 max_depth,  # 23
-                                 max_raw_depth,  # 24
-                ))
+                if self.settings.average_sound_speed is True:
+                    ssp_list.append((row['pk'],  # 0
+                                     row['cast_datetime'],  # 1
+                                     row['cast_position'],  # 2
+                                     sensor_type,  # 3
+                                     probe_type,  # 4
+                                     row['original_path'],  # 5
+                                     row['institution'],  # 6
+                                     row['survey'],  # 7
+                                     row['vessel'],  # 8
+                                     row['sn'],  # 9
+                                     row['proc_time'],  # 10
+                                     row['proc_info'],  # 11
+                                     row['surveylines'],  # 12
+                                     row['comments'],  # 13
+                                     row['pressure_uom'],  # 14
+                                     row['depth_uom'],  # 15
+                                     row['speed_uom'],  # 16
+                                     row['temperature_uom'],  # 17
+                                     row['conductivity_uom'],  # 18
+                                     row['salinity_uom'],  # 19
+                                     ss_at_min_depth,  # 20
+                                     mean_ss,  # 21
+                                     min_depth,  # 22
+                                     max_depth,  # 23
+                                     max_raw_depth,  # 24
+                    ))
+                else:
+                    ssp_list.append((row['pk'],  # 0
+                                     row['cast_datetime'],  # 1
+                                     row['cast_position'],  # 2
+                                     sensor_type,  # 3
+                                     probe_type,  # 4
+                                     row['original_path'],  # 5
+                                     row['institution'],  # 6
+                                     row['survey'],  # 7
+                                     row['vessel'],  # 8
+                                     row['sn'],  # 9
+                                     row['proc_time'],  # 10
+                                     row['proc_info'],  # 11
+                                     row['surveylines'],  # 12
+                                     row['comments'],  # 13
+                                     row['pressure_uom'],  # 14
+                                     row['depth_uom'],  # 15
+                                     row['speed_uom'],  # 16
+                                     row['temperature_uom'],  # 17
+                                     row['conductivity_uom'],  # 18
+                                     row['salinity_uom'],  # 19
+                                     ss_at_min_depth,  # 20
+                                     min_depth,  # 21
+                                     max_depth,  # 22
+                                     max_raw_depth,  # 23
+                    ))
                 
             return ssp_list
 
