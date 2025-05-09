@@ -220,7 +220,8 @@ class ExportDb:
         if self.filter_fields is None:
             self.filter_fields = ExportDbFields()
 
-        GdalAux()
+        GdalAux.check_gdal_data(verbose=True)
+        GdalAux.check_proj4_data(verbose=True)
         output = os.path.join(self.export_folder(output_folder=output_folder), project_name)
 
         # create the data source
@@ -229,7 +230,7 @@ class ExportDb:
             lyr = self._create_ogr_lyr_and_fields(ds)
 
         except RuntimeError as e:
-            logger.error("%s" % e)
+            logger.error("%s" % e, exc_info=True)
             return False
 
         rows = self.db.list_profiles()
