@@ -76,12 +76,11 @@ class Profile:
 
         raise RuntimeError("unable to calculated median")
 
-    def weighted_harmonic_mean(self):
+    def weighted_harmonic_mean(self) -> float:
         avg_depth = 10000.0  # just a very deep value
-        half_swath_angle = 1.0  # a small angle since we just cure about nadir
+        half_swath_angle = 0  # zero since we just care about nadir
 
-        tp1 = TracedProfile(ssp=self, avg_depth=avg_depth,
-                            half_swath=half_swath_angle)
+        tp1 = TracedProfile(ssp=self, avg_depth=avg_depth, half_swath=half_swath_angle, verbose=False)
 
         if len(tp1.harmonic_means) == 0:
             return 0
@@ -178,6 +177,10 @@ class Profile:
         return np.equal(self.sis.flag, Dicts.flags['thin'])
 
     @property
+    def data_depth_max(self):
+        return self.data.depth[self.data_valid].max()
+
+    @property
     def proc_invalid_direction(self):
         """Return indices of invalid data for direction"""
         return np.equal(self.proc.flag, Dicts.flags['direction'])  # numpy 1.10.4 if a warning
@@ -189,6 +192,10 @@ class Profile:
     @property
     def proc_speed_min(self):
         return self.proc.speed[self.proc_valid].min()
+
+    @property
+    def proc_speed_at_min_depth(self):
+        return self.proc.speed[self.proc_valid][self.proc.depth[self.proc_valid].argmin()]
 
     @property
     def proc_temp_min(self):

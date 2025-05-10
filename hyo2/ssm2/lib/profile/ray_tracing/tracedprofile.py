@@ -1,15 +1,21 @@
-import numpy as np
-import math
 import logging
+import math
+from typing import TYPE_CHECKING
+
+import numpy as np
 from scipy.interpolate import interp1d
+
+if TYPE_CHECKING:
+    from hyo2.ssm2.lib.profile.profile import Profile
 
 logger = logging.getLogger(__name__)
 
 
 class TracedProfile:
 
-    def __init__(self, ssp, half_swath=65, avg_depth=10000, tss_depth=None, tss_value=None):
-        # PyDateTime_IMPORT
+    def __init__(self, ssp: 'Profile', half_swath: float = 65.0, avg_depth: float = 10000.0,
+                 tss_depth: float | None = None, tss_value: float | None = None, verbose: bool = False) -> None:
+
         self.avg_depth = avg_depth
         self.half_swath = half_swath
 
@@ -43,11 +49,12 @@ class TracedProfile:
                 logger.info("removed latest extension depth: %s" % depths[-1])
                 del depths[-1]
 
-        logger.info("profile timestamp: %s" % ssp.meta.utc_time)
-        logger.debug("valid samples: %d" % (len(depths)), )
-        logger.debug("depth: min %.2f, max %.2f" % (depths[0], depths[-1]))
-        # logger.debug("depths: %s" % depth)
-        # logger.debug("speeds: %s" % speed)
+        if verbose:
+            logger.info("profile timestamp: %s" % ssp.meta.utc_time)
+            logger.debug("valid samples: %d" % (len(depths)), )
+            logger.debug("depth: min %.2f, max %.2f" % (depths[0], depths[-1]))
+            # logger.debug("depths: %s" % depth)
+            # logger.debug("speeds: %s" % speed)
 
         # ray-trace a few angles (ref: Lurton, An Introduction to UA, p.50-52)
         self.rays = list()
@@ -69,8 +76,8 @@ class TracedProfile:
             for idx in range(len(depths) - 1):
 
                 # calculate delta (next - current)
-                dz = depths[idx+1] - depths[idx]
-                dc = speeds[idx+1] - speeds[idx]
+                dz = depths[idx + 1] - depths[idx]
+                dc = speeds[idx + 1] - speeds[idx]
                 # logger.debug("%s: dy %s, dc %s" % (x, dy, dc))
 
                 if dc == 0:  # "constant speed" case: no curvature
@@ -83,8 +90,8 @@ class TracedProfile:
 
                     # gradient = dc/dy
                     beta.append(beta[idx])  # beta does not change
-                    dx = dz / (math.tan(beta[idx+1]))  # no curvature!
-                    dt = (((dx**2)+(dz**2))**.5) / speeds[idx+1]
+                    dx = dz / (math.tan(beta[idx + 1]))  # no curvature!
+                    dt = (((dx ** 2) + (dz ** 2)) ** .5) / speeds[idx + 1]
 
                 elif dz == 0:  # "same depth" case: just adjust the ray angle
 
@@ -114,8 +121,8 @@ class TracedProfile:
                     dx = curve * ((math.sin(beta[idx])) - (math.sin(beta[idx + 1])))  # Lurton, (2.67)
                     dt = abs((1 / gradient) *
                              math.log(
-                                (speeds[idx + 1] / speeds[idx]) *
-                                (abs((1 + math.sin(beta[idx])) / (1 + math.sin(beta[idx + 1]))))))  # Lurton, (2.70)
+                                 (speeds[idx + 1] / speeds[idx]) *
+                                 (abs((1 + math.sin(beta[idx])) / (1 + math.sin(beta[idx + 1]))))))  # Lurton, (2.70)
 
                 total_z.append(total_z[-1] + dz)
                 total_x.append(total_x[-1] + dx)
@@ -128,7 +135,7 @@ class TracedProfile:
             if len(depths) > 1:
                 harm_mean = (total_z[-1] - total_z[0]) / (total_t[-1] - total_t[0])
             elif len(depths) == 1:
-                harm_mean = depths[0]
+                harm_mean = speeds[0]
             else:
                 raise RuntimeError("invalid profile with zero valid depth values")
             self.harmonic_means.append(harm_mean)
@@ -149,13 +156,14 @@ class TracedProfile:
 
             self.rays.append(np.array([interp_t, interp_x, interp_z]))
 
-        logger.debug("rays: %d (%d samples per-ray)" % (len(self.rays), len(self.rays[0][0])))
+        if verbose:
+            logger.debug("rays: %d (%d samples per-ray)" % (len(self.rays), len(self.rays[0][0])))
         self.date_time = ssp.meta.utc_time
         self.latitude = ssp.meta.latitude
         self.longitude = ssp.meta.longitude
         self.data = [depths, speeds]
 
-    def debug_rays(self, ray_idx=0):
+    def debug_rays(self, ray_idx: int = 0) -> None:
         nr_rays = len(self.rays)
         if (ray_idx < 0) or (ray_idx >= nr_rays):
             logger.warning("invalid ray index: %d (total rays: %d)" % (ray_idx, nr_rays))
@@ -164,10 +172,12 @@ class TracedProfile:
         logger.debug("[%d]" % ray_idx)
         logger.debug("t      | x      | z     |")
         for idx in range(len(self.rays[ray_idx][0])):
-            logger.debug("%10.4f %10.3f %10.2f"
-                         % (self.rays[ray_idx][0][idx], self.rays[ray_idx][1][idx], self.rays[ray_idx][2][idx]))
+            logger.debug("%10.4f %10.3f %10.2f" % (
+                float(self.rays[ray_idx][0][idx]),
+                float(self.rays[ray_idx][1][idx]),
+                float(self.rays[ray_idx][2][idx])))
 
-    def debug_plot(self, ray_idx=0):
+    def debug_plot(self, ray_idx: int = 0) -> None:
         nr_rays = len(self.rays)
         if (ray_idx < 0) or (ray_idx >= nr_rays):
             logger.warning("invalid ray index: %d (total rays: %d)" % (ray_idx, nr_rays))
@@ -195,7 +205,7 @@ class TracedProfile:
         plt.grid(True)
         plt.title('z vs. x')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         msg = "<%s>\n" % self.__class__.__name__
 
         msg += "  <timestamp: %s>\n" % self.date_time

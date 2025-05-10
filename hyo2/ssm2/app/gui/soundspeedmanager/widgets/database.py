@@ -136,9 +136,18 @@ class Database(AbstractWidget):
         self.btn_refresh_db.clicked.connect(self.update_table)
         self.btn_refresh_db.setToolTip("Refresh DB entries")
         self.manage_btn_box.addButton(self.btn_refresh_db, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
-        self.refresh_db_act = QtGui.QAction('Open Projects DB Folder', self)
+        self.refresh_db_act = QtGui.QAction('Refresh DB entries', self)
         self.refresh_db_act.triggered.connect(self.update_table)
         self.main_win.database_menu.addAction(self.refresh_db_act)
+
+        # ---- show stats
+        self.btn_show_stats = QtWidgets.QPushButton("Show stats")
+        self.btn_show_stats.clicked.connect(self.show_stats)
+        self.btn_show_stats.setToolTip("Show stats for DB entries")
+        self.manage_btn_box.addButton(self.btn_show_stats, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
+        self.show_stats_act = QtGui.QAction('Show stats for DB entries', self)
+        self.show_stats_act.triggered.connect(self.show_stats)
+        self.main_win.database_menu.addAction(self.show_stats_act)
 
         right_vbox.addStretch()
         right_vbox.addStretch()
@@ -764,7 +773,12 @@ class Database(AbstractWidget):
         self.lib.map_db_profiles(pks)
         self.lib.raise_plot_window()
 
-    def update_table(self):
+    def show_stats(self) -> None:
+        self.update_table(with_stats=True)
+
+    def update_table(self, with_stats: bool = False):
+
+        self.lib.progress.start(title="Sound Speed Profiles", text="Loading casts", init_value=5)
 
         class NumberWidgetItem(QtWidgets.QTableWidgetItem):
 
@@ -791,35 +805,55 @@ class Database(AbstractWidget):
                 except (ValueError, TypeError):
                     return True
 
+        if with_stats:
+            labels = ['id', 'time', 'location',
+                      'sensor', 'probe',
+                      'ss@min depth', 'min depth', 'mean speed',
+                      'max depth', 'max depth[raw]',
+                      'original path', 'institution',
+                      'survey', 'vessel', 'sn',
+                      'processing time', 'processing info', 'surveylines', 'comments',
+                      'pressure uom', 'depth uom', 'speed uom',
+                      'temperature uom', 'conductivity uom', 'salinity uom',
+                      ]
+        else:
+            labels = ['id', 'time', 'location',
+                      'sensor', 'probe',
+                      'original path', 'institution',
+                      'survey', 'vessel', 'sn',
+                      'processing time', 'processing info', 'surveylines', 'comments',
+                      'pressure uom', 'depth uom', 'speed uom',
+                      'temperature uom', 'conductivity uom', 'salinity uom',
+                      ]
+
         # set the top label
         self.active_label.setText("<b>Current project: %s</b>" % self.lib.current_project)
 
-        lst = self.lib.db_list_profiles()
+        lst = self.lib.db_list_profiles(with_stats=with_stats)
 
         # prepare the table
         self.ssp_list.setSortingEnabled(False)
         self.ssp_list.clear()
         self.ssp_list.setColumnCount(24)
-        self.ssp_list.setHorizontalHeaderLabels(['id', 'time', 'location',
-                                                 'sensor', 'probe',
-                                                 'ss@min depth', 'min depth', 'max depth', 'max depth[no ext]',
-                                                 'original path', 'institution',
-                                                 'survey', 'vessel', 'sn',
-                                                 'processing time', 'processing info', 'surveylines', 'comments',
-                                                 'pressure uom', 'depth uom', 'speed uom',
-                                                 'temperature uom', 'conductivity uom', 'salinity uom',
-                                                 ])
+        self.ssp_list.setHorizontalHeaderLabels(labels)
 
         # populate the table
         self.ssp_list.setRowCount(len(lst))
+
+        nr_rows = len(lst)
+        quantum = 95 / (nr_rows + 1)
 
         # logger.debug("Populating %d table entries ..." % len(lst))
         for i, ssp_ in enumerate(lst):
 
             processed = True
             tokens = ssp_[11].split(";")
-            # Re-arrange index to match the new items and labels
-            ssp = ssp_[0:5] + ssp_[20:24] + ssp_[5:20]
+            if with_stats:
+                # Re-arrange index to match the new items and labels
+                ssp = ssp_[0:5] + ssp_[20:25] + ssp_[5:20]
+            else:
+                ssp = ssp_[0:20]
+
             if Dicts.proc_user_infos['PLOTTED'] not in tokens:
                 processed = False
 
@@ -836,7 +870,9 @@ class Database(AbstractWidget):
                 else:
                     label = field
 
-                if j in [0, 5, 6, 7, 8, ]:
+                if j in [0, ]:
+                        item = NumberWidgetItem("%s" % label)
+                elif j in [5, 6, 7, 8, 9] and with_stats:
                     item = NumberWidgetItem("%s" % label)
                 elif j in [2, ]:
                     item = LocationWidgetItem("%s" % label)
@@ -857,12 +893,16 @@ class Database(AbstractWidget):
 
                 self.ssp_list.setItem(i, j, item)
 
+            self.lib.progress.add(quantum=quantum, text="%d/%d" % (i + 1, nr_rows))
+
         # logger.debug("Populating %d table entries ... (sorting)" % len(lst))
         self.ssp_list.setSortingEnabled(True)
         # logger.debug("Populating %d table entries ... (resizing)" % len(lst))
         self.ssp_list.resizeColumnsToContents()
 
         # logger.debug("Populating %d table entries ... DONE" % len(lst))
+
+        self.lib.progress.end()
 
     def data_stored(self):
         self.update_table()
