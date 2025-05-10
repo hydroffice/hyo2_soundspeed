@@ -1191,13 +1191,13 @@ class SoundSpeedLibrary:
 
         return success
 
-    def db_list_profiles(self, project: Optional[str] = None) -> list:
+    def db_list_profiles(self, project: Optional[str] = None, with_stats: bool = False) -> list:
         """List the profile on the db"""
         if project is None:
             project = self.current_project
 
         db = ProjectDb(projects_folder=self.projects_folder, project_name=project)
-        lst = db.list_profiles()
+        lst = db.list_profiles(with_stats=with_stats)
         db.disconnect()
         return lst
 

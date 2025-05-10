@@ -614,7 +614,7 @@ class ProjectDb:
             logger.error("retrieving the time stamp list, %s: %s" % (type(e), e))
             return None
 
-    def list_profiles(self):
+    def list_profiles(self, with_stats: bool = False):
         if not self.conn:
             logger.error("missing db connection")
             return None
@@ -622,16 +622,6 @@ class ProjectDb:
         ssp_list = list()
         # noinspection SqlResolve
         sql = self.conn.execute("SELECT * FROM ssp_view")
-        sql_min = self.conn.execute("SELECT ssp_pk, speed, MIN(depth) as 'depth' FROM proc "
-                                    "WHERE flag=? GROUP BY ssp_pk", (Dicts.flags['valid'],)).fetchall()
-        sql_max = self.conn.execute("SELECT ssp_pk, speed, MAX(depth) as 'depth' FROM proc "
-                                    "WHERE flag=? GROUP BY ssp_pk", (Dicts.flags['valid'],)).fetchall()
-        sql_raw = self.conn.execute("SELECT ssp_pk, speed, MAX(depth) as 'depth' FROM proc "
-                                    "WHERE flag=? AND source!=? AND source!=? AND source!=? "
-                                    "AND source!=? AND source!=? AND source!=? GROUP BY ssp_pk",
-                                    (Dicts.flags['valid'], Dicts.sources['woa09_ext'], Dicts.sources['woa13_ext'],
-                                     Dicts.sources['woa18_ext'], Dicts.sources['rtofs_ext'],
-                                     Dicts.sources['gomofs_ext'], Dicts.sources['ref_ext'],)).fetchall()
 
         try:
             for row in sql:
@@ -646,73 +636,52 @@ class ProjectDb:
                 if probe_type not in Dicts.probe_types.values():
                     probe_type = Dicts.probe_types['Future']
 
-                # special handling for surface sound speed, min depth, max depth
-                try:
-                    ss_at_min_depth = str()
-                    min_depth = str()
-                    for row_min in sql_min:
-                        if row_min['ssp_pk'] == row['pk']:
-                            ss_at_min_depth = '%0.2f' % row_min['speed']
-                            min_depth = '%0.2f' % row_min['depth']
-                            break
-                    if min_depth == '':
-                        logger.warning("unable to retrieve min depth for profile: %s -> skipping" % row['pk'])
-                        continue
-                except Exception as e:
-                    logger.warning("profile %s: %s -> skipping" % (e, row['pk']))
-                    continue
+                values = [
+                    row['pk'],  # 0
+                    row['cast_datetime'],  # 1
+                    row['cast_position'],  # 2
+                    sensor_type,  # 3
+                    probe_type,  # 4
+                    row['original_path'],  # 5
+                    row['institution'],  # 6
+                    row['survey'],  # 7
+                    row['vessel'],  # 8
+                    row['sn'],  # 9
+                    row['proc_time'],  # 10
+                    row['proc_info'],  # 11
+                    row['surveylines'],  # 12
+                    row['comments'],  # 13
+                    row['pressure_uom'],  # 14
+                    row['depth_uom'],  # 15
+                    row['speed_uom'],  # 16
+                    row['temperature_uom'],  # 17
+                    row['conductivity_uom'],  # 18
+                    row['salinity_uom'],  # 19
+                ]
 
-                try:
-                    max_depth = str()
-                    for row_max in sql_max:
-                        if row_max['ssp_pk'] == row['pk']:
-                            max_depth = '%0.2f' % row_max['depth']
-                            break
-                    if max_depth == '':
-                        logger.warning("unable to retrieve max depth for profile: %s -> skipping" % row['pk'])
-                        continue
-                except Exception as e:
-                    logger.warning("profile %s: %s -> skipping" % (e, row['pk']))
-                    continue
+                if with_stats:
+                    # special handling for surface sound speed, mean sound speed, min depth, max depth
+                    try:
+                        ssp = self.profile_by_pk(row['pk'])
+                        min_depth = '%0.2f' % ssp.cur.proc_depth_min
+                        ss_at_min_depth = '%0.2f' % ssp.cur.proc_speed_at_min_depth
+                        mean_ss = '%0.2f' % ssp.cur.proc_speed_mean
+                        max_depth = '%0.2f' % ssp.cur.proc_depth_max
+                        max_raw_depth = '%0.2f' % ssp.cur.data_depth_max
 
-                try:
-                    max_raw_depth = str()
-                    for row_raw in sql_raw:
-                        if row_raw['ssp_pk'] == row['pk']:
-                            max_raw_depth = '%0.2f' % row_raw['depth']
-                            break
-                    if max_raw_depth == '':
-                        logger.warning("unable to retrieve max raw depth for profile: %s -> skipping" % row['pk'])
+                    except Exception as e:
+                        logger.warning("profile %s: %s -> skipping" % (e, row['pk']), exc_info=True)
                         continue
-                except Exception as e:
-                    logger.warning("profile %s: %s -> skipping" % (e, row['pk']))
-                    continue
 
-                ssp_list.append((row['pk'],  # 0
-                                 row['cast_datetime'],  # 1
-                                 row['cast_position'],  # 2
-                                 sensor_type,  # 3
-                                 probe_type,  # 4
-                                 row['original_path'],  # 5
-                                 row['institution'],  # 6
-                                 row['survey'],  # 7
-                                 row['vessel'],  # 8
-                                 row['sn'],  # 9
-                                 row['proc_time'],  # 10
-                                 row['proc_info'],  # 11
-                                 row['surveylines'],  # 12
-                                 row['comments'],  # 13
-                                 row['pressure_uom'],  # 14
-                                 row['depth_uom'],  # 15
-                                 row['speed_uom'],  # 16
-                                 row['temperature_uom'],  # 17
-                                 row['conductivity_uom'],  # 18
-                                 row['salinity_uom'],  # 19
-                                 ss_at_min_depth,  # 20
-                                 min_depth,  # 21
-                                 max_depth,  # 22
-                                 max_raw_depth,  # 23
-                                 ))
+                    values += [
+                        ss_at_min_depth,  # 20
+                        min_depth,  # 21
+                        mean_ss,  # 22
+                        max_depth,  # 23
+                        max_raw_depth  # 24
+                    ]
+
+                ssp_list.append(values)
 
             return ssp_list
 
