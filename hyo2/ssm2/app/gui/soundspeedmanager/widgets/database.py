@@ -131,6 +131,13 @@ class Database(AbstractWidget):
         self.project_folder_act.triggered.connect(self.project_folder)
         self.main_win.database_menu.addAction(self.project_folder_act)
 
+        # ---- show stats
+        self.btn_show_stats = QtWidgets.QPushButton("Show stats")
+        self.btn_show_stats.setCheckable(True)
+        self.btn_show_stats.clicked.connect(self.update_table)
+        self.btn_show_stats.setToolTip("Show stats for DB entries")
+        self.manage_btn_box.addButton(self.btn_show_stats, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
+
         # ---- refresh DB
         self.btn_refresh_db = QtWidgets.QPushButton("Refresh DB")
         self.btn_refresh_db.clicked.connect(self.update_table)
@@ -139,15 +146,6 @@ class Database(AbstractWidget):
         self.refresh_db_act = QtGui.QAction('Refresh DB entries', self)
         self.refresh_db_act.triggered.connect(self.update_table)
         self.main_win.database_menu.addAction(self.refresh_db_act)
-
-        # ---- show stats
-        self.btn_show_stats = QtWidgets.QPushButton("Show stats")
-        self.btn_show_stats.clicked.connect(self.show_stats)
-        self.btn_show_stats.setToolTip("Show stats for DB entries")
-        self.manage_btn_box.addButton(self.btn_show_stats, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
-        self.show_stats_act = QtGui.QAction('Show stats for DB entries', self)
-        self.show_stats_act.triggered.connect(self.show_stats)
-        self.main_win.database_menu.addAction(self.show_stats_act)
 
         right_vbox.addStretch()
         right_vbox.addStretch()
@@ -773,10 +771,7 @@ class Database(AbstractWidget):
         self.lib.map_db_profiles(pks)
         self.lib.raise_plot_window()
 
-    def show_stats(self) -> None:
-        self.update_table(with_stats=True)
-
-    def update_table(self, with_stats: bool = False):
+    def update_table(self):
 
         self.lib.progress.start(title="Sound Speed Profiles", text="Loading casts", init_value=5)
 
@@ -805,10 +800,12 @@ class Database(AbstractWidget):
                 except (ValueError, TypeError):
                     return True
 
+        with_stats = self.btn_show_stats.isChecked()
+
         if with_stats:
             labels = ['id', 'time', 'location',
                       'sensor', 'probe',
-                      'ss@min depth', 'min depth', 'mean speed',
+                      'ss@min depth', 'min depth', 'avg speed',
                       'max depth', 'max depth[raw]',
                       'original path', 'institution',
                       'survey', 'vessel', 'sn',
@@ -834,7 +831,7 @@ class Database(AbstractWidget):
         # prepare the table
         self.ssp_list.setSortingEnabled(False)
         self.ssp_list.clear()
-        self.ssp_list.setColumnCount(24)
+        self.ssp_list.setColumnCount(len(labels))
         self.ssp_list.setHorizontalHeaderLabels(labels)
 
         # populate the table

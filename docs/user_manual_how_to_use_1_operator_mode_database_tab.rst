@@ -96,7 +96,7 @@ The context menu provides access to different tools based on the number of selec
 Project and Profiles groups
 ---------------------------
 
-The *Project* group provides functionalaties to:
+The *Project* group provides functionalities to:
 
 * Create a new project (*New project* button).
 
@@ -107,6 +107,10 @@ The *Project* group provides functionalaties to:
 * Import data from an existing database to the current project (*Import data* button).
 
 * Open the folder that contains the project databases (*Open folder* button).
+
+* Show/hide some statistics (e.g., minimum and maximum depths) for all the casts (*Show stats* button).
+
+* Refresh the table with the casts from the database (*Refresh DB* button).
 
 From the *Profiles* group, it is possible to import (*Import profiles* button) or export (*Export profiles* button) multiple profiles.
 
