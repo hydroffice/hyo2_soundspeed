@@ -26,6 +26,7 @@ class Valeport(AbstractTextReader):
         Dicts.probe_types['MiniCTD']: Dicts.sensor_types["CTD"],        
         Dicts.probe_types['MONITOR CTD']: Dicts.sensor_types["CTD"],
         Dicts.probe_types['MONITOR SVP 500']: Dicts.sensor_types["SVPT"],
+        Dicts.probe_types['RapidPro CTD']: Dicts.sensor_types["CTD"],
         Dicts.probe_types['RapidSV']: Dicts.sensor_types["SVP"],
         Dicts.probe_types['RapidSVT']: Dicts.sensor_types["SVPT"],
         Dicts.probe_types['SWiFT']: Dicts.sensor_types["SVPT"],
@@ -85,6 +86,9 @@ class Valeport(AbstractTextReader):
 
         has_header = False
 
+        device_series = None
+        device_type = None
+
         for idx, line in enumerate(self.lines):
 
             line = line.strip().upper()
@@ -127,6 +131,22 @@ class Valeport(AbstractTextReader):
                     continue
                 else:
                     raise RuntimeError("Unknown/unsupported instrument: %s" % line)
+
+            if tokens[0] == "DEVICESERIES":
+                if tokens[1] == "RAPIDPRO":
+                    device_series = "RAPIDPRO"
+                    if (device_series == "RAPIDPRO") and (device_type == "CTD"):
+                        self.ssp.cur.meta.probe_type = Dicts.probe_types['RapidPro CTD']
+                        self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
+                continue
+
+            if tokens[0] == "DEVICETYPE":
+                if tokens[1] == "CTDF":
+                    device_type = "CTD"
+                    if (device_series == "RAPIDPRO") and (device_type == "CTD"):
+                        self.ssp.cur.meta.probe_type = Dicts.probe_types['RapidPro CTD']
+                        self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
+                continue
 
             if tokens[0] in ["INSTRUMENTCODE", "SERIAL_NUMBER"]:
                 try:

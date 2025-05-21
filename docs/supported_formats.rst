@@ -39,6 +39,7 @@ Turo (.nc)                                          X
 UNB (.unb)                                          X    X
 Valeport Midas/Monitor SVP/SVX2 (.000)              X
 Valeport MiniSVP/MiniCTD (.txt)                     X
+Valeport RapidPro CTD (.vp2)                        X
 Valeport RapidSV/SVT (.txt)                         X
 Valeport Monitor CTD, Midas SVP/SVX2 (.vpd)         X
 Valeport SWiFT SVP/CTD (.vp2)                       X

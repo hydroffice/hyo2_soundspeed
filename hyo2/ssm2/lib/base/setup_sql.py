@@ -39,14 +39,15 @@ institution_list = [
     "UNH CCOM/JHC"
 ]
 
+default_use_woa_09 = 1
+default_use_woa_13 = 0
+default_use_woa_18 = 0
+default_use_woa_23 = 0
+default_use_rtofs = 0
+default_use_gomofs = 0
+
 if PkgHelper.is_pydro():
     logger.debug("using pydro setup")
-    default_use_woa_09 = 1
-    default_use_woa_13 = 0
-    default_use_woa_18 = 0
-    default_use_woa_23 = 0
-    default_use_rtofs = 0
-    default_use_gomofs = 0
     default_custom_woa09_folder = PkgHelper.hstb_woa09_folder()
     default_custom_woa13_folder = PkgHelper.hstb_woa13_folder()
     default_custom_woa18_folder = PkgHelper.hstb_woa18_folder()
@@ -55,12 +56,6 @@ if PkgHelper.is_pydro():
     default_default_institution = institution_list[0]
 
 else:
-    default_use_woa_09 = 1
-    default_use_woa_13 = 0
-    default_use_woa_18 = 0
-    default_use_woa_23 = 0
-    default_use_rtofs = 0
-    default_use_gomofs = 0
     default_custom_woa09_folder = ""
     default_custom_woa13_folder = ""
     default_custom_woa18_folder = ""
@@ -183,8 +178,28 @@ DROP_SETTINGS_VIEW = """-- noinspection SqlResolveForFile
 
 # ALTER TABLES/VIEWS
 
+ALTER_OLD_SETTINGS_USE_NMEA_0183 = """-- noinspection SqlResolveForFile
+    ALTER TABLE general_old ADD COLUMN use_nmea_0183 INTEGER DEFAULT 0
+"""
+
+ALTER_OLD_SETTINGS_NMEA_LISTEN_PORT = """-- noinspection SqlResolveForFile
+    ALTER TABLE general_old ADD COLUMN nmea_listen_port INTEGER DEFAULT 2006
+"""
+
+ALTER_OLD_SETTINGS_NMEA_LISTEN_TIMEOUT = """-- noinspection SqlResolveForFile
+    ALTER TABLE general_old ADD COLUMN nmea_listen_timeout INTEGER DEFAULT 10
+"""
+
+ALTER_OLD_SETTINGS_USE_WOA18 = """-- noinspection SqlResolveForFile
+    ALTER TABLE general_old ADD COLUMN use_woa18 INTEGER DEFAULT 0
+"""
+
 ALTER_OLD_SETTINGS_USE_WOA23 = """-- noinspection SqlResolveForFile
     ALTER TABLE general_old ADD COLUMN use_woa23 INTEGER DEFAULT 0
+"""
+
+ALTER_OLD_SETTINGS_CUSTOM_WOA18_FOLDER = """-- noinspection SqlResolveForFile
+    ALTER TABLE general_old ADD COLUMN custom_woa18_folder TEXT DEFAULT ''
 """
 
 ALTER_OLD_SETTINGS_CUSTOM_WOA23_FOLDER = """-- noinspection SqlResolveForFile

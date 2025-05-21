@@ -97,6 +97,7 @@ class Dicts:
         ('MIDAS SVP', 313),
         ('SWiFT CTD', 314),
         ('MiniCTD',315),
+        ('RapidPro CTD', 316),
         
         ('Future', 999),
 
