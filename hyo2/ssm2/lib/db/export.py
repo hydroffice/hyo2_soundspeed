@@ -35,6 +35,7 @@ class ExportDbFields:
             'sal_uom': True,
             'ss_at_mind': True,
             'min_depth': True,
+            'avg_speed': True,
             'max_depth': True,
             'max_raw_d': True,
             'POINT_X': True,
@@ -191,6 +192,11 @@ class ExportDb:
             if lyr.CreateField(field) != 0:
                 raise RuntimeError("Creating field failed.")
 
+        if self.filter_fields.fields['avg_speed']:
+            field = ogr.FieldDefn('avg_speed', ogr.OFTReal)
+            if lyr.CreateField(field) != 0:
+                raise RuntimeError("Creating field failed.")
+
         if self.filter_fields.fields['max_depth']:
             field = ogr.FieldDefn('max_depth', ogr.OFTReal)
             if lyr.CreateField(field) != 0:
@@ -233,7 +239,7 @@ class ExportDb:
             logger.error("%s" % e, exc_info=True)
             return False
 
-        rows = self.db.list_profiles()
+        rows = self.db.list_profiles(with_stats=True)
         if rows is None:
             raise RuntimeError("Unable to retrieve profiles. Empty database?")
         if len(rows) == 0:
@@ -323,13 +329,17 @@ class ExportDb:
                 if row[21]:
                     ft.SetField('min_depth', row[21])
 
-            if self.filter_fields.fields['max_depth']:
+            if self.filter_fields.fields['avg_speed']:
                 if row[22]:
-                    ft.SetField('max_depth', row[22])
+                    ft.SetField('avg_speed', row[22])
+
+            if self.filter_fields.fields['max_depth']:
+                if row[23]:
+                    ft.SetField('max_depth', row[23])
 
             if self.filter_fields.fields['max_raw_d']:
-                if row[23]:
-                    ft.SetField('max_raw_d', row[23])
+                if row[24]:
+                    ft.SetField('max_raw_d', row[24])
 
             pt = ogr.Geometry(ogr.wkbPoint)
             lat = row[2].y
