@@ -397,6 +397,8 @@ class Sis(AbstractListener):
 
         if self.sis5.mrz:
             echo_id = "%d_%d" % (self.sis5.mrz.sounder_id, self.sis5.mrz.system_id)
+        elif self.sis5.ssm:
+            echo_id = "%d_%d" % (self.sis5.ssm.sounder_id, self.sis5.ssm.system_id)
         elif self.sis5.spo:
             echo_id = "%d_%d" % (self.sis5.spo.sounder_id, self.sis5.spo.system_id)
         else:
