@@ -201,6 +201,8 @@ class Aml(AbstractTextReader):
         lon = None
         lat2 = None
         lon2 = None
+        fields = []
+        units = []
 
         for row_nr, line in enumerate(self.lines):
 
@@ -293,11 +295,14 @@ class Aml(AbstractTextReader):
                         fields = tokens[1].split(',')
                         for field_idx, field in enumerate(fields):
                             self.field_index[field.lower()] = field_idx
+                            if len(fields) == len(units):
+                                self.field_units[field.lower()] = units[field_idx]
 
                     if tokens[0].lower() == self._aml.units:
                         units = tokens[1].split(',')
                         for unit_idx, unit in enumerate(units):
-                            self.field_units[unit_idx] = unit.lower()
+                            if len(fields) == len(units):
+                                self.field_units[fields[unit_idx].lower()] = unit
 
             except ValueError:
                 traceback.print_exc()
@@ -347,7 +352,11 @@ class Aml(AbstractTextReader):
         if self._aml.cond in self.field_units:
             if self.field_units[self._aml.cond] == "mS/cm":
                 self._aml.cond_multi = 0.1
-            elif self.field_units[self._aml.cond] == "S/m":
+                self.field_units[self._aml.cond] = "S/m"
+            if self.field_units[self._aml.cond] == "uS/cm":
+                self._aml.cond_multi = 0.0001
+                self.field_units[self._aml.cond] = "S/m"
+            elif self.field_units[self._aml.cond] != "S/m":
                 logger.warning('unsupported UoM for conductivity: %s' % self.field_units[self._aml.cond])
                 del self.field_index[self._aml.cond]
         if self._aml.sal in self.field_units:
