@@ -11,7 +11,7 @@ app_media_path = os.path.join(app_path, "media")
 
 app_info = pkg_info.app_info(
     app_name="SSM-SIS",
-    app_version="1.2.0",
+    app_version="1.2.1",
     app_beta=True,
     app_url="https://www.hydroffice.org/ssm_sis/",
     app_latest_url="https://www.hydroffice.org/latest/ssm_sis.txt",
