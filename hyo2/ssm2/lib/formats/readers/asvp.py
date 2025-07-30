@@ -13,7 +13,7 @@ class Asvp(AbstractTextReader):
 
     def __init__(self):
         super(Asvp, self).__init__()
-        self.desc = "Konsgberg"
+        self.desc = "Kongsberg"
         self._ext.add('asvp')
 
         # header token
