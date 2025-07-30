@@ -161,7 +161,7 @@ class DataPlots(AbstractWidget):
             self.hbox = QtWidgets.QHBoxLayout()
             self.vbox.addLayout(self.hbox)
             # navigation
-            self.nav = NavToolbar(canvas=self.c, parent=self.top_widget, plot_win=self, prj=self.lib)
+            self.nav = NavToolbar(canvas=self.c, parent=self.top_widget, plot_win=self, prj=self.lib, debug=False)
             self.hbox.addWidget(self.nav)
 
         self.on_first_draw()

@@ -49,10 +49,11 @@ class NavToolbar(NavigationToolbar2QT):
     }
 
     def __init__(self, canvas: 'FigureCanvas', parent: QtWidgets.QWidget, plot_win: 'DataPlots',
-                 prj: 'SoundSpeedLibrary', coordinates: bool = True):
+                 prj: 'SoundSpeedLibrary', coordinates: bool = True, debug: bool = False):
 
         self.plot_win = plot_win
         self.prj = prj
+        self._debug = debug
 
         self._lastCursor: None | Cursors = None
         self._active: None | str = None
@@ -136,6 +137,8 @@ class NavToolbar(NavigationToolbar2QT):
             vbox.addWidget(self.mon_label)
             # vbox.addStretch()
 
+        self._debug and logger.debug(self.debug_info())
+
     # ################### Helper functions ###################
 
     def _icon(self, name: str) -> QtGui.QIcon:
@@ -167,6 +170,7 @@ class NavToolbar(NavigationToolbar2QT):
     def _update_buttons_checked(self) -> None:
         # sync button check states to match active mode
         logger.debug("Mode: %s" % self._active)
+
         self._actions['pan'].setChecked(self._active == 'PAN')
         self._actions['scale'].setChecked(self._active == 'SCALE')
         self._actions['zoom_in'].setChecked(self._active == 'ZOOM_IN')
@@ -174,6 +178,8 @@ class NavToolbar(NavigationToolbar2QT):
         self._actions['flag'].setChecked(self._active == 'FLAG')
         self._actions['unflag'].setChecked(self._active == 'UNFLAG')
         self._actions['insert'].setChecked(self._active == 'INSERT')
+
+        self._debug and logger.debug(self.debug_info())
 
     def mouse_move(self, event):
         self._update_cursor(event)
@@ -305,11 +311,19 @@ class NavToolbar(NavigationToolbar2QT):
 
     def reset(self) -> None:
         logger.debug("reset")
+
         self._lastCursor = None
         self._active = None
+        if self._id_press:
+            self.canvas.mpl_disconnect(self._id_press)
         self._id_press = None
+        if self._id_release:
+            self.canvas.mpl_disconnect(self._id_release)
         self._id_release = None
         self._xypress = None
+        if self._ids_flag:
+            for flag_id in self._ids_flag:
+                self.canvas.mpl_disconnect(flag_id)
         self._ids_flag = None
         self._flag_mode = None
         self._flag_start = None
@@ -318,6 +332,10 @@ class NavToolbar(NavigationToolbar2QT):
 
         self._pan_info = None
         self._zoom_info = None
+
+        self._debug and logger.debug(self.debug_info())
+
+        self._update_buttons_checked()
 
     def press(self, event: MouseEvent) -> None:
         # print("press", event.button)
@@ -394,7 +412,7 @@ class NavToolbar(NavigationToolbar2QT):
 
     def press_pan(self, event: MouseEvent) -> None:
         """Callback for mouse button press in pan/zoom mode."""
-        logger.debug("mode: %s" % self._active)
+        self._debug and logger.debug("mode: %s" % self._active)
 
         if (event.button not in [MouseButton.LEFT]
                 or event.x is None or event.y is None):
@@ -421,7 +439,7 @@ class NavToolbar(NavigationToolbar2QT):
             self._pan_info = self._PanInfo(button=MouseButton.LEFT, axes=axes, cid=id_drag)
 
     def drag_pan(self, event: MouseEvent) -> None:
-        logger.debug("mode: %s" % self._active)
+        self._debug and logger.debug("mode: %s" % self._active)
 
         """Callback for dragging in pan/zoom mode."""
         for ax in self._pan_info.axes:
@@ -974,3 +992,19 @@ class NavToolbar(NavigationToolbar2QT):
                         logger.info("missing legend to remove")
 
         self.canvas.draw_idle()
+
+    def debug_info(self) -> str:
+        info = (
+            "DEBUG INFO\n"
+            f"{self.mode=}\n"
+            f"{self._active=}\n"
+            f"{self._id_press=}\n"
+            f"{self._id_release=}\n"
+            f"{self._xypress=}\n"
+            f"{self._ids_flag=}\n"
+            f"{self._flag_mode=}\n"
+            f"{self._flag_start=}\n"
+            f"{self._flag_end=}\n"
+            f"{self.insert_sample=}\n"
+        )
+        return info
