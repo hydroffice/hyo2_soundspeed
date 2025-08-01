@@ -342,7 +342,7 @@ class Aml(AbstractTextReader):
                    (self._aml.temp3 in self.field_index)
 
         if self._aml.pressure in self.field_units:
-            if self.field_units[self._aml.pressure] != "dbar":
+            if self.field_units[self._aml.pressure] not in ["dbar", "dBar"]:
                 logger.warning('unsupported UoM for pressure: %s' % self.field_units[self._aml.pressure])
                 del self.field_index[self._aml.pressure]
         if self._aml.depth in self.field_units:
