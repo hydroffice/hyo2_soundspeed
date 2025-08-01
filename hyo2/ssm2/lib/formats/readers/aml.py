@@ -63,6 +63,7 @@ class Aml(AbstractTextReader):
                 self.temp = "temp"
                 self.temp2 = "tempct"
                 self.temp3 = "tempsv"
+                self.temp4 = "tempsvt"
                 self.cond = "cond"
                 self.cond_multi = 1.0
                 self.sal = "salinity"
@@ -339,7 +340,7 @@ class Aml(AbstractTextReader):
             self.ssp.cur.meta.original_path = self.fid.path
 
         has_temp = (self._aml.temp in self.field_index) or (self._aml.temp2 in self.field_index) or \
-                   (self._aml.temp3 in self.field_index)
+                   (self._aml.temp3 in self.field_index) or (self._aml.temp4 in self.field_index)
 
         if self._aml.pressure in self.field_units:
             if self.field_units[self._aml.pressure] not in ["dbar", "dBar"]:
@@ -375,6 +376,10 @@ class Aml(AbstractTextReader):
             if self.field_units[self._aml.temp3] != "C":
                 logger.warning('unsupported UoM for temperature: %s' % self.field_units[self._aml.temp3])
                 del self.field_index[self._aml.temp3]
+        if self._aml.temp4 in self.field_units:
+            if self.field_units[self._aml.temp4] != "C":
+                logger.warning('unsupported UoM for temperature: %s' % self.field_units[self._aml.temp4])
+                del self.field_index[self._aml.temp4]
         if self._aml.speed in self.field_units:
             if self.field_units[self._aml.speed] != "m/s":
                 logger.warning('unsupported UoM for sound speed: %s' % self.field_units[self._aml.speed])
@@ -388,13 +393,13 @@ class Aml(AbstractTextReader):
             raise RuntimeError('Unable to locate valid depth or pressure column')
 
         # logger.info(self.field_index)
-        if self._aml.speed2 in self.field_index:  # CalcSV -> CTD
-            self.ssp.cur.meta.sensor_type = Dicts.sensor_types['CTD']            
-        elif self._aml.speed in self.field_index:  # SV -> SV or SVT
+        if self._aml.speed in self.field_index:  # SV -> SV or SVT
             if has_temp:
                 self.ssp.cur.meta.sensor_type = Dicts.sensor_types['SVPT']
             else:
                 self.ssp.cur.meta.sensor_type = Dicts.sensor_types['SVP']
+        elif self._aml.speed2 in self.field_index:  # CalcSV -> CTD
+            self.ssp.cur.meta.sensor_type = Dicts.sensor_types['CTD']
         else:  # missing sound speed
             if has_temp:
                 self.ssp.cur.meta.sensor_type = Dicts.sensor_types['XBT']
@@ -716,6 +721,8 @@ class Aml(AbstractTextReader):
                     self.ssp.cur.data.temp[count] = float(data[self.field_index[self._aml.temp2]])
                 elif self._aml.temp3 in self.field_index:
                     self.ssp.cur.data.temp[count] = float(data[self.field_index[self._aml.temp3]])
+                elif self._aml.temp4 in self.field_index:
+                    self.ssp.cur.data.temp[count] = float(data[self.field_index[self._aml.temp4]])
             except ValueError:
                 logger.warning("invalid conversion parsing of line #%s" % (self.samples_offset + line_idx))
                 continue
