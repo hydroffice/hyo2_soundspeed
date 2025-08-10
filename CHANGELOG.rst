@@ -3,12 +3,19 @@ Changelog
 
 Main changes to Sound Speed Manager:
 
+Version 2025.4.2 (2025-08-10)
+-----------------------------
+
+- Added debugging mode by setting "SSM_DEBUG=1" as environmental variable.
+
+
 Version 2025.4.0 (2025-07-30)
 -----------------------------
 
 - Fixed bug with editing a profile (after the first import) in the Data Editor Tab.
 
 - Fixed bug in AML driver related to specific units of measure for conductivity.
+
 
 Version 2025.3.3 (2025-06-24)
 -----------------------------

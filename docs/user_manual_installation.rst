@@ -94,3 +94,14 @@ be unzipped under the same folder (e.g., :numref:`data_monitor_tool_tab`).
 
 .. note:: If a previous version of the application was installed, *Sound Speed Manager* will try to localize past
     installations of WOA databases (WOA09, WOA13, WOA18 and WOA23).
+
+
+Troubleshooting
+===============
+
+In case of issues, it may be useful to run SSM in debugging mode.
+
+To activate the debugging mode, you need to:
+
+* Create a *SSM_DEBUG* environment variable and assign *1* as value.
+* Restart SSM.

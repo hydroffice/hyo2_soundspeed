@@ -3,10 +3,11 @@ import math
 import os
 import sys
 import traceback
-from datetime import datetime
+from datetime import datetime, UTC
 from urllib.request import urlopen
 
 from PySide6 import QtCore, QtGui, QtWidgets
+
 
 from hyo2.abc2.app.pkg_info.pkg_exception.pkg_exception_dialog import PkgExceptionDialog
 from hyo2.abc2.app.pkg_info.pkg_info_tab import PkgInfoTab
@@ -28,7 +29,7 @@ class MainWin(QtWidgets.QMainWindow):
     def __init__(self, use_sdm4: bool = False):
         QtWidgets.QMainWindow.__init__(self)
 
-        logger.info("* > APP: initializing ...")
+        os.environ.get("SSM_DEBUG") and logger.info("Main Windows init ...")
 
         # set the application name and the version
         self.name = app_info.app_name
@@ -151,11 +152,6 @@ class MainWin(QtWidgets.QMainWindow):
                                               QtGui.QIcon(os.path.join(app_info.app_media_path, 'server.png')), "")
         self.tabs.setTabToolTip(self.idx_server, "Synthetic Profile Server")
 
-        # refraction
-        # self.tab_refraction = Refraction(lib=self.lib, main_win=self)
-        # idx = self.tabs.insertTab(5, self.tab_refraction,
-        #                           QtGui.QIcon(os.path.join(app_info.app_media_path, 'refraction.png')), "")
-        # self.tabs.setTabToolTip(idx, "Refraction Monitor")
         # setup
         self.tab_setup = Settings(lib=self.lib, main_win=self)
         # noinspection PyArgumentList
@@ -219,7 +215,7 @@ class MainWin(QtWidgets.QMainWindow):
         # using in app tests
         self.skip_do_you_really_quit = False
 
-        logger.info("* > APP: initialized!")
+        os.environ.get("SSM_DEBUG") and logger.info("* > APP: initialized!")
 
     def on_change(self, i):
         # logger.debug("Current Tab Index: %s" % type(self.tabs.widget(i)))
@@ -253,11 +249,11 @@ class MainWin(QtWidgets.QMainWindow):
     def check_woa09(self):
         """ helper function that looks after WOA09 database"""
         if not self.lib.use_woa09():
-            logger.debug('WOA09: disabled by settings')
+            os.environ.get("SSM_DEBUG") and logger.debug('WOA09: disabled by settings')
             return
 
         if self.lib.has_woa09():
-            logger.debug('WOA09: enabled')
+            os.environ.get("SSM_DEBUG") and logger.debug('WOA09: enabled')
             return
 
         msg = 'The WOA09 atlas is required by some advanced application functions.\n\n' \
@@ -284,7 +280,7 @@ class MainWin(QtWidgets.QMainWindow):
             # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.information(self, "Sound Speed Manager - WOA09 Atlas", msg,
                                               QtWidgets.QMessageBox.StandardButton.Ok)
-            logger.debug('WOA09: disabled')
+            os.environ.get("SSM_DEBUG") and logger.debug('WOA09: disabled')
             return
 
         success = self.lib.download_woa09()
@@ -300,19 +296,19 @@ class MainWin(QtWidgets.QMainWindow):
             # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
             QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - WOA09 Atlas", msg,
                                           QtWidgets.QMessageBox.StandardButton.Ok)
-            logger.debug('WOA09: disabled')
+            os.environ.get("SSM_DEBUG") and logger.debug('WOA09: disabled')
             return
 
-        logger.debug('WOA09: enabled')
+        os.environ.get("SSM_DEBUG") and logger.debug('WOA09: enabled')
 
     def check_woa13(self):
         """ helper function that looks after WOA13 database"""
         if not self.lib.use_woa13():
-            logger.debug('WOA13: disabled by settings')
+            os.environ.get("SSM_DEBUG") and logger.debug('WOA13: disabled by settings')
             return
 
         if self.lib.has_woa13():
-            logger.debug('WOA13: enabled')
+            os.environ.get("SSM_DEBUG") and logger.debug('WOA13: enabled')
             return
 
         msg = 'The WOA13 atlas is required by some advanced application functions.\n\n' \
@@ -342,7 +338,7 @@ class MainWin(QtWidgets.QMainWindow):
             # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.information(self, "Sound Speed Manager - WOA13 Atlas", msg,
                                               QtWidgets.QMessageBox.StandardButton.Ok)
-            logger.debug('WOA13: disabled')
+            os.environ.get("SSM_DEBUG") and logger.debug('WOA13: disabled')
             return
 
         success = self.lib.download_woa13()
@@ -360,19 +356,19 @@ class MainWin(QtWidgets.QMainWindow):
             # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
             QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - WOA13 Atlas", msg,
                                           QtWidgets.QMessageBox.StandardButton.Ok)
-            logger.debug('WOA13: disabled')
+            os.environ.get("SSM_DEBUG") and logger.debug('WOA13: disabled')
             return
 
-        logger.debug('WOA13: enabled')
+        os.environ.get("SSM_DEBUG") and logger.debug('WOA13: enabled')
 
     def check_woa18(self):
         """ helper function that looks after WOA18 database"""
         if not self.lib.use_woa18():
-            logger.debug('WOA18: disabled by settings')
+            os.environ.get("SSM_DEBUG") and logger.debug('WOA18: disabled by settings')
             return
 
         if self.lib.has_woa18():
-            logger.debug('WOA18: enabled')
+            os.environ.get("SSM_DEBUG") and logger.debug('WOA18: enabled')
             return
 
         msg = 'The WOA18 atlas is required by some advanced application functions.\n\n' \
@@ -402,7 +398,7 @@ class MainWin(QtWidgets.QMainWindow):
             # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.information(self, "Sound Speed Manager - WOA18 Atlas", msg,
                                               QtWidgets.QMessageBox.StandardButton.Ok)
-            logger.debug('WOA18: disabled')
+            os.environ.get("SSM_DEBUG") and logger.debug('WOA18: disabled')
             return
 
         success = self.lib.download_woa18()
@@ -420,19 +416,19 @@ class MainWin(QtWidgets.QMainWindow):
             # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
             QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - WOA18 Atlas", msg,
                                           QtWidgets.QMessageBox.StandardButton.Ok)
-            logger.debug('WOA18: disabled')
+            os.environ.get("SSM_DEBUG") and logger.debug('WOA18: disabled')
             return
 
-        logger.debug('WOA18: enabled')
+        os.environ.get("SSM_DEBUG") and logger.debug('WOA18: enabled')
 
     def check_woa23(self):
         """ helper function that looks after WOA23 database"""
         if not self.lib.use_woa23():
-            logger.debug('WOA23: disabled by settings')
+            os.environ.get("SSM_DEBUG") and logger.debug('WOA23: disabled by settings')
             return
 
         if self.lib.has_woa23():
-            logger.debug('WOA23: enabled')
+            os.environ.get("SSM_DEBUG") and logger.debug('WOA23: enabled')
             return
 
         msg = 'The WOA23 atlas is required by some advanced application functions.\n\n' \
@@ -462,7 +458,7 @@ class MainWin(QtWidgets.QMainWindow):
             # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.information(self, "Sound Speed Manager - WOA23 Atlas", msg,
                                               QtWidgets.QMessageBox.StandardButton.Ok)
-            logger.debug('WOA23: disabled')
+            os.environ.get("SSM_DEBUG") and logger.debug('WOA23: disabled')
             return
 
         success = self.lib.download_woa23()
@@ -480,19 +476,19 @@ class MainWin(QtWidgets.QMainWindow):
             # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
             QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - WOA23 Atlas", msg,
                                           QtWidgets.QMessageBox.StandardButton.Ok)
-            logger.debug('WOA23: disabled')
+            os.environ.get("SSM_DEBUG") and logger.debug('WOA23: disabled')
             return
 
-        logger.debug('WOA233: enabled')
+        os.environ.get("SSM_DEBUG") and logger.debug('WOA233: enabled')
 
     def check_rtofs(self):
         """ helper function that looks after RTOFS connection"""
         if not self.lib.use_rtofs():
-            logger.debug('RTOFS: disabled by settings')
+            os.environ.get("SSM_DEBUG") and logger.debug('RTOFS: disabled by settings')
             return
 
         if self.lib.has_rtofs():
-            logger.debug('RTOFS: enabled')
+            os.environ.get("SSM_DEBUG") and logger.debug('RTOFS: enabled')
             return
 
         success = self.lib.download_rtofs()
@@ -505,10 +501,10 @@ class MainWin(QtWidgets.QMainWindow):
             # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
             QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - RTOFS Atlas", msg,
                                           QtWidgets.QMessageBox.StandardButton.Ok)
-            logger.debug('RTOFS: disabled')
+            os.environ.get("SSM_DEBUG") and logger.debug('RTOFS: disabled')
             return
 
-        logger.debug('RTOFS: enabled')
+        os.environ.get("SSM_DEBUG") and logger.debug('RTOFS: enabled')
 
     def check_sis(self):
         if self.lib.use_sis():
@@ -615,6 +611,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.statusBar().setStyleSheet(self.normal_stylesheet)
 
     def _check_latest_release(self):
+        os.environ.get("SSM_DEBUG") and logger.info("Checking latest release ...")
 
         new_release = False
         new_bugfix = False
@@ -636,19 +633,21 @@ class MainWin(QtWidgets.QMainWindow):
 
             self.release_checked = True
 
-        except Exception as _:
-            # logger.info("unable to check latest release (reason: %s)" % _)
+        except Exception as ex:
+            os.environ.get("SSM_DEBUG") and logger.info("Unable to check latest release (reason: %s)" % ex)
             return
 
         if new_release:
-            logger.info("new release available: %s" % latest_version)
+            logger.info("New release available: %s" % latest_version)
             self.releaseInfo.setText("New release available: %s" % latest_version)
             self.releaseInfo.setStyleSheet(self.red_stylesheet)
 
         elif new_bugfix:
-            logger.info("new bugfix available: %s" % latest_version)
+            logger.info("New bugfix available: %s" % latest_version)
             self.releaseInfo.setText("New bugfix available: %s" % latest_version)
             self.releaseInfo.setStyleSheet(self.yellow_stylesheet)
+
+        os.environ.get("SSM_DEBUG") and logger.info("Checking latest release ... DONE")
 
     def _update_gui_in_use(self) -> str:
         tokens = list()
@@ -684,11 +683,11 @@ class MainWin(QtWidgets.QMainWindow):
     def _update_gui_from_sis_nav(self, msg: str) -> str:
         self.old_sis_nav_data = False
         if self.lib.listeners.sis.nav_last_time is not None:
-            diff_time = datetime.utcnow() - self.lib.listeners.sis.nav_last_time
+            diff_time = datetime.now(UTC) - self.lib.listeners.sis.nav_last_time
             self.old_sis_nav_data = diff_time.total_seconds() > (self.lib.setup.sis_listen_timeout * 10)
             if self.old_sis_nav_data:
                 logger.warning("%s: navigation datagram is too old (%d seconds)"
-                               % (datetime.utcnow(), diff_time.total_seconds()))
+                               % (datetime.now(UTC), diff_time.total_seconds()))
 
         # time stamp
         msg += "time:"
@@ -730,11 +729,11 @@ class MainWin(QtWidgets.QMainWindow):
     def _update_gui_from_sis_xyz(self, msg: str) -> str:
         self.old_sis_xyz_data = False
         if self.lib.listeners.sis.xyz_last_time is not None:
-            diff_time = datetime.utcnow() - self.lib.listeners.sis.xyz_last_time
+            diff_time = datetime.now(UTC) - self.lib.listeners.sis.xyz_last_time
             self.old_sis_xyz_data = diff_time.total_seconds() > (self.lib.setup.sis_listen_timeout * 10)
             if self.old_sis_xyz_data:
                 logger.warning("%s: xyz datagram is too old (%d seconds)"
-                               % (datetime.utcnow(), diff_time.total_seconds()))
+                               % (datetime.now(UTC), diff_time.total_seconds()))
 
         if self.old_sis_xyz_data:
             msg += 'XYZ88 OLD [pinging?]'
@@ -772,11 +771,11 @@ class MainWin(QtWidgets.QMainWindow):
     def _update_gui_from_nmea_nav(self, msg: str) -> str:
         self.old_nmea_nav_data = False
         if self.lib.listeners.nmea.nav_last_time is not None:
-            diff_time = datetime.utcnow() - self.lib.listeners.nmea.nav_last_time
+            diff_time = datetime.now(UTC) - self.lib.listeners.nmea.nav_last_time
             self.old_nmea_nav_data = diff_time.total_seconds() > (self.lib.setup.nmea_listen_timeout * 10)
             if self.old_nmea_nav_data:
                 logger.warning("%s: navigation message is too old (%d seconds)"
-                               % (datetime.utcnow(), diff_time.total_seconds()))
+                               % (datetime.now(UTC), diff_time.total_seconds()))
 
         # position
         msg += "  -  pos:"
@@ -814,7 +813,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.setWindowTitle('%s v.%s [project: %s]' % (self.name, self.version, self.lib.current_project))
 
         # check release
-        if (self.timer_execs % 200 == 0) and not self.release_checked:
+        if (self.timer_execs % 200 == 5) and not self.release_checked:
             # logger.debug("timer executions: %d" % self.timer_execs)
             self._check_latest_release()
 
