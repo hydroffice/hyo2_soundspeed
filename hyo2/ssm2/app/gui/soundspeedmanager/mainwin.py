@@ -258,8 +258,7 @@ class MainWin(QtWidgets.QMainWindow):
 
         msg = 'The WOA09 atlas is required by some advanced application functions.\n\n' \
               'The data set (~120MB) can be retrieved from:\n' \
-              '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-              'gma72_usnh_edu/EaMqI1w9pplDsqCapeqJYYgBo0LP8CqHnkyXlDKkoHeBLg?e=4MEVzV&download=1\n' \
+              '   https://1drv.ms/u/c/3579835830bc10b0/EXg1dSjUVtlPkv1uN0KY3NEBoTCeO-IaQkfigxaTV7948w?e=TakkyO\n' \
               'then unzipped it into:\n' \
               '   %s\n\n' \
               'Do you want that I perform this operation for you?\n' \
@@ -272,8 +271,7 @@ class MainWin(QtWidgets.QMainWindow):
         if ret == QtWidgets.QMessageBox.StandardButton.No:
             msg = 'You can also manually install it. The steps are:\n' \
                   ' - download the archive from:\n' \
-                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-                  'gma72_usnh_edu/EaMqI1w9pplDsqCapeqJYYgBo0LP8CqHnkyXlDKkoHeBLg?e=4MEVzV&download=1\n' \
+                  '   https://1drv.ms/u/c/3579835830bc10b0/EXg1dSjUVtlPkv1uN0KY3NEBoTCeO-IaQkfigxaTV7948w?e=TakkyO\n' \
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
                   ' - restart Sound Speed Manager\n' % self.lib.woa09_folder
@@ -288,8 +286,7 @@ class MainWin(QtWidgets.QMainWindow):
             msg = 'Unable to retrieve the WOA09 atlas.\n\n ' \
                   'You may manually install it. The steps are:\n' \
                   ' - download the archive from:\n' \
-                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-                  'gma72_usnh_edu/EaMqI1w9pplDsqCapeqJYYgBo0LP8CqHnkyXlDKkoHeBLg?e=4MEVzV&download=1\n' \
+                  '   https://1drv.ms/u/c/3579835830bc10b0/EXg1dSjUVtlPkv1uN0KY3NEBoTCeO-IaQkfigxaTV7948w?e=TakkyO\n' \
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
                   ' - restart Sound Speed Manager\n' % self.lib.woa09_folder
@@ -313,10 +310,8 @@ class MainWin(QtWidgets.QMainWindow):
 
         msg = 'The WOA13 atlas is required by some advanced application functions.\n\n' \
               'The data set (~4GB) can be retrieved from:\n' \
-              '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-              'gma72_usnh_edu/ET4kv3t8CuBGuyHUqThonvMBMmxWp5f3ZTt08XG_u9COHQ?e=mVEJij&download=1\n' \
-              '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-              'gma72_usnh_edu/EXq15M1i-WBIkYmjALq6VSUBGuaZ7LoQqMBdG1jJYbjCcA?e=3v56kV&download=1\n' \
+              '   https://1drv.ms/u/c/3579835830bc10b0/EQXFY3rWGZlGsaarQnb6HvgBV_0GbdtNGmgTq02K52nuQw?e=ZdfR10\n' \
+              '   https://1drv.ms/u/c/3579835830bc10b0/Eau4zJisHeJFidaTzV0-MhkBOwxT-jRAQLPPXTueaBSYMw?e=HbqT2L\n' \
               'then unzipped it into:\n' \
               '   %s\n\n' \
               'Do you want that I perform this operation for you?\n' \
@@ -328,10 +323,8 @@ class MainWin(QtWidgets.QMainWindow):
         if ret == QtWidgets.QMessageBox.StandardButton.No:
             msg = 'You can also manually install it. The steps are:\n' \
                   ' - download the archive from (anonymous ftp):\n' \
-                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-                  'gma72_usnh_edu/ET4kv3t8CuBGuyHUqThonvMBMmxWp5f3ZTt08XG_u9COHQ?e=mVEJij&download=1\n' \
-                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-                  'gma72_usnh_edu/EXq15M1i-WBIkYmjALq6VSUBGuaZ7LoQqMBdG1jJYbjCcA?e=3v56kV&download=1\n' \
+                  '   https://1drv.ms/u/c/3579835830bc10b0/EQXFY3rWGZlGsaarQnb6HvgBV_0GbdtNGmgTq02K52nuQw?e=ZdfR10\n' \
+                  '   https://1drv.ms/u/c/3579835830bc10b0/Eau4zJisHeJFidaTzV0-MhkBOwxT-jRAQLPPXTueaBSYMw?e=HbqT2L\n' \
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
                   ' - restart Sound Speed Manager\n' % self.lib.woa13_folder
@@ -346,10 +339,8 @@ class MainWin(QtWidgets.QMainWindow):
             msg = 'Unable to retrieve the WOA13 atlas.\n\n ' \
                   'You may manually install it. The steps are:\n' \
                   ' - download the archive from (anonymous ftp):\n' \
-                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-                  'gma72_usnh_edu/ET4kv3t8CuBGuyHUqThonvMBMmxWp5f3ZTt08XG_u9COHQ?e=mVEJij&download=1\n' \
-                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-                  'gma72_usnh_edu/EXq15M1i-WBIkYmjALq6VSUBGuaZ7LoQqMBdG1jJYbjCcA?e=3v56kV&download=1\n' \
+                  '   https://1drv.ms/u/c/3579835830bc10b0/EQXFY3rWGZlGsaarQnb6HvgBV_0GbdtNGmgTq02K52nuQw?e=ZdfR10\n' \
+                  '   https://1drv.ms/u/c/3579835830bc10b0/Eau4zJisHeJFidaTzV0-MhkBOwxT-jRAQLPPXTueaBSYMw?e=HbqT2L\n' \
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
                   ' - restart Sound Speed Manager\n' % self.lib.woa13_folder
@@ -373,10 +364,8 @@ class MainWin(QtWidgets.QMainWindow):
 
         msg = 'The WOA18 atlas is required by some advanced application functions.\n\n' \
               'The data set (~4GB) can be retrieved from:\n' \
-              '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-              'gma72_usnh_edu/EfOHuG2a5TRHpFWyP4cXIHsBU5nnpngIHqXr43nGA2-FVg?e=RgfYWe&download=1\n' \
-              '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-              'gma72_usnh_edu/ETftTVRyTGNHrCKThnLoF0EB7WiG1YmVUN9Ly3OKqXO0qg?e=IFaveC&download=1\n' \
+              '   https://1drv.ms/u/c/3579835830bc10b0/EVKa9LZCIVhIsoEGwkP0d3cBuPooilizs8trzRsFRaF3YQ?e=4sklUP\n' \
+              '   https://1drv.ms/u/c/3579835830bc10b0/Ecfe-ndRsYhIt3U_hgrrj-kB55jLYZiJ81b8ZUnOr4cPTQ?e=GmsdDJ\n' \
               'then unzipped it into:\n' \
               '   %s\n\n' \
               'Do you want that I perform this operation for you?\n' \
@@ -388,10 +377,8 @@ class MainWin(QtWidgets.QMainWindow):
         if ret == QtWidgets.QMessageBox.StandardButton.No:
             msg = 'You can also manually install it. The steps are:\n' \
                   ' - download the archive from:\n' \
-                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-                  'gma72_usnh_edu/EfOHuG2a5TRHpFWyP4cXIHsBU5nnpngIHqXr43nGA2-FVg?e=RgfYWe&download=1\n' \
-                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-                  'gma72_usnh_edu/ETftTVRyTGNHrCKThnLoF0EB7WiG1YmVUN9Ly3OKqXO0qg?e=IFaveC&download=1\n' \
+                  '   https://1drv.ms/u/c/3579835830bc10b0/EVKa9LZCIVhIsoEGwkP0d3cBuPooilizs8trzRsFRaF3YQ?e=4sklUP\n' \
+                  '   https://1drv.ms/u/c/3579835830bc10b0/Ecfe-ndRsYhIt3U_hgrrj-kB55jLYZiJ81b8ZUnOr4cPTQ?e=GmsdDJ\n' \
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
                   ' - restart Sound Speed Manager\n' % self.lib.woa18_folder
@@ -406,10 +393,8 @@ class MainWin(QtWidgets.QMainWindow):
             msg = 'Unable to retrieve the WOA18 atlas.\n\n ' \
                   'You may manually install it. The steps are:\n' \
                   ' - download the archive from:\n' \
-                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-                  'gma72_usnh_edu/EfOHuG2a5TRHpFWyP4cXIHsBU5nnpngIHqXr43nGA2-FVg?e=RgfYWe&download=1\n' \
-                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-                  'gma72_usnh_edu/ETftTVRyTGNHrCKThnLoF0EB7WiG1YmVUN9Ly3OKqXO0qg?e=IFaveC&download=1\n' \
+                  '   https://1drv.ms/u/c/3579835830bc10b0/EVKa9LZCIVhIsoEGwkP0d3cBuPooilizs8trzRsFRaF3YQ?e=4sklUP\n' \
+                  '   https://1drv.ms/u/c/3579835830bc10b0/Ecfe-ndRsYhIt3U_hgrrj-kB55jLYZiJ81b8ZUnOr4cPTQ?e=GmsdDJ\n' \
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
                   ' - restart Sound Speed Manager\n' % self.lib.woa18_folder
@@ -433,10 +418,8 @@ class MainWin(QtWidgets.QMainWindow):
 
         msg = 'The WOA23 atlas is required by some advanced application functions.\n\n' \
               'The data set (~4GB) can be retrieved from:\n' \
-              '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-              'gma72_usnh_edu/EYRfBTuu-e9IlgiBYl_W5sEB0Ea6FVpLUmT26ic8ivHxqA?e=Wp5qYO&download=1\n' \
-              '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-              'gma72_usnh_edu/Eeuy-EBSbQVGm8w3B9WxiRkBrmDU38bdpK5je7YyNVo7Dw?e=v5eXqV&download=1\n' \
+              '   https://1drv.ms/u/c/3579835830bc10b0/EQ71R_-GothHgGWii3wuC3cB4yNJ4XxLmZlCrvHW8_Yz1Q?e=eoaSvW\n' \
+              '   https://1drv.ms/u/c/3579835830bc10b0/Ed9FWFOkxFhMmWcP1sgdFekBcEsqY9BU5wnB74LKoLEN4g?e=bcYJyC\n' \
               'then unzipped it into:\n' \
               '   %s\n\n' \
               'Do you want that I perform this operation for you?\n' \
@@ -448,10 +431,8 @@ class MainWin(QtWidgets.QMainWindow):
         if ret == QtWidgets.QMessageBox.StandardButton.No:
             msg = 'You can also manually install it. The steps are:\n' \
                   ' - download the archive from:\n' \
-                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-                  'gma72_usnh_edu/EYRfBTuu-e9IlgiBYl_W5sEB0Ea6FVpLUmT26ic8ivHxqA?e=Wp5qYO&download=1\n' \
-                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-                  'gma72_usnh_edu/Eeuy-EBSbQVGm8w3B9WxiRkBrmDU38bdpK5je7YyNVo7Dw?e=v5eXqV&download=1\n' \
+                  '   https://1drv.ms/u/c/3579835830bc10b0/EQ71R_-GothHgGWii3wuC3cB4yNJ4XxLmZlCrvHW8_Yz1Q?e=eoaSvW\n' \
+                  '   https://1drv.ms/u/c/3579835830bc10b0/Ed9FWFOkxFhMmWcP1sgdFekBcEsqY9BU5wnB74LKoLEN4g?e=bcYJyC\n' \
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
                   ' - restart Sound Speed Manager\n' % self.lib.woa23_folder
@@ -466,10 +447,8 @@ class MainWin(QtWidgets.QMainWindow):
             msg = 'Unable to retrieve the WOA23 atlas.\n\n ' \
                   'You may manually install it. The steps are:\n' \
                   ' - download the archive from:\n' \
-                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-                  'gma72_usnh_edu/EYRfBTuu-e9IlgiBYl_W5sEB0Ea6FVpLUmT26ic8ivHxqA?e=Wp5qYO&download=1\n' \
-                  '   https://universitysystemnh-my.sharepoint.com/:u:/g/personal/' \
-                  'gma72_usnh_edu/Eeuy-EBSbQVGm8w3B9WxiRkBrmDU38bdpK5je7YyNVo7Dw?e=v5eXqV&download=1\n' \
+                  '   https://1drv.ms/u/c/3579835830bc10b0/EQ71R_-GothHgGWii3wuC3cB4yNJ4XxLmZlCrvHW8_Yz1Q?e=eoaSvW\n' \
+                  '   https://1drv.ms/u/c/3579835830bc10b0/Ed9FWFOkxFhMmWcP1sgdFekBcEsqY9BU5wnB74LKoLEN4g?e=bcYJyC\n' \
                   ' - unzip the archive into:\n' \
                   '   %s\n' \
                   ' - restart Sound Speed Manager\n' % self.lib.woa23_folder

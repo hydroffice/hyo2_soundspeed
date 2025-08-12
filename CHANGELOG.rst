@@ -3,6 +3,13 @@ Changelog
 
 Main changes to Sound Speed Manager:
 
+Version 2025.4.4 (2025-08-12)
+-----------------------------
+
+- Added new urls for WOA zip files + hashes on website
+- Fixed bug with mixed types of timestamps
+
+
 Version 2025.4.2 (2025-08-10)
 -----------------------------
 

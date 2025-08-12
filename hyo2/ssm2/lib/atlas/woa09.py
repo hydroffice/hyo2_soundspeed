@@ -66,8 +66,7 @@ class Woa09(AbstractAtlas):
 
         try:
             od = OneDrive(show_progress=True, debug_mode=True, progress=self.prj.progress)
-            data_zip_src = "https://universitysystemnh-my.sharepoint.com/:u:/g/personal/" \
-                           "gma72_usnh_edu/EaMqI1w9pplDsqCapeqJYYgBo0LP8CqHnkyXlDKkoHeBLg?e=4MEVzV&download=1"
+            data_zip_src = "https://1drv.ms/u/c/3579835830bc10b0/EXg1dSjUVtlPkv1uN0KY3NEBoTCeO-IaQkfigxaTV7948w?e=TakkyO"
             data_zip_dst = os.path.abspath(os.path.join(self.data_folder, os.pardir, "woa09.red.zip"))
             od.get_file(file_src=data_zip_src, file_dst=data_zip_dst, unzip_it=True)
             return self.is_present()

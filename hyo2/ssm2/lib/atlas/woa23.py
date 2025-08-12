@@ -63,14 +63,12 @@ class Woa23(AbstractAtlas):
 
         try:  # TODO
             od = OneDrive(show_progress=True, debug_mode=True, progress=self.prj.progress)
-            data_zip_src = "https://universitysystemnh-my.sharepoint.com/:u:/g/personal/" \
-                           "gma72_usnh_edu/EYRfBTuu-e9IlgiBYl_W5sEB0Ea6FVpLUmT26ic8ivHxqA?e=Wp5qYO&download=1"
+            data_zip_src = "https://1drv.ms/u/c/3579835830bc10b0/EQ71R_-GothHgGWii3wuC3cB4yNJ4XxLmZlCrvHW8_Yz1Q?e=eoaSvW"
             data_zip_dst = os.path.abspath(os.path.join(self.data_folder, os.pardir, "woa23_temp.red.zip"))
             od.get_file(file_src=data_zip_src, file_dst=data_zip_dst, unzip_it=True)
 
             od = OneDrive(show_progress=True, debug_mode=True, progress=self.prj.progress)
-            data_zip_src = "https://universitysystemnh-my.sharepoint.com/:u:/g/personal/" \
-                           "gma72_usnh_edu/Eeuy-EBSbQVGm8w3B9WxiRkBrmDU38bdpK5je7YyNVo7Dw?e=v5eXqV&download=1"
+            data_zip_src = "https://1drv.ms/u/c/3579835830bc10b0/Ed9FWFOkxFhMmWcP1sgdFekBcEsqY9BU5wnB74LKoLEN4g?e=bcYJyC"
             data_zip_dst = os.path.abspath(os.path.join(self.data_folder, os.pardir, "woa23_sal.red.zip"))
             od.get_file(file_src=data_zip_src, file_dst=data_zip_dst, unzip_it=True)
 
