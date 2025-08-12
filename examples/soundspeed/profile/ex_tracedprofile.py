@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, UTC
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -38,7 +38,7 @@ def make_fake_ssp(bias=0.0, nr_samples=100):
     p.proc.flag[50:52] = Dicts.flags['filtered']
     p.meta.latitude = 43.13555
     p.meta.longitude = -70.9395
-    p.meta.utc_time = datetime.utcnow()
+    p.meta.utc_time = datetime.now(UTC)
     return p
 
 

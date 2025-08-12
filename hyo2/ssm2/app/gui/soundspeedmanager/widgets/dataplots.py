@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -582,7 +582,7 @@ class DataPlots(AbstractWidget):
         if self.lib.setup.client_list.last_tx_time and self.lib.use_sis():
             if len(msg) > 0:
                 msg += " "
-            delta = datetime.utcnow() - self.lib.setup.client_list.last_tx_time
+            delta = datetime.now(UTC) - self.lib.setup.client_list.last_tx_time
             msg += "[%dh %dm since cast time of last tx]" % (delta.days * 24 + delta.seconds // 3600,
                                                              (delta.seconds // 60) % 60)
         self.f.suptitle(msg)

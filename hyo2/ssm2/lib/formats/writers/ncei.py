@@ -159,7 +159,7 @@ class Ncei(AbstractWriter):
         # version.(CF / ACDD)
         self.root_group.Conventions = 'CF-1.6, ACDD-1.3'
         # RECOMMENDED - Creation date of this version of the data(netCDF).  Use ISO 8601:2004 for date and time. (ACDD)
-        self.root_group.date_created = '%s' % dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+        self.root_group.date_created = '%s' % dt.datetime.now(dt.UTC).strftime('%Y-%m-%dT%H:%M:%SZ')
         self.root_group.survey = '%s' % self.ssp.cur.meta.survey
         # RECOMMENDED - The name of the project(s) principally responsible for originating this data.
         # Multiple projects can be separated by commas.(ACDD)
@@ -290,10 +290,12 @@ class Ncei(AbstractWriter):
 
         self.root_group.close()
 
-    def _is_empty(self, data):
+    @staticmethod
+    def _is_empty(data):
         return data.min() == data.max()
 
-    def _not_empty(self, data):
+    @staticmethod
+    def _not_empty(data):
         return data.min() != data.max()
 
     def _miss_metadata(self):

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 import os
 import re
 import logging
@@ -340,7 +340,9 @@ class QtCallbacks(AbstractCallbacks):
 
                 # noinspection PyBroadException
                 try:
+                    # noinspection PyTypeChecker
                     default_lat = float(settings.value("last_lat"))
+                    # noinspection PyTypeChecker
                     default_lon = float(settings.value("last_lon"))
                 except Exception:
                     default_lat = 43.13555
@@ -388,7 +390,7 @@ class QtCallbacks(AbstractCallbacks):
 
     def ask_date(self) -> Optional[datetime]:
         """Ask user for date"""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         date_msg = "Enter date as DD/MM/YYYY [default: %s]:" % now.strftime("%d/%m/%Y")
         time_msg = "Enter time as HH:MM:SS [default: %s]:" % now.strftime("%H:%M:%S")
         dt = None
@@ -513,6 +515,7 @@ class QtCallbacks(AbstractCallbacks):
         settings = QtCore.QSettings()
         # noinspection PyBroadException
         try:
+            # noinspection PyTypeChecker
             last_tss = float(settings.value("last_tss"))
         except Exception:
             last_tss = 1500.0
@@ -532,6 +535,7 @@ class QtCallbacks(AbstractCallbacks):
         settings = QtCore.QSettings()
         # noinspection PyBroadException
         try:
+            # noinspection PyTypeChecker
             last_draft = float(settings.value("last_draft"))
         except Exception:
             last_draft = 8.0

@@ -1,5 +1,5 @@
 import time
-from datetime import datetime as dt
+from datetime import datetime as dt, UTC
 import logging
 from enum import IntEnum
 from PySide6 import QtWidgets
@@ -58,25 +58,25 @@ lib = SoundSpeedLibrary(progress=QtProgress(parent=mw), callbacks=QtCallbacks(pa
 # Choose test location
 tests = [
 
-    # (-19.1, 74.17, dt.utcnow()),              # Indian Ocean
-    # (72.852028, -67.315431, dt.utcnow())      # Baffin Bay
-    # (18.2648113, 16.1761115, dt.utcnow()),    # in land -> middle of Africa
-    # (39.725989, -104.967745, dt.utcnow())     # in land -> Denver, CO
-    # (37.985427, -76.311156, dt.utcnow()),     # Chesapeake Bay
-    # (39.162802, -75.278057, dt.utcnow()),     # Deleware Bay
-    # (43.026480, -70.318824, dt.utcnow()),     # offshore Portsmouth
-    # (40.662218, -74.049306, dt.utcnow())      # New York Harbor
-    # (30.382518, -81.573615, dt.utcnow())      # Mill Cove, St. Johns River
-    # (28.976225, -92.078882, dt. utcnow())     # Offshore Louisiana
-    # (27.762904, -82.557280, dt.utcnow())      # Tampa Bay
-    # (41.806023, -82.393283, dt.utcnow())      # Lake Erie
-    # (44.564914, -82.845794, dt.utcnow())      # Lake Huron
-    # (43.138573, -86.832183, dt.utcnow())      # Lake Michigan
-    # (43.753190, -76.826818, dt.utcnow())      # Lake Ontario
-    # (47.457546, -89.347715, dt.utcnow())      # Lake Superior
-    # (46.161403, -124.107396, dt.utcnow())     # Offshore of Colombia River
-    # (37.689510, -122.298514, dt.utcnow())     # San Francisco Bay
-    (37.779088, -124.209048, dt.utcnow())     # Offshore San Francisco (West Coast)
+    # (-19.1, 74.17, dt.now(UTC))               # Indian Ocean
+    # (72.852028, -67.315431, dt.now(UTC))      # Baffin Bay
+    # (18.2648113, 16.1761115, dt.now(UTC))     # in land -> middle of Africa
+    # (39.725989, -104.967745, dt.now(UTC))     # in land -> Denver, CO
+    # (37.985427, -76.311156, dt.now(UTC))      # Chesapeake Bay
+    # (39.162802, -75.278057, dt.now(UTC))      # Deleware Bay
+    # (43.026480, -70.318824, dt.now(UTC))      # offshore Portsmouth
+    # (40.662218, -74.049306, dt.now(UTC))      # New York Harbor
+    # (30.382518, -81.573615, dt.now(UTC))      # Mill Cove, St. Johns River
+    # (28.976225, -92.078882, dt.now(UTC))      # Offshore Louisiana
+    # (27.762904, -82.557280, dt.now(UTC))      # Tampa Bay
+    # (41.806023, -82.393283, dt.now(UTC))      # Lake Erie
+    # (44.564914, -82.845794, dt.now(UTC))      # Lake Huron
+    # (43.138573, -86.832183, dt.now(UTC))      # Lake Michigan
+    # (43.753190, -76.826818, dt.now(UTC))      # Lake Ontario
+    # (47.457546, -89.347715, dt.now(UTC))      # Lake Superior
+    # (46.161403, -124.107396, dt.now(UTC))     # Offshore of Colombia River
+    # (37.689510, -122.298514, dt.now(UTC))     # San Francisco Bay
+    (37.779088, -124.209048, dt.now(UTC))     # Offshore San Francisco (West Coast)
 ]
 
 if switch is ModelOptions.WOA09:
@@ -219,13 +219,13 @@ else:
 #
 #     # test today urls
 #     # noinspection PyProtectedMember
-#     temp_url, sal_url = lib.atlases.rtofs._build_check_urls(dt.utcnow())
+#     temp_url, sal_url = lib.atlases.rtofs._build_check_urls(dt.now(UTC))
 #     # noinspection PyProtectedMember
 #     logger.info("urls:\n- %s [%s]\n%s [%s]"
 #                 % (temp_url, lib.atlases.rtofs._check_url(temp_url), sal_url, lib.atlases.rtofs._check_url(sal_url)))
 #     # test yesterday urls
 #     # noinspection PyProtectedMember
-#     temp_url, sal_url = lib.atlases.rtofs._build_check_urls(dt.utcnow() - timedelta(days=1))
+#     temp_url, sal_url = lib.atlases.rtofs._build_check_urls(dt.now(UTC) - timedelta(days=1))
 #     # noinspection PyProtectedMember
 #     logger.info("urls:\n- %s [%s]\n%s [%s]"
 #                 % (temp_url, lib.atlases.rtofs._check_url(temp_url), sal_url, lib.atlases.rtofs._check_url(sal_url)))
@@ -234,13 +234,13 @@ else:
 #
 #     # test today urls
 #     # noinspection PyProtectedMember
-#     url = lib.atlases.gomofs._build_check_url(dt.utcnow())
+#     url = lib.atlases.gomofs._build_check_url(dt.now(UTC))
 #     # noinspection PyProtectedMember
 #     logger.info("url:\n- %s [%s]"
 #                 % (url, lib.atlases.gomofs._check_url(url)))
 #     # test yesterday urls
 #     # noinspection PyProtectedMember
-#     url = lib.atlases.gomofs._build_check_url(dt.utcnow() - timedelta(days=1))
+#     url = lib.atlases.gomofs._build_check_url(dt.now(UTC) - timedelta(days=1))
 #     # noinspection PyProtectedMember
 #     logger.info("url:\n- %s [%s]"
 #                 % (url, lib.atlases.gomofs._check_url(url)))

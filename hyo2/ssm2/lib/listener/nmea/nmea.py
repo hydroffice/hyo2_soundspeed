@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional, Union
 
 from hyo2.ssm2.lib.formats.nmea_0183.nmea_0183_gga import Nmea0183GGA
@@ -41,11 +41,11 @@ class Nmea(AbstractListener):
 
         if sentence_type == 'GGA':
             self.nav = Nmea0183GGA(this_data)
-            self.nav_last_time = datetime.utcnow()
+            self.nav_last_time = datetime.now(UTC)
 
         elif sentence_type == 'GLL':
             self.nav = Nmea0183GLL(this_data)
-            self.nav_last_time = datetime.utcnow()
+            self.nav_last_time = datetime.now(UTC)
 
     def __repr__(self):
         msg = "%s" % super(Nmea, self).__repr__()

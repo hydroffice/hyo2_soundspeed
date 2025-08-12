@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 import os
 import random
 import logging
@@ -28,7 +28,7 @@ class FakeCallbacks(AbstractCallbacks):
         return "Hello world", True
 
     def ask_date(self) -> Optional[datetime]:
-        return datetime.utcnow()
+        return datetime.now(UTC)
 
     def ask_location(self, default_lat: Optional[float] = 43.13555, default_lon: Optional[float] = -70.9395) -> tuple:
         # noinspection PyBroadException

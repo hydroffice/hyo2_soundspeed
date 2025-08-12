@@ -3,7 +3,7 @@ import csv
 import numpy as np
 from netCDF4 import Dataset
 import logging
-from datetime import datetime as dt
+from datetime import datetime as dt, UTC
 from typing import Union, TYPE_CHECKING
 
 from hyo2.abc2.lib.onedrive import OneDrive
@@ -32,8 +32,8 @@ class Woa13(AbstractAtlas):
         self.s = list()
         self.landsea = None
 
-        self.lat = None
-        self.lon = None
+        self.lat: np.ndarray | None = None
+        self.lon: np.ndarray | None = None
         self.lat_step = 0.25
         self.lon_step = 0.25
         self.num_levels = None
@@ -154,14 +154,17 @@ class Woa13(AbstractAtlas):
     def query(self, lat: float, lon: float, dtstamp: Union[dt, None] = None, server_mode: bool = False):
         """Query WOA13 for passed location and timestamp"""
         if dtstamp is None:
-            dtstamp = dt.utcnow()
+            dtstamp = dt.now(UTC)
         if not isinstance(dtstamp, dt):
             raise RuntimeError("invalid datetime passed: %s" % type(dtstamp))
         logger.debug("query: %s @ (%.6f, %.6f)" % (dtstamp, lon, lat))
 
         # check the inputs
-        if (lat is None) or (lon is None) or (dtstamp is None):
+        if (lat is None) or (lon is None):
             logger.error("invalid query: %s @ (%s, %s)" % (dtstamp.strftime("%Y/%m/%d %H:%M:%S"), lon, lat))
+            return None
+        if dtstamp is None:
+            logger.error("invalid query: %s @ (%s, %s)" % (dtstamp, lon, lat))
             return None
 
         if not self.has_data_loaded:

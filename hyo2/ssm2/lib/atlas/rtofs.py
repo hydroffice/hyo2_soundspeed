@@ -1,6 +1,6 @@
 import math
 import os.path
-from datetime import datetime as dt, date, timedelta
+from datetime import datetime as dt, date, timedelta, UTC
 import logging
 import shutil
 from typing import TYPE_CHECKING
@@ -165,6 +165,7 @@ class Rtofs(AbstractAtlas):
                 progress.update(value=50)
                 with requests.get(url_ck_temp, stream=True) as r:
                     with open(loc_path_temp, 'wb') as f:
+                        # noinspection PyTypeChecker
                         shutil.copyfileobj(r.raw, f)
             self._file_temp = Dataset(loc_path_temp)
 
@@ -177,6 +178,7 @@ class Rtofs(AbstractAtlas):
                 progress.update(value=75)
                 with requests.get(url_ck_sal, stream=True) as r:
                     with open(loc_path_sal, 'wb') as f:
+                        # noinspection PyTypeChecker
                         shutil.copyfileobj(r.raw, f)
             self._file_sal = Dataset(loc_path_sal)
 
@@ -199,7 +201,7 @@ class Rtofs(AbstractAtlas):
     def download_db(self, dtstamp: dt | None = None, server_mode: bool = False) -> bool:
         """try to connect and load info from the data set"""
         if dtstamp is None:
-            dtstamp = dt.utcnow()
+            dtstamp = dt.now(UTC)
 
         if not self._download_files(datestamp=dtstamp, server_mode=server_mode):
             return False
@@ -255,7 +257,7 @@ class Rtofs(AbstractAtlas):
     def query(self, lat: float | None, lon: float | None, dtstamp: dt | None = None, server_mode: bool = False):
         """Query RTOFS for passed location and timestamp"""
         if dtstamp is None:
-            dtstamp = dt.utcnow()
+            dtstamp = dt.now(UTC)
 
         # check the inputs
         if (lat is None) or (lon is None):

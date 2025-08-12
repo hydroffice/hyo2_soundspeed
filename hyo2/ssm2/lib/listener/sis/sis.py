@@ -5,7 +5,7 @@ import socket
 import struct
 import time
 import traceback
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional, Union
 
 from hyo2.ssm2.lib.listener.abstract import AbstractListener
@@ -280,7 +280,7 @@ class Sis(AbstractListener):
         elif self.cur_id == 0x50:
             self.sis4.nav = km.KmNav(this_data)
             self.sis4.nav_count += 1
-            self.nav_last_time = datetime.utcnow()
+            self.nav_last_time = datetime.now(UTC)
             if self.debug:
                 logger.debug("Parsed")
 
@@ -305,7 +305,7 @@ class Sis(AbstractListener):
         elif self.cur_id == 0x58:
             self.sis4.xyz88 = km.KmXyz88(this_data)
             self.sis4.xyz88_count += 1
-            self.xyz_last_time = datetime.utcnow()
+            self.xyz_last_time = datetime.now(UTC)
             if self.debug:
                 logger.debug("Parsed")
 
@@ -347,9 +347,9 @@ class Sis(AbstractListener):
                 return
             self.sis5.ssm = ssm
             self.sis5.ssm_count += 1
-            self.nav_last_time = datetime.utcnow()
+            self.nav_last_time = datetime.now(UTC)
             if not ssm.inactive_pinging:
-                self.xyz_last_time = datetime.utcnow()
+                self.xyz_last_time = datetime.now(UTC)
             if self.debug:
                 logger.debug("%s: Parsed" % self.cur_id)
 
@@ -360,7 +360,7 @@ class Sis(AbstractListener):
             if datagram_nr == 1:
                 self.sis5.mrz = kmall.KmallMRZ(this_data, self.debug)
                 self.sis5.mrz_count += 1
-                self.xyz_last_time = datetime.utcnow()
+                self.xyz_last_time = datetime.now(UTC)
                 if self.debug:
                     logger.info("%s: %d/%d -> Parsed" % (self.cur_id, datagram_nr, nr_of_datagrams))
             else:
@@ -373,7 +373,7 @@ class Sis(AbstractListener):
                 return
             self.sis5.spo = spo
             self.sis5.spo_count += 1
-            self.nav_last_time = datetime.utcnow()
+            self.nav_last_time = datetime.now(UTC)
             if self.debug:
                 logger.debug("%s: Parsed" % self.cur_id)
 

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 import random
 import logging
 
@@ -13,22 +13,22 @@ logger = logging.getLogger(__name__)
 
 
 def fresh_profile():
-    ssp = Profile()
+    profile = Profile()
     d = [random.gauss(val, .2) for val in np.arange(1.0, 51.0, 0.5)]
     vs = [random.gauss(val, 5.0) for val in np.arange(1450.0, 1550.0, 1.0)]
     t = [random.gauss(val, .2) for val in np.arange(15.0, 25.0, 0.1)]
     s = [random.gauss(val, .1) for val in np.arange(10.0, 60.0, 0.5)]
-    ssp.init_proc(len(d))
-    ssp.proc.depth = np.array(d)
-    ssp.proc.speed = np.array(vs)
-    ssp.proc.temp = np.array(t)
-    ssp.proc.sal = np.array(s)
+    profile.init_proc(len(d))
+    profile.proc.depth = np.array(d)
+    profile.proc.speed = np.array(vs)
+    profile.proc.temp = np.array(t)
+    profile.proc.sal = np.array(s)
     # ssp.proc.flag[40:50] = 1
     # ssp.proc.flag[50:70] = 2
-    ssp.meta.latitude = 43.13555
-    ssp.meta.longitude = -70.9395
-    ssp.meta.utc_time = datetime.utcnow()
-    return ssp
+    profile.meta.latitude = 43.13555
+    profile.meta.longitude = -70.9395
+    profile.meta.utc_time = datetime.now(UTC)
+    return profile
 
 
 ssp = fresh_profile()

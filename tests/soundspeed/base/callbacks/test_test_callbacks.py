@@ -19,16 +19,16 @@ class TestSoundSpeedTestCallbacks(unittest.TestCase):
         self.assertTrue(type(self.cb.ask_text()) is str)
 
     def test_ask_date(self):
-        from datetime import datetime as dt
-        self.assertEqual(self.cb.ask_date().year, dt.utcnow().year)
-        self.assertEqual(self.cb.ask_date().month, dt.utcnow().month)
-        self.assertEqual(self.cb.ask_date().day, dt.utcnow().day)
-        self.assertEqual(self.cb.ask_date().hour, dt.utcnow().hour)
-        self.assertEqual(self.cb.ask_date().minute, dt.utcnow().minute)
+        from datetime import datetime as dt, UTC
+        self.assertEqual(self.cb.ask_date().year, dt.now(UTC).year)
+        self.assertEqual(self.cb.ask_date().month, dt.now(UTC).month)
+        self.assertEqual(self.cb.ask_date().day, dt.now(UTC).day)
+        self.assertEqual(self.cb.ask_date().hour, dt.now(UTC).hour)
+        self.assertEqual(self.cb.ask_date().minute, dt.now(UTC).minute)
 
         import sys
         if (sys.platform == 'win32') or (os.name == "nt"):
-            self.assertEqual(self.cb.ask_date().second, dt.utcnow().second)
+            self.assertEqual(self.cb.ask_date().second, dt.now(UTC).second)
 
     def test_ask_location(self):
         loc = self.cb.ask_location()

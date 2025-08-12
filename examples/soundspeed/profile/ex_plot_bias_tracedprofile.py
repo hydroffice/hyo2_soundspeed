@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, UTC
 
 import numpy as np
 
@@ -29,7 +29,7 @@ def make_fake_ssp(bias=0.0):
     ssp.proc.sal = s
     ssp.meta.latitude = 43.13555
     ssp.meta.longitude = -70.9395
-    ssp.meta.utc_time = datetime.utcnow()
+    ssp.meta.utc_time = datetime.now(UTC)
     return ssp
 
 

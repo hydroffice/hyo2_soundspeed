@@ -150,7 +150,7 @@ class ProjectDb:
                 self.conn.execute("""
                                   INSERT INTO library VALUES (?, ?, ?)
                                   """, (self.cur_version, "%s v.%s" % (pkg_info.name, pkg_info.version),
-                                        datetime.datetime.utcnow(),))
+                                        datetime.datetime.now(datetime.UTC),))
 
             # check if the library version is old
             # noinspection SqlResolve
@@ -850,7 +850,7 @@ class ProjectDb:
         self.conn.execute("""
                           INSERT INTO library VALUES (?, ?, ?)
                           """, (self.cur_version, "%s v.%s" % (pkg_info.name, pkg_info.version),
-                                datetime.datetime.utcnow(),))
+                                datetime.datetime.now(datetime.UTC),))
 
     def __repr__(self) -> str:
         msg = "<%s>\n" % self.__class__.__name__

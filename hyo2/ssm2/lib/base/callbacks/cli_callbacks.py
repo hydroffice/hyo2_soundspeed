@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 import os
 import logging
 from typing import Optional
@@ -50,7 +50,7 @@ class CliCallbacks(AbstractCallbacks):
 
     def ask_date(self) -> Optional[datetime]:
         """Ask user for date"""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         date_msg = "Enter date as DD/MM/YYYY [default: %s]:" % now.strftime("%d/%m/%Y")
         time_msg = "Enter time as HH:MM:SS [default: %s]:" % now.strftime("%H:%M:%S")
         dt = None

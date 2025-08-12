@@ -100,7 +100,7 @@ class SeacatDialog(AbstractDialog):
     def set_com_label(self):
         self.com_label.setText(get_last_comport())
 
-    def on_download_selected(self, event=None):
+    def on_download_selected(self, _=None):
         self.download(selected=[])
 
     def on_download_last(self):
@@ -146,9 +146,11 @@ class SeacatDialog(AbstractDialog):
 
                         succeeded, _failed = self.download_from_seacat(cat, download_list, output_path)
                         for pth in succeeded:
+                            # noinspection PyBroadException
                             try:
                                 self.lib.import_data(data_path=pth, data_format="seabird")
                                 self.lib.store_data()
+                                # noinspection PyBroadException
                                 try:
                                     self.lib.filter_cur_data()
                                     self.lib.store_data()
@@ -253,13 +255,15 @@ class SeacatDialog(AbstractDialog):
         with AutoSeacat(progbar=self.progress) as cat:  # with auto-closes port even if an exception is thrown
             if cat.isOpen():
                 self.com_label.setText(cat.get_com_str())
+                # noinspection PyBroadException
                 try:
-                    msg = "Do you want to set the clock to " + datetime.datetime.utcnow().isoformat()
+                    msg = "Do you want to set the clock to " + datetime.datetime.now(datetime.UTC).isoformat()
                     # noinspection PyCallByClass
-                    ret = QtWidgets.QMessageBox.question(self, "Confirm Seacat Time Change", msg,
-                                                         QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
-                    if ret == QtWidgets.QMessageBox.Yes:
-                        cat.set_datetime(datetime.datetime.utcnow())
+                    ret = QtWidgets.QMessageBox.question(
+                        self, "Confirm Seacat Time Change", msg,
+                        QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+                    if ret == QtWidgets.QMessageBox.StandardButton.Yes:
+                        cat.set_datetime(datetime.datetime.now(datetime.UTC))
                 except Exception:
                     traceback.print_exc()
 
@@ -268,12 +272,13 @@ class SeacatDialog(AbstractDialog):
         logger.debug('precast setup ...')
         with AutoSeacat(progbar=self.progress) as cat:  # with auto-closes port even if an exception is thrown
             if cat.isOpen():
+                # noinspection PyBroadException
                 try:
-                    dt_now = datetime.datetime.utcnow()
+                    dt_now = datetime.datetime.now(datetime.UTC)
                     dt = cat.get_datetime()  # Get time refreshes the Status message -- voltages are included in status
                     diff = dt_now - dt
                     # see if time is more than 3 minutes off
-                    bSetTime = False
+                    b_set_time = False
                     if diff > datetime.timedelta(0, 3 * 60) or diff < datetime.timedelta(0, -3 * 60):
                         msg = """The Seacat time is %s
                             CPU time UTC is %s
@@ -282,22 +287,24 @@ class SeacatDialog(AbstractDialog):
                             Do you want to reset the Seacat time when initializing?""" % (dt.isoformat(),
                                                                                           dt_now.isoformat())
                         # noinspection PyCallByClass
-                        ret = QtWidgets.QMessageBox.question(self, "Time Mismatch", msg,
-                                                             QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
-                        if ret == QtWidgets.QMessageBox.Yes:
-                            bSetTime = True
+                        ret = QtWidgets.QMessageBox.question(
+                            self, "Time Mismatch", msg,
+                            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+                        if ret == QtWidgets.QMessageBox.StandardButton.Yes:
+                            b_set_time = True
 
                     # Getting the time refreshes the Status message -- voltages are included in status
                     volt_messages = cat.get_voltages()
                     # noinspection PyCallByClass
-                    ret = QtWidgets.QMessageBox.question(self, "Confirm Seacat Init",
-                                                         "Do you want to clear the Seacat memory now" +
-                                                         "\nAnd set the clock" * bSetTime + "?"
-                                                                                            "\n\nAlso - note the battery voltages:\n\n" + volt_messages,
-                                                         QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
-                    if ret == QtWidgets.QMessageBox.Yes:
-                        if bSetTime:
-                            cat.set_datetime(datetime.datetime.utcnow())
+                    ret = QtWidgets.QMessageBox.question(
+                        self, "Confirm Seacat Init",
+                        "Do you want to clear the Seacat memory now" +
+                        "\nAnd set the clock" * b_set_time + "?"
+                        "\n\nAlso - note the battery voltages:\n\n" + volt_messages,
+                        QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+                    if ret == QtWidgets.QMessageBox.StandardButton.Yes:
+                        if b_set_time:
+                            cat.set_datetime(datetime.datetime.now(datetime.UTC))
                         cat.init_logging()
 
                 except Exception:
@@ -313,11 +320,13 @@ class SeacatDialog(AbstractDialog):
             seabird_utils_exe = ""
 
         if not seabird_utils_exe:
+            # noinspection PyBroadException
             try:
                 rootkey = winreg.HKEY_CLASSES_ROOT
                 xmlconkey = winreg.CreateKey(rootkey, "xmlconFile\\shell\\edit\\command")
                 xmlcon_val = winreg.QueryValue(xmlconkey, "")
-                path_to_seabird_exe = xmlcon_val[:xmlcon_val.lower().find(".exe") + 4].replace("'", "").replace('"', "")
+                path_to_seabird_exe = (
+                    xmlcon_val[:xmlcon_val.lower().find(".exe") + 4].replace("'", "").replace('"', ""))
                 seabird_utils_exe = os.path.join(os.path.dirname(path_to_seabird_exe), "datcnvw.exe")
                 if seabird_utils_exe:
                     if not os.path.exists(seabird_utils_exe):
@@ -344,30 +353,31 @@ class SeacatDialog(AbstractDialog):
         else:
             # Make sure that calibration file is present.  Ask user if it's not
             # local first
-            datadirec = os.path.dirname(hexfile_path)
-            conname = sbe_serialcomms.get_confile_name(serial_num, datadirec)
-            if not conname:
+            data_direc = os.path.dirname(hexfile_path)
+            con_name = sbe_serialcomms.get_confile_name(serial_num, data_direc)
+            if not con_name:
                 loc = get_setting_string("Seacat/AlternateConFilePath", '')
-                conname = sbe_serialcomms.get_confile_name(serial_num, loc)
-                if not conname:
-                    conname = self.lib.cb.ask_filename(saving=False, key_name="Seacat/AlternateConFilePath",
+                con_name = sbe_serialcomms.get_confile_name(serial_num, loc)
+                if not con_name:
+                    con_name = self.lib.cb.ask_filename(saving=False, key_name="Seacat/AlternateConFilePath",
                                                        title="Find the config file for %s" % str(serial_num),
                                                        file_filter="Seacat Config Files (*.con *.xmlcon)")
-                    if conname:
-                        matches_convention = sbe_serialcomms.get_confile_name(serial_num, os.path.dirname(conname))
+                    if con_name:
+                        matches_convention = sbe_serialcomms.get_confile_name(serial_num, os.path.dirname(con_name))
                         if not matches_convention:
-                            better_name = os.path.join(datadirec, (serial_num + ".con"))
+                            better_name = os.path.join(data_direc, (serial_num + ".con"))
                             msg = "The config file selected doesn't fit the automatically recognized pattern.  " \
                                   "Do you want Sound Speed Manager to make a copy of the config with a name that  " \
                                   "will automatically be found next time?\n\nCopy+Rename to: %s" % better_name
                             # noinspection PyCallByClass
-                            ret = QtWidgets.QMessageBox.question(self, "Copy and Rename?", msg,
-                                                                 QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
-                            if ret == QtWidgets.QMessageBox.Yes:
-                                shutil.copyfile(conname, better_name)
+                            ret = QtWidgets.QMessageBox.question(
+                                self, "Copy and Rename?", msg,
+                                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+                            if ret == QtWidgets.QMessageBox.StandardButton.Yes:
+                                shutil.copyfile(con_name, better_name)
                     else:
                         title = "User Cancelled"
                         msg = "No seabird config file selected."
                         return False, [title, msg]
 
-            return True, conname
+            return True, con_name

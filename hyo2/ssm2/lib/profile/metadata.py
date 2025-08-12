@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, UTC
 import logging
 
 logger = logging.getLogger(__name__)
@@ -75,7 +75,7 @@ class Metadata:
         self._sn = value.strip()
 
     def update_proc_time(self):
-        self.proc_time = datetime.utcnow()
+        self.proc_time = datetime.now(UTC)
 
     def __repr__(self):
         msg = "  <Meta>\n"

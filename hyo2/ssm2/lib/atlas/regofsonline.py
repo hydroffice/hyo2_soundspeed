@@ -1,4 +1,4 @@
-from datetime import datetime as dt, timedelta
+from datetime import datetime as dt, timedelta, UTC
 from enum import IntEnum
 from http import client
 import logging
@@ -103,7 +103,7 @@ class RegOfsOnline(AbstractAtlas):
     def download_db(self, dtstamp: Union[dt, None] = None, server_mode: bool = False) -> bool:
         """try to connect and load info from the data set"""
         if dtstamp is None:
-            dtstamp = dt.utcnow()
+            dtstamp = dt.now(UTC)
         if not isinstance(dtstamp, dt):
             raise RuntimeError("invalid date passed: %s" % type(dtstamp))
 
@@ -140,7 +140,7 @@ class RegOfsOnline(AbstractAtlas):
         """Query OFS for passed location and timestamp"""
         original_datestamp = dtstamp
         if dtstamp is None:
-            dtstamp = dt.utcnow()
+            dtstamp = dt.now(UTC)
         if not isinstance(dtstamp, dt):
             raise RuntimeError("invalid date passed: %s" % type(dtstamp))
         logger.debug("query: %s @ (%.6f, %.6f)" % (dtstamp, lon, lat))
