@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 import logging
 import struct
 import numpy as np
@@ -70,7 +70,7 @@ class Kmall:
 
     @classmethod
     def kmall_datetime(cls, dgm_time_sec: int, dgm_time_nanosec: int = 0):
-        return datetime.utcfromtimestamp(dgm_time_sec) + \
+        return datetime.fromtimestamp(dgm_time_sec, tz=UTC) + \
                timedelta(microseconds=(dgm_time_nanosec / 1000.0))
 
     def __str__(self):

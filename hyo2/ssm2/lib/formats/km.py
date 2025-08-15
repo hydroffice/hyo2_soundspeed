@@ -144,7 +144,8 @@ class Km:
 
         try:
             return dt.datetime(int(date[0:4]), int(date[4:6]), int(date[6:8]),
-                               int(hours), int(minutes), int(seconds), micro_secs)
+                               int(hours), int(minutes), int(seconds), micro_secs,
+                               tzinfo=dt.UTC)
         except ValueError:
             return None
 
@@ -330,7 +331,7 @@ class KmSvpInput(Km):
         cast_time = self.input_datagram.split(",")[3]
 
         self.acquisition_time = dt.datetime(int(year), int(month), int(day), int(cast_time[0:2]), int(cast_time[2:4]),
-                                            int(cast_time[4:6]), 0)
+                                            int(cast_time[4:6]), 0, tzinfo=dt.UTC)
 
     def __str__(self):
         output = Km.__str__(self)
