@@ -99,6 +99,8 @@ be unzipped under the same folder (e.g., :numref:`data_monitor_tool_tab`).
 Troubleshooting
 ===============
 
+.. index:: debug, troubleshooting, SSM_DEBUG
+
 In case of issues, it may be useful to run SSM in *debug mode*.
 
 On Windows, you can activate the debug mode by:
