@@ -3,6 +3,12 @@ Changelog
 
 Main changes to Sound Speed Manager:
 
+Version 2025.4.6 (2025-08-17)
+-----------------------------
+
+- Improved AML driver in relation to pressure uom
+
+
 Version 2025.4.5 (2025-08-16)
 -----------------------------
 
