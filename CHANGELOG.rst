@@ -25,7 +25,7 @@ Version 2025.4.4 (2025-08-12)
 Version 2025.4.2 (2025-08-10)
 -----------------------------
 
-- Added debugging mode by setting "SSM_DEBUG=1" as environmental variable.
+- Added debug mode by setting "SSM_DEBUG=1" as environmental variable.
 
 
 Version 2025.4.0 (2025-07-30)

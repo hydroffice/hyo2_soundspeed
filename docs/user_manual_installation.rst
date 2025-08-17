@@ -99,9 +99,19 @@ be unzipped under the same folder (e.g., :numref:`data_monitor_tool_tab`).
 Troubleshooting
 ===============
 
-In case of issues, it may be useful to run SSM in debugging mode.
+In case of issues, it may be useful to run SSM in *debug mode*.
 
-To activate the debugging mode, you need to:
+On Windows, you can activate the debug mode by:
 
-* Create a *SSM_DEBUG* environment variable and assign *1* as value.
-* Restart SSM.
+* Opening the environmental variables for your account in the *Control Panel*.
+* Creating a *SSM_DEBUG* environment variable and assign *1* as value (e.g., :numref:`ssm_debug_creation`).
+* Restarting SSM.
+
+.. _ssm_debug_creation:
+.. figure:: ./_static/ssm_debug_creation.png
+    :width: 500px
+    :align: center
+    :alt: Creation of SSM_DEBUG environmental variable
+    :figclass: align-center
+
+    Creation of *SSM_DEBUG* environmental variable on Windows *Control Panel*.
