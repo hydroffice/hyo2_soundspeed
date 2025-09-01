@@ -3,10 +3,13 @@ import os
 import sys
 import traceback
 
-if os.environ.get("SSM_DEBUG"):
+debug_var = "SSM_DEBUG"
+ret = os.getenv(debug_var, "0") != "0"
+if ret:
+    print(debug_var)
     # noinspection PyUnresolvedReferences
     from hyo2.abc2.lib.debug_import import DebugImport
-    DebugImport(numpy=True, pyproj=True, gdal=True, qt=True, matplotlib=True, cartopy=True)
+    DebugImport(logging_name=debug_var, numpy=True, pyproj=True, gdal=True, qt=True, matplotlib=True, cartopy=False)
 
 from PySide6 import QtCore, QtWidgets, QtGui
 
