@@ -89,47 +89,75 @@ class Sis(AbstractListener):
     @ssp.setter
     def ssp(self, value: Union[km.KmSvp, kmall.KmallSVP, None]) -> None:
         if self.use_sis5:
+
             self.sis5.svp = value
+
         else:
+
             self.sis4.ssp = value
 
     def clear_ssp(self) -> None:
         if self.use_sis5:
+
             self.sis5.svp = None
+
         else:
+
             self.sis4.ssp = None
 
     @property
     def nav(self) -> Union[km.KmNav, kmall.KmallSPO, kmall.KmallSSM]:
         if self.use_sis5:
+
             if self.sis5.ssm:
                 return self.sis5.ssm
+
             return self.sis5.spo
+
         else:
+
             return self.sis4.nav
 
     def clear_nav(self) -> None:
         if self.use_sis5:
-            self.sis5.ssm = None
-            self.sis5.spo = None
+
+            if self.sis5.spo:
+                self.sis5.spo = None
+
+            if self.sis5.ssm:
+                self.sis5.ssm = None
+
         else:
-            self.sis4.nav = None
+
+            if self.sis4.nav:
+                self.sis4.nav = None
 
     @property
     def xyz(self) -> Union[km.KmXyz88, kmall.KmallMRZ, kmall.KmallSSM]:
         if self.use_sis5:
+
             if self.sis5.ssm:
                 return self.sis5.ssm
+
             return self.sis5.mrz
+
         else:
+
             return self.sis4.xyz88
 
     def clear_xyz(self) -> None:
         if self.use_sis5:
-            self.sis5.ssm = None
-            self.sis5.mrz = None
+
+            if self.sis5.ssm:
+                self.sis5.ssm = None
+
+            if self.sis5.mrz:
+                self.sis5.mrz = None
+
         else:
-            self.sis4.xyz88 = None
+
+            if self.sis4.xyz88:
+                self.sis4.xyz88 = None
 
     @property
     def xyz_transducer_depth(self) -> Optional[float]:

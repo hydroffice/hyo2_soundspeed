@@ -1,4 +1,5 @@
 import logging
+import os
 import time
 import traceback
 from datetime import datetime
@@ -317,7 +318,12 @@ class Server(Thread):
                     return False
 
             else:
-                self.prj.listeners.sis.clear_nav()
+                os.environ.get("SSM_DEBUG") and logger.debug("POS: %s, %s, %s" % (
+                    self.cur_tm, self.cur_lat, self.cur_lon))
+
+                # Commented to avoid issues when adding TSS
+                # self.prj.listeners.sis.clear_nav()
+
                 return True
 
     def _retrieve_cur_source_idx(self) -> bool:
@@ -375,6 +381,15 @@ class Server(Thread):
                     self.cur_tss_diff = abs(self.cur_tss - self.last_tx_tss)
             if self.prj.listeners.sis.xyz_transducer_depth:
                 self.cur_draft = self.prj.listeners.sis.xyz_transducer_depth
+
+            os.environ.get("SSM_DEBUG") and logger.debug("TSS: %s, %s [diff: %s]" % (
+                self.cur_tss, self.cur_draft, self.cur_tss_diff))
+
+            # Commented to avoid issues when adding TSS
+            # self.prj.listeners.sis.clear_nav()
+
+        # Commented to avoid issues when adding TSS
+        # self.prj.listeners.sis.clear_xyz()
 
     def _is_new_profile_required(self):
         source_idx_changed = (self.cur_lat_idx != self.last_lat_idx) or (self.cur_lon_idx != self.last_lon_idx)
