@@ -3,9 +3,10 @@ Changelog
 
 Main changes to Sound Speed Manager:
 
-Version 2025.X.Y (2025-MM-DD)
+Version 2025.4.8 (2025-09-03)
 -----------------------------
 
+- Skipped deletion of datagrams in Server Mode to avoid error with retrieving TSS from #SSM
 - Added file logging in SSM_DEBUG mode.
 
 
