@@ -138,6 +138,11 @@ class Valeport(AbstractTextReader):
                     if (device_series == "RAPIDPRO") and (device_type == "CTD"):
                         self.ssp.cur.meta.probe_type = Dicts.probe_types['RapidPro CTD']
                         self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
+                elif tokens[1] == "RAPID":
+                    device_series = "RAPID"
+                    if (device_series == "RAPID") and (device_type == "SVP"):
+                        self.ssp.cur.meta.probe_type = Dicts.probe_types['RapidSV']
+                        self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
                 continue
 
             if tokens[0] == "DEVICETYPE":
@@ -145,6 +150,11 @@ class Valeport(AbstractTextReader):
                     device_type = "CTD"
                     if (device_series == "RAPIDPRO") and (device_type == "CTD"):
                         self.ssp.cur.meta.probe_type = Dicts.probe_types['RapidPro CTD']
+                        self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
+                elif tokens[1] == "SV":
+                    device_type = "SVP"
+                    if (device_series == "RAPID") and (device_type == "SVP"):
+                        self.ssp.cur.meta.probe_type = Dicts.probe_types['RapidSV']
                         self.ssp.cur.meta.sensor_type = self.sensor_dict[self.ssp.cur.meta.probe_type]
                 continue
 

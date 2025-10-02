@@ -3,6 +3,12 @@ Changelog
 
 Main changes to Sound Speed Manager:
 
+Version 2025.4.9 (2025-10-02)
+-----------------------------
+
+- Extended Valeport driver to support RapidSV delivered as .vp2
+
+
 Version 2025.4.8 (2025-09-03)
 -----------------------------
 
