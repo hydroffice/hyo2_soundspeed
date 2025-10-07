@@ -6,7 +6,7 @@ import logging
 from datetime import datetime as dt, timezone
 from typing import Union, TYPE_CHECKING
 
-from hyo2.abc2.lib.onedrive import OneDrive
+from hyo2.abc2.lib.googledrive import GoogleDrive
 
 from hyo2.ssm2.lib.atlas.abstract import AbstractAtlas
 from hyo2.ssm2.lib.profile.profile import Profile
@@ -65,10 +65,10 @@ class Woa09(AbstractAtlas):
         logger.debug('downloading WOA9 atlas')
 
         try:
-            od = OneDrive(show_progress=True, debug_mode=True, progress=self.prj.progress)
-            data_zip_src = "https://1drv.ms/u/c/3579835830bc10b0/EXg1dSjUVtlPkv1uN0KY3NEBoTCeO-IaQkfigxaTV7948w?e=TakkyO"
+            gd = GoogleDrive(show_progress=True, debug_mode=True, progress=self.prj.progress)
+            data_zip_src = "https://drive.google.com/file/d/1RewMnTDjFtu2DMDvJpifka87gHL6hCYX/view?usp=sharing"
             data_zip_dst = os.path.abspath(os.path.join(self.data_folder, os.pardir, "woa09.red.zip"))
-            od.get_file(file_src=data_zip_src, file_dst=data_zip_dst, unzip_it=True)
+            gd.get_file(file_src=data_zip_src, file_dst=data_zip_dst, unzip_it=True)
             return self.is_present()
 
         except Exception as e:

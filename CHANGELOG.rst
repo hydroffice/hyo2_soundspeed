@@ -3,6 +3,12 @@ Changelog
 
 Main changes to Sound Speed Manager:
 
+Version 2025.4.10 (2025-10-08)
+------------------------------
+
+- Adopted GoogleDrive links for atlases
+
+
 Version 2025.4.9 (2025-10-02)
 -----------------------------
 

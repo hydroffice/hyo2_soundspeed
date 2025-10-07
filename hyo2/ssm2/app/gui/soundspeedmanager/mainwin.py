@@ -257,12 +257,12 @@ class MainWin(QtWidgets.QMainWindow):
             return
 
         msg = 'The WOA09 atlas is required by some advanced application functions.\n\n' \
-              'The data set (~120MB) can be retrieved from:\n' \
-              '   https://1drv.ms/u/c/3579835830bc10b0/EXg1dSjUVtlPkv1uN0KY3NEBoTCeO-IaQkfigxaTV7948w?e=TakkyO\n' \
-              'then unzipped it into:\n' \
+              'First download the archive (~120MB) from:\n' \
+              '   https://drive.google.com/file/d/1RewMnTDjFtu2DMDvJpifka87gHL6hCYX/view?usp=sharing\n' \
+              'then unzip the "woa09" folder from the archive into:\n' \
               '   %s\n\n' \
               'Do you want that I perform this operation for you?\n' \
-              'Internet connection is required!\n' % self.lib.woa09_folder
+              'Internet connection is required!\n' % os.path.dirname(self.lib.woa09_folder)
         # noinspection PyCallByClass,PyArgumentList,PyUnresolvedReferences
 
         ret = QtWidgets.QMessageBox.information(
@@ -271,10 +271,10 @@ class MainWin(QtWidgets.QMainWindow):
         if ret == QtWidgets.QMessageBox.StandardButton.No:
             msg = 'You can also manually install it. The steps are:\n' \
                   ' - download the archive from:\n' \
-                  '   https://1drv.ms/u/c/3579835830bc10b0/EXg1dSjUVtlPkv1uN0KY3NEBoTCeO-IaQkfigxaTV7948w?e=TakkyO\n' \
-                  ' - unzip the archive into:\n' \
+                  '   https://drive.google.com/file/d/1RewMnTDjFtu2DMDvJpifka87gHL6hCYX/view?usp=sharing\n' \
+                  ' - unzip the "woa09" folder from the archive into:\n' \
                   '   %s\n' \
-                  ' - restart Sound Speed Manager\n' % self.lib.woa09_folder
+                  ' - restart Sound Speed Manager\n' % os.path.dirname(self.lib.woa09_folder)
             # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.information(self, "Sound Speed Manager - WOA09 Atlas", msg,
                                               QtWidgets.QMessageBox.StandardButton.Ok)
@@ -286,10 +286,10 @@ class MainWin(QtWidgets.QMainWindow):
             msg = 'Unable to retrieve the WOA09 atlas.\n\n ' \
                   'You may manually install it. The steps are:\n' \
                   ' - download the archive from:\n' \
-                  '   https://1drv.ms/u/c/3579835830bc10b0/EXg1dSjUVtlPkv1uN0KY3NEBoTCeO-IaQkfigxaTV7948w?e=TakkyO\n' \
-                  ' - unzip the archive into:\n' \
+                  '   https://drive.google.com/file/d/1RewMnTDjFtu2DMDvJpifka87gHL6hCYX/view?usp=sharing\n' \
+                  ' - unzip the "woa09" folder from the archive into:\n' \
                   '   %s\n' \
-                  ' - restart Sound Speed Manager\n' % self.lib.woa09_folder
+                  ' - restart Sound Speed Manager\n' % os.path.dirname(self.lib.woa09_folder)
             # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
             QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - WOA09 Atlas", msg,
                                           QtWidgets.QMessageBox.StandardButton.Ok)
@@ -309,25 +309,25 @@ class MainWin(QtWidgets.QMainWindow):
             return
 
         msg = 'The WOA13 atlas is required by some advanced application functions.\n\n' \
-              'The data set (~4GB) can be retrieved from:\n' \
-              '   https://1drv.ms/u/c/3579835830bc10b0/EQXFY3rWGZlGsaarQnb6HvgBV_0GbdtNGmgTq02K52nuQw?e=ZdfR10\n' \
-              '   https://1drv.ms/u/c/3579835830bc10b0/Eau4zJisHeJFidaTzV0-MhkBOwxT-jRAQLPPXTueaBSYMw?e=HbqT2L\n' \
-              'then unzipped it into:\n' \
+              'First download the archive (~4GB) from:\n' \
+              '   https://drive.google.com/file/d/1oV9ZkUNXkxdtB6EKkMr1FFDB38b18RxI/view?usp=sharing\n' \
+              '   https://drive.google.com/file/d/15xTrwl_DoLbJbOe39fR9dtHraWyW9hqL/view?usp=sharing\n' \
+              'unzip the "woa13" folder from both archives into:\n' \
               '   %s\n\n' \
               'Do you want that I perform this operation for you?\n' \
-              'Internet connection is required!\n' % self.lib.woa13_folder
+              'Internet connection is required!\n' % os.path.dirname(self.lib.woa13_folder)
         # noinspection PyCallByClass,PyArgumentList,PyUnresolvedReferences
         ret = QtWidgets.QMessageBox.information(
             self, "Sound Speed Manager - WOA13 Atlas", msg,
             QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.No)
         if ret == QtWidgets.QMessageBox.StandardButton.No:
             msg = 'You can also manually install it. The steps are:\n' \
-                  ' - download the archive from (anonymous ftp):\n' \
-                  '   https://1drv.ms/u/c/3579835830bc10b0/EQXFY3rWGZlGsaarQnb6HvgBV_0GbdtNGmgTq02K52nuQw?e=ZdfR10\n' \
-                  '   https://1drv.ms/u/c/3579835830bc10b0/Eau4zJisHeJFidaTzV0-MhkBOwxT-jRAQLPPXTueaBSYMw?e=HbqT2L\n' \
-                  ' - unzip the archive into:\n' \
+                  ' - download the archive from:\n' \
+                  '   https://drive.google.com/file/d/1oV9ZkUNXkxdtB6EKkMr1FFDB38b18RxI/view?usp=sharing\n' \
+                  '   https://drive.google.com/file/d/15xTrwl_DoLbJbOe39fR9dtHraWyW9hqL/view?usp=sharing\n' \
+                  ' - unzip the "woa13" folder from both archives into:\n' \
                   '   %s\n' \
-                  ' - restart Sound Speed Manager\n' % self.lib.woa13_folder
+                  ' - restart Sound Speed Manager\n' % os.path.dirname(self.lib.woa13_folder)
             # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.information(self, "Sound Speed Manager - WOA13 Atlas", msg,
                                               QtWidgets.QMessageBox.StandardButton.Ok)
@@ -338,12 +338,12 @@ class MainWin(QtWidgets.QMainWindow):
         if not success:
             msg = 'Unable to retrieve the WOA13 atlas.\n\n ' \
                   'You may manually install it. The steps are:\n' \
-                  ' - download the archive from (anonymous ftp):\n' \
-                  '   https://1drv.ms/u/c/3579835830bc10b0/EQXFY3rWGZlGsaarQnb6HvgBV_0GbdtNGmgTq02K52nuQw?e=ZdfR10\n' \
-                  '   https://1drv.ms/u/c/3579835830bc10b0/Eau4zJisHeJFidaTzV0-MhkBOwxT-jRAQLPPXTueaBSYMw?e=HbqT2L\n' \
-                  ' - unzip the archive into:\n' \
+                  ' - download the archive from:\n' \
+                  '   https://drive.google.com/file/d/1oV9ZkUNXkxdtB6EKkMr1FFDB38b18RxI/view?usp=sharing\n' \
+                  '   https://drive.google.com/file/d/15xTrwl_DoLbJbOe39fR9dtHraWyW9hqL/view?usp=sharing\n' \
+                  ' - unzip the "woa13" folder from both archives into:\n' \
                   '   %s\n' \
-                  ' - restart Sound Speed Manager\n' % self.lib.woa13_folder
+                  ' - restart Sound Speed Manager\n' % os.path.dirname(self.lib.woa13_folder)
             # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
             QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - WOA13 Atlas", msg,
                                           QtWidgets.QMessageBox.StandardButton.Ok)
@@ -363,13 +363,13 @@ class MainWin(QtWidgets.QMainWindow):
             return
 
         msg = 'The WOA18 atlas is required by some advanced application functions.\n\n' \
-              'The data set (~4GB) can be retrieved from:\n' \
-              '   https://1drv.ms/u/c/3579835830bc10b0/EVKa9LZCIVhIsoEGwkP0d3cBuPooilizs8trzRsFRaF3YQ?e=4sklUP\n' \
-              '   https://1drv.ms/u/c/3579835830bc10b0/Ecfe-ndRsYhIt3U_hgrrj-kB55jLYZiJ81b8ZUnOr4cPTQ?e=GmsdDJ\n' \
-              'then unzipped it into:\n' \
+              'First download the archive (~4GB) from:\n' \
+              '   https://drive.google.com/file/d/1kVMAW3u7oQSykCEORUnPvwRLzfmS895J/view?usp=sharing\n' \
+              '   https://drive.google.com/file/d/1vecKtVK8PJyq1EWFLtizZmkNV6EU30Qi/view?usp=sharing\n' \
+              'unzip the "woa18" folder from both archives into:\n' \
               '   %s\n\n' \
               'Do you want that I perform this operation for you?\n' \
-              'Internet connection is required!\n' % self.lib.woa18_folder
+              'Internet connection is required!\n' % os.path.dirname(self.lib.woa18_folder)
         # noinspection PyCallByClass,PyArgumentList,PyUnresolvedReferences
         ret = QtWidgets.QMessageBox.information(
             self, "Sound Speed Manager - WOA18 Atlas", msg,
@@ -377,11 +377,11 @@ class MainWin(QtWidgets.QMainWindow):
         if ret == QtWidgets.QMessageBox.StandardButton.No:
             msg = 'You can also manually install it. The steps are:\n' \
                   ' - download the archive from:\n' \
-                  '   https://1drv.ms/u/c/3579835830bc10b0/EVKa9LZCIVhIsoEGwkP0d3cBuPooilizs8trzRsFRaF3YQ?e=4sklUP\n' \
-                  '   https://1drv.ms/u/c/3579835830bc10b0/Ecfe-ndRsYhIt3U_hgrrj-kB55jLYZiJ81b8ZUnOr4cPTQ?e=GmsdDJ\n' \
-                  ' - unzip the archive into:\n' \
+                  '   https://drive.google.com/file/d/1kVMAW3u7oQSykCEORUnPvwRLzfmS895J/view?usp=sharing\n' \
+                  '   https://drive.google.com/file/d/1vecKtVK8PJyq1EWFLtizZmkNV6EU30Qi/view?usp=sharing\n' \
+                  ' - unzip the "woa18" folder from both archives into:\n' \
                   '   %s\n' \
-                  ' - restart Sound Speed Manager\n' % self.lib.woa18_folder
+                  ' - restart Sound Speed Manager\n' % os.path.dirname(self.lib.woa18_folder)
             # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.information(self, "Sound Speed Manager - WOA18 Atlas", msg,
                                               QtWidgets.QMessageBox.StandardButton.Ok)
@@ -393,11 +393,11 @@ class MainWin(QtWidgets.QMainWindow):
             msg = 'Unable to retrieve the WOA18 atlas.\n\n ' \
                   'You may manually install it. The steps are:\n' \
                   ' - download the archive from:\n' \
-                  '   https://1drv.ms/u/c/3579835830bc10b0/EVKa9LZCIVhIsoEGwkP0d3cBuPooilizs8trzRsFRaF3YQ?e=4sklUP\n' \
-                  '   https://1drv.ms/u/c/3579835830bc10b0/Ecfe-ndRsYhIt3U_hgrrj-kB55jLYZiJ81b8ZUnOr4cPTQ?e=GmsdDJ\n' \
-                  ' - unzip the archive into:\n' \
+                  '   https://drive.google.com/file/d/1kVMAW3u7oQSykCEORUnPvwRLzfmS895J/view?usp=sharing\n' \
+                  '   https://drive.google.com/file/d/1vecKtVK8PJyq1EWFLtizZmkNV6EU30Qi/view?usp=sharing\n' \
+                  ' - unzip the "woa18" folder from both archives into:\n' \
                   '   %s\n' \
-                  ' - restart Sound Speed Manager\n' % self.lib.woa18_folder
+                  ' - restart Sound Speed Manager\n' % os.path.dirname(self.lib.woa18_folder)
             # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
             QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - WOA18 Atlas", msg,
                                           QtWidgets.QMessageBox.StandardButton.Ok)
@@ -417,13 +417,13 @@ class MainWin(QtWidgets.QMainWindow):
             return
 
         msg = 'The WOA23 atlas is required by some advanced application functions.\n\n' \
-              'The data set (~4GB) can be retrieved from:\n' \
-              '   https://1drv.ms/u/c/3579835830bc10b0/EQ71R_-GothHgGWii3wuC3cB4yNJ4XxLmZlCrvHW8_Yz1Q?e=eoaSvW\n' \
-              '   https://1drv.ms/u/c/3579835830bc10b0/Ed9FWFOkxFhMmWcP1sgdFekBcEsqY9BU5wnB74LKoLEN4g?e=bcYJyC\n' \
-              'then unzipped it into:\n' \
+              'First download the archive (~4GB) from:\n' \
+              '   https://drive.google.com/file/d/1n38NwV7oUjoaGtDtitJHkgTxh47sFUCo/view?usp=sharing\n' \
+              '   https://drive.google.com/file/d/1ie1_hNH4EbAJ51mReLj_a6KJmZUimR1H/view?usp=sharing\n' \
+              'unzip the "woa23" folder from both archives into:\n' \
               '   %s\n\n' \
               'Do you want that I perform this operation for you?\n' \
-              'Internet connection is required!\n' % self.lib.woa23_folder
+              'Internet connection is required!\n' % os.path.dirname(self.lib.woa23_folder)
         # noinspection PyCallByClass,PyArgumentList,PyUnresolvedReferences
         ret = QtWidgets.QMessageBox.information(
             self, "Sound Speed Manager - WOA23 Atlas", msg,
@@ -431,11 +431,11 @@ class MainWin(QtWidgets.QMainWindow):
         if ret == QtWidgets.QMessageBox.StandardButton.No:
             msg = 'You can also manually install it. The steps are:\n' \
                   ' - download the archive from:\n' \
-                  '   https://1drv.ms/u/c/3579835830bc10b0/EQ71R_-GothHgGWii3wuC3cB4yNJ4XxLmZlCrvHW8_Yz1Q?e=eoaSvW\n' \
-                  '   https://1drv.ms/u/c/3579835830bc10b0/Ed9FWFOkxFhMmWcP1sgdFekBcEsqY9BU5wnB74LKoLEN4g?e=bcYJyC\n' \
-                  ' - unzip the archive into:\n' \
+                  '   https://drive.google.com/file/d/1n38NwV7oUjoaGtDtitJHkgTxh47sFUCo/view?usp=sharing\n' \
+                  '   https://drive.google.com/file/d/1ie1_hNH4EbAJ51mReLj_a6KJmZUimR1H/view?usp=sharing\n' \
+                  ' - unzip the "woa23" folder from both archives into:\n' \
                   '   %s\n' \
-                  ' - restart Sound Speed Manager\n' % self.lib.woa23_folder
+                  ' - restart Sound Speed Manager\n' % os.path.dirname(self.lib.woa23_folder)
             # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.information(self, "Sound Speed Manager - WOA23 Atlas", msg,
                                               QtWidgets.QMessageBox.StandardButton.Ok)
@@ -447,11 +447,11 @@ class MainWin(QtWidgets.QMainWindow):
             msg = 'Unable to retrieve the WOA23 atlas.\n\n ' \
                   'You may manually install it. The steps are:\n' \
                   ' - download the archive from:\n' \
-                  '   https://1drv.ms/u/c/3579835830bc10b0/EQ71R_-GothHgGWii3wuC3cB4yNJ4XxLmZlCrvHW8_Yz1Q?e=eoaSvW\n' \
-                  '   https://1drv.ms/u/c/3579835830bc10b0/Ed9FWFOkxFhMmWcP1sgdFekBcEsqY9BU5wnB74LKoLEN4g?e=bcYJyC\n' \
-                  ' - unzip the archive into:\n' \
+                  '   https://drive.google.com/file/d/1n38NwV7oUjoaGtDtitJHkgTxh47sFUCo/view?usp=sharing\n' \
+                  '   https://drive.google.com/file/d/1ie1_hNH4EbAJ51mReLj_a6KJmZUimR1H/view?usp=sharing\n' \
+                  ' - unzip the "woa23" folder from both archives into:\n' \
                   '   %s\n' \
-                  ' - restart Sound Speed Manager\n' % self.lib.woa23_folder
+                  ' - restart Sound Speed Manager\n' % os.path.dirname(self.lib.woa23_folder)
             # noinspection PyCallByClass,PyArgumentList,PyTypeChecker
             QtWidgets.QMessageBox.warning(self, "Sound Speed Manager - WOA23 Atlas", msg,
                                           QtWidgets.QMessageBox.StandardButton.Ok)

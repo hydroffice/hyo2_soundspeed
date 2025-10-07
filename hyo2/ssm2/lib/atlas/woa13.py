@@ -6,7 +6,7 @@ import logging
 from datetime import datetime as dt, UTC
 from typing import Union, TYPE_CHECKING
 
-from hyo2.abc2.lib.onedrive import OneDrive
+from hyo2.abc2.lib.googledrive import GoogleDrive
 
 from hyo2.ssm2.lib.atlas.abstract import AbstractAtlas
 from hyo2.ssm2.lib.profile.profile import Profile
@@ -62,15 +62,15 @@ class Woa13(AbstractAtlas):
         logger.debug('downloading WOA13 atlas')
 
         try:
-            od = OneDrive(show_progress=True, debug_mode=True, progress=self.prj.progress)
-            data_zip_src = "https://1drv.ms/u/c/3579835830bc10b0/EQXFY3rWGZlGsaarQnb6HvgBV_0GbdtNGmgTq02K52nuQw?e=ZdfR10"
+            gd = GoogleDrive(show_progress=True, debug_mode=True, progress=self.prj.progress)
+            data_zip_src = "https://drive.google.com/file/d/15xTrwl_DoLbJbOe39fR9dtHraWyW9hqL/view?usp=sharing"
             data_zip_dst = os.path.abspath(os.path.join(self.data_folder, os.pardir, "woa13_temp.red.zip"))
-            od.get_file(file_src=data_zip_src, file_dst=data_zip_dst, unzip_it=True)
+            gd.get_file(file_src=data_zip_src, file_dst=data_zip_dst, unzip_it=True)
 
-            od = OneDrive(show_progress=True, debug_mode=True, progress=self.prj.progress)
-            data_zip_src = "https://1drv.ms/u/c/3579835830bc10b0/Eau4zJisHeJFidaTzV0-MhkBOwxT-jRAQLPPXTueaBSYMw?e=HbqT2L"
+            gd = GoogleDrive(show_progress=True, debug_mode=True, progress=self.prj.progress)
+            data_zip_src = "https://drive.google.com/file/d/1oV9ZkUNXkxdtB6EKkMr1FFDB38b18RxI/view?usp=sharing"
             data_zip_dst = os.path.abspath(os.path.join(self.data_folder, os.pardir, "woa13_sal.red.zip"))
-            od.get_file(file_src=data_zip_src, file_dst=data_zip_dst, unzip_it=True)
+            gd.get_file(file_src=data_zip_src, file_dst=data_zip_dst, unzip_it=True)
 
             return self.is_present()
 
