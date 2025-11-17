@@ -25,6 +25,7 @@ from .readers.seabird import Seabird
 from .readers.oceanscience import OceanScience
 from .readers.sippican import Sippican
 from .readers.sonardyne import Sonardyne
+from .readers.tsk import TSK
 from .readers.turo import Turo
 from .readers.unb import Unb
 from .readers.valeport import Valeport
@@ -51,6 +52,7 @@ readers.append(Seabird())
 # readers.append(Simrad())
 readers.append(Sippican())
 readers.append(Sonardyne())
+readers.append(TSK())
 readers.append(Turo())
 readers.append(Unb())
 readers.append(Valeport())

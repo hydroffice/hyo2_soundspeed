@@ -35,6 +35,7 @@ SAIV (.txt)                                         X
 Seabird (.cnv)                                      X
 Sippican (.edf)                                     X
 Sonardyne (.pro)                                    X    X
+TSK (.xbt)                                          X
 Turo (.nc)                                          X
 UNB (.unb)                                          X    X
 Valeport Midas/Monitor SVP/SVX2 (.000)              X

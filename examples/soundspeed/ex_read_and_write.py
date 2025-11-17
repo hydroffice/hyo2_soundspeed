@@ -27,15 +27,25 @@ logger.info('output folder: %s' % data_output)
 
 # test readers/writers
 logger.info('test: *** START ***')
-filters = ["aml", ]
-formats = ["caris", "csv", "elac", "hypack", "ixblue", "asvp/ssp", "qps", "sonardyne", "unb", ]
+filters = ["tsk", ]
+formats = [
+    "caris",
+    "csv",
+    "elac",
+    "hypack",
+    "ixblue",
+    "asvp/ssp",
+    "qps",
+    "sonardyne",
+    "unb",
+]
 data_outputs = dict()
 for format in formats:
     data_outputs[format] = data_output
 tests = testing.input_dict_test_files(inclusive_filters=filters)
-# print(tests)
+print(tests)
 
-reduced_testing = True
+reduced_testing = False
 
 # import each identified file
 for idx, testfile in enumerate(tests.keys()):

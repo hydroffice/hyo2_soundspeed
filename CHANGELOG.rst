@@ -3,6 +3,12 @@ Changelog
 
 Main changes to Sound Speed Manager:
 
+Version 2025.4.11 (2025-11-17)
+------------------------------
+
+- Added basic driver for TSK .xbt files
+
+
 Version 2025.4.10 (2025-10-08)
 ------------------------------
 

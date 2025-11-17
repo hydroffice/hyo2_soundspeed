@@ -29,7 +29,7 @@ logger.info('output folder: %s' % data_output)
 
 # test readers/writers
 logger.info('test: *** START ***')
-filters = ["aml", ]
+filters = ["tsk", ]
 tests = testing.input_dict_test_files(inclusive_filters=filters)
 # print(tests)
 
