@@ -6,21 +6,45 @@ Sound Speed Manager - SIS v5 interaction
 .. index:: SIS; v5
 .. index:: K-Controller
 
-SIS v5 is currently supported in two ways:
+SIS v5 is currently supported in two alternative ways:
 
-* Through the Data Distribution application (usually installed with SIS v5).
-* Using the dedicated *Sound Speed Manager (SSM) IP and port* field (**only for SIS v5.14+**).
+* Using the dedicated *Sound Speed Manager (SSM) IP and port* field **[supported since SIS v5.14]** (see :ref:`ssm_sis5_sis_settings_new_method`).
+* Through the Data Distribution application, usually installed with SIS v5 **[legacy method]** (see :ref:`ssm_sis5_sis_settings_old_method`).
 
-This method covers both cases:
+The description covers both of the following cases:
 
 * Sound Speed Manager and SIS v5 installed on the same machine.
 * Sound Speed Manager and SIS v5 installed on the different machines.
 
+.. _ssm_sis5_sis_settings_new_method:
 
-.. _ssm_sis5_sis_settings:
+SIS v5 settings using *Sound Speed Manager (SSM) IP and port* field
+-------------------------------------------------------------------
 
-SIS v5 settings (through Data Distribution)
--------------------------------------------
+This solution is available only in SIS 5.14 (and higher):
+
+* In the SIS *Tools* menu, open the *Parameter Setup*.
+* Navigate to the *sound speed* menu.
+* In the *Sound Speed Manager (SSM) IP and port* field (see :numref:`sis_sound_speed_menu_fig`), enter the IP address of the SSM workstation and the port number (e.g., 16103). If SIS and SSM are on the same computer, use: 127.0.0.1:16103
+* Restart SIS.
+
+.. _sis_sound_speed_menu_fig:
+
+.. figure:: ./_static/sis_sound_speed_menu.png
+    :width: 580px
+    :align: center
+    :alt: figure with SIS Sound Speed menu
+    :figclass: align-center
+
+    SSM datagram configuration in SIS.
+
+.. _ssm_sis5_sis_settings_old_method:
+
+SIS v5 settings through Data Distribution (*legacy method*)
+-----------------------------------------------------------
+
+.. note::
+    For a known bug in SIS 5.15.0, this solution does not work. Please use a different version of SIS (e.g., 5.15.1).
 
 Verify Data Distribution settings in SIS v5:
 
@@ -60,28 +84,6 @@ settings (see :numref:`data_dist_exe_fig`):
 .. warning::
     Data Distribution requires to have SIS v5 in execution.
     Setups with the K-Controller interacting with acquisition software different from SIS v5 are *currently* unsupported.
-
-.. _ssm_sis5_sis_settings_2:
-
-SIS v5 settings (using *Sound Speed Manager (SSM) IP and port* field)
----------------------------------------------------------------------
-
-This solution is available only in SIS 5.14 (and higher):
-
-* In the SIS *Tools* menu, open the *Parameter Setup*.
-* Navigate to the *sound speed* menu.
-* In the *Sound Speed Manager (SSM) IP and port* field (see :numref:`sis_sound_speed_menu_fig`), enter the IP address of the SSM workstation and the port number (e.g., 16103). If SIS and SSM are on the same computer, use: 127.0.0.1:16103
-* Restart SIS.
-
-.. _sis_sound_speed_menu_fig:
-
-.. figure:: ./_static/sis_sound_speed_menu.png
-    :width: 640px
-    :align: center
-    :alt: figure with SIS Sound Speed menu
-    :figclass: align-center
-
-    SSM datagram configuration in SIS.
 
 .. _ssm_sis5_ssm_settings:
 

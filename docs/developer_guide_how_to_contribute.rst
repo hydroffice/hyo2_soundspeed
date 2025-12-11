@@ -58,8 +58,8 @@ For other issues installing dependencies (e.g., `GDAL`_), you may want to use `A
 
 Good references for a working dev env are:
 
-* Windows: https://github.com/hydroffice/hyo2_soundspeed/raw/refs/heads/master/.github/workflows/ssm_on_windows.yml
-* Linux: https://github.com/hydroffice/hyo2_soundspeed/raw/refs/heads/master/.github/workflows/ssm_on_linux.yml
+* `Windows`_
+* `Linux`_
 
 
 .. _`short tutorial`: https://gist.github.com/giumas/67abeffcbf49d00703a57cbafac8b118
@@ -74,3 +74,5 @@ Good references for a working dev env are:
 .. _`hyo2.abc2`: https://github.com/hydroffice/hyo2_abc2
 .. _`GDAL`: https://github.com/OSGeo/gdal
 .. _`Anaconda`: https://docs.anaconda.com/anaconda/install/
+.. _`Windows`: https://github.com/hydroffice/hyo2_soundspeed/raw/refs/heads/master/.github/workflows/ssm_on_windows.yml
+.. _`Linux`: https://github.com/hydroffice/hyo2_soundspeed/raw/refs/heads/master/.github/workflows/ssm_on_linux.yml

@@ -75,10 +75,9 @@ Alternatively, it is also possible to adopt a manual installation procedure:
 * Unpack the atlas data sets at any path that SSM can have access to.
 * Modify the configuration file to point to the correct root path (see :ref:`possible_configurations`).
 
-By default, SSM looks for databases at:
+By default, SSM looks for databases at (e.g., :numref:`woa18_folders`):
 
-* "C:/Documents and Settings/**<username>**/Application Data/HydrOffice/Sound Speed/atlases/**[woa09|woa13|woa18|woa23]**" (Windows XP), or
-* "C:/Users/**<username>**/AppData/Local/HydrOffice/Sound Speed/atlases/**[woa09|woa13|woa18|woa23]**" (newer Windows OS)
+* C:\\Users\\ **<username>** \\AppData\\Local\\HydrOffice\\Sound Speed\\atlases\\ **[woa09|woa13|woa18|woa23]**
 
 .. _woa18_folders:
 .. figure:: ./_static/woa18_folders.png

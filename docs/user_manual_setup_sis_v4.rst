@@ -301,7 +301,7 @@ Manager's Listeners tab, in the "Listen port:" dialog.
 .. _method_C_sis_ssm_comms_fig:
 
 .. figure:: ./_static/methodC_sis_ssm_comms.png
-    :width: 600px
+    :width: 500px
     :align: center
     :alt: figure with method C sis ssm comms
     :figclass: align-center

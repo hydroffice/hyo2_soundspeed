@@ -55,9 +55,9 @@ copyright = u'2025, CCOM/JHC,UNH'
 # built documents.
 #
 # The short X.Y version.
-version = '2025.4'
+version = '2025.5'
 # The full version, including alpha/beta/rc tags.
-release = '2025.4.11'
+release = '2025.5.0'
 
 numfig = True
 
@@ -192,7 +192,10 @@ latex_elements = {
 #'pointsize': '10pt',
 
 # Additional stuff for the LaTeX preamble.
-#'preamble': '',
+    "preamble": r"""
+\usepackage{url}
+\def\UrlBreaks{\do\/}
+"""
 }
 
 # Grouping the document tree into LaTeX files. List of tuples

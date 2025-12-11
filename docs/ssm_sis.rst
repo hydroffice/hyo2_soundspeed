@@ -25,7 +25,7 @@ Settings
 ========
 
 .. note::
-   For the settings required on the SIS side, see :ref:`ssm_sis5_sis_settings`.
+   For the settings required on the SIS side, see :ref:`ssm_sis5_sis_settings_new_method` and :ref:`ssm_sis5_sis_settings_old_method`.
 
 The *Settings* group box lists the app configuration settings:
 

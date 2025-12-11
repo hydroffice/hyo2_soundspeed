@@ -87,7 +87,7 @@ Currently implemented features
   * Idronaut (.txt)
   * ISS Fugro (.svp, .v*, .d*)
   * Kongsberg Maritime (.asvp)
-  * Rolls-Royce Moving Vessel Profiler (MVP) (.asvp, .calc, .m1, .s12)
+  * AML Moving Vessel Profiler (MVP) (.asvp, .calc, .m1, .s12)
   * Oceanscience Underway CTD (.asc)
   * SAIV (.txt)
   * Sea&Sun (.tob)
