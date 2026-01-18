@@ -1,11 +1,17 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
 import logging
+from typing import TYPE_CHECKING
 
 from hyo2.ssm2.lib.base.files import FileManager
 from hyo2.ssm2.lib.base.callbacks.cli_callbacks import CliCallbacks
 from hyo2.ssm2.lib.formats.abstract import AbstractFormat
 from hyo2.ssm2.lib.profile.dicts import Dicts
+
+if TYPE_CHECKING:
+    from hyo2.abc2.lib.progress.abstract_progress import AbstractProgress
+    from hyo2.ssm2.lib.base.callbacks.abstract_callbacks import AbstractCallbacks
+    from hyo2.ssm2.lib.base.setup import Setup
 
 logger = logging.getLogger(__name__)
 
@@ -13,15 +19,16 @@ logger = logging.getLogger(__name__)
 class AbstractReader(AbstractFormat, metaclass=ABCMeta):
     """ Abstract data reader """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super(AbstractReader, self).__init__()
-        self.fid = None
+        self.fid: FileManager | None = None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<%s:reader:%s:%s>" % (self.name, self.version, ",".join(self.ext))
 
     @abstractmethod
-    def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
+    def read(self, data_path: str, settings: 'Setup', callbacks: 'AbstractCallbacks' = CliCallbacks(),
+             progress: 'AbstractProgress | None' = None) -> bool:
         """Common read function signature
 
         The settings is a container with all the library settings.
@@ -30,14 +37,14 @@ class AbstractReader(AbstractFormat, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def _parse_header(self):
+    def _parse_header(self) -> None:
         pass
 
     @abstractmethod
-    def _parse_body(self):
+    def _parse_body(self) -> None:
         pass
 
-    def fix(self):
+    def fix(self) -> None:
         """Function called after the parsing is done, to execute some common checks/integration"""
 
         for profile in self.ssp.l:  # we may have multiple profiles
@@ -117,7 +124,7 @@ class AbstractReader(AbstractFormat, metaclass=ABCMeta):
                         profile.meta.vessel = self.s.default_vessel
                         # logger.debug('default vessel: %s' % profile.meta.vessel)
 
-    def finalize(self):
+    def finalize(self) -> None:
         """Function called at the end, to finalize the reading (e.g., clone raw to proc)"""
 
         for profile in self.ssp.l:  # we may have multiple profiles
@@ -128,13 +135,14 @@ class AbstractReader(AbstractFormat, metaclass=ABCMeta):
 class AbstractTextReader(AbstractReader, metaclass=ABCMeta):
     """ Abstract text data reader """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super(AbstractTextReader, self).__init__()
-        self.lines = []
-        self.total_data = None
-        self.samples_offset = None
+        self.lines: list[str] = []
+        self.total_data: str | None = None
+        self.samples_offset: int | None = None
+        self.field_index: dict[str, int] = dict()
 
-    def _read(self, data_path, encoding='utf8'):
+    def _read(self, data_path: str, encoding: str = 'utf8') -> None:
         """Helper function to read the raw file"""
         self.fid = FileManager(data_path, mode='r', encoding=encoding)
         try:

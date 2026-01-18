@@ -1,11 +1,17 @@
 import datetime as dt
 import logging
-
-logger = logging.getLogger(__name__)
+from typing import TYPE_CHECKING
 
 from hyo2.ssm2.lib.formats.readers.abstract import AbstractTextReader
 from hyo2.ssm2.lib.profile.dicts import Dicts
 from hyo2.ssm2.lib.base.callbacks.cli_callbacks import CliCallbacks
+
+if TYPE_CHECKING:
+    from hyo2.abc2.lib.progress.abstract_progress import AbstractProgress
+    from hyo2.ssm2.lib.base.callbacks.abstract_callbacks import AbstractCallbacks
+    from hyo2.ssm2.lib.base.setup import Setup
+
+logger = logging.getLogger(__name__)
 
 
 class RBR(AbstractTextReader):
@@ -14,7 +20,7 @@ class RBR(AbstractTextReader):
     Info: https://rbr-global.com/products/standard-loggers/rbrmaestro
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.desc = "RBR"
         self.ext.add('txt')
@@ -38,7 +44,8 @@ class RBR(AbstractTextReader):
         self.has_pressure = False
         self.has_conductivity = False
 
-    def read(self, data_path, settings, callbacks=CliCallbacks(), progress=None):
+    def read(self, data_path: str, settings: 'Setup', callbacks: 'AbstractCallbacks' = CliCallbacks(),
+             progress: 'AbstractProgress | None' = None) -> bool:
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings
@@ -61,7 +68,7 @@ class RBR(AbstractTextReader):
         logger.debug('*** %s ***: done' % self.driver)
         return True
 
-    def _parse_header(self):
+    def _parse_header(self) -> None:
         """Parsing header: field header, time, latitude, longitude"""
         logger.debug('parsing header')
 
@@ -76,7 +83,7 @@ class RBR(AbstractTextReader):
         col = 0  # field column
         for field in fields:  # split fields by comma
             field = field.lower()
-            self.field_index[field] = col
+            add_to_index = True
             if field == self.tk_depth:
                 self.has_depth = True
                 self.more_fields.insert(0, field)  # prepend depth to additional fields
@@ -93,14 +100,20 @@ class RBR(AbstractTextReader):
             elif field == self.tk_cast_time:
                 pass
             else:
-                self.more_fields.append(field)
+                if field in self.more_fields:
+                    add_to_index = False
+                    logger.info(f"Skipping duplicated column #{col} with name: {field}")
+                else:
+                    self.more_fields.append(field)
+            if add_to_index:
+                self.field_index[field] = col
             col += 1
 
         self.samples_offset += 1
         logger.debug("samples offset: %s" % self.samples_offset)
 
         # retrieve the first timestamp from the data
-        for idx, line in enumerate(self.lines[self.samples_offset:self.samples_offset+3]):
+        for idx, line in enumerate(self.lines[self.samples_offset:self.samples_offset + 3]):
 
             # skip empty lines
             if len(line.split()) == 0:
@@ -144,7 +157,7 @@ class RBR(AbstractTextReader):
         # initialize additional fields
         self.ssp.cur.init_more(self.more_fields)
 
-    def _parse_body(self):
+    def _parse_body(self) -> None:
         """Parsing samples: depth, speed, temp, sal"""
         logger.debug('parsing body')
 

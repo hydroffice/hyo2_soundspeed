@@ -3,7 +3,7 @@ from datetime import datetime as dt
 import logging
 import math
 import os
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from hyo2.ssm2.lib.formats.readers.abstract import AbstractTextReader
 from hyo2.ssm2.lib.profile.dicts import Dicts
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 class Aml(AbstractTextReader):
     """AML SeaCast "CSV" reader -> SVP style"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.desc = "AML"
         self._ext.add('csv')
@@ -78,7 +78,7 @@ class Aml(AbstractTextReader):
         self.field_units = dict()
 
     def read(self, data_path: str, settings: 'Setup', callbacks: 'AbstractCallbacks' = CliCallbacks(),
-             progress: Optional['AbstractProgress'] = None):
+             progress: 'AbstractProgress | None' = None):
         logger.debug('*** %s ***: start' % self.driver)
 
         self.s = settings
@@ -101,7 +101,7 @@ class Aml(AbstractTextReader):
         logger.debug('*** %s ***: done' % self.driver)
         return True
 
-    def _parse_header(self):
+    def _parse_header(self) -> None:
         if self._path_ext in [".csv"]:
             self._csv_header()
         elif self._path_ext in [".aml"]:
@@ -109,7 +109,7 @@ class Aml(AbstractTextReader):
         else:
             raise RuntimeError('Unsupported extension> %s' % self._path_ext)
 
-    def _csv_header(self):
+    def _csv_header(self) -> None:
         logger.debug('parsing CSV header')
 
         date = None
@@ -189,7 +189,7 @@ class Aml(AbstractTextReader):
 
         self.ssp.cur.meta.sensor_type = Dicts.sensor_types['SVP']
 
-    def _aml_header(self):
+    def _aml_header(self) -> None:
         logger.debug('parsing AML header')
 
         read_header = False
@@ -406,7 +406,7 @@ class Aml(AbstractTextReader):
             else:  # missing temperature
                 raise RuntimeError("Unable to locate depth or sound speed column")
 
-    def _parse_body(self):
+    def _parse_body(self) -> None:
         if self._path_ext in [".csv"]:
             self._csv_body()
         elif self._path_ext in [".aml"]:
@@ -414,7 +414,7 @@ class Aml(AbstractTextReader):
         else:
             raise RuntimeError('Unsupported extension> %s' % self._path_ext)
 
-    def _csv_body(self):
+    def _csv_body(self) -> None:
         logger.debug('parsing CSV body')
 
         count = 0
@@ -564,7 +564,7 @@ class Aml(AbstractTextReader):
                     logger.warning("invalid index parsing of line #%s" % row_nr)
                     continue
 
-        if read_samples is False:
+        if not read_samples:
             raise RuntimeError("Issue in finding data token: %s" % self._csv.data)
 
         if not (has_depth_and_speed or has_pressure_and_speed):
@@ -674,7 +674,7 @@ class Aml(AbstractTextReader):
         logger.debug("retrieved %d samples" % count)
         self.ssp.cur.data_resize(count)
 
-    def _aml_body(self):
+    def _aml_body(self) -> None:
         logger.debug('parsing AML body')
 
         self.ssp.cur.init_data(len(self.lines) - self.samples_offset)

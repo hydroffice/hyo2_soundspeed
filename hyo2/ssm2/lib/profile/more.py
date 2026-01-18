@@ -1,36 +1,32 @@
-import numpy as np
 import logging
+
+import matplotlib.pyplot as plt
+import numpy as np
+import numpy.typing as npt
 
 logger = logging.getLogger(__name__)
 
 
 class More:
-    def __init__(self):
-        self.sa = None
+    def __init__(self) -> None:
+        self.default_dt = np.float32
+        self.sa: npt.NDArray[np.float32] = np.empty((0, 0), dtype=self.default_dt)
 
-    def init_struct_array(self, num_samples, fields):
-        """Initialize the stuctured array using the passed num_samples and the len of 'fields' list
+    def init_struct_array(self, num_samples: int, fields: list[str]) -> None:
+        """Initialize the structured array using the passed num_samples and the len of 'fields' list
 
         The 'fields' must have as first field the depth
         """
         if len(fields) == 0:
+            logger.debug("No 'more' fields")
             return
-        dt = [(fld, 'f4') for fld in fields]
+
+        dt = [(fld, self.default_dt) for fld in fields]
         self.sa = np.zeros((num_samples, len(fields)), dtype=dt)
 
-    def __repr__(self):
-        msg = "  <More>\n"
-        if self.sa is not None:
-            msg += "    <shape:(%s,%s)>\n" % self.sa.shape
-            for fn in self.sa.dtype.names:
-                if len(self.sa[fn]) > 2:
-                    msg += "    <%s sz:%s min:%.3f max:%.3f>\n" \
-                           % (fn, self.sa[fn].shape[0], self.sa[fn].min(), self.sa[fn].max())
-        return msg
-
-    def resize(self, count):
+    def resize(self, count: int) -> None:
         """Resize the arrays (if present) to the new given number of elements"""
-        if self.sa is None:
+        if self.sa.size == 0:
             return
 
         if self.sa.shape[0] == count:
@@ -38,12 +34,12 @@ class More:
 
         self.sa = np.resize(self.sa, (count, self.sa.shape[1]))
 
-    def debug_plot(self):
+    def debug_plot(self) -> None:
         """Create a debug plot with the data, optionally with the extra data if available"""
-        if self.sa is None:
+        if self.sa.size == 0:
+            logger.info("No 'more' samples to plot")
             return
 
-        import matplotlib.pyplot as plt
         nr_fields = self.sa.shape[1] - 1
         nr_figures = (nr_fields // 4) + 1
 
@@ -83,3 +79,12 @@ class More:
                 count += 1
 
             plt.show(block=False)
+
+    def __repr__(self):
+        msg = "  <More>\n"
+        msg += "    <shape:(%s,%s)>\n" % self.sa.shape
+        if self.sa.size != 0:
+            for fn in self.sa.dtype.names:
+                msg += "    <%s sz:%s min:%.3f max:%.3f>\n" \
+                       % (fn, self.sa[fn].shape[0], self.sa[fn].min(), self.sa[fn].max())
+        return msg

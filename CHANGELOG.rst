@@ -3,6 +3,12 @@ Changelog
 
 Main changes to Sound Speed Manager:
 
+Version 2026.0.0 (2026-01-17)
+-----------------------------
+
+- Improved RBR driver by skipping columns with duplicated names
+
+
 Version 2025.4.11 (2025-11-17)
 ------------------------------
 

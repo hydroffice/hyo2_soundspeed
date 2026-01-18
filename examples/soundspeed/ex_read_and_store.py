@@ -29,9 +29,8 @@ logger.info('output folder: %s' % data_output)
 
 # test readers/writers
 logger.info('test: *** START ***')
-filters = ["tsk", ]
+filters = ["rbr", ]
 tests = testing.input_dict_test_files(inclusive_filters=filters)
-# print(tests)
 
 first_done = False
 
