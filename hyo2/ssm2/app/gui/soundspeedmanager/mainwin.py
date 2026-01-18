@@ -8,7 +8,6 @@ from urllib.request import urlopen
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
-
 from hyo2.abc2.app.pkg_info.pkg_exception.pkg_exception_dialog import PkgExceptionDialog
 from hyo2.abc2.app.pkg_info.pkg_info_tab import PkgInfoTab
 from hyo2.abc2.app.qt_progress import QtProgress
@@ -179,25 +178,24 @@ class MainWin(QtWidgets.QMainWindow):
         self.help_menu.addAction(self.tab_info.authors_action)
         self.help_menu.addAction(self.tab_info.show_about_action)
 
-        self.normal_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
-                                 "background-color:rgba(0,0,0,0);}"
-        self.orange_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
-                                 "background-color:rgba(255,163,102,128);}"
-        self.purple_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
-                                 "background-color:rgba(221,160,221,128);}"
-        self.khaki_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
+        self.status_normal_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
+                                        "background-color:rgba(0,0,0,0);}"
+        self.status_orange_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
+                                        "background-color:rgba(255,163,102,128);}"
+        self.status_purple_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
+                                        "background-color:rgba(221,160,221,128);}"
+        self.status_khaki_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
                                 "background-color:rgba(240,230,140,128);}"
-        self.red_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
-                              "background-color:rgba(255,0,0,128);}"
-        self.yellow_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
-                                 "background-color:rgba(255,255,0,128);}"
-        self.cyan_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
+        self.status_cyan_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
                                "background-color:rgba(51,204,255,128);}"
-        self.statusBar().setStyleSheet(self.normal_stylesheet)
+        self.label_normal_stylesheet = "color:rgba(0,0,0,128);"
+        self.label_red_stylesheet = "color:rgba(255,0,0,128);"
+        self.label_yellow_stylesheet = "color:rgba(255,255,0,128);"
+        self.statusBar().setStyleSheet(self.status_normal_stylesheet)
         self.statusBar().showMessage("%s" % app_info.app_name, 2000)
         self.releaseInfo = QtWidgets.QLabel()
         self.statusBar().addPermanentWidget(self.releaseInfo)
-        self.releaseInfo.setStyleSheet(self.normal_stylesheet)
+        self.releaseInfo.setStyleSheet(self.status_normal_stylesheet)
         self.release_checked = False
         self.old_sis_xyz_data = False
         self.old_sis_nav_data = False
@@ -579,7 +577,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.tab_server.server_started()
         # self.tab_refraction.server_started()
         self.tab_setup.server_started()
-        self.statusBar().setStyleSheet(self.cyan_stylesheet)
+        self.statusBar().setStyleSheet(self.status_cyan_stylesheet)
 
     def server_stopped(self):
         self.tab_editor.server_stopped()
@@ -587,7 +585,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.tab_server.server_stopped()
         # self.tab_refraction.server_stopped()
         self.tab_setup.server_stopped()
-        self.statusBar().setStyleSheet(self.normal_stylesheet)
+        self.statusBar().setStyleSheet(self.status_normal_stylesheet)
 
     def _check_latest_release(self):
         os.environ.get("SSM_DEBUG") and logger.info("Checking latest release ...")
@@ -619,12 +617,16 @@ class MainWin(QtWidgets.QMainWindow):
         if new_release:
             logger.info("New release available: %s" % latest_version)
             self.releaseInfo.setText("New release available: %s" % latest_version)
-            self.releaseInfo.setStyleSheet(self.red_stylesheet)
+            self.releaseInfo.setStyleSheet(self.label_red_stylesheet)
 
         elif new_bugfix:
             logger.info("New bugfix available: %s" % latest_version)
             self.releaseInfo.setText("New bugfix available: %s" % latest_version)
-            self.releaseInfo.setStyleSheet(self.yellow_stylesheet)
+            self.releaseInfo.setStyleSheet(self.label_yellow_stylesheet)
+
+        else:
+            self.releaseInfo.setText("")
+            self.releaseInfo.setStyleSheet(self.label_normal_stylesheet)
 
         os.environ.get("SSM_DEBUG") and logger.info("Checking latest release ... DONE")
 
@@ -833,14 +835,14 @@ class MainWin(QtWidgets.QMainWindow):
 
         if not self.lib.server.is_alive():  # user mode - listeners
             if self.lib.has_mvp_to_process() or self.lib.has_sippican_to_process():
-                self.statusBar().setStyleSheet(self.orange_stylesheet)
+                self.statusBar().setStyleSheet(self.status_orange_stylesheet)
             else:
                 if self.old_sis_nav_data or self.old_nmea_nav_data:
-                    self.statusBar().setStyleSheet(self.purple_stylesheet)
+                    self.statusBar().setStyleSheet(self.status_purple_stylesheet)
                 elif self.old_sis_xyz_data:
-                    self.statusBar().setStyleSheet(self.khaki_stylesheet)
+                    self.statusBar().setStyleSheet(self.status_khaki_stylesheet)
                 else:
-                    self.statusBar().setStyleSheet(self.normal_stylesheet)
+                    self.statusBar().setStyleSheet(self.status_normal_stylesheet)
 
     def change_info_url(self, url):
         self.tab_info.change_url(url)
