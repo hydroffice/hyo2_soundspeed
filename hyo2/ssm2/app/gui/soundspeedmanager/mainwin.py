@@ -1,3 +1,4 @@
+import copy
 import logging
 import math
 import os
@@ -830,6 +831,17 @@ class MainWin(QtWidgets.QMainWindow):
                         self.tab_editor.dataplots.on_first_draw()
                         self.lib.cur.listener_displayed = True
 
+                    settings = QtCore.QSettings()
+                    previousRef = settings.value("PreviousRef")
+                    if previousRef == 'true':
+                        if self.lib.has_ssp():
+                            #logger.debug('cloning previously received profile')
+                            self.lib.ref = copy.deepcopy(self.lib.ssp)
+                    else:
+                        if self.lib.has_ref():
+                            #logger.debug('cleaning reference')
+                            self.lib.ref = None
+                        
                 self.tab_editor.dataplots.update_data()
                 self.tab_editor.dataplots.redraw()
 
