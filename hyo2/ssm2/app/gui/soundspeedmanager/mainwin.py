@@ -180,8 +180,8 @@ class MainWin(QtWidgets.QMainWindow):
 
         self.status_normal_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
                                         "background-color:rgba(0,0,0,0);}"
-        self.status_orange_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
-                                        "background-color:rgba(255,163,102,128);}"
+        self.status_orangered_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
+                                        "background-color:rgba(255,69,0,128);}"
         self.status_purple_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
                                         "background-color:rgba(221,160,221,128);}"
         self.status_khaki_stylesheet = "QStatusBar{color:rgba(0,0,0,128);font-size: 8pt;" \
@@ -835,7 +835,7 @@ class MainWin(QtWidgets.QMainWindow):
 
         if not self.lib.server.is_alive():  # user mode - listeners
             if self.lib.has_mvp_to_process() or self.lib.has_sippican_to_process():
-                self.statusBar().setStyleSheet(self.status_orange_stylesheet)
+                self.statusBar().setStyleSheet(self.status_orangered_stylesheet)
             else:
                 if self.old_sis_nav_data or self.old_nmea_nav_data:
                     self.statusBar().setStyleSheet(self.status_purple_stylesheet)
