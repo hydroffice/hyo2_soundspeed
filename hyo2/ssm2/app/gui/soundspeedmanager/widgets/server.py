@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
+from hyo2.abc2.app.freeze_debugger import FreezeDebugger
 from hyo2.ssm2.app.gui.soundspeedmanager.widgets.widget import AbstractWidget
 from hyo2.ssm2.app.gui.soundspeedmanager.widgets.dataplots import DataPlots
 
@@ -99,10 +100,18 @@ class Server(AbstractWidget):
 
         self._deactivate_gui(also_main_win=False)
 
+        self.freeze_dbg: FreezeDebugger | None = None
         self.activated_server = False
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.update_gui)
         timer.start(2000)
+
+    def start_debugger(self) -> None:
+        self.freeze_dbg = FreezeDebugger(parent=self, log_path=os.path.join(self.lib.logs_folder, "server_debug.log"))
+
+    def stop_debugger(self) -> None:
+        if self.freeze_dbg:
+            self.freeze_dbg.stop()
 
     def on_start_server(self):
         logger.debug('start server')
@@ -150,10 +159,20 @@ class Server(AbstractWidget):
             QtWidgets.QMessageBox.critical(self, "Server mode", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
+        self.progress.start(text="Starting server... Please wait!")
+
+        self.start_debugger()
+
+        self.progress.add(quantum=20)
+
         self.lib.start_server()
+
+        self.progress.add(quantum=40)
 
         self.activated_server = True
         self._activate_gui()
+
+        self.progress.end()
 
     def on_force_server(self):
         logger.debug('force server')
@@ -165,8 +184,15 @@ class Server(AbstractWidget):
             QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
+        self.progress.start(text="Sending profile... Please wait!", init_value=20)
+
         self.lib.force_server()
+
+        self.progress.add(quantum=40)
+
         self.main_win.data_stored()
+
+        self.progress.end()
 
     def on_stop_server(self):
         logger.debug('stop server')
@@ -178,10 +204,20 @@ class Server(AbstractWidget):
             QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
+        self.progress.start(text="Stopping server... Please wait!")
+
+        self.stop_debugger()
+
+        self.progress.add(quantum=20)
+
         self.lib.stop_server()
+
+        self.progress.add(quantum=40)
 
         self.activated_server = False
         self._deactivate_gui()
+
+        self.progress.end()
 
     def update_gui(self):
         if self.activated_server and not self.lib.server_is_alive():

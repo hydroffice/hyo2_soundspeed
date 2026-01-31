@@ -4,9 +4,11 @@ import sys
 import traceback
 
 debug_var = "SSM_DEBUG"
-ret = os.getenv(debug_var, "0") != "0"
-if ret:
+debug_mode = os.getenv(debug_var, "0") != "0"
+last_beat = 0.0
+if debug_mode:
     print(debug_var)
+
     # noinspection PyUnresolvedReferences
     from hyo2.abc2.lib.debug_import import DebugImport
     DebugImport(logging_name=debug_var, numpy=True, pyproj=True, gdal=True, qt=True, matplotlib=True, cartopy=False)

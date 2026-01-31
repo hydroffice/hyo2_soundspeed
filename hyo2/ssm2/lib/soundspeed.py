@@ -59,6 +59,7 @@ class SoundSpeedLibrary:
         self._release_folder: str | None = None
         self._projects_folder: str | None = None
         self._outputs_folder: str | None = None
+        self._logs_folder: str | None = None
         # _noaa_project format OPR-Xnnn-XX-nn
         self._noaa_project = None
         self._noaa_project_validate = re.compile(r"^(OPR-[A-Z]\d{3}-[A-Z]{2}-\d{2})")
@@ -120,6 +121,19 @@ class SoundSpeedLibrary:
             os.makedirs(data_folder)
         # logger.debug("library folder: %s" % data_folder)
         return data_folder
+
+    @classmethod
+    def make_logs_folder(cls, data_folder: Optional[str] = None) -> str:
+
+        data_folder = cls.make_data_folder(data_folder=data_folder)
+
+        # logs data folder
+        logs_folder = os.path.join(data_folder, "logs")
+        if not os.path.exists(logs_folder):  # create it if it does not exist
+            os.makedirs(logs_folder)
+        # logger.debug("logs folder: %s" % self.logs_folder)
+
+        return logs_folder
 
     @classmethod
     def make_releases_folder(cls, data_folder: Optional[str] = None) -> str:
@@ -198,6 +212,7 @@ class SoundSpeedLibrary:
         """manage library folders creation"""
 
         self._data_folder = self.make_data_folder(data_folder=data_folder)
+        self._logs_folder = self.make_logs_folder(data_folder=data_folder)
         self._releases_folder = self.make_releases_folder(data_folder=data_folder)
         self._release_folder = self.make_release_folder(data_folder=data_folder)
 
@@ -324,6 +339,21 @@ class SoundSpeedLibrary:
 
     def open_outputs_folder(self) -> None:
         PkgHelper.explore_folder(self.outputs_folder)
+
+    # logs
+
+    @property
+    def logs_folder(self) -> str:
+        """Get the logs folder"""
+        return self._logs_folder
+
+    @logs_folder.setter
+    def logs_folder(self, value: str) -> None:
+        """ Set the logs folder"""
+        self._logs_folder = value
+
+    def open_logs_folder(self) -> None:
+        PkgHelper.explore_folder(self.logs_folder)
 
     # --- readers/writers
 
@@ -2200,7 +2230,7 @@ class SoundSpeedLibrary:
         if not self.server.is_alive():
             self.server = Server(prj=self)
             self.server.start()
-            time.sleep(0.1)
+            time.sleep(0.2)
         return self.server.is_alive()
 
     def force_server(self) -> bool:
@@ -2216,7 +2246,7 @@ class SoundSpeedLibrary:
         logger.debug("stop server")
         if self.server.is_alive():
             self.server.stop()
-            self.server.join(2)
+            self.server.join()
         return not self.server.is_alive()
 
     # --- repr
