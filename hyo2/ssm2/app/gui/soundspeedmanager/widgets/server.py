@@ -103,9 +103,9 @@ class Server(AbstractWidget):
 
         self.freeze_dbg: FreezeDebugger | None = None
         self.activated_server = False
-        timer = QtCore.QTimer(self)
-        timer.timeout.connect(self.update_gui)
-        timer.start(2000)
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(self.update_gui)
+        self.timer.start(2000)
 
     def start_debugger(self) -> None:
         log_basename = os.path.join(self.lib.logs_folder, "synthetic_profile_server")
@@ -225,6 +225,7 @@ class Server(AbstractWidget):
 
         self.progress.add(quantum=10)
 
+        self.timer.stop()
         self.lib.stop_server()
 
         self.progress.add(quantum=20)

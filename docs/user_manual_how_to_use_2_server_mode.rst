@@ -121,3 +121,8 @@ to the client are made. Thus, in case that a “dead” SIS-based client comes b
 
 The *Server Mode* can be manually stopped by clicking the *Stop server* button (:numref:`server_tab0`).
 Closing SSM will also stop the server.
+
+In case of troubles during the *Server Mode* execution, you can inspect the logs stored under:
+
+* "C:/Documents and Settings/**<username>**/Application Data/HydrOffice/Sound Speed/logs/" (Windows XP), or
+* "C:/Users/**<username>**/AppData/Local/HydrOffice/Sound Speed/logs/" (newer Windows OS)

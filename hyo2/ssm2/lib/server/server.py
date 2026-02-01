@@ -234,21 +234,27 @@ class Server(Thread):
                     client.alive = True
                 logger.debug("Shutdown Server Mode")
                 break
-            if (count % 100) == 0:
-                logger.debug("#%05d: running" % count)
 
-            try:
-                self.check()
-            except Exception as e:
-                traceback.print_exc()
-                msg = "While in Server Mode, %s" % e
-                self.runtime_errors.append(msg)
-                logger.error(e)
-                self.shutdown.set()
-                continue
+            if (count % 60) == 0:
+                logger.debug("#%05d: Server Mode checking ..." % count)
 
-            time.sleep(60)  # TODO
+                try:
+                    self.check()
+                except Exception as e:
+                    traceback.print_exc()
+                    msg = "While in Server Mode, %s" % e
+                    self.runtime_errors.append(msg)
+                    logger.error(e)
+                    self.shutdown.set()
+                    continue
+
+                logger.debug("#%05d: Server Mode checking ... DONE" % count)
+
+            elif (count % 30) == 0:
+                logger.debug("#%05d: Server Mode running ..." % count)
+
             count += 1
+            time.sleep(1)
 
         logger.debug("%s -> ended" % self.name)
 
