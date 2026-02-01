@@ -3,6 +3,13 @@ Changelog
 
 Main changes to Sound Speed Manager:
 
+Version 2026.1.0 (2026-02-01)
+-----------------------------
+
+- Fixed race condition for Synthetic Profile Server
+- Added logs and dumps for Server Mode
+
+
 Version 2026.0.0 (2026-01-17)
 -----------------------------
 

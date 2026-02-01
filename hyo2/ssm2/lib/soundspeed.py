@@ -2246,7 +2246,7 @@ class SoundSpeedLibrary:
         logger.debug("stop server")
         if self.server.is_alive():
             self.server.stop()
-            self.server.join()
+            self.server.join(3)
         return not self.server.is_alive()
 
     # --- repr

@@ -56,31 +56,22 @@ class Server(Thread):
         """Check the server settings"""
 
         logger.debug("Initialization checks ...")
-        self.prj.progress.start(text='Check settings')
         self.settings_errors.clear()
         self.prj.setup.client_list.last_tx_time = None
         self.prj.setup.client_list.last_tx_time_2 = None
 
         # Check for atlas sources
         if not self._check_settings_source():
-            self.prj.progress.end()
             return False
-
-        self.prj.progress.update(30)
 
         # Check for SIS settings
         if not self._check_settings_sis():
-            self.prj.progress.end()
             return False
-
-        self.prj.progress.update(60)
 
         # Check for clients
         if not self._check_settings_clients(use_uni_clients=use_uni_clients):
-            self.prj.progress.end()
             return False
 
-        self.prj.progress.end()
         logger.debug("Initialization checks: OK")
         return True
 
@@ -188,7 +179,7 @@ class Server(Thread):
 
     def _check_settings_clients(self, use_uni_clients: bool = False) -> bool:
 
-        prog_quantum = 40 / (len(self.prj.setup.client_list.clients) + 1)
+        # prog_quantum = 40 / (len(self.prj.setup.client_list.clients) + 1)
         logger.info("Testing clients for reception-confirmation interaction")
         num_clients = 0
         for client in self.prj.setup.client_list.clients:
@@ -214,8 +205,6 @@ class Server(Thread):
             else:
                 logger.warning("Interaction test: KO")
                 client.alive = False
-
-            self.prj.progress.add(prog_quantum)
 
         if num_clients == 0:
             msg = "Unable to confirm clients."

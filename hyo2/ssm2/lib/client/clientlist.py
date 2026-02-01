@@ -24,7 +24,8 @@ class ClientList:
 
     def transmit_ssp(self, prj: 'SoundSpeedLibrary', server_mode: bool = False):
 
-        prj.progress.start(text='Transmitting', is_disabled=server_mode, has_abortion=True)
+        if not server_mode:
+            prj.progress.start(text='Transmitting', is_disabled=server_mode, has_abortion=True)
 
         # loop through the client list
         success = True  # false if one tx has troubles
@@ -38,7 +39,8 @@ class ClientList:
             if client.protocol in ["SIS", "KCTRL"]:
                 prj.listeners.sis.ssp = None
 
-            prj.progress.add(prog_quantum)
+            if not server_mode:
+                prj.progress.add(prog_quantum)
 
             if not client.send_cast(prj=prj, server_mode=server_mode):
                 logger.warning('unable to send profile to %s' % client.name)
@@ -71,10 +73,11 @@ class ClientList:
                 wait += 1
                 logger.debug("waiting for %s sec" % wait)
 
-                prj.progress.update()
-                if prj.progress.canceled:
-                    logger.info("canceled by user")
-                    wait = wait_max
+                if not server_mode:
+                    prj.progress.update()
+                    if prj.progress.canceled:
+                        logger.info("canceled by user")
+                        wait = wait_max
 
             if client.protocol in ["SIS", "KCTRL"] and prj.listeners.sis.ssp:
                 # The KM .all SVP datagrams have a bug in their time reporting and
@@ -106,5 +109,6 @@ class ClientList:
                     prj.cb.msg_tx_sis_not_confirmed(name=client.name, port=prj.setup.sis_listen_port)
                 success = False
 
-        prj.progress.end()
+        if not server_mode:
+            prj.progress.end()
         return success

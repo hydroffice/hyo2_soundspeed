@@ -1,5 +1,6 @@
 import os
 import logging
+import time
 from typing import TYPE_CHECKING
 
 from PySide6 import QtCore, QtGui, QtWidgets
@@ -107,7 +108,8 @@ class Server(AbstractWidget):
         timer.start(2000)
 
     def start_debugger(self) -> None:
-        self.freeze_dbg = FreezeDebugger(parent=self, log_path=os.path.join(self.lib.logs_folder, "server_debug.log"))
+        log_basename = os.path.join(self.lib.logs_folder, "synthetic_profile_server")
+        self.freeze_dbg = FreezeDebugger(parent=self, log_basename=log_basename)
 
     def stop_debugger(self) -> None:
         if self.freeze_dbg:
@@ -116,10 +118,23 @@ class Server(AbstractWidget):
     def on_start_server(self):
         logger.debug('start server')
 
+        self.progress.start(text="Checking server status... Please wait!")
+
+        counter = 0
+        while self.lib.server_is_alive():
+            time.sleep(2)
+            counter += 1
+            self.progress.add(20)
+            if counter == 4:
+                break
+
         if self.lib.server_is_alive():
-            msg = "The server mode is already started!"
+            msg = "The server mode is still stopping. Please try again in a few seconds!"
             QtWidgets.QMessageBox.warning(self, "Server mode", msg, QtWidgets.QMessageBox.StandardButton.Ok)
+            self.progress.end()
             return
+
+        self.progress.end()
 
         self.main_win.switch_to_server_tab()
 
@@ -208,11 +223,19 @@ class Server(AbstractWidget):
 
         self.stop_debugger()
 
-        self.progress.add(quantum=20)
+        self.progress.add(quantum=10)
 
         self.lib.stop_server()
 
-        self.progress.add(quantum=40)
+        self.progress.add(quantum=20)
+
+        wait_secs = 100
+        quantum = 60 / wait_secs
+        for i in range(wait_secs):
+            if not self.lib.server_is_alive():
+                break
+            time.sleep(1)
+            self.progress.add(quantum=quantum)
 
         self.activated_server = False
         self._deactivate_gui()
