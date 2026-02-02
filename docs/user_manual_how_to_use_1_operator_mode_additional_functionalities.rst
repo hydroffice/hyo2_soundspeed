@@ -107,6 +107,8 @@ such as exporting or transmission to a sounder. The reference profile can be cle
 via the *Clear reference cast* option under the *Reference cast* menu (:numref:`editor_tab14`).
 Further extensions and augmentations will then use WOA/RTOFS.
 
+If :ref:`network_data_reception` is activated, the previously received cast can be automatically set as reference cast by choosing *Set previous profile as reference cast (used for data reception only)*. This functionality will remain active as long as the *Apply* button remains pressed.
+
 .. _editor_tab14:
 .. figure:: ./_static/editor_tab14.png
     :width: 280px
@@ -142,6 +144,8 @@ while’ alert). :numref:`statusbar_colors` summarizes the possible statuses sho
 
     The possible statuses shown in the SSM taskbar.
 
+.. _network_data_reception:
+    
 Network data reception
 ======================
 
