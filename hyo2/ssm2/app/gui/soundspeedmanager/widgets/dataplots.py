@@ -689,10 +689,8 @@ class DataPlots(AbstractWidget):
                                 mean_sis_depth = self.lib.listeners.sis.xyz_mean_depth
                     max_proc_sis_depth = max(max_proc_depth, mean_sis_depth)
 
-                    max_depth = 1.1 * max_proc_sis_depth
-                    min_depth = -0.05 * max_proc_sis_depth
-                    if min_depth > 0:
-                        min_depth = -5
+                    max_depth = max(8., 1.1 * max_proc_sis_depth)
+                    min_depth = min(-2., -0.05 * max_proc_sis_depth)
 
                     self.speed_ax.set_ylim(bottom=max_depth, top=min_depth)
 
