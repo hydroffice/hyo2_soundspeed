@@ -41,8 +41,8 @@ ax.coastlines(resolution='110m', linewidth=1)
 ax.gridlines(draw_labels=True)
 
 # Add land and ocean features
-ax.add_feature(cfeature.LAND, zorder=0, edgecolor='black')
-ax.add_feature(cfeature.OCEAN, zorder=0)
+ax.add_geo_feature(cfeature.LAND, zorder=0, edgecolor='black')
+ax.add_geo_feature(cfeature.OCEAN, zorder=0)
 
 # Plot temperature (adjust cmap and vmin/vmax for better visualization if needed)
 temp_plot = ax.contourf(lon, lat, temp, levels=60, transform=ccrs.PlateCarree(), cmap='coolwarm')
