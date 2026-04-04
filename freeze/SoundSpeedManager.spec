@@ -123,7 +123,7 @@ if is_darwin:
 
 a = Analysis(['SoundSpeedManager.py'],
              pathex=[],
-             hiddenimports=['PySide6.QtSvg'],
+             hiddenimports=['PySide6.QtSvg', 'hyo2.sdm3'],
              excludes=['qgis', 'pandas', 'fiona', 'PyQt5', 'PySide2', 'shiboken2', 'wx'],
              hookspath=None,
              runtime_hooks=None)
