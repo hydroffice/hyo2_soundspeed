@@ -15,5 +15,6 @@ app_info = pkg_info.app_info(
     app_path=app_path,
     app_media_path=app_media_path,
     app_license_path=os.path.join(app_media_path, "LICENSE"),
-    app_icon_path=os.path.join(app_media_path, "app_icon.png")
+    app_icon_path=os.path.join(app_media_path, "app_icon.png"),
+    app_manual_offline=os.path.join(app_media_path, "SoundSpeedManager.pdf"),
 )
