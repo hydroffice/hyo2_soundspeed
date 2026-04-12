@@ -7,34 +7,31 @@
 # The resulting .exe file is placed in the dist/SoundSpeedManager folder.
 #
 # It may require to manually copy DLLs and other files.
-# Move _gdal.dll under a folder named 'osgeo'
-# Copy the qt.conf and opengl32sw.dll, libEGL.dll, d3dcompiler_47.dll
-#
-# Uploading to BitBucket: curl -s -v -u giumas:password -X POST https://api.bitbucket.org/2.0/repositories/hydroffice/hyo_sound_speed_manager/downloads -F files=@SoundSpeedManager.2020.0.4.zip
-
 
 from datetime import datetime
 import sys
 import os
+
 from PyInstaller.building.build_main import Analysis, PYZ, EXE, COLLECT, TOC
+from PyInstaller.utils.hooks import get_package_paths, remove_prefix, PY_IGNORE_EXTENSIONS
 from PyInstaller.compat import is_darwin, is_win
 
-from hyo2.ssm2 import __version__ as ssm_version
+from hyo2.ssm2.app.gui.soundspeedmanager import app_info
 
 sys.setrecursionlimit(20000)
 
-is_alpha = False
-is_beta = False
-if is_alpha:
+if app_info.app_alpha:
+    debug = True
     alphabeta = ".a%s" % datetime.now().strftime("%Y%m%d%H%M%S")
-elif is_beta:
+elif app_info.app_beta:
+    debug = False
     alphabeta = ".b%s" % datetime.now().strftime("%Y%m%d%H%M%S")
 else:
+    debug = False
     alphabeta = str()
 
 
 def collect_pkg_data(package, include_py_files=False, subdir=None):
-    from PyInstaller.utils.hooks import get_package_paths, remove_prefix, PY_IGNORE_EXTENSIONS
 
     # Accept only strings as packages.
     if type(package) is not str:
@@ -114,26 +111,39 @@ ssm2_data = collect_pkg_data('hyo2.ssm2')
 try:
     sdm_data = collect_pkg_data('hyo2.sdm3')
 except Exception as e:
-    print("skipping hyo2.surveydatamonitor: %s" % e)
-    sdm_data = TOC()
+    try:
+        sdm_data = collect_pkg_data('hyo2.sdm4')
+    except Exception as e:
+        print("skipping hyo2.surveydatamonitor: %s" % e)
+        sdm_data = TOC()
 
 icon_file = os.path.normpath(os.path.join(os.getcwd(), 'freeze', 'SoundSpeedManager.ico'))
 if is_darwin:
     icon_file = os.path.normpath(os.path.join(os.getcwd(), 'freeze', 'SoundSpeedManager.icns'))
+
+if debug:
+    noarchive = True  # equivalent to --debug noarchive
+    options = [('v', None, 'OPTION')]   # equivalent to --debug imports
+else:
+    noarchive = False
+    options = []
 
 a = Analysis(['SoundSpeedManager.py'],
              pathex=[],
              hiddenimports=['PySide6.QtSvg', 'hyo2.sdm3'],
              excludes=['qgis', 'pandas', 'fiona', 'PyQt5', 'PySide2', 'shiboken2', 'wx'],
              hookspath=None,
-             runtime_hooks=None)
+             runtime_hooks=None,
+             noarchive=noarchive
+             )
 
 pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts,
+          options,
           exclude_binaries=True,
-          name='SoundSpeedManager',
-          debug=False,
+          name=app_info.app_name_no_spaces,
+          debug=debug,
           strip=None,
           upx=True,
           console=True,
@@ -142,7 +152,6 @@ coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
-               # pyside6_data,
                sdm_data,
                pyproj_data,
                cartopy_data,
@@ -150,4 +159,4 @@ coll = COLLECT(exe,
                ssm2_data,
                strip=None,
                upx=True,
-               name='SoundSpeedManager.%s%s' % (ssm_version, alphabeta))
+               name='%s.%s%s' % (app_info.app_name_no_spaces, app_info.app_version, alphabeta))
