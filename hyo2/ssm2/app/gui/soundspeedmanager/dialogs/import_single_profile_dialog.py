@@ -5,13 +5,23 @@ from typing import TYPE_CHECKING
 
 from PySide6 import QtCore, QtWidgets
 
+# noinspection PyUnresolvedReferences
 from hyo2.abc2.lib.package.pkg_helper import PkgHelper
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2 import pkg_info
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.dialog import AbstractDialog
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.seacat_dialog import SeacatDialog
+# noinspection PyUnresolvedReferences
+from hyo2.ssm2.lib.atlas.regofs_model import RegOfsModel
 
 if TYPE_CHECKING:
+    # noinspection PyUnresolvedReferences
     from hyo2.ssm2.app.gui.soundspeedmanager.mainwin import MainWin
+    # noinspection PyUnresolvedReferences
+    from hyo2.ssm2.app.gui.soundspeedmanager.widgets.editor import Editor
+    # noinspection PyUnresolvedReferences
     from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
@@ -19,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 class ImportSingleProfileDialog(AbstractDialog):
 
-    def __init__(self, main_win: 'MainWin', lib: 'SoundSpeedLibrary', parent=None) -> None:
+    def __init__(self, main_win: 'MainWin', lib: 'SoundSpeedLibrary', parent: 'Editor') -> None:
         AbstractDialog.__init__(self, main_win=main_win, lib=lib, parent=parent)
 
         self.setWindowTitle("Input data")
@@ -151,31 +161,37 @@ class ImportSingleProfileDialog(AbstractDialog):
         btn = QtWidgets.QPushButton("CBOFS")
         self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         btn.setToolTip("Retrieve synthetic data from CBOFS Atlas")
+        btn.setDisabled(RegOfsModel.CBOFS.skip)
         btn.clicked.connect(self.on_click_cbofs)
         # ---- SSCOFS
         btn = QtWidgets.QPushButton("SSCOFS")
         self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         btn.setToolTip("Retrieve synthetic data from SSCOFS Atlas")
+        btn.setDisabled(RegOfsModel.SSCOFS.skip)
         btn.clicked.connect(self.on_click_sscofs)
         # ---- DBOFS
         btn = QtWidgets.QPushButton("DBOFS")
         self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         btn.setToolTip("Retrieve synthetic data from DBOFS Atlas")
+        btn.setDisabled(RegOfsModel.DBOFS.skip)
         btn.clicked.connect(self.on_click_dbofs)
         # ---- GoMOFS
         btn = QtWidgets.QPushButton("GoMOFS")
         self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         btn.setToolTip("Retrieve synthetic data from GoMOFS Atlas")
+        btn.setDisabled(RegOfsModel.GoMOFS.skip)
         btn.clicked.connect(self.on_click_gomofs)
         # -- NGOFS2
         btn = QtWidgets.QPushButton("NGOFS2")
         self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         btn.setToolTip("Retrieve synthetic data from NGOFS2 Atlas")
+        btn.setDisabled(RegOfsModel.NGOFS2.skip)
         btn.clicked.connect(self.on_click_ngofs2)
         # -- SFBOFS
         btn = QtWidgets.QPushButton("SFBOFS")
         self.midRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         btn.setToolTip("Retrieve synthetic data from SFBOFS Atlas")
+        btn.setDisabled(RegOfsModel.SFBOFS.skip)
         btn.clicked.connect(self.on_click_sfbofs)
 
         # --- right button box
@@ -186,44 +202,50 @@ class ImportSingleProfileDialog(AbstractDialog):
         btn = QtWidgets.QPushButton("WCOFS")
         self.rightRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         btn.setToolTip("Retrieve synthetic data from WCOFS Atlas")
+        btn.setDisabled(RegOfsModel.WCOFS.skip)
         btn.clicked.connect(self.on_click_wcofs)
         # -- TBOFS
         btn = QtWidgets.QPushButton("TBOFS")
         self.rightRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         btn.setToolTip("Retrieve synthetic data from TBOFS Atlas")
+        btn.setDisabled(RegOfsModel.TBOFS.skip)
         btn.clicked.connect(self.on_click_tbofs)
         # ---- LEOFS
         btn = QtWidgets.QPushButton("LEOFS")
         self.rightRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         btn.setToolTip("Retrieve synthetic data from LEOFS Atlas")
+        btn.setDisabled(RegOfsModel.LEOFS.skip)
         btn.clicked.connect(self.on_click_leofs)
         # ---- LMHOFS
         btn = QtWidgets.QPushButton("LMHOFS")
         self.rightRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         btn.setToolTip("Retrieve synthetic data from LMHOFS Atlas")
+        btn.setDisabled(RegOfsModel.LMHOFS.skip)
         btn.clicked.connect(self.on_click_lmhofs)
         # ---- LOOFS
         btn = QtWidgets.QPushButton("LOOFS")
         self.rightRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         btn.setToolTip("Retrieve synthetic data from LOOFS Atlas")
+        btn.setDisabled(RegOfsModel.LOOFS.skip)
         btn.clicked.connect(self.on_click_loofs)
         # -- LSOFS
         btn = QtWidgets.QPushButton("LSOFS")
         self.rightRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         btn.setToolTip("Retrieve synthetic data from LSOFS Atlas")
+        btn.setDisabled(RegOfsModel.LSOFS.skip)
         btn.clicked.connect(self.on_click_lsofs)
         # -- NYOFS
         btn = QtWidgets.QPushButton("NYOFS")
         self.rightRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         btn.setToolTip("Retrieve synthetic data from NYOFS Atlas")
         # TODO: Add support for Regional OFS without regular grids
-        btn.setDisabled(True)
+        btn.setDisabled(RegOfsModel.NYOFS.skip)
         # -- SJROFS
         btn = QtWidgets.QPushButton("SJROFS")
         self.rightRetrieveButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         btn.setToolTip("Retrieve synthetic data from SJROFS Atlas")
         # TODO: Add support for Regional OFS without regular grids
-        btn.setDisabled(True)
+        btn.setDisabled(RegOfsModel.SJROFS.skip)
 
         self.retrieveLayout.addStretch()
 
@@ -232,6 +254,7 @@ class ImportSingleProfileDialog(AbstractDialog):
         fmt_desc = settings.value("default_input_format")
         if (fmt_desc is None) or ("Ask" in fmt_desc):
             return
+        fmt_desc: str
         if fmt_desc == "Seabird CTD":
             self.on_click_seabird_ctd()
             return
@@ -251,7 +274,7 @@ class ImportSingleProfileDialog(AbstractDialog):
         idx = self.lib.desc_readers.index(btn.text())
         self.do_import(idx)
 
-    def do_import(self, idx):
+    def do_import(self, idx: int) -> None:
         name = self.lib.name_readers[idx]
         desc = self.lib.desc_readers[idx]
         ext = self.lib.ext_readers[idx]
@@ -303,8 +326,10 @@ class ImportSingleProfileDialog(AbstractDialog):
         self.progress.end()
 
         if settings.value("show_metadata_at_import") == 'true':
-            if self.parent() is not None:
-                self.parent().on_metadata()
+            par = self.parent()
+            if par is not None:
+                par: Editor
+                par.on_metadata()
 
         self.accept()
 

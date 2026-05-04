@@ -105,8 +105,8 @@ class Setup:
 
         # current settings
         self.current_project: str | None = None
-        self.custom_projects_folder: str | None = None
-        self.custom_outputs_folder: str | None = None
+        self._custom_projects_folder: str | None = None
+        self._custom_outputs_folder: str | None = None
         self.custom_woa09_folder: str | None = None
         self.custom_woa13_folder: str | None = None
         self.custom_woa18_folder: str | None = None
@@ -118,11 +118,33 @@ class Setup:
         self.auto_apply_default_metadata: bool | None = None
 
         # loading settings
-        self.release_folder: str | None = release_folder
+        self.release_folder: str = release_folder
         self.load_from_db()
 
     @property
+    def custom_projects_folder(self) -> str:
+        if self._custom_projects_folder is None:
+            raise RuntimeError("custom projects folder is unset")
+        return self._custom_projects_folder
+
+    @custom_projects_folder.setter
+    def custom_projects_folder(self, value: str) -> None:
+        self._custom_projects_folder = value
+
+    @property
+    def custom_outputs_folder(self) -> str:
+        if self._custom_outputs_folder is None:
+            raise RuntimeError("custom outputs folder is unset")
+        return self._custom_outputs_folder
+
+    @custom_outputs_folder.setter
+    def custom_outputs_folder(self, value: str) -> None:
+        self._custom_outputs_folder = value
+
+    @property
     def use_sis(self) -> bool:
+        if self.use_sis4 is None or self.use_sis5 is None:
+            raise RuntimeError("use_sis4 or use_sis5 unset")
         return self.use_sis4 or self.use_sis5
 
     @property
@@ -211,8 +233,8 @@ class Setup:
 
         # current settings
         self.current_project = db.current_project
-        self.custom_projects_folder = db.custom_projects_folder
-        self.custom_outputs_folder = db.custom_outputs_folder
+        self._custom_projects_folder = db.custom_projects_folder
+        self._custom_outputs_folder = db.custom_outputs_folder
         self.custom_woa09_folder = db.custom_woa09_folder
         self.custom_woa13_folder = db.custom_woa13_folder
         self.custom_woa18_folder = db.custom_woa18_folder

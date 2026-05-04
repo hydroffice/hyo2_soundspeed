@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 class Editor(AbstractWidget):
-    here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
+    here = os.path.abspath(os.path.join(str(os.path.dirname(__file__))))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
 
     def __init__(self, main_win: 'MainWin', lib: 'SoundSpeedLibrary') -> None:

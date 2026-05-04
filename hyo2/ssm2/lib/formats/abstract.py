@@ -1,11 +1,14 @@
 import logging
 from abc import ABCMeta
-from typing import Optional, Set, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.profile.profilelist import ProfileList
 
 if TYPE_CHECKING:
+    # noinspection PyUnresolvedReferences
     from hyo2.ssm2.lib.base.callbacks.abstract_callbacks import AbstractCallbacks
+    # noinspection PyUnresolvedReferences
     from hyo2.ssm2.lib.base.setup import Setup
 
 logger = logging.getLogger(__name__)
@@ -14,7 +17,7 @@ logger = logging.getLogger(__name__)
 class AbstractFormat(metaclass=ABCMeta):
     """ Common abstract data format """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.name = self.__class__.__name__.lower()
         self.desc = "Abstract Format"  # a human-readable description
         self.version = "0.1.0"
@@ -27,7 +30,7 @@ class AbstractFormat(metaclass=ABCMeta):
         self.cb: AbstractCallbacks | None = None
 
     @property
-    def ssp(self) -> Optional[ProfileList]:
+    def ssp(self) -> ProfileList | None:
         return self._ssp
 
     @ssp.setter
@@ -35,7 +38,7 @@ class AbstractFormat(metaclass=ABCMeta):
         self._ssp = value
 
     @property
-    def ext(self) -> Set[str]:
+    def ext(self) -> set[str]:
         return self._ext
 
     @property

@@ -1,17 +1,18 @@
-import os
-import math
-import numpy as np
-from netCDF4 import Dataset
 import logging
+import math
+import os
 from datetime import datetime as dt, timezone
 from typing import Union, TYPE_CHECKING
 
-from hyo2.abc2.lib.googledrive import GoogleDrive
+import numpy as np
+from netCDF4 import Dataset
 
+from hyo2.abc2.lib.googledrive import GoogleDrive
 from hyo2.ssm2.lib.atlas.abstract import AbstractAtlas
+from hyo2.ssm2.lib.profile.dicts import Dicts
 from hyo2.ssm2.lib.profile.profile import Profile
 from hyo2.ssm2.lib.profile.profilelist import ProfileList
-from hyo2.ssm2.lib.profile.dicts import Dicts
+
 if TYPE_CHECKING:
     from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
@@ -146,17 +147,17 @@ class Woa09(AbstractAtlas):
         lon_idx = int(round((lon - self.lon_0) / self.lon_step, 0))
         return lat_idx, lon_idx
 
-    def query(self, lat: float, lon: float, dtstamp: Union[dt, None] = None, server_mode: bool = False):
+    def query(self, lat: float, lon: float, datestamp: Union[dt, None] = None, server_mode: bool = False):
         """Query WOA09 for passed location and timestamp"""
-        if dtstamp is None:
-            dtstamp = dt.now(tz=timezone.utc)
-        if not isinstance(dtstamp, dt):
-            raise RuntimeError("invalid datetime passed: %s" % type(dtstamp))
-        logger.debug("query: %s @ (%.6f, %.6f)" % (dtstamp, lon, lat))
+        if datestamp is None:
+            datestamp = dt.now(tz=timezone.utc)
+        if not isinstance(datestamp, dt):
+            raise RuntimeError("invalid datetime passed: %s" % type(datestamp))
+        logger.debug("query: %s @ (%.6f, %.6f)" % (datestamp, lon, lat))
 
         # check the inputs
-        if (lat is None) or (lon is None) or (dtstamp is None):
-            logger.error("invalid query: %s @ (%s, %s)" % (dtstamp.strftime("%Y/%m/%d %H:%M:%S"), lon, lat))
+        if (lat is None) or (lon is None) or (datestamp is None):
+            logger.error("invalid query: %s @ (%s, %s)" % (datestamp.strftime("%Y/%m/%d %H:%M:%S"), lon, lat))
             return None
         if lon < 0:  # Make all longitudes positive
             lon += 360.0
@@ -167,7 +168,7 @@ class Woa09(AbstractAtlas):
                 return None
 
         # calculate month and season indices (based on julian day)
-        jd = int(dtstamp.strftime("%j"))
+        jd = int(datestamp.strftime("%j"))
         self.calc_month_idx(jday=jd)
         self.calc_season_idx(jday=jd)
 
@@ -287,9 +288,9 @@ class Woa09(AbstractAtlas):
         ssp.meta.probe_type = Dicts.probe_types['WOA09']
         ssp.meta.latitude = lat
         ssp.meta.longitude = lon
-        ssp.meta.utc_time = dt(year=dtstamp.year, month=dtstamp.month, day=dtstamp.day,
-                               hour=dtstamp.hour, minute=dtstamp.minute, second=dtstamp.second)
-        ssp.meta.original_path = "WOA09_%s" % dtstamp.strftime("%Y%m%d_%H%M%S")
+        ssp.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day,
+                               hour=datestamp.hour, minute=datestamp.minute, second=datestamp.second)
+        ssp.meta.original_path = "WOA09_%s" % datestamp.strftime("%Y%m%d_%H%M%S")
         ssp.init_data(num_values)
         ssp.data.depth = self.t_seasonal.variables['depth'][0:num_values]
         ssp.data.temp = t[valid]
@@ -312,8 +313,8 @@ class Woa09(AbstractAtlas):
         ssp_min.meta.probe_type = Dicts.probe_types['WOA09']
         ssp_min.meta.latitude = lat
         ssp_min.meta.longitude = lon
-        ssp_min.meta.utc_time = dt(year=dtstamp.year, month=dtstamp.month, day=dtstamp.day,
-                                   hour=dtstamp.hour, minute=dtstamp.minute, second=dtstamp.second)
+        ssp_min.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day,
+                                   hour=datestamp.hour, minute=datestamp.minute, second=datestamp.second)
         if num_values > 0:
             ssp_min.init_data(num_values)
             ssp_min.data.depth = self.t_seasonal.variables['depth'][0:num_values]
@@ -331,7 +332,7 @@ class Woa09(AbstractAtlas):
         ssp_max.meta.probe_type = Dicts.probe_types['WOA09']
         ssp_max.meta.latitude = lat
         ssp_max.meta.longitude = lon
-        ssp_max.meta.utc_time = dt(year=dtstamp.year, month=dtstamp.month, day=dtstamp.day,
+        ssp_max.meta.utc_time = dt(year=datestamp.year, month=dtstamp.month, day=dtstamp.day,
                                    hour=dtstamp.hour, minute=dtstamp.minute, second=dtstamp.second)
         if num_values > 0:
             ssp_max.init_data(num_values)

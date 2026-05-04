@@ -1,23 +1,29 @@
+import logging
 import math
 import os.path
-from datetime import datetime as dt, date, timedelta, UTC
-import logging
 import shutil
+from datetime import datetime as dt, date, timedelta, UTC
 from typing import TYPE_CHECKING
 
-from netCDF4 import Dataset
 import numpy as np
 import requests
+from netCDF4 import Dataset
 
+# noinspection PyUnresolvedReferences
 from hyo2.abc2.lib.progress.cli_progress import CliProgress
-
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.atlas.abstract import AbstractAtlas
-from hyo2.ssm2.lib.profile.profile import Profile
-from hyo2.ssm2.lib.profile.profilelist import ProfileList
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.profile.dicts import Dicts
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.profile.oceanography import Oceanography as Oc
+# noinspection PyUnresolvedReferences
+from hyo2.ssm2.lib.profile.profile import Profile
+# noinspection PyUnresolvedReferences
+from hyo2.ssm2.lib.profile.profilelist import ProfileList
 
 if TYPE_CHECKING:
+    # noinspection PyUnresolvedReferences
     from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
@@ -198,12 +204,12 @@ class Rtofs(AbstractAtlas):
         progress.end()
         return True
 
-    def download_db(self, dtstamp: dt | None = None, server_mode: bool = False) -> bool:
+    def download_db(self, datestamp: dt | None = None, server_mode: bool = False) -> bool:
         """try to connect and load info from the data set"""
-        if dtstamp is None:
-            dtstamp = dt.now(UTC)
+        if datestamp is None:
+            datestamp = dt.now(UTC)
 
-        if not self._download_files(datestamp=dtstamp, server_mode=server_mode):
+        if not self._download_files(datestamp=datestamp, server_mode=server_mode):
             return False
 
         try:
@@ -223,12 +229,12 @@ class Rtofs(AbstractAtlas):
 
         return True
 
-    def grid_coords(self, lat: float, lon: float, dtstamp: dt, server_mode: bool | None = False) -> tuple:
+    def grid_coords(self, lat: float, lon: float, datestamp: dt, server_mode: bool | None = False) -> tuple:
         """Convert the passed position in RTOFS grid coords"""
 
         # check if we need to update the data set (new day!)
-        if not self.download_db(dtstamp, server_mode=server_mode):
-            logger.error("troubles in downloading RTOFS data for timestamp: %s" % dtstamp.strftime("%Y%m%d"))
+        if not self.download_db(datestamp, server_mode=server_mode):
+            logger.error("troubles in downloading RTOFS data for timestamp: %s" % datestamp.strftime("%Y%m%d"))
             return None, None
 
         # make longitude "safe" since RTOFS grid starts at east longitude 70-ish degrees
@@ -254,19 +260,19 @@ class Rtofs(AbstractAtlas):
 
         return lat_idx, lon_idx
 
-    def query(self, lat: float | None, lon: float | None, dtstamp: dt | None = None, server_mode: bool = False):
+    def query(self, lat: float | None, lon: float | None, datestamp: dt | None = None, server_mode: bool = False):
         """Query RTOFS for passed location and timestamp"""
-        if dtstamp is None:
-            dtstamp = dt.now(UTC)
+        if datestamp is None:
+            datestamp = dt.now(UTC)
 
         # check the inputs
         if (lat is None) or (lon is None):
-            logger.error("invalid query: %s @ (%s, %s)" % (dtstamp.strftime("%Y/%m/%d %H:%M:%S"), lon, lat))
+            logger.error("invalid query: %s @ (%s, %s)" % (datestamp.strftime("%Y/%m/%d %H:%M:%S"), lon, lat))
             return None
-        logger.debug("query: %s @ (%.6f, %.6f)" % (dtstamp.strftime("%Y/%m/%d %H:%M:%S"), lon, lat))
+        logger.debug("query: %s @ (%.6f, %.6f)" % (datestamp.strftime("%Y/%m/%d %H:%M:%S"), lon, lat))
 
         try:
-            lat_idx, lon_idx = self.grid_coords(lat, lon, dtstamp=dtstamp, server_mode=server_mode)
+            lat_idx, lon_idx = self.grid_coords(lat, lon, datestamp=datestamp, server_mode=server_mode)
             if lat_idx is None:
                 logger.info("troubles with data source or location outside of %s coverage" % self.name)
                 return None
@@ -318,9 +324,9 @@ class Rtofs(AbstractAtlas):
         if lon > 180.0:  # Go back to negative longitude
             lon -= 360.0
         ssp.meta.longitude = lon
-        ssp.meta.utc_time = dt(year=dtstamp.year, month=dtstamp.month, day=dtstamp.day,
-                               hour=dtstamp.hour, minute=dtstamp.minute, second=dtstamp.second)
-        ssp.meta.original_path = "RTOFS_%s" % dtstamp.strftime("%Y%m%d_%H%M%S")
+        ssp.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day,
+                               hour=datestamp.hour, minute=datestamp.minute, second=datestamp.second)
+        ssp.meta.original_path = "RTOFS_%s" % datestamp.strftime("%Y%m%d_%H%M%S")
         ssp.init_data(num_values)
         ssp.data.depth = d[0:num_values]
         ssp.data.temp = temp_in_situ[0:num_values]
