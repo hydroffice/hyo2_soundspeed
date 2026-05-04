@@ -1,11 +1,15 @@
-from abc import ABCMeta, abstractmethod
-from datetime import datetime as dt, date
 import logging
-from typing import Optional, Union, TYPE_CHECKING
+from abc import ABCMeta, abstractmethod
+from datetime import datetime
+from typing import TYPE_CHECKING
 
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.base.geodesy import Geodesy
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.profile.profilelist import ProfileList
+
 if TYPE_CHECKING:
+    # noinspection PyUnresolvedReferences
     from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
@@ -26,8 +30,8 @@ class AbstractAtlas(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def query(self, lat: Optional[float], lon: Optional[float], datestamp: Union[date, dt, None],
-              server_mode: bool = False) -> Optional[ProfileList]:
+    def query(self, lat: float, lon: float, datestamp: datetime | None,
+              server_mode: bool = False) -> ProfileList | None:
         pass
 
     @abstractmethod

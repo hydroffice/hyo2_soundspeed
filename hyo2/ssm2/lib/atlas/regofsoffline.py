@@ -1,64 +1,31 @@
-from datetime import datetime as dt
-import os
-from enum import IntEnum
 import logging
+import os
+from datetime import datetime as dt
 from typing import Optional, TYPE_CHECKING
+
 from netCDF4 import Dataset, num2date
 
-from hyo2.ssm2.lib.base.geodesy import Geodesy
-from hyo2.ssm2.lib.profile.dicts import Dicts
-from hyo2.ssm2.lib.profile.profile import Profile
-from hyo2.ssm2.lib.profile.profilelist import ProfileList
+# noinspection PyUnresolvedReferences
 from hyo2.abc2.lib.progress.cli_progress import CliProgress
+# noinspection PyUnresolvedReferences
+from hyo2.ssm2.lib.atlas.regofs import RegOfs
+# noinspection PyUnresolvedReferences
+from hyo2.ssm2.lib.base.geodesy import Geodesy
+# noinspection PyUnresolvedReferences
+from hyo2.ssm2.lib.profile.dicts import Dicts
+# noinspection PyUnresolvedReferences
+from hyo2.ssm2.lib.profile.profile import Profile
+# noinspection PyUnresolvedReferences
+from hyo2.ssm2.lib.profile.profilelist import ProfileList
+
 if TYPE_CHECKING:
+    # noinspection PyUnresolvedReferences
     from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 
 
 class RegOfsOffline:
-
-    class Model(IntEnum):
-        # East Coast
-        CBOFS = 10  # RG = True     # Format is GoMOFS
-        DBOFS = 11  # RG = True     # Format is GoMOFS
-        GoMOFS = 12  # RG = True     # Format is GoMOFS
-        NYOFS = 13  # RG = False
-        SJROFS = 14  # RG = False
-
-        # Gulf of Mexico
-        NGOFS2 = 20  # RG = True     # Format is GoMOFS
-        TBOFS = 21  # RG = True     # Format is GoMOFS
-
-        # Great Lakes
-        LEOFS = 30  # RG = True     # Format is GoMOFS
-        LMHOFS = 31  # RG = True    # Format is GoMOFS
-        LOOFS = 33  # RG = True     # Format is GoMOFS
-        LSOFS = 34  # RG = True     # Format is GoMOFS
-
-        # Pacific Coast
-        SSCOFS = 40  # RG = True     # Format is GoMOFS
-        SFBOFS = 41  # RG = True     # Format is GoMOFS
-        WCOFS = 42  # RG = True     # Format is GoMOFS
-
-    # noinspection DuplicatedCode
-    regofs_model_descs = \
-        {
-            Model.CBOFS: "Chesapeake Bay Operational Forecast System",
-            Model.DBOFS: "Delaware Bay Operational Forecast System",
-            Model.GoMOFS: "Gulf of Maine Operational Forecast System",
-            Model.NYOFS: "Port of New York and New Jersey Operational Forecast System",
-            Model.SJROFS: "St. John's River Operational Forecast System",
-            Model.NGOFS2: "Northern Gulf of Mexico Operational Forecast System",
-            Model.TBOFS: "Tampa Bay Operational Forecast System",
-            Model.LEOFS: "Lake Erie Operational Forecast System",
-            Model.LMHOFS: "Lake Michigan and Huron Operational Forecast System",
-            Model.LOOFS: "Lake Ontario Operational Forecast System",
-            Model.LSOFS: "Lake Superior Operational Forecast System",
-            Model.SSCOFS: "Salish Sea and Columbia River Operational Forecast System",
-            Model.SFBOFS: "San Francisco Bay Operational Forecast System",
-            Model.WCOFS: "West Coast Operational Forecast System"
-        }
 
     def __init__(self, data_folder: str, prj: 'SoundSpeedLibrary') -> None:
         self.name = self.__class__.__name__

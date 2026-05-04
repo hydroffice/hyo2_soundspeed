@@ -1,19 +1,19 @@
+from datetime import datetime, timezone, timedelta
 import logging
-from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING
 
-from netCDF4 import Dataset, num2date
 from numpy import full_like, isnan, nan, ma, zeros, nanargmin, unravel_index
 from numpy import typing
+from netCDF4 import Dataset, num2date
 
 # noinspection PyUnresolvedReferences
 from hyo2.abc2.lib.package.pkg_helper import PkgHelper
 # noinspection PyUnresolvedReferences
 from hyo2.abc2.lib.progress.cli_progress import CliProgress
 # noinspection PyUnresolvedReferences
-from hyo2.ssm2.lib.atlas.abstract import AbstractAtlas
+from hyo2.ssm2.lib.atlas.regofs_model import RegOfsModel
 # noinspection PyUnresolvedReferences
-from hyo2.ssm2.lib.atlas.regofs import RegOfs
+from hyo2.ssm2.lib.atlas.abstract import AbstractAtlas
 # noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.profile.dicts import Dicts
 # noinspection PyUnresolvedReferences
@@ -23,104 +23,97 @@ from hyo2.ssm2.lib.profile.profile import Profile
 # noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.profile.profilelist import ProfileList
 
+
 if TYPE_CHECKING:
     # noinspection PyUnresolvedReferences
     from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
+
 logger = logging.getLogger(__name__)
 
 
-class RegOfsOnline(AbstractAtlas):
+class RegOfs(AbstractAtlas):
 
     def __init__(self, data_folder: str, prj: 'SoundSpeedLibrary',
-                 model: RegOfs.Model) -> None:
+                 model: RegOfsModel) -> None:
         super().__init__(data_folder=data_folder, prj=prj)
-        self.model = model
-        self.name = model.name
-        self.desc = model.description
-
+        self.model: RegOfsModel = model
+        self.name: str = model.name
+        self.desc: str = model.description
+        
         # How far are we willing to look for solutions? size in grid nodes
-        self._search_window = 5
-        self._search_half_window = self._search_window // 2
+        self._search_window: int = 5
+        self._search_half_window: int = self._search_window // 2
         # 2000 dBar is the ref depth associated with the potential temperatures in the grid (sigma-2)
-        self._ref_p = 2000
-
-        self._has_data_loaded = False  # grids are "loaded" ? (netCDF files are opened)
-        self._last_loaded_day = datetime(1900, 1, 1)  # some silly day in the past
+        self._ref_p: float = 2000.0
+        
+        self._has_data_loaded: bool = False  # grids are "loaded" ? (netCDF files are opened)
+        self._last_loaded_day: datetime = datetime(1900, 1, 1)  # some silly day in the past
         self._file = None
-        self._day_idx = None
+        self._day_idx: int | None = None
         self._d = None
         self._lat: typing.NDArray | None = None
         self._lon: typing.NDArray | None = None
-        self._lat_step = None
-        self._lat_min = None
-        self._lat_max = None
-        self._lon_step = None
-        self._lon_min = None
-        self._lon_max = None
+        self._lat_step: float | None = None
+        self._lat_min: float | None = None
+        self._lat_max: float | None = None
+        self._lon_step: float | None = None
+        self._lon_min: float | None = None
+        self._lon_max: float | None = None
+        
+    @property
+    def lat_step(self) -> float:
+        if self._lat_step is None:
+            raise RuntimeError("_lat_step is unset")
+        return self._lat_step
+        
+    @property
+    def lat_min(self) -> float:
+        if self._lat_min is None:
+            raise RuntimeError("_lat_min in unset")
+        return self._lat_min
+    
+    @property
+    def lat_max(self) -> float:
+        if self._lat_max is None:
+            raise RuntimeError("_lat_max in unset")
+        return self._lat_max
 
-    # ### public API ###
+    @property
+    def lon_step(self) -> float:
+        if self._lon_step is None:
+            raise RuntimeError("_lon_step is unset")
+        return self._lon_step
 
+    @property
+    def lon_min(self) -> float:
+        if self._lon_min is None:
+            raise RuntimeError("_lon_min in unset")
+        return self._lon_min
+
+    @property
+    def lon_max(self) -> float:
+        if self._lon_max is None:
+            raise RuntimeError("_lon_max in unset")
+        return self._lon_max
+    
+    # is_present function
+        
     def is_present(self) -> bool:
         """check the availability"""
         return self._has_data_loaded
-
-    def download_db(self, dtstamp: datetime | None = None, server_mode: bool = False) -> bool:
-        """try to connect and load info from the data set"""
-        if dtstamp is None:
-            dtstamp: datetime = datetime.now(tz=timezone.utc)
-
-        if not self._download_files(dtstamp=dtstamp, server_mode=server_mode):
-            return False
-
-        try:
-            # Now get latitudes, longitudes and depths for x,y,z referencing
-            self._d = self._file.variables['Depth'][:]
-            self._lat: typing.NDArray = self._file.variables['Latitude'][:]
-            self._lon: typing.NDArray = self._file.variables['Longitude'][:]
-            # logger.debug('d:(%s)\n%s' % (self._d.shape, self._d))
-            # logger.debug('lat:(%s)\n%s' % (self._lat.shape, self._lat))
-            # logger.debug('lon:(%s)\n%s' % (self._lon.shape, self._lon))
-
-        except Exception as e:
-            logger.error("troubles in variable lookup for lat/long grid and/or depth: %s" % e)
-            self.clear_data()
-            return False
-
-        if self._lon is None:
-            raise RuntimeError("_lon is unset")
-        if self._lat is None:
-            raise RuntimeError("_lat is unset")
-
-        self._lat_min = self._lat[0, 0]
-        self._lat_max = self._lat[-1, 0]
-        self._lat_step = self._lat[1, 0] - self._lat_min
-        self._lon_min = self._lon[0, 0]
-        self._lon_max = self._lon[0, -1]
-        self._lon_step = self._lon[0, 1] - self._lon_min
-
-        logger.debug("0(%.3f, %.3f); -1(%.3f, %.3f); step(%.3f, %.3f)"
-                     % (self._lat_min, self._lon_min, self._lat_max, self._lon_max, self._lat_step, self._lon_step))
-        return True
-
-    def query(self, lat: float | None, lon: float | None, dtstamp: datetime | None = None, server_mode: bool = False):
+    
+    # query function
+    
+    def query(self, lat: float, lon: float, datestamp: datetime | None = None, server_mode: bool = False):
         """Query OFS for passed location and timestamp"""
-        if dtstamp is None:
-            dtstamp: datetime = datetime.now(tz=timezone.utc)
+        if datestamp is None:
+            datestamp: datetime = datetime.now(tz=timezone.utc)
 
-        # check the inputs
-        if (lat is None) or (lon is None):
-            logger.error("invalid location query: %s @ (%s, %s)" % (dtstamp.strftime("%Y/%m/%d %H:%M:%S"), lon, lat))
-            return None
-
-        if dtstamp is None:
-            logger.error("invalid time query: (%s, %s)" % (lon, lat))
-            return None
-
-        logger.debug("query: %s @ (%.6f, %.6f)" % (dtstamp, lon, lat))
+        logger.debug("query: %s @ (%.6f, %.6f)" % (datestamp, lon, lat))
 
         try:
-            lat_idx, lon_idx = self.grid_coords(lat, lon, dtstamp=dtstamp, server_mode=server_mode)
+            lat_idx, lon_idx = self.grid_coords(lat, lon, datestamp=datestamp, server_mode=server_mode)
             if lat_idx is None:
                 logger.info("troubles with data source or location outside of %s coverage" % self.name)
                 return None
@@ -131,8 +124,8 @@ class RegOfsOnline(AbstractAtlas):
 
         ocean_time = self._file.variables['time']
         datetime_retrieved = num2date(ocean_time[0], units=ocean_time.units, calendar=ocean_time.calendar)
-        logger.debug(('Query datetime:\t\t\t%s' % dtstamp.isoformat()))
-        logger.debug("Retrieved datetime:\t\t%s" % datetime_retrieved.isoformat())
+        logger.debug(("Query datetime: %s" % datestamp.isoformat()))
+        logger.debug("Retrieved datetime: %s" % datetime_retrieved.isoformat())
 
         if self._lon is None:
             raise RuntimeError("_lon is unset")
@@ -161,9 +154,9 @@ class RegOfsOnline(AbstractAtlas):
         t = self._file.variables['temp'][self._day_idx, :][..., lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
         # logger.debug('t shape: %s' % (t.shape, ))
         # https://ponce.sdsu.edu/lakesalinityworld.html#:~:text=The%20salinity%20of%20Lake%20Superior,between%200.05%20and%200.60%20ppt.
-        if self.name == RegOfs.Model.LMHOFS.name:
+        if self.model == RegOfsModel.LMHOFS:
             s = full_like(t, 0.3)
-        elif self.name == RegOfs.Model.LOOFS.name:
+        elif self.model == RegOfsModel.LOOFS:
             s = full_like(t, 0.5)
         else:
             s = self._file.variables['salt'][self._day_idx, :][..., lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
@@ -242,14 +235,6 @@ class RegOfsOnline(AbstractAtlas):
             logger.info("no data from lookup!")
             return None
 
-        # ind = np.nanargmin(distances[0])
-        # ind2 = np.unravel_index(ind, distances[0].shape)
-        # switching to the query location
-        # lat_out = latitudes[ind2]
-        # lon_out = longitudes[ind2]
-        # while lon_out > 180.0:
-        #     lon_out -= 360.0
-
         # Make a new SV object to return our query in
         ssp = Profile()
         ssp.meta.sensor_type = Dicts.sensor_types['Synthetic']
@@ -258,9 +243,9 @@ class RegOfsOnline(AbstractAtlas):
         if lon > 180.0:  # Go back to negative longitude
             lon -= 360.0
         ssp.meta.longitude = lon
-        ssp.meta.utc_time = datetime(year=dtstamp.year, month=dtstamp.month, day=dtstamp.day,
-                               hour=dtstamp.hour, minute=dtstamp.minute, second=dtstamp.second)
-        ssp.meta.original_path = "%s_%s" % (self.name, dtstamp.strftime("%Y%m%d_%H%M%S"))
+        ssp.meta.utc_time = datetime(year=datestamp.year, month=datestamp.month, day=datestamp.day,
+                               hour=datestamp.hour, minute=datestamp.minute, second=datestamp.second)
+        ssp.meta.original_path = "%s_%s" % (self.name, datestamp.strftime("%Y%m%d_%H%M%S"))
         ssp.init_data(num_values)
         ssp.data.depth = d[0:num_values]
         ssp.data.temp = temp_in_situ[0:num_values]
@@ -273,6 +258,119 @@ class RegOfsOnline(AbstractAtlas):
         profiles.append_profile(ssp)
 
         return profiles
+    
+    def grid_coords(self, lat: float, lon: float, datestamp: datetime, server_mode: bool = False) -> tuple:
+        """Convert the passed position in OFS grid coords"""
+
+        # check if we need to update the data set (new day!)
+        if not self.download_db(datestamp, server_mode=server_mode):
+            logger.error("troubles in updating data set for timestamp: %s" % datestamp.strftime("%Y/%m/%d %H:%M:%S"))
+            return None, None
+
+        # check validity of longitude and latitude
+        if lon < (self.lon_min - self.lon_step / 2.0):
+            return None, None
+        if lat < (self.lat_min - self.lat_step / 2.0):
+            return None, None
+        if lon > (self.lon_max + self.lon_step / 2.0):
+            return None, None
+        if lat > (self.lat_max + self.lat_step / 2.0):
+            return None, None
+
+        # This does a nearest neighbor lookup
+        lat_idx = int(round((lat - self._lat_min) / self._lat_step, 0))
+        lon_idx = int(round((lon - self._lon_min) / self._lon_step, 0))
+
+        return lat_idx, lon_idx
+
+    # download_db function
+
+    def download_db(self, datestamp: datetime | None = None, server_mode: bool = False) -> bool:
+        """try to connect and load info from the data set"""
+        if datestamp is None:
+            datestamp: datetime = datetime.now(tz=timezone.utc)
+
+        if not self._download_files(datestamp=datestamp, server_mode=server_mode):
+            return False
+
+        try:
+            # Now get latitudes, longitudes and depths for x,y,z referencing
+            self._d = self._file.variables['Depth'][:]
+            self._lat: typing.NDArray = self._file.variables['Latitude'][:]
+            self._lon: typing.NDArray = self._file.variables['Longitude'][:]
+            # logger.debug('d:(%s)\n%s' % (self._d.shape, self._d))
+            # logger.debug('lat:(%s)\n%s' % (self._lat.shape, self._lat))
+            # logger.debug('lon:(%s)\n%s' % (self._lon.shape, self._lon))
+
+        except Exception as e:
+            logger.error("troubles in variable lookup for lat/long grid and/or depth: %s" % e)
+            self.clear_data()
+            return False
+
+        if self._lon is None:
+            raise RuntimeError("_lon is unset")
+        if self._lat is None:
+            raise RuntimeError("_lat is unset")
+
+        self._lat_min = self._lat[0, 0]
+        self._lat_max = self._lat[-1, 0]
+        self._lat_step = self._lat[1, 0] - self.lat_min
+        self._lon_min = self._lon[0, 0]
+        self._lon_max = self._lon[0, -1]
+        self._lon_step = self._lon[0, 1] - self.lon_min
+
+        logger.debug("0(%.3f, %.3f); -1(%.3f, %.3f); step(%.3f, %.3f)"
+                     % (self.lat_min, self.lon_min, self.lat_max, self.lon_max, self.lat_step, self.lon_step))
+        return True
+    
+    def _download_files(self, datestamp: datetime, server_mode: bool = False) -> bool:
+        """Actually, just try to connect with the remote files
+        For a given queried date, we may have to use the forecast from the previous
+        day since the current nowcast doesn't hold data for today (solved?)
+        """
+        progress = CliProgress()
+
+        # check if the files are loaded and that the date matches
+        if self._has_data_loaded:
+            # logger.info("%s" % self.last_loaded_day)
+            if self._last_loaded_day == datestamp:
+                return True
+            else:  # the data are old
+                logger.info("cleaning data: %s %s" % (self._last_loaded_day, datestamp))
+                self.clear_data()
+
+        progress.start(text="Connect to %s" % self.name, is_disabled=server_mode)
+
+        # check if the data are available on the RTOFS server
+        url = self.model.valid_opendap_url(input_date=datestamp)
+        if not url:
+            logger.warning('unable to retrieve data from %s server for date: %s and previous day'
+                           % (self.name, datestamp))
+            self.clear_data()
+            progress.end()
+            return False
+
+        progress.update(30)
+
+        # Try to open the data grid grids
+        try:
+            self._file = Dataset(url)
+            progress.update(70)
+            self._day_idx = 0
+
+        except (RuntimeError, IOError) as e:
+            logger.warning("unable to access data: %s -> %s" % (datestamp.strftime("%Y%m%d"), e))
+            self.clear_data()
+            progress.end()
+            return False
+
+        # success!
+        self._has_data_loaded = True
+        self._last_loaded_day = datestamp
+        progress.end()
+        return True
+
+    # Other methods
 
     def clear_data(self) -> None:
         """Delete the data and reset the last loaded day"""
@@ -298,83 +396,3 @@ class RegOfsOnline(AbstractAtlas):
         msg += "      <has data loaded: %s>\n" % (self._has_data_loaded,)
         msg += "      <last loaded day: %s>\n" % (self._last_loaded_day.strftime(r"%d\%m\%Y"),)
         return msg
-
-    # ### private methods ###
-
-    def _download_files(self, dtstamp: datetime, server_mode: bool = False) -> bool:
-        """Actually, just try to connect with the remote files
-        For a given queried date, we may have to use the forecast from the previous
-        day since the current nowcast doesn't hold data for today (solved?)
-        """
-        progress = CliProgress()
-
-        # check if the files are loaded and that the date matches
-        if self._has_data_loaded:
-            # logger.info("%s" % self.last_loaded_day)
-            if self._last_loaded_day == dtstamp:
-                return True
-            else:  # the data are old
-                logger.info("cleaning data: %s %s" % (self._last_loaded_day, dtstamp))
-                self.clear_data()
-
-        progress.start(text="Download %s" % self.name, is_disabled=server_mode)
-
-        # check if the data are available on the RTOFS server
-        url_ck = self.model.download_url(dt=dtstamp)
-        if not PkgHelper.check_url(url_ck):
-
-            dtstamp -= timedelta(days=1)
-            url_ck = self.model.download_url(dt=dtstamp)
-
-            if not PkgHelper.check_url(url_ck):
-                logger.warning('unable to retrieve data from %s server for date: %s and next day'
-                               % (self.name, dtstamp))
-                self.clear_data()
-                progress.end()
-                return False
-
-        progress.update(30)
-
-        # Try to download the data grid grids
-        url = self.model.opendap_url(dt=dtstamp)
-        # logger.debug('downloading RTOFS data for %s' % datestamp)
-        try:
-            self._file = Dataset(url)
-            progress.update(70)
-            self._day_idx = 0
-
-        except (RuntimeError, IOError) as e:
-            logger.warning("unable to access data: %s -> %s" % (dtstamp.strftime("%Y%m%d"), e))
-            self.clear_data()
-            progress.end()
-            return False
-
-        # success!
-        self._has_data_loaded = True
-        self._last_loaded_day = dtstamp
-        progress.end()
-        return True
-
-    def grid_coords(self, lat: float, lon: float, dtstamp: datetime, server_mode: bool = False) -> tuple:
-        """Convert the passed position in OFS grid coords"""
-
-        # check if we need to update the data set (new day!)
-        if not self.download_db(dtstamp, server_mode=server_mode):
-            logger.error("troubles in updating data set for timestamp: %s" % dtstamp.strftime("%Y/%m/%d %H:%M:%S"))
-            return None, None
-
-        # check validity of longitude and latitude
-        if lon < (self._lon_min - self._lon_step / 2.0):
-            return None, None
-        if lat < (self._lat_min - self._lat_step / 2.0):
-            return None, None
-        if lon > (self._lon_max + self._lon_step / 2.0):
-            return None, None
-        if lat > (self._lat_max + self._lat_step / 2.0):
-            return None, None
-
-        # This does a nearest neighbor lookup
-        lat_idx = int(round((lat - self._lat_min) / self._lat_step, 0))
-        lon_idx = int(round((lon - self._lon_min) / self._lon_step, 0))
-
-        return lat_idx, lon_idx

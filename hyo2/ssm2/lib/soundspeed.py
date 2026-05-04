@@ -5,34 +5,53 @@ import re
 import shutil
 import time
 import traceback
-from typing import Optional, TYPE_CHECKING
+from datetime import datetime
+from typing import cast
 
 from appdirs import user_data_dir
 
+# noinspection PyUnresolvedReferences
 from hyo2.abc2.lib.gdal_aux import GdalAux
+# noinspection PyUnresolvedReferences
 from hyo2.abc2.lib.package.pkg_helper import PkgHelper
+# noinspection PyUnresolvedReferences
 from hyo2.abc2.lib.progress.abstract_progress import AbstractProgress
+# noinspection PyUnresolvedReferences
 from hyo2.abc2.lib.progress.cli_progress import CliProgress
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2 import pkg_info
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib import formats
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.atlas.atlases import Atlases
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.base.callbacks.abstract_callbacks import AbstractCallbacks
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.base.callbacks.cli_callbacks import CliCallbacks
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.base.setup import Setup
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.base.setup_db import SetupDb
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.db.db import ProjectDb
+# noinspection PyUnresolvedReferences
+from hyo2.ssm2.lib.db.export import ExportDbFields
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.listener.listeners import Listeners
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.profile.dicts import Dicts
+# noinspection PyUnresolvedReferences
+from hyo2.ssm2.lib.profile.profile import Profile
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.profile.profilelist import ProfileList
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.profile.ray_tracing.diff_tracedprofiles import DiffTracedProfiles
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.profile.ray_tracing.plot_tracedprofiles import PlotTracedProfiles
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.profile.ray_tracing.tracedprofile import TracedProfile
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.server.server import Server
-
-if TYPE_CHECKING:
-    from datetime import datetime
-    from hyo2.ssm2.lib.profile.profile import Profile
-    from hyo2.ssm2.lib.db.export import ExportDbFields
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +59,7 @@ logger = logging.getLogger(__name__)
 class SoundSpeedLibrary:
     """Sound Speed library"""
 
-    def __init__(self, data_folder: Optional[str] = None,
+    def __init__(self, data_folder: str | None = None,
                  callbacks: AbstractCallbacks = CliCallbacks(), progress: AbstractProgress = CliProgress()) -> None:
         """Initialization for the library"""
         # logger.info("** > LIB: initializing ...")
@@ -112,20 +131,20 @@ class SoundSpeedLibrary:
     # --- library, release, atlases, and projects folders
 
     @classmethod
-    def make_data_folder(cls, data_folder: Optional[str] = None) -> str:
+    def make_data_folder(cls, data_folder: str | None = None) -> str:
 
         # output data folder: where all the library data are written
         if data_folder is None:
-            data_folder = user_data_dir(pkg_info.name, "HydrOffice")
+            data_folder: str = user_data_dir(pkg_info.name, "HydrOffice")
         if not os.path.exists(data_folder):  # create it if it does not exist
             os.makedirs(data_folder)
         # logger.debug("library folder: %s" % data_folder)
         return data_folder
 
     @classmethod
-    def make_logs_folder(cls, data_folder: Optional[str] = None) -> str:
+    def make_logs_folder(cls, data_folder: str | None = None) -> str:
 
-        data_folder = cls.make_data_folder(data_folder=data_folder)
+        data_folder: str = cls.make_data_folder(data_folder=data_folder)
 
         # logs data folder
         logs_folder = os.path.join(data_folder, "logs")
@@ -136,9 +155,9 @@ class SoundSpeedLibrary:
         return logs_folder
 
     @classmethod
-    def make_releases_folder(cls, data_folder: Optional[str] = None) -> str:
+    def make_releases_folder(cls, data_folder: str | None = None) -> str:
 
-        data_folder = cls.make_data_folder(data_folder=data_folder)
+        data_folder: str = cls.make_data_folder(data_folder=data_folder)
 
         # releases data folder
         releases_folder = os.path.join(data_folder, "releases")
@@ -149,7 +168,7 @@ class SoundSpeedLibrary:
         return releases_folder
 
     @classmethod
-    def make_release_folder(cls, data_folder: Optional[str] = None) -> str:
+    def make_release_folder(cls, data_folder: str | None = None) -> str:
         # release data folder: release-specific data (as settings)
         releases_folder = cls.make_releases_folder(data_folder=data_folder)
         release_folder = os.path.join(releases_folder, pkg_info.version[:pkg_info.version.rindex('.')])
@@ -208,7 +227,7 @@ class SoundSpeedLibrary:
         logger.info("copied content from: %s to: %s" % (input_setup, output_setup))
         return True
 
-    def set_folders(self, data_folder: str) -> None:
+    def set_folders(self, data_folder: str | None) -> None:
         """manage library folders creation"""
 
         self._data_folder = self.make_data_folder(data_folder=data_folder)
@@ -218,14 +237,14 @@ class SoundSpeedLibrary:
 
         # projects folder
         self._projects_folder = os.path.join(self.data_folder, "projects")
-        if not os.path.exists(self._projects_folder):  # create it if it does not exist
-            os.makedirs(self._projects_folder)
+        if not os.path.exists(self.projects_folder):  # create it if it does not exist
+            os.makedirs(self.projects_folder)
         # logger.debug("projects folder: %s" % self.projects_folder)
 
         # outputs folder
         self._outputs_folder = os.path.join(self.data_folder, "outputs")
-        if not os.path.exists(self._outputs_folder):  # create it if it does not exist
-            os.makedirs(self._outputs_folder)
+        if not os.path.exists(self.outputs_folder):  # create it if it does not exist
+            os.makedirs(self.outputs_folder)
             # logger.debug("outputs folder: %s" % self.projects_folder)
 
     # library data folder
@@ -233,6 +252,8 @@ class SoundSpeedLibrary:
     @property
     def data_folder(self) -> str:
         """Get the library data folder"""
+        if self._data_folder is None:
+            raise RuntimeError("data folder not set")
         return self._data_folder
 
     @data_folder.setter
@@ -248,6 +269,8 @@ class SoundSpeedLibrary:
     @property
     def releases_folder(self) -> str:
         """Get the releases data folder"""
+        if self._releases_folder is None:
+            raise ReferenceError("Releases folder not set")
         return self._releases_folder
 
     @releases_folder.setter
@@ -263,6 +286,8 @@ class SoundSpeedLibrary:
     @property
     def release_folder(self) -> str:
         """Get the release data folder"""
+        if self._release_folder is None:
+            raise ReferenceError("Release folder not set")
         return self._release_folder
 
     @release_folder.setter
@@ -315,6 +340,8 @@ class SoundSpeedLibrary:
     @property
     def projects_folder(self) -> str:
         """Get the projects folder"""
+        if self._projects_folder is None:
+            raise RuntimeError("No projects folder set")
         return self._projects_folder
 
     @projects_folder.setter
@@ -330,6 +357,8 @@ class SoundSpeedLibrary:
     @property
     def outputs_folder(self) -> str:
         """Get the outputs folder"""
+        if self._outputs_folder is None:
+            raise RuntimeError("No outputs folder set")
         return self._outputs_folder
 
     @outputs_folder.setter
@@ -345,6 +374,8 @@ class SoundSpeedLibrary:
     @property
     def logs_folder(self) -> str:
         """Get the logs folder"""
+        if self._logs_folder is None:
+            raise RuntimeError("No logs folder set")
         return self._logs_folder
 
     @logs_folder.setter
@@ -393,10 +424,12 @@ class SoundSpeedLibrary:
 
     @property
     def ssp_list(self) -> ProfileList:
+        if self.ssp is None:
+            raise RuntimeError("No ssp list set")
         return self.ssp
 
     @property
-    def cur(self) -> Optional['Profile']:
+    def cur(self) -> Profile | None:
         if self.ssp is None:
             return None
         return self.ssp.cur
@@ -405,18 +438,20 @@ class SoundSpeedLibrary:
     def cur_basename(self) -> str:
         if self.cur is None:
             return "output"
-        if self.cur.meta.original_path is None:
+        cur = cast(Profile, self.cur)
+        if cur.meta.original_path is None:
             return "output"
         # noinspection PyTypeChecker
-        return os.path.basename(self.cur.meta.original_path).split('.')[0]
+        return os.path.basename(cur.meta.original_path).split('.')[0]
 
     @property
-    def cur_file(self) -> Optional[str]:
+    def cur_file(self) -> str | None:
         if self.cur is None:
             return None
-        if self.cur.meta.original_path is None:
+        cur = cast(Profile, self.cur)
+        if cur.meta.original_path is None:
             return None
-        return os.path.basename(self.cur.meta.original_path)
+        return os.path.basename(cur.meta.original_path)
 
     def has_ssp(self) -> bool:
         if self.cur is None:
@@ -489,6 +524,9 @@ class SoundSpeedLibrary:
 
     def _retrieve_atlases(self):
         # retrieve atlases data for each retrieved profile
+        if self.ssp is None:
+            raise RuntimeError("No ssp list set")
+
         for pr in self.ssp.l:
 
             if self.use_woa09() and self.has_woa09():
@@ -1014,8 +1052,8 @@ class SoundSpeedLibrary:
 
     # --- export data
 
-    def export_data(self, data_formats: list, data_paths: Optional[dict],
-                    data_files: Optional[dict] = None, custom_writer_instrument: Optional[str] = None):
+    def export_data(self, data_formats: list, data_paths: dict[str, str] | None,
+                    data_files: dict[str, str] | None = None, custom_writer_instrument: str | None = None):
         """Export data using a list of formats name"""
 
         # checks
@@ -1032,12 +1070,15 @@ class SoundSpeedLibrary:
                 has_data_files = True
 
         if data_paths is None:
-            data_paths = dict()
+            data_paths: dict[str, str] = dict()
             for name in data_formats:
                 data_paths[name] = self.outputs_folder
 
         # create the outputs
         for i, name in enumerate(data_formats):
+
+            if self.ssp is None:
+                raise RuntimeError("ssp not set")
 
             # special case: synthetic multiple profiles, we just save the average profile
             if (name == 'ncei') and (self.ssp.l[0].meta.sensor_type == Dicts.sensor_types['Synthetic']):
@@ -1056,8 +1097,12 @@ class SoundSpeedLibrary:
                         logger.warning("issue in preparing the data for SIS")
                         return False
 
-                    si = self.cur.sis_thinned
-                    thin_profile_length = self.cur.sis.flag[si].size
+                    if self.cur is None:
+                        raise RuntimeError("cur not set")
+                    cur = cast(Profile, self.cur)
+
+                    si = cur.sis_thinned
+                    thin_profile_length = cur.sis.flag[si].size
                     logger.debug("thin profile size: %d (with tolerance: %.3f)" % (thin_profile_length, tolerance))
                     if thin_profile_length < 1000:
                         break
@@ -1221,7 +1266,7 @@ class SoundSpeedLibrary:
 
         return success
 
-    def db_list_profiles(self, project: Optional[str] = None, with_stats: bool = False) -> list:
+    def db_list_profiles(self, project: str | None = None, with_stats: bool = False) -> list:
         """List the profile on the db"""
         if project is None:
             project = self.current_project
@@ -1298,64 +1343,69 @@ class SoundSpeedLibrary:
         return lst
 
     def profile_stats(self) -> str:
+        if self.cur is None:
+            raise RuntimeError("No profile set")
+        cur = cast(Profile, self.cur)
+
         msg = str()
         if not self.has_ssp():
             return "Profile not loaded"
 
-        if self.cur.proc.depth[self.cur.proc_valid].size == 0:
+        if cur.proc.depth[cur.proc_valid].size == 0:
             return "Empty profile"
 
         pre = "<pre style='margin:3px;'>"
 
-        msg += "%s<b>Nr. of Samples</b>: %d</pre>" % (pre, self.cur.proc.depth[self.cur.proc_valid].size)
+        msg += "%s<b>Nr. of Samples</b>: %d</pre>" % (pre, cur.proc.depth[cur.proc_valid].size)
 
         msg += "%s           <b>Depth</b>     <b>Sound Speed</b>    <b>Temperature</b>   <b>Salinity</b></pre>" % pre
         msg += "%s<b>min</b>:    % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
                    pre,
-                   self.cur.proc_depth_min, self.cur.meta.depth_uom,
-                   self.cur.proc_speed_min, self.cur.meta.speed_uom,
-                   self.cur.proc_temp_min, self.cur.meta.temperature_uom,
-                   self.cur.proc_sal_min, self.cur.meta.salinity_uom,
+                   cur.proc_depth_min, cur.meta.depth_uom,
+                   cur.proc_speed_min, cur.meta.speed_uom,
+                   cur.proc_temp_min, cur.meta.temperature_uom,
+                   cur.proc_sal_min, cur.meta.salinity_uom,
                )
         msg += "%s<b>max</b>:    % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
                    pre,
-                   self.cur.proc_depth_max, self.cur.meta.depth_uom,
-                   self.cur.proc_speed_max, self.cur.meta.speed_uom,
-                   self.cur.proc_temp_max, self.cur.meta.temperature_uom,
-                   self.cur.proc_sal_max, self.cur.meta.salinity_uom
+                   cur.proc_depth_max, cur.meta.depth_uom,
+                   cur.proc_speed_max, cur.meta.speed_uom,
+                   cur.proc_temp_max, cur.meta.temperature_uom,
+                   cur.proc_sal_max, cur.meta.salinity_uom
                )
         # noinspection PyStringFormat
         msg += "%s<b>med</b>:    % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
                    pre,
-                   self.cur.proc_depth_median, self.cur.meta.depth_uom,
-                   self.cur.proc_speed_median, self.cur.meta.speed_uom,
-                   self.cur.proc_temp_median, self.cur.meta.temperature_uom,
-                   self.cur.proc_sal_median, self.cur.meta.salinity_uom
+                   cur.proc_depth_median, cur.meta.depth_uom,
+                   cur.proc_speed_median, cur.meta.speed_uom,
+                   cur.proc_temp_median, cur.meta.temperature_uom,
+                   cur.proc_sal_median, cur.meta.salinity_uom
                )
         msg += "%s<b>avg(*)</b>: % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
                    pre,
-                   self.cur.proc_depth_mean, self.cur.meta.depth_uom,
-                   self.cur.proc_speed_mean, self.cur.meta.speed_uom,
-                   self.cur.proc_temp_mean, self.cur.meta.temperature_uom,
-                   self.cur.proc_sal_mean, self.cur.meta.salinity_uom
+                   cur.proc_depth_mean, cur.meta.depth_uom,
+                   cur.proc_speed_mean, cur.meta.speed_uom,
+                   cur.proc_temp_mean, cur.meta.temperature_uom,
+                   cur.proc_sal_mean, cur.meta.salinity_uom
                )
         msg += "%s<b>std</b>:    % 8.1f %s% 10.1f %s% 8.1f %s% 8.1f %s    </pre>" \
                % (
                    pre,
-                   self.cur.proc_depth_std, self.cur.meta.depth_uom,
-                   self.cur.proc_speed_std, self.cur.meta.speed_uom,
-                   self.cur.proc_temp_std, self.cur.meta.temperature_uom,
-                   self.cur.proc_sal_std, self.cur.meta.salinity_uom
+                   cur.proc_depth_std, cur.meta.depth_uom,
+                   cur.proc_speed_std, cur.meta.speed_uom,
+                   cur.proc_temp_std, cur.meta.temperature_uom,
+                   cur.proc_sal_std, cur.meta.salinity_uom
                )
         msg += "(*) Weighted harmonic mean for sound speed, otherwise arithmetic."
 
         return msg
 
-    def load_profile(self, pk: int, skip_atlas: Optional[bool] = False) -> bool:
+    def load_profile(self, pk: int, skip_atlas: bool = False) -> bool:
+
         ssp = self.db_retrieve_profile(pk)
         if not ssp:
             return False
@@ -1363,43 +1413,47 @@ class SoundSpeedLibrary:
         self.clear_data()
         self.ssp = ssp
 
+        if self.ssp.cur is None:
+            raise RuntimeError("No profile set")
+        cur = cast(Profile, self.ssp.cur)
+
         # retrieve atlases data for each retrieved profile
         if self.use_woa09() and self.has_woa09() and not skip_atlas:
-            self.ssp.cur.woa09 = self.atlases.woa09.query(lat=self.ssp.cur.meta.latitude,
-                                                          lon=self.ssp.cur.meta.longitude,
-                                                          dtstamp=self.ssp.cur.meta.utc_time)
+            cur.woa09 = self.atlases.woa09.query(lat=cur.meta.latitude,
+                                                 lon=cur.meta.longitude,
+                                                 dtstamp=cur.meta.utc_time)
 
         if self.use_woa13() and self.has_woa13() and not skip_atlas:
-            self.ssp.cur.woa13 = self.atlases.woa13.query(lat=self.ssp.cur.meta.latitude,
-                                                          lon=self.ssp.cur.meta.longitude,
-                                                          dtstamp=self.ssp.cur.meta.utc_time)
+            cur.woa13 = self.atlases.woa13.query(lat=cur.meta.latitude,
+                                                 lon=cur.meta.longitude,
+                                                 dtstamp=cur.meta.utc_time)
 
         if self.use_woa18() and self.has_woa18() and not skip_atlas:
-            self.ssp.cur.woa18 = self.atlases.woa18.query(lat=self.ssp.cur.meta.latitude,
-                                                          lon=self.ssp.cur.meta.longitude,
-                                                          dtstamp=self.ssp.cur.meta.utc_time)
+            cur.woa18 = self.atlases.woa18.query(lat=cur.meta.latitude,
+                                                 lon=cur.meta.longitude,
+                                                 dtstamp=cur.meta.utc_time)
 
         if self.use_woa23() and self.has_woa23() and not skip_atlas:
-            self.ssp.cur.woa23 = self.atlases.woa23.query(lat=self.ssp.cur.meta.latitude,
-                                                          lon=self.ssp.cur.meta.longitude,
-                                                          dtstamp=self.ssp.cur.meta.utc_time)
+            cur.woa23 = self.atlases.woa23.query(lat=cur.meta.latitude,
+                                                 lon=cur.meta.longitude,
+                                                 dtstamp=cur.meta.utc_time)
 
         if self.use_rtofs() and not skip_atlas:
             try:
-                self.ssp.cur.rtofs = self.atlases.rtofs.query(lat=self.ssp.cur.meta.latitude,
-                                                              lon=self.ssp.cur.meta.longitude,
-                                                              dtstamp=self.ssp.cur.meta.utc_time)
+                cur.rtofs = self.atlases.rtofs.query(lat=cur.meta.latitude,
+                                                     lon=cur.meta.longitude,
+                                                     dtstamp=cur.meta.utc_time)
             except RuntimeError:
-                self.ssp.cur.rtofs = None
+                cur.rtofs = None
                 logger.warning("unable to retrieve RTOFS data")
 
         if self.use_gomofs() and not skip_atlas:
             try:
-                self.ssp.cur.gomofs = self.atlases.gomofs.query(lat=self.ssp.cur.meta.latitude,
-                                                                lon=self.ssp.cur.meta.longitude,
-                                                                dtstamp=self.ssp.cur.meta.utc_time)
+                cur.gomofs = self.atlases.gomofs.query(lat=cur.meta.latitude,
+                                                       lon=cur.meta.longitude,
+                                                       dtstamp=cur.meta.utc_time)
             except RuntimeError:
-                self.ssp.cur.gomofs = None
+                cur.gomofs = None
                 logger.warning("unable to retrieve GoMOFS data")
 
         return True
@@ -1465,7 +1519,7 @@ class SoundSpeedLibrary:
             logger.error(e)
             return
 
-    def dqa_at_surface(self, pk: int) -> Optional[str]:
+    def dqa_at_surface(self, pk: int) -> str | None:
         """Check the sound speed difference between a point measure and the current profile"""
 
         sn = self.cb.ask_text(title="Enter text", msg="Serial number of surface sound speed instrument")
@@ -1514,7 +1568,7 @@ class SoundSpeedLibrary:
 
         return msg
 
-    def dqa_full_profile(self, pk: int, pk_ref: Optional[int] = None, angle: Optional[float] = None) -> Optional[str]:
+    def dqa_full_profile(self, pk: int, pk_ref: int | None = None, angle: float | None = None) -> str | None:
 
         if angle is None:
             angle = self.cb.ask_number(title="Enter number", msg="What launch angle(deg) should be checked",
@@ -1539,7 +1593,7 @@ class SoundSpeedLibrary:
         _ = db.plot.raise_window()
         db.disconnect()
 
-    def map_db_profiles(self, pks: Optional[list] = None, show_plot: Optional[bool] = False) -> bool:
+    def map_db_profiles(self, pks: list | None = None, show_plot: bool = False) -> bool:
         """List the profile on the db"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         ret = db.plot.map_profiles(pks=pks, show_plot=show_plot)
@@ -1585,8 +1639,8 @@ class SoundSpeedLibrary:
 
     # exporting
 
-    def export_db_profiles_metadata(self, ogr_format: Optional[int] = GdalAux.ogr_formats['ESRI Shapefile'],
-                                    filter_fields: Optional['ExportDbFields'] = None) -> bool:
+    def export_db_profiles_metadata(self, ogr_format: int = GdalAux.ogr_formats['ESRI Shapefile'],
+                                    filter_fields: ExportDbFields | None = None) -> bool:
         """Export the db profile metadata"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         success = db.export.export_profiles_metadata(project_name=self.current_project,
@@ -1759,7 +1813,7 @@ class SoundSpeedLibrary:
 
         return True
 
-    def add_cur_tss(self, server_mode: Optional[bool] = False) -> bool:
+    def add_cur_tss(self, server_mode: bool = False) -> bool:
         """Add the transducer sound speed to the current profile"""
         if not self.has_ssp():
             logger.warning("no profile!")
@@ -1856,8 +1910,8 @@ class SoundSpeedLibrary:
 
         return True
 
-    def prepare_sis(self, apply_thin: Optional[bool] = True, apply_12k: Optional[bool] = True,
-                    thin_tolerance: Optional[float] = 0.01) -> bool:
+    def prepare_sis(self, apply_thin: bool = True, apply_12k: bool = True,
+                    thin_tolerance: float = 0.01) -> bool:
         if not self.has_ssp():
             logger.warning("no profile!")
             return False
@@ -1937,7 +1991,7 @@ class SoundSpeedLibrary:
 
     # --- plot data
 
-    def plot_ssp(self, more: Optional[bool] = False, show: Optional[bool] = True) -> None:
+    def plot_ssp(self, more: bool = False, show: bool = True) -> None:
         """Plot the profiles (mainly for debug)"""
         if self.cur is None:
             return
@@ -1987,57 +2041,93 @@ class SoundSpeedLibrary:
 
     # --- atlases
     def use_woa09(self) -> bool:
+        if self.setup.use_woa09 is None:
+            raise RuntimeError('use_woa09 not defined')
         return self.setup.use_woa09
 
     def use_woa13(self) -> bool:
+        if self.setup.use_woa13 is None:
+            raise RuntimeError('use_woa13 not defined')
         return self.setup.use_woa13
 
     def use_woa18(self) -> bool:
+        if self.setup.use_woa18 is None:
+            raise RuntimeError('use_woa18 not defined')
         return self.setup.use_woa18
 
     def use_woa23(self) -> bool:
+        if self.setup.use_woa23 is None:
+            raise RuntimeError('use_woa23 not defined')
         return self.setup.use_woa23
 
     def use_rtofs(self) -> bool:
+        if self.setup.use_rtofs is None:
+            raise RuntimeError('use_rtofs not defined')
         return self.setup.use_rtofs
 
     def use_cbofs(self) -> bool:
+        if self.setup.use_cbofs is None:
+            raise RuntimeError('use_cbofs not defined')
         return self.setup.use_cbofs
 
     def use_dbofs(self) -> bool:
+        if self.setup.use_dbofs is None:
+            raise RuntimeError('use_dbofs not defined')
         return self.setup.use_dbofs
 
     def use_gomofs(self) -> bool:
+        if self.setup.use_gomofs is None:
+            raise RuntimeError('use_gomofs not defined')
         return self.setup.use_gomofs
 
     def use_nyofs(self) -> bool:
+        if self.setup.use_nyofs is None:
+            raise RuntimeError('use_nyofs not defined')
         return self.setup.use_nyofs
 
     def use_sjrofs(self) -> bool:
+        if self.setup.use_sjrofs is None:
+            raise RuntimeError('use_sjrofs not defined')
         return self.setup.use_sjrofs
 
     def use_ngofs2(self) -> bool:
+        if self.setup.use_ngofs2 is None:
+            raise RuntimeError('use_ngofs2 not defined')
         return self.setup.use_ngofs2
 
     def use_tbofs(self) -> bool:
+        if self.setup.use_tbofs is None:
+            raise RuntimeError('use_tbofs not defined')
         return self.setup.use_tbofs
 
     def use_leofs(self) -> bool:
+        if self.setup.use_leofs is None:
+            raise RuntimeError('use_leofs not defined')
         return self.setup.use_leofs
 
     def use_lmhofs(self) -> bool:
+        if self.setup.use_lmhofs is None:
+            raise RuntimeError('use_lmhofs not defined')
         return self.setup.use_lmhofs
 
     def use_loofs(self) -> bool:
+        if self.setup.use_loofs is None:
+            raise RuntimeError('use_loofs not defined')
         return self.setup.use_loofs
 
     def use_lsofs(self) -> bool:
+        if self.setup.use_lsofs is None:
+            raise RuntimeError('use_lsofs not defined')
         return self.setup.use_lsofs
 
     def use_sscofs(self) -> bool:
+        if self.setup.use_sscofs is None:
+            raise RuntimeError('use_sscofs not defined')
         return self.setup.use_sscofs
 
     def use_sfbofs(self) -> bool:
+        if self.setup.use_sfbofs is None:
+            raise RuntimeError('use_sfbofs not defined')
         return self.setup.use_sfbofs
 
     def has_woa09(self) -> bool:
@@ -2109,50 +2199,50 @@ class SoundSpeedLibrary:
     def download_woa23(self) -> bool:
         return self.atlases.woa23.download_db()
 
-    def download_rtofs(self, datestamp: Optional['datetime'] = None) -> bool:
-        return self.atlases.rtofs.download_db(dtstamp=datestamp)
+    def download_rtofs(self, datestamp: datetime | None = None) -> bool:
+        return self.atlases.rtofs.download_db(datestamp=datestamp)
 
-    def download_cbofs(self, datestamp: Optional['datetime'] = None) -> bool:
-        return self.atlases.cbofs.download_db(dtstamp=datestamp)
+    def download_cbofs(self, datestamp: datetime | None = None) -> bool:
+        return self.atlases.cbofs.download_db(datestamp=datestamp)
 
-    def download_dbofs(self, datestamp: Optional['datetime'] = None) -> bool:
-        return self.atlases.dbofs.download_db(dtstamp=datestamp)
+    def download_dbofs(self, datestamp: datetime | None = None) -> bool:
+        return self.atlases.dbofs.download_db(datestamp=datestamp)
 
-    def download_gomofs(self, datestamp: Optional['datetime'] = None) -> bool:
-        return self.atlases.gomofs.download_db(dtstamp=datestamp)
+    def download_gomofs(self, datestamp: datetime | None = None) -> bool:
+        return self.atlases.gomofs.download_db(datestamp=datestamp)
 
-    def download_nyofs(self, datestamp: Optional['datetime'] = None) -> bool:
-        return self.atlases.nyofs.download_db(dtstamp=datestamp)
+    def download_nyofs(self, datestamp: datetime | None = None) -> bool:
+        return self.atlases.nyofs.download_db(datestamp=datestamp)
 
-    def download_sjrofs(self, datestamp: Optional['datetime'] = None) -> bool:
-        return self.atlases.sjrofs.download_db(dtstamp=datestamp)
+    def download_sjrofs(self, datestamp: datetime | None = None) -> bool:
+        return self.atlases.sjrofs.download_db(datestamp=datestamp)
 
-    def download_ngofs2(self, datestamp: Optional['datetime'] = None) -> bool:
-        return self.atlases.ngofs2.download_db(dtstamp=datestamp)
+    def download_ngofs2(self, datestamp: datetime | None = None) -> bool:
+        return self.atlases.ngofs2.download_db(datestamp=datestamp)
 
-    def download_tbofs(self, datestamp: Optional['datetime'] = None) -> bool:
-        return self.atlases.tbofs.download_db(dtstamp=datestamp)
+    def download_tbofs(self, datestamp: datetime | None = None) -> bool:
+        return self.atlases.tbofs.download_db(datestamp=datestamp)
 
-    def download_leofs(self, datestamp: Optional['datetime'] = None) -> bool:
-        return self.atlases.leofs.download_db(dtstamp=datestamp)
+    def download_leofs(self, datestamp: datetime | None = None) -> bool:
+        return self.atlases.leofs.download_db(datestamp=datestamp)
 
-    def download_lmhofs(self, datestamp: Optional['datetime'] = None) -> bool:
-        return self.atlases.lmhofs.download_db(dtstamp=datestamp)
+    def download_lmhofs(self, datestamp: datetime | None = None) -> bool:
+        return self.atlases.lmhofs.download_db(datestamp=datestamp)
 
-    def download_loofs(self, datestamp: Optional['datetime'] = None) -> bool:
-        return self.atlases.loofs.download_db(dtstamp=datestamp)
+    def download_loofs(self, datestamp: datetime | None = None) -> bool:
+        return self.atlases.loofs.download_db(datestamp=datestamp)
 
-    def download_lsofs(self, datestamp: Optional['datetime'] = None) -> bool:
-        return self.atlases.lsofs.download_db(dtstamp=datestamp)
+    def download_lsofs(self, datestamp: datetime | None = None) -> bool:
+        return self.atlases.lsofs.download_db(datestamp=datestamp)
 
-    def download_sscofs(self, datestamp: Optional['datetime'] = None) -> bool:
-        return self.atlases.sscofs.download_db(dtstamp=datestamp)
+    def download_sscofs(self, datestamp: datetime | None = None) -> bool:
+        return self.atlases.sscofs.download_db(datestamp=datestamp)
 
-    def download_sfbofs(self, datestamp: Optional['datetime'] = None) -> bool:
-        return self.atlases.sfbofs.download_db(dtstamp=datestamp)
+    def download_sfbofs(self, datestamp: datetime | None = None) -> bool:
+        return self.atlases.sfbofs.download_db(datestamp=datestamp)
 
-    def download_wcofs(self, datestamp: Optional['datetime'] = None) -> bool:
-        return self.atlases.wcofs.download_db(dtstamp=datestamp)
+    def download_wcofs(self, datestamp: datetime | None = None) -> bool:
+        return self.atlases.wcofs.download_db(datestamp=datestamp)
 
     # --- listeners
 
@@ -2162,19 +2252,29 @@ class SoundSpeedLibrary:
 
     def use_sis5(self) -> bool:
         """True if SIS5 use is enabled"""
+        if self.setup.use_sis5 is None:
+            raise RuntimeError("use_sis5 is not set")
         return self.setup.use_sis5
 
     def use_sis4(self) -> bool:
         """True if SIS4 use is enabled"""
+        if self.setup.use_sis4 is None:
+            raise RuntimeError("use_sis4 is not set")
         return self.setup.use_sis4
 
     def use_sippican(self) -> bool:
+        if self.setup.use_sippican is None:
+            raise RuntimeError("use_sippican is not set")
         return self.setup.use_sippican
 
     def use_nmea_0183(self) -> bool:
+        if self.setup.use_nmea_0183 is None:
+            raise RuntimeError("use_nmea_0183 is not set")
         return self.setup.use_nmea_0183
 
     def use_mvp(self) -> bool:
+        if self.setup.use_mvp is None:
+            raise RuntimeError("use_mvp is not set")
         return self.setup.use_mvp
 
     def listen_sis(self) -> bool:

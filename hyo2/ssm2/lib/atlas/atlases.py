@@ -1,12 +1,21 @@
 import os
 import logging
 
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.atlas.woa09 import Woa09
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.atlas.woa13 import Woa13
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.atlas.woa18 import Woa18
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.atlas.woa23 import Woa23
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.atlas.rtofs import Rtofs
-from hyo2.ssm2.lib.atlas.regofsonline import RegOfsOnline
+# noinspection PyUnresolvedReferences
+from hyo2.ssm2.lib.atlas.regofs import RegOfs
+# noinspection PyUnresolvedReferences
+from hyo2.ssm2.lib.atlas.regofs_model import RegOfsModel
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.atlas.regofsoffline import RegOfsOffline
 
 logger = logging.getLogger(__name__)
@@ -89,20 +98,20 @@ class Atlases:
         self.woa23 = Woa23(data_folder=woa23_folder, prj=self.prj)
         self.rtofs = Rtofs(data_folder=rtofs_folder, prj=self.prj)
 
-        self.cbofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.CBOFS)
-        self.dbofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.DBOFS)
-        self.gomofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.GoMOFS)
-        self.nyofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.NYOFS)
-        self.sjrofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.SJROFS)
-        self.ngofs2 = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.NGOFS2)
-        self.tbofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.TBOFS)
-        self.leofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.LEOFS)
-        self.lmhofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.LMHOFS)
-        self.loofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.LOOFS)
-        self.lsofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.LSOFS)
-        self.sscofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.SSCOFS)
-        self.sfbofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.SFBOFS)
-        self.wcofs = RegOfsOnline(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsOnline.Model.WCOFS)
+        self.cbofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsModel.CBOFS)
+        self.dbofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsModel.DBOFS)
+        self.gomofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsModel.GoMOFS)
+        self.nyofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsModel.NYOFS)
+        self.sjrofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsModel.SJROFS)
+        self.ngofs2 = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsModel.NGOFS2)
+        self.tbofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsModel.TBOFS)
+        self.leofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsModel.LEOFS)
+        self.lmhofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsModel.LMHOFS)
+        self.loofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsModel.LOOFS)
+        self.lsofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsModel.LSOFS)
+        self.sscofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsModel.SSCOFS)
+        self.sfbofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsModel.SFBOFS)
+        self.wcofs = RegOfs(data_folder=self._regofs_folder, prj=self.prj, model=RegOfsModel.WCOFS)
 
         self.offofs = RegOfsOffline(data_folder=self._regofs_folder, prj=self.prj)
 
