@@ -75,14 +75,15 @@ class ImportDataDialog(AbstractDialog):
         self.progress.end()
 
         if len(pk_issues) == 0:
-            msg = "Successfully imported %d profile(s)" % len(pk_done)
+            msg = "Successfully imported: %d profile(s)" % len(pk_done)
             # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.information(self, "Import data", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             self.accept()
 
         else:
-            msg = "Issue in importing %s profile(s)\n" % ", ".join(["#%02d" % pk for pk in pk_issues])
-            msg += "Possible primary key duplication!"
+            msg = "Successfully imported: %d profile(s)\n\n" % len(pk_done)
+            msg += "Skipped %s profile(s) duplicated in position and time:\n" % len(pk_issues)
+            msg += f"id %s" % ", ".join([str(pk) for pk in pk_issues])
             # noinspection PyCallByClass,PyArgumentList
             QtWidgets.QMessageBox.warning(self, "Import warning", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
