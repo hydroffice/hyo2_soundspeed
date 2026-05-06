@@ -332,8 +332,8 @@ class Woa09(AbstractAtlas):
         ssp_max.meta.probe_type = Dicts.probe_types['WOA09']
         ssp_max.meta.latitude = lat
         ssp_max.meta.longitude = lon
-        ssp_max.meta.utc_time = dt(year=datestamp.year, month=dtstamp.month, day=dtstamp.day,
-                                   hour=dtstamp.hour, minute=dtstamp.minute, second=dtstamp.second)
+        ssp_max.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day,
+                                   hour=datestamp.hour, minute=datestamp.minute, second=datestamp.second)
         if num_values > 0:
             ssp_max.init_data(num_values)
             ssp_max.data.depth = self.t_seasonal.variables['depth'][0:num_values].astype(np.float64)

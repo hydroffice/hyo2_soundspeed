@@ -325,8 +325,8 @@ class Woa18(AbstractAtlas):
         ssp_min.meta.probe_type = Dicts.probe_types['WOA18']
         ssp_min.meta.latitude = lat
         ssp_min.meta.longitude = lon
-        ssp_min.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=dtstamp.day,
-                                   hour=dtstamp.hour, minute=dtstamp.minute, second=dtstamp.second)
+        ssp_min.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day,
+                                   hour=datestamp.hour, minute=datestamp.minute, second=datestamp.second)
         if num_values > 0:
             ssp_min.init_data(num_values)
             ssp_min.data.depth = self.t[self.season_idx].variables['depth'][0:num_values]
@@ -343,9 +343,9 @@ class Woa18(AbstractAtlas):
         ssp_max.meta.probe_type = Dicts.probe_types['WOA18']
         ssp_max.meta.latitude = lat
         ssp_max.meta.longitude = lon
-        ssp_max.meta.utc_time = dt(year=dtstamp.year, month=dtstamp.month, day=dtstamp.day,
-                                   hour=dtstamp.hour, minute=dtstamp.minute, second=dtstamp.second)
-        ssp.meta.original_path = "WOA18_%s" % dtstamp.strftime("%Y%m%d_%H%M%S")
+        ssp_max.meta.utc_time = dt(year=datestamp.year, month=datestamp.month, day=datestamp.day,
+                                   hour=datestamp.hour, minute=datestamp.minute, second=datestamp.second)
+        ssp.meta.original_path = "WOA18_%s" % datestamp.strftime("%Y%m%d_%H%M%S")
         if num_values > 0:
             ssp_max.init_data(num_values)
             ssp_max.data.depth = self.t[self.season_idx].variables['depth'][0:num_values].astype(np.float64)
