@@ -7,8 +7,6 @@ from numpy import full_like, isnan, nan, ma, zeros, nanargmin, unravel_index
 from numpy import typing
 
 # noinspection PyUnresolvedReferences
-from hyo2.abc2.lib.package.pkg_helper import PkgHelper
-# noinspection PyUnresolvedReferences
 from hyo2.abc2.lib.progress.cli_progress import CliProgress
 # noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.atlas.abstract import AbstractAtlas

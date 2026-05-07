@@ -4,11 +4,10 @@ from datetime import datetime as dt
 from typing import Optional, TYPE_CHECKING
 
 from netCDF4 import Dataset, num2date
+from numpy import typing, float64
 
 # noinspection PyUnresolvedReferences
 from hyo2.abc2.lib.progress.cli_progress import CliProgress
-# noinspection PyUnresolvedReferences
-from hyo2.ssm2.lib.atlas.regofs import RegOfs
 # noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.base.geodesy import Geodesy
 # noinspection PyUnresolvedReferences
@@ -42,10 +41,10 @@ class RegOfsOffline:
         self._zeta = None
         self._siglay = None
         self._h = None
-        self._lats = None
-        self._lons = None
-        self._lat = None
-        self._lon = None
+        self._lats: typing.NDArray[float64] | None = None
+        self._lons: typing.NDArray[float64] | None = None
+        self._lat: float | None = None
+        self._lon: float | None = None
         self._loc_idx = None
         self._d = None
         self._temp = None
@@ -106,6 +105,10 @@ class RegOfsOffline:
 
         min_dist = 100000.0
         min_idx = None
+        if self._lats is None:
+            raise RuntimeError("_lats is unset")
+        if self._lons is None:
+            raise RuntimeError("_lons is unset")
         for idx, _ in enumerate(self._lats):
             nc_lat = self._lats[idx]
             nc_lon = self._lons[idx]
@@ -123,10 +126,16 @@ class RegOfsOffline:
             return None
 
         self._loc_idx = min_idx
-        self._lon = self._lons[self._loc_idx]
+        if self._lons is None:
+            raise RuntimeError("_lons is unset")
+        self._lon = float(self._lons[self._loc_idx])
+        if self._lon is None:
+            raise RuntimeError("_lon is unset")
         if self._lon > 180.0:
             self._lon = self._lon - 360.0
-        self._lat = self._lats[self._loc_idx]
+        self._lat = float(self._lats[self._loc_idx])
+        if self._loc_idx is None:
+            raise RuntimeError("_loc_idx is unset")
         logger.debug('closest node: %d [%s, %s] -> %s' % (self._loc_idx, self._lat, self._lon, min_dist))
 
         zeta = self._zeta[self._loc_idx]

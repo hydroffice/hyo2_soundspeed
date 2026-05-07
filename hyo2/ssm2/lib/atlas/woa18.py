@@ -7,20 +7,25 @@ from typing import Union, TYPE_CHECKING
 import numpy as np
 from netCDF4 import Dataset
 
+# noinspection PyUnresolvedReferences
 from hyo2.abc2.lib.googledrive import GoogleDrive
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.atlas.abstract import AbstractAtlas
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.profile.dicts import Dicts
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.profile.profile import Profile
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.profile.profilelist import ProfileList
 
 if TYPE_CHECKING:
+    # noinspection PyUnresolvedReferences
     from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 
 
 class Woa18(AbstractAtlas):
-    """WOA18 atlas"""
 
     def __init__(self, data_folder: str, prj: 'SoundSpeedLibrary') -> None:
         super(Woa18, self).__init__(data_folder=data_folder, prj=prj)
@@ -43,9 +48,6 @@ class Woa18(AbstractAtlas):
         self.season_idx = 0
 
     def is_present(self) -> bool:
-        """Check the presence of one of the db file
-
-        The default location is first checked. If not present, the search is enlarged to past installations"""
 
         # first check the location based on the current version
         check_woa18_temp = os.path.join(self.data_folder, 'temp', 'woa18_decav_t00_04.nc')
@@ -59,7 +61,6 @@ class Woa18(AbstractAtlas):
         return False
 
     def download_db(self) -> bool:
-        """try to download the data set"""
         logger.debug('downloading WOA18 atlas')
 
         try:
@@ -80,7 +81,6 @@ class Woa18(AbstractAtlas):
             return False
 
     def load_grids(self) -> bool:
-        """Load atlas grids"""
         try:
             for i in range(1, 17):
                 t_path = os.path.join(self.data_folder, "temp", "woa18_decav_t%02d_04.nc" % i)
@@ -139,7 +139,6 @@ class Woa18(AbstractAtlas):
         logger.debug("indices -> month idx: %s, season idx: %s" % (self.month_idx, self.season_idx))
 
     def grid_coords(self, lat: float, lon: float) -> tuple:
-        """This does a nearest neighbour lookup"""
 
         if not self.has_data_loaded:
             if not self.load_grids():
@@ -151,7 +150,6 @@ class Woa18(AbstractAtlas):
         return lat_idx, lon_idx
 
     def query(self, lat: float, lon: float, datestamp: Union[dt, None] = None, server_mode: bool = False):
-        """Query WOA13 for passed location and timestamp"""
         if datestamp is None:
             datestamp = dt.now(UTC)
         if not isinstance(datestamp, dt):
@@ -370,7 +368,6 @@ class Woa18(AbstractAtlas):
         return profiles
 
     def clear_data(self) -> None:
-        """Delete the data and reset the last loaded day"""
         logger.debug("clearing data")
         if self.has_data_loaded:
             # delete all the netcdf datasets
