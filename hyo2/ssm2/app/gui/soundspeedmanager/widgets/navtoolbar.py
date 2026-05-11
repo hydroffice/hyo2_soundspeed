@@ -79,6 +79,7 @@ class NavToolbar(NavigationToolbar2QT):
             ('Unflag', 'Unflag samples', 'unflag', 'unflag'),  # NEW
             ('Insert', 'Insert samples', 'insert', 'insert'),  # NEW
             (None, None, None, None),  # NEW
+            ('Previous', 'Show/hide previous', 'previous', 'previous_plot'),  # NEW
             ('Flagged', 'Show/hide flagged', 'flagged', 'flagged_plot'),  # NEW
             ('Grid', 'Toggle grids', 'plot_grid', 'grid_plot'),  # NEW
             ('Legend', 'Toggle legends', 'plot_legend', 'legend_plot'),  # NEW
@@ -102,6 +103,8 @@ class NavToolbar(NavigationToolbar2QT):
         self._actions['flag'].setCheckable(True)
         self._actions['unflag'].setCheckable(True)
         self._actions['insert'].setCheckable(True)
+        self._actions['previous_plot'].setCheckable(True)
+        self._actions['previous_plot'].setChecked(False)
         self._actions['flagged_plot'].setCheckable(True)
         self._actions['flagged_plot'].setChecked(True)
         self._actions['grid_plot'].setCheckable(True)
@@ -958,6 +961,12 @@ class NavToolbar(NavigationToolbar2QT):
         self.canvas.draw_idle()
 
     # ------------------ plotting ---------------------
+
+    def previous_plot(self):
+        prev_flag = self._actions['previous_plot'].isChecked()
+        self.plot_win.set_previous_visibility(prev_flag)
+
+        self.canvas.draw_idle()
 
     def flagged_plot(self):
         flagged_flag = self._actions['flagged_plot'].isChecked()

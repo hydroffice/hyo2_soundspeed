@@ -5,7 +5,7 @@ import re
 import shutil
 import time
 import traceback
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import cast, TYPE_CHECKING
 
 from appdirs import user_data_dir
@@ -76,6 +76,8 @@ class SoundSpeedLibrary:
         self.progress: AbstractProgress = progress
 
         self.ssp: ProfileList | None = None  # current profile
+        self.cur_datetime: datetime | None = None  # used to cache the previous profile
+        self.prep: ProfileList | None = None  # previous profile
         self.ref: ProfileList | None = None  # reference profile
 
         # take care of all the required folders
@@ -441,6 +443,31 @@ class SoundSpeedLibrary:
         return self.ssp.cur
 
     @property
+    def prev(self) -> Profile | None:
+        # we first check for current profile
+        cur = self.cur
+        if cur is None:
+            self.prep = None
+            return None
+
+        # we then check if the search was already done
+        if self.cur_datetime == cur.meta.utc_time:
+            if self.prep is None:
+                return None
+            return self.prep.cur
+
+        # we need to search
+        self.prep = None
+        self.cur_datetime = cur.meta.utc_time
+        prev_pk = self.db_previous_profile_key(dt=self.cur_datetime)
+        if prev_pk is None:
+            return None
+        self.prep = self.db_retrieve_profile(pk=prev_pk)
+        if self.prep is None:
+            return None
+        return self.prep.cur
+
+    @property
     def cur_basename(self) -> str:
         if self.cur is None:
             return "output"
@@ -461,6 +488,11 @@ class SoundSpeedLibrary:
 
     def has_ssp(self) -> bool:
         if self.cur is None:
+            return False
+        return True
+
+    def has_prev(self) -> bool:
+        if self.prev is None:
             return False
         return True
 
@@ -1059,7 +1091,7 @@ class SoundSpeedLibrary:
     # --- export data
 
     def export_data(self, data_formats: list, data_paths: dict[str, str] | None,
-                    data_files: dict[str, str] | None = None, custom_writer_instrument: str | None = None):
+                    data_files: dict[str, str] | None = None, custom_writer_instrument: str | None = None) -> None:
         """Export data using a list of formats name"""
 
         # checks
@@ -1101,7 +1133,7 @@ class SoundSpeedLibrary:
 
                     if not self.prepare_sis(thin_tolerance=tolerance):
                         logger.warning("issue in preparing the data for SIS")
-                        return False
+                        return None
 
                     if self.cur is None:
                         raise RuntimeError("cur not set")
@@ -1136,8 +1168,11 @@ class SoundSpeedLibrary:
         # take care of listeners
         if self.has_sippican_to_process():
             self.listeners.sippican_to_process = False
+
         if self.has_mvp_to_process():
             self.listeners.mvp_to_process = False
+
+        return None
 
     # --- project db
 
@@ -1149,7 +1184,10 @@ class SoundSpeedLibrary:
     def not_noaa_project(self, value: str, format_ok: bool = False) -> bool:
         # noinspection PyBroadException
         try:
-            self._noaa_project = self._noaa_project_validate.match(value).group(1)
+            validate_match = self._noaa_project_validate.match(value)
+            if validate_match is None:
+                return False
+            self._noaa_project = validate_match.group(1)
             return False
 
         except Exception:
@@ -1161,6 +1199,8 @@ class SoundSpeedLibrary:
 
     @property
     def current_project(self) -> str:
+        if self.setup.current_project is None:
+            raise RuntimeError("current_project not set")
         return self.setup.current_project
 
     @current_project.setter
@@ -1214,7 +1254,7 @@ class SoundSpeedLibrary:
         """Remove the current profile in the project db"""
 
         # checks
-        if not self.has_ssp():
+        if not self.has_ssp() or self.ssp is None:
             raise RuntimeError("Data not loaded")
 
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
@@ -1230,6 +1270,8 @@ class SoundSpeedLibrary:
             success = db.remove_casts(tmp_ssp)
 
         else:
+            if self.ssp is None:
+                raise RuntimeError("Profile list not loaded")
             success = db.remove_casts(self.ssp)
         db.disconnect()
 
@@ -1246,7 +1288,7 @@ class SoundSpeedLibrary:
         """Store the current profile in the project db"""
 
         # checks
-        if not self.has_ssp():
+        if not self.has_ssp() or self.ssp is None:
             raise RuntimeError("Data not loaded")
 
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
@@ -1262,6 +1304,8 @@ class SoundSpeedLibrary:
             success = db.add_casts(tmp_ssp)
 
         else:
+            if self.ssp is None:
+                raise RuntimeError("Profile list not loaded")
             success = db.add_casts(self.ssp)
         db.disconnect()
 
@@ -1284,7 +1328,7 @@ class SoundSpeedLibrary:
         db.disconnect()
         return lst
 
-    def db_retrieve_profile(self, pk: int) -> ProfileList:
+    def db_retrieve_profile(self, pk: int) -> ProfileList | None:
         """Retrieve a profile by primary key"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         ssp = db.profile_by_pk(pk=pk)
@@ -1299,9 +1343,12 @@ class SoundSpeedLibrary:
 
         in_db = ProjectDb(projects_folder=in_projects_folder, project_name=in_project_name)
 
-        if in_db.get_db_version() > 3:
+        db_version = in_db.get_db_version()
+        if db_version is None:
+            raise RuntimeError("unretrievable db version")
+        if db_version > 3:
             raise RuntimeError("unsupported db version: %s" % in_db.get_db_version())
-        logger.debug('input project db version: %s' % in_db.get_db_version())
+        logger.debug('input project db version: %s' % db_version)
 
         cur_db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
 
@@ -1330,6 +1377,10 @@ class SoundSpeedLibrary:
                 continue
 
             ssp = in_db.profile_by_pk(pk=in_ssp[0])
+            if ssp is None:
+                pk_issues.append(in_ssp[0])
+                continue
+
             success = cur_db.add_casts(ssp)
             if success:
                 pk_done.append(in_ssp[0])
@@ -1343,12 +1394,19 @@ class SoundSpeedLibrary:
 
         return pk_issues, pk_done
 
-    def db_timestamp_list(self) -> list:
+    def db_timestamp_list(self) -> list[datetime | int] | None:
         """Retrieve a list with the timestamp of all the profiles"""
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         lst = db.timestamp_list()
         db.disconnect()
         return lst
+
+    def db_previous_profile_key(self, dt: datetime = None,
+                            max_age: timedelta = timedelta(hours=12)) -> int | None:
+        db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
+        pk = db.previous_profile_key(dt=dt, max_age=max_age)
+        db.disconnect()
+        return pk
 
     def profile_stats(self) -> str:
         if self.cur is None:
@@ -1415,15 +1473,15 @@ class SoundSpeedLibrary:
     def load_profile(self, pk: int, skip_atlas: bool = False) -> bool:
 
         ssp = self.db_retrieve_profile(pk)
-        if not ssp:
+        if ssp is None:
             return False
 
         self.clear_data()
         self.ssp = ssp
 
-        if self.ssp.cur is None:
+        if self.ssp is None or self.ssp.cur is None:
             raise RuntimeError("No profile set")
-        cur = cast(Profile, self.ssp.cur)
+        cur = self.ssp.cur
 
         # retrieve atlases data for each retrieved profile
         if self.use_woa09() and self.has_woa09() and not skip_atlas:
@@ -1479,10 +1537,13 @@ class SoundSpeedLibrary:
         half_swath_angle = 70.0  # a safely large angle
 
         ssp1 = self.db_retrieve_profile(pk1)
+        if ssp1 is None:
+            raise RuntimeError("No profile 1")
         tp1 = TracedProfile(ssp=ssp1.cur, avg_depth=avg_depth,
                             half_swath=half_swath_angle)
         ssp2 = self.db_retrieve_profile(pk2)
-
+        if ssp2 is None:
+            raise RuntimeError("No profile 2")
         tp2 = TracedProfile(ssp=ssp2.cur, avg_depth=avg_depth,
                             half_swath=half_swath_angle)
 
@@ -1499,10 +1560,13 @@ class SoundSpeedLibrary:
 
         try:
             ssp1 = self.db_retrieve_profile(pk1)
+            if ssp1 is None:
+                raise RuntimeError("No profile 1")
             tp1 = TracedProfile(ssp=ssp1.cur, avg_depth=avg_depth,
                                 half_swath=half_swath_angle)
             ssp2 = self.db_retrieve_profile(pk2)
-
+            if ssp2 is None:
+                raise RuntimeError("No profile 1")
             tp2 = TracedProfile(ssp=ssp2.cur, avg_depth=avg_depth,
                                 half_swath=half_swath_angle)
         except RuntimeError as e:
@@ -1546,7 +1610,10 @@ class SoundSpeedLibrary:
             logger.error("missing the sound speed of surface sensor")
             return None
 
-        prof = self.db_retrieve_profile(pk).cur
+        pl = self.db_retrieve_profile(pk)
+        if pl is None:
+            raise RuntimeError("No profile list")
+        prof = pl.cur
         cast_speed = prof.interpolate_proc_speed_at_depth(depth=surface_depth)
         speed_diff = abs(cast_speed - surface_speed)
 
@@ -1585,12 +1652,20 @@ class SoundSpeedLibrary:
                 logger.error("missing the launch angle to be checked")
                 return None
 
-        profile = self.db_retrieve_profile(pk).cur
+        pl = self.db_retrieve_profile(pk)
+        if pl is None:
+            raise RuntimeError("No profile list")
+        profile = pl.cur
 
         if pk_ref is None:
+            if self.ref is None:
+                raise RuntimeError("No reference profile list")
             ref_profile = self.ref.cur
         else:
-            ref_profile = self.db_retrieve_profile(pk_ref).cur
+            ref_pl = self.db_retrieve_profile(pk_ref)
+            if ref_pl is None:
+                raise RuntimeError("No reference profile list")
+            ref_profile = ref_pl.cur
 
         return ref_profile.compare_profile(profile, angle)
 
@@ -1662,7 +1737,7 @@ class SoundSpeedLibrary:
 
     def filter_cur_data(self) -> bool:
         """Filter/smooth the current profile"""
-        if not self.has_ssp():
+        if not self.has_ssp() or self.cur is None:
             logger.warning("no profile!")
             return False
 
@@ -1683,12 +1758,12 @@ class SoundSpeedLibrary:
 
     def replace_cur_salinity(self) -> bool:
         """Replace salinity using atlases for the current profile"""
-        if not self.has_ssp():
+        if not self.has_ssp() or self.cur is None:
             logger.warning("no profile!")
             return False
 
         if self.setup.ssp_salinity_source == Dicts.atlases['ref']:
-            if not self.has_ref():
+            if not self.has_ref() or self.ref is None:
                 logger.warning("missing reference profile")
                 return False
             if not self.cur.replace_proc_sal(self.ref):
@@ -1753,7 +1828,7 @@ class SoundSpeedLibrary:
 
     def replace_cur_temp_sal(self) -> bool:
         """Replace temperature/salinity using atlases for the current profile"""
-        if not self.has_ssp():
+        if not self.has_ssp() or self.cur is None:
             logger.warning("no profile!")
             return False
 
@@ -1823,7 +1898,7 @@ class SoundSpeedLibrary:
 
     def add_cur_tss(self, server_mode: bool = False) -> bool:
         """Add the transducer sound speed to the current profile"""
-        if not self.has_ssp():
+        if not self.has_ssp() or self.cur is None:
             logger.warning("no profile!")
             return False
 
@@ -1859,12 +1934,12 @@ class SoundSpeedLibrary:
         self.cur.modify_proc_info(Dicts.proc_user_infos['PLOTTED'])
 
     def extend_profile(self) -> bool:
-        if not self.has_ssp():
+        if not self.has_ssp() or self.cur is None:
             logger.warning("no profile!")
             return False
 
         if self.setup.ssp_extension_source == Dicts.atlases['ref']:
-            if not self.has_ref():
+            if not self.has_ref() or self.ref is None:
                 logger.warning("missing reference profile")
                 return False
             if not self.cur.extend_profile(self.ref, ext_type=Dicts.sources['ref_ext']):
@@ -1920,7 +1995,7 @@ class SoundSpeedLibrary:
 
     def prepare_sis(self, apply_thin: bool = True, apply_12k: bool = True,
                     thin_tolerance: float = 0.01) -> bool:
-        if not self.has_ssp():
+        if not self.has_ssp() or self.cur is None:
             logger.warning("no profile!")
             return False
 

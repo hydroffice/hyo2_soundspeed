@@ -2,15 +2,20 @@ import datetime
 import logging
 import os
 import sqlite3
-from typing import Optional
 
-import numpy as np
+from numpy import float32
 
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2 import pkg_info
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.db.export import ExportDb
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.db.plot import PlotDb
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.db.point import Point, convert_point, adapt_point
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.profile.dicts import Dicts
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.profile.profilelist import ProfileList
 
 logger = logging.getLogger(__name__)
@@ -19,17 +24,17 @@ logger = logging.getLogger(__name__)
 class ProjectDb:
     """Class that provides an interface to a SQLite db with Sound Speed data"""
 
-    def __init__(self, projects_folder: Optional[str] = None, project_name: Optional[str] = None,
+    def __init__(self, projects_folder: str | None = None, project_name: str | None = None,
                  info_loc: bool = True) -> None:
 
         # in case that no data folder is passed
         if projects_folder is None:
-            projects_folder = os.path.abspath(os.path.curdir)
-        self.data_folder = projects_folder
+            projects_folder: str = os.path.abspath(os.path.curdir)
+        self.data_folder: str = projects_folder
 
         # in case that none is passed as project name
         if project_name is None:
-            project_name = "default"
+            project_name: str = "default"
 
         # the passed project name is used to identify the project database to open
         self.db_path = os.path.abspath(os.path.join(projects_folder, self.clean_project_name(project_name) + ".db"))
@@ -76,6 +81,9 @@ class ProjectDb:
         except sqlite3.Error as e:
             raise RuntimeError("Unable to connect: %s" % e)
 
+        if self.conn is None:
+            raise RuntimeError("conn is None")
+
         try:
             self.conn.execute('PRAGMA foreign_keys=ON')
 
@@ -95,7 +103,7 @@ class ProjectDb:
 
         try:
             # Register the adapter
-            sqlite3.register_adapter(np.float32, float)
+            sqlite3.register_adapter(float32, float)
 
         except sqlite3.Error as e:
             raise RuntimeError("Unable to register numpy float adapter: %s - %s" % (type(e), e))
@@ -142,124 +150,320 @@ class ProjectDb:
 
             # check if the library table is empty
             # noinspection SqlResolve
-            ret = self.conn.execute("""SELECT COUNT(*) FROM library""").fetchone()
+            ret = self.conn.execute("""SELECT COUNT(*)
+                                       FROM library""").fetchone()
             # logger.debug("library content: %s" % (list(ret), ))
             # if not present, add it
             if ret[0] == 0:
                 # noinspection SqlResolve
                 self.conn.execute("""
-                                  INSERT INTO library VALUES (?, ?, ?)
+                                  INSERT INTO library
+                                  VALUES (?, ?, ?)
                                   """, (self.cur_version, "%s v.%s" % (pkg_info.name, pkg_info.version),
                                         datetime.datetime.now(datetime.UTC),))
 
             # check if the library version is old
             # noinspection SqlResolve
-            ret = self.conn.execute("""SELECT version FROM library""").fetchone()
+            ret = self.conn.execute("""SELECT version
+                                       FROM library""").fetchone()
             if ret[0] < 3:
                 logger.debug("updated old library version from %s to %s" % (ret[0], self.cur_version))
                 self._updates_to_version_3_no_commit(old_version=ret[0])
 
             self.conn.execute("""
-                              CREATE TABLE IF NOT EXISTS ssp_pk(
-                                 id INTEGER PRIMARY KEY,
-                                 cast_datetime timestamp NOT NULL,
-                                 cast_position point NOT NULL)
+                              CREATE TABLE IF NOT EXISTS ssp_pk
+                              (
+                                  id
+                                  INTEGER
+                                  PRIMARY
+                                  KEY,
+                                  cast_datetime
+                                  timestamp
+                                  NOT
+                                  NULL,
+                                  cast_position
+                                  point
+                                  NOT
+                                  NULL
+                              )
                               """)
 
             # noinspection SqlResolve
             self.conn.execute("""
-                              CREATE TABLE IF NOT EXISTS ssp(
-                                 pk integer NOT NULL,
-                                 sensor_type integer NOT NULL,
-                                 probe_type integer NOT NULL,
-                                 original_path text NOT NULL DEFAULT '',
-                                 institution text NOT NULL DEFAULT '',
-                                 survey text NOT NULL DEFAULT '',
-                                 vessel text NOT NULL DEFAULT '',
-                                 sn text NOT NULL DEFAULT '',
-                                 proc_time timestamp,
-                                 proc_info text NOT NULL DEFAULT '',
-                                 surveylines text NOT NULL DEFAULT '',                                     
-                                 comments text NOT NULL DEFAULT '',
-                                 pressure_uom text NOT NULL DEFAULT '',
-                                 depth_uom text NOT NULL DEFAULT '',
-                                 speed_uom text NOT NULL DEFAULT '',
-                                 temperature_uom text NOT NULL DEFAULT '',
-                                 conductivity_uom text NOT NULL DEFAULT '',
-                                 salinity_uom text NOT NULL DEFAULT '',
-                                 PRIMARY KEY (pk),
-                                 FOREIGN KEY(pk) REFERENCES ssp_pk(id))
+                              CREATE TABLE IF NOT EXISTS ssp
+                              (
+                                  pk
+                                  integer
+                                  NOT
+                                  NULL,
+                                  sensor_type
+                                  integer
+                                  NOT
+                                  NULL,
+                                  probe_type
+                                  integer
+                                  NOT
+                                  NULL,
+                                  original_path
+                                  text
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  '',
+                                  institution
+                                  text
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  '',
+                                  survey
+                                  text
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  '',
+                                  vessel
+                                  text
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  '',
+                                  sn
+                                  text
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  '',
+                                  proc_time
+                                  timestamp,
+                                  proc_info
+                                  text
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  '',
+                                  surveylines
+                                  text
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  '',
+                                  comments
+                                  text
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  '',
+                                  pressure_uom
+                                  text
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  '',
+                                  depth_uom
+                                  text
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  '',
+                                  speed_uom
+                                  text
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  '',
+                                  temperature_uom
+                                  text
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  '',
+                                  conductivity_uom
+                                  text
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  '',
+                                  salinity_uom
+                                  text
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  '',
+                                  PRIMARY
+                                  KEY
+                              (
+                                  pk
+                              ),
+                                  FOREIGN KEY
+                              (
+                                  pk
+                              ) REFERENCES ssp_pk
+                              (
+                                  id
+                              ))
                               """)
 
             # noinspection SqlResolve
             self.conn.execute("""
-                              CREATE TABLE IF NOT EXISTS data(
-                                 ssp_pk integer NOT NULL,
-                                 pressure real,
-                                 depth real NOT NULL,
-                                 speed real,
-                                 temperature real,
-                                 conductivity real,
-                                 salinity real,
-                                 source int NOT NULL DEFAULT  0,
-                                 flag int NOT NULL DEFAULT 0,
-                                 FOREIGN KEY(ssp_pk)
-                                    REFERENCES ssp(pk))
+                              CREATE TABLE IF NOT EXISTS data
+                              (
+                                  ssp_pk
+                                  integer
+                                  NOT
+                                  NULL,
+                                  pressure
+                                  real,
+                                  depth
+                                  real
+                                  NOT
+                                  NULL,
+                                  speed
+                                  real,
+                                  temperature
+                                  real,
+                                  conductivity
+                                  real,
+                                  salinity
+                                  real,
+                                  source
+                                  int
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  0,
+                                  flag
+                                  int
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  0,
+                                  FOREIGN
+                                  KEY
+                              (
+                                  ssp_pk
+                              )
+                                  REFERENCES ssp
+                              (
+                                  pk
+                              ))
                               """)
 
             # noinspection SqlResolve
             self.conn.execute("""
-                              CREATE TABLE IF NOT EXISTS proc(
-                                 ssp_pk integer NOT NULL,
-                                 pressure real,
-                                 depth real NOT NULL,
-                                 speed real,
-                                 temperature real,
-                                 conductivity real,
-                                 salinity real,
-                                 source int NOT NULL DEFAULT  0,
-                                 flag int NOT NULL DEFAULT 0,
-                                 FOREIGN KEY(ssp_pk)
-                                    REFERENCES ssp(pk))
+                              CREATE TABLE IF NOT EXISTS proc
+                              (
+                                  ssp_pk
+                                  integer
+                                  NOT
+                                  NULL,
+                                  pressure
+                                  real,
+                                  depth
+                                  real
+                                  NOT
+                                  NULL,
+                                  speed
+                                  real,
+                                  temperature
+                                  real,
+                                  conductivity
+                                  real,
+                                  salinity
+                                  real,
+                                  source
+                                  int
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  0,
+                                  flag
+                                  int
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  0,
+                                  FOREIGN
+                                  KEY
+                              (
+                                  ssp_pk
+                              )
+                                  REFERENCES ssp
+                              (
+                                  pk
+                              ))
                               """)
 
             # noinspection SqlResolve
             self.conn.execute("""
-                              CREATE TABLE IF NOT EXISTS sis(
-                                 ssp_pk integer NOT NULL,
-                                 pressure real,
-                                 depth real NOT NULL,
-                                 speed real,
-                                 temperature real,
-                                 conductivity real,
-                                 salinity real,
-                                 source int NOT NULL DEFAULT  0,
-                                 flag int NOT NULL DEFAULT 0,
-                                 FOREIGN KEY(ssp_pk)
-                                    REFERENCES ssp(pk))
+                              CREATE TABLE IF NOT EXISTS sis
+                              (
+                                  ssp_pk
+                                  integer
+                                  NOT
+                                  NULL,
+                                  pressure
+                                  real,
+                                  depth
+                                  real
+                                  NOT
+                                  NULL,
+                                  speed
+                                  real,
+                                  temperature
+                                  real,
+                                  conductivity
+                                  real,
+                                  salinity
+                                  real,
+                                  source
+                                  int
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  0,
+                                  flag
+                                  int
+                                  NOT
+                                  NULL
+                                  DEFAULT
+                                  0,
+                                  FOREIGN
+                                  KEY
+                              (
+                                  ssp_pk
+                              )
+                                  REFERENCES ssp
+                              (
+                                  pk
+                              ))
                               """)
 
             # noinspection SqlResolve
             self.conn.execute("""
                               CREATE VIEW IF NOT EXISTS ssp_view AS
-                                 SELECT pk, cast_datetime, cast_position,
-                                    sensor_type, probe_type,
-                                    original_path,
-                                    institution,
-                                    survey,
-                                    vessel,
-                                    sn,
-                                    proc_time,
-                                    proc_info,
-                                    surveylines,
-                                    comments,
-                                    pressure_uom,
-                                    depth_uom,
-                                    speed_uom,
-                                    temperature_uom,
-                                    conductivity_uom,
-                                    salinity_uom
-                                    FROM ssp a LEFT OUTER JOIN ssp_pk b ON a.pk=b.id
+                              SELECT pk,
+                                     cast_datetime,
+                                     cast_position,
+                                     sensor_type,
+                                     probe_type,
+                                     original_path,
+                                     institution,
+                                     survey,
+                                     vessel,
+                                     sn,
+                                     proc_time,
+                                     proc_info,
+                                     surveylines,
+                                     comments,
+                                     pressure_uom,
+                                     depth_uom,
+                                     speed_uom,
+                                     temperature_uom,
+                                     conductivity_uom,
+                                     salinity_uom
+                              FROM ssp a
+                                       LEFT OUTER JOIN ssp_pk b ON a.pk = b.id
                               """)
 
             return True
@@ -337,22 +541,23 @@ class ProjectDb:
             logger.error("during adding casts, %s: %s" % (type(e), e))
             return False
 
-    def get_db_version(self):
+    def get_db_version(self) -> int | None:
         """Get the project db version"""
         if not self.conn:
             logger.error("missing db connection")
-            return False
+            return None
 
         try:
             # noinspection SqlResolve
-            ret = self.conn.execute("""SELECT * FROM library""").fetchone()
+            ret = self.conn.execute("""SELECT *
+                                       FROM library""").fetchone()
             return ret[0]
 
         except sqlite3.Error as e:
             logger.error("while getting db version, %s: %s" % (type(e), e))
             return None
 
-    def _get_ssp_pk(self):
+    def _get_ssp_pk(self) -> bool:
 
         utc_time = self.tmp_data.meta.utc_time
         point = Point(self.tmp_data.meta.longitude, self.tmp_data.meta.latitude)
@@ -365,14 +570,18 @@ class ProjectDb:
             # check if the ssp key is present
             # noinspection SqlResolve
             ret = self.conn.execute("""
-                                    SELECT COUNT(*) FROM ssp_pk WHERE cast_datetime=? AND cast_position=?
+                                    SELECT COUNT(*)
+                                    FROM ssp_pk
+                                    WHERE cast_datetime = ?
+                                      AND cast_position = ?
                                     """, (utc_time, point,)).fetchone()
             # if not present, add it
             if ret[0] == 0:
                 # logger.info("add new spp pk for %s @ %s" % (utc_time, point))
                 # noinspection SqlResolve
                 self.conn.execute("""
-                                  INSERT INTO ssp_pk VALUES (NULL, ?, ?)
+                                  INSERT INTO ssp_pk
+                                  VALUES (NULL, ?, ?)
                                   """, (utc_time, point,))
 
         except sqlite3.Error as e:
@@ -383,7 +592,10 @@ class ProjectDb:
             # return the ssp pk
             # noinspection SqlResolve
             ret = self.conn.execute("""
-                                    SELECT rowid FROM ssp_pk WHERE cast_datetime=? AND cast_position=?
+                                    SELECT rowid
+                                    FROM ssp_pk
+                                    WHERE cast_datetime = ?
+                                      AND cast_position = ?
                                     """, (utc_time, point,)).fetchone()
             # logger.info("spp pk: %s" % ret['id'])
             self.tmp_ssp_pk = ret['id']
@@ -394,12 +606,17 @@ class ProjectDb:
 
         return True
 
-    def _delete_old_ssp_no_commit(self, full=False):
+    def _delete_old_ssp_no_commit(self, full: bool = False) -> bool:
         """Delete all the entries with the selected pk, with 'full' also the pk from ssp_pk"""
+
+        if self.conn is None:
+            raise RuntimeError("missing db connection")
 
         try:
             # noinspection SqlResolve
-            self.conn.execute("""DELETE FROM data WHERE ssp_pk=?""", (self.tmp_ssp_pk,))
+            self.conn.execute("""DELETE
+                                 FROM data
+                                 WHERE ssp_pk = ?""", (self.tmp_ssp_pk,))
             # logger.info("deleted %s pk entries from data" % self.tmp_ssp_pk)
 
         except sqlite3.Error as e:
@@ -408,7 +625,9 @@ class ProjectDb:
 
         try:
             # noinspection SqlResolve
-            self.conn.execute("""DELETE FROM proc WHERE ssp_pk=?""", (self.tmp_ssp_pk,))
+            self.conn.execute("""DELETE
+                                 FROM proc
+                                 WHERE ssp_pk = ?""", (self.tmp_ssp_pk,))
             # logger.info("deleted %s pk entries from proc" % self.tmp_ssp_pk)
 
         except sqlite3.Error as e:
@@ -417,7 +636,9 @@ class ProjectDb:
 
         try:
             # noinspection SqlResolve
-            self.conn.execute("""DELETE FROM sis WHERE ssp_pk=?""", (self.tmp_ssp_pk,))
+            self.conn.execute("""DELETE
+                                 FROM sis
+                                 WHERE ssp_pk = ?""", (self.tmp_ssp_pk,))
             # logger.info("deleted %s pk entries from sis" % self.tmp_ssp_pk)
 
         except sqlite3.Error as e:
@@ -426,7 +647,9 @@ class ProjectDb:
 
         try:
             # noinspection SqlResolve
-            self.conn.execute("""DELETE FROM ssp WHERE pk=?""", (self.tmp_ssp_pk,))
+            self.conn.execute("""DELETE
+                                 FROM ssp
+                                 WHERE pk = ?""", (self.tmp_ssp_pk,))
             # logger.info("deleted %s pk entry from ssp" % self.tmp_ssp_pk)
 
         except sqlite3.Error as e:
@@ -436,7 +659,9 @@ class ProjectDb:
         if full:
             try:
                 # noinspection SqlResolve
-                self.conn.execute("""DELETE FROM ssp_pk WHERE id=?""", (self.tmp_ssp_pk,))
+                self.conn.execute("""DELETE
+                                     FROM ssp_pk
+                                     WHERE id = ?""", (self.tmp_ssp_pk,))
                 # logger.info("deleted %s id entry from ssp_pk" % self.tmp_ssp_pk)
 
             except sqlite3.Error as e:
@@ -447,14 +672,17 @@ class ProjectDb:
 
         return True
 
-    def _add_ssp_no_commit(self):
+    def _add_ssp_no_commit(self) -> bool:
+
+        if self.conn is None:
+            raise RuntimeError("missing db connection")
 
         try:
             # noinspection SqlResolve
             self.conn.execute("""
-                              INSERT INTO ssp (pk, sensor_type, probe_type, original_path, institution, 
-                                               survey, vessel, sn, proc_time, proc_info, surveylines, comments, 
-                                               pressure_uom, depth_uom, speed_uom, 
+                              INSERT INTO ssp (pk, sensor_type, probe_type, original_path, institution,
+                                               survey, vessel, sn, proc_time, proc_info, surveylines, comments,
+                                               pressure_uom, depth_uom, speed_uom,
                                                temperature_uom, conductivity_uom, salinity_uom)
                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                               """, (self.tmp_ssp_pk,
@@ -484,7 +712,10 @@ class ProjectDb:
 
         return True
 
-    def _add_data_no_commit(self):
+    def _add_data_no_commit(self) -> bool:
+
+        if self.conn is None:
+            raise RuntimeError("missing db connection")
 
         sz = self.tmp_data.data.num_samples
         # logger.info("num samples to add: %s" % sz)
@@ -496,7 +727,8 @@ class ProjectDb:
                 # first check if the sample is already present with exactly the same values
                 # noinspection SqlResolve
                 self.conn.execute("""
-                                  INSERT INTO data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                  INSERT INTO data
+                                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                                   """, (self.tmp_ssp_pk,
                                         self.tmp_data.data.pressure[i],
                                         self.tmp_data.data.depth[i],
@@ -521,7 +753,10 @@ class ProjectDb:
         # logger.info("added %s raw samples" % added_samples)
         return True
 
-    def _add_proc_no_commit(self):
+    def _add_proc_no_commit(self) -> bool:
+
+        if self.conn is None:
+            raise RuntimeError("missing db connection")
 
         sz = self.tmp_data.proc.num_samples
         # logger.info("max processed samples to add: %s" % sz)
@@ -533,7 +768,8 @@ class ProjectDb:
                 # first check if the sample is already present with exactly the same values
                 # noinspection SqlResolve
                 self.conn.execute("""
-                                  INSERT INTO proc VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                  INSERT INTO proc
+                                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                                   """, (self.tmp_ssp_pk,
                                         self.tmp_data.proc.pressure[i],
                                         self.tmp_data.proc.depth[i],
@@ -557,7 +793,10 @@ class ProjectDb:
         # logger.info("added %s processed samples" % added_samples)
         return True
 
-    def _add_sis_no_commit(self):
+    def _add_sis_no_commit(self) -> bool:
+
+        if self.conn is None:
+            raise RuntimeError("missing db connection")
 
         sz = self.tmp_data.sis.num_samples
         # logger.info("max sis samples to add: %s" % sz)
@@ -569,7 +808,8 @@ class ProjectDb:
                 # first check if the sample is already present with exactly the same values
                 # noinspection SqlResolve
                 self.conn.execute("""
-                                  INSERT INTO sis VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                  INSERT INTO sis
+                                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                                   """, (self.tmp_ssp_pk,
                                         self.tmp_data.sis.pressure[i],
                                         self.tmp_data.sis.depth[i],
@@ -594,7 +834,7 @@ class ProjectDb:
         # logger.info("added %s sis samples" % added_samples)
         return True
 
-    def timestamp_list(self):
+    def timestamp_list(self) -> list[datetime.datetime | int] | None:
         """Create and return the timestamp list (and the pk)"""
 
         if not self.conn:
@@ -605,8 +845,10 @@ class ProjectDb:
             # ssp spatial timestamp
             # noinspection SqlResolve
             ts_list = self.conn.execute("""
-                                         SELECT cast_datetime, pk FROM ssp_view ORDER BY cast_datetime
-                                         """).fetchall()
+                                        SELECT cast_datetime, pk
+                                        FROM ssp_view
+                                        ORDER BY cast_datetime
+                                        """).fetchall()
             # logger.info("retrieved %s timestamps from ssp view" % len(ts_list))
             return ts_list
 
@@ -614,10 +856,39 @@ class ProjectDb:
             logger.error("retrieving the time stamp list, %s: %s" % (type(e), e))
             return None
 
-    def list_profiles(self, with_stats: bool = False):
+    def previous_profile_key(self, dt: datetime.datetime = None,
+                         max_age: datetime.timedelta = datetime.timedelta(hours=12)) -> int | None:
+
         if not self.conn:
             logger.error("missing db connection")
             return None
+
+        if dt is None:
+            dt = datetime.datetime.now(tz=datetime.timezone.utc)
+
+        try:
+            oldest_allowed = dt - max_age
+
+            row = self.conn.execute("""
+                                    SELECT pk
+                                    FROM ssp_view
+                                    WHERE cast_datetime < ?
+                                      AND cast_datetime >= ?
+                                    ORDER BY cast_datetime DESC LIMIT 1
+                                    """, (dt, oldest_allowed)).fetchone()
+
+            if row is None:
+                return None
+
+            return row[0]
+
+        except sqlite3.Error as e:
+            logger.error("retrieving previous profile, %s: %s" % (type(e), e))
+            return None
+
+    def list_profiles(self, with_stats: bool = False) -> list:
+        if self.conn is None:
+            raise RuntimeError("missing db connection")
 
         ssp_list = list()
         # noinspection SqlResolve
@@ -663,6 +934,8 @@ class ProjectDb:
                     # special handling for surface sound speed, mean sound speed, min depth, max depth
                     try:
                         ssp = self.profile_by_pk(row['pk'])
+                        if ssp is None or ssp.cur is None:
+                            raise RuntimeError("missing cur profile")
                         min_depth = '%0.2f' % ssp.cur.proc_depth_min
                         ss_at_min_depth = '%0.2f' % ssp.cur.proc_speed_at_min_depth
                         mean_ss = '%0.2f' % ssp.cur.proc_speed_mean
@@ -689,7 +962,7 @@ class ProjectDb:
             logger.error("%s: %s" % (type(e), e))
             return ssp_list
 
-    def profile_by_pk(self, pk):
+    def profile_by_pk(self, pk: int) -> ProfileList | None:
         if not self.conn:
             logger.error("missing db connection")
             return None
@@ -827,17 +1100,22 @@ class ProjectDb:
         if not self._delete_old_ssp_no_commit(full=True):
             raise RuntimeError("unable to delete ssp with pk: %s" % pk)
 
+        if self.conn is None:
+            raise RuntimeError("missing db connection")
+
         self.conn.commit()
 
         self.tmp_ssp_pk = None
         return True
 
     def _updates_to_version_3_no_commit(self, old_version: int) -> None:
-        # noinspection SqlResolve
+        if self.conn is None:
+            raise RuntimeError("missing db connection")
 
         # - 'ssp' table
         # noinspection SqlResolve
-        self.conn.execute("""ALTER TABLE ssp ADD COLUMN surveylines text NOT NULL DEFAULT ''""")
+        self.conn.execute("""ALTER TABLE ssp
+            ADD COLUMN surveylines text NOT NULL DEFAULT ''""")
 
         # - 'ssp_view' view
         # noinspection SqlResolve
@@ -845,10 +1123,13 @@ class ProjectDb:
 
         # - 'library' table
         # noinspection SqlResolve
-        self.conn.execute("""DELETE FROM library WHERE version=?""", (old_version,))
+        self.conn.execute("""DELETE
+                             FROM library
+                             WHERE version = ?""", (old_version,))
         # noinspection SqlResolve
         self.conn.execute("""
-                          INSERT INTO library VALUES (?, ?, ?)
+                          INSERT INTO library
+                          VALUES (?, ?, ?)
                           """, (self.cur_version, "%s v.%s" % (pkg_info.name, pkg_info.version),
                                 datetime.datetime.now(datetime.UTC),))
 
