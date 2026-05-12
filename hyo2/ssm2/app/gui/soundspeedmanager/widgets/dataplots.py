@@ -1,12 +1,12 @@
 import logging
 from datetime import datetime, UTC
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
-import numpy as np
 from PySide6 import QtCore, QtWidgets
 from matplotlib import rc_context
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+from numpy import array, logical_and
 
 # noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.widgets.navtoolbar import NavToolbar
@@ -177,7 +177,7 @@ class DataPlots(AbstractWidget):
 
     def _draw_grid(self) -> None:
         for a in self.f.get_axes():
-            a.grid(True)
+            a.grid(cast(bool, QtCore.QSettings().value("ssm_grid_plot", True, type=bool)))
 
     def _draw_speed(self) -> None:
         cur = self.lib.cur
@@ -282,9 +282,12 @@ class DataPlots(AbstractWidget):
                                                     label='GoMOFS'
                                                     )
         if self.lib.has_ref():
-            ref_vi = self.lib.ref.cur.proc_valid
-            self.speed_ref, = self.speed_ax.plot(self.lib.ref.cur.proc.speed[ref_vi],
-                                                 self.lib.ref.cur.proc.depth[ref_vi],
+            ref = self.lib.ref
+            if ref is None:
+                raise RuntimeError('No ref profile')
+            ref_vi = ref.cur.proc_valid
+            self.speed_ref, = self.speed_ax.plot(ref.cur.proc.speed[ref_vi],
+                                                 ref.cur.proc.depth[ref_vi],
                                                  color=self.ref_color,
                                                  linestyle='--',
                                                  label='ref'
@@ -341,9 +344,9 @@ class DataPlots(AbstractWidget):
                                                     color=self.seafloor_color,
                                                     linestyle=':',
                                                     label='depth')
-        self.speed_draft.set_ydata(np.array([None]))
-        self.speed_sensor.set_xdata(np.array([None]))
-        self.speed_seafloor.set_ydata(np.array([None]))
+        self.speed_draft.set_ydata(array([None]))
+        self.speed_sensor.set_xdata(array([None]))
+        self.speed_seafloor.set_ydata(array([None]))
 
         self.speed_ax.set_label("speed")
 
@@ -453,9 +456,12 @@ class DataPlots(AbstractWidget):
                                                   label='GoMOFS'
                                                   )
         if self.lib.has_ref():
-            ref_vi = self.lib.ref.cur.proc_valid
-            self.temp_ref, = self.temp_ax.plot(self.lib.ref.cur.proc.temp[ref_vi],
-                                               self.lib.ref.cur.proc.depth[ref_vi],
+            ref = self.lib.ref
+            if ref is None:
+                raise RuntimeError('No ref profile')
+            ref_vi = ref.cur.proc_valid
+            self.temp_ref, = self.temp_ax.plot(ref.cur.proc.temp[ref_vi],
+                                               ref.cur.proc.depth[ref_vi],
                                                color=self.ref_color,
                                                linestyle='--',
                                                label='ref'
@@ -594,9 +600,12 @@ class DataPlots(AbstractWidget):
                                                 label='GoMOFS'
                                                 )
         if self.lib.has_ref():
-            ref_vi = self.lib.ref.cur.proc_valid
-            self.sal_ref, = self.sal_ax.plot(self.lib.ref.cur.proc.sal[ref_vi],
-                                             self.lib.ref.cur.proc.depth[ref_vi],
+            ref = self.lib.ref
+            if ref is None:
+                raise RuntimeError('No ref profile')
+            ref_vi = ref.cur.proc_valid
+            self.sal_ref, = self.sal_ax.plot(ref.cur.proc.sal[ref_vi],
+                                             ref.cur.proc.depth[ref_vi],
                                              color=self.ref_color,
                                              linestyle='--',
                                              label='ref'
@@ -699,9 +708,9 @@ class DataPlots(AbstractWidget):
 
             if not self.lib.use_sis():  # in case that SIS was disabled
                 if self.speed_draft:
-                    self.speed_draft.set_ydata(np.array([None]))
+                    self.speed_draft.set_ydata(array([None]))
                 if self.speed_sensor:
-                    self.speed_sensor.set_xdata(np.array([None]))
+                    self.speed_sensor.set_xdata(array([None]))
                 return
 
             # plot title
@@ -712,17 +721,17 @@ class DataPlots(AbstractWidget):
                 return
 
             if self.lib.listeners.sis.xyz is None:
-                self.speed_draft.set_ydata(np.array([None]))
-                self.speed_sensor.set_xdata(np.array([None]))
+                self.speed_draft.set_ydata(array([None]))
+                self.speed_sensor.set_xdata(array([None]))
             else:
                 # sensor speed
                 if self.lib.listeners.sis.xyz_transducer_sound_speed is None:
-                    self.speed_sensor.set_xdata(np.array([None]))
+                    self.speed_sensor.set_xdata(array([None]))
                 else:
                     self.speed_sensor.set_xdata([self.lib.listeners.sis.xyz_transducer_sound_speed, ])
                 # draft
                 if self.lib.listeners.sis.xyz_transducer_depth is None:
-                    self.speed_draft.set_ydata(np.array([None]))
+                    self.speed_draft.set_ydata(array([None]))
                 else:
                     self.speed_draft.set_ydata([self.lib.listeners.sis.xyz_transducer_depth, ])
                 # seafloor
@@ -730,13 +739,19 @@ class DataPlots(AbstractWidget):
                 if mean_depth:
                     self.speed_seafloor.set_ydata([mean_depth, ])
                 else:
-                    self.speed_seafloor.set_ydata(np.array([None]))
+                    self.speed_seafloor.set_ydata(array([None]))
 
     def update_all_limits(self) -> None:
         self.update_depth_limits()
         self.update_temp_limits()
         self.update_sal_limits()
         self.update_speed_limits()
+
+        if not self.server_mode and self.lib.has_ssp():
+            self.nav.previous_plot()
+            self.nav.flagged_plot()
+            self.nav.grid_plot()
+            self.nav.legend_plot()
 
     def update_depth_limits(self) -> None:
 
@@ -825,17 +840,23 @@ class DataPlots(AbstractWidget):
 
         self.svi = cur.sis_thinned  # sis valid indices (thinned!)
         self.vi = cur.proc_valid  # proc valid indices
-        self.ii = np.logical_and(~self.vi, ~cur.proc_invalid_direction)  # selected invalid indices
+        self.ii = logical_and(~self.vi, ~cur.proc_invalid_direction)  # selected invalid indices
 
     def set_previous_visibility(self, value: bool) -> None:
-        self.speed_prev.set_visible(value)
-        self.temp_prev.set_visible(value)
-        self.sal_prev.set_visible(value)
+        if self.speed_prev:
+            self.speed_prev.set_visible(value)
+        if self.temp_prev:
+            self.temp_prev.set_visible(value)
+        if self.sal_prev:
+            self.sal_prev.set_visible(value)
 
     def set_invalid_visibility(self, value: bool) -> None:
-        self.speed_invalid.set_visible(value)
-        self.temp_invalid.set_visible(value)
-        self.sal_invalid.set_visible(value)
+        if self.speed_invalid:
+            self.speed_invalid.set_visible(value)
+        if self.temp_invalid:
+            self.temp_invalid.set_visible(value)
+        if self.sal_invalid:
+            self.sal_invalid.set_visible(value)
 
     def reset(self) -> None:
         if not self.server_mode:
