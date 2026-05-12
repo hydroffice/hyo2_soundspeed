@@ -30,7 +30,7 @@ class Sample:
 
 
 class NavToolbar(NavigationToolbar2QT):
-    here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
+    here = os.path.abspath(os.path.join(os.path.dirname(str(__file__))))  # to be overloaded
     media = os.path.abspath(os.path.join(here, os.pardir, 'media'))
     font_size = 6
     rc_context = {
@@ -66,7 +66,7 @@ class NavToolbar(NavigationToolbar2QT):
         self._flag_end: None | tuple = None
         self.insert_sample = None
 
-        self.toolitems = [
+        self.toolitems: list[tuple[str | None, str | None, str | None, str | None]] = [
             ('Home', 'Reset original view', 'home', 'home'),
             ('Back', 'Back to previous view', 'back', 'back'),
             ('Forward', 'Forward to next view', 'forward', 'forward'),
@@ -79,7 +79,7 @@ class NavToolbar(NavigationToolbar2QT):
             ('Unflag', 'Unflag samples', 'unflag', 'unflag'),  # NEW
             ('Insert', 'Insert samples', 'insert', 'insert'),  # NEW
             (None, None, None, None),  # NEW
-            ('Previous', 'Show/hide previous', 'previous', 'previous_plot'),  # NEW
+            ('Previous', 'Show/hide previous profile', 'previous', 'previous_plot'),  # NEW
             ('Flagged', 'Show/hide flagged', 'flagged', 'flagged_plot'),  # NEW
             ('Grid', 'Toggle grids', 'plot_grid', 'grid_plot'),  # NEW
             ('Legend', 'Toggle legends', 'plot_legend', 'legend_plot'),  # NEW
@@ -104,13 +104,13 @@ class NavToolbar(NavigationToolbar2QT):
         self._actions['unflag'].setCheckable(True)
         self._actions['insert'].setCheckable(True)
         self._actions['previous_plot'].setCheckable(True)
-        self._actions['previous_plot'].setChecked(False)
+        self._actions['previous_plot'].setChecked(QtCore.QSettings().value("ssm_previous_plot", False, type=bool))
         self._actions['flagged_plot'].setCheckable(True)
-        self._actions['flagged_plot'].setChecked(True)
+        self._actions['flagged_plot'].setChecked(QtCore.QSettings().value("ssm_flagged_plot", True, type=bool))
         self._actions['grid_plot'].setCheckable(True)
-        self._actions['grid_plot'].setChecked(True)
+        self._actions['grid_plot'].setChecked(QtCore.QSettings().value("ssm_grid_plot", True, type=bool))
         self._actions['legend_plot'].setCheckable(True)
-        self._actions['legend_plot'].setChecked(False)
+        self._actions['legend_plot'].setChecked(QtCore.QSettings().value("ssm_legend_plot", False, type=bool))
 
         # noinspection PyTypeChecker
         self.canvas.mpl_connect('button_press_event', self.press)
@@ -964,19 +964,26 @@ class NavToolbar(NavigationToolbar2QT):
 
     def previous_plot(self):
         prev_flag = self._actions['previous_plot'].isChecked()
+        QtCore.QSettings().setValue("ssm_prev_plot", prev_flag)
         self.plot_win.set_previous_visibility(prev_flag)
+
+        self.legend_plot()
 
         self.canvas.draw_idle()
 
     def flagged_plot(self):
         flagged_flag = self._actions['flagged_plot'].isChecked()
+        QtCore.QSettings().setValue("ssm_flagged_plot", flagged_flag)
         # logger.debug("plot flagged: %s" % flagged_flag)
         self.plot_win.set_invalid_visibility(flagged_flag)
+
+        self.legend_plot()
 
         self.canvas.draw_idle()
 
     def grid_plot(self):
         grid_flag = self._actions['grid_plot'].isChecked()
+        QtCore.QSettings().setValue("ssm_grid_plot", grid_flag)
         # logger.debug("plot grid: %s" % grid_flag)
 
         with rc_context(self.rc_context):
@@ -987,12 +994,15 @@ class NavToolbar(NavigationToolbar2QT):
 
     def legend_plot(self):
         legend_flag = self._actions['legend_plot'].isChecked()
+        QtCore.QSettings().setValue("ssm_legend_plot", legend_flag)
         # logger.debug("plot legend: %s" % legend_flag)
 
         with rc_context(self.rc_context):
             if legend_flag:
                 for a in self.canvas.figure.get_axes():
-                    a.legend(loc='lower left')
+                    handles, labels = a.get_legend_handles_labels()
+                    visible = [(h, l) for h, l in zip(handles, labels) if h.get_visible()]
+                    a.legend(*zip(*visible), loc='lower left')
             else:
                 for a in self.canvas.figure.get_axes():
                     try:
