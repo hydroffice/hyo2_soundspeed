@@ -27,6 +27,10 @@ class TestSoundSpeedAtlasRegofs(unittest.TestCase):
             self.assertFalse(model.lib_func_has_model(lib=prj)())
         prj.close()
 
+    @unittest.skipIf(
+        os.getenv("GITHUB_ACTIONS") == "true",
+        "Known intermittent NetCDF DAP failure on GitHub Actions"
+    )
     def test_download_model(self) -> None:
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
         for model in RegOfsModel:
@@ -36,6 +40,10 @@ class TestSoundSpeedAtlasRegofs(unittest.TestCase):
             self.assertTrue(model.lib_func_has_model(lib=prj)())
         prj.close()
 
+    @unittest.skipIf(
+        os.getenv("GITHUB_ACTIONS") == "true",
+        "Known intermittent NetCDF DAP failure on GitHub Actions"
+    )
     def test_query(self) -> None:
         prj = SoundSpeedLibrary(data_folder=self.cur_dir)
         for model in RegOfsModel:

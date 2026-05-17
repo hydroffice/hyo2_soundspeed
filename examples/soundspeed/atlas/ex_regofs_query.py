@@ -33,6 +33,10 @@ lib = SoundSpeedLibrary(progress=QtProgress(parent=mw), callbacks=QtCallbacks(pa
 for model in models:
     logger.info(f"Model: {model.name} ...")
 
+    if model in RegOfsModel.skip_models():
+        logger.info(f"Model: {model.name} ... SKIP")
+        continue
+
     has_model = model.lib_func_has_model(lib=lib)
     download_model = model.lib_func_download_model(lib=lib)
     query = model.lib_func_query(lib=lib)
