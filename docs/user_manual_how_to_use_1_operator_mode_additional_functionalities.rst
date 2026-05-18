@@ -122,6 +122,24 @@ If desired, the edited version can then be set as the new reference cast and wil
 Prior to setting a cast as the reference cast, it is advisable to store it in database such that future sessions
 do not need to repeat any reference cast processing.
 
+Displaying the previous cast
+============================
+
+Occasionally, it can be useful to visually compare the shape of the current profile with the profile that was previously acquired in order to track changes to the sound speed structure of the water column. This quick visual inspection can warrant further analysis by using pair-profile tools such as *Ray-tracing comparison* and *Across-swath bias* (See section :ref:`database_tab`).
+
+The previous profile can be displayed in the Data Editor tab by pressing the *Show/hide previous profile* button in the plotting toolbar at the bottom. The previous profile will be displayed if it was acquired within the last 12 hours of the acquisition time of the currently loaded profile (:numref:`previous_profile`).
+
+.. _previous_profile:
+.. figure:: ./_static/previous_profile.png
+    :width: 640px
+    :align: center
+    :alt: previous profile
+    :figclass: align-center
+
+    Displaying the previous profile by pressing the *Show/hide previous profile* button.
+
+The previous profile can also be used with the network data reception systems such as *MVP* and *Sippican* (:ref:`network_data_reception`).
+    
 Statusbar information
 =====================
 
@@ -142,6 +160,8 @@ while’ alert). :numref:`statusbar_colors` summarizes the possible statuses sho
 
     The possible statuses shown in the SSM taskbar.
 
+.. _network_data_reception:
+    
 Network data reception
 ======================
 
