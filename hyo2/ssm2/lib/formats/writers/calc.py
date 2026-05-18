@@ -63,7 +63,7 @@ class Calc(AbstractTextWriter):
 
         last_depth = None
         for i in range(np.sum(vi)):
-            if self.ssp.cur.proc.depth[vi][i] < 0.0:
+            if self.ssp.cur.proc.depth[vi][i] < 0.001:
                 continue
             body += "%7.1f %8.2f %7.3f\n" % (self.ssp.cur.proc.depth[vi][i],
                                              self.ssp.cur.proc.speed[vi][i],
