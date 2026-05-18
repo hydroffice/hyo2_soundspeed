@@ -95,6 +95,12 @@ class Client:
 
     def send_hyp_format(self, prj: 'SoundSpeedLibrary') -> bool:
         logger.info("using hypack format")
+
+        start_depth = 0.1  # prevent transmitting a 0.0 depth to hypack
+        if not prj.prepare_hypack(start_depth=start_depth):
+            logger.info("issue in preparing the data")
+            return False            
+        
         calc = Calc()
         tx_data = calc.convert(prj.ssp)
 

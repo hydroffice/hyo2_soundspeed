@@ -1918,6 +1918,15 @@ class SoundSpeedLibrary:
 
         return True
 
+    def prepare_hypack(self, start_depth: float = 0.1) -> bool:
+        if not self.has_ssp():
+            logger.warning("no profile!")
+            return False
+
+        self.cur.remove_first_water_entries(start_depth)
+
+        return True
+    
     def prepare_sis(self, apply_thin: bool = True, apply_12k: bool = True,
                     thin_tolerance: float = 0.01) -> bool:
         if not self.has_ssp():

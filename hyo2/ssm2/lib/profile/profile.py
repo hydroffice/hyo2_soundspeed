@@ -302,6 +302,18 @@ class Profile:
         logger.debug("water index: %d (using salinity threshold: %.3f)" % (water_i, sal_thresh))
         return water_i
 
+    def remove_first_water_entries(self, depth_thresh):
+        """Remove data that is above a depth threshold"""
+
+        if self.proc.depth[self.proc_valid][0] < depth_thresh:
+            try:
+                min_depth_ii = self.proc.depth < depth_thresh
+                valid_and_min_depth_ii = np.logical_and(self.proc_valid, min_depth_ii)
+                self.proc.flag[valid_and_min_depth_ii] = Dicts.flags['filtered']
+                logger.debug("Removed data below %s meters" % depth_thresh)
+            except IndexError:
+                logger.warning("issue with removing samples below depth threshold %s meters" % depth_thresh)    
+    
     def remove_pre_water_entry(self):
         """Look for data that is likely out of the water by searching for very low salinity levels"""
 
