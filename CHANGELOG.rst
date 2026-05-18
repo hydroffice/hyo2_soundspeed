@@ -3,6 +3,19 @@ Changelog
 
 Main changes to Sound Speed Manager:
 
+Version 2026.2.0 (2026-05-18)
+-----------------------------
+
+- Bug fix for removing 0-meter samples in Hypack integration
+- Added toolbar option to visualize previous profile within 12 hours
+
+
+Version 2026.1.4 (2026-05-07)
+-----------------------------
+
+- Improved message dialog when importing data from existing projects
+
+
 Version 2026.1.0 (2026-02-01)
 -----------------------------
 
