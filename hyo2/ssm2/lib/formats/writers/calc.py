@@ -39,12 +39,12 @@ class Calc(AbstractTextWriter):
         body = self._convert_body()
         self.fod.io.write(body)
 
-    def convert(self, ssp):
-        """Convert a profile in a given Kongsberg format"""
+    def convert(self, ssp, for_hypack=False):
+        """Convert a profile in AML Oceanographic Calc format"""
         self.ssp = ssp
 
         header = self._convert_header()
-        body = self._convert_body()
+        body = self._convert_body(hypack=for_hypack)
 
         return header + body
 
@@ -57,18 +57,30 @@ class Calc(AbstractTextWriter):
         header += "DEPTH (M) VELOCITY (M/S) TEMP (C)\n"
         return header
 
-    def _convert_body(self):
+    def _convert_body(self, hypack):
         body = str()
         vi = self.ssp.cur.proc_valid
 
         last_depth = None
-        for i in range(np.sum(vi)):
-            if self.ssp.cur.proc.depth[vi][i] < 0.001:
-                continue
-            body += "%7.1f %8.2f %7.3f\n" % (self.ssp.cur.proc.depth[vi][i],
-                                             self.ssp.cur.proc.speed[vi][i],
-                                             self.ssp.cur.proc.temp[vi][i])
-            last_depth = self.ssp.cur.proc.depth[vi][i]
+        if hypack:
+            # Hypack supports two decimal precision for depth, which differs from
+            # the one decimal precision of the AML Calc format. Also, hypack has
+            # showcased erratic behaviour when receiving depth values of 0.00m.
+            for i in range(np.sum(vi)):
+                if self.ssp.cur.proc.depth[vi][i] < 0.01:
+                    continue
+                body += "%7.2f %8.2f %7.3f\n" % (self.ssp.cur.proc.depth[vi][i],
+                                                 self.ssp.cur.proc.speed[vi][i],
+                                                 self.ssp.cur.proc.temp[vi][i])
+                last_depth = self.ssp.cur.proc.depth[vi][i]
+        else:
+            for i in range(np.sum(vi)):
+                if self.ssp.cur.proc.depth[vi][i] < 0.0:
+                    continue
+                body += "%7.1f %8.2f %7.3f\n" % (self.ssp.cur.proc.depth[vi][i],
+                                                 self.ssp.cur.proc.speed[vi][i],
+                                                 self.ssp.cur.proc.temp[vi][i])
+                last_depth = self.ssp.cur.proc.depth[vi][i]            
 
         body += "0  0  0\n"
         body += "*** NAV ****\n"

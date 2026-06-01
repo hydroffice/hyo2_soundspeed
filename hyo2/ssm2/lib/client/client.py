@@ -96,7 +96,7 @@ class Client:
     def send_hyp_format(self, prj: 'SoundSpeedLibrary') -> bool:
         logger.info("using hypack format")
         calc = Calc()
-        tx_data = calc.convert(prj.ssp)
+        tx_data = calc.convert(prj.ssp, for_hypack=True)
 
         return self._transmit(tx_data)
 
