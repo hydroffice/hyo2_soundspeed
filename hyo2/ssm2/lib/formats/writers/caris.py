@@ -1,10 +1,13 @@
-import math
 import datetime
 import logging
+import math
 
-import numpy as np
+from numpy import sum
 
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.formats.writers.abstract import AbstractTextWriter
+# noinspection PyUnresolvedReferences
+from hyo2.ssm2.lib.profile.profilelist import ProfileList
 
 logger = logging.getLogger(__name__)
 
@@ -12,12 +15,12 @@ logger = logging.getLogger(__name__)
 class Caris(AbstractTextWriter):
     """CARIS svp writer"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super(Caris, self).__init__()
         self.desc = "CARIS"
         self._ext.add('svp')
 
-    def write(self, ssp, data_path, data_file=None, project=''):
+    def write(self, ssp: ProfileList, data_path: str, data_file: str | None = None, project: str = '') -> bool:
         # logger.debug('*** %s ***: start' % self.driver)
 
         self._project = project
@@ -34,29 +37,33 @@ class Caris(AbstractTextWriter):
         # logger.debug('*** %s ***: done' % self.driver)
         return True
 
-    def _write_header(self):
-        # logger.debug('generating header')
+    def _write_header(self) -> str:
+        if self.fod is None:
+            raise RuntimeError("FileManager is not set")
+        ssp = self.ssp
+        if ssp is None:
+            raise RuntimeError("Profile is not set")
 
         header = str()
 
         logger.debug("append: %s" % self.fod.append_exists)
         if not self.fod.append_exists:
             header += "[SVP_VERSION_2]\r\n"
-            header += "%s\r\n" % (self.fod.path)
+            header += "%s\r\n" % self.fod.path
 
         # date
-        if self.ssp.cur.meta.utc_time:
-            date_string = "%s" % self.ssp.cur.meta.utc_time.strftime("%Y-%j %H:%M:%S")
+        if ssp.cur.meta.utc_time:
+            date_string = "%s" % ssp.cur.meta.utc_time.strftime("%Y-%j %H:%M:%S")
         else:
             date_string = "%s" % datetime.datetime.now().strftime("%Y-%j %H:%M:%S")
 
         # position
-        if not self.ssp.cur.meta.latitude or not self.ssp.cur.meta.longitude:
+        if not ssp.cur.meta.latitude or not ssp.cur.meta.longitude:
             latitude = 0.0
             longitude = 0.0
         else:
-            latitude = self.ssp.cur.meta.latitude
-            longitude = self.ssp.cur.meta.longitude
+            latitude = ssp.cur.meta.latitude
+            longitude = ssp.cur.meta.longitude
         while longitude > 180.0:
             longitude -= 360.0
 
@@ -74,11 +81,17 @@ class Caris(AbstractTextWriter):
 
         header += "Section " + date_string + " " + position_string + "\r\n"
         self.fod.io.write(header)
+        return header
 
-    def _write_body(self):
-        # logger.debug('generating body')
-        vi = self.ssp.cur.proc_valid
+    def _write_body(self) -> None:
+        if self.fod is None:
+            raise RuntimeError("FileManager is not set")
+        ssp = self.ssp
+        if ssp is None:
+            raise RuntimeError("Profile is not set")
+
+        vi = ssp.cur.proc_valid
         # noinspection PyTypeChecker
-        for idx in range(np.sum(vi)):
+        for idx in range(sum(vi)):
             self.fod.io.write("%.6f %.6f\r\n"
-                              % (self.ssp.cur.proc.depth[vi][idx], self.ssp.cur.proc.speed[vi][idx],))
+                              % (ssp.cur.proc.depth[vi][idx], ssp.cur.proc.speed[vi][idx],))

@@ -1402,7 +1402,7 @@ class SoundSpeedLibrary:
         return lst
 
     def db_previous_profile_key(self, dt: datetime = None,
-                            max_age: timedelta = timedelta(hours=12)) -> int | None:
+                                max_age: timedelta = timedelta(hours=12)) -> int | None:
         db = ProjectDb(projects_folder=self.projects_folder, project_name=self.current_project)
         pk = db.previous_profile_key(dt=dt, max_age=max_age)
         db.disconnect()
@@ -1737,20 +1737,21 @@ class SoundSpeedLibrary:
 
     def filter_cur_data(self) -> bool:
         """Filter/smooth the current profile"""
-        if not self.has_ssp() or self.cur is None:
+        cur = self.cur
+        if not self.has_ssp() or cur is None:
             logger.warning("no profile!")
             return False
 
-        logger.debug("initial valid samples: %s" % self.cur.nr_valid_proc_samples)
+        logger.debug("initial valid samples: %s" % cur.nr_valid_proc_samples)
 
-        self.cur.remove_pre_water_entry()
-        logger.debug("post-pre-water-removal valid samples: %s" % self.cur.nr_valid_proc_samples)
+        cur.remove_pre_water_entry()
+        logger.debug("post-pre-water-removal valid samples: %s" % cur.nr_valid_proc_samples)
 
-        self.cur.statistical_filter()
-        logger.debug("post-filter valid samples: %s" % self.cur.nr_valid_proc_samples)
+        cur.statistical_filter()
+        logger.debug("post-filter valid samples: %s" % cur.nr_valid_proc_samples)
 
-        self.cur.cosine_smooth()
-        logger.debug("post-smooth valid samples: %s" % self.cur.nr_valid_proc_samples)
+        cur.cosine_smooth()
+        logger.debug("post-smooth valid samples: %s" % cur.nr_valid_proc_samples)
 
         return True
 
@@ -1758,7 +1759,8 @@ class SoundSpeedLibrary:
 
     def replace_cur_salinity(self) -> bool:
         """Replace salinity using atlases for the current profile"""
-        if not self.has_ssp() or self.cur is None:
+        cur = self.cur
+        if not self.has_ssp() or cur is None:
             logger.warning("no profile!")
             return False
 
@@ -1766,127 +1768,128 @@ class SoundSpeedLibrary:
             if not self.has_ref() or self.ref is None:
                 logger.warning("missing reference profile")
                 return False
-            if not self.cur.replace_proc_sal(self.ref):
+            if not cur.replace_proc_sal(self.ref):
                 return False
-            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_REF'])
+            cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_REF'])
 
         elif self.setup.ssp_salinity_source == Dicts.atlases['RTOFS']:
             if not self.has_rtofs():
                 logger.warning("missing RTOFS profile")
                 return False
-            if not self.cur.replace_proc_sal(self.cur.rtofs):
+            if not cur.replace_proc_sal(cur.rtofs):
                 return False
-            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_RTOFS'])
+            cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_RTOFS'])
 
         elif self.setup.ssp_salinity_source == Dicts.atlases['GoMOFS']:
             if not self.has_gomofs():
                 logger.warning("missing GoMOFS profile")
                 return False
-            if not self.cur.replace_proc_sal(self.cur.gomofs):
+            if not cur.replace_proc_sal(cur.gomofs):
                 return False
-            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_GoMOFS'])
+            cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_GoMOFS'])
 
         elif self.setup.ssp_salinity_source == Dicts.atlases['WOA09']:
             if not self.has_woa09():
                 logger.warning("missing WOA09 profile")
                 return False
-            if not self.cur.replace_proc_sal(self.cur.woa09):
+            if not cur.replace_proc_sal(cur.woa09):
                 return False
-            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_WOA09'])
+            cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_WOA09'])
 
         elif self.setup.ssp_salinity_source == Dicts.atlases['WOA13']:
             if not self.has_woa13():
                 logger.warning("missing WOA13 profile")
                 return False
-            if not self.cur.replace_proc_sal(self.cur.woa13):
+            if not cur.replace_proc_sal(cur.woa13):
                 return False
-            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_WOA13'])
+            cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_WOA13'])
 
         elif self.setup.ssp_salinity_source == Dicts.atlases['WOA18']:
             if not self.has_woa18():
                 logger.warning("missing WOA18 profile")
                 return False
-            if not self.cur.replace_proc_sal(self.cur.woa18):
+            if not cur.replace_proc_sal(cur.woa18):
                 return False
-            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_WOA18'])
+            cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_WOA18'])
 
         elif self.setup.ssp_salinity_source == Dicts.atlases['WOA23']:
             if not self.has_woa23():
                 logger.warning("missing WOA23 profile")
                 return False
-            if not self.cur.replace_proc_sal(self.cur.woa23):
+            if not cur.replace_proc_sal(cur.woa23):
                 return False
-            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_WOA23'])
+            cur.modify_proc_info(Dicts.proc_user_infos['REP_SAL_WOA23'])
 
         else:
             logger.warning("unknown atlases: %s" % self.setup.ssp_salinity_source)
             return False
 
-        self.cur.calc_proc_speed()
+        cur.calc_proc_speed()
 
         return True
 
     def replace_cur_temp_sal(self) -> bool:
         """Replace temperature/salinity using atlases for the current profile"""
-        if not self.has_ssp() or self.cur is None:
+        cur = self.cur
+        if not self.has_ssp() or cur is None:
             logger.warning("no profile!")
             return False
 
         if self.setup.ssp_temp_sal_source == Dicts.atlases['ref']:
-            if not self.has_ref():
+            if not self.has_ref() or self.ref is None:
                 logger.warning("missing reference profile")
                 return False
-            if not self.cur.replace_proc_temp_sal(self.ref):
+            if not cur.replace_proc_temp_sal(self.ref):
                 return False
-            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_REF'])
+            cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_REF'])
 
         elif self.setup.ssp_temp_sal_source == Dicts.atlases['RTOFS']:
             if not self.has_rtofs():
                 logger.warning("missing RTOFS profile")
                 return False
-            if not self.cur.replace_proc_temp_sal(self.cur.rtofs):
+            if not cur.replace_proc_temp_sal(cur.rtofs):
                 return False
-            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_RTOFS'])
+            cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_RTOFS'])
 
         elif self.setup.ssp_temp_sal_source == Dicts.atlases['GoMOFS']:
             if not self.has_gomofs():
                 logger.warning("missing GoMOFS profile")
                 return False
-            if not self.cur.replace_proc_temp_sal(self.cur.gomofs):
+            if not cur.replace_proc_temp_sal(cur.gomofs):
                 return False
-            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_GoMOFS'])
+            cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_GoMOFS'])
 
         elif self.setup.ssp_temp_sal_source == Dicts.atlases['WOA09']:
             if not self.has_woa09():
                 logger.warning("missing WOA09 profile")
                 return False
-            if not self.cur.replace_proc_temp_sal(self.cur.woa09):
+            if not cur.replace_proc_temp_sal(cur.woa09):
                 return False
-            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_WOA09'])
+            cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_WOA09'])
 
         elif self.setup.ssp_temp_sal_source == Dicts.atlases['WOA13']:
             if not self.has_woa13():
                 logger.warning("missing WOA13 profile")
                 return False
-            if not self.cur.replace_proc_temp_sal(self.cur.woa13):
+            if not cur.replace_proc_temp_sal(cur.woa13):
                 return False
-            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_WOA13'])
+            cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_WOA13'])
 
         elif self.setup.ssp_temp_sal_source == Dicts.atlases['WOA18']:
             if not self.has_woa18():
                 logger.warning("missing WOA18 profile")
                 return False
-            if not self.cur.replace_proc_temp_sal(self.cur.woa18):
+            if not cur.replace_proc_temp_sal(cur.woa18):
                 return False
-            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_WOA18'])
+            cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_WOA18'])
 
         elif self.setup.ssp_temp_sal_source == Dicts.atlases['WOA23']:
             if not self.has_woa23():
                 logger.warning("missing WOA23 profile")
                 return False
-            if not self.cur.replace_proc_temp_sal(self.cur.woa23):
+            if not cur.replace_proc_temp_sal(cur.woa23):
                 return False
-            self.cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_WOA23'])
+            cur.modify_proc_info(Dicts.proc_user_infos['REP_TEMP_SAL_WOA23'])
 
         else:
             logger.warning("unknown atlases: %s" % self.setup.ssp_temp_sal_source)
@@ -1898,7 +1901,8 @@ class SoundSpeedLibrary:
 
     def add_cur_tss(self, server_mode: bool = False) -> bool:
         """Add the transducer sound speed to the current profile"""
-        if not self.has_ssp() or self.cur is None:
+        cur = self.cur
+        if not self.has_ssp() or cur is None:
             logger.warning("no profile!")
             return False
 
@@ -1926,15 +1930,19 @@ class SoundSpeedLibrary:
             logger.warning("unable to retrieve tss values")
             return False
 
-        self.cur.insert_proc_speed(depth=tss_depth, speed=tss_value, src=Dicts.sources['tss'])
-        self.cur.modify_proc_info(Dicts.proc_user_infos['ADD_TSS'])
+        cur.insert_proc_speed(depth=tss_depth, speed=tss_value, src=Dicts.sources['tss'])
+        cur.modify_proc_info(Dicts.proc_user_infos['ADD_TSS'])
         return True
 
     def cur_plotted(self) -> None:
-        self.cur.modify_proc_info(Dicts.proc_user_infos['PLOTTED'])
+        cur = self.cur
+        if cur is None:
+            raise RuntimeError("No current profile")
+        cur.modify_proc_info(Dicts.proc_user_infos['PLOTTED'])
 
     def extend_profile(self) -> bool:
-        if not self.has_ssp() or self.cur is None:
+        cur = self.cur
+        if not self.has_ssp() or cur is None:
             logger.warning("no profile!")
             return False
 
@@ -1942,49 +1950,49 @@ class SoundSpeedLibrary:
             if not self.has_ref() or self.ref is None:
                 logger.warning("missing reference profile")
                 return False
-            if not self.cur.extend_profile(self.ref, ext_type=Dicts.sources['ref_ext']):
+            if not cur.extend_profile(self.ref, ext_type=Dicts.sources['ref_ext']):
                 return False
 
         elif self.setup.ssp_extension_source == Dicts.atlases['RTOFS']:
             if not self.has_rtofs():
                 logger.warning("missing RTOFS profile")
                 return False
-            if not self.cur.extend_profile(self.cur.rtofs, ext_type=Dicts.sources['rtofs_ext']):
+            if not cur.extend_profile(cur.rtofs, ext_type=Dicts.sources['rtofs_ext']):
                 return False
 
         elif self.setup.ssp_extension_source == Dicts.atlases['GoMOFS']:
             if not self.has_gomofs():
                 logger.warning("missing GoMOFS profile")
                 return False
-            if not self.cur.extend_profile(self.cur.gomofs, ext_type=Dicts.sources['gomofs_ext']):
+            if not cur.extend_profile(cur.gomofs, ext_type=Dicts.sources['gomofs_ext']):
                 return False
 
         elif self.setup.ssp_extension_source == Dicts.atlases['WOA09']:
             if not self.has_woa09():
                 logger.warning("missing WOA09 profile")
                 return False
-            if not self.cur.extend_profile(self.cur.woa09, ext_type=Dicts.sources['woa09_ext']):
+            if not cur.extend_profile(cur.woa09, ext_type=Dicts.sources['woa09_ext']):
                 return False
 
         elif self.setup.ssp_extension_source == Dicts.atlases['WOA13']:
             if not self.has_woa13():
                 logger.warning("missing WOA13 profile")
                 return False
-            if not self.cur.extend_profile(self.cur.woa13, ext_type=Dicts.sources['woa13_ext']):
+            if not cur.extend_profile(cur.woa13, ext_type=Dicts.sources['woa13_ext']):
                 return False
 
         elif self.setup.ssp_extension_source == Dicts.atlases['WOA18']:
             if not self.has_woa18():
                 logger.warning("missing WOA18 profile")
                 return False
-            if not self.cur.extend_profile(self.cur.woa18, ext_type=Dicts.sources['woa18_ext']):
+            if not cur.extend_profile(cur.woa18, ext_type=Dicts.sources['woa18_ext']):
                 return False
 
         elif self.setup.ssp_extension_source == Dicts.atlases['WOA23']:
             if not self.has_woa23():
                 logger.warning("missing WOA23 profile")
                 return False
-            if not self.cur.extend_profile(self.cur.woa23, ext_type=Dicts.sources['woa23_ext']):
+            if not cur.extend_profile(cur.woa23, ext_type=Dicts.sources['woa23_ext']):
                 return False
 
         else:
@@ -1995,27 +2003,28 @@ class SoundSpeedLibrary:
 
     def prepare_sis(self, apply_thin: bool = True, apply_12k: bool = True,
                     thin_tolerance: float = 0.01) -> bool:
-        if not self.has_ssp() or self.cur is None:
+        cur = self.cur
+        if not self.has_ssp() or cur is None:
             logger.warning("no profile!")
             return False
 
-        self.cur.clone_proc_to_sis()
+        cur.clone_proc_to_sis()
 
         if apply_thin:
-            if not self.cur.thin(tolerance=thin_tolerance):
+            if not cur.thin(tolerance=thin_tolerance):
                 logger.warning("thinning issue")
                 return False
         else:
-            self.cur.sis.flag[self.cur.sis_valid] = Dicts.flags['thin']
+            cur.sis.flag[cur.sis_valid] = Dicts.flags['thin']
 
         # filter the data for depth
-        si = self.cur.sis_thinned
-        valid = self.cur.sis.flag[si][:]
+        si = cur.sis_thinned
+        valid = cur.sis.flag[si][:]
         last_depth = -1.0
         # logger.debug('valid size: %s' % valid.size)
-        for i in range(self.cur.sis.flag[si].size):
+        for i in range(cur.sis.flag[si].size):
 
-            depth = self.cur.sis.depth[si][i]
+            depth = cur.sis.depth[si][i]
             if abs(depth - last_depth) < 0.02:  # ignore sample with small separation
                 valid[i] = Dicts.flags['sis']
                 # logger.debug('small change: %s %s %s' % (i, last_depth, depth))
@@ -2026,16 +2035,16 @@ class SoundSpeedLibrary:
 
             last_depth = depth
 
-        self.cur.sis.flag[si] = valid[:]
+        cur.sis.flag[si] = valid[:]
 
         # check depth 0.0
-        si = self.cur.sis_thinned
-        if self.cur.sis.flag[si].size == 0:
+        si = cur.sis_thinned
+        if cur.sis.flag[si].size == 0:
             logger.warning("no valid samples after depth filters")
             return False
-        depth_0 = self.cur.sis.depth[si][0]
+        depth_0 = cur.sis.depth[si][0]
         if depth_0 > 0:
-            self.cur.insert_sis_speed(depth=0.0, speed=self.cur.sis.speed[si][0], src=Dicts.sources['sis'])
+            cur.insert_sis_speed(depth=0.0, speed=cur.sis.speed[si][0], src=Dicts.sources['sis'])
 
         # check last depth
         # Add a final value at 12000m, from: Taira, K., Yanagimoto, D. and Kitagawa, S. (2005).,
@@ -2043,16 +2052,16 @@ class SoundSpeedLibrary:
         # TODO: add T/S at location of max depth in the current basin in between last observation and 12000m sample
         if apply_12k:
 
-            si = self.cur.sis_thinned
-            if self.cur.sis.flag[si].size == 0:
+            si = cur.sis_thinned
+            if cur.sis.flag[si].size == 0:
                 logger.warning("no valid samples after depth filters")
                 return False
-            depth_end = self.cur.sis.depth[si][-1]
+            depth_end = cur.sis.depth[si][-1]
 
             if depth_end < 12000:
                 # logger.debug('extending after last depth: %s' % depth_end)
-                self.cur.insert_sis_speed(depth=12000.0, speed=1675.8, src=Dicts.sources['sis'],
-                                          cond=30.9, temp=2.46, sal=34.70)
+                cur.insert_sis_speed(depth=12000.0, speed=1675.8, src=Dicts.sources['sis'],
+                                     cond=30.9, temp=2.46, sal=34.70)
 
         return True
 
@@ -2066,8 +2075,9 @@ class SoundSpeedLibrary:
 
     def restart_proc(self) -> None:
         """Clear current data"""
-        if self.has_ssp():
-            for profile in self.ssp.l:  # we may have multiple profiles
+        ssp = self.ssp
+        if self.has_ssp() and ssp is not None:
+            for profile in ssp.l:  # we may have multiple profiles
                 profile.clone_data_to_proc()
                 profile.init_sis()  # initialize to zero
                 profile.remove_user_proc_info()  # remove the token that are added by user actions
@@ -2079,7 +2089,10 @@ class SoundSpeedLibrary:
         if self.cur is None:
             return
         from matplotlib import pyplot as plt
-        self.ssp.debug_plot(more=more)
+        ssp = self.ssp
+        if ssp is None:
+            raise RuntimeError("No current profile")
+        ssp.debug_plot(more=more)
         if show:
             plt.show()
 

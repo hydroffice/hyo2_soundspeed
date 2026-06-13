@@ -34,7 +34,7 @@ class AbstractFormat(metaclass=ABCMeta):
         return self._ssp
 
     @ssp.setter
-    def ssp(self, value: ProfileList):
+    def ssp(self, value: ProfileList) -> None:
         self._ssp = value
 
     @property
