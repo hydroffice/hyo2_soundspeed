@@ -3,6 +3,12 @@ Changelog
 
 Main changes to Sound Speed Manager:
 
+Version 2026.3.0 (2026-06-28)
+-----------------------------
+
+- Improved TSK driver and extended with .xctd and .xctp files
+
+
 Version 2026.2.0 (2026-05-18)
 -----------------------------
 

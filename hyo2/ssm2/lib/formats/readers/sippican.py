@@ -28,6 +28,9 @@ class Sippican(AbstractTextReader):
         Dicts.probe_types["XCTD-01"]: Dicts.sensor_types["XCTD"],
         Dicts.probe_types["XCTD-1"]: Dicts.sensor_types["XCTD"],
         Dicts.probe_types["XCTD-2"]: Dicts.sensor_types["XCTD"],
+        Dicts.probe_types["XCTD-3"]: Dicts.sensor_types["XCTD"],
+        Dicts.probe_types["XCTD-4"]: Dicts.sensor_types["XCTD"],
+        Dicts.probe_types["AXCTD-1"]: Dicts.sensor_types["XCTD"],
         Dicts.probe_types["Fast Deep"]: Dicts.sensor_types["XBT"],
     }
 
@@ -62,8 +65,7 @@ class Sippican(AbstractTextReader):
         self.is_var_alpha = False
         self.input_salinity = None
 
-        self.init_data()  # create a new empty profile list
-        self.ssp.append()  # append a new profile
+        self.init_data_and_append()  # create a new empty profile list and append a new profile
 
         self._read(data_path=data_path)
         self._parse_header()

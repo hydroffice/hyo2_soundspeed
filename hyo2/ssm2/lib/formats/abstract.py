@@ -48,3 +48,9 @@ class AbstractFormat(metaclass=ABCMeta):
     def init_data(self) -> None:
         """Create a new empty profile list"""
         self._ssp = ProfileList()
+
+    def init_data_and_append(self) -> None:
+        """Create a new empty profile list"""
+        self._ssp = ProfileList()
+        if self._ssp:
+            self._ssp.append()

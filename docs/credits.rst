@@ -4,11 +4,13 @@
 Credits
 *******
 
-Sound Speed library and manager are jointly developed by the `Center for Coastal and Ocean Mapping, UNH <https://ccom.unh.edu/>`_ and
-`NOAA Coast Survey Development Laboratory (CSDL) <https://www.nauticalcharts.noaa.gov/>`_.
+Authors
+~~~~~~~
 
+HydrOffice's Sound Speed Manager (SSM) is based on an ongoing joint development between the NOAA's `Ocean of Coastal Survey <http://www.nauticalcharts.noaa.gov/>`_
+and UNH's `Center for Coastal and Ocean Mapping <http://ccom.unh.edu>`_.
 
-The package developers and maintainers are:
+SSM is written and maintained by:
 
 - `Giuseppe Masetti <mailto:gmasetti@ccom.unh.edu>`_
 
@@ -16,7 +18,13 @@ The package developers and maintainers are:
 
 - `Chen Zhang <mailto:chen.zhang@noaa.gov>`_
 
-Other past and present contributors are:
+For bugs and feature requests: `soundspeed@hydroffice.org <mailto:soundspeed@hydroffice.org>`_
+
+
+Contributors
+~~~~~~~~~~~~
+
+We would like to express our sincere gratitude and appreciation to the following contributors for their valuable contributions to this project:
 
 - `Roland Arsenault <roland.arsenault@unh.edu>`_
 
@@ -25,6 +33,8 @@ Other past and present contributors are:
 - `Jonathan Beaudoin <mailto:beaudoin@qps.nl>`_
 
 - `Brian R. Calder <mailto:brc@ccom.unh.edu>`_
+
+- `Tyanne Faulkes <mailto:tyanne.faulkes@noaa.gov>`_
 
 - `Lindsay Gee <mailto:lindsayjgee@gmail.com>`_
 
@@ -53,8 +63,3 @@ Other past and present contributors are:
 - `Michael Smith <mailto:msmith@ccom.unh.edu>`_
 
 - `Matthew J. Wilson <mailto:matthew.wilson@noaa.gov>`_
-
-Feel free to contact us for comments and suggestions.
-
-
-For bugs and feature requests: `soundspeed@hydroffice.org <mailto:soundspeed@hydroffice.org>`_

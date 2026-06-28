@@ -37,7 +37,7 @@ Supported Formats
    Seabird (.cnv)                                       X
    Sippican (.edf)                                      X
    Sonardyne (.pro)                                     X    X
-   TSK (.xbt)                                           X
+   TSK (.xbt, .xctd, .xctp)                             X
    Turo (.nc)                                           X
    UNB (.unb)                                           X    X
    Valeport Midas/Monitor SVP/SVX2 (.000)               X

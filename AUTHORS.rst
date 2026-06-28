@@ -16,7 +16,7 @@ The package developers and maintainers are:
 Contributors
 ~~~~~~~~~~~~
 
-Other past and present contributors are:
+We would like to express our sincere gratitude and appreciation to the following contributors for their valuable contributions to this project:
 
 - `Roland Arsenault <roland.arsenault@unh.edu>`_
 
@@ -25,6 +25,8 @@ Other past and present contributors are:
 - `Jonathan Beaudoin <mailto:beaudoin@qps.nl>`_
 
 - `Brian R. Calder <mailto:brc@ccom.unh.edu>`_
+
+- `Tyanne Faulkes <mailto:tyanne.faulkes@noaa.gov>`_
 
 - `Lindsay Gee <mailto:lindsayjgee@gmail.com>`_
 
