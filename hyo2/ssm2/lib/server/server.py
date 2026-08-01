@@ -218,7 +218,7 @@ class Server(Thread):
         return True
 
     def run(self) -> None:
-        """Start the simulation"""
+        """Start the server"""
         # self.init_logger()
         logger.debug("%s -> started" % self.name)
         self.runtime_errors.clear()
@@ -256,6 +256,8 @@ class Server(Thread):
             count += 1
             time.sleep(1)
 
+        if self.is_alive():
+            self.stop()
         logger.debug("%s -> ended" % self.name)
 
     def check(self) -> None:
@@ -436,9 +438,9 @@ class Server(Thread):
                     logger.info('missed reception of last transmitted SSP -> '
                                 'SIS is using the previously-transmitted SSP')
                 else:
-                    msg = "Times mismatch > %s AND %s != %s " \
-                          % (self.prj.setup.client_list.last_tx_time, self.prj.setup.client_list.last_tx_time_2,
-                             self.prj.listeners.sis.ssp.acquisition_time)
+                    msg = ("Profile timestamps mismatch -> last tx: %s != current: %s. \n"
+                           "Was a new sound speed profile manually set? ") \
+                          % (self.prj.setup.client_list.last_tx_time, self.prj.listeners.sis.ssp.acquisition_time)
                     self.runtime_errors.append(msg)
                     logger.error(msg)
                     self.shutdown.set()
