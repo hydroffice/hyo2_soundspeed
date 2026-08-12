@@ -151,10 +151,14 @@ class RegOfs(AbstractAtlas):
         t = self._file.variables['temp'][self._day_idx, :][..., lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
         # logger.debug('t shape: %s' % (t.shape, ))
         # https://ponce.sdsu.edu/lakesalinityworld.html#:~:text=The%20salinity%20of%20Lake%20Superior,between%200.05%20and%200.60%20ppt.
-        if self.model == RegOfsModel.LMHOFS:
+        if self.model == RegOfsModel.LEOFS:
+            s = full_like(t, 0.15)
+        elif self.model == RegOfsModel.LMHOFS:
             s = full_like(t, 0.3)
         elif self.model == RegOfsModel.LOOFS:
             s = full_like(t, 0.5)
+        elif self.model == RegOfsModel.LSOFS:
+            s = full_like(t, 0.06)
         else:
             s = self._file.variables['salt'][self._day_idx, :][..., lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
         # Set 'unfilled' elements to NANs (BUT when the entire array has valid data, it returns numpy.ndarray)
