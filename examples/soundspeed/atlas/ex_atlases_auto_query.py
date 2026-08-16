@@ -1,7 +1,8 @@
+import logging
 import time
 from datetime import datetime as dt, UTC
-import logging
 from enum import IntEnum
+
 from PySide6 import QtWidgets
 
 # noinspection PyUnresolvedReferences
@@ -9,10 +10,9 @@ from hyo2.abc2.app.qt_progress import QtProgress
 # noinspection PyUnresolvedReferences
 from hyo2.abc2.lib.logging import set_logging
 # noinspection PyUnresolvedReferences
-from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
-# noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.qt_callbacks import QtCallbacks
-
+# noinspection PyUnresolvedReferences
+from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 set_logging(ns_list=["hyo2.abc2", "hyo2.ssm2"])
 
@@ -39,7 +39,7 @@ lib = SoundSpeedLibrary(progress=QtProgress(parent=mw), callbacks=QtCallbacks(pa
 # Choose test location
 tests = [
 
-    (-19.1, 74.17, dt.now(UTC))               # Indian Ocean
+    (-19.1, 74.17, dt.now(UTC))  # Indian Ocean
     # (72.852028, -67.315431, dt.now(UTC))      # Baffin Bay
     # (18.2648113, 16.1761115, dt.now(UTC))     # in land -> middle of Africa
     # (39.725989, -104.967745, dt.now(UTC))     # in land -> Denver, CO

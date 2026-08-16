@@ -30,31 +30,43 @@ mw.show()
 
 lib = SoundSpeedLibrary(progress=QtProgress(parent=mw), callbacks=QtCallbacks(parent=mw))
 
+count_errors = 0
+
 for model in models:
-    logger.info(f"Model: {model.name} ...")
 
-    if model in RegOfsModel.skip_models():
-        logger.info(f"Model: {model.name} ... SKIP")
-        continue
+    try:
 
-    has_model = model.lib_func_has_model(lib=lib)
-    download_model = model.lib_func_download_model(lib=lib)
-    query = model.lib_func_query(lib=lib)
+        logger.info(f"Model: {model.name} ...")
 
-    if not has_model():
-        download_model()
-    logger.debug(f"has model: {has_model()}")
+        if model in RegOfsModel.skip_models():
+            logger.info(f"Model: {model.name} ... SKIP")
+            continue
 
-    test = model.test
+        has_model = model.lib_func_has_model(lib=lib)
+        download_model = model.lib_func_download_model(lib=lib)
+        query = model.lib_func_query(lib=lib)
 
-    start_time = time.time()
-    if interactive:
-        # ask user for location and timestamp
-        model.lib_func_retrieve(lib=lib)()
-        ssp = lib.ssp
-    else:
-        ssp = query(lat=test[0], lon=test[1], datestamp=test[2])
-    logger.info(f"profiles:\n{ssp}")
-    logger.info("execution time: %.3f s" % (time.time() - start_time))
+        if not has_model():
+            download_model()
+        logger.debug(f"has model: {has_model()}")
 
-    logger.info(f"Model: {model.name} ... DONE")
+        test = model.test
+
+        start_time = time.time()
+        if interactive:
+            # ask user for location and timestamp
+            model.lib_func_retrieve(lib=lib)()
+            ssp = lib.ssp
+        else:
+            ssp = query(lat=test[0], lon=test[1], datestamp=test[2])
+        logger.info(f"profiles:\n{ssp}")
+        logger.info("execution time: %.3f s" % (time.time() - start_time))
+
+        logger.info(f"Model: {model.name} ... DONE")
+
+    except Exception as e:
+        count_errors += 1
+        logger.error(f"Model: {model.name} ... FAILED\n{e}", exc_info=True)
+
+if count_errors > 0:
+    logger.warning(f"There were {count_errors} errors while querying {models}")

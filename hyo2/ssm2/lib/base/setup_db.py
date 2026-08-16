@@ -1,10 +1,13 @@
-import os
 import logging
+import os
 import sqlite3
 import traceback
 
+# noinspection PyUnresolvedReferences
 from hyo2.abc2.lib.package.pkg_helper import PkgHelper
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.base.basedb import BaseDb
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.base.setup_sql import (
     CREATE_SETTINGS, CREATE_SETTINGS_VIEW, CREATE_CLIENT_LIST,
     RENAME_SETTINGS, RENAME_CLIENT_LIST, DROP_OLD_SETTINGS, DROP_OLD_CLIENT_LIST, DROP_SETTINGS_VIEW,
@@ -28,39 +31,34 @@ class SetupDb(BaseDb):
         self.use_setup_name = use_setup_name
 
     def update_from_v1_to_v7(self) -> bool:
-        if not self.conn:
-            logger.error("Missing db connection")
-            return False
-
         try:
-            self.conn.execute(""" PRAGMA foreign_keys = 0""")
+            self.c.execute(""" PRAGMA foreign_keys = 0""")
 
-            self.conn.execute(RENAME_SETTINGS)
-            self.conn.execute(RENAME_CLIENT_LIST)
-            self.conn.execute(DROP_SETTINGS_VIEW)
-            self.conn.execute(CREATE_SETTINGS)
-            self.conn.execute(CREATE_CLIENT_LIST)
-            self.conn.execute(CREATE_SETTINGS_VIEW)
+            self.c.execute(RENAME_SETTINGS)
+            self.c.execute(RENAME_CLIENT_LIST)
+            self.c.execute(DROP_SETTINGS_VIEW)
+            self.c.execute(CREATE_SETTINGS)
+            self.c.execute(CREATE_CLIENT_LIST)
+            self.c.execute(CREATE_SETTINGS_VIEW)
 
-            self.conn.execute(ALTER_OLD_SETTINGS_USE_NMEA_0183)
-            self.conn.execute(ALTER_OLD_SETTINGS_NMEA_LISTEN_PORT)
-            self.conn.execute(ALTER_OLD_SETTINGS_NMEA_LISTEN_TIMEOUT)
-            self.conn.execute(ALTER_OLD_SETTINGS_USE_WOA18)
-            self.conn.execute(ALTER_OLD_SETTINGS_USE_WOA23)
-            self.conn.execute(ALTER_OLD_SETTINGS_CUSTOM_WOA18_FOLDER)
-            self.conn.execute(ALTER_OLD_SETTINGS_CUSTOM_WOA23_FOLDER)
+            self.c.execute(ALTER_OLD_SETTINGS_USE_NMEA_0183)
+            self.c.execute(ALTER_OLD_SETTINGS_NMEA_LISTEN_PORT)
+            self.c.execute(ALTER_OLD_SETTINGS_NMEA_LISTEN_TIMEOUT)
+            self.c.execute(ALTER_OLD_SETTINGS_USE_WOA18)
+            self.c.execute(ALTER_OLD_SETTINGS_USE_WOA23)
+            self.c.execute(ALTER_OLD_SETTINGS_CUSTOM_WOA18_FOLDER)
+            self.c.execute(ALTER_OLD_SETTINGS_CUSTOM_WOA23_FOLDER)
 
-            self.conn.execute(V1_V7_COPY_SETTINGS)
-            self.conn.execute(V1_V7_COPY_CLIENT_LIST)
-            self.conn.execute(DROP_OLD_SETTINGS)
-            self.conn.execute(DROP_OLD_CLIENT_LIST)
+            self.c.execute(V1_V7_COPY_SETTINGS)
+            self.c.execute(V1_V7_COPY_CLIENT_LIST)
+            self.c.execute(DROP_OLD_SETTINGS)
+            self.c.execute(DROP_OLD_CLIENT_LIST)
 
-            if self.conn.execute(""" PRAGMA foreign_keys """):
-                # logger.info("foreign keys active")
-                pass
-            else:
-                logger.error("foreign keys not active")
+            foreign_keys_enabled = bool(self.c.execute("PRAGMA foreign_keys").fetchone()[0])
+            if not foreign_keys_enabled:
+                logger.error("Foreign keys are not active")
                 return False
+
             self.commit()
             return True
 
@@ -70,20 +68,14 @@ class SetupDb(BaseDb):
             return False
 
     def build_tables(self) -> bool:
-        if not self.conn:
-            logger.error("Missing db connection")
-            return False
-
         try:
-            if self.conn.execute(""" PRAGMA foreign_keys """):
-                # logger.info("foreign keys active")
-                pass
-            else:
-                logger.error("foreign keys not active")
+            foreign_keys_enabled = bool(self.c.execute("PRAGMA foreign_keys").fetchone()[0])
+            if not foreign_keys_enabled:
+                logger.error("Foreign keys are not active")
                 return False
-            self.conn.execute(CREATE_SETTINGS)
-            self.conn.execute(CREATE_CLIENT_LIST)
-            self.conn.execute(CREATE_SETTINGS_VIEW)
+            self.c.execute(CREATE_SETTINGS)
+            self.c.execute(CREATE_CLIENT_LIST)
+            self.c.execute(CREATE_SETTINGS_VIEW)
             self.commit()
             return True
 
@@ -109,35 +101,38 @@ class SetupDb(BaseDb):
     def setup_exists(self, setup_name: str) -> bool:
         """Check if the passed profile exists"""
         try:
-            ret = self.conn.execute(""" SELECT COUNT(id) FROM general WHERE setup_name=? """,
-                                    (setup_name,)).fetchone()
+            ret = self.c.execute(""" SELECT COUNT(id)
+                                     FROM general
+                                     WHERE setup_name = ? """,
+                                 (setup_name,)).fetchone()
             # logger.info("found %d settings named %s" % (ret[0], setup_name))
             if ret[0] == 0:
                 return False
             else:
                 return True
+
         except sqlite3.Error as e:
             raise RuntimeError("%s: %s" % (type(e), e))
 
     # noinspection SqlResolve
     def add_setup(self, setup_name: str) -> bool:
         """ Add setting with passed name and default values."""
-        if not self.conn:
-            logger.error("Missing db connection")
-            return False
-
         try:
             logger.info("inserting %s settings with default values" % setup_name)
             # create a default settings record
-            self.conn.execute(""" INSERT INTO general (setup_name) VALUES(?) """, (setup_name,))
+            self.c.execute(""" INSERT INTO general (setup_name)
+                               VALUES (?) """, (setup_name,))
 
             # retrieve settings id
-            ret = self.conn.execute(""" SELECT id FROM general WHERE setup_name=? """,
-                                    (setup_name,)).fetchone()
+            ret = self.c.execute(""" SELECT id
+                                     FROM general
+                                     WHERE setup_name = ? """,
+                                 (setup_name,)).fetchone()
             # logger.info("%s settings id: %s" % (setup_name, ret[0]))
 
             # add default client list
-            self.conn.execute(""" INSERT INTO client_list (setup_id) VALUES(?) """, (ret[0],))
+            self.c.execute(""" INSERT INTO client_list (setup_id)
+                               VALUES (?) """, (ret[0],))
             # logger.info("inserted %s settings values" % setup_name)
 
             self.commit()
@@ -151,20 +146,20 @@ class SetupDb(BaseDb):
     # noinspection SqlResolve
     def delete_setup(self, setup_name: str) -> bool:
         """ Delete a profile (if not active)."""
-        if not self.conn:
-            logger.error("Missing db connection")
-            return False
-
         try:
             # check if active
-            ret = self.conn.execute(""" SELECT setup_status FROM general WHERE setup_name=? """,
-                                    (setup_name,)).fetchone()
+            ret = self.c.execute(""" SELECT setup_status
+                                     FROM general
+                                     WHERE setup_name = ? """,
+                                 (setup_name,)).fetchone()
             # logger.info("%s settings status: %s" % (setup_name, ret))
             if ret == "active":
                 raise RuntimeError("Attempt to delete active profile (%s)" % setup_name)
 
             # create a default settings record
-            self.conn.execute(""" DELETE FROM general WHERE setup_name=? """, (setup_name,))
+            self.c.execute(""" DELETE
+                               FROM general
+                               WHERE setup_name = ? """, (setup_name,))
             # logger.info("deleted profile: %s" % setup_name)
 
             self.commit()
@@ -181,15 +176,14 @@ class SetupDb(BaseDb):
         if not self.setup_exists(setup_name):
             return False
 
-        if not self.conn:
-            logger.error("Missing db connection")
-            return False
-
         try:
             # set all the values to inactive
-            self.conn.execute(""" UPDATE general SET setup_status="inactive" """)
+            self.c.execute(""" UPDATE general
+                               SET setup_status="inactive" """)
             # set active just the passed profile
-            self.conn.execute(""" UPDATE general SET setup_status="active" WHERE setup_name=? """, (setup_name,))
+            self.c.execute(""" UPDATE general
+                               SET setup_status="active"
+                               WHERE setup_name = ? """, (setup_name,))
             # logger.info("activated profile: %s" % setup_name)
             self.commit()
             return True
@@ -203,18 +197,24 @@ class SetupDb(BaseDb):
     def active_setup_id(self) -> int:
         """ Retrieve the active settings id """
         if self.use_setup_name is None:
-            ret = self.conn.execute(""" SELECT id FROM general WHERE setup_status="active" """).fetchone()
+            ret = self.c.execute(""" SELECT id
+                                     FROM general
+                                     WHERE setup_status = "active" """).fetchone()
             return ret[0]
 
         # logger.debug('using setup name: %s' % self.use_setup_name)
-        ret = self.conn.execute(""" SELECT id FROM general WHERE setup_name=? """,
-                                (self.use_setup_name,)).fetchone()
+        ret = self.c.execute(""" SELECT id
+                                 FROM general
+                                 WHERE setup_name = ? """,
+                             (self.use_setup_name,)).fetchone()
         return ret[0]
 
     # noinspection SqlResolve
     def setup_id_from_setup_name(self, setup_name: str) -> int:
-        ret = self.conn.execute(""" SELECT id FROM general WHERE setup_name=? """,
-                                (setup_name,)).fetchone()
+        ret = self.c.execute(""" SELECT id
+                                 FROM general
+                                 WHERE setup_name = ? """,
+                             (setup_name,)).fetchone()
         return ret[0]
 
     # --- clients list
@@ -222,8 +222,11 @@ class SetupDb(BaseDb):
     # noinspection SqlResolve
     @property
     def client_list(self) -> list:
-        ret = self.conn.execute(""" SELECT id, name, ip, port, protocol FROM client_list WHERE setup_id=? """,
-                                (self.active_setup_id,)).fetchall()
+
+        ret = self.c.execute(""" SELECT id, name, ip, port, protocol
+                                 FROM client_list
+                                 WHERE setup_id = ? """,
+                             (self.active_setup_id,)).fetchall()
         # logger.info("SSP clients: %s" % len(ret))
         return ret
 
@@ -231,13 +234,16 @@ class SetupDb(BaseDb):
     def client_exists(self, client_name: str) -> bool:
         """Check if the passed profile exists"""
         try:
-            ret = self.conn.execute(""" SELECT COUNT(id) FROM client_list WHERE name=? """,
-                                    (client_name,)).fetchone()
+            ret = self.c.execute(""" SELECT COUNT(id)
+                                     FROM client_list
+                                     WHERE name = ? """,
+                                 (client_name,)).fetchone()
             # logger.info("found %s clients named %s" % (ret[0], client_name))
             if ret[0] == 0:
                 return False
             else:
                 return True
+
         except sqlite3.Error as e:
             raise RuntimeError("%s: %s" % (type(e), e))
 
@@ -245,14 +251,10 @@ class SetupDb(BaseDb):
     def add_client(self, client_name: str, client_ip: str = "127.0.0.1", client_port: int = 4001,
                    client_protocol: str = "SIS") -> bool:
         """Add client with passed name and default values."""
-        if not self.conn:
-            logger.error("Missing db connection")
-            return False
-
         try:
-            self.conn.execute(""" INSERT INTO client_list (setup_id, name, ip, port, protocol)
-                                              VALUES(?, ?, ?, ?, ?) """,
-                              (self.active_setup_id, client_name, client_ip, client_port, client_protocol))
+            self.c.execute(""" INSERT INTO client_list (setup_id, name, ip, port, protocol)
+                               VALUES (?, ?, ?, ?, ?) """,
+                           (self.active_setup_id, client_name, client_ip, client_port, client_protocol))
             # logger.info("inserted %s client values" % client_name, client_ip, client_port, client_protocol)
             self.commit()
             return True
@@ -264,13 +266,12 @@ class SetupDb(BaseDb):
     # noinspection SqlResolve
     def delete_client(self, client_name: str) -> bool:
         """Delete a client."""
-        if not self.conn:
-            logger.error("Missing db connection")
-            return False
-
         try:
-            self.conn.execute(""" DELETE FROM client_list WHERE name=? AND setup_id=?""",
-                              (client_name, self.active_setup_id,))
+            self.c.execute(""" DELETE
+                               FROM client_list
+                               WHERE name = ?
+                                 AND setup_id = ?""",
+                           (client_name, self.active_setup_id,))
             self.commit()
             # logger.info("deleted client: %s" % client_name)
             return True
@@ -282,13 +283,12 @@ class SetupDb(BaseDb):
     # noinspection SqlResolve
     def delete_clients(self) -> bool:
         """Delete all clients."""
-        if not self.conn:
-            logger.error("Missing db connection")
-            return False
 
         try:
-            self.conn.execute(""" DELETE FROM client_list WHERE setup_id=?""",
-                              (self.active_setup_id,))
+            self.c.execute(""" DELETE
+                               FROM client_list
+                               WHERE setup_id = ?""",
+                           (self.active_setup_id,))
             self.commit()
             # logger.info("deleted clients")
             return True
@@ -302,36 +302,37 @@ class SetupDb(BaseDb):
     # noinspection SqlResolve
     @property
     def setup_list(self) -> list:
-        ret = self.conn.execute(""" SELECT id, setup_name, setup_status, setup_version FROM general """).fetchall()
+        ret = self.c.execute(""" SELECT id, setup_name, setup_status, setup_version
+                                 FROM general """).fetchall()
         # logger.info("Profiles list: %s" % len(ret))
         return ret
 
     # --- templates
     def _getter_int(self, attrib: str) -> int:
-        r = self.conn.execute(""" SELECT """ + attrib + """ FROM general WHERE id=? """,
-                              (self.active_setup_id,)).fetchone()
+        r = self.c.execute(""" SELECT """ + attrib + """ FROM general WHERE id=? """,
+                           (self.active_setup_id,)).fetchone()
         # logger.info("%s = %d" % (attrib, r[0]))
         return r[0]
 
     def _setter_int(self, attrib: str, value: int) -> None:
         try:
-            self.conn.execute(""" UPDATE general SET """ + attrib + """=? WHERE id=? """,
-                              (value, self.active_setup_id,))
+            self.c.execute(""" UPDATE general SET """ + attrib + """=? WHERE id=? """,
+                           (value, self.active_setup_id,))
             self.commit()
         except sqlite3.Error as e:
             logger.error("while setting %s, %s: %s" % (attrib, type(e), e))
         # logger.info("%s = %d" % (attrib, value))
 
     def _getter_str(self, attrib: str) -> str:
-        r = self.conn.execute(""" SELECT """ + attrib + """ FROM general WHERE id=? """,
-                              (self.active_setup_id,)).fetchone()
+        r = self.c.execute(""" SELECT """ + attrib + """ FROM general WHERE id=? """,
+                           (self.active_setup_id,)).fetchone()
         # logger.info("%s = %s" % (attrib, r[0]))
         return r[0]
 
     def _setter_str(self, attrib: str, value: str) -> None:
         try:
-            self.conn.execute(""" UPDATE general SET """ + attrib + """=? WHERE id=? """,
-                              (value, self.active_setup_id,))
+            self.c.execute(""" UPDATE general SET """ + attrib + """=? WHERE id=? """,
+                           (value, self.active_setup_id,))
             self.commit()
         except sqlite3.Error as e:
             logger.error("while setting %s, %s: %s" % (attrib, type(e), e))
@@ -339,8 +340,8 @@ class SetupDb(BaseDb):
 
     def _getter_bool(self, attrib: str) -> bool:
         # logger.error("bool attrib: %s" % type(attrib))
-        r = self.conn.execute(""" SELECT """ + attrib + """ FROM general WHERE id=? """,
-                              (self.active_setup_id,)).fetchone()
+        r = self.c.execute(""" SELECT """ + attrib + """ FROM general WHERE id=? """,
+                           (self.active_setup_id,)).fetchone()
         # logger.info("%s = %s" % (attrib, r[0]))
         if isinstance(r[0], str):
             return r[0] == "True"
@@ -348,34 +349,25 @@ class SetupDb(BaseDb):
             return r[0] == 1
 
     def _setter_bool(self, attrib: str, value: bool) -> None:
-
-        # required to check whether we are using the old str boolean
-        r = self.conn.execute(""" SELECT """ + attrib + """ FROM general WHERE id=? """,
-                              (self.active_setup_id,)).fetchone()
-        # logger.info("%s = %s" % (attrib, r[0]))
-        if isinstance(r[0], str):
-            is_str = True
-        else:
-            is_str = False
-
-        if value:
-            if is_str:
-                value = "True"
-            else:
-                value = 1
-        else:
-            if is_str:
-                value = "False"
-            else:
-                value = 0
-
         try:
-            self.conn.execute(""" UPDATE general SET """ + attrib + """=? WHERE id=? """,
-                              (value, self.active_setup_id,))
+            # required to check whether we are using the old str boolean
+            r = self.c.execute(f"SELECT {attrib} FROM general WHERE id=?",
+                               (self.active_setup_id,)).fetchone()
+            if r is None:
+                raise RuntimeError(f"Unable to find setup id {self.active_setup_id}")
+
+            # Keep compatibility with old databases storing booleans as strings.
+            if isinstance(r[0], str):
+                db_value = "True" if value else "False"
+            else:
+                db_value = int(value)
+
+            self.c.execute(f"UPDATE general SET {attrib}=? WHERE id=?",
+                           (db_value, self.active_setup_id))
             self.commit()
         except sqlite3.Error as e:
             logger.error("while setting %s, %s: %s" % (attrib, type(e), e))
-        # logger.info("%s = %s" % (attrib, value))
+            raise
 
     # --- active library version
     @property
@@ -605,9 +597,10 @@ class SetupDb(BaseDb):
 
     @nmea_listen_timeout.setter
     def nmea_listen_timeout(self, value: int) -> None:
-        self._setter_int("nmea_listen_timeout", value)        
+        self._setter_int("nmea_listen_timeout", value)
 
-    # --- mvp_ip_address
+        # --- mvp_ip_address
+
     @property
     def mvp_ip_address(self) -> str:
         return self._getter_str("mvp_ip_address")

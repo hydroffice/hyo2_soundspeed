@@ -30,8 +30,7 @@ logger = logging.getLogger(__name__)
 
 class RegOfs(AbstractAtlas):
 
-    def __init__(self, data_folder: str, prj: 'SoundSpeedLibrary',
-                 model: RegOfsModel) -> None:
+    def __init__(self, data_folder: str, prj: 'SoundSpeedLibrary', model: RegOfsModel) -> None:
         super().__init__(data_folder=data_folder, prj=prj)
         self.model: RegOfsModel = model
         self.name: str = model.name
@@ -45,9 +44,9 @@ class RegOfs(AbstractAtlas):
 
         self._has_data_loaded: bool = False  # grids are "loaded" ? (netCDF files are opened)
         self._last_loaded_day: datetime = datetime(1900, 1, 1)  # some silly day in the past
-        self._file = None
+        self._file: Dataset | None = None
         self._day_idx: int | None = None
-        self._d = None
+        self._d: typing.NDArray | None = None
         self._lat: typing.NDArray | None = None
         self._lon: typing.NDArray | None = None
         self._lat_step: float | None = None
@@ -56,6 +55,30 @@ class RegOfs(AbstractAtlas):
         self._lon_step: float | None = None
         self._lon_min: float | None = None
         self._lon_max: float | None = None
+
+    @property
+    def file(self) -> Dataset:
+        if self._file is None:
+            raise RuntimeError("_file is unset")
+        return self._file
+
+    @property
+    def d(self) -> typing.NDArray:
+        if self._d is None:
+            raise RuntimeError("_d is unset")
+        return self._d
+
+    @property
+    def lat(self) -> typing.NDArray:
+        if self._lat is None:
+            raise RuntimeError("_lat is unset")
+        return self._lat
+
+    @property
+    def lon(self) -> typing.NDArray:
+        if self._lon is None:
+            raise RuntimeError("_lon is unset")
+        return self._lon
 
     @property
     def lat_step(self) -> float:
@@ -119,36 +142,31 @@ class RegOfs(AbstractAtlas):
             logger.critical("while converting location to grid coords, %s" % e)
             return None
 
-        ocean_time = self._file.variables['time']
+        ocean_time = self.file.variables['time']
         datetime_retrieved = num2date(ocean_time[0], units=ocean_time.units, calendar=ocean_time.calendar)
         logger.debug(("Query datetime: %s" % datestamp.isoformat()))
         logger.debug("Retrieved datetime: %s" % datetime_retrieved.isoformat())
-
-        if self._lon is None:
-            raise RuntimeError("_lon is unset")
-        if self._lat is None:
-            raise RuntimeError("_lat is unset")
 
         logger.debug("idx > lat: %s, lon: %s" % (lat_idx, lon_idx))
         lat_s_idx = lat_idx - self._search_half_window
         if lat_s_idx < 0:
             lat_s_idx = 0
         lat_n_idx = lat_idx + self._search_half_window
-        if lat_n_idx >= self._lat.shape[0]:
-            lat_n_idx = self._lat.shape[0] - 1
+        if lat_n_idx >= self.lat.shape[0]:
+            lat_n_idx = self.lat.shape[0] - 1
         lon_w_idx = lon_idx - self._search_half_window
         if lon_w_idx < 0:
             lon_w_idx = 0
         lon_e_idx = lon_idx + self._search_half_window
-        if lon_e_idx >= self._lon.shape[1]:
-            lon_e_idx = self._lon.shape[1] - 1
+        if lon_e_idx >= self.lon.shape[1]:
+            lon_e_idx = self.lon.shape[1] - 1
         # logger.info("indices -> %s %s %s %s" % (lat_s_idx, lat_n_idx, lon_w_idx, lon_e_idx))
         lat_search_window = lat_n_idx - lat_s_idx + 1
         lon_search_window = lon_e_idx - lon_w_idx + 1
         logger.info("updated search window: (%s, %s)" % (lat_search_window, lon_search_window))
 
         # Need +1 on the north and east indices since it is the "stop" value in these slices
-        t = self._file.variables['temp'][self._day_idx, :][..., lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
+        t = self.file.variables['temp'][self._day_idx, :, lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
         # logger.debug('t shape: %s' % (t.shape, ))
         # https://ponce.sdsu.edu/lakesalinityworld.html#:~:text=The%20salinity%20of%20Lake%20Superior,between%200.05%20and%200.60%20ppt.
         if self.model == RegOfsModel.LEOFS:
@@ -160,7 +178,7 @@ class RegOfs(AbstractAtlas):
         elif self.model == RegOfsModel.LSOFS:
             s = full_like(t, 0.06)
         else:
-            s = self._file.variables['salt'][self._day_idx, :][..., lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
+            s = self.file.variables['salt'][self._day_idx, :, lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
         # Set 'unfilled' elements to NANs (BUT when the entire array has valid data, it returns numpy.ndarray)
         if isinstance(t, ma.core.MaskedArray):
             t_mask = t.mask
@@ -172,10 +190,10 @@ class RegOfs(AbstractAtlas):
             s[s_mask] = nan
 
         # Calculate distances from requested position to each of the grid node locations
-        distances = zeros((self._d.size, lon_search_window, lat_search_window))
+        distances = zeros((self.d.size, lon_search_window, lat_search_window))
         # logger.debug('distances shape: %s' % (distances.shape,))
-        longitudes = self._lon[lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
-        latitudes = self._lat[lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
+        longitudes = self.lon[lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
+        latitudes = self.lat[lat_s_idx:lat_n_idx + 1, lon_w_idx:lon_e_idx + 1]
 
         for i in range(lat_search_window):
 
@@ -193,12 +211,12 @@ class RegOfs(AbstractAtlas):
         # logger.info("distance array:\n%s" % distances[0])
 
         # Spin through all the depth levels
-        temp_pot = zeros(self._d.size)
-        temp_in_situ = zeros(self._d.size)
-        d = zeros(self._d.size)
-        sal = zeros(self._d.size)
+        temp_pot = zeros(self.d.size)
+        temp_in_situ = zeros(self.d.size)
+        d = zeros(self.d.size)
+        sal = zeros(self.d.size)
         num_values = 0
-        for i in range(self._d.size):
+        for i in range(self.d.size):
 
             t_level = t[i]
             s_level = s[i]
@@ -222,7 +240,7 @@ class RegOfs(AbstractAtlas):
 
             temp_pot[i] = t_closest
             sal[i] = s_closest
-            d[i] = self._d[i]
+            d[i] = self.d[i]
 
             # Calculate in-situ temperature
             p = Oc.d2p(d[i], lat)
@@ -297,9 +315,9 @@ class RegOfs(AbstractAtlas):
 
         try:
             # Now get latitudes, longitudes and depths for x,y,z referencing
-            self._d = self._file.variables['Depth'][:]
-            self._lat: typing.NDArray = self._file.variables['Latitude'][:]
-            self._lon: typing.NDArray = self._file.variables['Longitude'][:]
+            self._d: typing.NDArray = self.file.variables['Depth'][:]
+            self._lat: typing.NDArray = self.file.variables['Latitude'][:]
+            self._lon: typing.NDArray = self.file.variables['Longitude'][:]
             # logger.debug('d:(%s)\n%s' % (self._d.shape, self._d))
             # logger.debug('lat:(%s)\n%s' % (self._lat.shape, self._lat))
             # logger.debug('lon:(%s)\n%s' % (self._lon.shape, self._lon))
@@ -309,17 +327,12 @@ class RegOfs(AbstractAtlas):
             self.clear_data()
             return False
 
-        if self._lon is None:
-            raise RuntimeError("_lon is unset")
-        if self._lat is None:
-            raise RuntimeError("_lat is unset")
-
-        self._lat_min = self._lat[0, 0]
-        self._lat_max = self._lat[-1, 0]
-        self._lat_step = self._lat[1, 0] - self.lat_min
-        self._lon_min = self._lon[0, 0]
-        self._lon_max = self._lon[0, -1]
-        self._lon_step = self._lon[0, 1] - self.lon_min
+        self._lat_min = self.lat[0, 0]
+        self._lat_max = self.lat[-1, 0]
+        self._lat_step = self.lat[1, 0] - self.lat_min
+        self._lon_min = self.lon[0, 0]
+        self._lon_max = self.lon[0, -1]
+        self._lon_step = self.lon[0, 1] - self.lon_min
 
         logger.debug("0(%.3f, %.3f); -1(%.3f, %.3f); step(%.3f, %.3f)"
                      % (self.lat_min, self.lon_min, self.lat_max, self.lon_max, self.lat_step, self.lon_step))
@@ -378,7 +391,7 @@ class RegOfs(AbstractAtlas):
         """Delete the data and reset the last loaded day"""
         logger.debug("clearing data")
         if self._has_data_loaded:
-            if self._file:
+            if self._file is not None:
                 self._file.close()
             self._file = None
             self._lat = None

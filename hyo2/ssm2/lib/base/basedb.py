@@ -38,6 +38,12 @@ class BaseDb(metaclass=ABCMeta):
         self.db_path: str = db_path
         self.conn: sqlite3.Connection | None = None
 
+    @property
+    def c(self) -> sqlite3.Connection:
+        if self.conn is None:
+            raise RuntimeError("Missing db connection")
+        return self.conn
+
     def check_table_total_rows(self, table_name: str, print_out: bool = False) -> int:
         """ Returns the total number of rows in the database """
         table_name = BaseDb.clean_name(table_name)
