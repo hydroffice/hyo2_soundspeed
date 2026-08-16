@@ -173,7 +173,7 @@ class TestSoundSpeedSetupDb(unittest.TestCase):
         self.assertEqual(db.sis_listen_timeout, 999)
         db.sis_listen_port = 999
         self.assertEqual(db.sis_listen_port, 999)
-        db.sis_auto_apply_manual_casts = "True"
+        db.sis_auto_apply_manual_casts = True
         self.assertTrue(db.sis_auto_apply_manual_casts)
         db.close()
 
@@ -217,7 +217,7 @@ class TestSoundSpeedSetupDb(unittest.TestCase):
         db = SetupDb(data_folder=self.data_folder, db_file=self.db_name)
         db.server_source = "WOA13"
         self.assertEqual(db.server_source, "WOA13")
-        db.server_apply_surface_sound_speed = "True"
+        db.server_apply_surface_sound_speed = True
         self.assertTrue(db.server_apply_surface_sound_speed)
         db.close()
 

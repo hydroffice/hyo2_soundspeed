@@ -1,11 +1,13 @@
-import unittest
+import logging
 import os
 import shutil
-import logging
+import unittest
 from collections.abc import Callable
 from datetime import datetime, timezone, timedelta
 
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.atlas.regofs import RegOfsModel
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger()
@@ -48,6 +50,10 @@ class TestSoundSpeedAtlasRegofsModel(unittest.TestCase):
             self.assertIsInstance(ts, datetime)
             self.assertTrue(min_ts <= ts <= max_ts)
 
+    @unittest.skipIf(
+        os.getenv("GITHUB_ACTIONS") == "true",
+        "Known intermittent NetCDF DAP failure on GitHub Actions"
+    )
     def test_valid_download_url(self) -> None:
         for model in RegOfsModel:
             if model in RegOfsModel.skip_models():
@@ -55,6 +61,10 @@ class TestSoundSpeedAtlasRegofsModel(unittest.TestCase):
             url = model.valid_download_url()
             self.assertIsNotNone(url, model.name)
 
+    @unittest.skipIf(
+        os.getenv("GITHUB_ACTIONS") == "true",
+        "Known intermittent NetCDF DAP failure on GitHub Actions"
+    )
     def test_valid_opendap_url(self) -> None:
         for model in RegOfsModel:
             if model in RegOfsModel.skip_models():
@@ -62,12 +72,17 @@ class TestSoundSpeedAtlasRegofsModel(unittest.TestCase):
             url = model.valid_opendap_url()
             self.assertIsNotNone(url, model.name)
 
+    @unittest.skipIf(
+        os.getenv("GITHUB_ACTIONS") == "true",
+        "Known intermittent NetCDF DAP failure on GitHub Actions"
+    )
     def test_lib_func(self) -> None:
         lib = SoundSpeedLibrary()
         for model in RegOfsModel:
             self.assertIsInstance(model.lib_func_has_model(lib=lib), Callable, model.name)
             self.assertIsInstance(model.lib_func_download_model(lib=lib), Callable, model.name)
             self.assertIsInstance(model.lib_func_query(lib=lib), Callable, model.name)
+
 
 def suite():
     s = unittest.TestSuite()

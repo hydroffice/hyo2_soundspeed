@@ -28,8 +28,11 @@ jobs:
         conda install appdirs beautifulsoup4 cartopy gdal matplotlib-base numpy=1.* psutil pyproj qt-material tqdm flake8 coveralls pyyaml pytest pytest-cov
         conda install gsw netCDF4 pillow pyserial scipy
         pip install PySide6
+        
         sudo apt-get install -y libegl1
+        
         pip install --no-deps https://github.com/hydroffice/hyo2_abc2/archive/master.zip
+        
         pip install --no-deps .
 
     - name: Lint with flake8

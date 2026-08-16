@@ -25,13 +25,28 @@ jobs:
 
     - name: Install dependencies
       run: |
-        conda install -y appdirs beautifulsoup4 cartopy gdal matplotlib-base numpy=1.* psutil pyproj qt-material tqdm flake8 coveralls pyyaml pytest pytest-cov
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-        conda install -y gsw netCDF4 pillow pyserial scipy
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-        
-        pip install PySide6
+        conda install -y `
+          appdirs `
+          beautifulsoup4 `
+          cartopy `
+          gdal `
+          matplotlib-base `
+          numpy=1.* `
+          psutil `
+          pyproj `
+          pyside6 `
+          qt-material `
+          tqdm `
+          flake8 `
+          coveralls `
+          pyyaml `
+          pytest `
+          pytest-cov `
+          gsw `
+          netCDF4 `
+          pillow `
+          pyserial `
+          scipy
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         
         pip install --no-deps https://github.com/hydroffice/hyo2_abc2/archive/master.zip
@@ -39,6 +54,11 @@ jobs:
         
         pip install --no-deps .
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+    - name: Check Qt
+      run: |
+        python -c "from PySide6 import QtCore; print('PySide6:', QtCore.__version__); print('Qt:', QtCore.qVersion())"
+        python -c "from PySide6 import QtWidgets; print('QtWidgets OK')"
 
     - name: Lint with flake8
       run: |
