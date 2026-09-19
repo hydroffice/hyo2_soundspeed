@@ -32,6 +32,7 @@ class Sippican(AbstractTextReader):
         Dicts.probe_types["XCTD-4"]: Dicts.sensor_types["XCTD"],
         Dicts.probe_types["AXCTD-1"]: Dicts.sensor_types["XCTD"],
         Dicts.probe_types["Fast Deep"]: Dicts.sensor_types["XBT"],
+        Dicts.probe_types["T-11"]: Dicts.sensor_types["XBT"],
     }
 
     def __init__(self):

@@ -83,6 +83,7 @@ class Dicts:
         ('XCTD-3', 216),
         ('XCTD-4', 217),
         ('AXCTD-1', 218),
+        ('T-11', 219),
 
         ('MONITOR SVP 500', 300),
         ('MIDAS SVP 6000', 301),
