@@ -276,7 +276,11 @@ class SeacatDialog(AbstractDialog):
                 try:
                     dt_now = datetime.datetime.now(datetime.UTC)
                     dt = cat.get_datetime()  # Get time refreshes the Status message -- voltages are included in status
-                    diff = dt_now - dt
+                    try:
+                        diff = dt_now - dt
+                    except:
+                        dt = dt.astimezone(datetime.UTC)
+                        diff = dt_now - dt
                     # see if time is more than 3 minutes off
                     b_set_time = False
                     if diff > datetime.timedelta(0, 3 * 60) or diff < datetime.timedelta(0, -3 * 60):
