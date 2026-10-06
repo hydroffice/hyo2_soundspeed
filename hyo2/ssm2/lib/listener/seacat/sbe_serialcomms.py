@@ -389,7 +389,10 @@ class SeacatComms:
                 fname = os.path.join(path, "%04d_%03d_%02d%02d%02d.HEX" % (self.get_cast_time(n)))
                 fname = MakeUniqueFilename(fname)[0]
                 logger.info("Saving cast %d to %s\n" % (n, fname))
-                f = open(fname, 'wb')
+                try:
+                    f = open(fname, 'wb')
+                except:
+                    f = open(os.path.normpath(fname), 'wb')
 
                 def WriteHeaderLines(data):
                     for line in data.splitlines(True):
