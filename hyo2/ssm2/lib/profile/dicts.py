@@ -63,6 +63,7 @@ class Dicts:
         ('SST-CTD', 121),  # SeaAndSun
         ('SST-CTP', 122),  # SeaAndSun
         ('SST-MEM', 123),  # SeaAndSun
+        ('NEMO', 124),
 
         ('Deep Blue', 200),
         ('T-10', 201),

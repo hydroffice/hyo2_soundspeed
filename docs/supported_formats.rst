@@ -29,6 +29,7 @@ Supported Formats
    Kongsberg absorption (.abs)                               X
    Kongsberg HiPAP (.usr)                                    X
    NCEI (.nc) [1]_                                           X
+   NEMO (.csv)                                          X
    QPS (.bsvp) [2]_                                          X
    OceanScience (.asc)                                  X
    RBR Ltd. (.txt)                                      X

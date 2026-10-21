@@ -1,11 +1,11 @@
 import datetime as dt
 import logging
 
-logger = logging.getLogger(__name__)
-
 from hyo2.ssm2.lib.formats.readers.abstract import AbstractTextReader
 from hyo2.ssm2.lib.profile.dicts import Dicts
 from hyo2.ssm2.lib.base.callbacks.cli_callbacks import CliCallbacks
+
+logger = logging.getLogger(__name__)
 
 
 class Castaway(AbstractTextReader):
@@ -15,7 +15,7 @@ class Castaway(AbstractTextReader):
     """
 
     def __init__(self):
-        super(Castaway, self).__init__()
+        super().__init__()
         self.desc = "Castaway"
         self.ext.add('csv')
 
@@ -58,7 +58,7 @@ class Castaway(AbstractTextReader):
         return True
 
     def _parse_header(self):
-        """Parsing header: field header, time, latitude, longitude"""
+        """Parsing header: field header, timestamp, latitude, longitude"""
         logger.debug('parsing header')
 
         # control flags
@@ -66,8 +66,6 @@ class Castaway(AbstractTextReader):
         has_speed = False
         has_temp = False
         has_sal = False
-        has_pressure = False
-        has_conductivity = False
         self.conductivity_ms_per_cm = False
 
         for line in self.lines:

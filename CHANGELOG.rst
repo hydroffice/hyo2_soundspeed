@@ -3,6 +3,12 @@ Changelog
 
 Main changes to Sound Speed Manager:
 
+Version 2026.3.7 (2026-10-21)
+-----------------------------
+
+- Added NEMO (.csv) driver
+
+
 Version 2026.3.0 (2026-06-28)
 -----------------------------
 

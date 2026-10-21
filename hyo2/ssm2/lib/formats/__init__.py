@@ -30,6 +30,8 @@ from hyo2.ssm2.lib.formats.readers.iss import Iss as IssReader
 # noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.formats.readers.mvp import Mvp as MvpReader
 # noinspection PyUnresolvedReferences
+from hyo2.ssm2.lib.formats.readers.nemo import NEMO as NEMOReader
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.formats.readers.oceanscience import OceanScience as OceanScienceReader
 # noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.formats.readers.rbr import RBR as RBRReader
@@ -96,6 +98,7 @@ readers.append(IdronautReader())
 readers.append(IssReader())
 readers.append(AsvpReader())
 readers.append(MvpReader())
+readers.append(NEMOReader())
 readers.append(OceanScienceReader())
 readers.append(RBRReader())
 readers.append(SaivReader())
