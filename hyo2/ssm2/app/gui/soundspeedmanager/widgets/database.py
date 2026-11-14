@@ -4,31 +4,50 @@ from typing import TYPE_CHECKING
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
+# noinspection PyUnresolvedReferences
+from hyo2.abc2.app.app_style.table_cell_delegate import TableCellDelegate
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.common_metadata_dialog import CommonMetadataDialog
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.export_multi_profile_dialog import ExportMultiProfileDialog
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.export_profile_metadata_dialog import ExportProfileMetadataDialog
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.export_single_profile_dialog import ExportSingleProfileDialog
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.import_data_dialog import ImportDataDialog
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.import_multi_profile_dialog import ImportMultiProfileDialog
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.metadata_dialog import MetadataDialog
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.plot_multi_profile_dialog import PlotMultiProfileDialog
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.plot_profiles_dialog import PlotProfilesDialog
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.project_new_dialog import ProjectNewDialog
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.project_rename_dialog import ProjectRenameDialog
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.project_switch_dialog import ProjectSwitchDialog
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.text_editor_dialog import TextEditorDialog
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.widgets.widget import AbstractWidget
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.profile.dicts import Dicts
 
 if TYPE_CHECKING:
+    # noinspection PyUnresolvedReferences
     from hyo2.ssm2.app.gui.soundspeedmanager.mainwin import MainWin
+    # noinspection PyUnresolvedReferences
     from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
 
 logger = logging.getLogger(__name__)
 
 
 class Database(AbstractWidget):
-    here = os.path.abspath(os.path.join(os.path.dirname(__file__)))  # to be overloaded
+    here = os.path.abspath(os.path.join(str(os.path.dirname(__file__))))  # to be overloaded
     media = os.path.join(here, os.pardir, 'media')
 
     def __init__(self, main_win: 'MainWin', lib: 'SoundSpeedLibrary') -> None:
@@ -70,6 +89,9 @@ class Database(AbstractWidget):
         self.ssp_list.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ssp_list.customContextMenuRequested.connect(self.make_context_menu)
         self.ssp_list.itemDoubleClicked.connect(self.load_profile)
+        # temporary workaround: https://github.com/UN-GCPDS/qt-material/issues/95
+        self._table_cell_delegate = TableCellDelegate(parent=self.ssp_list)
+        self.ssp_list.setItemDelegate(self._table_cell_delegate)
         hbox.addWidget(self.ssp_list)
 
         # - RIGHT COLUMN
@@ -341,7 +363,10 @@ class Database(AbstractWidget):
             # noinspection PyUnresolvedReferences
             menu.hovered.connect(handle_menu_hovered)
 
-        menu.exec(self.ssp_list.mapToGlobal(pos))
+        pnt = self.ssp_list.mapToGlobal(pos)
+        if isinstance(pnt, QtCore.QPointF):
+            pnt: QtCore.QPoint = pnt.toPoint()
+        menu.exec(pnt)
 
     def load_profile(self):
         logger.debug("user want to load a profile")
@@ -883,9 +908,10 @@ class Database(AbstractWidget):
                     item.setForeground(QtGui.QColor(200, 100, 100))
 
                 if not processed:
-                    item.setBackground(QtGui.QColor(200, 100, 100, 50))
+                    item.setBackground(QtGui.QBrush(QtGui.QColor(200, 100, 100, 20)))
 
                 item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignVCenter | QtCore.Qt.AlignmentFlag.AlignHCenter)
+                # noinspection PyTypeChecker
                 item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
 
                 self.ssp_list.setItem(i, j, item)

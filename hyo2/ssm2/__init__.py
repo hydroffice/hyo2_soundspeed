@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 name = "Sound Speed"
-__version__ = '2026.3.7'
+__version__ = '2026.4.0'
 __copyright__ = 'Copyright 2026 University of New Hampshire, Center for Coastal and Ocean Mapping'
 
 pkg_info = PkgInfo(

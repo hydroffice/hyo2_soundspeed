@@ -1,10 +1,13 @@
-import os
 import logging
+import os
 
 from PySide6 import QtCore, QtWidgets
 
+# noinspection PyUnresolvedReferences
 from hyo2.abc2.lib.package.pkg_helper import PkgHelper
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2 import pkg_info
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.dialog import AbstractDialog
 
 logger = logging.getLogger(__name__)
@@ -36,13 +39,13 @@ class ImportMultiProfileDialog(AbstractDialog):
         self.fmtLayout = QtWidgets.QHBoxLayout()
         self.importLayout.addLayout(self.fmtLayout)
         # -- left
-        self.leftButtonBox = QtWidgets.QDialogButtonBox(QtCore.Qt.Vertical)
+        self.leftButtonBox = QtWidgets.QDialogButtonBox(QtCore.Qt.Orientation.Vertical)
         self.fmtLayout.addWidget(self.leftButtonBox)
         # -- middle
-        self.midButtonBox = QtWidgets.QDialogButtonBox(QtCore.Qt.Vertical)
+        self.midButtonBox = QtWidgets.QDialogButtonBox(QtCore.Qt.Orientation.Vertical)
         self.fmtLayout.addWidget(self.midButtonBox)
         # -- right
-        self.rightButtonBox = QtWidgets.QDialogButtonBox(QtCore.Qt.Vertical)
+        self.rightButtonBox = QtWidgets.QDialogButtonBox(QtCore.Qt.Orientation.Vertical)
         self.fmtLayout.addWidget(self.rightButtonBox)
         # --- add buttons
         for idx, _ in enumerate(self.lib.name_readers):
@@ -55,11 +58,11 @@ class ImportMultiProfileDialog(AbstractDialog):
                                                         ", *.".join(self.lib.ext_readers[idx])))
             btn.setMinimumWidth(self.botton_min_width)
             if (idx % 3) == 0:
-                self.leftButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+                self.leftButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
             elif (idx % 3) == 1:
-                self.midButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+                self.midButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
             else:
-                self.rightButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ActionRole)
+                self.rightButtonBox.addButton(btn, QtWidgets.QDialogButtonBox.ButtonRole.ActionRole)
         # noinspection PyUnresolvedReferences
         self.leftButtonBox.clicked.connect(self.on_click_import)
         # noinspection PyUnresolvedReferences
@@ -79,8 +82,9 @@ class ImportMultiProfileDialog(AbstractDialog):
                   "This operation may OVERWRITE existing raw data \nin the database!" \
                   % desc
             # noinspection PyCallByClass,PyArgumentList
-            ret = QtWidgets.QMessageBox.warning(self, "Pre-processed source warning", msg,
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            ret = QtWidgets.QMessageBox.warning(
+                self, "Pre-processed source warning", msg,
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
             if ret == QtWidgets.QMessageBox.StandardButton.No:
                 return
 
@@ -89,7 +93,7 @@ class ImportMultiProfileDialog(AbstractDialog):
         settings = QtCore.QSettings()
         # noinspection PyCallByClass
         selections, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "Load data files",
-                                                               settings.value("import_folder"),
+                                                               str(settings.value("import_folder", "")),
                                                                flt)
         if len(selections) == 0:
             return
