@@ -304,6 +304,7 @@ class ImportSingleProfileDialog(AbstractDialog):
             QtWidgets.QMessageBox.critical(self, "Import error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
+        # Special case for format like CARIS that can contain multiple profiles
         if self.lib.ssp_list.nr_profiles > 1:
             ssp_list = list()
             for i, ssp in enumerate(self.lib.ssp_list.l):
@@ -312,7 +313,7 @@ class ImportSingleProfileDialog(AbstractDialog):
 
             sel, ok = QtWidgets.QInputDialog.getItem(self, 'Multiple profiles',
                                                      'Select a profile (if you want to import all of them,\n'
-                                                     'use the multi-import dialog in Database tab):',
+                                                     'use the Import Profiles dialog in the Database tab):',
                                                      ssp_list, 0, False)
 
             if sel and ok:

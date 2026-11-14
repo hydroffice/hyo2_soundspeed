@@ -728,14 +728,12 @@ class Database(AbstractWidget):
 
         self.main_win.switch_to_database_tab()
 
-        QtWidgets.QMessageBox.warning(self, "Warning about multi-profile import",
-                                      "The multi-profile dialog allows you to directly\n"
-                                      "import profiles into the database, BUT skipping\n"
-                                      "all the processing steps and the visual inspection!\n"
+        QtWidgets.QMessageBox.warning(self, "About importing multiple profiles",
+                                      "The dialog allows to directly import multiple profiles\n"
+                                      "into the database, BUT skipping visual inspection!\n"
                                       "\n"
-                                      "For your convenience, all the imported profiles are\n"
-                                      "highlighted in red until loaded for visual inspection\n"
-                                      "and saved back into the database.")
+                                      "All the imported profiles will be highlighted in red\n"
+                                      "until loaded in the Editor and save into the database.")
 
         dlg = ImportMultiProfileDialog(main_win=self.main_win, lib=self.lib, parent=self)
         dlg.exec()
