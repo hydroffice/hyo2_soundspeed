@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import TYPE_CHECKING
 
 from PySide6 import QtCore, QtWidgets
 
@@ -10,15 +11,23 @@ from hyo2.ssm2 import pkg_info
 # noinspection PyUnresolvedReferences
 from hyo2.ssm2.app.gui.soundspeedmanager.dialogs.dialog import AbstractDialog
 
+if TYPE_CHECKING:
+    # noinspection PyUnresolvedReferences
+    from hyo2.ssm2.app.gui.soundspeedmanager.mainwin import MainWin
+    # noinspection PyUnresolvedReferences
+    from hyo2.ssm2.app.gui.soundspeedmanager.widgets.database import Database
+    # noinspection PyUnresolvedReferences
+    from hyo2.ssm2.lib.soundspeed import SoundSpeedLibrary
+
 logger = logging.getLogger(__name__)
 
 
 class ImportMultiProfileDialog(AbstractDialog):
 
-    def __init__(self, main_win, lib, parent=None):
+    def __init__(self, main_win: 'MainWin', lib: 'SoundSpeedLibrary', parent: 'Database' = None):
         AbstractDialog.__init__(self, main_win=main_win, lib=lib, parent=parent)
 
-        self.setWindowTitle("Import multiple profiles")
+        self.setWindowTitle("Input profiles")
         self.botton_min_width = 80
 
         # outline ui
@@ -32,7 +41,7 @@ class ImportMultiProfileDialog(AbstractDialog):
         import_hbox = QtWidgets.QHBoxLayout()
         self.importLayout.addLayout(import_hbox)
         import_hbox.addStretch()
-        import_label = QtWidgets.QLabel("Cast formats:")
+        import_label = QtWidgets.QLabel("Import from file:")
         import_hbox.addWidget(import_label)
         import_hbox.addStretch()
         # - fmt layout

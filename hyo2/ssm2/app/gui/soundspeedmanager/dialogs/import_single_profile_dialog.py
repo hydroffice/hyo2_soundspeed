@@ -1,6 +1,7 @@
 import logging
 import os
 import traceback
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 from PySide6 import QtCore, QtWidgets
@@ -32,7 +33,7 @@ class ImportSingleProfileDialog(AbstractDialog):
     def __init__(self, main_win: 'MainWin', lib: 'SoundSpeedLibrary', parent: 'Editor') -> None:
         AbstractDialog.__init__(self, main_win=main_win, lib=lib, parent=parent)
 
-        self.setWindowTitle("Input data")
+        self.setWindowTitle("Input profile")
         self.botton_min_width = 80
 
         # outline ui
@@ -46,7 +47,7 @@ class ImportSingleProfileDialog(AbstractDialog):
         import_hbox = QtWidgets.QHBoxLayout()
         self.importLayout.addLayout(import_hbox)
         import_hbox.addStretch()
-        import_label = QtWidgets.QLabel("Import file:")
+        import_label = QtWidgets.QLabel("Import from file:")
         import_hbox.addWidget(import_label)
         import_hbox.addStretch()
         # - fmt layout
@@ -91,7 +92,7 @@ class ImportSingleProfileDialog(AbstractDialog):
         retrieve_hbox = QtWidgets.QHBoxLayout()
         self.retrieveLayout.addLayout(retrieve_hbox)
         retrieve_hbox.addStretch()
-        retrieve_label = QtWidgets.QLabel("Retrieve from:")
+        retrieve_label = QtWidgets.QLabel("Retrieve from source:")
         retrieve_hbox.addWidget(retrieve_label)
         retrieve_hbox.addStretch()
         # - retrieve Sources
@@ -387,397 +388,98 @@ class ImportSingleProfileDialog(AbstractDialog):
         self.accept()
 
     def on_click_woa09(self):
-        """Retrieve WOA09 data"""
-
         if not self.lib.setup.use_woa09:
             msg = "First activate the 'Use WOA09' option in Setup/Input tab"
             QtWidgets.QMessageBox.critical(self, "WOA09 not in use", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
-        self.progress.start(text="Retrieve WOA09")
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_woa09()
-
-        except RuntimeError as e:
-            msg = "Issue in importing the WOA09 data:\n\n> %s" % e
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("WOA09", self.lib.retrieve_woa09)
 
     def on_click_woa13(self):
-        """Retrieve WOA13 data"""
-
         if not self.lib.setup.use_woa13:
             msg = "First activate the 'Use WOA13' option in Setup/Input tab"
             QtWidgets.QMessageBox.critical(self, "WOA13 not in use", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
-        self.progress.start(text="Retrieve WOA13")
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_woa13()
-
-        except RuntimeError as e:
-            msg = "Issue in importing the WOA13 data:\n\n> %s" % e
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("WOA13", self.lib.retrieve_woa13)
 
     def on_click_woa18(self):
-        """Retrieve WOA18 data"""
-
         if not self.lib.setup.use_woa18:
             msg = "First activate the 'Use WOA18' option in Setup/Input tab"
             QtWidgets.QMessageBox.critical(self, "WOA18 not in use", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
-        self.progress.start(text="Retrieve WOA18")
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_woa18()
-
-        except RuntimeError as e:
-            msg = "Issue in importing the WOA18 data:\n\n> %s" % e
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("WOA18", self.lib.retrieve_woa18)
 
     def on_click_woa23(self):
-        """Retrieve WOA23 data"""
-
         if not self.lib.setup.use_woa23:
             msg = "First activate the 'Use WOA23' option in Setup/Input tab"
             QtWidgets.QMessageBox.critical(self, "WOA23 not in use", msg, QtWidgets.QMessageBox.StandardButton.Ok)
             return
 
-        self.progress.start(text="Retrieve WOA23")
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_woa23()
-
-        except RuntimeError as e:
-            msg = "Issue in importing the WOA23 data:\n\n> %s" % e
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("WOA23", self.lib.retrieve_woa23)
 
     def on_click_rtofs(self):
-        """Retrieve RTOFS data"""
-
-        self.progress.start(text="Retrieve RTOFS")
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_rtofs()
-
-        except RuntimeError as e:
-            msg = "Issue in importing the RTOFS data:\n\n> %s" % e
-            # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("RTOFS", self.lib.retrieve_rtofs)
 
     def on_click_cbofs(self):
         """Retrieve CBOFS"""
 
-        self.progress.start(text='Retrieve CBOFS')
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_cbofs()
-
-        except RuntimeError as e:
-            msg = 'Issue in importing the CBOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("CBOFS", self.lib.retrieve_cbofs)
 
     def on_click_sscofs(self):
-        """Retrieve SSCOFS"""
-
-        self.progress.start(text='Retrieve SSCOFS')
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_sscofs()
-
-        except RuntimeError as e:
-            msg = 'Issue in importing the SSCOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("SSCOFS", self.lib.retrieve_sscofs)
 
     def on_click_dbofs(self):
-        """Retrieve DBOFS"""
-
-        self.progress.start(text='Retrieve DBOFS')
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_dbofs()
-
-        except RuntimeError as e:
-            msg = 'Issue in importing the DBOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("DBOFS", self.lib.retrieve_dbofs)
 
     def on_click_gomofs(self):
-        """Retrieve RTOFS data"""
-
-        self.progress.start(text="Retrieve GoMOFS")
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_gomofs()
-
-        except RuntimeError as e:
-            msg = "Issue in importing the GoMOFS data:\n\n> %s" % e
-            # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("GoMOFS", self.lib.retrieve_gomofs)
 
     def on_click_leofs(self):
-        """Retrieve LEOFS data"""
-
-        self.progress.start(text="Retrieve LEOFS")
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_leofs()
-
-        except RuntimeError as e:
-            msg = "Issue in importing the LEOFS data:\n\n> %s" % e
-            # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("LEOFS", self.lib.retrieve_leofs)
 
     def on_click_lmhofs(self):
-        """Retrieve LMHOFS"""
-
-        self.progress.start(text='Retrieve LMHOFS')
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_lmhofs()
-
-        except RuntimeError as e:
-            msg = 'Issue in importing the LMHOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("LMHOFS", self.lib.retrieve_lmhofs)
 
     def on_click_loofs(self):
-        """Retrieve LOOFS"""
-
-        self.progress.start(text='Retrieve LOOFS')
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_loofs()
-
-        except RuntimeError as e:
-            msg = 'Issue in importing the LOOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("LOOFS", self.lib.retrieve_loofs)
 
     def on_click_lsofs(self):
-        """Retrieve LSOFS"""
-
-        self.progress.start(text='Retrieve LSOFS')
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_lsofs()
-
-        except RuntimeError as e:
-            msg = 'Issue in importing the LSOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("LSOFS", self.lib.retrieve_lsofs)
 
     def on_click_ngofs2(self):
-        """Retrieve NGOFS2"""
-
-        self.progress.start(text='Retrieve NGOFS2')
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_ngofs2()
-
-        except RuntimeError as e:
-            msg = 'Issue in importing the NGOFS2 data:\n\n> %s' % e
-            # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("NGOFS2", self.lib.retrieve_ngofs2)
 
     def on_click_nyofs(self):
-        """Retrieve NYOFS"""
-
-        self.progress.start(text='Retrieve NYOFS')
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_nyofs()
-
-        except RuntimeError as e:
-            msg = 'Issue in importing the NYOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("NYOFS", self.lib.retrieve_nyofs)
 
     def on_click_sfbofs(self):
-        """Retrieve SFBOFS"""
-
-        self.progress.start(text='Retrieve SFBOFS')
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_sfbofs()
-
-        except RuntimeError as e:
-            msg = 'Issue in importing the SFBOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("SFBOFS", self.lib.retrieve_sfbofs)
 
     def on_click_sjrofs(self):
-        """Retrieve SJROFS"""
-
-        self.progress.start(text='Retrieve SJROFS')
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_sjrofs()
-
-        except RuntimeError as e:
-            msg = 'Issue in importing the SJROFS data:\n\n> %s' % e
-            # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("SJROFS", self.lib.retrieve_sjrofs)
 
     def on_click_tbofs(self):
-        """Retrieve TBOFS"""
-
-        self.progress.start(text='Retrieve TBOFS')
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_tbofs()
-
-        except RuntimeError as e:
-            msg = 'Issue in importing the TBOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("TBOFS", self.lib.retrieve_tbofs)
 
     def on_click_wcofs(self):
-        """Retrieve WCOFS"""
-
-        self.progress.start(text='Retrieve WCOFS')
-        self.progress.update(value=30)
-
-        try:
-            self.lib.retrieve_wcofs()
-
-        except RuntimeError as e:
-            msg = 'Issue in importing the WCOFS data:\n\n> %s' % e
-            # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Receive error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
-            return
-
-        self.accept()
-        self.progress.end()
+        self._retrieve_atlas("WCOFS", self.lib.retrieve_wcofs)
 
     def on_click_offofs(self):
-        """Retrieve Regional OFS"""
+        self._retrieve_atlas("from .nc OFS", self.lib.retrieve_offofs)
 
-        self.progress.start(text='Retrieve from .nc OFS')
-        self.progress.update(value=30)
-
+    def _retrieve_atlas(self, label: str, retrieve: Callable[[], None]) -> None:
+        self.progress.start(text=f"Retrieve {label}")
         try:
-            self.lib.retrieve_offofs()
-
-        except RuntimeError as e:
-            msg = 'Issue in retrieving the regional OFS data:\n\n> %s' % e
-            # noinspection PyCallByClass,PyArgumentList
-            QtWidgets.QMessageBox.critical(self, "Retrieve error", msg, QtWidgets.QMessageBox.StandardButton.Ok)
-            self.progress.end()
+            try:
+                self.progress.update(value=30)
+                retrieve()
+            finally:
+                self.progress.end()
+        except RuntimeError as exc:
+            logger.exception("Failed to retrieve %s data", label)
+            QtWidgets.QMessageBox.critical(self, "Receive error", str(exc))
             return
 
         self.accept()
-        self.progress.end()
