@@ -1,3 +1,3 @@
-from hyo2.ssm2.app.gui.soundspeedmanager import gui
+from hyo2.ssm2.app.gui.soundspeedmanager import main
 
-gui.gui(use_sdm4=False)
+main.main()
