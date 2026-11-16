@@ -84,7 +84,7 @@ setup(
     long_description=(read("README.rst") + "\n\n\"\"\"\"\"\"\"\n\n" +
                       read("HISTORY.rst") + "\n\n\"\"\"\"\"\"\"\n\n" +
                       read("AUTHORS.rst") + "\n\n\"\"\"\"\"\"\"\n\n" +
-                      read(os.path.join("docs", "developer_guide_how_to_contribute.rst"))),
+                      read(os.path.join("docs", "dev_guide", "dev_guide_how_to_contribute.rst"))),
     url="https://github.com/hydroffice/hyo2_soundspeed",
     classifiers=[  # https://pypi.python.org/pypi?%3Aaction=list_classifiers
         'Development Status :: 5 - Production/Stable',
