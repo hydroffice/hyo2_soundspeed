@@ -1,24 +1,26 @@
 import logging
 import os
 
+# noinspection PyUnresolvedReferences
 from hyo2.abc2.lib.package.pkg_helper import PkgHelper
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.base.setup_db import SetupDb
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.base.setup_sql import setup_version
-from hyo2.ssm2.lib.profile.dicts import Dicts
+# noinspection PyUnresolvedReferences
 from hyo2.ssm2.lib.client.clientlist import ClientList
+# noinspection PyUnresolvedReferences
+from hyo2.ssm2.lib.profile.dicts import Dicts
 
 logger = logging.getLogger(__name__)
 
 
 class Setup:
-
     SUPPORTED_VERSION = setup_version
 
     @classmethod
     def are_updates_required(cls, db_path: str) -> bool:
-        # logger.debug("check if version updates are required for %s" % db_path)
         db = SetupDb(os.path.dirname(db_path))
-        # logger.debug(db.setup_version)
         if db.setup_version < cls.SUPPORTED_VERSION:
             return True
         return False
@@ -71,7 +73,7 @@ class Setup:
         self.use_mvp: bool | None = None
 
         # output
-        self.client_list = ClientList()
+        self.client_list: ClientList = ClientList()
 
         # listeners - sis
         self.sis_listen_port: int | None = None
@@ -149,15 +151,11 @@ class Setup:
 
     @property
     def db(self) -> SetupDb:
-        """Usually the data_folder is set when the project is instantiated, so this is safe"""
-        # logger.debug("release_folder: %s, use setup: %s" % (self.release_folder, self.use_setup_name))
-        return SetupDb(self.release_folder, use_setup_name=self.use_setup_name)
+        return SetupDb(data_folder=self.release_folder, use_setup_name=self.use_setup_name)
 
     def load_from_db(self, db_path: str | None = None) -> None:
         """Load/reload the setting from the setup db"""
-        # logger.info("*** > SETUP: loading ...")
 
-        # try:
         if db_path is None:
             db = self.db
         else:
@@ -210,7 +208,7 @@ class Setup:
 
         # listeners - nmea
         self.nmea_listen_port = db.nmea_listen_port
-        self.nmea_listen_timeout = db.nmea_listen_timeout        
+        self.nmea_listen_timeout = db.nmea_listen_timeout
 
         # listeners - mvp
         self.mvp_ip_address = db.mvp_ip_address
@@ -246,11 +244,6 @@ class Setup:
         self.auto_apply_default_metadata = db.auto_apply_default_metadata
 
         db.close()
-
-        # except Exception as e:
-        #     raise RuntimeError("while loading db setup, %s" % e)
-
-        # logger.info("*** > SETUP: loaded!")
 
     def save_to_db(self) -> None:
         """Save setup to db"""
@@ -303,7 +296,7 @@ class Setup:
 
             # listeners - nmea
             db.nmea_listen_port = self.nmea_listen_port
-            db.nmea_listen_timeout = self.nmea_listen_timeout            
+            db.nmea_listen_timeout = self.nmea_listen_timeout
 
             # listeners - mvp
             db.mvp_ip_address = self.mvp_ip_address
@@ -381,7 +374,7 @@ class Setup:
         msg += "      <sippican_listen_timeout: %s>\n" % self.sippican_listen_timeout
         msg += "    <listeners - nmea>\n"
         msg += "      <nmea_listen_port: %s>\n" % self.nmea_listen_port
-        msg += "      <nmea_listen_timeout: %s>\n" % self.nmea_listen_timeout        
+        msg += "      <nmea_listen_timeout: %s>\n" % self.nmea_listen_timeout
         msg += "    <listeners - mvp>\n"
         msg += "      <mvp_ip_address: %s>\n" % self.mvp_ip_address
         msg += "      <mvp_listen_port: %s>\n" % self.mvp_listen_port

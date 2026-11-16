@@ -63,12 +63,10 @@ logger = logging.getLogger(__name__)
 
 
 class SoundSpeedLibrary:
-    """Sound Speed library"""
 
     def __init__(self, data_folder: str | None = None,
                  callbacks: AbstractCallbacks = CliCallbacks(), progress: AbstractProgress = CliProgress()) -> None:
         """Initialization for the library"""
-        # logger.info("** > LIB: initializing ...")
 
         # callbacks
         self.cb: AbstractCallbacks = callbacks
@@ -87,21 +85,18 @@ class SoundSpeedLibrary:
         self._projects_folder: str | None = None
         self._outputs_folder: str | None = None
         self._logs_folder: str | None = None
-        # _noaa_project format OPR-Xnnn-XX-nn
-        self._noaa_project = None
-        self._noaa_project_validate = re.compile(r"^(OPR-[A-Z]\d{3}-[A-Z]{2}-\d{2})")
+        self._noaa_project: str | None = None  # format OPR-Xnnn-XX-nn
+        self._noaa_project_validate: re.Pattern = re.compile(r"^(OPR-[A-Z]\d{3}-[A-Z]{2}-\d{2})")
         self.set_folders(data_folder=data_folder)
 
         # load settings and other functionalities
-        self.setup = Setup(release_folder=self.release_folder)
-        self.atlases = Atlases(prj=self)
+        self.setup: Setup = Setup(release_folder=self.release_folder)
+        self.atlases: Atlases = Atlases(prj=self)
         self.check_custom_folders()
-        self.listeners = Listeners(prj=self)
+        self.listeners: Listeners = Listeners(prj=self)
         self.cb.sis_listener = self.listeners.sis  # to provide default values from SIS (if available)
         self.cb.nmea_listener = self.listeners.nmea  # to provide default values from NMEA (if available)
-        self.server = Server(prj=self)
-
-        # logger.info("** > LIB: initialized!")
+        self.server: Server = Server(prj=self)
 
     def check_custom_folders(self) -> None:
         # logger.info("Checking for custom folders")

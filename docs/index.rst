@@ -9,8 +9,9 @@ HydrOffice Sound Speed's documentation
     :numbered:
 	
     in_brief
-    user_manual
-    developer_guide
+    ssm/user_manual
+    cli/cli
+    dev_guide/dev_guide
     ssm_sis
     license
     credits

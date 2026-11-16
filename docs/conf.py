@@ -25,6 +25,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.coverage',
     'sphinx.ext.intersphinx',
+    'sphinxarg.ext',
     'sphinx_multiversion',
 ]
 
@@ -55,9 +56,9 @@ copyright = u'2026, CCOM/JHC,UNH'
 # built documents.
 #
 # The short X.Y version.
-version = '2026.3'
+version = '2026.4'
 # The full version, including alpha/beta/rc tags.
-release = '2026.3.7'
+release = '2026.4.1'
 
 numfig = True
 
