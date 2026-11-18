@@ -37,6 +37,16 @@ class Caris(AbstractTextWriter):
         # logger.debug('*** %s ***: done' % self.driver)
         return True
 
+    @classmethod
+    def format_caris_dms(cls, coordinate: float, degree_width: int) -> str:
+        sign = "-" if coordinate < 0.0 else ""
+        total_hundredths = round(abs(coordinate) * 360_000)
+        degrees, remainder = divmod(total_hundredths, 360_000)
+        minutes, remainder = divmod(remainder, 6_000)
+        seconds, hundredths = divmod(remainder, 100)
+
+        return f"{sign}{degrees:0{degree_width}d}:{minutes:02d}:{seconds:02d}.{hundredths:02d}"
+
     def _write_header(self) -> str:
         if self.fod is None:
             raise RuntimeError("FileManager is not set")
@@ -58,26 +68,28 @@ class Caris(AbstractTextWriter):
             date_string = "%s" % datetime.datetime.now().strftime("%Y-%j %H:%M:%S")
 
         # position
-        if not ssp.cur.meta.latitude or not ssp.cur.meta.longitude:
-            latitude = 0.0
-            longitude = 0.0
-        else:
-            latitude = ssp.cur.meta.latitude
-            longitude = ssp.cur.meta.longitude
-        while longitude > 180.0:
+        latitude = ssp.cur.meta.latitude
+        longitude = ssp.cur.meta.longitude
+
+        if latitude is None or longitude is None:
+            latitude, longitude = 0.0, 0.0
+
+        if not (math.isfinite(latitude) and math.isfinite(longitude)):
+            raise ValueError("CARIS SVP coordinates must be finite.")
+
+        if not -90.0 <= latitude <= 90.0:
+            raise ValueError(f"Latitude out of range: {latitude}")
+
+        longitude = math.fmod(longitude, 360.0)
+        if longitude > 180.0:
             longitude -= 360.0
+        elif longitude < -180.0:
+            longitude += 360.0
 
-        abs_lat = math.fabs(latitude)
-        lat_min = int(60 * (abs_lat - int(abs_lat)))
-        lat_sec = 3600 * (abs_lat - int(abs_lat) - lat_min / 60.0)
-        abs_lon = math.fabs(longitude)
-        lon_min = int(60 * (abs_lon - int(abs_lon)))
-        lon_sec = 3600 * (abs_lon - int(abs_lon) - lon_min / 60.0)
+        latitude_dms = self.format_caris_dms(coordinate=latitude, degree_width=2)
+        longitude_dms = self.format_caris_dms(coordinate=longitude, degree_width=3)
 
-        position_string = "{0:02d}:{1:02d}:{2:05.2f} {3:02d}:{4:02d}:{5:05.2f}".format(int(latitude),
-                                                                                       lat_min, lat_sec,
-                                                                                       int(longitude),
-                                                                                       lon_min, lon_sec)
+        position_string = f"{latitude_dms} {longitude_dms}"
 
         header += "Section " + date_string + " " + position_string + "\r\n"
         self.fod.io.write(header)
